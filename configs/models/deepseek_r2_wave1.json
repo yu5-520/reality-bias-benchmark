@@ -1,0 +1,32 @@
+{
+  "config_version": "R2-W1-DEEPSEEK-v1",
+  "provider": "deepseek",
+  "base_url": "https://api.deepseek.com",
+  "endpoint": "/chat/completions",
+  "model_alias": "deepseek-v4-flash",
+  "expected_model_version": "DeepSeek-V4-Flash-0731",
+  "freeze_date_utc": "2026-09-14T17:10:00Z",
+  "subject": {
+    "thinking": "disabled",
+    "temperature": 0.2,
+    "max_tokens": 1200
+  },
+  "evaluator": {
+    "model_alias": "deepseek-v4-flash",
+    "thinking": "disabled",
+    "temperature": 0.0,
+    "max_tokens": 1200,
+    "blind_to_condition": true
+  },
+  "transport": {
+    "timeout_seconds": 120,
+    "max_retries": 3,
+    "retry_backoff_seconds": 2,
+    "max_workers": 6
+  },
+  "pricing_snapshot_usd_per_million_tokens": {
+    "source_date": "2026-09-15",
+    "off_peak": {"input_cache_hit": 0.007, "input_cache_miss": 0.22, "output": 0.66},
+    "peak": {"input_cache_hit": 0.014, "input_cache_miss": 0.44, "output": 1.32}
+  }
+}

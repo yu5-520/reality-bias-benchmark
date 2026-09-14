@@ -1,0 +1,15 @@
+{
+  "version": "R2-repeat-policy-v0.2",
+  "wave1_repeats": 3,
+  "default_extension_repeats": 5,
+  "max_without_protocol_change": 7,
+  "temperature_warning_threshold": 0.7,
+  "extension_triggers": [
+    "high within-cell variance or unstable binary realization pattern",
+    "wide confidence interval that prevents directional interpretation",
+    "condition ordering flips across the first 3 trials",
+    "temperature > 0.7 plus unstable outcomes",
+    "item-level outlier dominating the dimension aggregate"
+  ],
+  "principle": "Do not automatically increase all cells. Extend only unstable item×condition cells after Wave 1."
+}

@@ -1,0 +1,68 @@
+name: R2 Wave 1 Real Run
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r2-wave1.yml'
+      - 'configs/models/deepseek_r2_wave1.json'
+      - 'conditions/r2_conditions_v0.3.json'
+      - 'benchmark/r2_primary_mapping_items_v0.2.jsonl'
+      - 'manifests/r2_wave1_plan_v0.3.json'
+      - 'runners/run_r2_real.py'
+      - 'adapters/deepseek_chat.py'
+  workflow_dispatch:
+
+concurrency:
+  group: r2-wave1-real
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: API smoke test C/P/R
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python runners/run_r2_real.py --mode smoke --max-workers 3 --out results/smoke.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: r2-smoke-${{ github.run_id }}
+          path: results/smoke.jsonl
+          if-no-files-found: error
+
+  wave1:
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run 252 R2 Wave 1 cells
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python runners/run_r2_real.py --mode full --max-workers 6 --out results/r2_wave1_raw.jsonl
+      - name: Analyze Wave 1
+        run: |
+          python analysis/analyze_r2_real.py --input results/r2_wave1_raw.jsonl --outdir results/analysis
+          cat results/analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: r2-wave1-${{ github.run_id }}
+          path: |
+            results/r2_wave1_raw.jsonl
+            results/analysis/
+          if-no-files-found: error
+          retention-days: 90
