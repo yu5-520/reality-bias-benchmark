@@ -1,5 +1,5 @@
 {
-  "config_version": "R2-W1-DEEPSEEK-v1",
+  "config_version": "R2-W1-DEEPSEEK-v1.1",
   "provider": "deepseek",
   "base_url": "https://api.deepseek.com",
   "endpoint": "/chat/completions",
@@ -15,7 +15,7 @@
     "model_alias": "deepseek-v4-flash",
     "thinking": "disabled",
     "temperature": 0.0,
-    "max_tokens": 1200,
+    "max_tokens": 1800,
     "blind_to_condition": true
   },
   "transport": {
@@ -24,6 +24,7 @@
     "retry_backoff_seconds": 2,
     "max_workers": 6
   },
+  "json_format_retries": 3,
   "pricing_snapshot_usd_per_million_tokens": {
     "source_date": "2026-09-15",
     "off_peak": {"input_cache_hit": 0.007, "input_cache_miss": 0.22, "output": 0.66},

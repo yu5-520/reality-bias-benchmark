@@ -37,7 +37,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: r2-smoke-${{ github.run_id }}
-          path: results/smoke.jsonl
+          path: |
+            results/smoke.jsonl
+            results/json_format_retries.jsonl
           if-no-files-found: error
 
   wave1:
@@ -58,11 +60,15 @@ jobs:
         run: |
           python analysis/analyze_r2_real.py --input results/r2_wave1_raw.jsonl --outdir results/analysis
           cat results/analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4
+      - name: Upload Wave 1 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: r2-wave1-${{ github.run_id }}
           path: |
             results/r2_wave1_raw.jsonl
+            results/r2_wave1_raw.jsonl.errors.json
+            results/json_format_retries.jsonl
             results/analysis/
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 90
