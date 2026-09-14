@@ -1,0 +1,48 @@
+name: R2 Benchmark Trigger Calibration v0.4
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r2-calibration-v0.4.yml'
+      - 'benchmark/r2_primary_mapping_items_v0.4_calibration.jsonl'
+      - 'runners/run_r2_calibration_v04.py'
+  workflow_dispatch:
+
+concurrency:
+  group: r2-calibration-v0.4
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run 60 baseline calibration cells with evaluator v0.4
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python runners/run_r2_calibration_v04.py --repeats 5 --max-workers 6 --out results/r2_calibration_v0.4_raw.jsonl
+      - name: Analyze item trigger rates
+        run: |
+          python analysis/analyze_r2_calibration.py --input results/r2_calibration_v0.4_raw.jsonl --outdir results/r2_calibration_v0.4_analysis
+          cat results/r2_calibration_v0.4_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload calibration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-calibration-v0.4-${{ github.run_id }}
+          path: |
+            results/r2_calibration_v0.4_raw.jsonl
+            results/r2_calibration_v0.4_raw.jsonl.errors.json
+            results/json_format_retries.jsonl
+            results/r2_calibration_v0.4_analysis/
+          if-no-files-found: warn
+          retention-days: 90
