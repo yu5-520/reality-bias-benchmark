@@ -1,16 +1,6 @@
 name: R2 Wave 1 Real Run
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/r2-wave1.yml'
-      - 'configs/models/deepseek_r2_wave1.json'
-      - 'conditions/r2_conditions_v0.3.json'
-      - 'benchmark/r2_primary_mapping_items_v0.2.jsonl'
-      - 'manifests/r2_wave1_plan_v0.3.json'
-      - 'runners/run_r2_real.py'
-      - 'adapters/deepseek_chat.py'
   workflow_dispatch:
 
 concurrency:
@@ -59,6 +49,7 @@ jobs:
       - name: Analyze Wave 1
         run: |
           python analysis/analyze_r2_real.py --input results/r2_wave1_raw.jsonl --outdir results/analysis
+          python analysis/analyze_r2_primary_event.py --input results/r2_wave1_raw.jsonl --outdir results/primary_event_analysis
           cat results/analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
       - name: Upload Wave 1 evidence
         if: always()
@@ -70,5 +61,6 @@ jobs:
             results/r2_wave1_raw.jsonl.errors.json
             results/json_format_retries.jsonl
             results/analysis/
+            results/primary_event_analysis/
           if-no-files-found: warn
           retention-days: 90
