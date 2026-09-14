@@ -1,0 +1,61 @@
+name: R2 Rejudge Calibration with Evaluator v0.4
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r2-rejudge-v0.4.yml'
+      - 'evaluation/evaluator_v04.py'
+      - 'runners/rejudge_r2_calibration.py'
+  workflow_dispatch:
+
+concurrency:
+  group: r2-rejudge-v0.4
+  cancel-in-progress: false
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  rejudge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download frozen v0.3 calibration artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: r2-calibration-v0.3-34879965665
+          path: prior
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 34879965665
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rejudge exact 60 frozen subject outputs
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python runners/rejudge_r2_calibration.py \
+            --input prior/r2_calibration_v0.3_raw.jsonl \
+            --out results/r2_calibration_v0.3_rejudged_v0.4.jsonl \
+            --max-workers 6
+      - name: Analyze rejudged trigger rates
+        run: |
+          python analysis/analyze_r2_calibration.py \
+            --input results/r2_calibration_v0.3_rejudged_v0.4.jsonl \
+            --outdir results/r2_calibration_v0.3_rejudged_v0.4_analysis
+          cat results/r2_calibration_v0.3_rejudged_v0.4_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload rejudgment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-rejudge-v0.4-${{ github.run_id }}
+          path: |
+            results/r2_calibration_v0.3_rejudged_v0.4.jsonl
+            results/r2_calibration_v0.3_rejudged_v0.4.jsonl.errors.json
+            results/json_format_retries.jsonl
+            results/r2_calibration_v0.3_rejudged_v0.4_analysis/
+          if-no-files-found: warn
+          retention-days: 90
