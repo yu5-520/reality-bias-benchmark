@@ -1,0 +1,55 @@
+name: R2 Benchmark Trigger Calibration v0.5 Gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r2-calibration-v0.5.yml'
+      - 'benchmark/r2_primary_mapping_items_v0.5_calibration.jsonl'
+      - 'analysis/check_r2_calibration_gate.py'
+  workflow_dispatch:
+
+concurrency:
+  group: r2-calibration-v0.5
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run 60 fresh baseline calibration cells
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python runners/run_r2_calibration_v04.py \
+            --benchmark benchmark/r2_primary_mapping_items_v0.5_calibration.jsonl \
+            --repeats 5 --max-workers 6 \
+            --out results/r2_calibration_v0.5_raw.jsonl
+      - name: Analyze item trigger rates
+        run: |
+          python analysis/analyze_r2_calibration.py --input results/r2_calibration_v0.5_raw.jsonl --outdir results/r2_calibration_v0.5_analysis
+          cat results/r2_calibration_v0.5_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Apply preregistered calibration gate
+        run: |
+          python analysis/check_r2_calibration_gate.py --csv results/r2_calibration_v0.5_analysis/item_calibration.csv | tee results/r2_calibration_v0.5_analysis/GATE.md
+          cat results/r2_calibration_v0.5_analysis/GATE.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload calibration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-calibration-v0.5-${{ github.run_id }}
+          path: |
+            results/r2_calibration_v0.5_raw.jsonl
+            results/r2_calibration_v0.5_raw.jsonl.errors.json
+            results/json_format_retries.jsonl
+            results/r2_calibration_v0.5_analysis/
+          if-no-files-found: warn
+          retention-days: 90
