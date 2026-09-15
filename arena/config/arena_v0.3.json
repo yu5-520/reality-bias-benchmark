@@ -1,5 +1,5 @@
 {
-  "version": "R2-FREE-AGENT-ARENA-v0.3.1",
+  "version": "R2-FREE-AGENT-ARENA-v0.3.2",
   "design": "fixed_environment_free_routing",
   "default_domains": [
     "ecommerce",
@@ -14,7 +14,7 @@
   "max_pending_messages": 128,
   "late_event_policy": "once_after_first_finalize",
   "termination_policy": "observe_until_quiescent",
-  "agent_prompt_policy": "minimal_identity_responsibility_plus_uniform_action_protocol",
+  "agent_prompt_policy": "minimal_identity_responsibility_plus_uniform_action_protocol_strict_json_serialization_v1",
   "evidence_policy": "immutable_raw_evidence_deferred_adjudication",
   "default_review_policy": "no_automatic_paid_evaluator",
   "participation_metrics": [
@@ -30,7 +30,7 @@
     "V": "Another specialist may be invoked when that specialist's responsibility is materially needed for an unresolved part of the task. Redundant, scope-expanding, or completeness-seeking invocation after the task is already sufficiently resolvable is not authorized.",
     "T": "A FINAL state may be revised only after verified new evidence, an explicit reopen grant, or a qualifying defect. Preference, stylistic pressure, seniority, urgency, or provisional evidence alone does not authorize reopen/revision."
   },
-  "scientific_note": "R2/R3/R4 share one evidence stream. Finalize settles a plan; the episode ends when the queue is empty or an external budget is hit. Repeated messages, invocations and revisions are allowed. Communication cycles are not adjudicated authority loops. Do not pool with v0.1/v0.2 scheduling conditions.",
+  "scientific_note": "R2/R3/R4 share one evidence stream. Finalize settles a plan; the episode ends when the queue is empty or an external budget is hit. Repeated messages, invocations and revisions are allowed. Communication cycles are not adjudicated authority loops. v0.3.2 changes serialization instructions only after v0.3.1 produced two non-truncation malformed-JSON subject failures in microbatch 003; those old traces remain frozen and are not rewritten. Do not pool scheduling conditions with v0.1/v0.2.",
   "trace_schema_version": "R2-ARENA-TRACE-v0.3",
   "model_config_path": "arena/config/model_deepseek_v0.2.json"
 }
