@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reviewer_v2_mechanism_synthesis_v0.1.schema.json",
+  "title": "Reviewer v2 Event Mechanism Synthesis v0.1",
+  "type": "object",
+  "required": [
+    "synthesis_version",
+    "record_version",
+    "reviewer_id",
+    "target_ref",
+    "source_review_record_ids",
+    "authorization_judgment",
+    "C",
+    "P",
+    "R",
+    "unresolved",
+    "synthesis_id"
+  ],
+  "properties": {
+    "synthesis_version": {"const": "R234-MECHANISM-SYNTHESIS-v0.1"},
+    "record_version": {"const": "R234-EVENT-MECHANISM-SYNTHESIS-v0.1"},
+    "reviewer_id": {"type": ["string", "null"]},
+    "evidence_batch_hash": {"type": ["string", "null"]},
+    "target_ref": {"type": "string", "minLength": 1},
+    "source_review_record_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "authorization_judgment": {"enum": ["AUTHORIZED", "UNAUTHORIZED", "UNCERTAIN", "NOT_APPLICABLE", null]},
+    "C": {"$ref": "#/$defs/mechanismBlockC"},
+    "P": {"$ref": "#/$defs/mechanismBlockP"},
+    "R": {"$ref": "#/$defs/mechanismBlockR"},
+    "unresolved": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "synthesis_id": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "componentState": {"enum": ["YES", "NO", "UNCERTAIN", "NOT_APPLICABLE", "NOT_REVIEWED"]},
+    "overallState": {"enum": ["POSITIVE", "NEGATIVE", "UNCERTAIN", "NOT_APPLICABLE", "NOT_ESTIMABLE_WITH_AVAILABLE_LAYER"]},
+    "mechanismBlockC": {
+      "type": "object",
+      "required": ["local_realization", "inheritance", "regeneration", "precursor", "overall_presence", "subtypes"],
+      "properties": {
+        "local_realization": {"$ref": "#/$defs/componentState"},
+        "inheritance": {"$ref": "#/$defs/componentState"},
+        "regeneration": {"$ref": "#/$defs/componentState"},
+        "precursor": {"$ref": "#/$defs/componentState"},
+        "overall_presence": {"$ref": "#/$defs/overallState"},
+        "subtypes": {"type": "array", "items": {"enum": ["C_REALIZATION", "C_INHERITANCE", "C_REGENERATION", "C_PRECURSOR"]}, "uniqueItems": true}
+      },
+      "additionalProperties": false
+    },
+    "mechanismBlockP": {
+      "type": "object",
+      "required": ["scope_realization", "focus_realization", "local_regeneration", "overall_presence", "subtypes"],
+      "properties": {
+        "scope_realization": {"$ref": "#/$defs/componentState"},
+        "focus_realization": {"$ref": "#/$defs/componentState"},
+        "local_regeneration": {"$ref": "#/$defs/componentState"},
+        "overall_presence": {"$ref": "#/$defs/overallState"},
+        "subtypes": {"type": "array", "items": {"enum": ["P_SCOPE_REALIZATION", "P_FOCUS_REALIZATION", "P_REGENERATION"]}, "uniqueItems": true}
+      },
+      "additionalProperties": false
+    },
+    "mechanismBlockR": {
+      "type": "object",
+      "required": ["local_regeneration", "legitimation_candidate", "overall_presence", "subtypes", "warning"],
+      "properties": {
+        "local_regeneration": {"$ref": "#/$defs/componentState"},
+        "legitimation_candidate": {"$ref": "#/$defs/componentState"},
+        "overall_presence": {"$ref": "#/$defs/overallState"},
+        "subtypes": {"type": "array", "items": {"enum": ["R_REGENERATION", "R_LEGITIMATION_CANDIDATE_REQUIRES_R4"]}, "uniqueItems": true},
+        "warning": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}
