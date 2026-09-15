@@ -20,6 +20,7 @@ Research repository for the first Reality Bias paper:
   - current subject runtime is **v0.3.2**, which hardens JSON serialization and uses at most one audited format-recovery attempt while preserving the same v0.3 social/observation architecture.
   - Format Verify 005 passed transport: 32/32 subject calls were valid on the first response, but the episode reached the 32-turn observation cap with work still queued and is therefore `BUDGET_CENSORED`, not complete.
 - R2/R3/R4 are event, relation and feedback-loop audit layers over the same Arena evidence; they are not sequential subject-experiment phases.
+- R4 planning now separates **base fixed-window measurement** from an expensive **upper-bound loop-budget probe**. Initial K values are restricted to 2 then 4, with K=4 allowed only after a reviewed K=2 persistence/expansion/amplification candidate. No paid K run is currently active.
 - Evidence is captured during execution and audited asynchronously. Layer-specific Gates govern claims, not collection. Existing structural runs do not by themselves prove causal propagation or self-reinforcement.
 - Current research plan: [R Plan v2.0](docs/R_Plan_v2.0.md), registered by [CN-R-024](theory/change_notes/CN-R-024_structural_layers_async_audit.md).
 
@@ -30,6 +31,7 @@ Research repository for the first Reality Bias paper:
 - `arena/` — Free-Agent Arena runtime, evidence capture, objective metrics, structural views, review packet export and optional deferred-review adapters.
 - `arena/config/arena_v0.3.json` — current Arena v0.3.2 execution policy.
 - `arena/config/model_deepseek_v0.2.json` — current subject/evaluator transport and token-budget configuration.
+- `arena/config/loop_budget_policy_v0.1.json` — inactive R4 base/upper-bound policy registry; K=2/K=4 only in the initial staged design.
 - `schemas/evidence_batch_v0.2.schema.json` — immutable evidence-batch interface.
 - `schemas/review_record_v0.1.schema.json` — append-only human/model review interface.
 - `conditions/` — retained R2 condition definitions.
@@ -54,6 +56,19 @@ Raw evidence binds task/agent/model/config/code versions and hashes. Current tra
 System statistics are factual execution measurements. C/P/R, invocation necessity, semantic dependency, revision-basis sufficiency, authority penetration, self-reinforcement and decision impact are semantic adjudications. If no review exists, reports say `NOT_ADJUDICATED`; absence of a review record is never converted to a zero finding.
 
 `BUDGET_CENSORED` is a separate objective state: it means the observation window ended while the episode still had pending work. It is not converted to `RUN_COMPLETE`, and no convergence/non-convergence claim is extrapolated beyond the observed boundary.
+
+## Base measurement vs upper-bound loop budget
+
+The base and upper-bound studies have different jobs.
+
+- **Base fixed window:** current common horizon is 32 turns. It is used to establish reproducible event/relation measurement and fixed-horizon occurrence statements such as “observed by turn 32”.
+- **Upper-bound loop budget:** planned, not active. K counts only a future semantically blind `structural_feedback_round`; runtime must not use C/P/R, Authority-penetration labels or evaluator outputs to count K.
+- Initial paid sequence is strictly `BASE stable → K=2 → deferred review gate → optional K=4 → deferred review gate → STOP`.
+- K=4 requires at least one reviewed C/P/R dimension to show a persistence/expansion/amplification candidate after K=2.
+- A larger cumulative C/P/R count by itself does not qualify, because more K mechanically creates more observation opportunities. Qualified growth must appear in measures such as new reviewed events per round, affected Agents/fields, propagation depth or re-inheritance/reopen depth.
+- Any K greater than 4 requires a new Change Note and explicit cost review.
+
+Passing K=2/K=4 supports discovery wording such as persistence or amplification candidate. Causal self-reinforcement still requires later intervention evidence.
 
 ## Participation terminology
 
@@ -87,14 +102,19 @@ See:
 
 - [R Plan v2.0](docs/R_Plan_v2.0.md)
 - [R2–R4 shared runtime v0.3](docs/R234_runtime_v0.3.md)
+- [R2–R4 observation censoring policy v0.1](docs/R234_censoring_policy_v0.1.md)
+- [R4 upper-bound loop budget protocol v0.1](docs/R4_loop_budget_protocol_v0.1.md)
 - [R2–R4 v0.3.1 execution result](docs/R234_v0.3.1_execution_result.md)
 - [R2–R4 v0.3.1 Microbatch 003 result](docs/R234_v0.3.1_microbatch_003_result.md)
 - [R2–R4 v0.3.2 Format Verify 005](docs/R234_v0.3.2_format_verify_005_result.md)
+- [R2–R4 Format 005 censor-aware re-derivation](docs/R234_format005_censor_aware_rederive_result.md)
 - [R2 evidence and deferred review protocol v0.2](docs/R2_evidence_and_review_protocol_v0.2.md)
 - [R2 E-commerce micro-pilot report v0.2](docs/R2_ecommerce_micro_pilot_report_v0.2.md)
 - [CN-R-025 structural runtime v0.3](theory/change_notes/CN-R-025_structural_runtime_v03.md)
 - [CN-R-026 v0.3.1 serialization failure](theory/change_notes/CN-R-026_v031_microbatch_serialization_failure.md)
 - [CN-R-027 v0.3.2 serialization pass / censoring](theory/change_notes/CN-R-027_v032_serialization_pass_observation_censoring.md)
+- [CN-R-028 censor-aware R2–R4 analysis](theory/change_notes/CN-R-028_censor_aware_r234_analysis.md)
+- [CN-R-029 base then K2/K4 upper bound](theory/change_notes/CN-R-029_base_then_loop_budget_upper_bound.md)
 - [CN-R2-023 evidence-first deferred adjudication](theory/change_notes/CN-R2-023_evidence_first_deferred_adjudication.md)
 
 Mock/dry-run/scripted-provider outputs are engineering validation only and are not scientific evidence. Human and multi-model inter-rater reliability remain unmeasured unless explicitly reported from future review records.
