@@ -1,0 +1,93 @@
+name: R2-R4 Reviewer v2 R3 Dedup Offline Validate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'arena/optimize_reviewer_v2_r3_packets.py'
+      - 'arena/test_optimize_reviewer_v2_r3_packets.py'
+      - '.github/workflows/r234-reviewer-v2-r3-dedup-offline-validate.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Unit tests
+        run: python -m unittest arena.test_optimize_reviewer_v2_r3_packets
+
+      - name: Download validated compact packets v0.1
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34990393003
+          name: r234-reviewer-v2-compact-packets-34990393003
+          path: compact_v01
+
+      - name: Optimize R3 downstream-call representation
+        run: |
+          python -m arena.optimize_reviewer_v2_r3_packets \
+            --input compact_v01/compact_r3_packets.jsonl \
+            --output compact_r3_packets_v02.jsonl \
+            --summary r3_compaction_v02_summary.json
+
+      - name: Deterministic rebuild
+        run: |
+          python -m arena.optimize_reviewer_v2_r3_packets \
+            --input compact_v01/compact_r3_packets.jsonl \
+            --output compact_r3_packets_v02_rebuild.jsonl \
+            --summary r3_compaction_v02_rebuild_summary.json
+
+      - name: Safety and reduction gates
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          a = json.loads(Path('r3_compaction_v02_summary.json').read_text())
+          b = json.loads(Path('r3_compaction_v02_rebuild_summary.json').read_text())
+          assert a['version'] == 'R234-REVIEWER-V2-R3-COMPACT-v0.2'
+          assert a['packet_count'] == 70
+          assert a['output_hash'] == b['output_hash']
+          assert a['semantic_selection_used'] is False
+          assert a['semantic_labels_present'] is False
+          assert a['provider_calls'] == 0
+          assert a['bounded_expansion_preserved'] is True
+          assert a['reduction_fraction'] > 0.25, a
+
+          old = [json.loads(x) for x in Path('compact_v01/compact_r3_packets.jsonl').read_text().splitlines() if x.strip()]
+          new = [json.loads(x) for x in Path('compact_r3_packets_v02.jsonl').read_text().splitlines() if x.strip()]
+          assert len(old) == len(new) == 70
+          old_by = {x['packet_id']: x for x in old}
+          for row in new:
+              src = old_by[row['packet_id']]
+              assert row['machine_lineage'] == src['machine_lineage']
+              assert row['target_candidate'] == src['target_candidate']
+              assert row['target_call'] == src['target_call']
+              assert row['boundary_fields'] == src['boundary_fields']
+              assert row['context_expansion'] == src['context_expansion']
+              assert row['prior_reviewer_outputs_included'] is False
+              assert row['expected_mechanism_mapping_included'] is False
+              assert row['compaction_boundary']['semantic_selection_used'] is False
+              assert all('action' not in x for call in row['downstream_calls'] for x in call['output_event_refs'])
+          print(json.dumps(a, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload R3 v0.2 compact artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r234-reviewer-v2-r3-compact-v02-${{ github.run_id }}
+          path: |
+            compact_r3_packets_v02.jsonl
+            r3_compaction_v02_summary.json
+          retention-days: 90
