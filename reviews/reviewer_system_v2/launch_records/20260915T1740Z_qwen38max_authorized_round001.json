@@ -1,0 +1,63 @@
+{
+  "launch_record_version": "R234-INDEPENDENT-REVIEWER-V2-AUTHORIZED-LAUNCH-v0.1",
+  "status": "AUTHORIZED",
+  "execute_real_api": true,
+  "authorization_ref": "CHAT-2026-09-16-DIRECT-EXECUTE-QWEN-INDEPENDENT-REVIEWER-V2-ROUND001",
+  "authorized_at": "2026-09-15T17:40:00Z",
+  "authorization_scope": "One full 144-unit blind independent Reviewer-v2 replication using the frozen Qwen3.8-Max-0902 snapshot. No subject reruns, no K=2, no comparison before output freeze.",
+  "scientific_role": "INDEPENDENT_REVIEWER_V2_REPLICATION",
+  "evidence_batch_hash": "94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9",
+  "provider": {
+    "provider": "alibaba_cloud_bailian_business_space",
+    "model_family": "Qwen",
+    "model": "qwen3.8-max-0902",
+    "accepted_returned_model_values": ["qwen3.8-max-0902"],
+    "transport_smoke_run_id": 35001647574,
+    "different_from_deepseek_family": true
+  },
+  "blind_bundle_binding": {
+    "bundle_version": "R234-INDEPENDENT-REVIEWER-V2-BLIND-BUNDLE-v0.1",
+    "bundle_hash": "fc46e673c0d21bff9e30ca97a197c3b9dd04c27bf69ba0f3e07849ee6d00638e",
+    "artifact_id": 10406569694,
+    "artifact_digest": "sha256:0defe71e372440bdcea9f5fe6b2bfc3d8fa7b9a0eea569de56cdc89e44739c5e",
+    "population": {"R2": 70, "R3": 70, "R4": 4, "total": 144},
+    "expansion_corpus_sha256": "9ef68ef54a56f50ba81e8a9cca2d0eb1ab33ff7e4b2d4d0de1ace757666b24a3"
+  },
+  "packet_hashes": {
+    "R2": "c23522f9916530b4a342c2fd4b2cc028bb8613d0b8626cdc0d76ed9bc1ded63f",
+    "R3": "7cbe61987172f6dd2fa6f547766c145ddf8782d5fc7ec1bf3762b06fb0db0151",
+    "R4": "fe0a7d24a2d8fa4f102da9883529bebbcef9be0397057f3b8a23230754ee393a"
+  },
+  "prompt_hashes": {
+    "R2": "88cc842ea12030530abd43563b8d6c9d6fb82ef25f997bcd9f55831c4794a924",
+    "R3": "e3b2aaafb0ac344b9d92ce3b0c8e0b0dd1fe2693a78b773c5bb3afd8e432373d",
+    "R4": "626ace9b857e352380801eb4d125d387af97953ee184b692aa9981b0b2ed12af"
+  },
+  "model_config_sha256": "75073ff34a6b32208620cad0ac61eaefd5b9b94a2b263ef799b882ba87504ae6",
+  "runtime_policy": {
+    "max_workers": 1,
+    "malformed_output_retries_max": 2,
+    "context_expansion_max_per_packet": 1,
+    "semantic_uncertainty_retry": false,
+    "subject_rerun_on_reviewer_failure": false,
+    "preserve_partial_review_records": true,
+    "comparison_before_full_freeze": false
+  },
+  "spend_policy": {
+    "currency": "CNY",
+    "price_snapshot_source_date": "2026-09-16",
+    "input_cny_per_million_tokens": 12.0,
+    "output_including_reasoning_cny_per_million_tokens": 36.0,
+    "cache_discount_used_for_ceiling": false,
+    "launch_max_spend_cny": 100.0,
+    "repository_level_absolute_ceiling_cny": 100.0
+  },
+  "execution_binding": {
+    "runner_version": "R234-REVIEWER-V2-BAILIAN-QWEN-ROUND-v0.1",
+    "runner": "arena/run_reviewer_v2_bailian_qwen_round.py",
+    "workflow": ".github/workflows/r234-reviewer-v2-bailian-qwen-one-round.yml",
+    "subject_rerun_authorized": false,
+    "k2_authorized": false
+  },
+  "immutability_rule": "This launch record is immutable after creation. Provider outputs must be frozen before any DeepSeek-v2 comparison is performed."
+}
