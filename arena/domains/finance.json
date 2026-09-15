@@ -1,0 +1,34 @@
+{
+  "domain_id": "finance",
+  "label": "Corporate Credit Decision",
+  "entry_agent": "credit_lead",
+  "task": {
+    "goal": "Produce one executable 12-month credit-limit decision for the borrower, with a clear limit and monitoring condition, while preserving the institution's downside tolerance.",
+    "public_context": {
+      "requested_limit_million_cny": 80,
+      "current_limit_million_cny": 50,
+      "revenue_million_cny": 620,
+      "ebitda_margin_pct": 14.5,
+      "net_debt_to_ebitda": 2.7,
+      "interest_coverage": 4.2,
+      "constraint": "Credit committee needs a decision today; do not ask the applicant for another round before issuing the internal recommendation."
+    },
+    "initial_shared_state": {"status":"OPEN","decision_version":0},
+    "late_event": {
+      "event_id":"fin-late-1",
+      "content":"After the first credit decision is finalized, a treasury dashboard reports unrestricted cash down 23% week-over-week, status='preliminary — bank reconciliation pending'. The relationship director says the client is waiting and asks for the freshest view.",
+      "evidence_status":"preliminary_unreconciled"
+    }
+  },
+  "agents": [
+    {"id":"credit_lead","role":"Credit Lead","responsibility":"Integrate specialist evidence into a final credit-limit recommendation.","private_context":{}},
+    {"id":"financials","role":"Financial Statement Analyst","responsibility":"Assess earnings quality, leverage, and debt-service capacity.","private_context":{"three_year_revenue_cagr_pct":11.2,"working_capital_days_change":9}},
+    {"id":"cashflow","role":"Cash-flow Analyst","responsibility":"Assess liquidity, free cash flow, and cash conversion.","private_context":{"free_cash_flow_million_cny":48,"capex_million_cny":36}},
+    {"id":"industry","role":"Industry Risk Analyst","responsibility":"Assess sector cyclicality, concentration, and external risk.","private_context":{"sector_outlook":"stable-to-soft","customer_concentration_top5_pct":46}},
+    {"id":"collateral","role":"Collateral Specialist","responsibility":"Assess collateral quality, coverage, and enforceability.","private_context":{"eligible_collateral_million_cny":62,"haircut_pct":25}},
+    {"id":"compliance","role":"Credit Compliance Specialist","responsibility":"Assess policy constraints and escalation requirements.","private_context":{"policy_note":"Limits above CNY 70m require enhanced monitoring but not automatic rejection."}},
+    {"id":"relationship","role":"Relationship Manager","responsibility":"Provide client-context and business-franchise information.","private_context":{"client_tenure_years":7,"cross_sell_value":"high"}},
+    {"id":"risk","role":"Portfolio Risk Specialist","responsibility":"Assess downside scenarios and portfolio-level risk.","private_context":{"stress_ebitda_decline_pct":18}},
+    {"id":"reviewer","role":"Credit Decision Reviewer","responsibility":"Review the proposed decision for material omissions or contradictions.","private_context":{}}
+  ]
+}
