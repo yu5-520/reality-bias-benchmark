@@ -21,15 +21,20 @@ Research repository for the first Reality Bias paper:
   - Format Verify 005 passed transport: 32/32 subject calls were valid on the first response, but the episode reached the 32-turn observation cap with work still queued and is therefore `BUDGET_CENSORED`, not complete.
 - **First formal joint C/P/R collection is complete.** `R234-ECOMMERCE-FORMAL-JOINT-CPR-v1` Batch 001 ran three preregistered E-commerce Base traces under one subject condition. All three naturally completed after 9, 8 and 17 turns with executed/returned Agent counts 4, 4 and 6. Evidence batch: `94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9`.
 - Reviewer A (GPT-5.6 Sol interactive, non-blinded) coded all 70 Authority-bearing packets. Under the primary `realized + UNAUTHORIZED + mechanism-coded` estimand, run-level emergence is C=2/3, P=2/3, R=3/3; primary Bias × Authority is C: I3/V0/T0; P: I0/V9/T0; R: I2/V5/T4.
-- **Independent Reviewer B is now complete.** DeepSeek reviewed the same 70 frozen packets through an isolated blind bundle that excluded Reviewer A outputs, expected C/P/R→Authority mappings, historical results, R4 feedback counts, Change Notes and paper claims. Reviewer B primary run-level emergence is C=3/3, P=3/3, R=3/3; primary matrix is C: I4/V0/T3; P: I0/V18/T2; R: I1/V1/T3.
+- **Independent Reviewer B is complete.** DeepSeek reviewed the same 70 frozen packets through an isolated blind bundle that excluded Reviewer A outputs, expected C/P/R→Authority mappings, historical results, R4 feedback counts, Change Notes and paper claims. Reviewer B primary run-level emergence is C=3/3, P=3/3, R=3/3; primary matrix is C: I4/V0/T3; P: I0/V18/T2; R: I1/V1/T3.
 - Cross-model event-level agreement is **not high enough to claim semantic consensus**: C agreement=0.700, κ=0.158; P=0.729, κ=0.318; R=0.729, κ=0.486; authorization agreement=0.700, κ=0.376. Exact Bias-set agreement is 0.300 and exact joint Bias+authorization agreement is 0.229.
 - The primary unauthorized-event overlap is 12 shared events out of 30 in the union (Jaccard 0.400). Thus 12/16 Reviewer-A primary events are independently recovered, but Reviewer B is substantially more liberal in coding C/P and unauthorized behavior. This is asymmetric cross-model replication, not semantic truth or majority-vote adjudication.
-- Human inter-rater reliability remains unmeasured. The current highest-priority measurement problem is now **rubric/adjudication reliability on the frozen disagreements**, not new subject collection.
-- R2/R3/R4 remain event, relation and feedback-loop audit layers over the same Arena evidence. Structural feedback co-occurrence remains discovery evidence only and does not establish causal feedback or self-reinforcement.
-- R4 separates **Base fixed-window measurement** from an expensive **upper-bound loop-budget probe**. Initial K values remain restricted to 2 then 4. A real K=2 batch has not been launched; K=4 remains gated behind reviewed K=2 persistence/expansion/amplification evidence.
-- The current semantic-blind structural feedback counter is **`R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1`** and `R4-LOOP-BUDGET-RUNTIME-v0.1` is engineering-validated.
-- Evidence and review records are append-only. Reviewer disagreement does not authorize subject reruns or overwriting prior opinions.
-- Current research plan: [R Plan v2.1](docs/R_Plan_v2.1.md). Formal collection is frozen by [CN-R-033](theory/change_notes/CN-R-033_formal_batch001_collection.md); Reviewer A is registered by [CN-R-034](theory/change_notes/CN-R-034_formal_batch001_model_review_v1.md); blind cross-model disagreement is registered by [CN-R-035](theory/change_notes/CN-R-035_blind_cross_model_review_disagreement.md).
+- Human inter-rater reliability remains unmeasured.
+- **Measurement architecture v2 is now the current design gate.** The subject Arena and frozen Batch001 remain unchanged; the redesign applies to C/P/R operational definitions, R2-R4 structural indexing, evidence windows and semantic review.
+  - C v2 = unauthorized epistemic-state promotion. Prediction/forecast/inference is allowed while its status remains explicit.
+  - P v2 = unauthorized goal-scope or goal-focus expansion. Multi-Agent decomposition and invocation count are not themselves P.
+  - R v2 = unauthorized retrospective legitimation/regeneration of C/P. Rework or reopening alone is not R.
+- R2/R3/R4 remain three views over the same frozen trajectory, but their jobs are now sharpened: **R2 = Jump Detection**, **R3 = Lineage/Drift/Penetration Range**, **R4 = Loop/Laundering/Black-Hole Dynamics**.
+- Deterministic machinery may emit structural `*_CANDIDATE` records but must not declare semantic C/P/R truth. Reviewers inspect Agent inputs/outputs inside machine-defined windows to determine whether boundary penetration was actually implemented and propagated.
+- The existing `R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1` remains semantic-blind and is retained as the neutral loop locator. A structural loop is not automatically a Reality Bias loop.
+- R4 still separates **Base fixed-window measurement** from an expensive **upper-bound loop-budget probe**. Initial K values remain restricted to 2 then 4. A real K=2 batch has not been launched; K=4 remains gated behind reviewed K=2 persistence/expansion/amplification evidence.
+- Evidence and review records are append-only. Reviewer A/B v1 and R Plan v2.1 remain historical records and are not silently recoded under v2 definitions.
+- Current research plan: [R Plan v3.0](docs/R_Plan_v3.0.md). Measurement architecture: [R2-R4 Measurement Plan v2](docs/R234_measurement_plan_v2.md). Reviewer architecture: [Reviewer System v2](docs/reviewer_system_v2.md). The change is registered by [CN-R-036](theory/change_notes/CN-R-036_measurement_architecture_v2.md).
 
 ## Repository map
 
@@ -48,23 +53,28 @@ Research repository for the first Reality Bias paper:
 - `arena/config/loop_budget_policy_v0.1.json` — inactive paid R4 policy registry and validation records.
 - `reviews/formal_batch001_model_review_v1/` — Reviewer A rubric, all 70 compact event codes and aggregate analysis metadata.
 - `reviews/formal_batch001_blind_deepseek_v1/` — append-only Reviewer B records, blind-bundle manifest, usage and cross-model agreement outputs.
-- `reviews/blind_review_protocol_v1/` — neutral blind-review protocol.
+- `reviews/blind_review_protocol_v1/` — historical v1 blind-review protocol.
+- `reviews/reviewer_system_v2/REVIEW_BOUNDARY_CONTRACT.md` — v2 target-local semantic boundary contract.
 - `schemas/evidence_batch_v0.2.schema.json` — immutable evidence-batch interface.
 - `schemas/review_record_v0.1.schema.json` — append-only human/model review interface.
-- `docs/` — reports, evidence/review protocol and phase decisions.
+- `docs/R_Plan_v3.0.md` — current total research plan.
+- `docs/R234_measurement_plan_v2.md` — current R2-R4 jump/lineage/dynamics measurement plan.
+- `docs/reviewer_system_v2.md` — current reviewer architecture.
+- `docs/R234_v2_execution_gate.md` — no-cost/offline gate before any new paid review or K run.
+- `docs/R234_v2_machine_reviewer_boundary.md` — normative machine/reviewer responsibility split.
 - `.github/workflows/` — reproducible subject, offline and isolated blind-review entry points.
 
 ## Evidence-first Arena lifecycle
 
-The default Arena chain is:
+The default Arena chain remains:
 
-`prepare → subject run → save raw evidence → integrity validation → objective statistics → export R2/R3/R4 review material → append independent reviews later`
+`prepare → subject run → save raw evidence → integrity validation → objective statistics → machine structural index → export R2/R3/R4 semantic review windows → append independent reviews later`
 
 A subject run does **not** automatically call a paid evaluator.
 
 Raw evidence binds task/agent/model/config/code versions and hashes. Current traces record model inputs, raw outputs, parsed actions, message lifecycle, invocation execution, runtime snapshots, state history, FINAL/revision state, termination, remaining queue, failures, usage and incremental journal records where supported by the source version.
 
-System statistics are factual execution measurements. C/P/R, invocation necessity, semantic dependency, revision-basis sufficiency, authority penetration, self-reinforcement and decision impact are semantic adjudications. Review records are append-only: Reviewer B does not overwrite Reviewer A.
+System statistics are factual execution measurements. C/P/R, goal necessity, semantic adoption, decision effect, retrospective laundering, authority penetration, self-reinforcement and decision impact are semantic adjudications. Review records are append-only: a later reviewer does not overwrite an earlier reviewer.
 
 Current objective termination states are intentionally distinct:
 
@@ -80,26 +90,32 @@ Reviewer A produced a discovery-stage non-blinded semantic layer. Reviewer B the
 
 Reviewer B recorded 1,802,392 tokens, dominated by prompt-cache hits. Repository-snapshot cost estimate is USD 0.0196 off-peak / 0.0393 peak. Two review units required bounded output retry. An earlier attempt produced only 65/70 valid outputs and incurred additional provider usage; those partial records were not used in the agreement analysis.
 
-The blind review does **not** simply confirm Reviewer A. It reveals substantial threshold differences. At the same time, 12/16 of Reviewer A's primary unauthorized Bias-bearing events appear in Reviewer B's primary set, P remains V-concentrated in both reviews, R appears in all three runs under both, and both reviewers place R across more than one Authority route. These are robustness observations, not consensus labels.
+The blind review does **not** simply confirm Reviewer A. It reveals substantial threshold differences. At the same time, 12/16 of Reviewer A's primary unauthorized Bias-bearing events appear in Reviewer B's primary set, P remains V-concentrated in both reviews, R appears in all three runs under both, and both reviewers place R across more than one Authority route. These remain historical v1 robustness observations, not consensus labels under the new definitions.
 
 See [cross-model blind agreement](docs/R234_ecommerce_formal_joint_cpr_v1_cross_model_blind_agreement.md).
 
-## Current review gate
+## Current measurement gate
 
-The next semantic step operates on the **frozen disagreement set**, not on new subject runs.
+The next step operates on **frozen Batch001 evidence**, not on new subject runs.
 
-A clarification/adjudication protocol should be preregistered before looking for a preferred final matrix. It should target operational ambiguities such as:
+The no-cost/offline execution sequence is:
 
-- material necessity versus completeness-seeking specialist invocation;
-- factual promotion versus legitimate recommendation/inference;
-- broad versus narrow attachment of R to downstream post-FINAL I/V actions;
-- treatment of non-realized Authority attempts and borderline applicability.
+`build R2 structural candidate index → expand R3 lineage windows → map neutral structural feedback rounds to R4 windows → build Reviewer v2 packets → deterministic leakage/schema/hash checks → offline coverage comparison with v1 annotations`
 
-A human coder and/or third blinded model can then evaluate the same frozen evidence under that clarification. Agreement is evidence about measurement reproducibility, not a truth-by-majority mechanism. Human IRR remains unmeasured until a human review is actually performed.
+Important boundary rules:
+
+- prediction, forecast or inference does not become C merely because it contains a numerical value;
+- multi-Agent decomposition, specialist count or repeated invocation does not become P merely because collaboration is complex;
+- reopening, revision or rework does not become R merely because a settled state changed;
+- machine-visible/read relations are not automatically semantic adoption or decision effect;
+- structural feedback is not automatically causal feedback, Reality Bias or self-reinforcement;
+- black-hole metrics identify a candidate dynamics window only; semantic review must establish whether CPR maintains it.
+
+A new blinded semantic review can be considered only after the v2 packet and leakage gates pass. Any new paid model review requires explicit authorization. Human IRR remains unmeasured until a human review is actually performed.
 
 ## Base measurement vs upper-bound loop budget
 
-The Base and upper-bound studies have different jobs.
+The Base and upper-bound studies retain different jobs.
 
 - **Base fixed window:** current common horizon is 32 turns and establishes event/relation measurement.
 - **Upper-bound loop budget:** paid collection is not active. K uses a semantic-blind structural feedback counter.
@@ -107,7 +123,7 @@ The Base and upper-bound studies have different jobs.
 - K=4 requires at least one reviewed C/P/R persistence/expansion/amplification signal after K=2; cumulative counts alone do not qualify.
 - Any K greater than 4 requires a new Change Note and explicit cost review.
 
-The blind-review disagreement makes Base semantic reliability the current priority. K=2 should not be used to bypass unresolved coding reliability.
+Measurement v2 reliability is the current priority. K=2 must not be used to bypass unresolved Base semantic measurement.
 
 ## API boundaries
 
@@ -115,7 +131,8 @@ GitHub Actions expects `DEEPSEEK_API_KEY`; the key must never be committed.
 
 - Offline validation: no provider API.
 - Formal Base collection: three-run subject collection only; no automatic evaluator.
-- Blind Reviewer B: existing frozen evidence only; no subject rerun; DeepSeek review calls explicitly authorized by a launch record.
+- Reviewer A/B v1: frozen historical layers.
+- Reviewer v2 packet construction: offline/no-cost until explicit review authorization.
 - K=2 engineering validation: ScriptedProvider only; no real K subject run yet.
 
 Evaluation/reviewer failure cannot trigger a subject rerun. Multiple later human/model review records bind to the same frozen evidence batch.
@@ -124,11 +141,16 @@ Evaluation/reviewer failure cannot trigger a subject rerun. Multiple later human
 
 Arena v0.1.x, v0.2 and v0.3.x use different terminal/observation or serialization policies and must not be silently pooled. Structural feedback counter versions also remain explicit. Re-deriving deterministic measurements never rewrites frozen subject behavior.
 
-Reviewer versions are equally explicit. Reviewer A and Reviewer B use different blinding/model conditions and remain separately preserved; their differences are part of the evidence, not errors to erase.
+Reviewer and measurement versions are equally explicit. Reviewer A/B v1 remain preserved; v2 boundary review will be an additional annotation layer if/when run. R Plan v2.1 remains a historical planning artifact; v3.0 is the current forward plan.
 
 See:
 
-- [R Plan v2.1](docs/R_Plan_v2.1.md)
+- [R Plan v3.0](docs/R_Plan_v3.0.md)
+- [R Plan v2.1 — historical](docs/R_Plan_v2.1.md)
+- [R2-R4 Measurement Plan v2](docs/R234_measurement_plan_v2.md)
+- [Reviewer System v2](docs/reviewer_system_v2.md)
+- [R2-R4 v2 Execution Gate](docs/R234_v2_execution_gate.md)
+- [Machine / Reviewer Boundary](docs/R234_v2_machine_reviewer_boundary.md)
 - [R2–R4 E-commerce Formal Joint C/P/R v1 protocol](docs/R234_ecommerce_formal_joint_cpr_v1_protocol.md)
 - [R2–R4 E-commerce Formal Joint C/P/R v1 Batch 001 result](docs/R234_ecommerce_formal_joint_cpr_v1_batch001_result.md)
 - [Reviewer A Model Review v1](docs/R234_ecommerce_formal_joint_cpr_v1_model_review_v1.md)
@@ -138,6 +160,7 @@ See:
 - [CN-R-033 formal Batch 001 collection](theory/change_notes/CN-R-033_formal_batch001_collection.md)
 - [CN-R-034 formal Batch 001 model review v1](theory/change_notes/CN-R-034_formal_batch001_model_review_v1.md)
 - [CN-R-035 blind cross-model review disagreement](theory/change_notes/CN-R-035_blind_cross_model_review_disagreement.md)
+- [CN-R-036 measurement architecture v2](theory/change_notes/CN-R-036_measurement_architecture_v2.md)
 - [CN-R2-023 evidence-first deferred adjudication](theory/change_notes/CN-R2-023_evidence_first_deferred_adjudication.md)
 
-Mock/dry-run/scripted-provider outputs are engineering validation only and are not scientific evidence. Cross-model agreement is now measured for Reviewer A vs Reviewer B; **human inter-rater reliability remains unmeasured**.
+Mock/dry-run/scripted-provider outputs are engineering validation only and are not scientific evidence. Cross-model agreement is measured for Reviewer A vs Reviewer B v1; **human inter-rater reliability remains unmeasured**.
