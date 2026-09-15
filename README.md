@@ -20,15 +20,17 @@ Research repository for the first Reality Bias paper:
   - current subject runtime is **v0.3.2**, which hardens JSON serialization and uses at most one audited format-recovery attempt while preserving the same v0.3 social/observation architecture.
   - Format Verify 005 passed transport: 32/32 subject calls were valid on the first response, but the episode reached the 32-turn observation cap with work still queued and is therefore `BUDGET_CENSORED`, not complete.
 - R2/R3/R4 are event, relation and feedback-loop audit layers over the same Arena evidence; they are not sequential subject-experiment phases.
-- R4 planning now separates **base fixed-window measurement** from an expensive **upper-bound loop-budget probe**. Initial K values are restricted to 2 then 4, with K=4 allowed only after a reviewed K=2 persistence/expansion/amplification candidate. No paid K run is currently active.
+- R4 planning separates **base fixed-window measurement** from an expensive **upper-bound loop-budget probe**. Initial K values are restricted to 2 then 4, with K=4 allowed only after a reviewed K=2 persistence/expansion/amplification candidate.
+- The semantic-blind structural feedback counter is now offline validated as **`R4-STRUCTURAL-FEEDBACK-ROUND-v0.2`** using the conservative `A settles → B sees/contributes → A demonstrably receives → A settles again` rule. It is integrated into structural views, but runtime K enforcement remains inactive and no paid K run has been launched.
 - Evidence is captured during execution and audited asynchronously. Layer-specific Gates govern claims, not collection. Existing structural runs do not by themselves prove causal propagation or self-reinforcement.
-- Current research plan: [R Plan v2.1](docs/R_Plan_v2.1.md), registered by [CN-R-029](theory/change_notes/CN-R-029_base_then_loop_budget_upper_bound.md).
+- Current research plan: [R Plan v2.1](docs/R_Plan_v2.1.md), with the K strategy registered by [CN-R-029](theory/change_notes/CN-R-029_base_then_loop_budget_upper_bound.md) and counter implementation frozen by [CN-R-030](theory/change_notes/CN-R-030_structural_feedback_counter_v02.md).
 
 ## Repository map
 
 - `theory/` — theory contract, change notes, novelty matrix.
 - `benchmark/` — R1 casebook and retained single-turn R2 pilot benchmarks.
 - `arena/` — Free-Agent Arena runtime, evidence capture, objective metrics, structural views, review packet export and optional deferred-review adapters.
+- `arena/structural_feedback.py` — semantic-blind structural feedback-round derivation used for offline R4/K measurement.
 - `arena/config/arena_v0.3.json` — current Arena v0.3.2 execution policy.
 - `arena/config/model_deepseek_v0.2.json` — current subject/evaluator transport and token-budget configuration.
 - `arena/config/loop_budget_policy_v0.1.json` — inactive R4 base/upper-bound policy registry; K=2/K=4 only in the initial staged design.
@@ -62,13 +64,14 @@ System statistics are factual execution measurements. C/P/R, invocation necessit
 The base and upper-bound studies have different jobs.
 
 - **Base fixed window:** current common horizon is 32 turns. It is used to establish reproducible event/relation measurement and fixed-horizon occurrence statements such as “observed by turn 32”.
-- **Upper-bound loop budget:** planned, not active. K counts only a future semantically blind `structural_feedback_round`; runtime must not use C/P/R, Authority-penetration labels or evaluator outputs to count K.
-- Initial paid sequence is strictly `BASE stable → K=2 → deferred review gate → optional K=4 → deferred review gate → STOP`.
+- **Upper-bound loop budget:** planned, not active. K is based on the offline-validated semantic-blind structural feedback counter; runtime must not use C/P/R, Authority-penetration labels or evaluator outputs to count K.
+- Counter v0.2 requires a recorded A→B→A return and is non-overlapping. Ordinary one-way propagation does not count as a feedback round.
+- Initial paid sequence remains strictly `BASE stable → K=2 → deferred review gate → optional K=4 → deferred review gate → STOP`.
 - K=4 requires at least one reviewed C/P/R dimension to show a persistence/expansion/amplification candidate after K=2.
 - A larger cumulative C/P/R count by itself does not qualify, because more K mechanically creates more observation opportunities. Qualified growth must appear in measures such as new reviewed events per round, affected Agents/fields, propagation depth or re-inheritance/reopen depth.
 - Any K greater than 4 requires a new Change Note and explicit cost review.
 
-Passing K=2/K=4 supports discovery wording such as persistence or amplification candidate. Causal self-reinforcement still requires later intervention evidence.
+Existing Base traces are allowed to validate the counter but are never retroactively converted into K-controlled arms. Passing K=2/K=4 supports discovery wording such as persistence or amplification candidate. Causal self-reinforcement still requires later intervention evidence.
 
 ## Participation terminology
 
@@ -89,6 +92,7 @@ GitHub Actions expects `DEEPSEEK_API_KEY`; the key must never be committed.
 - Subject experiment: `R2 Free-Agent Arena Subject Run` — manual `workflow_dispatch`; subject calls require `CALL_REAL_API`; stops at evidence export.
 - Bounded structural pilot: `R2-R4 Shared Structure Smoke` — launch-record or manual trigger; subject only, no paid evaluator.
 - Deferred review: `R2 Deferred Review Existing Evidence` — manual selection of an existing evidence artifact; default `PREPARE_ONLY`; reviewer calls require `CALL_REVIEW_API`.
+- Counter audits/re-derivations are offline Actions workflows that reuse frozen artifacts and do not call subject/evaluator providers.
 
 Evaluation failure therefore cannot trigger a subject rerun. Multiple later human/model review records can bind to the same frozen evidence batch.
 
@@ -98,6 +102,8 @@ Legacy single-turn calibration workflows are manual-only and are not triggered b
 
 Arena v0.1.x, v0.2 and v0.3.x use different terminal/observation or serialization policies and must not be silently pooled as one experimental condition. Current v0.3.2 retains `observe_until_quiescent`: FINAL settles a plan, while the episode continues until the work queue becomes empty or an external budget is hit. Relative to v0.3.1, v0.3.2 changes the explicit JSON serialization contract and its bounded, fully audited format-recovery transport policy; task/social conditions remain unchanged.
 
+The structural counter has its own version boundary. Counter v0.1 was rejected before runtime activation because it over-counted one-way propagation. Counter v0.2 requires an explicit A→B→A return. Re-deriving frozen traces with a newer deterministic counter does not alter their original subject evidence or experimental condition.
+
 See:
 
 - [R Plan v2.1](docs/R_Plan_v2.1.md)
@@ -105,6 +111,7 @@ See:
 - [R2–R4 shared runtime v0.3](docs/R234_runtime_v0.3.md)
 - [R2–R4 observation censoring policy v0.1](docs/R234_censoring_policy_v0.1.md)
 - [R4 upper-bound loop budget protocol v0.1](docs/R4_loop_budget_protocol_v0.1.md)
+- [R4 structural feedback counter v0.2 audit](docs/R4_structural_feedback_counter_v0.2_audit.md)
 - [R2–R4 v0.3.1 execution result](docs/R234_v0.3.1_execution_result.md)
 - [R2–R4 v0.3.1 Microbatch 003 result](docs/R234_v0.3.1_microbatch_003_result.md)
 - [R2–R4 v0.3.2 Format Verify 005](docs/R234_v0.3.2_format_verify_005_result.md)
@@ -116,6 +123,7 @@ See:
 - [CN-R-027 v0.3.2 serialization pass / censoring](theory/change_notes/CN-R-027_v032_serialization_pass_observation_censoring.md)
 - [CN-R-028 censor-aware R2–R4 analysis](theory/change_notes/CN-R-028_censor_aware_r234_analysis.md)
 - [CN-R-029 base then K2/K4 upper bound](theory/change_notes/CN-R-029_base_then_loop_budget_upper_bound.md)
+- [CN-R-030 structural feedback counter v0.2](theory/change_notes/CN-R-030_structural_feedback_counter_v02.md)
 - [CN-R2-023 evidence-first deferred adjudication](theory/change_notes/CN-R2-023_evidence_first_deferred_adjudication.md)
 
 Mock/dry-run/scripted-provider outputs are engineering validation only and are not scientific evidence. Human and multi-model inter-rater reliability remain unmeasured unless explicitly reported from future review records.
