@@ -7,6 +7,9 @@ on:
       - '.github/workflows/r2-calibration-v0.5.yml'
       - 'benchmark/r2_primary_mapping_items_v0.5_calibration.jsonl'
       - 'analysis/check_r2_calibration_gate.py'
+      - 'adapters/deepseek_chat.py'
+      - 'configs/models/deepseek_r2_wave1.json'
+      - 'runners/run_r2_calibration_v04.py'
   workflow_dispatch:
 
 concurrency:
@@ -17,9 +20,39 @@ permissions:
   contents: read
 
 jobs:
-  calibrate:
+  provider_smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Full-path smoke on one C, P, R item
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python runners/run_r2_calibration_v04.py \
+            --benchmark benchmark/r2_primary_mapping_items_v0.5_calibration.jsonl \
+            --item-ids R2-C01,R2-P01,R2-R01 \
+            --repeats 1 --max-workers 3 \
+            --out results/r2_v0.5_provider_smoke.jsonl
+      - name: Upload smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-v0.5-provider-smoke-${{ github.run_id }}
+          path: |
+            results/r2_v0.5_provider_smoke.jsonl
+            results/r2_v0.5_provider_smoke.jsonl.errors.json
+            results/json_format_retries.jsonl
+          if-no-files-found: warn
+          retention-days: 90
+
+  calibrate:
+    needs: provider_smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

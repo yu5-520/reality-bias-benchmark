@@ -1,33 +1,34 @@
 {
-  "config_version": "R2-W1-DEEPSEEK-v1.1",
+  "config_version": "R2-W1-DEEPSEEK-v1.2",
   "provider": "deepseek",
   "base_url": "https://api.deepseek.com",
   "endpoint": "/chat/completions",
-  "model_alias": "deepseek-v4-flash",
-  "expected_model_version": "DeepSeek-V4-Flash-0731",
-  "freeze_date_utc": "2026-09-14T17:10:00Z",
+  "model_alias": "deepseek-flash",
+  "expected_model_version": "DeepSeek-V4.1-Flash",
+  "freeze_date_utc": "2026-09-15T03:20:00Z",
+  "provider_transition_note": "DeepSeek announced V4.1-Flash on 2026-09-10. Legacy deepseek-v4-flash is retired and temporarily routes to V4.1-Flash; confirmatory R2 pins the current canonical alias deepseek-flash.",
   "subject": {
     "thinking": "disabled",
     "temperature": 0.2,
     "max_tokens": 1200
   },
   "evaluator": {
-    "model_alias": "deepseek-v4-flash",
+    "model_alias": "deepseek-flash",
     "thinking": "disabled",
     "temperature": 0.0,
     "max_tokens": 1800,
     "blind_to_condition": true
   },
   "transport": {
-    "timeout_seconds": 120,
-    "max_retries": 3,
+    "timeout_seconds": 60,
+    "max_retries": 2,
     "retry_backoff_seconds": 2,
     "max_workers": 6
   },
   "json_format_retries": 3,
   "pricing_snapshot_usd_per_million_tokens": {
     "source_date": "2026-09-15",
-    "off_peak": {"input_cache_hit": 0.007, "input_cache_miss": 0.22, "output": 0.66},
-    "peak": {"input_cache_hit": 0.014, "input_cache_miss": 0.44, "output": 1.32}
+    "off_peak": {"input_cache_hit": 0.003, "input_cache_miss": 0.15, "output": 0.6},
+    "peak": {"input_cache_hit": 0.006, "input_cache_miss": 0.3, "output": 1.2}
   }
 }

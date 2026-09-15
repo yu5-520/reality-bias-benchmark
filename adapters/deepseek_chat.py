@@ -16,7 +16,21 @@ class DeepSeekError(RuntimeError):
 _AUDIT_LOCK = threading.Lock()
 
 
-def _post_json(url, api_key, payload, timeout=120, max_retries=3, backoff=2):
+def _provider_error_detail(obj):
+    err = obj.get('error') if isinstance(obj, dict) else None
+    if err is None:
+        return None
+    if isinstance(err, dict):
+        return {
+            'message': err.get('message'),
+            'type': err.get('type'),
+            'code': err.get('code'),
+            'param': err.get('param'),
+        }
+    return {'message': str(err)}
+
+
+def _post_json(url, api_key, payload, timeout=60, max_retries=2, backoff=2):
     body = json.dumps(payload, ensure_ascii=False).encode('utf-8')
     last = None
     for attempt in range(max_retries):
@@ -28,7 +42,8 @@ def _post_json(url, api_key, payload, timeout=120, max_retries=3, backoff=2):
                 'Authorization': f'Bearer {api_key}',
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'User-Agent': 'reality-bias-benchmark/0.3.1'
+                'Connection': 'close',
+                'User-Agent': 'reality-bias-benchmark/0.4.0'
             }
         )
         started = time.time()
@@ -36,13 +51,30 @@ def _post_json(url, api_key, payload, timeout=120, max_retries=3, backoff=2):
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 raw = resp.read().decode('utf-8')
             obj = json.loads(raw)
-            obj['_transport_latency_ms'] = round((time.time() - started) * 1000, 2)
+            latency_ms = round((time.time() - started) * 1000, 2)
+            obj['_transport_latency_ms'] = latency_ms
+
+            # DeepSeek may return an application-level error object in a 200-shaped
+            # JSON response. Treat it as an infrastructure/provider failure, not as
+            # a model answer and never feed it into the scientific scorer.
+            provider_error = _provider_error_detail(obj)
+            if provider_error is not None and 'choices' not in obj:
+                raise DeepSeekError(
+                    'DeepSeek application error: '
+                    + json.dumps(provider_error, ensure_ascii=False, sort_keys=True)
+                    + f'; latency_ms={latency_ms}'
+                )
             return obj
         except urllib.error.HTTPError as e:
             detail = e.read().decode('utf-8', errors='replace')
-            last = DeepSeekError(f'HTTP {e.code}: {detail[:1000]}')
+            last = DeepSeekError(f'HTTP {e.code}: {detail[:1500]}')
             if e.code not in (408, 409, 429, 500, 502, 503, 504):
                 raise last
+        except DeepSeekError:
+            # Application errors can encode model retirement/routing/config errors.
+            # Fail fast so a 60-cell experiment cannot spend hours retrying an
+            # invalid provider state. A new workflow attempt is the audit unit.
+            raise
         except Exception as e:
             last = e
         if attempt + 1 < max_retries:
@@ -51,6 +83,9 @@ def _post_json(url, api_key, payload, timeout=120, max_retries=3, backoff=2):
 
 
 def _extract_content(response):
+    provider_error = _provider_error_detail(response) if isinstance(response, dict) else None
+    if provider_error is not None and 'choices' not in response:
+        raise DeepSeekError('Provider error payload: ' + json.dumps(provider_error, ensure_ascii=False, sort_keys=True))
     try:
         return response['choices'][0]['message'].get('content') or ''
     except Exception as e:
@@ -124,7 +159,6 @@ def chat_completion(config, messages, *, evaluator=False, response_format_json=F
     url = config['base_url'].rstrip('/') + config['endpoint']
     t = config['transport']
 
-    # Plain-text calls have no format retry layer.
     if not response_format_json:
         return _post_json(
             url, api_key, payload,
@@ -133,8 +167,8 @@ def chat_completion(config, messages, *, evaluator=False, response_format_json=F
             backoff=t['retry_backoff_seconds']
         )
 
-    # JSON-mode retries are infrastructure retries only. The exact same model,
-    # messages, decoding parameters and response format are used on every try.
+    # JSON-format retries are infrastructure retries only. The same model,
+    # messages and decoding parameters are used on every attempt.
     max_format_attempts = int(config.get('json_format_retries', 3))
     responses = []
     last_error = None
