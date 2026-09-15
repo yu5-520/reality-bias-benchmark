@@ -2,6 +2,7 @@ import unittest
 from pathlib import Path
 
 from arena.core import ArenaState
+from arena.engine import run_arena_once
 from arena.experimental_control import (
     apply_state_intervention,
     capture_state,
@@ -12,6 +13,7 @@ from arena.experimental_control import (
     verify_state_snapshot,
 )
 from arena.io_utils import load_json
+from arena.providers import ScriptedProvider
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -89,6 +91,41 @@ class ExperimentalControlTest(unittest.TestCase):
         blocked = decide_commit(stale, policy, current_state_hash=snapshot['state_hash'])
         self.assertEqual('BLOCK', blocked['decision'])
         self.assertIn('STATE_HASH_MISMATCH', blocked['reasons'])
+
+    def test_engine_continues_from_frozen_parent_with_branch_identity(self):
+        snapshot = capture_state(self.state, anchor_ref='A0', parent_trace_hash='trace:test')
+        intervention = {'type': 'set_shared_state_status', 'key': next(iter(snapshot['shared_state_metadata'])), 'status': 'initial'}
+        manifest = make_branch_manifest(
+            branch_id='B-CONTINUE-001',
+            parent_trace_hash='trace:test',
+            parent_snapshot=snapshot,
+            intervention_spec=intervention,
+            replicate_index=1,
+            model_identity={'model': 'scripted'},
+            config_identity={'arena': self.config['version']},
+            code_identity={'commit': 'TEST'},
+        )
+        scripted = ScriptedProvider([
+            {'decision_summary': 'settle', 'actions': [{'type': 'finalize', 'answer': 'Initial plan.'}]},
+            {'decision_summary': 'settle after late event', 'actions': [{'type': 'finalize', 'answer': 'Final plan.'}]},
+        ])
+        anchors = []
+        trace = run_arena_once(
+            self.domain,
+            self.config,
+            scripted,
+            'branch-run-001',
+            logical_seed=1,
+            initial_state_snapshot=snapshot,
+            branch_manifest=manifest,
+            state_snapshot_callback=anchors.append,
+        )
+        self.assertEqual('RUN_COMPLETE', trace['run_status'])
+        self.assertEqual('B-CONTINUE-001', trace['experimental_branch']['branch_id'])
+        self.assertEqual(snapshot['state_hash'], trace['experimental_branch']['parent_state_hash'])
+        self.assertFalse(trace['experimental_branch']['provider_internal_state_replayed'])
+        self.assertGreaterEqual(len(anchors), 2)
+        self.assertTrue(all(verify_state_snapshot(anchor) for anchor in anchors))
 
 
 if __name__ == '__main__':
