@@ -14,13 +14,13 @@ from .io_utils import load_json, load_jsonl, write_jsonl, sha256_file
 
 BUNDLE_VERSION = 'R234-BLIND-REVIEW-BUNDLE-v1'
 EXCLUDED_CONCEPTS = [
-    'prior_reviewer_outputs',
-    'expected_bias_authority_mapping',
-    'historical_pilot_results',
-    'structural_feedback_round_counts',
-    'r4_cooccurrence_conclusions',
-    'change_notes',
-    'paper_claims',
+    'prior reviewer outputs',
+    'expected bias-authority mapping',
+    'historical pilot results',
+    'structural feedback round counts',
+    'R4 co-occurrence conclusions',
+    'Change Notes',
+    'paper claims',
 ]
 
 AUTHORITY_CONTRACTS = {
