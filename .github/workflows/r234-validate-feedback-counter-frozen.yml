@@ -1,0 +1,99 @@
+name: R2-R4 Validate Structural Feedback Counter on Frozen Traces
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r234-validate-feedback-counter-frozen.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  validate-frozen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit tests
+        run: |
+          python -m unittest arena.tests.test_structural_feedback_rounds -v
+          python -m unittest arena.tests.test_loop_budget_policy -v
+      - name: Download v0.3.1 successful structural smoke
+        uses: actions/download-artifact@v4
+        with:
+          name: r234-structural-smoke-34959285562
+          path: frozen/smoke001
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 34959285562
+      - name: Download v0.3.1 Microbatch 003
+        uses: actions/download-artifact@v4
+        with:
+          name: r234-structural-smoke-34960602410
+          path: frozen/microbatch003
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 34960602410
+      - name: Download v0.3.2 Format Verify 005
+        uses: actions/download-artifact@v4
+        with:
+          name: r234-structural-smoke-34962065864
+          path: frozen/format005
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 34962065864
+      - name: Derive rounds from every preserved trace
+        run: |
+          mkdir -p results
+          python - <<'PY'
+          import json, pathlib
+          from arena.structural_feedback import derive_structural_feedback_rounds
+          rows=[]
+          for source in sorted(pathlib.Path('frozen').iterdir()):
+              candidates=list(source.rglob('subject_traces.jsonl'))
+              assert candidates, source
+              traces=[json.loads(x) for x in candidates[0].read_text(encoding='utf-8').splitlines() if x.strip()]
+              for trace in traces:
+                  result=derive_structural_feedback_rounds(trace)
+                  assert result['counter_status']=='RECORDED'
+                  assert result['semantic_blind'] is True
+                  row={
+                      'source':source.name,
+                      'run_id':trace['run_id'],
+                      'run_status':trace.get('run_status'),
+                      'turns':trace.get('turns'),
+                      'observation_censored':trace.get('observation_censored'),
+                      'round_count':result['round_count'],
+                      'open_tail':result['open_tail'],
+                      'rounds':result['rounds'],
+                  }
+                  rows.append(row)
+                  print(json.dumps({k:v for k,v in row.items() if k!='rounds'},ensure_ascii=False))
+                  for r in result['rounds']:
+                      print(f"  SFR{r['round_index']}: anchor turn {r['anchor_turn']} -> {r['exposure_actor']} turn {r['exposure_turn']} -> close turn {r['closing_turn']}")
+          pathlib.Path('results/frozen_feedback_counter_audit.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2),encoding='utf-8')
+          print('traces_checked=',len(rows))
+          PY
+      - name: Verify no semantic claims were introduced
+        run: |
+          python - <<'PY'
+          import json
+          rows=json.load(open('results/frozen_feedback_counter_audit.json',encoding='utf-8'))
+          assert len(rows) >= 5
+          for row in rows:
+              for r in row['rounds']:
+                  assert r['bias_labels']=='NOT_ADJUDICATED'
+                  assert r['authority_penetration']=='NOT_ADJUDICATED'
+                  assert r['semantic_dependency']=='NOT_ADJUDICATED'
+                  assert r['self_reinforcement']=='NOT_ADJUDICATED'
+          print('frozen-trace counter audit PASS')
+          PY
+      - name: Upload counter audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: r234-frozen-feedback-counter-audit-${{ github.run_id }}
+          path: results/frozen_feedback_counter_audit.json
+          retention-days: 90
