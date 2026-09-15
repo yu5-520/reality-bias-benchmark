@@ -186,15 +186,20 @@ def chat_completion(config, messages, *, evaluator=False, response_format_json=F
                 obj['usage'] = _aggregate_usage(responses)
                 obj['_transport_latency_ms'] = sum((x.get('_transport_latency_ms') or 0) for x in responses)
             obj['_json_format_retry_count'] = len(responses) - 1
+            obj['_prior_format_responses'] = responses[:-1]
             return obj
         except Exception as e:
             last_error = e
             _audit_format_retry(obj, evaluator=evaluator, attempt=attempt, error=e)
 
-    raise DeepSeekError(
+    error = DeepSeekError(
         f'JSON response remained malformed after {max_format_attempts} identical-request attempts: {last_error}'
     )
+    error.provider_responses = responses
+    error.usage = _aggregate_usage(responses)
+    raise error
 
 
 def extract_content(response):
     return _extract_content(response)
+

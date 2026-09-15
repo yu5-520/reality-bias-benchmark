@@ -24,7 +24,8 @@ def main():
         raise SystemExit('DEEPSEEK_API_KEY is not set')
     arena_path = ROOT / a.arena_config
     arena_cfg = load_json(arena_path)
-    model_cfg = load_json(ROOT / 'arena/config/model_deepseek_v0.1.json')
+    model_path = ROOT / arena_cfg.get('model_config_path', 'arena/config/model_deepseek_v0.1.json')
+    model_cfg = load_json(model_path)
     manifest = load_jsonl(a.manifest)
     out = Path(a.out); out.parent.mkdir(parents=True, exist_ok=True)
     if out.exists() or Path(a.out + '.journals').exists():
@@ -40,7 +41,7 @@ def main():
         if entry.get('arena_config_path') and entry['arena_config_path'] != a.arena_config:
             raise ValueError(f"manifest/config mismatch: {entry['arena_config_path']} != {a.arena_config}")
         domain_path = ROOT / f"arena/domains/{entry['domain_id']}.json"
-        for key, path in [('domain_hash', domain_path), ('arena_config_hash', arena_path), ('model_config_hash', ROOT / 'arena/config/model_deepseek_v0.1.json')]:
+        for key, path in [('domain_hash', domain_path), ('arena_config_hash', arena_path), ('model_config_hash', model_path)]:
             if entry.get(key) != sha256_file(path):
                 raise ValueError(f'manifest actual-file hash mismatch: {key}')
         domain = load_json(domain_path)

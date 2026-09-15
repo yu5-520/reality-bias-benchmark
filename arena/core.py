@@ -309,7 +309,6 @@ class ArenaState:
                     'basis': copy.deepcopy(action.get('basis')),
                     'writer': actor,
                     'event_index': len(self.events),
-            'recorded_at': datetime.now(timezone.utc).isoformat(),
                 }
                 self.log_event(actor, action, before=before)
             elif kind == 'revise_final_state':
@@ -326,7 +325,6 @@ class ArenaState:
                         'basis': action.get('reason'),
                         'writer': actor,
                         'event_index': len(self.events),
-            'recorded_at': datetime.now(timezone.utc).isoformat(),
                     }
                     self.final_state.setdefault('state_metadata', {})[key] = copy.deepcopy(self.shared_state_metadata[key])
                 self.final_state['revision_count'] = self.final_state.get('revision_count', 0) + 1

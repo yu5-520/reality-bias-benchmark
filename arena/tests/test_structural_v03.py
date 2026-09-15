@@ -87,6 +87,27 @@ class StructuralTests(unittest.TestCase):
                 self.assertEqual(row['previous_hash'], previous)
                 previous = digest
 
+    def test_failed_format_usage_is_preserved(self):
+        from unittest.mock import patch
+        from adapters.deepseek_chat import chat_completion, DeepSeekError
+        config = json.loads((ROOT/'arena/config/model_deepseek_v0.2.json').read_text())
+        response = {'choices':[{'message':{'content':'{"broken":'}, 'finish_reason':'length'}], 'usage':{'prompt_tokens':10,'completion_tokens':20,'total_tokens':30}}
+        with patch.dict('os.environ', {'DEEPSEEK_API_KEY':'test-only'}), patch('adapters.deepseek_chat._post_json', return_value=response), patch('adapters.deepseek_chat._audit_format_retry'):
+            with self.assertRaises(DeepSeekError) as caught:
+                chat_completion(config, [], response_format_json=True)
+        error = caught.exception
+        class Bad:
+            def complete_agent(self, *args, **kwargs):
+                raise error
+        t = run_arena_once(self.domain, self.config, Bad(), 'usage-failure')
+        self.assertEqual(t['usage_summary']['total_tokens'], 30)
+        self.assertEqual(t['model_calls'][0]['failed_provider_responses'][0]['choices'][0]['finish_reason'], 'length')
+
+    def test_observer_time_not_in_agent_state(self):
+        t = self.run_trace([actions({'type':'write_state','key':'x','value':1}, FINAL), actions(FINAL)])
+        self.assertIn('recorded_at', t['events'][0])
+        self.assertNotIn('recorded_at', t['model_calls'][1]['runtime_snapshot']['shared_state_metadata']['x'])
+
     def test_legacy_snapshot_not_fabricated(self):
         _, view = build_views({'run_id':'legacy','model_calls':[{}]}, 'batch')
         self.assertEqual(view['state_read_evidence'], 'NOT_RECORDED_IN_SOURCE_VERSION')

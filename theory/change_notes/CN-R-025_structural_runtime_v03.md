@@ -20,3 +20,9 @@ v0.1/v0.2 configurations and historical evidence remain available; default chang
 ## Validation
 
 18 regression tests cover old scheduling, repeated feedback, censoring, exact-boundary completion, complete inbox delivery, journal survival and legacy missingness. Four-domain synthetic export checks three-layer review import, invalid references and overwrite rejection. Real run outcome is tracked in GitHub Actions, not asserted by this pre-run change note.
+
+## v0.3.1 repair after real smoke 001
+
+Run 34958866944 (commit 8e5e9d0e) reached turn 8, activated 6 / executed 5 / returned 5. It stopped on malformed JSON after three risk-agent responses hit exactly 1800 completion tokens. Artifact 10392382759 preserves the trace and journal; batch hash d07c4adbc830df078400a49e26ab9a12d4a289b5edd48b74c2a6aacd775cdf8f. This is an output-transport failure, not natural completion or a loop finding.
+
+v0.3.1 selects a separate model config: 4096 output tokens, one format attempt (no automatic identical resampling of malformed outputs). Exhausted malformed responses and their usage are attached to the failed call, and successful responses retain provider finish_reason. Timestamps remain in observer event records, not actor-facing shared-state metadata. A single additional smoke launch verifies this repair; old output remains untouched. The prior trace usage summary excluded the final three failed responses (24,522 tokens); the artifact retry log supplies those records, giving 60,953 known total tokens for attempt 001 rather than 36,431. Do not rewrite that frozen trace to hide the accounting defect.

@@ -93,6 +93,8 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None, recorder
             })
             call.update({
                 'response_id': response.get('response_id'),
+                'provider_response': response.get('provider_response'),
+                'finish_reason': response.get('finish_reason'),
                 'provider_model': response.get('model'),
                 'usage': response.get('usage') or {},
                 'transport_latency_ms': response.get('transport_latency_ms'),
@@ -112,6 +114,9 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None, recorder
             if recorder:
                 recorder({'record_type': 'turn_completed', 'record': call, 'ledgers': state.evidence_snapshot()})
         except Exception as err:
+            if getattr(err, 'provider_responses', None):
+                call['failed_provider_responses'] = err.provider_responses
+                call['usage'] = err.usage
             call['status'] = 'failed'
             call['error'] = repr(err)
             call['event_index_end'] = len(state.events)

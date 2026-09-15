@@ -38,4 +38,7 @@ class DeepSeekArenaProvider:
             'model': response.get('model'),
             'usage': response.get('usage') or {},
             'transport_latency_ms': response.get('_transport_latency_ms'),
+            'provider_response': response,
+            'finish_reason': (response.get('choices') or [{}])[0].get('finish_reason'),
         }
+

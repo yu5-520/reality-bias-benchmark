@@ -17,7 +17,7 @@ def main():
     a = ap.parse_args()
     arena_path = ROOT / a.arena_config
     arena = load_json(arena_path)
-    model_path = ROOT / 'arena/config/model_deepseek_v0.1.json'
+    model_path = ROOT / arena.get('model_config_path', 'arena/config/model_deepseek_v0.1.json')
     model = load_json(model_path)
     domain_ids = arena['default_domains'] if a.domains == 'all' else [x.strip() for x in a.domains.split(',') if x.strip()]
     code_sha = os.environ.get('GITHUB_SHA') or 'LOCAL_OR_UNRECORDED'
@@ -40,6 +40,7 @@ def main():
                 'arena_config_path': a.arena_config,
                 'arena_config_version': arena['version'],
                 'arena_config_hash': sha256_file(arena_path),
+                'model_config_path': str(model_path.relative_to(ROOT)),
                 'model_config_version': model.get('config_version'),
                 'model_config_hash': sha256_file(model_path),
                 'task_goal': domain['task']['goal'],
