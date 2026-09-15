@@ -1,0 +1,38 @@
+{
+  "freeze_id": "R2-FREE-AGENT-ARENA-v0.1.2-PRE-API",
+  "supersedes": "R2-FREE-AGENT-ARENA-v0.1.1-PRE-API",
+  "status": "INFRASTRUCTURE_REPAIR_PENDING_OFFLINE_VALIDATION",
+  "scientific_stage": "no_complete_real_arena_wave_yet",
+  "invalid_real_attempt": {
+    "workflow_run_id": 34932966766,
+    "domain": "ecommerce",
+    "planned_repeats": 30,
+    "completed_raw_traces_before_abort": 2,
+    "failed_runs": 28,
+    "failure_classes": [
+      "subject JSON output truncated/malformed under 900-token cap",
+      "provider HTTP 402 Insufficient Balance"
+    ],
+    "scientific_use": "EXCLUDED_FROM_ALL_ESTIMATES"
+  },
+  "repair": {
+    "model_config_version": "R2-ARENA-DEEPSEEK-v0.1.1",
+    "subject_max_tokens_before": 900,
+    "subject_max_tokens_after": 1800,
+    "subject_temperature_unchanged": 0.7,
+    "thinking_unchanged": "disabled",
+    "agent_prompts_unchanged": true,
+    "domain_pack_unchanged": true,
+    "arena_engine_unchanged": true,
+    "evaluator_contract_unchanged": true,
+    "rationale": "Malformed outputs repeatedly terminated around the previous response cap. Because the first real wave never produced a complete analyzable dataset, increasing only the response ceiling is an infrastructure repair rather than a post-result scientific retune."
+  },
+  "execution_guard": {
+    "real_api_executed_after_this_freeze": false,
+    "required_before_rerun": [
+      "offline validation PASS on this commit",
+      "provider account balance restored"
+    ],
+    "required_confirmation": "CALL_REAL_API or an explicitly authorized one-shot execution commit"
+  }
+}
