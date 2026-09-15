@@ -39,7 +39,15 @@ No initial `K>4` run is authorized.
 
 K must never be counted by asking whether C/P/R occurred, whether an Authority violation occurred, or whether an evaluator thinks a loop is self-reinforcing. That would leak the research construct into the runtime.
 
-The future runtime counter must therefore be semantically blind: it may use only deterministic structural events such as versioned state/FINAL transitions, message/state exposure, participant return, and later output. The exact non-overlapping structural-round counter must be frozen and offline-tested before any paid K run.
+The current offline-validated counter is `R4-STRUCTURAL-FEEDBACK-ROUND-v0.2`. It counts one round only when the frozen trace deterministically shows:
+
+`A settles → B sees that exact settled version → B contributes → A demonstrably receives B's contribution → A settles again`
+
+The return to A must be supported by recorded message read, invocation read, state-version visibility, or exact settled-version visibility. The closing A settled event becomes the next anchor, so rounds are non-overlapping.
+
+This counter remains semantically blind: it does not read C/P/R, authorization, Authority penetration, semantic dependency, evaluator output, or self-reinforcement judgments. It is intentionally conservative and measures a structural return opportunity, not a Reality Bias loop.
+
+The counter has passed unit tests and frozen-trace offline audits. **Runtime K enforcement is still inactive.** Existing Base traces containing derived rounds are validation material and are not retroactively relabeled as K-controlled conditions.
 
 ## 3. Sequential spending gate
 
@@ -130,6 +138,10 @@ This prevents the experiment from paying for long trajectories merely to observe
 
 ## 9. Current implementation status
 
-`arena/config/loop_budget_policy_v0.1.json` registers the policy and is intentionally marked `PLANNED_NOT_ACTIVE`.
+`arena/config/loop_budget_policy_v0.1.json` remains `PLANNED_NOT_ACTIVE` for paid upper-bound execution.
 
-No paid K=2 or K=4 subject run has been launched by this protocol. Before activation, the deterministic structural-feedback-round counter and its evidence bindings must be implemented and validated offline.
+The prerequisite structural counter is now implemented and offline validated as `R4-STRUCTURAL-FEEDBACK-ROUND-v0.2`. Frozen-trace audit run `34965261787` verified the conservative A→B→A rule across five preserved v0.3 traces, and Format Verify 005 re-derivation run `34965319939` verified that the counter can be added to the deterministic structural view without changing the frozen evidence-batch identity.
+
+The rejected v0.1 counter was never activated: it over-counted ordinary one-way propagation. v0.2 requires an explicit recorded return to the anchor actor before a round closes.
+
+No paid K=2 or K=4 subject run has been launched. The remaining engineering prerequisite is an explicit runtime `loop_budget` stop condition bound to counter v0.2 plus the existing turn/invocation/queue safety caps. That runtime condition must be offline-tested before any paid K=2 launch.
