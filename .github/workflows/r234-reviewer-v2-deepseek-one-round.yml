@@ -1,0 +1,130 @@
+name: R2-R4 Reviewer v2 DeepSeek One Round
+
+on:
+  push:
+    paths:
+      - 'reviews/reviewer_system_v2/launch_records/*.json'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout immutable launch commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Resolve unique authorized launch record from commit
+        id: launch
+        run: |
+          set -euo pipefail
+          git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA" \
+            | grep '^reviews/reviewer_system_v2/launch_records/.*\.json$' > /tmp/launch_files.txt || true
+          count=$(wc -l < /tmp/launch_files.txt | tr -d ' ')
+          test "$count" = "1"
+          launch=$(cat /tmp/launch_files.txt)
+          echo "path=$launch" >> "$GITHUB_OUTPUT"
+          python - <<PY
+          import json
+          from pathlib import Path
+          p = Path('$launch')
+          x = json.loads(p.read_text())
+          assert x['status'] == 'AUTHORIZED'
+          assert x['execute_real_api'] is True
+          assert x['authorization_ref']
+          assert 0 < x['spend_policy']['launch_max_spend_usd'] <= x['spend_policy']['repository_level_absolute_ceiling_usd'] <= 2.0
+          assert x['runtime_policy']['max_workers'] == 1
+          assert x['runtime_policy']['subject_rerun_on_reviewer_failure'] is False
+          print({'launch_record': str(p), 'authorization_ref': x['authorization_ref'], 'max_spend_usd': x['spend_policy']['launch_max_spend_usd']})
+          PY
+
+      - name: Download frozen Batch001 subject artifact
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34970142001
+          name: r234-ecommerce-formal-joint-cpr-v1-batch001-34970142001
+          path: inputs/frozen
+
+      - name: Download compact R2/R4 artifact
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34990393003
+          name: r234-reviewer-v2-compact-packets-34990393003
+          path: inputs/compact_v01
+
+      - name: Download compact R3 v0.2 artifact
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34992079531
+          name: r234-reviewer-v2-r3-compact-v02-34992079531
+          path: inputs/r3_v02
+
+      - name: Execute one full Reviewer-v2 round
+        id: review
+        continue-on-error: true
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python -m arena.run_reviewer_v2_deepseek_round \
+            --launch-record '${{ steps.launch.outputs.path }}' \
+            --r2 inputs/compact_v01/compact_r2_packets.jsonl \
+            --r3 inputs/r3_v02/compact_r3_packets_v02.jsonl \
+            --r4 inputs/compact_v01/compact_r4_packets.jsonl \
+            --traces inputs/frozen/formal_subject_traces.jsonl \
+            --outdir reviewer_v2_round \
+            --execute-real-api
+
+      - name: Deterministic CPR synthesis
+        if: steps.review.outcome == 'success'
+        run: |
+          python -m arena.synthesize_reviewer_v2 \
+            --r2 reviewer_v2_round/r2_review_records.jsonl \
+            --r3 reviewer_v2_round/r3_review_records.jsonl \
+            --r4 reviewer_v2_round/r4_review_records.jsonl \
+            --outdir reviewer_v2_round/synthesis
+
+      - name: Freeze execution metadata
+        if: always()
+        run: |
+          cp '${{ steps.launch.outputs.path }}' reviewer_v2_round/launch_record.json 2>/dev/null || true
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p = Path('reviewer_v2_round/execution_metadata.json')
+          p.parent.mkdir(parents=True, exist_ok=True)
+          x = {
+              'github_run_id': os.environ['GITHUB_RUN_ID'],
+              'github_sha': os.environ['GITHUB_SHA'],
+              'review_step_outcome': '${{ steps.review.outcome }}',
+              'subject_rerun_triggered': False,
+          }
+          p.write_text(json.dumps(x, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload Reviewer-v2 round artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r234-reviewer-v2-deepseek-round-${{ github.run_id }}
+          path: reviewer_v2_round/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Fail workflow if semantic round stopped
+        if: steps.review.outcome != 'success'
+        run: |
+          echo 'Reviewer-v2 round did not complete; partial artifact was preserved.'
+          exit 1
