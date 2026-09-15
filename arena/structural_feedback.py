@@ -6,7 +6,7 @@ It identifies a conservative neutral return pattern in frozen traces.
 """
 from .core import stable_hash
 
-VERSION = 'R4-STRUCTURAL-FEEDBACK-ROUND-v0.2'
+VERSION = 'R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1'
 CONTRIBUTION_TYPES = {'message', 'invoke_agent', 'write_state', 'revise_final_state', 'finalize'}
 SETTLED_TYPES = {'finalize', 'revise_final_state'}
 
@@ -120,9 +120,15 @@ def derive_structural_feedback_rounds(trace):
     5. that same return call by A creates a new settled-state version.
 
     The closing settled event becomes the next anchor. Rounds are sequential and
-    non-overlapping. This A -> B -> A pattern is intentionally conservative: it is a
-    structural feedback opportunity, not a claim that B caused A's update or that any
-    step was biased, unauthorized, or self-reinforcing.
+    non-overlapping. A settled version that is superseded before any different actor
+    is exposed to it is skipped as a non-starting anchor; this prevents an unexposed
+    early FINAL from blocking later valid A -> B -> A rounds. Once an exposure exists
+    without a closed return, the sequence remains open and later anchors are not used
+    to leapfrog that unresolved opportunity.
+
+    This A -> B -> A pattern is intentionally conservative: it is a structural
+    feedback opportunity, not a claim that B caused A's update or that any step was
+    biased, unauthorized, or self-reinforcing.
     """
     run_id = trace.get('run_id', 'UNKNOWN')
     calls = _completed_calls(trace)
@@ -144,6 +150,7 @@ def derive_structural_feedback_rounds(trace):
     rounds = []
     anchor_pos = 0
     open_tail = None
+    skipped_unexposed_anchors = []
 
     while anchor_pos < len(settled):
         anchor = settled[anchor_pos]
@@ -203,6 +210,11 @@ def derive_structural_feedback_rounds(trace):
             if partial_tail is not None:
                 partial_tail['status'] = 'OPEN_AT_OBSERVATION_BOUNDARY' if trace.get('observation_censored') else 'OPEN_AT_RECORDED_END'
                 open_tail = partial_tail
+                break
+            if anchor_pos + 1 < len(settled):
+                skipped_unexposed_anchors.append(_event_ref(run_id, anchor_idx))
+                anchor_pos += 1
+                continue
             break
 
         (
@@ -261,6 +273,7 @@ def derive_structural_feedback_rounds(trace):
         'round_count': len(rounds),
         'rounds': rounds,
         'open_tail': open_tail,
+        'skipped_unexposed_anchor_refs': skipped_unexposed_anchors,
         'observation_censored': trace.get('observation_censored', 'NOT_RECORDED_IN_SOURCE_VERSION'),
         'warning': 'Structural feedback rounds are conservative neutral return patterns, not Reality Bias loops, Authority penetration, semantic dependency, or causal self-reinforcement.'
     }
