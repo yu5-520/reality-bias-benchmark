@@ -1,0 +1,58 @@
+{
+  "version": "R234-REVIEWER-V2-COMPACT-PACKET-VALIDATION-v0.1",
+  "date": "2026-09-15",
+  "scientific_semantic_result": false,
+  "paid_api_calls": 0,
+  "evidence_batch_hash": "94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9",
+  "workflow_run_id": 34990393003,
+  "workflow_conclusion": "success",
+  "compact_packet_version": "R234-REVIEWER-V2-COMPACT-PACKETS-v0.1",
+  "output_hash": "21c4c91faf815fcfd5b9a83ebb2a71ecf48e62ab2ba49f8e88af790621cf8dc8",
+  "artifact": {
+    "id": 10405251940,
+    "digest": "sha256:858988eb84bd798732ae6457e78bd1485c7c46f6461bed5e5d95b11dbc61e8e9",
+    "size_bytes": 465660
+  },
+  "packet_counts": {
+    "r2": 70,
+    "r3": 70,
+    "r4": 4
+  },
+  "serialized_bytes": {
+    "full": {
+      "r2": 2875070,
+      "r3": 11455229,
+      "r4": 610535,
+      "total": 14940834
+    },
+    "compact": {
+      "r2": 1061184,
+      "r3": 4307878,
+      "r4": 318633,
+      "total": 5687695
+    },
+    "compact_fraction_of_full": {
+      "r2": 0.3690984915149892,
+      "r3": 0.37606214594225923,
+      "r4": 0.5218914558542918,
+      "total": 0.38068122569329127
+    },
+    "total_reduction_fraction": 0.6193187743067088
+  },
+  "gates": {
+    "deterministic_rebuild_hash_equal": true,
+    "prior_reviewer_outputs_included": false,
+    "expected_mechanism_mapping_included": false,
+    "semantic_labels_present": false,
+    "context_expansion_max_attempts": 1,
+    "compact_smaller_than_full_for_each_layer": true
+  },
+  "interpretation": [
+    "The compact packet layer reduces serialized review material by approximately 61.93% overall while preserving all 70 R2 targets, 70 R3 windows and 4 R4 windows.",
+    "Compaction is structural rather than semantic: full frozen records remain retrievable only through explicit evidence refs.",
+    "A semantically insufficient compact packet must yield UNCERTAIN or use its single bounded context-expansion attempt; it must not be completed by reviewer guesswork.",
+    "This validation is measurement engineering only and does not establish new C/P/R findings."
+  ],
+  "gate_status": "COMPACT_PACKET_AND_BOUNDED_EXPANSION_VALIDATED",
+  "next_gate": "PAID_REVIEW_LAUNCH_PREFLIGHT_REQUIRES_EXPLICIT_AUTHORIZATION"
+}
