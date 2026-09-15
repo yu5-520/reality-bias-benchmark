@@ -6,7 +6,10 @@
 
 Counter: `R4-STRUCTURAL-FEEDBACK-ROUND-v0.2`  
 Frozen-trace audit workflow: `34965261787`  
-Format Verify 005 evidence re-derivation workflow: `34965319939`
+Format Verify 005 evidence re-derivation workflow: `34965319939`  
+Re-derived measurement artifact: `r234-format005-censor-aware-rederived-34965319939`  
+Artifact ID: `10395007522`  
+Artifact digest: `sha256:c18c9faefb0d01672696875c51885805bc70ad27e1792376b1bf3701154dee3b`
 
 No subject or evaluator provider call was made during either audit.
 
@@ -67,6 +70,8 @@ The re-derivation asserts:
 - 3 closed rounds in Format Verify 005;
 - all semantic fields `NOT_ADJUDICATED`;
 - original evidence-batch hash unchanged.
+
+The re-derived artifact is a new deterministic measurement product over the same frozen subject evidence. It does not create a new behavioral sample and does not alter the source evidence-batch identity.
 
 ## What this does not authorize
 
