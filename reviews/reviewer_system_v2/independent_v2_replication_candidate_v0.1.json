@@ -1,0 +1,92 @@
+{
+  "candidate_version": "R234-INDEPENDENT-REVIEWER-V2-REPLICATION-CANDIDATE-v0.1",
+  "status": "BLOCKED_PROVIDER_NOT_SELECTED",
+  "execute_real_api": false,
+  "scientific_role": "INDEPENDENT_REVIEWER_V2_REPLICATION",
+  "evidence_batch_hash": "94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9",
+  "independence_requirements": {
+    "reviewer_family_must_differ_from_deepseek": true,
+    "same_deepseek_family_qualifies_as_independent": false,
+    "current_interactive_gpt56_sol_qualifies_as_blind_independent": false,
+    "reason_current_interactive_model_is_excluded": "The current conversation has already observed historical results, the DeepSeek-v2 result, same-model transition analysis, hypotheses and paper framing.",
+    "freeze_outputs_before_comparison": true
+  },
+  "population": {
+    "selection_rule": "FULL_FROZEN_BASE_POPULATION",
+    "r2_units": 70,
+    "r3_units": 70,
+    "r4_units": 4,
+    "total_units": 144,
+    "historical_disagreement_conditioning": false,
+    "prior_v2_result_conditioning": false
+  },
+  "packet_bindings": {
+    "R2": {
+      "packet_version": "R234-REVIEWER-V2-R2-COMPACT-PACKET-v0.1",
+      "sha256": "c23522f9916530b4a342c2fd4b2cc028bb8613d0b8626cdc0d76ed9bc1ded63f"
+    },
+    "R3": {
+      "packet_version": "R234-REVIEWER-V2-R3-COMPACT-PACKET-v0.2",
+      "sha256": "7cbe61987172f6dd2fa6f547766c145ddf8782d5fc7ec1bf3762b06fb0db0151",
+      "packet_set_hash": "b1abe2510bce774a3d9f5792aaa8353b60781090894c6ba0bade7d4f5955a765"
+    },
+    "R4": {
+      "packet_version": "R234-REVIEWER-V2-R4-COMPACT-PACKET-v0.1",
+      "sha256": "fe0a7d24a2d8fa4f102da9883529bebbcef9be0397057f3b8a23230754ee393a"
+    }
+  },
+  "prompt_hashes": {
+    "R2": "88cc842ea12030530abd43563b8d6c9d6fb82ef25f997bcd9f55831c4794a924",
+    "R3": "e3b2aaafb0ac344b9d92ce3b0c8e0b0dd1fe2693a78b773c5bb3afd8e432373d",
+    "R4": "626ace9b857e352380801eb4d125d387af97953ee184b692aa9981b0b2ed12af"
+  },
+  "blind_workspace": {
+    "allow": [
+      "exact frozen R2/R3/R4 packets",
+      "exact frozen R2/R3/R4 prompts",
+      "sanitized expansion corpus containing only allowed frozen subject refs",
+      "schema/runtime validation code",
+      "provider/model config without study results"
+    ],
+    "forbid_result_sources": [
+      "reviews/formal_batch001_model_review_v1/",
+      "reviews/formal_batch001_blind_deepseek_v1/",
+      "results/formal_batch001_measurement_v2/reviewer_v2_deepseek_round001_summary.json",
+      "workflow artifact 10407112876",
+      "theory/change_notes/CN-R-034*",
+      "theory/change_notes/CN-R-035*",
+      "theory/change_notes/CN-R-042*",
+      "theory/change_notes/CN-R-043*",
+      "docs/R234_same_model_v1_v2_measurement_transition.md",
+      "any A/B agreement or current manuscript conclusion"
+    ],
+    "forbidden_semantic_cues": [
+      "historical C/P/R prevalence",
+      "historical authorization prevalence",
+      "first Reviewer-v2 C/P/R prevalence",
+      "v1-v2 transition counts",
+      "expected C/P/R to Authority routing",
+      "whether a target was historically disputed"
+    ]
+  },
+  "runtime_policy": {
+    "malformed_output_retries_max": 2,
+    "context_expansion_max_per_packet": 1,
+    "semantic_uncertainty_retry": false,
+    "subject_rerun_on_reviewer_failure": false,
+    "preserve_partial_review_records": true,
+    "comparison_before_full_freeze": false
+  },
+  "provider_selection": {
+    "provider": null,
+    "model_family": null,
+    "model": null,
+    "config_hash": null,
+    "accepted_returned_model_values": [],
+    "pricing_snapshot": null,
+    "hard_spend_ceiling_usd": null,
+    "explicit_user_authorization_ref": null
+  },
+  "activation_rule": "Real replication cannot start until a different-from-DeepSeek model family, exact blind-bundle hash, cost ceiling and explicit user authorization are frozen in a separate immutable launch record.",
+  "k2_authorized": false
+}
