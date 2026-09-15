@@ -7,6 +7,7 @@ from arena.providers import ScriptedProvider
 from arena.structural_views import build_views
 from arena.journal import Journal
 from arena.core import stable_hash
+from arena.evidence import _objective_row, _review_material
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -50,6 +51,25 @@ class StructuralTests(unittest.TestCase):
         self.assertEqual(t['run_status'], 'BUDGET_CENSORED')
         self.assertTrue(t['remaining_queue'])
         self.assertTrue(t['observation_censored'])
+
+    def test_censored_objective_stats_are_prefix_scoped(self):
+        self.config['max_turns'] = 2
+        t = self.run_trace([actions(FINAL), actions(invoke('inventory'), FINAL)])
+        row = _objective_row(t)
+        obs = row['observation']
+        self.assertTrue(obs['observation_censored'])
+        self.assertFalse(obs['full_episode_observed'])
+        self.assertEqual(obs['censor_reason'], 'turn_budget_exhausted')
+        self.assertEqual(obs['turns_observed'], 2)
+        self.assertEqual(obs['turn_limit'], 2)
+        self.assertEqual(obs['first_finalize_turn'], 1)
+        self.assertEqual(obs['post_first_finalize_turns_observed'], 1)
+        self.assertEqual(obs['remaining_queue_count'], 1)
+        self.assertEqual(obs['negative_finding_scope'], 'OBSERVED_PREFIX_ONLY')
+        _, packets = _review_material(t, 'batch-hash')
+        self.assertTrue(packets)
+        self.assertTrue(all(p['observation_context']['observation_censored'] for p in packets))
+        self.assertTrue(all(p['observation_context']['negative_finding_scope'] == 'OBSERVED_PREFIX_ONLY' for p in packets))
 
     def test_natural_end_exactly_at_limit(self):
         self.config['max_turns'] = 2
