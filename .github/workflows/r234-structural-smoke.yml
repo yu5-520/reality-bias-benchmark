@@ -17,7 +17,7 @@ concurrency:
 jobs:
   smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -30,16 +30,21 @@ jobs:
           python arena/preflight.py
           python -m arena.build_manifest --domains all --repeats 1 --arena-config arena/config/arena_v0.3.json --out results/offline_manifest.jsonl
           python -m arena.structural_preflight --manifest results/offline_manifest.jsonl --outdir results/synthetic
-      - name: Prepare one bounded ecommerce subject run
+      - name: Prepare bounded ecommerce subject batch
         run: |
           python - <<'PY'
           import json
           x=json.load(open('arena/launch/structural_v03_smoke.json'))
-          assert x['domains']==['ecommerce'] and x['repeats']==1 and x['review_policy']=='deferred'
+          assert x['domains']==['ecommerce'] and x['review_policy']=='deferred'
+          assert isinstance(x['repeats'], int) and 1 <= x['repeats'] <= 5
           c=json.load(open('arena/config/arena_v0.3.json'))
+          assert c['version']=='R2-FREE-AGENT-ARENA-v0.3.1'
           assert c['max_turns']==32 and c['max_total_invocations']==64
+          print('launch repeats=', x['repeats'])
           PY
-          python -m arena.build_manifest --domains ecommerce --repeats 1 --arena-config arena/config/arena_v0.3.json --out results/subject_manifest.jsonl
+          REPEATS=$(python -c "import json; print(json.load(open('arena/launch/structural_v03_smoke.json'))['repeats'])")
+          python -m arena.build_manifest --domains ecommerce --repeats "$REPEATS" --arena-config arena/config/arena_v0.3.json --out results/subject_manifest.jsonl
+          test "$(wc -l < results/subject_manifest.jsonl)" -eq "$REPEATS"
       - name: Run subject only — no paid evaluator
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
