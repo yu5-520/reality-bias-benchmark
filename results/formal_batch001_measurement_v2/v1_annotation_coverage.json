@@ -1,0 +1,43 @@
+{
+  "analysis_hash": "785899c245247d16afd77552a600fa0c9cf9bb472a2ec648d2349a82b45626c0",
+  "disagreement_candidate_family_counts": {
+    "EXPLICIT_STATUS_JUMP": 3,
+    "FINAL_REVISION": 8,
+    "HIGH_CERTAINTY_WRITE": 5,
+    "INVOCATION": 17,
+    "PENDING_DUPLICATE_INVOCATION": 4,
+    "POST_SETTLEMENT": 35,
+    "REPEAT_INVOCATION": 5,
+    "STATE_WRITE": 29
+  },
+  "event_count": 70,
+  "interpretation": [
+    "This is a coverage/alignment diagnostic only; Reviewer v1 labels are not ground truth for Measurement v2.",
+    "A v1 label outside a narrow structural family is not automatically a false positive because semantic promotion/scope/retrospective effects can be embedded in other action types.",
+    "The diagnostic shows where v1 labels were behavior-shaped and whether v2 target-local packets preserve the relevant events for later boundary review."
+  ],
+  "measurement_v2_target_coverage_count": 70,
+  "paid_api_calls": 0,
+  "reviewer_v2_packet_coverage_count": 70,
+  "reviewers": {
+    "A": {
+      "labels": {
+        "C": {"action_type_counts": {"write_state": 3}, "candidate_family_counts": {"EXPLICIT_STATUS_JUMP": 1, "FINAL_REVISION": 0, "HIGH_CERTAINTY_WRITE": 3, "INVOCATION": 0, "PENDING_DUPLICATE_INVOCATION": 0, "POST_SETTLEMENT": 2, "REPEAT_INVOCATION": 0, "STATE_WRITE": 3}, "positive_event_count": 3, "realized_positive_count": 3},
+        "P": {"action_type_counts": {"invoke_agent": 10}, "candidate_family_counts": {"EXPLICIT_STATUS_JUMP": 0, "FINAL_REVISION": 0, "HIGH_CERTAINTY_WRITE": 0, "INVOCATION": 10, "PENDING_DUPLICATE_INVOCATION": 7, "POST_SETTLEMENT": 5, "REPEAT_INVOCATION": 8, "STATE_WRITE": 0}, "positive_event_count": 10, "realized_positive_count": 10},
+        "R": {"action_type_counts": {"invoke_agent": 8, "revise_final_state": 6, "write_state": 28}, "candidate_family_counts": {"EXPLICIT_STATUS_JUMP": 1, "FINAL_REVISION": 6, "HIGH_CERTAINTY_WRITE": 2, "INVOCATION": 8, "PENDING_DUPLICATE_INVOCATION": 5, "POST_SETTLEMENT": 42, "REPEAT_INVOCATION": 6, "STATE_WRITE": 28}, "positive_event_count": 42, "realized_positive_count": 42}
+      },
+      "realized_unauthorized_mechanism_coded_count": 16
+    },
+    "B": {
+      "labels": {
+        "C": {"action_type_counts": {"invoke_agent": 1, "revise_final_state": 3, "write_state": 20}, "candidate_family_counts": {"EXPLICIT_STATUS_JUMP": 2, "FINAL_REVISION": 3, "HIGH_CERTAINTY_WRITE": 5, "INVOCATION": 1, "PENDING_DUPLICATE_INVOCATION": 1, "POST_SETTLEMENT": 19, "REPEAT_INVOCATION": 1, "STATE_WRITE": 20}, "positive_event_count": 24, "realized_positive_count": 24},
+        "P": {"action_type_counts": {"invoke_agent": 18, "revise_final_state": 3, "write_state": 4}, "candidate_family_counts": {"EXPLICIT_STATUS_JUMP": 0, "FINAL_REVISION": 3, "HIGH_CERTAINTY_WRITE": 0, "INVOCATION": 18, "PENDING_DUPLICATE_INVOCATION": 5, "POST_SETTLEMENT": 7, "REPEAT_INVOCATION": 6, "STATE_WRITE": 4}, "positive_event_count": 25, "realized_positive_count": 24},
+        "R": {"action_type_counts": {"invoke_agent": 4, "revise_final_state": 6, "write_state": 15}, "candidate_family_counts": {"EXPLICIT_STATUS_JUMP": 1, "FINAL_REVISION": 6, "HIGH_CERTAINTY_WRITE": 1, "INVOCATION": 4, "PENDING_DUPLICATE_INVOCATION": 3, "POST_SETTLEMENT": 25, "REPEAT_INVOCATION": 3, "STATE_WRITE": 15}, "positive_event_count": 25, "realized_positive_count": 25}
+      },
+      "realized_unauthorized_mechanism_coded_count": 26
+    }
+  },
+  "v1_disagreement_count": 54,
+  "v1_disagreement_target_coverage_count": 54,
+  "version": "R234-V2-V1-COVERAGE-ANALYSIS-v0.1"
+}

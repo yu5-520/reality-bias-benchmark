@@ -6,6 +6,7 @@ on:
     paths:
       - 'arena/measurement_v2.py'
       - 'arena/test_measurement_v2.py'
+      - 'arena/analyze_measurement_v2_v1_coverage.py'
       - 'schemas/r234_structural_candidate_v0.1.schema.json'
       - '.github/workflows/r234-measurement-v2-offline-validate.yml'
 
@@ -55,7 +56,7 @@ jobs:
             --manifest frozen/formal_subject_manifest.jsonl \
             --outdir measurement_v2_rebuild
 
-      - name: Gate checks
+      - name: Measurement gate checks
         run: |
           python - <<'PY'
           import json
@@ -91,6 +92,49 @@ jobs:
           assert all(x.get('same_response_actions_included') is False for x in rows)
           assert sum(x['target']['effect_scope'] == 'ATTEMPT_ONLY_NO_REALIZED_EFFECT' for x in rows) == 2
           print(json.dumps(a, indent=2, sort_keys=True))
+          PY
+
+      - name: Download frozen Reviewer B v1 artifact
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34976668171
+          name: formal-batch001-blind-deepseek-review-34976668171
+          path: reviewer_b_v1
+
+      - name: Download frozen A/B agreement artifact
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34976668171
+          name: formal-batch001-cross-model-agreement-34976668171
+          path: agreement_v1
+
+      - name: V1 annotation coverage diagnostic
+        run: |
+          python -m arena.analyze_measurement_v2_v1_coverage \
+            --r2 measurement_v2_out/r2_structural_candidates.jsonl \
+            --packets measurement_v2_out/reviewer_v2_r2_packets.jsonl \
+            --reviewer-b reviewer_b_v1/review_records.jsonl \
+            --agreement agreement_v1/agreement_summary.json \
+            --out measurement_v2_out/v1_annotation_coverage.json
+
+      - name: Coverage diagnostic gates
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x = json.loads(Path('measurement_v2_out/v1_annotation_coverage.json').read_text())
+          assert x['analysis_hash'] == '785899c245247d16afd77552a600fa0c9cf9bb472a2ec648d2349a82b45626c0'
+          assert x['event_count'] == 70
+          assert x['measurement_v2_target_coverage_count'] == 70
+          assert x['reviewer_v2_packet_coverage_count'] == 70
+          assert x['v1_disagreement_count'] == 54
+          assert x['v1_disagreement_target_coverage_count'] == 54
+          assert x['reviewers']['A']['realized_unauthorized_mechanism_coded_count'] == 16
+          assert x['reviewers']['B']['realized_unauthorized_mechanism_coded_count'] == 26
+          assert x['paid_api_calls'] == 0
+          print(json.dumps(x, indent=2, sort_keys=True))
           PY
 
       - name: Upload deterministic outputs
