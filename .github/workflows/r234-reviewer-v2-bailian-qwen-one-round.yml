@@ -4,11 +4,9 @@ on:
   push:
     paths:
       - 'reviews/reviewer_system_v2/launch_records/*qwen*authorized*.json'
-
 permissions:
   contents: read
   actions: read
-
 jobs:
   review:
     runs-on: ubuntu-latest
@@ -19,53 +17,41 @@ jobs:
       BAILIAN_MODEL: ${{ vars.BAILIAN_MODEL }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+        with: {fetch-depth: 2}
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+        with: {python-version: '3.11'}
       - name: Resolve immutable authorized Qwen launch record
         id: launch
         run: |
           set -euo pipefail
           git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA" | grep '^reviews/reviewer_system_v2/launch_records/.*qwen.*authorized.*\.json$' > /tmp/qwen_launch.txt || true
           test "$(wc -l < /tmp/qwen_launch.txt | tr -d ' ')" = "1"
-          launch=$(cat /tmp/qwen_launch.txt)
-          echo "path=$launch" >> "$GITHUB_OUTPUT"
+          launch=$(cat /tmp/qwen_launch.txt); echo "path=$launch" >> "$GITHUB_OUTPUT"
           python - <<PY
           import json
-          x=json.load(open('$launch'))
-          assert x['status']=='AUTHORIZED' and x['execute_real_api'] is True
-          assert x['scientific_role']=='INDEPENDENT_REVIEWER_V2_REPLICATION'
-          assert x['provider']['model_family']=='Qwen'
-          assert x['provider']['model']=='qwen3.8-max-0902'
+          x=json.load(open('$launch')); assert x['status']=='AUTHORIZED' and x['execute_real_api'] is True
+          assert x['scientific_role']=='INDEPENDENT_REVIEWER_V2_REPLICATION' and x['provider']['model_family']=='Qwen' and x['provider']['model']=='qwen3.8-max-0902'
           assert x['blind_bundle_binding']['bundle_hash']=='fc46e673c0d21bff9e30ca97a197c3b9dd04c27bf69ba0f3e07849ee6d00638e'
-          assert x['authorization_ref']
-          assert 0 < x['spend_policy']['launch_max_spend_cny'] <= x['spend_policy']['repository_level_absolute_ceiling_cny']
-          print({'launch_record':'$launch','model':x['provider']['model'],'max_spend_cny':x['spend_policy']['launch_max_spend_cny']})
+          assert x['authorization_ref']; assert 0 < x['spend_policy']['launch_max_spend_cny'] <= x['spend_policy']['repository_level_absolute_ceiling_cny']
+          print({'launch_record':'$launch','continuation_of':x.get('continuation_of')})
           PY
       - name: Download frozen Batch001 subject artifact
         uses: actions/download-artifact@v4
-        with:
-          github-token: ${{ github.token }}
-          run-id: 34970142001
-          name: r234-ecommerce-formal-joint-cpr-v1-batch001-34970142001
-          path: inputs/frozen
+        with: {github-token: '${{ github.token }}', run-id: 34970142001, name: r234-ecommerce-formal-joint-cpr-v1-batch001-34970142001, path: inputs/frozen}
       - name: Download compact R2/R4 artifact
         uses: actions/download-artifact@v4
-        with:
-          github-token: ${{ github.token }}
-          run-id: 34990393003
-          name: r234-reviewer-v2-compact-packets-34990393003
-          path: inputs/compact_v01
+        with: {github-token: '${{ github.token }}', run-id: 34990393003, name: r234-reviewer-v2-compact-packets-34990393003, path: inputs/compact_v01}
       - name: Download compact R3 v0.2 artifact
+        uses: actions/download-artifact@v4
+        with: {github-token: '${{ github.token }}', run-id: 34992079531, name: r234-reviewer-v2-r3-compact-v02-34992079531, path: inputs/r3_v02}
+      - name: Download frozen partial Qwen checkpoint when continuing
         uses: actions/download-artifact@v4
         with:
           github-token: ${{ github.token }}
-          run-id: 34992079531
-          name: r234-reviewer-v2-r3-compact-v02-34992079531
-          path: inputs/r3_v02
-      - name: Execute one blind Qwen Reviewer-v2 replication
+          run-id: 35002183717
+          name: r234-reviewer-v2-qwen-independent-round-35002183717
+          path: inputs/qwen_resume
+      - name: Execute blind Qwen Reviewer-v2 continuation
         id: review
         continue-on-error: true
         run: |
@@ -75,12 +61,11 @@ jobs:
             --r3 inputs/r3_v02/compact_r3_packets_v02.jsonl \
             --r4 inputs/compact_v01/compact_r4_packets.jsonl \
             --traces inputs/frozen/formal_subject_traces.jsonl \
-            --outdir reviewer_v2_qwen_round \
-            --execute-real-api
+            --resume-from inputs/qwen_resume \
+            --outdir reviewer_v2_qwen_round --execute-real-api
       - name: Deterministic CPR synthesis
         if: steps.review.outcome == 'success'
-        run: |
-          python -m arena.synthesize_reviewer_v2 --r2 reviewer_v2_qwen_round/r2_review_records.jsonl --r3 reviewer_v2_qwen_round/r3_review_records.jsonl --r4 reviewer_v2_qwen_round/r4_review_records.jsonl --outdir reviewer_v2_qwen_round/synthesis
+        run: python -m arena.synthesize_reviewer_v2 --r2 reviewer_v2_qwen_round/r2_review_records.jsonl --r3 reviewer_v2_qwen_round/r3_review_records.jsonl --r4 reviewer_v2_qwen_round/r4_review_records.jsonl --outdir reviewer_v2_qwen_round/synthesis
       - name: Freeze execution metadata
         if: always()
         run: |
@@ -88,17 +73,13 @@ jobs:
           python - <<'PY'
           import json,os
           from pathlib import Path
-          p=Path('reviewer_v2_qwen_round/execution_metadata.json'); p.parent.mkdir(parents=True,exist_ok=True)
-          p.write_text(json.dumps({'github_run_id':os.environ['GITHUB_RUN_ID'],'github_sha':os.environ['GITHUB_SHA'],'review_step_outcome':'${{ steps.review.outcome }}','subject_rerun_triggered':False},indent=2,sort_keys=True))
+          p=Path('reviewer_v2_qwen_round/execution_metadata.json');p.parent.mkdir(parents=True,exist_ok=True)
+          p.write_text(json.dumps({'github_run_id':os.environ['GITHUB_RUN_ID'],'github_sha':os.environ['GITHUB_SHA'],'review_step_outcome':'${{ steps.review.outcome }}','resumed_from_run_id':35002183717,'subject_rerun_triggered':False},indent=2,sort_keys=True))
           PY
       - name: Upload blind Qwen round artifact
         if: always()
         uses: actions/upload-artifact@v4
-        with:
-          name: r234-reviewer-v2-qwen-independent-round-${{ github.run_id }}
-          path: reviewer_v2_qwen_round/
-          if-no-files-found: error
-          retention-days: 90
+        with: {name: 'r234-reviewer-v2-qwen-independent-round-${{ github.run_id }}', path: reviewer_v2_qwen_round/, if-no-files-found: error, retention-days: 90}
       - name: Fail if semantic round stopped
         if: steps.review.outcome != 'success'
         run: exit 1
