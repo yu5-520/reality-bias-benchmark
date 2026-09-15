@@ -1,0 +1,51 @@
+{
+  "launch_record_version": "R234-REVIEWER-V2-AUTHORIZED-LAUNCH-RECORD-v0.1",
+  "status": "TEMPLATE_ONLY_NOT_AUTHORIZED",
+  "execute_real_api": false,
+  "authorization_ref": null,
+  "authorized_at": null,
+  "scientific_role": "REANNOTATION_CALIBRATION_UNDER_REVISED_SEMANTIC_CONTRACT",
+  "preflight_manifest_hash": "38288a8ceb51d2c95148f9ceca206c93efa0597244e67b7751919d85e9eebccc",
+  "evidence_batch_hash": "94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9",
+  "packet_files": {
+    "R2": {
+      "sha256": "c23522f9916530b4a342c2fd4b2cc028bb8613d0b8626cdc0d76ed9bc1ded63f",
+      "unit_count": 70,
+      "packet_version": "R234-REVIEWER-V2-R2-COMPACT-PACKET-v0.1"
+    },
+    "R3": {
+      "sha256": "7cbe61987172f6dd2fa6f547766c145ddf8782d5fc7ec1bf3762b06fb0db0151",
+      "unit_count": 70,
+      "packet_version": "R234-REVIEWER-V2-R3-COMPACT-PACKET-v0.2"
+    },
+    "R4": {
+      "sha256": "fe0a7d24a2d8fa4f102da9883529bebbcef9be0397057f3b8a23230754ee393a",
+      "unit_count": 4,
+      "packet_version": "R234-REVIEWER-V2-R4-COMPACT-PACKET-v0.1"
+    }
+  },
+  "prompt_hashes": {
+    "R2": "88cc842ea12030530abd43563b8d6c9d6fb82ef25f997bcd9f55831c4794a924",
+    "R3": "e3b2aaafb0ac344b9d92ce3b0c8e0b0dd1fe2693a78b773c5bb3afd8e432373d",
+    "R4": "626ace9b857e352380801eb4d125d387af97953ee184b692aa9981b0b2ed12af"
+  },
+  "model_config_sha256": "fe7bbafda1c4c12b1d1f5dca963d1a45cbe503713aaa486fac09f569d1b5f8c5",
+  "accepted_returned_model_values": ["deepseek-flash"],
+  "runtime_policy": {
+    "max_workers": 1,
+    "malformed_output_retries_max": 2,
+    "context_expansion_max_per_packet": 1,
+    "semantic_uncertainty_retry": false,
+    "subject_rerun_on_reviewer_failure": false,
+    "stop_on_first_unrecoverable_review_error": true,
+    "preserve_partial_review_records": true
+  },
+  "spend_policy": {
+    "price_mode_for_ceiling": "peak",
+    "price_snapshot_source_date": "2026-09-15",
+    "launch_max_spend_usd": null,
+    "repository_level_absolute_ceiling_usd": 2.0
+  },
+  "immutability_rule": "After authorization this template must be copied to a new launch_records/<unique-id>.json file. Do not convert the template in place and do not overwrite an authorized record after a provider call begins.",
+  "activation_rule": "Only explicit user authorization may set status=AUTHORIZED, execute_real_api=true, authorization_ref, authorized_at and a positive launch_max_spend_usd <= 2.0."
+}
