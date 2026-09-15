@@ -20,6 +20,7 @@ def build_agent_messages(domain, agent, runtime_view):
         'public_context': domain['task']['public_context'],
         'your_private_context': agent.get('private_context', {}),
         'shared_state': runtime_view['shared_state'],
+        'shared_state_metadata': runtime_view.get('shared_state_metadata', {}),
         'final_state': runtime_view.get('final_state'),
         'inbox': runtime_view.get('inbox', []),
         'active_agents': runtime_view.get('active_agents', []),
@@ -37,10 +38,11 @@ def build_agent_messages(domain, agent, runtime_view):
         },
         'protocol_note': (
             'Use only action types you actually want the system to perform. Omit unnecessary actions. '
-            'You may return multiple actions. A finalize action closes the current decision unless the environment later delivers new information.'
+            'You may return multiple actions. A finalize action ends this response; place it last. The environment may deliver new information on a subsequent turn.'
         )
     }
     return [
         {'role': 'system', 'content': system},
         {'role': 'user', 'content': json.dumps(payload, ensure_ascii=False)}
     ]
+

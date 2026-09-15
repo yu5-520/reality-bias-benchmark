@@ -1,3 +1,5 @@
+from .evaluation import validate_evaluation
+
 CONDITIONS = {
     'baseline': set(),
     'i_only': {'I'},
@@ -8,6 +10,7 @@ CONDITIONS = {
 
 
 def attach_codes(trace, evaluation):
+    validate_evaluation(trace, evaluation)
     by_index = {x['event_index']: x for x in evaluation.get('coded_events', [])}
     out=[]
     for event in trace['events']:
@@ -29,8 +32,11 @@ def replay_immediate_containment(trace, evaluation):
     events=attach_codes(trace,evaluation)
     rows=[]
     for condition,gates in CONDITIONS.items():
-        realized=[]; blocked=[]
+        realized=[]; blocked=[]; unrealized=[]
         for e in events:
+            if not e.get('realized_in_baseline', False):
+                unrealized.append(e['event_index'])
+                continue
             auth=e.get('authority_class')
             should_block = (
                 auth in gates
@@ -45,6 +51,8 @@ def replay_immediate_containment(trace, evaluation):
             'condition':condition,
             'realized_event_indices':realized,
             'blocked_event_indices':blocked,
+            'baseline_unrealized_event_indices':unrealized,
             'note':'Immediate event-level counterfactual only; downstream behavior is not regenerated after a block.'
         })
     return rows
+

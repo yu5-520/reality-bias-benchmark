@@ -31,6 +31,8 @@ jobs:
       - name: Run engineering-only scripted preflight
         run: |
           python arena/preflight.py
+      - name: Validate state and evidence regression cases
+        run: python -m unittest discover -s arena/tests -v
       - name: Build offline manifest sample
         run: |
           python -m arena.build_manifest --domains all --repeats 2 --out results/arena_manifest_preflight.jsonl
@@ -41,3 +43,4 @@ jobs:
           name: r2-free-agent-arena-preflight-${{ github.run_id }}
           path: results/arena_manifest_preflight.jsonl
           retention-days: 30
+

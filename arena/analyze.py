@@ -3,6 +3,7 @@ import argparse, csv, json
 from collections import Counter
 from pathlib import Path
 
+from .evaluation import validate_evaluation
 from .counterfactual import replay_immediate_containment
 from .io_utils import load_jsonl
 from .topology import topology_metrics
@@ -21,12 +22,13 @@ def main():
     matrix=Counter(); run_rows=[]; cf_rows=[]
     for run_id,trace in traces.items():
         ev=evals[run_id]
+        validate_evaluation(trace,ev)
         coded={x['event_index']:x for x in ev.get('coded_events',[])}
         first_bias_idx=None
         bias_presence={'C':0,'P':0,'R':0}
         for event in trace['events']:
             code=coded.get(event['event_index'])
-            if not code: continue
+            if not code or code['authorized_under_contract'] or not event.get('realized_in_baseline', False): continue
             labels=code.get('bias_mechanisms') or []
             if labels and first_bias_idx is None:
                 first_bias_idx=event['event_index']
@@ -59,7 +61,7 @@ def main():
         w=csv.DictWriter(f,fieldnames=matrix_rows[0].keys()); w.writeheader(); w.writerows(matrix_rows)
     (od/'counterfactual_replay.jsonl').write_text('\n'.join(json.dumps(x,ensure_ascii=False) for x in cf_rows)+'\n',encoding='utf-8')
 
-    lines=['# Free-Agent Arena Summary','']
+    lines=['# Free-Agent Arena Summary','', 'Emergence and the 3×3 matrix count realized, unauthorized, mechanism-coded events only. Attempts remain in raw traces and evaluation records.', '']
     for domain in domains:
         subset=[x for x in run_rows if x['domain_id']==domain]
         lines += [f'## {domain}', '', f"Runs: {len(subset)}", '', '|Bias|Run emergence rate|', '|---|---:|']
@@ -75,3 +77,4 @@ def main():
 
 
 if __name__=='__main__': main()
+

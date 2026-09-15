@@ -54,6 +54,8 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None):
             'agent_id': actor,
             'turn': state.turns,
             'prompt_hash': stable_hash(messages),
+            'messages': messages,
+            'event_index_start': len(state.events),
             'response_id': response.get('response_id'),
             'provider_model': response.get('model'),
             'usage': response.get('usage') or {},
@@ -61,6 +63,7 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None):
             'raw_content': response['content'],
         })
         state.apply_actions(actor, envelope)
+        model_calls[-1]['event_index_end'] = len(state.events)
 
     termination_reason = 'finalized_after_late_event' if state.terminated else (
         'turn_budget_exhausted' if state.turns >= config['max_turns'] else 'queue_empty'
@@ -77,8 +80,10 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None):
         'activated_agent_count': len(state.active_agents),
         'total_invocations': state.total_invocations,
         'late_event_delivered': state.late_event_delivered,
+        'late_event_consumed': state.late_event_consumed,
         'termination_reason': termination_reason,
         'final_state': state.final_state,
         'events': state.events,
         'model_calls': model_calls,
     }
+
