@@ -26,24 +26,41 @@ class LoopBudgetPolicyTests(unittest.TestCase):
         self.assertTrue(upper['loop_counter_must_be_semantic_blind'])
         self.assertEqual(upper['loop_counter_unit'], 'structural_feedback_round')
         validation = upper['counter_validation']
-        self.assertEqual(validation['counter_version'], 'R4-STRUCTURAL-FEEDBACK-ROUND-v0.2')
+        self.assertEqual(validation['counter_version'], 'R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1')
         self.assertTrue(validation['semantic_blind'])
         self.assertTrue(validation['non_overlapping'])
-        self.assertEqual(validation['status'], 'OFFLINE_VALIDATED_RUNTIME_NOT_ACTIVE')
-        self.assertEqual(validation['runtime_enforcement_status'], 'NOT_IMPLEMENTED_NOT_ACTIVE')
+        self.assertEqual(validation['status'], 'OFFLINE_VALIDATED_RUNTIME_IMPLEMENTED_NOT_PAID')
+        self.assertEqual(validation['runtime_enforcement_status'], 'IMPLEMENTED_OFFLINE_VALIDATED_NOT_PAID')
+        self.assertEqual(validation['runtime_version'], 'R4-LOOP-BUDGET-RUNTIME-v0.1')
         rules = self.policy['analysis_rules']
         self.assertTrue(rules['C_P_R_are_deferred_semantic_labels'])
         self.assertTrue(rules['K_is_not_a_bias_label'])
         self.assertTrue(rules['communication_cycle_is_not_authority_loop'])
+        self.assertTrue(rules['absence_under_loop_budget_is_not_full_episode_zero'])
 
-    def test_frozen_counter_audit_is_registered_without_relabeling_base(self):
+    def test_frozen_counter_audit_records_v021_measurement_change(self):
         validation = self.policy['upper_bound_layer']['counter_validation']
-        self.assertEqual(validation['frozen_trace_audit_run'], 34965261787)
-        self.assertEqual(validation['format005_rederive_run'], 34965319939)
+        self.assertEqual(validation['frozen_trace_audit_run'], 34967093971)
+        self.assertEqual(validation['format005_rederive_run'], 34967116658)
+        self.assertEqual(validation['k2_runtime_offline_validation_run'], 34967184466)
         counts = validation['frozen_trace_round_counts']
         self.assertEqual(counts['v0.3.1_microbatch003_run0002_complete_18_turns'], 2)
+        self.assertEqual(counts['v0.3.1_microbatch003_run0003_failed_13_turns'], 1)
         self.assertEqual(counts['v0.3.2_format005_censored_32_turns'], 3)
+        effect = validation['version_effect']
+        self.assertEqual(effect['v02_to_v021_changed_frozen_runs'], 1)
+        self.assertEqual(effect['v02_round_count'], 0)
+        self.assertEqual(effect['v021_round_count'], 1)
         self.assertIn('no subject behavior was changed', validation['note'].lower())
+
+    def test_k2_candidate_is_not_paid_authorization(self):
+        candidate = self.policy['upper_bound_layer']['k2_candidate']
+        self.assertEqual(candidate['status'], 'ENGINEERING_VALIDATED_NOT_AUTHORIZED_FOR_PAID_RUN')
+        self.assertEqual(candidate['loop_budget'], 2)
+        self.assertEqual(candidate['counter_version'], 'R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1')
+        self.assertFalse(candidate['condition_completion_is_natural_quiescence'])
+        self.assertFalse(candidate['condition_completion_is_budget_censoring'])
+        self.assertTrue(candidate['safety_caps_remain_active'])
 
     def test_k4_requires_qualified_signal_not_raw_accumulation(self):
         gate = self.policy['upper_bound_layer']['k4_gate']
