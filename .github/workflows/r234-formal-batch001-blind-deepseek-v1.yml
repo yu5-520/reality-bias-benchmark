@@ -42,6 +42,7 @@ jobs:
           TRACES=$(find source_evidence -name formal_subject_traces.jsonl -type f | head -n1)
           MANIFEST=$(find source_evidence -name formal_subject_manifest.jsonl -type f | head -n1)
           test -n "$BATCH_META" && test -n "$PACKETS" && test -n "$TRACES" && test -n "$MANIFEST"
+          export BATCH_META PACKETS TRACES MANIFEST
           echo "BATCH_META=$BATCH_META" >> "$GITHUB_ENV"
           echo "PACKETS=$PACKETS" >> "$GITHUB_ENV"
           echo "TRACES=$TRACES" >> "$GITHUB_ENV"
