@@ -23,7 +23,7 @@ jobs:
       - name: Unit tests
         run: |
           python -m unittest arena.tests.test_structural_feedback_rounds -v
-          python -m unittest arena.tests.test_loop_budget_policy -v
+          python -m unittest arena.tests.test_loop_budget_runtime -v
       - name: Download v0.3.1 successful structural smoke
         uses: actions/download-artifact@v4
         with:
@@ -45,7 +45,7 @@ jobs:
           path: frozen/format005
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: 34962065864
-      - name: Derive conservative A-B-A structural feedback rounds
+      - name: Derive v0.2.1 A-B-A structural feedback rounds
         run: |
           mkdir -p results
           python - <<'PY'
@@ -60,7 +60,7 @@ jobs:
                   result=derive_structural_feedback_rounds(trace)
                   assert result['counter_status']=='RECORDED'
                   assert result['semantic_blind'] is True
-                  assert result['version']=='R4-STRUCTURAL-FEEDBACK-ROUND-v0.2'
+                  assert result['version']=='R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1'
                   row={
                       'source':source.name,
                       'run_id':trace['run_id'],
@@ -68,6 +68,7 @@ jobs:
                       'turns':trace.get('turns'),
                       'observation_censored':trace.get('observation_censored'),
                       'round_count':result['round_count'],
+                      'skipped_unexposed_anchor_refs':result.get('skipped_unexposed_anchor_refs',[]),
                       'open_tail':result['open_tail'],
                       'rounds':result['rounds'],
                   }
@@ -78,13 +79,27 @@ jobs:
           pathlib.Path('results/frozen_feedback_counter_audit.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2),encoding='utf-8')
           print('traces_checked=',len(rows))
           PY
-      - name: Verify no semantic claims were introduced
+      - name: Compare v0.2.1 counts with frozen v0.2 audit
         run: |
           python - <<'PY'
-          import json
+          import json, pathlib
           rows=json.load(open('results/frozen_feedback_counter_audit.json',encoding='utf-8'))
-          assert len(rows) >= 5
+          assert len(rows)==5, len(rows)
+          expected={
+              ('smoke001','arena-ecommerce-0001'):3,
+              ('microbatch003','arena-ecommerce-0001'):1,
+              ('microbatch003','arena-ecommerce-0002'):2,
+              ('microbatch003','arena-ecommerce-0003'):0,
+              ('format005','arena-ecommerce-0001'):3,
+          }
+          diffs=[]
           for row in rows:
+              key=(row['source'],row['run_id'])
+              old=expected[key]
+              row['v02_round_count']=old
+              row['count_changed_from_v02']=row['round_count']!=old
+              if row['count_changed_from_v02']:
+                  diffs.append({'source':row['source'],'run_id':row['run_id'],'v02':old,'v021':row['round_count']})
               for r in row['rounds']:
                   assert r['bias_labels']=='NOT_ADJUDICATED'
                   assert r['authority_penetration']=='NOT_ADJUDICATED'
@@ -92,11 +107,14 @@ jobs:
                   assert r['self_reinforcement']=='NOT_ADJUDICATED'
                   assert r['anchor_actor']==r['return_actor']
                   assert r['anchor_actor']!=r['exposure_actor']
-          print('frozen-trace counter audit PASS')
+          pathlib.Path('results/frozen_feedback_counter_audit.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2),encoding='utf-8')
+          pathlib.Path('results/v02_to_v021_count_diff.json').write_text(json.dumps({'changed':bool(diffs),'diffs':diffs},ensure_ascii=False,indent=2),encoding='utf-8')
+          print('v0.2 -> v0.2.1 count diffs=',json.dumps(diffs,ensure_ascii=False))
+          print('frozen-trace semantic-blind audit PASS')
           PY
       - name: Upload counter audit
         uses: actions/upload-artifact@v4
         with:
-          name: r234-frozen-feedback-counter-audit-${{ github.run_id }}
-          path: results/frozen_feedback_counter_audit.json
+          name: r234-frozen-feedback-counter-v021-audit-${{ github.run_id }}
+          path: results/
           retention-days: 90
