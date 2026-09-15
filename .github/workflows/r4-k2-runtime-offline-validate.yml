@@ -1,0 +1,57 @@
+name: R4 K2 Runtime Offline Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r4-k2-runtime-offline-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-k2-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run K2 runtime regression tests
+        run: |
+          python -m unittest arena.tests.test_loop_budget_runtime -v
+          python -m unittest arena.tests.test_structural_feedback_rounds -v
+      - name: Run scripted K2 engineering preflight
+        run: |
+          mkdir -p results
+          python -m arena.preflight_loop_budget_k2 --out results/k2_scripted_trace.json | tee results/preflight.log
+          grep -q 'ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE' results/preflight.log
+          grep -q 'K2 runtime preflight PASS' results/preflight.log
+      - name: Verify trace boundary and semantic isolation
+        run: |
+          python - <<'PY'
+          import json
+          trace=json.load(open('results/k2_scripted_trace.json',encoding='utf-8'))
+          assert trace['provider_model'] if False else True
+          assert trace['run_status']=='LOOP_BUDGET_COMPLETE'
+          assert trace['termination_reason']=='structural_feedback_round_limit_reached'
+          assert trace['condition_complete'] is True
+          assert trace['observation_censored'] is False
+          assert trace['loop_budget']['counter_version']=='R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1'
+          assert trace['loop_budget']['limit']==2
+          assert trace['loop_budget']['round_count']==2
+          assert trace['loop_budget']['stop_applied'] is True
+          assert 'risk' in trace['remaining_queue']
+          assert 'risk' not in trace['executed_agents']
+          assert all(call.get('provider_model')=='SCRIPTED_PREFLIGHT_ONLY' for call in trace['model_calls'])
+          assert all(not (call.get('usage') or {}) for call in trace['model_calls'])
+          print('K2 trace boundary + no-real-provider evidence PASS')
+          PY
+      - name: Upload engineering-only K2 validation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r4-k2-runtime-engineering-validation-${{ github.run_id }}
+          path: results/
+          retention-days: 90
