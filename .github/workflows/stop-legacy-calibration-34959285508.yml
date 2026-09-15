@@ -1,0 +1,26 @@
+name: Stop legacy calibration triggered by adapter repair
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/stop-legacy-calibration-34959285508.yml']
+permissions:
+  actions: write
+jobs:
+  stop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Cancel only the unintended legacy run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import os, urllib.request, urllib.error
+          url='https://api.github.com/repos/yu5-520/reality-bias-benchmark/actions/runs/34959285508/cancel'
+          req=urllib.request.Request(url, data=b'', method='POST', headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'], 'Accept':'application/vnd.github+json'})
+          try:
+              with urllib.request.urlopen(req) as r: print('Cancellation requested', r.status)
+          except urllib.error.HTTPError as e:
+              if e.code==409: print('Run already completed; no cancellation possible')
+              else: raise
+          PY

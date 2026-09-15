@@ -1,15 +1,6 @@
 name: R2 Benchmark Trigger Calibration v0.5 Gate
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/r2-calibration-v0.5.yml'
-      - 'benchmark/r2_primary_mapping_items_v0.5_calibration.jsonl'
-      - 'analysis/check_r2_calibration_gate.py'
-      - 'adapters/deepseek_chat.py'
-      - 'configs/models/deepseek_r2_wave1.json'
-      - 'runners/run_r2_calibration_v04.py'
   workflow_dispatch:
 
 concurrency:
@@ -86,3 +77,4 @@ jobs:
             results/r2_calibration_v0.5_analysis/
           if-no-files-found: warn
           retention-days: 90
+
