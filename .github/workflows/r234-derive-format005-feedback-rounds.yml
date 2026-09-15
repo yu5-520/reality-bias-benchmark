@@ -1,0 +1,76 @@
+name: R2-R4 Derive Format 005 Structural Feedback Rounds
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r234-derive-format005-feedback-rounds.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  derive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate counter unit tests
+        run: |
+          python -m unittest arena.tests.test_structural_feedback_rounds -v
+          python -m unittest arena.tests.test_loop_budget_policy -v
+      - name: Download frozen Format Verify 005 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: r234-structural-smoke-34962065864
+          path: source_artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 34962065864
+      - name: Derive neutral structural feedback rounds offline
+        run: |
+          TRACES=$(find source_artifact -name subject_traces.jsonl -type f | head -n1)
+          test -n "$TRACES"
+          mkdir -p results
+          TRACES="$TRACES" python - <<'PY'
+          import json, os, pathlib
+          from arena.structural_feedback import derive_structural_feedback_rounds
+          traces=[json.loads(x) for x in pathlib.Path(os.environ['TRACES']).read_text(encoding='utf-8').splitlines() if x.strip()]
+          out=[]
+          for trace in traces:
+              result=derive_structural_feedback_rounds(trace)
+              assert result['counter_status']=='RECORDED'
+              assert result['semantic_blind'] is True
+              out.append(result)
+              print('run=', trace['run_id'])
+              print('structural_feedback_round_count=', result['round_count'])
+              print('open_tail=', json.dumps(result['open_tail'], ensure_ascii=False))
+              for r in result['rounds']:
+                  print(f"round {r['round_index']}: {r['anchor_event_ref']} -> {r['exposure_actor']}@turn{r['exposure_turn']} -> {r['closing_event_ref']}")
+          pathlib.Path('results/structural_feedback_rounds.jsonl').write_text(''.join(json.dumps(x,ensure_ascii=False)+'\n' for x in out),encoding='utf-8')
+          PY
+      - name: Confirm derivation is measurement-only
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          rows=[json.loads(x) for x in pathlib.Path('results/structural_feedback_rounds.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          assert rows
+          for row in rows:
+              assert row['semantic_blind'] is True
+              for rnd in row['rounds']:
+                  assert rnd['bias_labels']=='NOT_ADJUDICATED'
+                  assert rnd['authority_penetration']=='NOT_ADJUDICATED'
+                  assert rnd['semantic_dependency']=='NOT_ADJUDICATED'
+                  assert rnd['self_reinforcement']=='NOT_ADJUDICATED'
+          print('measurement-only structural round derivation PASS')
+          PY
+      - name: Upload offline structural-round derivation
+        uses: actions/upload-artifact@v4
+        with:
+          name: r234-format005-structural-feedback-rounds-${{ github.run_id }}
+          path: results/structural_feedback_rounds.jsonl
+          retention-days: 90
