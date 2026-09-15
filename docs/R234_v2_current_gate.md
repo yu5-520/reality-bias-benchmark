@@ -20,7 +20,9 @@ Historical Reviewer A/B v1 records remain append-only historical annotation laye
 | structural Measurement v2 | PASS | 70 R2 targets, 70 R3 windows, 4 R4 windows |
 | R3/R4 range packet materialization | PASS | Agent-visible input/output available inside structural ranges |
 | v1 event/disagreement coverage | PASS | 70/70 Authority targets and 54/54 historical disagreements retained |
-| compact packet layer | PASS | 144 packets, ~61.93% serialized-byte reduction overall |
+| compact packet layer v0.1 | PASS | 144 packets, ~61.93% serialized-byte reduction overall |
+| R3 structural compaction v0.2 | PASS | further ~31.24% reduction of compact-R3 bytes with lineage/target/boundary fields unchanged |
+| provider-independent volume profile | PASS | 144-unit request body + frozen prompts profiled in characters/bytes; no token/cost claim |
 | bounded context expansion | PASS | one explicit frozen-ref expansion maximum per packet |
 | independent semantic protocol | FROZEN | R2/R3/R4 boundary outputs defined |
 | deterministic mechanism synthesis | PASS | no semantic inference, no majority vote |
@@ -64,11 +66,22 @@ A reduced/staged review remains possible, but its selection rule and negative/co
 
 ## 5. Compact evidence interface
 
-Compact Reviewer-v2 packet hash:
+Base compact Reviewer-v2 packet hash:
 
 `21c4c91faf815fcfd5b9a83ebb2a71ecf48e62ab2ba49f8e88af790621cf8dc8`
 
-The compact representation preserves structural context and Agent natural-language evidence while omitting repeated full-state material. Omitted records remain available only through explicit frozen evidence refs.
+The compact v0.1 representation reduced R2/R3/R4 serialized material from `14,940,834` bytes to `5,687,695` bytes (~61.93%). A provider-independent profile of all 144 packet bodies plus their frozen layer prompts contains `6,114,821` Unicode characters / `6,115,113` UTF-8 bytes before provider wrappers, outputs, retries or expansions.
+
+R3 remained the dominant volume. Structural R3 compaction v0.2 therefore deduplicates repeated downstream-call context without semantic selection:
+
+- source compact-R3: `4,307,878` bytes;
+- R3 v0.2: `2,962,081` bytes;
+- additional reduction: **31.24%**;
+- deterministic hash: `b1abe2510bce774a3d9f5792aaa8353b60781090894c6ba0bade7d4f5955a765`.
+
+For state-read lineage, v0.2 retains structurally selected state values/metadata and state hashes. For direct message-read lineage, it retains the inbox. Full omitted calls remain available through the same one-ref bounded expansion contract.
+
+These byte/character measurements are not token counts and are not monetary estimates.
 
 If a compact packet is insufficient, the reviewer must either return `UNCERTAIN` or request the single allowed expansion. Missing evidence must not be completed by assumption.
 
@@ -101,7 +114,7 @@ Before any real call, freeze a launch record containing:
 
 1. provider/model and config hash;
 2. prompt hashes;
-3. compact packet hash;
+3. exact compact packet hashes/versions used by each layer;
 4. exact R2/R3/R4 population;
 5. retry/expansion ceilings;
 6. pricing snapshot;
@@ -122,6 +135,6 @@ Upper-bound loop-budget collection must not be used to bypass unresolved Base se
 
 ## 10. Current state in one line
 
-`subject evidence frozen → Measurement-v2 complete → Reviewer-v2 engineering complete → semantic review not yet launched → K2 blocked`
+`subject evidence frozen → Measurement-v2 complete → Reviewer-v2 engineering complete → R3 packet pressure reduced → semantic review not yet launched → K2 blocked`
 
 No new C/P/R scientific result, cross-reviewer agreement statistic, human IRR, laundering claim, black-hole claim or causal self-reinforcement claim is created by the engineering work above.
