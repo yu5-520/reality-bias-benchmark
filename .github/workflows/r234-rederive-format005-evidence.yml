@@ -1,0 +1,85 @@
+name: R2-R4 Re-derive Format 005 Evidence Offline
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r234-rederive-format005-evidence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  rederive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run offline regression suite
+        run: |
+          python -m unittest discover -s arena/tests -v
+      - name: Download frozen Format Verify 005 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: r234-structural-smoke-34962065864
+          path: source_artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 34962065864
+      - name: Locate immutable source files
+        run: |
+          MANIFEST=$(find source_artifact -name subject_manifest.jsonl -type f | head -n1)
+          TRACES=$(find source_artifact -name subject_traces.jsonl -type f | head -n1)
+          SOURCE_BATCH=$(find source_artifact -path '*/subject_evidence/evidence_batch.json' -type f | head -n1)
+          test -n "$MANIFEST" && test -n "$TRACES" && test -n "$SOURCE_BATCH"
+          echo "MANIFEST=$MANIFEST" >> "$GITHUB_ENV"
+          echo "TRACES=$TRACES" >> "$GITHUB_ENV"
+          echo "SOURCE_BATCH=$SOURCE_BATCH" >> "$GITHUB_ENV"
+          echo "ERRORS=${TRACES}.errors.json" >> "$GITHUB_ENV"
+      - name: Re-derive objective stats and review packets without provider calls
+        run: |
+          SOURCE_SHA=$(python - <<'PY'
+          import json, os
+          first=json.loads(open(os.environ['MANIFEST'],encoding='utf-8').readline())
+          print(first['code_commit_sha'])
+          PY
+          )
+          python -m arena.evidence \
+            --manifest "$MANIFEST" \
+            --traces "$TRACES" \
+            --errors "$ERRORS" \
+            --outdir results/rederived_evidence \
+            --code-sha "$SOURCE_SHA"
+      - name: Verify evidence identity is stable while derived measurement version advances
+        run: |
+          python - <<'PY'
+          import json, os, pathlib
+          old=json.load(open(os.environ['SOURCE_BATCH'],encoding='utf-8'))
+          new=json.load(open('results/rederived_evidence/evidence_batch.json',encoding='utf-8'))
+          assert new['evidence_batch_hash']==old['evidence_batch_hash'], (old['evidence_batch_hash'],new['evidence_batch_hash'])
+          assert new['objective_stats_version']=='R234-OBJECTIVE-STATS-v0.3.1-CENSOR-AWARE'
+          rows=[json.loads(x) for x in pathlib.Path('results/rederived_evidence/objective_stats.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          assert len(rows)==1
+          obs=rows[0]['observation']
+          assert obs['observation_censored'] is True
+          assert obs['negative_finding_scope']=='OBSERVED_PREFIX_ONLY'
+          assert obs['turns_observed']==32 and obs['turn_limit']==32
+          assert obs['remaining_queue_count'] >= 1
+          packets=[json.loads(x) for x in pathlib.Path('results/rederived_evidence/review_packets.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          assert packets and all(p['evidence_batch_hash']==old['evidence_batch_hash'] for p in packets)
+          assert all(p['observation_context']['negative_finding_scope']=='OBSERVED_PREFIX_ONLY' for p in packets)
+          print('stable evidence_batch_hash=', old['evidence_batch_hash'])
+          print('objective_stats_version=', new['objective_stats_version'])
+          print('censor-aware packets=', len(packets))
+          PY
+          cat results/rederived_evidence/RUN_REPORT.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload re-derived measurement layer
+        uses: actions/upload-artifact@v4
+        with:
+          name: r234-format005-censor-aware-rederived-${{ github.run_id }}
+          path: results/rederived_evidence/
+          retention-days: 90
