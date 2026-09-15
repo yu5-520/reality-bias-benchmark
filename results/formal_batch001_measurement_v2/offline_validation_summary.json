@@ -1,0 +1,57 @@
+{
+  "version": "R234-MEASUREMENT-V2-OFFLINE-VALIDATION-SUMMARY-v0.1",
+  "date": "2026-09-15",
+  "scientific_semantic_result": false,
+  "paid_api_calls": 0,
+  "evidence_batch_hash": "94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9",
+  "measurement_v2": {
+    "version": "R234-MEASUREMENT-V2-v0.1",
+    "workflow_run_id": 34987638198,
+    "workflow_conclusion": "success",
+    "output_hash": "9a2b966849f8b18fa553b2b425ff9723fe0d66c2b58e88260e29ad43e6f767f6",
+    "artifact_id": 10404425927,
+    "artifact_digest": "sha256:c92358520bb3d08639d9fdc5d184e22e3b9c85d2d71b3bf5c7f2a4b0242010e4",
+    "r2_candidate_count": 70,
+    "r2_realized_candidate_count": 68,
+    "r2_attempt_only_candidate_count": 2,
+    "r3_window_count": 70,
+    "r4_window_count": 4,
+    "r2_reviewer_packet_count": 70,
+    "semantic_labels_present": false
+  },
+  "reviewer_v2_range_packets": {
+    "version": "R234-REVIEWER-V2-RANGE-PACKETS-v0.1",
+    "workflow_run_id": 34988452980,
+    "workflow_conclusion": "success",
+    "output_hash": "e8b7d3cc7d09a2bc629ed95ac130e8d9aac737bb904229171b61f21979fff5f6",
+    "artifact_id": 10404024120,
+    "artifact_digest": "sha256:bb1c436d062ea5820127c2b56a906042a6e9834689eb3939141e389698b388dc",
+    "r3_reviewer_packet_count": 70,
+    "r4_reviewer_packet_count": 4,
+    "r4_black_hole_review_candidate_count": 1,
+    "semantic_labels_present": false
+  },
+  "black_hole_review_candidate": {
+    "run_id": "arena-ecommerce-0003",
+    "round_index": 2,
+    "triggering_structural_metrics": [
+      "tokens_per_call",
+      "tokens_per_event"
+    ],
+    "tokens_per_call_growth_fraction": 0.4568405956677475,
+    "tokens_per_event_growth_fraction": 0.9979528169157679,
+    "semantic_progress_required": true,
+    "interpretation": "Structural review trigger only. It does not establish a Reality Bias black hole, self-reinforcement, or semantic failure."
+  },
+  "v1_coverage_diagnostic": {
+    "version": "R234-V2-V1-COVERAGE-ANALYSIS-v0.1",
+    "event_count": 70,
+    "measurement_v2_target_coverage_count": 70,
+    "reviewer_v2_packet_coverage_count": 70,
+    "v1_disagreement_count": 54,
+    "v1_disagreement_target_coverage_count": 54,
+    "interpretation": "Coverage/alignment diagnostic only. Reviewer v1 labels are not ground truth for Measurement v2."
+  },
+  "gate_status": "OFFLINE_MEASUREMENT_AND_PACKET_ENGINEERING_VALIDATED",
+  "next_gate": "SEMANTIC_REVIEW_PROTOCOL_FREEZE_BEFORE_ANY_PAID_REVIEW"
+}
