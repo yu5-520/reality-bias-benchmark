@@ -1,0 +1,30 @@
+name: R2-R4 Bailian Thinking Mode Diagnostic
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BAI: ${{ secrets.BAI }}
+      BAILIAN_BASE_URL: ${{ vars.BAILIAN_BASE_URL }}
+      BAILIAN_MODEL: ${{ vars.BAILIAN_MODEL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Compare default, non-thinking, and bounded-thinking transport
+        run: |
+          python - <<'PY'
+          import json,time
+          from adapters.bailian_openai_chat import chat_completion,extract_content
+          messages=[{'role':'system','content':'Return only a JSON object.'},{'role':'user','content':'Return exactly {"diagnostic_ok":true,"value":17}. This is a non-study infrastructure diagnostic. Do not explain.'}]
+          modes=[('default',{}),('thinking_false',{'enable_thinking':False}),('thinking_budget_64',{'enable_thinking':True,'thinking_budget':64})]
+          results=[]
+          for name,kwargs in modes:
+            t=time.time();r=chat_completion(messages,response_format_json=True,max_tokens=128,temperature=0,**kwargs);elapsed=round((time.time()-t)*1000,2);u=r.get('usage') or {};details=u.get('completion_tokens_details') or u.get('output_tokens_details') or {}
+            results.append({'mode':name,'returned_model':r.get('model'),'elapsed_ms':elapsed,'transport_latency_ms':r.get('_transport_latency_ms'),'prompt_tokens':u.get('prompt_tokens') or u.get('input_tokens'),'completion_tokens':u.get('completion_tokens') or u.get('output_tokens'),'total_tokens':u.get('total_tokens'),'reasoning_tokens':details.get('reasoning_tokens'),'content':extract_content(r)})
+          print(json.dumps(results,ensure_ascii=False,indent=2))
+          PY
