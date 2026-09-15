@@ -1,0 +1,52 @@
+name: R2-R4 Reviewer v2 DeepSeek Adapter Offline Validate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'arena/evaluate_reviewer_v2_deepseek.py'
+      - 'arena/test_evaluate_reviewer_v2_deepseek.py'
+      - 'arena/reviewer_v2_contract.py'
+      - 'reviews/reviewer_system_v2/prompts/**'
+      - '.github/workflows/r234-reviewer-v2-deepseek-adapter-offline-validate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Unit tests
+        run: python -m unittest arena.test_reviewer_v2_contract arena.test_evaluate_reviewer_v2_deepseek
+
+      - name: Real API must fail closed without enable flag
+        run: |
+          set +e
+          output=$(python -m arena.evaluate_reviewer_v2_deepseek \
+            --layer R2 --packets DOES_NOT_EXIST --traces DOES_NOT_EXIST --outdir /tmp/never 2>&1)
+          code=$?
+          set -e
+          test "$code" -ne 0
+          echo "$output" | grep -q 'real API locked'
+          test ! -e /tmp/never
+
+      - name: Prompt and pricing snapshot hashes
+        run: |
+          python - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+          cfg = json.loads(Path('arena/config/model_deepseek_v0.2.json').read_text())
+          assert cfg['pricing_snapshot_usd_per_million_tokens']['source_date'] == '2026-09-15'
+          out = {}
+          for p in sorted(Path('reviews/reviewer_system_v2/prompts').glob('*.md')):
+              out[str(p)] = hashlib.sha256(p.read_bytes()).hexdigest()
+          print(json.dumps({'provider_calls': 0, 'prompt_hashes': out, 'pricing_source_date': '2026-09-15'}, indent=2, sort_keys=True))
+          PY
