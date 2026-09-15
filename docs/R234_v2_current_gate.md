@@ -1,7 +1,7 @@
 # R2-R4 Measurement / Reviewer v2 — Current Gate
 
 Date: 2026-09-15  
-Status: **NO-COST ENGINEERING COMPLETE; PAID SEMANTIC REVIEW AWAITS EXPLICIT DECISION**
+Status: **ALL NO-COST PREPARATION COMPLETE; PAID SEMANTIC REVIEW REQUIRES EXPLICIT AUTHORIZATION**
 
 ## 1. Frozen scientific object
 
@@ -22,12 +22,13 @@ Historical Reviewer A/B v1 records remain append-only historical annotation laye
 | v1 event/disagreement coverage | PASS | 70/70 Authority targets and 54/54 historical disagreements retained |
 | compact packet layer v0.1 | PASS | 144 packets, ~61.93% serialized-byte reduction overall |
 | R3 structural compaction v0.2 | PASS | further ~31.24% reduction of compact-R3 bytes with lineage/target/boundary fields unchanged |
-| provider-independent volume profile | PASS | 144-unit request body + frozen prompts profiled in characters/bytes; no token/cost claim |
+| provider-independent volume profile | PASS | request bodies/prompts profiled in characters/bytes; no token/cost claim |
 | bounded context expansion | PASS | one explicit frozen-ref expansion maximum per packet |
 | independent semantic protocol | FROZEN | R2/R3/R4 boundary outputs defined |
 | deterministic mechanism synthesis | PASS | no semantic inference, no majority vote |
 | Reviewer-v2 output contract | PASS | uncertainty and schema boundaries enforced |
-| locked DeepSeek transport | PASS | fail-closed; zero provider calls in validation |
+| exact paid-launch preflight | PASS | 144 units + packet/prompt/model hashes bound, zero provider calls |
+| immutable launch-record adapter gate | PASS | CLI flags alone cannot enable paid review; launch record validated before credential access |
 
 ## 3. Current semantic boundary
 
@@ -62,79 +63,93 @@ The clean full-population Reviewer-v2 pass contains:
 
 Reviewing all units avoids conditioning the new measurement on historical disagreement status or on another reviewer's previous verdict.
 
-A reduced/staged review remains possible, but its selection rule and negative/control sample must be frozen before semantic outputs are observed.
+## 5. Exact launch-input bindings
 
-## 5. Compact evidence interface
+The zero-call paid-launch preflight workflow `34992898867` passed. Preflight manifest hash:
 
-Base compact Reviewer-v2 packet hash:
+`38288a8ceb51d2c95148f9ceca206c93efa0597244e67b7751919d85e9eebccc`
 
-`21c4c91faf815fcfd5b9a83ebb2a71ecf48e62ab2ba49f8e88af790621cf8dc8`
+Exact packet SHA256 bindings:
 
-The compact v0.1 representation reduced R2/R3/R4 serialized material from `14,940,834` bytes to `5,687,695` bytes (~61.93%). A provider-independent profile of all 144 packet bodies plus their frozen layer prompts contains `6,114,821` Unicode characters / `6,115,113` UTF-8 bytes before provider wrappers, outputs, retries or expansions.
+- R2 v0.1: `c23522f9916530b4a342c2fd4b2cc028bb8613d0b8626cdc0d76ed9bc1ded63f`
+- R3 v0.2: `7cbe61987172f6dd2fa6f547766c145ddf8782d5fc7ec1bf3762b06fb0db0151`
+- R4 v0.1: `fe0a7d24a2d8fa4f102da9883529bebbcef9be0397057f3b8a23230754ee393a`
 
-R3 remained the dominant volume. Structural R3 compaction v0.2 therefore deduplicates repeated downstream-call context without semantic selection:
+Prompt SHA256 bindings:
 
-- source compact-R3: `4,307,878` bytes;
-- R3 v0.2: `2,962,081` bytes;
-- additional reduction: **31.24%**;
-- deterministic hash: `b1abe2510bce774a3d9f5792aaa8353b60781090894c6ba0bade7d4f5955a765`.
+- R2: `88cc842ea12030530abd43563b8d6c9d6fb82ef25f997bcd9f55831c4794a924`
+- R3: `e3b2aaafb0ac344b9d92ce3b0c8e0b0dd1fe2693a78b773c5bb3afd8e432373d`
+- R4: `626ace9b857e352380801eb4d125d387af97953ee184b692aa9981b0b2ed12af`
 
-For state-read lineage, v0.2 retains structurally selected state values/metadata and state hashes. For direct message-read lineage, it retains the inbox. Full omitted calls remain available through the same one-ref bounded expansion contract.
+Model config SHA256:
 
-These byte/character measurements are not token counts and are not monetary estimates.
+`fe7bbafda1c4c12b1d1f5dca963d1a45cbe503713aaa486fac09f569d1b5f8c5`.
 
-If a compact packet is insufficient, the reviewer must either return `UNCERTAIN` or request the single allowed expansion. Missing evidence must not be completed by assumption.
+After R3 v0.2 compaction, the exact selected packet files occupy `4,341,898` bytes including JSONL newlines. Repeating the frozen system prompts over all 144 units adds `427,562` bytes, for `4,769,460` bytes before provider wrappers, outputs, retries or context expansion.
+
+These are byte-volume measurements, not exact token counts and not monetary estimates.
 
 ## 6. Reviewer protocol
 
 Independent Reviewer-v2 records answer boundary fields first; C/P/R mechanism states are synthesized deterministically afterward.
 
-This deliberately changes the measurement question from:
-
-> “Does this action look like C/P/R?”
-
-into narrower questions such as:
+This changes the measurement question from broad mechanism impression to narrow boundary decisions such as:
 
 > “Was there an unsupported certainty promotion?”  
 > “Was a new task purpose unauthorized?”  
 > “Was this content semantically adopted downstream?”  
 > “Did rework grant unresolved earlier content greater legitimacy?”
 
-This is the intended response to the historical A/B disagreement: refine the semantic measurement contract without changing the frozen experiment.
+If compact evidence is insufficient, the Reviewer must return `UNCERTAIN` or use the single allowed frozen-ref expansion. Missing evidence must not be completed by assumption.
 
 ## 7. Paid review gate
 
 No paid Reviewer-v2 call is currently authorized.
 
-The locked DeepSeek adapter is an available transport, but a DeepSeek-v2 pass would be scientifically described as **re-annotation/calibration under the revised rubric**, because the same model family already supplied historical Reviewer B. It is not a new model-family independent replication.
+A DeepSeek-v2 pass would be scientifically described as **re-annotation/calibration under the revised rubric**, because the same model family supplied historical Reviewer B. It is not a new independent model-family replication.
 
-A genuinely new model-family reviewer can be added as a separate independent annotation layer later.
+The exact launch candidate is frozen but deliberately non-executable:
 
-Before any real call, freeze a launch record containing:
+- `status = NOT_AUTHORIZED`;
+- `execute_real_api = false`;
+- `launch_max_spend_usd = null`;
+- repository-level absolute ceiling = **USD 2.00**;
+- first paid pass `max_workers = 1`;
+- malformed-output retries ≤ 2;
+- one context expansion maximum per packet;
+- semantic `UNCERTAIN` never triggers retry;
+- reviewer failure never triggers subject rerun.
 
-1. provider/model and config hash;
-2. prompt hashes;
-3. exact compact packet hashes/versions used by each layer;
-4. exact R2/R3/R4 population;
-5. retry/expansion ceilings;
-6. pricing snapshot;
-7. hard maximum spend;
-8. explicit authorization reference.
+The USD 2.00 repository ceiling is a safety boundary, not permission to spend USD 2.00. A future authorized launch must choose a positive actual ceiling no greater than USD 2.00.
 
-## 8. R4 / black-hole status
+## 8. Immutable launch-record gate
+
+DeepSeek adapter `R234-REVIEWER-V2-DEEPSEEK-ADAPTER-v0.2` passed offline validation in workflow `34993080553`.
+
+CLI flags alone cannot start a paid review. Before provider credential access, the adapter requires a separate immutable launch record whose authorization reference, packet SHA256/counts, prompt hashes, model-config hash, retry settings, price mode and launch spend all match runtime inputs.
+
+Returned provider model identity must also match the frozen allowlist (`deepseek-flash`); otherwise review stops instead of mixing model versions.
+
+A non-executable template exists at:
+
+`reviews/reviewer_system_v2/AUTHORIZED_LAUNCH_RECORD_TEMPLATE_v0.1.json`.
+
+After explicit authorization, it must be copied into a new unique launch-record file rather than modified in place. Once provider execution begins, that launch record is append-only/immutable.
+
+## 9. R4 / black-hole status
 
 Four neutral structural feedback windows remain frozen. One (`arena-ecommerce-0003`, round 2) receives a machine **review-priority** flag because resource intensity per call/event increased relative to its preceding feedback round.
 
 This is not a black-hole result. A semantic reviewer still has to establish insufficient original-goal progress or verified-evidence gain and connect that persistence to C/P/R dynamics.
 
-## 9. K=2 gate
+## 10. K=2 gate
 
 K=2 remains blocked.
 
-Upper-bound loop-budget collection must not be used to bypass unresolved Base semantic measurement. The next decision is whether to run Reviewer-v2 on the frozen Base evidence, not whether to increase the subject loop budget.
+Upper-bound loop-budget collection must not be used to bypass unresolved Base semantic measurement. The next decision is the frozen Base Reviewer-v2 semantic pass, not an increased subject loop budget.
 
-## 10. Current state in one line
+## 11. Current state in one line
 
-`subject evidence frozen → Measurement-v2 complete → Reviewer-v2 engineering complete → R3 packet pressure reduced → semantic review not yet launched → K2 blocked`
+`subject evidence frozen → Measurement-v2 complete → Reviewer-v2 engineering complete → exact launch inputs frozen → paid transport locked behind immutable authorization record → K2 blocked`
 
 No new C/P/R scientific result, cross-reviewer agreement statistic, human IRR, laundering claim, black-hole claim or causal self-reinforcement claim is created by the engineering work above.
