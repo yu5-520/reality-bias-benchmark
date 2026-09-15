@@ -1,0 +1,136 @@
+name: R2-R4 Reviewer v2 Compact Packets Offline Validate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'arena/compact_reviewer_packets_v2.py'
+      - 'arena/test_compact_reviewer_packets_v2.py'
+      - '.github/workflows/r234-reviewer-v2-compact-packets-offline-validate.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Unit tests
+        run: python -m unittest arena.test_compact_reviewer_packets_v2
+
+      - name: Download frozen Batch001 artifact
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34970142001
+          name: r234-ecommerce-formal-joint-cpr-v1-batch001-34970142001
+          path: frozen
+
+      - name: Rebuild Measurement v2 structural outputs
+        run: |
+          python -m arena.measurement_v2 \
+            --traces frozen/formal_subject_traces.jsonl \
+            --structural-views frozen/formal_evidence/structural_views.jsonl \
+            --batch-meta frozen/formal_evidence/evidence_batch.json \
+            --manifest frozen/formal_subject_manifest.jsonl \
+            --outdir measurement_v2_out
+
+      - name: Build full R3/R4 packet layer and enriched R4 windows
+        run: |
+          python -m arena.reviewer_packets_v2 \
+            --traces frozen/formal_subject_traces.jsonl \
+            --manifest frozen/formal_subject_manifest.jsonl \
+            --r2 measurement_v2_out/r2_structural_candidates.jsonl \
+            --r3 measurement_v2_out/r3_lineage_windows.jsonl \
+            --r4 measurement_v2_out/r4_dynamics_windows.jsonl \
+            --batch-meta frozen/formal_evidence/evidence_batch.json \
+            --outdir reviewer_v2_full
+
+      - name: Build compact Reviewer v2 packets
+        run: |
+          python -m arena.compact_reviewer_packets_v2 \
+            --traces frozen/formal_subject_traces.jsonl \
+            --manifest frozen/formal_subject_manifest.jsonl \
+            --r2 measurement_v2_out/r2_structural_candidates.jsonl \
+            --r3 measurement_v2_out/r3_lineage_windows.jsonl \
+            --r4 reviewer_v2_full/r4_dynamics_windows_with_review_candidates.jsonl \
+            --batch-hash 94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9 \
+            --outdir compact_out
+
+      - name: Deterministic compact rebuild
+        run: |
+          python -m arena.compact_reviewer_packets_v2 \
+            --traces frozen/formal_subject_traces.jsonl \
+            --manifest frozen/formal_subject_manifest.jsonl \
+            --r2 measurement_v2_out/r2_structural_candidates.jsonl \
+            --r3 measurement_v2_out/r3_lineage_windows.jsonl \
+            --r4 reviewer_v2_full/r4_dynamics_windows_with_review_candidates.jsonl \
+            --batch-hash 94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9 \
+            --outdir compact_rebuild
+
+      - name: Compact packet gates
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          expected_batch = '94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9'
+          a = json.loads(Path('compact_out/compact_packet_summary.json').read_text())
+          b = json.loads(Path('compact_rebuild/compact_packet_summary.json').read_text())
+          assert a['evidence_batch_hash'] == expected_batch
+          assert a['output_hash'] == b['output_hash']
+          assert a['r2_packet_count'] == 70
+          assert a['r3_packet_count'] == 70
+          assert a['r4_packet_count'] == 4
+          assert a['semantic_labels_present'] is False
+          assert a['paid_api_calls'] == 0
+          assert a['context_expansion_max_attempts'] == 1
+
+          files = {
+              'r2': Path('compact_out/compact_r2_packets.jsonl'),
+              'r3': Path('compact_out/compact_r3_packets.jsonl'),
+              'r4': Path('compact_out/compact_r4_packets.jsonl'),
+          }
+          rows = {k: [json.loads(x) for x in p.read_text(encoding='utf-8').splitlines() if x.strip()] for k, p in files.items()}
+          assert all(x['prior_reviewer_outputs_included'] is False for group in rows.values() for x in group)
+          assert all(x['expected_mechanism_mapping_included'] is False for group in rows.values() for x in group)
+          assert all(x['context_expansion']['max_attempts'] == 1 for group in rows.values() for x in group)
+          assert all(set(x['boundary_fields'].values()) == {'NOT_ADJUDICATED'} for group in rows.values() for x in group)
+
+          combined = ''.join(p.read_text(encoding='utf-8') for p in files.values()).lower()
+          forbidden = ['Reviewer A', 'Reviewer B', 'C→I', 'P→V', 'R→T', 'Jaccard', 'CN-R-034', 'primary matrix']
+          hits = [x for x in forbidden if x.lower() in combined]
+          assert not hits, hits
+          assert 'SHOULD_NOT_BE_COPIED_TO_COMPACT_PACKET'.lower() not in combined
+
+          # Compaction must reduce serialized review material instead of simply renaming it.
+          full_sizes = {
+              'r2': Path('measurement_v2_out/reviewer_v2_r2_packets.jsonl').stat().st_size,
+              'r3': Path('reviewer_v2_full/reviewer_v2_r3_packets.jsonl').stat().st_size,
+              'r4': Path('reviewer_v2_full/reviewer_v2_r4_packets.jsonl').stat().st_size,
+          }
+          reductions = {}
+          for key in ('r2', 'r3', 'r4'):
+              compact = files[key].stat().st_size
+              full = full_sizes[key]
+              reductions[key] = {'full_bytes': full, 'compact_bytes': compact, 'fraction': compact / full}
+              assert compact < full, reductions[key]
+          print(json.dumps({'summary': a, 'reductions': reductions}, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload compact packet artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r234-reviewer-v2-compact-packets-${{ github.run_id }}
+          path: compact_out/
+          retention-days: 90
