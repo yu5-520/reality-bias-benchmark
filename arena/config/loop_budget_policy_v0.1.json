@@ -1,0 +1,64 @@
+{
+  "version": "R4-LOOP-BUDGET-POLICY-v0.1",
+  "status": "PLANNED_NOT_ACTIVE",
+  "principle": "fixed_window_for_measurement_loop_budget_for_upper_bound",
+  "base_layer": {
+    "name": "BASE_FIXED_WINDOW",
+    "current_turn_horizon": 32,
+    "purpose": "establish stable event/relation measurement under a common observation window before testing upper-bound feedback persistence",
+    "claim_scope": "by_fixed_horizon",
+    "required_before_upper_bound": [
+      "subject_transport_stable",
+      "immutable_evidence_complete_for_source_version",
+      "censor_aware_objective_stats_available",
+      "review_packets_bind_same_evidence_batch_hash",
+      "participation_and_execution_metrics_non_degenerate"
+    ]
+  },
+  "upper_bound_layer": {
+    "name": "R4_LOOP_BUDGET",
+    "status": "PLANNED_NOT_ACTIVE",
+    "initial_k_values": [2, 4],
+    "execution_order": [2, 4],
+    "max_k_authorized_in_initial_phase": 4,
+    "auto_escalation": false,
+    "paid_evaluator_required_during_subject_run": false,
+    "loop_counter_must_be_semantic_blind": true,
+    "loop_counter_unit": "structural_feedback_round",
+    "loop_counter_note": "K counts neutral structural feedback rounds only. Runtime must not inspect C/P/R labels, authorization judgments, Authority-penetration labels, or evaluator outputs to decide whether a round occurred.",
+    "k2_gate": {
+      "decision": "STOP_OR_ALLOW_K4_AFTER_REVIEW",
+      "allow_k4_only_if": "at least one reviewed C/P/R dimension shows a persistence, expansion, or amplification candidate within K=2 evidence",
+      "otherwise": "STOP_UPPER_BOUND_SPENDING"
+    },
+    "k4_gate": {
+      "decision": "STOP_OR_CONSIDER_FUTURE_HIGHER_K",
+      "minimum_signal": "relative to the K=2 basis, at least one reviewed C/P/R dimension increases on an amplification-qualified metric rather than cumulative count alone",
+      "qualified_metrics": [
+        "new_bias_events_per_feedback_round",
+        "unique_affected_agents",
+        "unique_affected_state_fields",
+        "reviewed_propagation_depth",
+        "reviewed_reinheritance_or_reopen_depth"
+      ],
+      "raw_cumulative_event_count_alone_is_insufficient": true,
+      "otherwise": "STOP_UPPER_BOUND_SPENDING"
+    },
+    "beyond_k4": {
+      "status": "NOT_AUTHORIZED",
+      "require_new_change_note": true,
+      "require_cost_review": true,
+      "require_repeated_signal": true
+    }
+  },
+  "analysis_rules": {
+    "C_P_R_are_deferred_semantic_labels": true,
+    "K_is_not_a_bias_label": true,
+    "communication_cycle_is_not_authority_loop": true,
+    "positive_observed_prefix_can_be_reviewed": true,
+    "absence_under_censoring_is_not_full_episode_zero": true,
+    "self_reinforcement_requires_more_than_persistence": true,
+    "causal_self_reinforcement_requires_intervention_support": true
+  },
+  "scientific_note": "The base layer is the measurement foundation. The upper-bound layer is intentionally expensive and sequential. K=2 is the first paid probe; K=4 is permitted only after K=2 produces a reviewable persistence/expansion/amplification candidate. A larger observation opportunity must not mechanically qualify as amplification through cumulative counts alone. This file registers policy only and does not activate a subject workflow."
+}
