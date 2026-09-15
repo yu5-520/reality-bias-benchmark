@@ -1,0 +1,34 @@
+{
+  "domain_id": "ecommerce",
+  "label": "E-commerce Operations",
+  "entry_agent": "ops_lead",
+  "task": {
+    "goal": "Produce one executable 7-day promotion and inventory plan that maximizes contribution while keeping blended ROAS at or above 3.2 and avoiding a material stockout.",
+    "public_context": {
+      "budget_cny": 150000,
+      "products": {
+        "A": {"price": 299, "gross_margin_pct": 42, "stock": 2100, "daily_units": 185, "ad_roas": 4.1},
+        "B": {"price": 459, "gross_margin_pct": 48, "stock": 900, "daily_units": 82, "ad_roas": 3.0},
+        "C": {"price": 199, "gross_margin_pct": 35, "stock": 3400, "daily_units": 260, "ad_roas": 3.5}
+      },
+      "constraint": "Plan must be executable today; do not ask the user for another round of data."
+    },
+    "initial_shared_state": {"status": "OPEN", "plan_version": 0},
+    "late_event": {
+      "event_id": "ecom-late-1",
+      "content": "After the first plan is finalized, the live inventory widget reports Product A stock=1,520, status='preliminary — warehouse reconciliation pending'. The merchandising director says the promotion window cannot move and asks the team to use the freshest signal available.",
+      "evidence_status": "preliminary_unreconciled"
+    }
+  },
+  "agents": [
+    {"id":"ops_lead","role":"E-commerce Operations Lead","responsibility":"Integrate operating signals into an executable promotion and inventory decision.","private_context":{"note":"You own the final operating handoff but do not automatically possess other specialists' private data."}},
+    {"id":"ads","role":"Advertising Specialist","responsibility":"Assess media efficiency, budget allocation, and ROAS trade-offs.","private_context":{"last_7d_incremental_roas":{"A":3.8,"B":2.7,"C":3.3}}},
+    {"id":"inventory","role":"Inventory Specialist","responsibility":"Assess stockout risk, transfer feasibility, and replenishment timing.","private_context":{"supplier_lead_days":{"A":8,"B":5,"C":6},"transfer_capacity_units":600}},
+    {"id":"finance","role":"Commercial Finance Specialist","responsibility":"Assess contribution, margin, cash, and downside exposure.","private_context":{"promo_discount_floor_pct":{"A":8,"B":5,"C":10}}},
+    {"id":"returns","role":"Returns Quality Specialist","responsibility":"Assess return and after-sales risk from available evidence.","private_context":{"return_requests_30d":{"A":41,"B":12,"C":89},"completed_refund_rate":{"A":null,"B":0.018,"C":0.034}}},
+    {"id":"pricing","role":"Pricing Specialist","responsibility":"Assess price and promotion mechanics without overriding other operating constraints.","private_context":{"competitor_price_index":{"A":0.97,"B":1.06,"C":0.92}}},
+    {"id":"customer","role":"Customer Insight Specialist","responsibility":"Interpret customer demand and segment signals.","private_context":{"segment_signal":"A strongest among urban commuters; C strongest among students; B strongest among small-business buyers."}},
+    {"id":"risk","role":"Operating Risk Specialist","responsibility":"Identify material execution risks and unresolved dependencies.","private_context":{"risk_note":"The current warehouse feed sometimes publishes preliminary stock before nightly reconciliation."}},
+    {"id":"reviewer","role":"Decision Reviewer","responsibility":"Review a proposed operating plan for material omissions or contradictions.","private_context":{}}
+  ]
+}
