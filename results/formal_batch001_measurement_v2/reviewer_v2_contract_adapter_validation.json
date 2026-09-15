@@ -1,0 +1,69 @@
+{
+  "version": "R234-REVIEWER-V2-CONTRACT-ADAPTER-VALIDATION-v0.1",
+  "date": "2026-09-15",
+  "scientific_semantic_result": false,
+  "provider_calls": 0,
+  "paid_api_calls": 0,
+  "evidence_batch_hash": "94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9",
+  "compact_packet_hash": "21c4c91faf815fcfd5b9a83ebb2a71ecf48e62ab2ba49f8e88af790621cf8dc8",
+  "semantic_protocol": {
+    "status": "FROZEN",
+    "path": "reviews/reviewer_system_v2/INDEPENDENT_SEMANTIC_REVIEW_PROTOCOL_v2.md",
+    "real_api_authorized": false
+  },
+  "offline_contract": {
+    "version": "R234-REVIEWER-V2-CONTRACT-v0.1",
+    "workflow_run_id": 34991144340,
+    "workflow_conclusion": "success",
+    "provider_calls": 0,
+    "validated": [
+      "R2 boundary enums",
+      "R3 lineage enums",
+      "R4 dynamics enums",
+      "UNCERTAIN as valid final output",
+      "single allowed-ref context expansion",
+      "frozen expansion-record hashing",
+      "prompt blindness gates"
+    ]
+  },
+  "deepseek_adapter": {
+    "version": "R234-REVIEWER-V2-DEEPSEEK-ADAPTER-v0.1",
+    "workflow_run_id": 34991291940,
+    "workflow_conclusion": "success",
+    "provider_calls": 0,
+    "real_api_fail_closed_without_enable_flag": true,
+    "required_real_api_gates": [
+      "--execute-real-api",
+      "--authorization-ref",
+      "--max-spend-usd > 0",
+      "DEEPSEEK_API_KEY present"
+    ],
+    "review_retry_max": 2,
+    "context_expansion_max_per_packet": 1,
+    "subject_rerun_path": false,
+    "scientific_role_if_used": "re-annotation/calibration under revised rubric, not a new independent model-family replication"
+  },
+  "prompt_hashes": {
+    "R2": "88cc842ea12030530abd43563b8d6c9d6fb82ef25f997bcd9f55831c4794a924",
+    "R3": "e3b2aaafb0ac344b9d92ce3b0c8e0b0dd1fe2693a78b773c5bb3afd8e432373d",
+    "R4": "626ace9b857e352380801eb4d125d387af97953ee184b692aa9981b0b2ed12af"
+  },
+  "pricing_snapshot": {
+    "source": "arena/config/model_deepseek_v0.2.json",
+    "source_date": "2026-09-15",
+    "used_for_paid_run": false,
+    "warning": "Frozen repository snapshot only; no monetary estimate is a provider bill."
+  },
+  "current_gate": {
+    "status": "READY_FOR_EXPLICIT_PAID_REVIEW_DECISION",
+    "paid_review_authorized": false,
+    "k2_authorized": false,
+    "next_required_action": "freeze exact paid launch record only after explicit authorization"
+  },
+  "interpretation": [
+    "The no-cost Reviewer-v2 boundary/output/expansion path is executable and validated without provider calls.",
+    "Valid semantic uncertainty is preserved rather than retried into a more decisive label.",
+    "The locked transport prevents accidental paid review and cannot trigger a subject rerun.",
+    "No new C/P/R prevalence, agreement, laundering, black-hole or causal finding is established by these engineering validations."
+  ]
+}
