@@ -74,7 +74,7 @@ class StructuralFeedbackRoundTests(unittest.TestCase):
         }
         result = derive_structural_feedback_rounds(trace)
         self.assertEqual(result['counter_status'], 'RECORDED')
-        self.assertEqual(result['version'], 'R4-STRUCTURAL-FEEDBACK-ROUND-v0.2')
+        self.assertEqual(result['version'], 'R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1')
         self.assertTrue(result['semantic_blind'])
         self.assertEqual(result['round_count'], 2)
         self.assertEqual(result['rounds'][0]['exposure_actor'], 'inventory')
@@ -85,6 +85,31 @@ class StructuralFeedbackRoundTests(unittest.TestCase):
         self.assertIn('state_version_visible', result['rounds'][1]['return_evidence_modes'])
         self.assertEqual(result['rounds'][1]['closing_event_ref'], 'two-rounds:EVENT:0004')
         self.assertEqual(result['rounds'][0]['bias_labels'], 'NOT_ADJUDICATED')
+
+    def test_superseded_unexposed_anchor_does_not_block_later_round(self):
+        v1 = {'status': 'FINAL', 'version': 1}
+        v2 = {'status': 'FINAL', 'version': 2}
+        v3 = {'status': 'FINAL', 'version': 3}
+        trace = {
+            'run_id': 'superseded-anchor',
+            'events': [
+                {**settled(0, 1, 'lead', 1), 'final_state_after': v1},
+                {**settled(1, 2, 'lead', 2), 'final_state_after': v2},
+                contribution(2, 3, 'inventory', 'message', 'M2'),
+                {**settled(3, 4, 'lead', 3, 'revise_final_state'), 'final_state_after': v3},
+            ],
+            'model_calls': [
+                call(1, 'lead', None, 0, 1),
+                call(2, 'lead', v1, 1, 2),
+                call(3, 'inventory', v2, 2, 3),
+                call(4, 'lead', v2, 3, 4, input_messages=['M2']),
+            ],
+        }
+        result = derive_structural_feedback_rounds(trace)
+        self.assertEqual(result['round_count'], 1)
+        self.assertIn('superseded-anchor:EVENT:0000', result['skipped_unexposed_anchor_refs'])
+        self.assertEqual(result['rounds'][0]['anchor_event_ref'], 'superseded-anchor:EVENT:0001')
+        self.assertEqual(result['rounds'][0]['closing_event_ref'], 'superseded-anchor:EVENT:0003')
 
     def test_propagation_without_return_is_not_feedback_round(self):
         v1 = {'status': 'FINAL', 'version': 1}
