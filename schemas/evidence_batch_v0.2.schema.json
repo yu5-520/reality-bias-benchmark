@@ -6,7 +6,11 @@
   "properties": {
     "version": {"const": "R2-EVIDENCE-BATCH-v0.2"},
     "evidence_batch_hash": {"type": "string"},
-    "status": {"enum": ["RUN_COMPLETE_PENDING_REVIEW", "RUN_FINISHED_WITH_INCOMPLETE_EVIDENCE_PENDING_REVIEW"]},
+    "status": {"enum": [
+      "RUN_COMPLETE_PENDING_REVIEW",
+      "OBSERVATION_FINISHED_WITH_CENSORING_PENDING_REVIEW",
+      "RUN_FINISHED_WITH_INCOMPLETE_EVIDENCE_PENDING_REVIEW"
+    ]},
     "review_status": {"const": "PENDING_REVIEW"},
     "manifest_sha256": {"type": "string"},
     "traces_sha256": {"type": "string"},
