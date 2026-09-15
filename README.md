@@ -11,51 +11,72 @@ Research repository for the first Reality Bias paper:
 - R2 Primary Mapping: **PASS WITH CONTRACT REVISION** (CN-R2-016).
   - Completion → Information: supported in frozen confirmatory mapping.
   - Perfection → Invocation: supported in frozen confirmatory mapping.
-  - Retrospective → Temporal: **not universal**. Stateful replication found architecture-dependent route displacement, dominated by Information Authority when a writable active-state override exists.
-- R2 Free-Agent Arena extension: environment v0.1 prepared for self-organizing multi-agent discovery; real API execution is manually gated and has not been run by the environment-build commit.
-- R3 Coupling: next phase; design must use separate Bias-mechanism and Authority-route axes.
+  - Retrospective → Temporal: **not universal**; stateful replication found architecture-dependent route displacement.
+- R2 Free-Agent Arena:
+  - v0.1.x five-run E-commerce method-development sample is frozen.
+  - raw-trace re-audit shows 4/5 short runs activated four agents but executed only one; only run 0005 verified six-agent execution.
+  - v0.2 therefore separates activation from execution and adopts an explicit pending-work scheduling policy.
+  - subject generation and semantic review are now separated by an immutable evidence boundary.
+- R3 Coupling remains a later phase; the five-run Arena sample does not prove C→P→R temporal propagation.
 
 ## Repository map
 
 - `theory/` — theory contract, change notes, novelty matrix.
-- `benchmark/` — R1 casebook and R2 benchmark/micro-workflow items.
-- `arena/` — domain-general Free-Agent Arena, minimal Agent Cards, self-organizing routing engine, topology metrics, blinded event coding, and Authority counterfactual replay.
-- `conditions/` — frozen R2 condition definitions.
-- `configs/models/` — frozen provider/model settings (no secrets).
+- `benchmark/` — R1 casebook and retained single-turn R2 pilot benchmarks.
+- `arena/` — Free-Agent Arena runtime, evidence capture, objective metrics, review packet export and optional deferred-review adapters.
+- `arena/config/arena_v0.2.json` — current Arena execution policy.
+- `schemas/evidence_batch_v0.2.schema.json` — immutable evidence-batch interface.
+- `schemas/review_record_v0.1.schema.json` — append-only human/model review interface.
+- `conditions/` — retained R2 condition definitions.
+- `configs/models/` and `arena/config/` — frozen provider/model settings (no secrets).
 - `adapters/` — provider transport layer.
-- `runners/` — real-model experiment runners.
-- `evaluation/` — scoring specification.
-- `analysis/` — item/dimension/gate analysis.
-- `manifests/` — run matrices and repeat policy.
-- `docs/` — phase decisions and protocol notes.
+- `runners/` — retained benchmark experiment runners.
+- `evaluation/` — retained scoring specifications.
+- `analysis/` — retained benchmark analysis.
+- `docs/` — reports, evidence/review protocol and phase decisions.
 - `.github/workflows/` — reproducible execution entry points.
 
-## Secret
+## Evidence-first Arena lifecycle
 
-GitHub Actions expects a repository secret named `DEEPSEEK_API_KEY`. The key must never be committed to the repository.
+The default Arena chain is:
 
-## R2 evidence freeze
+`prepare → subject run → save raw evidence → integrity validation → objective statistics → export review packets → RUN_COMPLETE_PENDING_REVIEW`
 
-Frozen C/P confirmatory run:
-- GitHub Actions `34927333961`
-- 72 unique API traces → 168 condition cells
-- exact matched structural-gate counterfactuals
+A subject run does **not** automatically call a paid evaluator.
 
-Frozen R stateful replication:
-- GitHub Actions `34927333973`
-- 40 fresh micro-workflow traces
-- Retrospective primary Authority distribution: I=10, V=0, T=2 among 12 observed R events
-- counterfactual realization: Baseline 0.30; I-only 0.05; V-only 0.30; T-only 0.25; Full 0.00
+Raw evidence binds task/agent/model/config/code versions and hashes. Evidence-v0.2 records model inputs, raw outputs, parsed actions, message lifecycle, invocation execution, state history, FINAL/revision state, termination, remaining queue, failures and usage where available.
 
-See `docs/R2_decision.md` and `theory/change_notes/CN-R2-016.md`.
+System statistics are factual execution measurements. C/P/R, invocation necessity, revision-basis sufficiency and decision impact are semantic adjudications. If no review exists, reports say `NOT_ADJUDICATED`; absence of a review record is never converted to C/P/R=0.
 
-## Free-Agent Arena execution boundary
+## Participation terminology
 
-The Arena fixes task/input/goal, agent identities/responsibilities, private information, shared-state interface, resource limits, and external Authority rules. Agent activation count, routing order, communication topology, state writes, and revision behavior are free to self-organize.
+Arena v0.2 reports separately:
 
-- Offline validation workflow: `R2 Free-Agent Arena Offline Validation` — never uses the provider API.
-- Real workflow: `R2 Free-Agent Arena Real API Run` — `workflow_dispatch` only; provider calls require the explicit confirmation string `CALL_REAL_API`.
+- **available** — present in the domain registry;
+- **activated** — entered the active collaboration set through accepted routing/invocation;
+- **executed** — completed at least one subject-model call;
+- **returned/contributing** — produced a realized message/state/revision/final contribution.
 
-See `docs/R2_free_agent_arena_design.md` and `theory/change_notes/CN-R2-017_free_agent_arena.md`.
+Message read/delivery and invocation execution are logged separately. Decision impact is reviewed later.
 
-Mock/dry-run/scripted-provider outputs are engineering validation only and are not scientific evidence.
+## API boundaries
+
+GitHub Actions expects `DEEPSEEK_API_KEY`; the key must never be committed.
+
+- Offline validation: `R2 Free-Agent Arena Offline Validation` — no provider API.
+- Subject experiment: `R2 Free-Agent Arena Subject Run` — manual `workflow_dispatch`; subject calls require `CALL_REAL_API`; stops at evidence export.
+- Deferred review: `R2 Deferred Review Existing Evidence` — manual selection of an existing evidence artifact; default `PREPARE_ONLY`; reviewer calls require `CALL_REVIEW_API`.
+
+Evaluation failure therefore cannot trigger a subject rerun. Multiple later human/model review records can bind to the same frozen evidence batch.
+
+## Version boundary
+
+Arena v0.1.x used a different terminal scheduling policy. Arena v0.2 uses `await_pending_work_before_terminal_finalize`, so accepted pending expert work is allowed to execute before terminal shutdown. v0.1.x and v0.2 must not be silently pooled as the same experimental version.
+
+See:
+
+- `docs/R2_evidence_and_review_protocol_v0.2.md`
+- `docs/R2_ecommerce_micro_pilot_report_v0.2.md`
+- `theory/change_notes/CN-R2-023_evidence_first_deferred_adjudication.md`
+
+Mock/dry-run/scripted-provider outputs are engineering validation only and are not scientific evidence. Human and multi-model inter-rater reliability remain unmeasured unless explicitly reported from future review records.
