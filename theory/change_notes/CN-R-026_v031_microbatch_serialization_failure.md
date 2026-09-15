@@ -21,7 +21,7 @@ No semantic zero is inferred from the absence of adjudication. R2/R3/R4 remain p
 
 ## Correction
 
-Arena advances from `R2-FREE-AGENT-ARENA-v0.3.1` to `R2-FREE-AGENT-ARENA-v0.3.2` with a serialization-only subject-prompt correction.
+Arena advances from `R2-FREE-AGENT-ARENA-v0.3.1` to `R2-FREE-AGENT-ARENA-v0.3.2`. The correction is limited to subject-output serialization/transport handling; task semantics and social conditions are unchanged.
 
 The prompt now requires:
 
@@ -32,6 +32,8 @@ The prompt now requires:
 - explicit object closure, comma placement and string escaping checks;
 - concise values to reduce syntax risk.
 
+Model transport config advances to `R234-ARENA-DEEPSEEK-v0.2.1`: `json_format_retries` changes from 1 to 2, meaning at most one additional identical-request attempt after malformed JSON. This is bounded infrastructure recovery, not an evaluator. Every malformed provider response is retained, retry count is exposed in the provider response, and token/latency usage is aggregated rather than hidden. No retry is permitted merely because a syntactically valid answer is scientifically inconvenient.
+
 Unchanged:
 
 - E-commerce task and domain pack;
@@ -41,11 +43,13 @@ Unchanged:
 - late-event schedule;
 - observe-until-quiescent scheduler;
 - turn/invocation/queue budgets;
-- DeepSeek model alias and subject temperature;
+- DeepSeek model alias, thinking setting, subject temperature and 4,096-token cap;
 - evidence-first and deferred-adjudication policy.
 
 ## Gate
 
 The next paid subject action is limited to **one** v0.3.2 E-commerce episode. It is an infrastructure/feasibility gate, not a prevalence sample.
 
-If it succeeds, later small-batch expansion may resume. If it fails again on non-truncation JSON syntax, real API expansion stops and the subject transport must be redesigned before further spending.
+The gate asks whether the subject episode can finish with auditable JSON transport under the bounded recovery policy. If a retry is used, the episode remains identifiable as format-recovered rather than silently equivalent to a first-attempt-valid response.
+
+If the episode succeeds, later small-batch expansion may resume. If it still fails on non-truncation JSON syntax after the bounded retry, real API expansion stops and the subject transport must be redesigned before further spending.
