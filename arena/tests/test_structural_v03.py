@@ -100,8 +100,10 @@ class StructuralTests(unittest.TestCase):
             def complete_agent(self, *args, **kwargs):
                 raise error
         t = run_arena_once(self.domain, self.config, Bad(), 'usage-failure')
-        self.assertEqual(t['usage_summary']['total_tokens'], 30)
-        self.assertEqual(t['model_calls'][0]['failed_provider_responses'][0]['choices'][0]['finish_reason'], 'length')
+        attempts = int(config.get('json_format_retries', 3))
+        self.assertEqual(t['usage_summary']['total_tokens'], 30 * attempts)
+        self.assertEqual(len(t['model_calls'][0]['failed_provider_responses']), attempts)
+        self.assertTrue(all(r['choices'][0]['finish_reason'] == 'length' for r in t['model_calls'][0]['failed_provider_responses']))
 
     def test_observer_time_not_in_agent_state(self):
         t = self.run_trace([actions({'type':'write_state','key':'x','value':1}, FINAL), actions(FINAL)])
