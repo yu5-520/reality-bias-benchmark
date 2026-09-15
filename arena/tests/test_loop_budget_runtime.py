@@ -30,7 +30,8 @@ class LoopBudgetRuntimeTests(unittest.TestCase):
     def scripted_k2_trace(self):
         # Queue/actor sequence:
         # 1 ops_lead: invoke inventory + initial FINAL
-        # 2 ops_lead: consumes fixed late event + distinct settled FINAL
+        # 2 ops_lead: consumes fixed late event + distinct settled FINAL. The first
+        #   unexposed FINAL is therefore superseded and must not block later rounds.
         # 3 inventory: sees turn-2 settled version and returns message
         # 4 ops_lead: reads inventory message, revises FINAL, invokes inventory (round 1 closes)
         # 5 inventory: sees revised version and returns another message
@@ -67,7 +68,7 @@ class LoopBudgetRuntimeTests(unittest.TestCase):
         self.assertTrue(loop['stop_applied'])
         self.assertEqual(loop['limit'], 2)
         self.assertEqual(loop['round_count'], 2)
-        self.assertEqual(loop['counter_version'], 'R4-STRUCTURAL-FEEDBACK-ROUND-v0.2')
+        self.assertEqual(loop['counter_version'], 'R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1')
         self.assertEqual(loop['reached_at_turn'], 6)
         self.assertEqual(len(loop['round_ids']), 2)
 
@@ -78,7 +79,9 @@ class LoopBudgetRuntimeTests(unittest.TestCase):
         self.assertGreaterEqual(len(trace['pending_invocations']), 1)
 
         derived = derive_structural_feedback_rounds(trace)
+        self.assertEqual(derived['version'], 'R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1')
         self.assertEqual(derived['round_count'], 2)
+        self.assertGreaterEqual(len(derived['skipped_unexposed_anchor_refs']), 1)
         self.assertEqual(derived['rounds'][0]['anchor_actor'], 'ops_lead')
         self.assertEqual(derived['rounds'][0]['exposure_actor'], 'inventory')
         self.assertEqual(derived['rounds'][0]['return_actor'], 'ops_lead')
