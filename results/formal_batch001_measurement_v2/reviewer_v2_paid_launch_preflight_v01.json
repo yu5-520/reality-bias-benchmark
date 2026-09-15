@@ -1,0 +1,103 @@
+{
+  "version": "R234-REVIEWER-V2-PAID-LAUNCH-PREFLIGHT-RESULT-v0.1",
+  "date": "2026-09-15",
+  "scientific_semantic_result": false,
+  "provider_calls": 0,
+  "paid_api_authorized": false,
+  "workflow_run_id": 34992898867,
+  "workflow_conclusion": "success",
+  "artifact": {
+    "id": 10406541534,
+    "digest": "sha256:8df2f7b2f3d80f10c076818ec3dc8ff7a13db3d8d59de581c5acbcbacff6d2f6",
+    "size_bytes": 2308
+  },
+  "candidate": {
+    "sha256": "0688adf23ceaef9a240c003a7d218210120583e12c1ab5593b158eb501bdf560",
+    "semantic_hash": "92b489a35b1a6295f3fe5e0ed5ead2639ede517bb34ec5574a80e825c95dd2df",
+    "status": "NOT_AUTHORIZED",
+    "execute_real_api": false
+  },
+  "preflight_manifest_hash": "38288a8ceb51d2c95148f9ceca206c93efa0597244e67b7751919d85e9eebccc",
+  "evidence_batch_hash": "94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9",
+  "scientific_role": "REANNOTATION_CALIBRATION_UNDER_REVISED_SEMANTIC_CONTRACT",
+  "population": {
+    "R2": 70,
+    "R3": 70,
+    "R4": 4,
+    "total": 144,
+    "selection_rule": "FULL_FROZEN_BASE_POPULATION"
+  },
+  "packet_files": {
+    "R2": {
+      "sha256": "c23522f9916530b4a342c2fd4b2cc028bb8613d0b8626cdc0d76ed9bc1ded63f",
+      "bytes": 1061184,
+      "packet_version": "R234-REVIEWER-V2-R2-COMPACT-PACKET-v0.1"
+    },
+    "R3": {
+      "sha256": "7cbe61987172f6dd2fa6f547766c145ddf8782d5fc7ec1bf3762b06fb0db0151",
+      "bytes": 2962081,
+      "packet_version": "R234-REVIEWER-V2-R3-COMPACT-PACKET-v0.2"
+    },
+    "R4": {
+      "sha256": "fe0a7d24a2d8fa4f102da9883529bebbcef9be0397057f3b8a23230754ee393a",
+      "bytes": 318633,
+      "packet_version": "R234-REVIEWER-V2-R4-COMPACT-PACKET-v0.1"
+    }
+  },
+  "prompt_hashes": {
+    "R2": "88cc842ea12030530abd43563b8d6c9d6fb82ef25f997bcd9f55831c4794a924",
+    "R3": "e3b2aaafb0ac344b9d92ce3b0c8e0b0dd1fe2693a78b773c5bb3afd8e432373d",
+    "R4": "626ace9b857e352380801eb4d125d387af97953ee184b692aa9981b0b2ed12af"
+  },
+  "model_config": {
+    "sha256": "fe7bbafda1c4c12b1d1f5dca963d1a45cbe503713aaa486fac09f569d1b5f8c5",
+    "config_version": "R234-ARENA-DEEPSEEK-v0.2.1",
+    "model_alias": "deepseek-flash",
+    "expected_model_version": "DeepSeek-V4.1-Flash",
+    "accepted_returned_model_values": ["deepseek-flash"]
+  },
+  "serialized_request_body_without_provider_wrapper": {
+    "packet_file_bytes_including_jsonl_newlines": 4341898,
+    "repeated_system_prompt_bytes": 427562,
+    "combined_bytes": 4769460,
+    "note": "Byte volume only; not a provider-token or monetary estimate."
+  },
+  "runtime_policy": {
+    "max_workers": 1,
+    "malformed_output_retries_max": 2,
+    "context_expansion_max_per_packet": 1,
+    "semantic_uncertainty_retry": false,
+    "subject_rerun_on_reviewer_failure": false,
+    "stop_on_first_unrecoverable_review_error": true,
+    "preserve_partial_review_records": true
+  },
+  "spend_policy": {
+    "price_mode_for_ceiling": "peak",
+    "price_snapshot_source_date": "2026-09-15",
+    "launch_max_spend_usd": null,
+    "repository_level_absolute_ceiling_usd": 2.0,
+    "paid_launch_enabled": false
+  },
+  "pathological_retry_expansion_envelope": {
+    "max_calls_per_unit_if_every_attempt_expands_and_retries": 6,
+    "max_provider_calls_before_spend_stop_if_no_other_stop_condition": 864,
+    "max_output_tokens_if_every_call_hit_configured_output_cap": 3456000,
+    "interpretation": "Safety envelope only; not expected usage."
+  },
+  "adapter_gate": {
+    "adapter_version": "R234-REVIEWER-V2-DEEPSEEK-ADAPTER-v0.2",
+    "offline_validation_workflow_run_id": 34993080553,
+    "offline_validation_conclusion": "success",
+    "immutable_launch_record_required": true,
+    "unexpected_returned_model_stops_review": true,
+    "credential_access_occurs_after_launch_record_validation": true
+  },
+  "next_gate": "EXPLICIT_USER_AUTHORIZATION_AND_SEPARATE_IMMUTABLE_AUTHORIZED_LAUNCH_RECORD",
+  "k2_authorized": false,
+  "interpretation": [
+    "The exact 144-unit Reviewer-v2 population, packet files, prompts and model config are now hash-bound before any paid call.",
+    "The candidate remains deliberately non-executable: no authorization reference and no launch spend amount are present.",
+    "The real adapter now requires a separate AUTHORIZED immutable launch record whose packet/config/prompt hashes and spend/retry settings match the runtime command before credential access.",
+    "This preflight is engineering only and establishes no new C/P/R result."
+  ]
+}
