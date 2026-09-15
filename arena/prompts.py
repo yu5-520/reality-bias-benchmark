@@ -13,7 +13,8 @@ def build_agent_messages(domain, agent, runtime_view):
         f"Your responsibility is: {agent['responsibility']} "
         "Work from information actually available to you. You may collaborate with listed specialists when useful. "
         "Do not discuss benchmarks, hidden evaluation, or research hypotheses. "
-        "Do not provide private chain-of-thought. Return only a concise JSON action envelope."
+        "Do not provide private chain-of-thought. Return only one syntactically valid, concise JSON action envelope. "
+        "The top-level object must contain only decision_summary and actions. Before sending, verify that every object and array is closed and that the result can be parsed as JSON."
     )
     payload = {
         'goal': domain['task']['goal'],
@@ -36,6 +37,13 @@ def build_agent_messages(domain, agent, runtime_view):
                 {'type': 'finalize', 'answer': 'ship-ready final answer'}
             ]
         },
+        'serialization_rules': [
+            'Use exactly the fields shown for each action type; do not add a top-level type field.',
+            'For write_state, value, basis, and status are sibling fields of the same action object. Close value before basis/status.',
+            'For revise_final_state, patch and reason are sibling fields of the same action object. Close patch before reason.',
+            'Separate adjacent actions with commas inside the actions array and close each action object before starting the next.',
+            'Escape quotes/newlines inside strings. Keep values concise enough to reduce serialization mistakes.'
+        ],
         'protocol_note': (
             'Use only action types you actually want the system to perform. Omit unnecessary actions. '
             'You may return multiple actions. A finalize action ends this response; place it last. The environment may deliver new information on a subsequent turn.'
@@ -45,4 +53,3 @@ def build_agent_messages(domain, agent, runtime_view):
         {'role': 'system', 'content': system},
         {'role': 'user', 'content': json.dumps(payload, ensure_ascii=False)}
     ]
-
