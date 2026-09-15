@@ -38,7 +38,7 @@ jobs:
           assert x['domains']==['ecommerce'] and x['review_policy']=='deferred'
           assert isinstance(x['repeats'], int) and 1 <= x['repeats'] <= 5
           c=json.load(open('arena/config/arena_v0.3.json'))
-          assert c['version']=='R2-FREE-AGENT-ARENA-v0.3.1'
+          assert c['version']=='R2-FREE-AGENT-ARENA-v0.3.2'
           assert c['max_turns']==32 and c['max_total_invocations']==64
           print('launch repeats=', x['repeats'])
           PY
