@@ -43,7 +43,7 @@ class LoopBudgetPolicyTests(unittest.TestCase):
         counts = validation['frozen_trace_round_counts']
         self.assertEqual(counts['v0.3.1_microbatch003_run0002_complete_18_turns'], 2)
         self.assertEqual(counts['v0.3.2_format005_censored_32_turns'], 3)
-        self.assertIn('not rewritten', validation['note'].lower())
+        self.assertIn('no subject behavior was changed', validation['note'].lower())
 
     def test_k4_requires_qualified_signal_not_raw_accumulation(self):
         gate = self.policy['upper_bound_layer']['k4_gate']
