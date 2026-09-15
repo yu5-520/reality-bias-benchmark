@@ -31,12 +31,29 @@ jobs:
         run: |
           set +e
           output=$(python -m arena.evaluate_reviewer_v2_deepseek \
-            --layer R2 --packets DOES_NOT_EXIST --traces DOES_NOT_EXIST --outdir /tmp/never 2>&1)
+            --layer R2 \
+            --packets DOES_NOT_EXIST \
+            --traces DOES_NOT_EXIST \
+            --outdir /tmp/never \
+            --launch-record DOES_NOT_EXIST 2>&1)
           code=$?
           set -e
           test "$code" -ne 0
           echo "$output" | grep -q 'real API locked'
           test ! -e /tmp/never
+
+      - name: Candidate record cannot satisfy paid launch gate
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x = json.loads(Path('reviews/reviewer_system_v2/paid_launch_candidate_v0.1.json').read_text())
+          assert x['status'] == 'NOT_AUTHORIZED'
+          assert x['execute_real_api'] is False
+          assert x['authorization']['authorized_by_user'] is False
+          assert x['spend_policy']['launch_max_spend_usd'] is None
+          print({'candidate_paid_launch_enabled': False, 'provider_calls': 0})
+          PY
 
       - name: Prompt and pricing snapshot hashes
         run: |
