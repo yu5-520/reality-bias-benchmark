@@ -1,7 +1,8 @@
 """Deterministic exposure links and feedback projections, never semantic labels."""
 from .core import stable_hash
+from .structural_feedback import derive_structural_feedback_rounds
 
-VERSION = 'ARENA-STRUCTURAL-VIEWS-v0.1'
+VERSION = 'ARENA-STRUCTURAL-VIEWS-v0.2'
 MISSING = 'NOT_RECORDED_IN_SOURCE_VERSION'
 
 
@@ -80,10 +81,12 @@ def build_views(trace, batch_hash):
                 'authority_penetration': 'NOT_ADJUDICATED', 'self_reinforcement': 'NOT_ADJUDICATED'})
         adjacency.setdefault(edge['source'], []).append(edge)
     revisions = [event_ref(e['event_index']) for e in events if e.get('action_type') in ('finalize', 'revise_final_state')]
+    feedback_rounds = derive_structural_feedback_rounds(trace)
     return index, {'version': VERSION, 'run_id': run, 'evidence_batch_hash': batch_hash,
         'layers': {x: 'PENDING_REVIEW' for x in ('R2', 'R3', 'R4')},
         'relations': edges, 'feedback_candidates': candidates,
+        'structural_feedback_rounds': feedback_rounds,
         'settled_state_event_refs': revisions,
         'state_read_evidence': 'RECORDED' if all('runtime_snapshot' in c for c in trace.get('model_calls', [])) else MISSING,
         'observation_censored': trace.get('observation_censored', MISSING),
-        'warning': 'Exposure is not dependency. Communication return paths are not authority loops; no candidate is not a reviewed absence of loops.'}
+        'warning': 'Exposure is not dependency. Communication return paths and structural feedback rounds are not authority loops; no candidate is not a reviewed absence of loops.'}
