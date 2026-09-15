@@ -1,0 +1,31 @@
+{
+  "config_version": "R234-ARENA-BAILIAN-QWEN38MAX-v0.1",
+  "provider": "alibaba_cloud_bailian_business_space",
+  "transport": "openai_compatible_chat_completions",
+  "credential_env": "BAI",
+  "base_url_env": "BAILIAN_BASE_URL",
+  "model_env": "BAILIAN_MODEL",
+  "model_alias": "qwen3.8-max-0902",
+  "expected_returned_models": ["qwen3.8-max-0902"],
+  "evaluator": {
+    "temperature": 0.0,
+    "max_tokens": 4000,
+    "response_format_json": true
+  },
+  "runtime": {
+    "timeout_seconds": 120,
+    "max_workers": 1,
+    "malformed_output_retries_max": 2,
+    "context_expansion_max_per_packet": 1
+  },
+  "pricing_snapshot_cny_per_million_tokens": {
+    "source_date": "2026-09-16",
+    "source": "Alibaba Cloud Model Studio official qwen3.8-max model pricing",
+    "region_binding": "business-space endpoint in cn-beijing",
+    "input": 12.0,
+    "output_including_reasoning": 36.0,
+    "cache_hit_input": 1.5,
+    "ceiling_calculation_uses_cache_discount": false
+  },
+  "pricing_note": "Official list price snapshot. Promotional/free quota is intentionally ignored for the hard ceiling. Reasoning tokens are charged as output tokens."
+}
