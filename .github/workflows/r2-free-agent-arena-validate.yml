@@ -1,0 +1,43 @@
+name: R2 Free-Agent Arena Offline Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'arena/**'
+      - 'docs/R2_free_agent_arena_design.md'
+      - 'theory/change_notes/CN-R2-017_free_agent_arena.md'
+      - '.github/workflows/r2-free-agent-arena-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Syntax check
+        run: |
+          python -m py_compile arena/*.py
+      - name: Validate domain environment and prompt isolation
+        run: |
+          python arena/validate_environment.py
+      - name: Run engineering-only scripted preflight
+        run: |
+          python arena/preflight.py
+      - name: Build offline manifest sample
+        run: |
+          python -m arena.build_manifest --domains all --repeats 2 --out results/arena_manifest_preflight.jsonl
+          wc -l results/arena_manifest_preflight.jsonl
+      - name: Upload offline preflight evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-free-agent-arena-preflight-${{ github.run_id }}
+          path: results/arena_manifest_preflight.jsonl
+          retention-days: 30
