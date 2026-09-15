@@ -1,0 +1,250 @@
+name: R2-R4 Formal Batch001 Blind DeepSeek Review v1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'arena/launch/formal_batch001_blind_deepseek_v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: r234-formal-batch001-blind-deepseek-v1
+  cancel-in-progress: false
+
+jobs:
+  prepare_blind_bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Offline syntax and review-tool checks
+        run: |
+          python -m py_compile arena/build_blind_review_bundle.py arena/evaluate_blind_review_real.py arena/analyze_blind_review_agreement.py
+          python -m unittest discover -s arena/tests -v
+      - name: Download frozen formal Batch001 evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: r234-ecommerce-formal-joint-cpr-v1-batch001-34970142001
+          path: source_evidence
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 34970142001
+      - name: Locate and verify frozen evidence
+        run: |
+          BATCH_META=$(find source_evidence -path '*formal_evidence/evidence_batch.json' -type f | head -n1)
+          PACKETS=$(find source_evidence -path '*formal_evidence/review_packets.jsonl' -type f | head -n1)
+          TRACES=$(find source_evidence -name formal_subject_traces.jsonl -type f | head -n1)
+          MANIFEST=$(find source_evidence -name formal_subject_manifest.jsonl -type f | head -n1)
+          test -n "$BATCH_META" && test -n "$PACKETS" && test -n "$TRACES" && test -n "$MANIFEST"
+          echo "BATCH_META=$BATCH_META" >> "$GITHUB_ENV"
+          echo "PACKETS=$PACKETS" >> "$GITHUB_ENV"
+          echo "TRACES=$TRACES" >> "$GITHUB_ENV"
+          echo "MANIFEST=$MANIFEST" >> "$GITHUB_ENV"
+          python - <<'PY'
+          import json, os, pathlib
+          meta=json.load(open(os.environ['BATCH_META'],encoding='utf-8'))
+          assert meta['evidence_batch_hash']=='94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9'
+          packets=[x for x in pathlib.Path(os.environ['PACKETS']).read_text(encoding='utf-8').splitlines() if x.strip()]
+          traces=[x for x in pathlib.Path(os.environ['TRACES']).read_text(encoding='utf-8').splitlines() if x.strip()]
+          assert len(packets)==70, len(packets)
+          assert len(traces)==3, len(traces)
+          print('frozen formal evidence verified: 3 traces / 70 packets')
+          PY
+      - name: Generate sanitized blind-review bundle
+        run: |
+          mkdir -p results/blind_input
+          python -m arena.build_blind_review_bundle \
+            --batch-meta "$BATCH_META" \
+            --packets "$PACKETS" \
+            --traces "$TRACES" \
+            --domain arena/domains/ecommerce.json \
+            --manifest "$MANIFEST" \
+            --out results/blind_input/blind_units.jsonl \
+            --manifest-out results/blind_input/blind_bundle_manifest.json
+      - name: Enforce blinding boundary before API use
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          manifest=json.load(open('results/blind_input/blind_bundle_manifest.json',encoding='utf-8'))
+          assert manifest['unit_count']==70
+          assert manifest['evidence_batch_hash']=='94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9'
+          rows=[json.loads(x) for x in pathlib.Path('results/blind_input/blind_units.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          assert len(rows)==70
+          forbidden=('semantic_fields','primary_3x3','reviewer_a_labels','expected_bias_authority_mapping')
+          raw=pathlib.Path('results/blind_input/blind_units.jsonl').read_text(encoding='utf-8').lower()
+          for token in forbidden:
+              assert token.lower() not in raw, token
+          assert all(r['blinding']['prior_semantic_review_included'] is False for r in rows)
+          assert all(r['blinding']['expected_mapping_included'] is False for r in rows)
+          assert all(r['blinding']['structural_feedback_metrics_included'] is False for r in rows)
+          print('BLIND BUNDLE PASS; bundle_hash=',manifest['bundle_hash'])
+          PY
+      - name: Upload isolated blind input
+        uses: actions/upload-artifact@v4
+        with:
+          name: formal-batch001-blind-input-${{ github.run_id }}
+          path: results/blind_input/
+          retention-days: 90
+
+  blind_review:
+    needs: prepare_blind_bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            arena
+            adapters
+          sparse-checkout-cone-mode: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify prior review and theory files are absent from reviewer workspace
+        run: |
+          test ! -e reviews/formal_batch001_model_review_v1
+          test ! -e theory/change_notes/CN-R-034_formal_batch001_model_review_v1.md
+          test ! -e docs/R234_ecommerce_formal_joint_cpr_v1_model_review_v1.md
+          echo 'isolated reviewer workspace PASS'
+      - uses: actions/download-artifact@v4
+        with:
+          name: formal-batch001-blind-input-${{ github.run_id }}
+          path: blind_input
+      - name: Run independent DeepSeek Reviewer B over sanitized units
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          mkdir -p results/blind_review
+          python arena/evaluate_blind_review_real.py \
+            --bundle blind_input/blind_units.jsonl \
+            --out results/blind_review/review_records.jsonl \
+            --reviewer-id deepseek-blind-reviewer-b-v1 \
+            --model-config arena/config/model_deepseek_v0.2.json \
+            --max-workers 4 \
+            --execute-real-api | tee results/blind_review/reviewer_run.log
+      - name: Verify complete blinded review freeze
+        run: |
+          cp blind_input/blind_bundle_manifest.json results/blind_review/
+          python - <<'PY'
+          import json, pathlib
+          rows=[json.loads(x) for x in pathlib.Path('results/blind_review/review_records.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          assert len(rows)==70, len(rows)
+          assert len({r['packet_id'] for r in rows})==70
+          assert len({r['event_id'] for r in rows})==70
+          assert {r['evidence_batch_hash'] for r in rows}=={'94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9'}
+          assert all(r['record_kind']=='independent' for r in rows)
+          assert all(r['reviewer']['blind_to_prior_review'] is True for r in rows)
+          assert all(r['reviewer']['blind_to_expected_mapping'] is True for r in rows)
+          usage={}
+          for r in rows:
+              for k,v in (r.get('usage') or {}).items():
+                  if isinstance(v,(int,float)) and not isinstance(v,bool): usage[k]=usage.get(k,0)+v
+          pathlib.Path('results/blind_review/usage_summary.json').write_text(json.dumps(usage,indent=2),encoding='utf-8')
+          print('BLIND REVIEW FREEZE PASS; usage=',json.dumps(usage,sort_keys=True))
+          PY
+      - name: Upload append-only blind review records
+        uses: actions/upload-artifact@v4
+        with:
+          name: formal-batch001-blind-deepseek-review-${{ github.run_id }}
+          path: results/blind_review/
+          retention-days: 90
+
+  compare_after_freeze:
+    needs: blind_review
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: formal-batch001-blind-deepseek-review-${{ github.run_id }}
+          path: blind_review
+      - name: Compare Reviewer B only after B records are frozen
+        run: |
+          mkdir -p results/comparison
+          python -m arena.analyze_blind_review_agreement \
+            --reviewer-a reviews/formal_batch001_model_review_v1/review_event_codes.csv \
+            --reviewer-b blind_review/review_records.jsonl \
+            --out-json results/comparison/agreement_summary.json \
+            --out-md results/comparison/AGREEMENT_REPORT.md | tee results/comparison/analysis.log
+      - name: Add usage and price estimate metadata
+        run: |
+          cp blind_review/usage_summary.json results/comparison/
+          cp blind_review/blind_bundle_manifest.json results/comparison/
+          python - <<'PY'
+          import json, pathlib, datetime
+          usage=json.load(open('blind_review/usage_summary.json',encoding='utf-8'))
+          cfg=json.load(open('arena/config/model_deepseek_v0.2.json',encoding='utf-8'))
+          rates=cfg['pricing_snapshot_usd_per_million_tokens']
+          hit=usage.get('prompt_cache_hit_tokens',0)
+          miss=usage.get('prompt_cache_miss_tokens', usage.get('prompt_tokens',0)-hit)
+          out=usage.get('completion_tokens',0)
+          def cost(r): return (hit*r['input_cache_hit']+miss*r['input_cache_miss']+out*r['output'])/1_000_000
+          meta={
+            'review':'FORMAL-BATCH001-DEEPSEEK-BLIND-REVIEW-v1',
+            'evidence_batch_hash':'94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9',
+            'review_units':70,
+            'reviewer':'deepseek-blind-reviewer-b-v1',
+            'blinded_to_reviewer_a':True,
+            'blinded_to_expected_mapping':True,
+            'usage':usage,
+            'stored_price_snapshot_date':cfg['pricing_snapshot_usd_per_million_tokens']['source_date'],
+            'estimated_cost_usd_off_peak':cost(rates['off_peak']),
+            'estimated_cost_usd_peak':cost(rates['peak']),
+            'workflow_run_id':'${{ github.run_id }}',
+            'created_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+          }
+          pathlib.Path('results/comparison/review_metadata.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding='utf-8')
+          with open('results/comparison/AGREEMENT_REPORT.md','a',encoding='utf-8') as f:
+              f.write(f"\n## Reviewer B usage\n\nRecorded reviewer usage: `{json.dumps(usage,sort_keys=True)}`.\n\nStored-price estimate: off-peak `${meta['estimated_cost_usd_off_peak']:.4f}`, peak `${meta['estimated_cost_usd_peak']:.4f}`. These are repository-snapshot estimates, not provider billing.\n")
+          print(json.dumps(meta,ensure_ascii=False,indent=2))
+          PY
+          cat results/comparison/AGREEMENT_REPORT.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload agreement analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: formal-batch001-cross-model-agreement-${{ github.run_id }}
+          path: results/comparison/
+          retention-days: 90
+
+  persist_results:
+    needs: compare_after_freeze
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: formal-batch001-blind-deepseek-review-${{ github.run_id }}
+          path: blind_review
+      - uses: actions/download-artifact@v4
+        with:
+          name: formal-batch001-cross-model-agreement-${{ github.run_id }}
+          path: comparison
+      - name: Persist append-only Reviewer B records and agreement report
+        run: |
+          mkdir -p reviews/formal_batch001_blind_deepseek_v1
+          cp blind_review/review_records.jsonl reviews/formal_batch001_blind_deepseek_v1/
+          cp blind_review/blind_bundle_manifest.json reviews/formal_batch001_blind_deepseek_v1/
+          cp blind_review/usage_summary.json reviews/formal_batch001_blind_deepseek_v1/
+          cp comparison/agreement_summary.json reviews/formal_batch001_blind_deepseek_v1/
+          cp comparison/review_metadata.json reviews/formal_batch001_blind_deepseek_v1/
+          cp comparison/AGREEMENT_REPORT.md reviews/formal_batch001_blind_deepseek_v1/
+          cp comparison/AGREEMENT_REPORT.md docs/R234_ecommerce_formal_joint_cpr_v1_cross_model_blind_agreement.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add reviews/formal_batch001_blind_deepseek_v1 docs/R234_ecommerce_formal_joint_cpr_v1_cross_model_blind_agreement.md
+          git commit -m 'review: persist independent blind DeepSeek Batch001 review' || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
