@@ -1,0 +1,106 @@
+name: R2 Arena E-commerce Micro Pilot Rejudge
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r2-arena-ecommerce-micropilot-rejudge.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: r2-arena-ecommerce-micropilot-rejudge
+  cancel-in-progress: false
+
+jobs:
+  rejudge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify evaluator repair and Arena regression tests
+        run: |
+          python arena/validate_environment.py
+          python -m unittest discover -s arena/tests -v
+          python - <<'PY'
+          from arena.evaluation import EVALUATOR_VERSION
+          assert EVALUATOR_VERSION == 'R2-ARENA-EVAL-v0.1.3'
+          print('Evaluator coding-key repair verified.')
+          PY
+      - name: Download frozen five subject traces from failed coding run
+        uses: actions/download-artifact@v4
+        with:
+          name: r2-arena-ecommerce-micropilot-34933874204
+          path: source_artifact
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 34933874204
+      - name: Freeze source traces for rejudgment
+        run: |
+          mkdir -p results
+          cp source_artifact/arena_traces.jsonl results/arena_traces.jsonl
+          test "$(wc -l < results/arena_traces.jsonl)" -eq 5
+          sha256sum results/arena_traces.jsonl | tee results/SOURCE_TRACE_SHA256.txt
+      - name: Re-code all five traces with evaluator v0.1.3 only
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python arena/evaluate_real.py \
+            --input results/arena_traces.jsonl \
+            --out results/arena_evaluations_v013.jsonl \
+            --max-workers 2 \
+            --execute-real-api
+          test "$(wc -l < results/arena_evaluations_v013.jsonl)" -eq 5
+      - name: Analyze complete micro-pilot
+        run: |
+          python -m arena.analyze \
+            --traces results/arena_traces.jsonl \
+            --evaluations results/arena_evaluations_v013.jsonl \
+            --outdir results/arena_analysis_v013
+          cat results/arena_analysis_v013/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Freeze rejudgment metadata
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, pathlib
+          def sha(p):
+              h=hashlib.sha256()
+              with open(p,'rb') as f:
+                  for c in iter(lambda:f.read(65536),b''): h.update(c)
+              return h.hexdigest()
+          traces=[json.loads(x) for x in pathlib.Path('results/arena_traces.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          evals=[json.loads(x) for x in pathlib.Path('results/arena_evaluations_v013.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          assert len(traces)==5 and len(evals)==5
+          assert {x['evaluator_version'] for x in evals}=={'R2-ARENA-EVAL-v0.1.3'}
+          meta={
+            'status':'MICRO_PILOT_REJUDGED_COMPLETE',
+            'source_subject_run_id':34933874204,
+            'source_subject_traces_reused':5,
+            'subject_traces_regenerated':False,
+            'rejudge_github_run_id':os.environ.get('GITHUB_RUN_ID'),
+            'rejudge_git_sha':os.environ.get('GITHUB_SHA'),
+            'evaluator_version':'R2-ARENA-EVAL-v0.1.3',
+            'trace_sha256':sha('results/arena_traces.jsonl'),
+            'evaluation_sha256':sha('results/arena_evaluations_v013.jsonl'),
+            'scientific_scope':'five-run discovery micro-pilot; not prevalence estimate'
+          }
+          pathlib.Path('results/arena_analysis_v013/REJUDGE_METADATA.json').write_text(json.dumps(meta,indent=2),encoding='utf-8')
+          print(json.dumps(meta,indent=2))
+          PY
+      - name: Upload rejudged micro-pilot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-arena-ecommerce-micropilot-rejudged-${{ github.run_id }}
+          path: |
+            results/arena_traces.jsonl
+            results/SOURCE_TRACE_SHA256.txt
+            results/arena_evaluations_v013.jsonl
+            results/arena_evaluations_v013.jsonl.errors.json
+            results/json_format_retries.jsonl
+            results/arena_analysis_v013/
+          if-no-files-found: warn
+          retention-days: 90
