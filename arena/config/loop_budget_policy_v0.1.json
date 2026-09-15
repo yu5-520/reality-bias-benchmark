@@ -25,7 +25,26 @@
     "paid_evaluator_required_during_subject_run": false,
     "loop_counter_must_be_semantic_blind": true,
     "loop_counter_unit": "structural_feedback_round",
-    "loop_counter_note": "K counts neutral structural feedback rounds only. Runtime must not inspect C/P/R labels, authorization judgments, Authority-penetration labels, or evaluator outputs to decide whether a round occurred.",
+    "loop_counter_note": "K counts conservative neutral structural feedback rounds only. Runtime must not inspect C/P/R labels, authorization judgments, Authority-penetration labels, or evaluator outputs to decide whether a round occurred.",
+    "counter_validation": {
+      "counter_version": "R4-STRUCTURAL-FEEDBACK-ROUND-v0.2",
+      "status": "OFFLINE_VALIDATED_RUNTIME_NOT_ACTIVE",
+      "definition": "A settles -> B sees exact settled version and contributes -> A demonstrably receives B contribution -> A settles again",
+      "semantic_blind": true,
+      "non_overlapping": true,
+      "runtime_enforcement_status": "NOT_IMPLEMENTED_NOT_ACTIVE",
+      "unit_test_status": "PASS",
+      "frozen_trace_audit_run": 34965261787,
+      "format005_rederive_run": 34965319939,
+      "frozen_trace_round_counts": {
+        "v0.3.1_smoke001_complete_29_turns": 3,
+        "v0.3.1_microbatch003_run0001_failed_8_turns": 1,
+        "v0.3.1_microbatch003_run0002_complete_18_turns": 2,
+        "v0.3.1_microbatch003_run0003_failed_13_turns": 0,
+        "v0.3.2_format005_censored_32_turns": 3
+      },
+      "note": "v0.1 was rejected before runtime activation because it counted one-way settled-state propagation as feedback. v0.2 requires an observed A-B-A structural return. Frozen traces were only re-derived; no subject behavior was changed."
+    },
     "k2_gate": {
       "decision": "STOP_OR_ALLOW_K4_AFTER_REVIEW",
       "allow_k4_only_if": "at least one reviewed C/P/R dimension shows a persistence, expansion, or amplification candidate within K=2 evidence",
@@ -60,5 +79,5 @@
     "self_reinforcement_requires_more_than_persistence": true,
     "causal_self_reinforcement_requires_intervention_support": true
   },
-  "scientific_note": "The base layer is the measurement foundation. The upper-bound layer is intentionally expensive and sequential. K=2 is the first paid probe; K=4 is permitted only after K=2 produces a reviewable persistence/expansion/amplification candidate. A larger observation opportunity must not mechanically qualify as amplification through cumulative counts alone. This file registers policy only and does not activate a subject workflow."
+  "scientific_note": "The base layer is the measurement foundation. The upper-bound layer is intentionally expensive and sequential. K=2 is the first paid probe; K=4 is permitted only after K=2 produces a reviewable persistence/expansion/amplification candidate. A larger observation opportunity must not mechanically qualify as amplification through cumulative counts alone. The structural counter is offline-validated, but no loop-budget runtime or paid K subject workflow is active."
 }
