@@ -1,5 +1,5 @@
 {
-  "config_version": "R234-ARENA-DEEPSEEK-v0.2",
+  "config_version": "R234-ARENA-DEEPSEEK-v0.2.1",
   "provider": "deepseek",
   "base_url": "https://api.deepseek.com",
   "endpoint": "/chat/completions",
@@ -22,7 +22,8 @@
     "retry_backoff_seconds": 2,
     "max_workers": 6
   },
-  "json_format_retries": 1,
+  "json_format_retries": 2,
+  "format_recovery_note": "Micro-batch run 34960602410 preserved two subject failures where DeepSeek returned malformed JSON with finish_reason=stop below the 4096-token cap. One identical-request format retry is now allowed and fully audited; raw malformed responses and aggregate token usage remain preserved.",
   "pricing_snapshot_usd_per_million_tokens": {
     "source_date": "2026-09-15",
     "off_peak": {
