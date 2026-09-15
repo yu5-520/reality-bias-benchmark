@@ -25,10 +25,25 @@ class LoopBudgetPolicyTests(unittest.TestCase):
         upper = self.policy['upper_bound_layer']
         self.assertTrue(upper['loop_counter_must_be_semantic_blind'])
         self.assertEqual(upper['loop_counter_unit'], 'structural_feedback_round')
+        validation = upper['counter_validation']
+        self.assertEqual(validation['counter_version'], 'R4-STRUCTURAL-FEEDBACK-ROUND-v0.2')
+        self.assertTrue(validation['semantic_blind'])
+        self.assertTrue(validation['non_overlapping'])
+        self.assertEqual(validation['status'], 'OFFLINE_VALIDATED_RUNTIME_NOT_ACTIVE')
+        self.assertEqual(validation['runtime_enforcement_status'], 'NOT_IMPLEMENTED_NOT_ACTIVE')
         rules = self.policy['analysis_rules']
         self.assertTrue(rules['C_P_R_are_deferred_semantic_labels'])
         self.assertTrue(rules['K_is_not_a_bias_label'])
         self.assertTrue(rules['communication_cycle_is_not_authority_loop'])
+
+    def test_frozen_counter_audit_is_registered_without_relabeling_base(self):
+        validation = self.policy['upper_bound_layer']['counter_validation']
+        self.assertEqual(validation['frozen_trace_audit_run'], 34965261787)
+        self.assertEqual(validation['format005_rederive_run'], 34965319939)
+        counts = validation['frozen_trace_round_counts']
+        self.assertEqual(counts['v0.3.1_microbatch003_run0002_complete_18_turns'], 2)
+        self.assertEqual(counts['v0.3.2_format005_censored_32_turns'], 3)
+        self.assertIn('not rewritten', validation['note'].lower())
 
     def test_k4_requires_qualified_signal_not_raw_accumulation(self):
         gate = self.policy['upper_bound_layer']['k4_gate']
