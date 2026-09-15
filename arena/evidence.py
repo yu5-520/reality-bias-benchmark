@@ -10,6 +10,7 @@ from .io_utils import load_json, load_jsonl, write_jsonl, sha256_file
 from .topology import topology_metrics, participation_metrics
 
 EVIDENCE_BATCH_VERSION = 'R2-EVIDENCE-BATCH-v0.2'
+OBJECTIVE_STATS_VERSION = 'R234-OBJECTIVE-STATS-v0.3.1-CENSOR-AWARE'
 REVIEW_PACKET_VERSION = 'R2-REVIEW-PACKET-v0.1'
 
 
@@ -22,16 +23,67 @@ def _call_for_event(trace, event_index):
     return None, None
 
 
+def _observation_window(trace):
+    events = trace.get('events', [])
+    realized = [e for e in events if e.get('realized_in_baseline')]
+    finalize_events = [e for e in realized if e.get('action_type') == 'finalize']
+    revision_events = [e for e in realized if e.get('action_type') == 'revise_final_state']
+    first_finalize_turn = finalize_events[0].get('turn') if finalize_events else None
+    turns_observed = trace.get('turns')
+    if isinstance(turns_observed, int) and isinstance(first_finalize_turn, int):
+        post_final_turns = max(0, turns_observed - first_finalize_turn)
+        post_final_actions = sum(
+            1 for e in realized
+            if isinstance(e.get('turn'), int) and e['turn'] > first_finalize_turn and e.get('actor') != 'ENVIRONMENT'
+        )
+    else:
+        post_final_turns = None
+        post_final_actions = None
+
+    limits = trace.get('budget_limits') if isinstance(trace.get('budget_limits'), dict) else {}
+    remaining = trace.get('remaining_queue')
+    unread = trace.get('unread_messages')
+    pending_invocations = trace.get('pending_invocations')
+    censored = trace.get('observation_censored')
+    if type(censored) is not bool:
+        censored = trace.get('run_status') == 'BUDGET_CENSORED'
+    full_episode_observed = trace.get('run_status') == 'RUN_COMPLETE' and not censored
+
+    return {
+        'turns_observed': turns_observed,
+        'turn_limit': limits.get('max_turns', 'NOT_RECORDED_IN_SOURCE_VERSION'),
+        'invocation_limit': limits.get('max_total_invocations', 'NOT_RECORDED_IN_SOURCE_VERSION'),
+        'queue_limit': limits.get('max_pending_messages', 'NOT_RECORDED_IN_SOURCE_VERSION'),
+        'observation_censored': censored,
+        'censor_reason': trace.get('termination_reason') if censored else None,
+        'full_episode_observed': full_episode_observed,
+        'first_finalize_turn': first_finalize_turn,
+        'post_first_finalize_turns_observed': post_final_turns,
+        'post_first_finalize_realized_action_count': post_final_actions,
+        'realized_finalize_count': len(finalize_events),
+        'realized_revision_count': len(revision_events),
+        'remaining_queue_count': len(remaining) if isinstance(remaining, list) else None,
+        'remaining_queue_agents': remaining if isinstance(remaining, list) else 'NOT_RECORDED_IN_SOURCE_VERSION',
+        'unread_message_count': len(unread) if isinstance(unread, list) else None,
+        'pending_invocation_count': len(pending_invocations) if isinstance(pending_invocations, list) else None,
+        'negative_finding_scope': 'OBSERVED_PREFIX_ONLY' if censored else ('FULL_RECORDED_EPISODE' if full_episode_observed else 'INCOMPLETE_EPISODE'),
+    }
+
+
 def _objective_row(trace):
     topo = topology_metrics(trace)
     part = participation_metrics(trace)
+    observation = _observation_window(trace)
     return {
+        'objective_stats_version': OBJECTIVE_STATS_VERSION,
         'run_id': trace['run_id'],
         'domain_id': trace['domain_id'],
         'run_status': trace.get('run_status', 'LEGACY_STATUS_UNKNOWN'),
         'review_status': trace.get('review_status', 'PENDING_REVIEW'),
         'termination_reason': trace.get('termination_reason'),
-        'observation_censored': trace.get('observation_censored', 'NOT_RECORDED_IN_SOURCE_VERSION'),
+        'observation': observation,
+        # Backward-compatible top-level field retained for older consumers.
+        'observation_censored': observation['observation_censored'],
         'turns': trace.get('turns'),
         'usage_summary': trace.get('usage_summary', 'NOT_RECORDED_IN_SOURCE_VERSION'),
         'participation': part,
@@ -59,6 +111,16 @@ def _review_material(trace, batch_hash):
     index_records = []
     packets = []
     run_id = trace['run_id']
+    observation = _observation_window(trace)
+    review_observation_context = {
+        'run_status': trace.get('run_status'),
+        'termination_reason': trace.get('termination_reason'),
+        'observation_censored': observation['observation_censored'],
+        'turns_observed': observation['turns_observed'],
+        'turn_limit': observation['turn_limit'],
+        'full_episode_observed': observation['full_episode_observed'],
+        'negative_finding_scope': observation['negative_finding_scope'],
+    }
     for i, call in enumerate(trace.get('model_calls', [])):
         ref = f"{run_id}:CALL:{i:04d}"
         index_records.append({
@@ -91,6 +153,7 @@ def _review_material(trace, batch_hash):
             'domain_id': trace['domain_id'],
             'actor': event.get('actor'),
             'turn': event.get('turn'),
+            'observation_context': review_observation_context,
             'structural_facts': {
                 'action_type': event.get('action_type'),
                 'authority_class': event.get('authority_class'),
@@ -137,6 +200,7 @@ def build_batch(manifest_path, traces_path, errors_path, outdir, code_sha=None):
     source = {
         'journal_hashes': journal_hashes,
         'version': EVIDENCE_BATCH_VERSION,
+        'objective_stats_version': OBJECTIVE_STATS_VERSION,
         'manifest_sha256': sha256_file(manifest_path),
         'traces_sha256': sha256_file(traces_path),
         'errors_sha256': sha256_file(errors_path) if errors_path and Path(errors_path).exists() else None,
@@ -186,6 +250,7 @@ def build_batch(manifest_path, traces_path, errors_path, outdir, code_sha=None):
         'runner_errors': len(errors),
         'review_packet_count': len(packets),
         'legacy_missing_fields': missing_legacy,
+        'censoring_warning': 'For BUDGET_CENSORED runs, absence means not observed within the recorded window. Do not encode full-episode absence or natural termination from a censored prefix.',
         'semantic_warning': 'Objective outputs contain no C/P/R zeros. Until adjudication exists, all semantic labels are NOT_ADJUDICATED.',
     }
     out = Path(outdir); out.mkdir(parents=True, exist_ok=True)
@@ -198,17 +263,20 @@ def build_batch(manifest_path, traces_path, errors_path, outdir, code_sha=None):
         '# R2 Arena Run Report — Objective Facts Only', '',
         f"Evidence batch: `{batch_hash}`", '',
         f"Status: **{status}**", '',
-        f"Planned runs: {len(manifest)}; preserved traces: {len(traces)}; complete runs: {completed}; runner errors: {len(errors)}.", '',
+        f"Planned runs: {len(manifest)}; preserved traces: {len(traces)}; complete runs: {completed}; budget-censored runs: {censored}; runner errors: {len(errors)}.", '',
         'C/P/R: **NOT_ADJUDICATED**.', '',
         'Invocation necessity: **NOT_ADJUDICATED**. Revision-basis sufficiency: **NOT_ADJUDICATED**. Decision impact: **NOT_ADJUDICATED**.', '',
+        'For a BUDGET_CENSORED run, an event not present in the trace is only **not observed within the recorded window**. It is not a full-episode zero and the run is not natural completion.', '',
         'This report intentionally stops at deterministic execution facts. Review packets are exported separately and can be judged later by humans or independent evaluator agents without rerunning the subject experiment.', '',
-        '|Run|Status|Activated|Executed|Returned|Turns|Unread messages|Unexecuted invocations|',
-        '|---|---|---:|---:|---:|---:|---:|---:|',
+        '|Run|Status|Activated|Executed|Returned|Turns / limit|First FINAL|Post-FINAL turns|Pending queue|Unread messages|',
+        '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|',
     ]
     for row in objective_rows:
         p = row['participation']
+        o = row['observation']
+        limit = o['turn_limit']
         report.append(
-            f"|{row['run_id']}|{row['run_status']}|{p['activated_agent_count']}|{p['executed_agent_count']}|{p['returned_agent_count']}|{row['turns']}|{p['unread_messages'] if p['unread_messages'] is not None else 'N/R'}|{p['unexecuted_invocations'] if p['unexecuted_invocations'] is not None else 'N/R'}|"
+            f"|{row['run_id']}|{row['run_status']}|{p['activated_agent_count']}|{p['executed_agent_count']}|{p['returned_agent_count']}|{o['turns_observed']} / {limit}|{o['first_finalize_turn'] if o['first_finalize_turn'] is not None else 'N/O'}|{o['post_first_finalize_turns_observed'] if o['post_first_finalize_turns_observed'] is not None else 'N/R'}|{o['remaining_queue_count'] if o['remaining_queue_count'] is not None else 'N/R'}|{o['unread_message_count'] if o['unread_message_count'] is not None else 'N/R'}|"
         )
     (out / 'RUN_REPORT.md').write_text('\n'.join(report) + '\n', encoding='utf-8')
     integrity = {
@@ -240,4 +308,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
