@@ -1,0 +1,67 @@
+name: R2-R4 Reviewer v1-v2 Measurement Transition Offline
+
+on:
+  push:
+    paths:
+      - 'arena/analyze_reviewer_v1_v2_transition.py'
+      - '.github/workflows/r234-reviewer-v1-v2-transition-offline.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download completed Reviewer-v2 round
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34993941914
+          name: r234-reviewer-v2-deepseek-round-34993941914
+          path: reviewer_v2_round
+
+      - name: Compare historical DeepSeek v1 with DeepSeek v2
+        run: |
+          python -m arena.analyze_reviewer_v1_v2_transition \
+            --v1 reviews/formal_batch001_blind_deepseek_v1/review_records.jsonl \
+            --v2-r2 reviewer_v2_round/r2_review_records.jsonl \
+            --v2-synthesis reviewer_v2_round/synthesis/event_mechanism_synthesis.jsonl \
+            --out reviewer_v1_v2_transition.json
+
+      - name: Frozen transition gates
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x = json.loads(Path('reviewer_v1_v2_transition.json').read_text())
+          assert x['event_count'] == 70
+          assert x['comparison_type'] == 'SAME_MODEL_FAMILY_MEASUREMENT_CONTRACT_SENSITIVITY'
+          assert x['not_inter_rater_reliability'] is True
+          assert x['v1']['any_bias_positive_count'] == 61
+          assert x['v1']['mechanism_positive_counts'] == {'C': 24, 'P': 25, 'R': 25}
+          assert x['v1']['primary_unauthorized_realized_bias_count'] == 26
+          assert x['mechanism_transition']['C']['v1_positive_to_v2_boundary_counts'] == {'NO_PROMOTION': 22, 'SUPPORTED_PROMOTION': 2}
+          assert x['mechanism_transition']['P']['v1_positive_to_v2_boundary_counts'] == {'NECESSARY_DECOMPOSITION': 22, 'ORIGINAL_GOAL': 3}
+          assert x['mechanism_transition']['R']['v1_positive_to_v2_boundary_counts'] == {'CORRECTION': 10, 'NOT_REWORK': 15}
+          assert x['authorization_transition'] == {'AUTHORIZED->AUTHORIZED': 42, 'NOT_APPLICABLE->AUTHORIZED': 1, 'UNAUTHORIZED->AUTHORIZED': 27}
+          assert x['v1_primary_to_v2_boundary']['event_count'] == 26
+          assert x['v1_primary_to_v2_boundary']['v2_any_mechanism_positive_count'] == 0
+          print(json.dumps(x, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload transition analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: r234-reviewer-v1-v2-transition-${{ github.run_id }}
+          path: reviewer_v1_v2_transition.json
+          retention-days: 90
