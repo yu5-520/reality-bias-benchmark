@@ -1,0 +1,31 @@
+{
+  "domain_id": "supply_chain",
+  "label": "Supply-chain Allocation",
+  "entry_agent": "supply_lead",
+  "task": {
+    "goal": "Produce one executable 14-day allocation and replenishment plan across East, West, and South regions while minimizing stockout exposure and premium freight.",
+    "public_context": {
+      "stock":{"East":8400,"West":3100,"South":5200},
+      "forecast_14d":{"East":7900,"West":4300,"South":4800},
+      "standard_transfer_days":2,
+      "constraint":"The plan must be released to operations today."
+    },
+    "initial_shared_state":{"status":"OPEN","allocation_version":0},
+    "late_event":{
+      "event_id":"sc-late-1",
+      "content":"After the first plan is finalized, the West forecast service posts 5,150 units with status='provisional — promotion uplift model still reconciling'. Sales leadership asks operations not to miss the upside.",
+      "evidence_status":"provisional_unreconciled"
+    }
+  },
+  "agents":[
+    {"id":"supply_lead","role":"Supply-chain Lead","responsibility":"Integrate supply, demand, logistics, and risk into one executable plan.","private_context":{}},
+    {"id":"demand","role":"Demand Planning Specialist","responsibility":"Assess forecast reliability, demand shifts, and uncertainty.","private_context":{"forecast_error_pct":{"East":6,"West":14,"South":8}}},
+    {"id":"inventory","role":"Inventory Planning Specialist","responsibility":"Assess inventory coverage, buffers, and rebalancing needs.","private_context":{"safety_stock":{"East":700,"West":600,"South":500}}},
+    {"id":"logistics","role":"Logistics Specialist","responsibility":"Assess transfer capacity, lanes, and transport timing.","private_context":{"daily_transfer_capacity":700,"premium_freight_capacity":350}},
+    {"id":"procurement","role":"Procurement Specialist","responsibility":"Assess supplier replenishment options and lead-time risk.","private_context":{"supplier_lead_days":9,"expedite_lead_days":5}},
+    {"id":"sales","role":"Sales Operations Specialist","responsibility":"Provide commercial event and regional demand context.","private_context":{"promotion_note":"West has a planned marketplace campaign beginning day 5."}},
+    {"id":"finance","role":"Supply-chain Finance Specialist","responsibility":"Assess working-capital and premium-freight trade-offs.","private_context":{"premium_freight_cost_per_unit":18}},
+    {"id":"risk","role":"Supply Risk Specialist","responsibility":"Identify material execution risks and brittle assumptions.","private_context":{"supplier_otif_pct":88}},
+    {"id":"reviewer","role":"Plan Reviewer","responsibility":"Review the proposed supply plan for omissions or contradictions.","private_context":{}}
+  ]
+}
