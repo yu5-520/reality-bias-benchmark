@@ -1,0 +1,95 @@
+import unittest
+from pathlib import Path
+
+from arena.core import ArenaState
+from arena.experimental_control import (
+    apply_state_intervention,
+    capture_state,
+    decide_commit,
+    make_branch_manifest,
+    restore_state,
+    verify_branch_manifest,
+    verify_state_snapshot,
+)
+from arena.io_utils import load_json
+
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+class ExperimentalControlTest(unittest.TestCase):
+    def setUp(self):
+        self.domain = load_json(ROOT / 'arena/domains/ecommerce.json')
+        self.config = load_json(ROOT / 'arena/config/arena_v0.3.json')
+        self.state = ArenaState(self.domain, self.config, 'experimental-control-test')
+
+    def test_snapshot_roundtrip_preserves_arena_state(self):
+        snapshot = capture_state(
+            self.state,
+            anchor_ref='before-first-agent-call',
+            parent_trace_hash='trace:test',
+        )
+        self.assertTrue(verify_state_snapshot(snapshot))
+        restored = restore_state(
+            self.domain,
+            self.config,
+            'experimental-control-test',
+            snapshot,
+        )
+        roundtrip = capture_state(
+            restored,
+            anchor_ref='before-first-agent-call',
+            parent_trace_hash='trace:test',
+        )
+        self.assertEqual(snapshot['state_hash'], roundtrip['state_hash'])
+        self.assertFalse(roundtrip['provider_internal_state_captured'])
+
+    def test_branch_manifest_binds_parent_and_intervention(self):
+        snapshot = capture_state(self.state, anchor_ref='A0', parent_trace_hash='trace:test')
+        intervention = {
+            'type': 'set_shared_state_status',
+            'key': next(iter(snapshot['shared_state_metadata'])),
+            'status': 'provisional',
+        }
+        manifest = make_branch_manifest(
+            branch_id='B-001',
+            parent_trace_hash='trace:test',
+            parent_snapshot=snapshot,
+            intervention_spec=intervention,
+            replicate_index=0,
+            model_identity={'model': 'scripted'},
+            config_identity={'arena': self.config['version']},
+            code_identity={'commit': 'TEST'},
+        )
+        self.assertTrue(verify_branch_manifest(manifest, snapshot))
+        changed = apply_state_intervention(snapshot, intervention)
+        self.assertNotEqual(snapshot['state_hash'], changed['state_hash'])
+        self.assertEqual(changed['shared_state_metadata'][intervention['key']]['status'], 'provisional')
+
+    def test_commit_gate_is_fail_closed_and_state_bound(self):
+        snapshot = capture_state(self.state, anchor_ref='A0', parent_trace_hash='trace:test')
+        policy = {
+            'default_decision': 'BLOCK',
+            'allowed_action_types': ['write_state'],
+            'allowed_authority_classes': ['I'],
+            'require_source_refs': True,
+            'require_expected_state_hash': True,
+        }
+        proposal = {
+            'action_type': 'write_state',
+            'authority_class': 'I',
+            'source_refs': ['source:1'],
+            'expected_state_hash': snapshot['state_hash'],
+        }
+        passed = decide_commit(proposal, policy, current_state_hash=snapshot['state_hash'])
+        self.assertEqual('PASS', passed['decision'])
+
+        stale = dict(proposal)
+        stale['expected_state_hash'] = 'stale'
+        blocked = decide_commit(stale, policy, current_state_hash=snapshot['state_hash'])
+        self.assertEqual('BLOCK', blocked['decision'])
+        self.assertIn('STATE_HASH_MISMATCH', blocked['reasons'])
+
+
+if __name__ == '__main__':
+    unittest.main()
