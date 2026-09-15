@@ -125,7 +125,7 @@ jobs:
           import json
           from pathlib import Path
           x = json.loads(Path('measurement_v2_out/v1_annotation_coverage.json').read_text())
-          assert x['analysis_hash'] == '785899c245247d16afd77552a600fa0c9cf9bb472a2ec648d2349a82b45626c0'
+          assert x['analysis_hash'] == 'ad2951dfc5eaa73ab1335a409457531e2817268640c369a412b345ca2929f191'
           assert x['event_count'] == 70
           assert x['measurement_v2_target_coverage_count'] == 70
           assert x['reviewer_v2_packet_coverage_count'] == 70
