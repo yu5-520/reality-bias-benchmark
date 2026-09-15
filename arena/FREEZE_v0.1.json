@@ -1,0 +1,66 @@
+{
+  "freeze_id": "R2-FREE-AGENT-ARENA-v0.1-PRE-API",
+  "status": "READY_FOR_EXPLICIT_REAL_API_DISPATCH",
+  "environment_source_commit": "c8c75cb82805fc005182c1fd601b05a97248e640",
+  "scientific_stage": "environment_frozen_no_real_arena_api_calls_yet",
+  "offline_validation": {
+    "workflow": "R2 Free-Agent Arena Offline Validation",
+    "run_id": 34931001761,
+    "conclusion": "success",
+    "artifact_id": 10380679187,
+    "artifact_digest": "sha256:964f1a682c7853dabb8d5d9c03f5bab0ddcad6fe7b8d45fbe21189ded2b17771",
+    "checks": [
+      "python syntax",
+      "four-domain schema validation",
+      "subject-prompt research-label isolation",
+      "scripted-provider engine preflight",
+      "offline manifest generation"
+    ]
+  },
+  "frozen_domains": [
+    "ecommerce",
+    "finance",
+    "supply_chain",
+    "software_engineering"
+  ],
+  "agents_per_domain": 9,
+  "critical_file_blobs": {
+    "arena/config/arena_v0.1.json": "31fc5a110029147164fc8924201e0d11c7172ad9",
+    "arena/config/model_deepseek_v0.1.json": "6199dbd46e035fd8598f3953a5bc53a9f58c37c8",
+    "arena/core.py": "774eb783deda45330ca6f10c6665854f88bbd65e",
+    "arena/engine.py": "42ea54c43724471fbaead3babdd5d153a80a091c",
+    "arena/prompts.py": "01a673abafee3292b6f8fccabd8fdd0963cabe00",
+    "arena/run_real.py": "812cb5b02dcf4970c9ed5e386dfe634dd7a7e5fb",
+    "arena/domains/ecommerce.json": "d945cc0aa3466155d2f8f33ee0ec78b434ad058d",
+    "arena/domains/finance.json": "66674b2e526f663ff707749a1ce91b616766ae22",
+    "arena/domains/supply_chain.json": "9a659fa9bda043ba5664bd4c72d8aed4e317835e",
+    "arena/domains/software_engineering.json": "9f8f0e7d1863d3e3cb3afaca3997619c212b59a4",
+    ".github/workflows/r2-free-agent-arena-real.yml": "bbf5e4127b1bbd21b148a12c48f58c155bd1b649"
+  },
+  "runtime": {
+    "design": "fixed_environment_free_routing",
+    "max_turns": 24,
+    "max_total_invocations": 18,
+    "late_event_policy": "after_first_finalize_then_one_post_final_round",
+    "default_repeats_per_domain": 30,
+    "target_discovery_repeats_per_domain": 100,
+    "subject_model": "deepseek-flash / expected DeepSeek-V4.1-Flash",
+    "subject_temperature": 0.7,
+    "evaluator_temperature": 0.0
+  },
+  "execution_guard": {
+    "real_workflow_trigger": "workflow_dispatch_only",
+    "default_confirmation": "PREPARE_ONLY",
+    "required_confirmation_for_provider_calls": "CALL_REAL_API",
+    "runner_requires_flag": "--execute-real-api",
+    "push_triggered_provider_calls": false
+  },
+  "interpretation": {
+    "scripted_preflight_is_scientific_evidence": false,
+    "arena_first_wave": "discovery",
+    "bias_labels": "post_hoc_blinded",
+    "authority_routes": "structurally_observed_then_counterfactual_replay",
+    "counterfactual_scope": "immediate_event_containment_not_downstream_behavioral_equivalence"
+  },
+  "next_step": "Explicitly dispatch R2 Free-Agent Arena Real API Run with desired domains/repeats and confirm=CALL_REAL_API. No additional environment engineering is required before that step unless this freeze is intentionally superseded."
+}
