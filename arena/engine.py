@@ -9,6 +9,7 @@ from .loop_budget import (
     evaluate_loop_budget,
     validate_loop_budget_config,
 )
+from .experimental_control import capture_state, restore_state, verify_branch_manifest
 
 TRACE_SCHEMA_VERSION = 'R2-ARENA-TRACE-v0.2'
 
@@ -64,18 +65,52 @@ def _returned_agents(events):
     })
 
 
-def run_arena_once(domain, config, provider, run_id, logical_seed=None, recorder=None):
-    # Validate a K condition before any provider call. Base configurations omit the
-    # loop-budget fields and therefore keep their prior runtime behavior.
+def run_arena_once(
+    domain,
+    config,
+    provider,
+    run_id,
+    logical_seed=None,
+    recorder=None,
+    initial_state_snapshot=None,
+    branch_manifest=None,
+    state_snapshot_callback=None,
+):
+    """Run one Arena continuation.
+
+    `initial_state_snapshot`, `branch_manifest`, and `state_snapshot_callback` are
+    experimental-control hooks. They are optional and therefore do not change the
+    historical Free-Agent baseline when omitted.
+    """
     loop_settings = validate_loop_budget_config(config)
-    loop_runtime = evaluate_loop_budget(run_id, [], [], loop_settings)
+
+    if initial_state_snapshot is None:
+        if branch_manifest is not None:
+            raise ValueError('branch_manifest_requires_initial_state_snapshot')
+        state = ArenaState(domain, config, run_id, recorder=recorder)
+    else:
+        if branch_manifest is not None:
+            verify_branch_manifest(branch_manifest, initial_state_snapshot)
+        state = restore_state(domain, config, run_id, initial_state_snapshot, recorder=recorder)
+        if state.terminated:
+            raise ValueError('initial_state_snapshot_is_terminal')
+
+    loop_runtime = evaluate_loop_budget(run_id, state.events, [], loop_settings)
     loop_runtime['stop_applied'] = False
 
-    state = ArenaState(domain, config, run_id, recorder=recorder)
     amap = {a['id']: a for a in domain['agents']}
     model_calls = []
+    branch_parent_state_hash = initial_state_snapshot.get('state_hash') if initial_state_snapshot else None
 
     while state.queue and not state.terminated and state.turns < config['max_turns']:
+        if state_snapshot_callback is not None:
+            anchor = capture_state(
+                state,
+                anchor_ref=f'before_turn:{state.turns + 1}',
+                parent_trace_hash=(branch_manifest or {}).get('parent_trace_hash'),
+            )
+            state_snapshot_callback(anchor)
+
         actor = state.queue.popleft()
         state.turns += 1
         view = state.runtime_view(actor)
@@ -102,6 +137,8 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None, recorder
                 'agent_id': actor,
                 'turn': state.turns,
                 'logical_seed': logical_seed,
+                'branch_id': (branch_manifest or {}).get('branch_id'),
+                'replicate_index': (branch_manifest or {}).get('replicate_index'),
             })
             call.update({
                 'response_id': response.get('response_id'),
@@ -125,6 +162,14 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None, recorder
             model_calls.append(call)
             if recorder:
                 recorder({'record_type': 'turn_completed', 'record': call, 'ledgers': state.evidence_snapshot()})
+
+            if state_snapshot_callback is not None:
+                anchor = capture_state(
+                    state,
+                    anchor_ref=f'after_turn:{state.turns}',
+                    parent_trace_hash=(branch_manifest or {}).get('parent_trace_hash'),
+                )
+                state_snapshot_callback(anchor)
 
             # K is evaluated only after the completed call and its realized events
             # have been frozen into the in-memory trace. Safety failures/censoring
@@ -188,7 +233,7 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None, recorder
     condition_limits = {}
     if loop_runtime.get('enabled'):
         condition_limits['structural_feedback_rounds'] = loop_runtime['limit']
-    return {
+    trace = {
         'trace_schema_version': config.get('trace_schema_version', TRACE_SCHEMA_VERSION),
         'observation_policy': config.get('termination_policy'),
         'experimental_stop_policy': 'structural_feedback_round_limit' if loop_runtime.get('enabled') else None,
@@ -233,4 +278,14 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None, recorder
         'events': state.events,
         'model_calls': model_calls,
     }
-
+    if branch_manifest is not None:
+        trace['experimental_branch'] = {
+            'branch_id': branch_manifest['branch_id'],
+            'branch_hash': branch_manifest['branch_hash'],
+            'parent_trace_hash': branch_manifest['parent_trace_hash'],
+            'parent_state_hash': branch_parent_state_hash,
+            'intervention_hash': branch_manifest['intervention_hash'],
+            'replicate_index': branch_manifest['replicate_index'],
+            'provider_internal_state_replayed': False,
+        }
+    return trace
