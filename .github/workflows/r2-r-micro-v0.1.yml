@@ -1,0 +1,55 @@
+name: R2 R-Micro v0.1 Structural Pilot
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r2-r-micro-v0.1.yml'
+      - 'benchmark/r2_r_micro_items_v0.1.jsonl'
+      - 'runners/run_r2_r_micro_pilot.py'
+      - 'analysis/analyze_r2_r_micro_pilot.py'
+      - 'theory/change_notes/CN-R2-010.md'
+  workflow_dispatch:
+
+concurrency:
+  group: r2-r-micro-v0.1
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run 20 stateful R micro-workflow traces
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python runners/run_r2_r_micro_pilot.py \
+            --benchmark benchmark/r2_r_micro_items_v0.1.jsonl \
+            --repeats 5 --max-workers 4 \
+            --out results/r2_r_micro_v0.1_raw.jsonl
+      - name: Analyze structural pilot
+        run: |
+          python analysis/analyze_r2_r_micro_pilot.py \
+            --input results/r2_r_micro_v0.1_raw.jsonl \
+            --outdir results/r2_r_micro_v0.1_analysis
+          cat results/r2_r_micro_v0.1_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload pilot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-r-micro-v0.1-${{ github.run_id }}
+          path: |
+            results/r2_r_micro_v0.1_raw.jsonl
+            results/r2_r_micro_v0.1_raw.jsonl.errors.json
+            results/json_format_retries.jsonl
+            results/r2_r_micro_v0.1_analysis/
+          if-no-files-found: warn
+          retention-days: 90
