@@ -17,7 +17,8 @@ Research repository for the first Reality Bias paper:
   - raw-trace re-audit shows 4/5 short runs activated four agents but executed only one; only run 0005 verified six-agent execution.
   - v0.2 introduced activation/execution separation and the immutable evidence boundary.
   - v0.3.1 separated plan FINAL from episode termination and produced genuine multi-agent execution, but Microbatch 003 completed only 1/3 episodes because two non-truncated subject responses were malformed JSON.
-  - current subject runtime is **v0.3.2**, a serialization-only correction over the same v0.3 observation architecture; semantic review remains deferred.
+  - current subject runtime is **v0.3.2**, which hardens JSON serialization and uses at most one audited format-recovery attempt while preserving the same v0.3 social/observation architecture.
+  - Format Verify 005 passed transport: 32/32 subject calls were valid on the first response, but the episode reached the 32-turn observation cap with work still queued and is therefore `BUDGET_CENSORED`, not complete.
 - R2/R3/R4 are event, relation and feedback-loop audit layers over the same Arena evidence; they are not sequential subject-experiment phases.
 - Evidence is captured during execution and audited asynchronously. Layer-specific Gates govern claims, not collection. Existing structural runs do not by themselves prove causal propagation or self-reinforcement.
 - Current research plan: [R Plan v2.0](docs/R_Plan_v2.0.md), registered by [CN-R-024](theory/change_notes/CN-R-024_structural_layers_async_audit.md).
@@ -52,6 +53,8 @@ Raw evidence binds task/agent/model/config/code versions and hashes. Current tra
 
 System statistics are factual execution measurements. C/P/R, invocation necessity, semantic dependency, revision-basis sufficiency, authority penetration, self-reinforcement and decision impact are semantic adjudications. If no review exists, reports say `NOT_ADJUDICATED`; absence of a review record is never converted to a zero finding.
 
+`BUDGET_CENSORED` is a separate objective state: it means the observation window ended while the episode still had pending work. It is not converted to `RUN_COMPLETE`, and no convergence/non-convergence claim is extrapolated beyond the observed boundary.
+
 ## Participation terminology
 
 Arena v0.3.2 reports separately:
@@ -78,7 +81,7 @@ Legacy single-turn calibration workflows are manual-only and are not triggered b
 
 ## Version boundary
 
-Arena v0.1.x, v0.2 and v0.3.x use different terminal/observation or serialization policies and must not be silently pooled as one experimental condition. Current v0.3.2 retains `observe_until_quiescent`: FINAL settles a plan, while the episode continues until the work queue becomes empty or an external budget is hit. v0.3.2 differs from v0.3.1 only in the explicit JSON serialization contract, introduced after frozen Microbatch 003 failures.
+Arena v0.1.x, v0.2 and v0.3.x use different terminal/observation or serialization policies and must not be silently pooled as one experimental condition. Current v0.3.2 retains `observe_until_quiescent`: FINAL settles a plan, while the episode continues until the work queue becomes empty or an external budget is hit. Relative to v0.3.1, v0.3.2 changes the explicit JSON serialization contract and its bounded, fully audited format-recovery transport policy; task/social conditions remain unchanged.
 
 See:
 
@@ -86,10 +89,12 @@ See:
 - [R2–R4 shared runtime v0.3](docs/R234_runtime_v0.3.md)
 - [R2–R4 v0.3.1 execution result](docs/R234_v0.3.1_execution_result.md)
 - [R2–R4 v0.3.1 Microbatch 003 result](docs/R234_v0.3.1_microbatch_003_result.md)
+- [R2–R4 v0.3.2 Format Verify 005](docs/R234_v0.3.2_format_verify_005_result.md)
 - [R2 evidence and deferred review protocol v0.2](docs/R2_evidence_and_review_protocol_v0.2.md)
 - [R2 E-commerce micro-pilot report v0.2](docs/R2_ecommerce_micro_pilot_report_v0.2.md)
 - [CN-R-025 structural runtime v0.3](theory/change_notes/CN-R-025_structural_runtime_v03.md)
 - [CN-R-026 v0.3.1 serialization failure](theory/change_notes/CN-R-026_v031_microbatch_serialization_failure.md)
+- [CN-R-027 v0.3.2 serialization pass / censoring](theory/change_notes/CN-R-027_v032_serialization_pass_observation_censoring.md)
 - [CN-R2-023 evidence-first deferred adjudication](theory/change_notes/CN-R2-023_evidence_first_deferred_adjudication.md)
 
 Mock/dry-run/scripted-provider outputs are engineering validation only and are not scientific evidence. Human and multi-model inter-rater reliability remain unmeasured unless explicitly reported from future review records.
