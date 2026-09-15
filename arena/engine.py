@@ -3,6 +3,12 @@ from datetime import datetime, timezone
 from collections import defaultdict
 from .core import ArenaState, stable_hash
 from .prompts import build_agent_messages
+from .loop_budget import (
+    RUN_STATUS as LOOP_BUDGET_RUN_STATUS,
+    TERMINATION_REASON as LOOP_BUDGET_TERMINATION_REASON,
+    evaluate_loop_budget,
+    validate_loop_budget_config,
+)
 
 TRACE_SCHEMA_VERSION = 'R2-ARENA-TRACE-v0.2'
 
@@ -59,6 +65,12 @@ def _returned_agents(events):
 
 
 def run_arena_once(domain, config, provider, run_id, logical_seed=None, recorder=None):
+    # Validate a K condition before any provider call. Base configurations omit the
+    # loop-budget fields and therefore keep their prior runtime behavior.
+    loop_settings = validate_loop_budget_config(config)
+    loop_runtime = evaluate_loop_budget(run_id, [], [], loop_settings)
+    loop_runtime['stop_applied'] = False
+
     state = ArenaState(domain, config, run_id, recorder=recorder)
     amap = {a['id']: a for a in domain['agents']}
     model_calls = []
@@ -113,6 +125,21 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None, recorder
             model_calls.append(call)
             if recorder:
                 recorder({'record_type': 'turn_completed', 'record': call, 'ledgers': state.evidence_snapshot()})
+
+            # K is evaluated only after the completed call and its realized events
+            # have been frozen into the in-memory trace. Safety failures/censoring
+            # always take precedence over a coincident K boundary.
+            loop_runtime = evaluate_loop_budget(run_id, state.events, model_calls, loop_settings)
+            loop_runtime['stop_applied'] = False
+            if loop_runtime['reached'] and not state.termination_reason:
+                state.terminated = True
+                state.termination_reason = LOOP_BUDGET_TERMINATION_REASON
+                loop_runtime['stop_applied'] = True
+                if recorder:
+                    recorder({
+                        'record_type': 'loop_budget_reached',
+                        'record': loop_runtime,
+                    })
         except Exception as err:
             if getattr(err, 'provider_responses', None):
                 call['failed_provider_responses'] = err.provider_responses
@@ -148,6 +175,8 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None, recorder
     returned_agents = _returned_agents(state.events)
     if state.failures:
         run_status = 'RUN_FAILED'
+    elif termination_reason == LOOP_BUDGET_TERMINATION_REASON:
+        run_status = LOOP_BUDGET_RUN_STATUS
     elif termination_reason in ('turn_budget_exhausted', 'invocation_budget_exhausted', 'queue_capacity_exhausted'):
         run_status = 'BUDGET_CENSORED'
     elif state.final_state is None:
@@ -156,12 +185,19 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None, recorder
         run_status = 'RUN_COMPLETE'
 
     evidence = state.evidence_snapshot()
+    condition_limits = {}
+    if loop_runtime.get('enabled'):
+        condition_limits['structural_feedback_rounds'] = loop_runtime['limit']
     return {
         'trace_schema_version': config.get('trace_schema_version', TRACE_SCHEMA_VERSION),
         'observation_policy': config.get('termination_policy'),
+        'experimental_stop_policy': 'structural_feedback_round_limit' if loop_runtime.get('enabled') else None,
         'budget_hits': state.budget_hits,
         'observation_censored': run_status == 'BUDGET_CENSORED',
+        'condition_complete': run_status in ('RUN_COMPLETE', LOOP_BUDGET_RUN_STATUS),
         'budget_limits': {k: config[k] for k in ('max_turns', 'max_total_invocations', 'max_pending_messages')},
+        'condition_limits': condition_limits,
+        'loop_budget': loop_runtime,
         'run_id': run_id,
         'domain_id': domain['domain_id'],
         'domain_label': domain['label'],
