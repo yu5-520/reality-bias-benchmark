@@ -1,0 +1,100 @@
+name: R2 Deferred Review Existing Evidence
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'GitHub Actions run id that owns the frozen evidence artifact'
+        required: true
+        type: string
+      artifact_name:
+        description: 'Exact evidence artifact name, e.g. r2-arena-evidence-123456789'
+        required: true
+        type: string
+      reviewer_id:
+        description: 'Independent reviewer identifier'
+        required: true
+        default: 'deepseek-reviewer-01'
+        type: string
+      confirm:
+        description: 'Type CALL_REVIEW_API to spend evaluator tokens; PREPARE_ONLY does not call a model'
+        required: true
+        default: 'PREPARE_ONLY'
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  prepare_review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: source_evidence
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.source_run_id }}
+      - name: Verify frozen packets exist
+        run: |
+          test -f source_evidence/evidence_batch/review_packets.jsonl
+          test -f source_evidence/evidence_batch/evidence_batch.json
+          python - <<'PY'
+          import json
+          x=json.load(open('source_evidence/evidence_batch/evidence_batch.json'))
+          print('evidence_batch_hash=',x['evidence_batch_hash'])
+          print('review_status=',x['review_status'])
+          PY
+      - name: Upload prepared review input
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-review-prepared-${{ github.run_id }}
+          path: |
+            source_evidence/evidence_batch/evidence_batch.json
+            source_evidence/evidence_batch/review_packets.jsonl
+            source_evidence/evidence_batch/review_evidence_index.jsonl
+          retention-days: 30
+
+  review_api:
+    needs: prepare_review
+    if: ${{ inputs.confirm == 'CALL_REVIEW_API' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: source_evidence
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.source_run_id }}
+      - name: Run one independent deferred reviewer over frozen packets
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          mkdir -p results
+          python arena/evaluate_review_packets_real.py \
+            --packets source_evidence/evidence_batch/review_packets.jsonl \
+            --out results/review_records.jsonl \
+            --reviewer-id '${{ inputs.reviewer_id }}' \
+            --max-workers 2 \
+            --execute-real-api
+      - name: Upload append-only review records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-review-records-${{ github.run_id }}
+          path: |
+            results/review_records.jsonl
+            results/review_records.jsonl.errors.json
+          if-no-files-found: warn
+          retention-days: 90

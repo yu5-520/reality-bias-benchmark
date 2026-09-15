@@ -1,4 +1,4 @@
-name: R2 Free-Agent Arena Real API Run
+name: R2 Free-Agent Arena Subject Run
 
 on:
   workflow_dispatch:
@@ -11,16 +11,16 @@ on:
       repeats:
         description: 'Repeated runs per domain'
         required: true
-        default: '30'
+        default: '5'
         type: string
       confirm:
-        description: 'Type CALL_REAL_API to execute provider calls'
+        description: 'Type CALL_REAL_API to execute subject provider calls'
         required: true
         default: 'PREPARE_ONLY'
         type: string
 
 concurrency:
-  group: r2-free-agent-arena-real
+  group: r2-free-agent-arena-subject
   cancel-in-progress: false
 
 permissions:
@@ -35,15 +35,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate environment
+      - name: Validate v0.2 environment
         run: |
           python arena/validate_environment.py
           python arena/preflight.py
+          python -m unittest discover -s arena/tests -v
       - name: Build exact requested manifest
         run: |
           python -m arena.build_manifest \
             --domains '${{ inputs.domains }}' \
             --repeats '${{ inputs.repeats }}' \
+            --arena-config arena/config/arena_v0.2.json \
             --out results/arena_manifest.jsonl
           wc -l results/arena_manifest.jsonl
       - name: Upload prepared manifest
@@ -53,7 +55,7 @@ jobs:
           path: results/arena_manifest.jsonl
           retention-days: 30
 
-  real_api:
+  subject_run:
     needs: prepare
     if: ${{ inputs.confirm == 'CALL_REAL_API' }}
     runs-on: ubuntu-latest
@@ -68,44 +70,38 @@ jobs:
           python -m arena.build_manifest \
             --domains '${{ inputs.domains }}' \
             --repeats '${{ inputs.repeats }}' \
+            --arena-config arena/config/arena_v0.2.json \
             --out results/arena_manifest.jsonl
-      - name: Run self-organizing multi-agent arena
+      - name: Run self-organizing multi-agent subject experiment
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
           python arena/run_real.py \
             --manifest results/arena_manifest.jsonl \
             --out results/arena_traces.jsonl \
-            --max-workers 4 \
+            --arena-config arena/config/arena_v0.2.json \
+            --max-workers 2 \
             --execute-real-api
-      - name: Blind-code naturally occurring events
-        env:
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+      - name: Validate and freeze raw evidence, compute objective facts, export review packets
+        if: always()
         run: |
-          python arena/evaluate_real.py \
-            --input results/arena_traces.jsonl \
-            --out results/arena_evaluations.jsonl \
-            --max-workers 4 \
-            --execute-real-api
-      - name: Analyze topology, emergence, and 3x3 Authority routes
-        run: |
-          python -m arena.analyze \
+          python -m arena.evidence \
+            --manifest results/arena_manifest.jsonl \
             --traces results/arena_traces.jsonl \
-            --evaluations results/arena_evaluations.jsonl \
-            --outdir results/arena_analysis
-          cat results/arena_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
-      - name: Upload scientific evidence
+            --errors results/arena_traces.jsonl.errors.json \
+            --outdir results/evidence_batch \
+            --code-sha '${{ github.sha }}'
+          cat results/evidence_batch/RUN_REPORT.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload immutable evidence batch — no paid evaluator called
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: r2-free-agent-arena-real-${{ github.run_id }}
+          name: r2-arena-evidence-${{ github.run_id }}
           path: |
             results/arena_manifest.jsonl
             results/arena_traces.jsonl
             results/arena_traces.jsonl.errors.json
-            results/arena_evaluations.jsonl
-            results/arena_evaluations.jsonl.errors.json
             results/json_format_retries.jsonl
-            results/arena_analysis/
+            results/evidence_batch/
           if-no-files-found: warn
           retention-days: 90

@@ -5,8 +5,10 @@ on:
     branches: [main]
     paths:
       - 'arena/**'
+      - 'schemas/evidence_batch_v0.2.schema.json'
+      - 'schemas/review_record_v0.1.schema.json'
       - 'docs/R2_free_agent_arena_design.md'
-      - 'theory/change_notes/CN-R2-017_free_agent_arena.md'
+      - 'theory/change_notes/**'
       - '.github/workflows/r2-free-agent-arena-validate.yml'
   workflow_dispatch:
 
@@ -23,24 +25,20 @@ jobs:
         with:
           python-version: '3.12'
       - name: Syntax check
-        run: |
-          python -m py_compile arena/*.py
-      - name: Validate domain environment and prompt isolation
-        run: |
-          python arena/validate_environment.py
-      - name: Run engineering-only scripted preflight
-        run: |
-          python arena/preflight.py
-      - name: Validate state and evidence regression cases
+        run: python -m py_compile arena/*.py
+      - name: Validate v0.2 domain environment and prompt isolation
+        run: python arena/validate_environment.py
+      - name: Run engineering-only scripted v0.2 preflight
+        run: python arena/preflight.py
+      - name: Validate state, evidence, deferred-review, and legacy regression cases
         run: python -m unittest discover -s arena/tests -v
       - name: Build offline manifest sample
         run: |
-          python -m arena.build_manifest --domains all --repeats 2 --out results/arena_manifest_preflight.jsonl
-          wc -l results/arena_manifest_preflight.jsonl
+          python -m arena.build_manifest --domains all --repeats 2 --arena-config arena/config/arena_v0.2.json --out results/arena_manifest_preflight.jsonl
+          test "$(wc -l < results/arena_manifest_preflight.jsonl)" -eq 8
       - name: Upload offline preflight evidence
         uses: actions/upload-artifact@v4
         with:
           name: r2-free-agent-arena-preflight-${{ github.run_id }}
           path: results/arena_manifest_preflight.jsonl
           retention-days: 30
-

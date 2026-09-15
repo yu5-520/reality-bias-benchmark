@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "R2-REVIEW-RECORD-v0.1",
+  "type": "object",
+  "required": ["review_record_version", "review_record_id", "record_kind", "evidence_batch_hash", "packet_id", "event_id", "reviewer", "rubric_version", "prompt_version", "bias_labels", "authorization_judgment", "rationale", "confidence", "uncertainties", "created_at", "review_version"],
+  "properties": {
+    "review_record_version": {"const": "R2-REVIEW-RECORD-v0.1"},
+    "review_record_id": {"type": "string"},
+    "record_kind": {"enum": ["independent", "recheck", "adjudication"]},
+    "evidence_batch_hash": {"type": "string"},
+    "packet_id": {"type": "string"},
+    "event_id": {"type": "string"},
+    "reviewer": {"type": "object", "required": ["id", "type"]},
+    "rubric_version": {"type": "string"},
+    "prompt_version": {"type": "string"},
+    "bias_labels": {"type": "array", "uniqueItems": true, "items": {"enum": ["C", "P", "R"]}},
+    "authorization_judgment": {"enum": ["AUTHORIZED", "UNAUTHORIZED", "UNCERTAIN", "NOT_APPLICABLE"]},
+    "rationale": {"type": "string", "minLength": 1},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "uncertainties": {"type": "array", "items": {"type": "string"}},
+    "created_at": {"type": "string"},
+    "review_version": {"type": "string"},
+    "parent_review_ids": {"type": "array", "items": {"type": "string"}}
+  }
+}
