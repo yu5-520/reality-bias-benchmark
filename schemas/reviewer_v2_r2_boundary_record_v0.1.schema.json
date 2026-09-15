@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reviewer_v2_r2_boundary_record_v0.1.schema.json",
+  "title": "Reviewer v2 R2 Boundary Record v0.1",
+  "type": "object",
+  "required": [
+    "review_record_version",
+    "review_layer",
+    "review_record_id",
+    "evidence_batch_hash",
+    "packet_id",
+    "target_ref",
+    "target_effect_scope",
+    "reviewer",
+    "epistemic_transition",
+    "goal_relation",
+    "goal_focus_transition",
+    "local_retrospective_outcome",
+    "authorization_judgment",
+    "rationale",
+    "confidence",
+    "uncertainties",
+    "evidence_refs"
+  ],
+  "properties": {
+    "review_record_version": {"const": "R234-REVIEWER-V2-R2-BOUNDARY-RECORD-v0.1"},
+    "review_layer": {"const": "R2"},
+    "review_record_id": {"type": "string", "minLength": 1},
+    "evidence_batch_hash": {"type": "string", "minLength": 1},
+    "packet_id": {"type": "string", "minLength": 1},
+    "target_ref": {"type": "string", "minLength": 1},
+    "target_effect_scope": {"enum": ["REALIZED_STRUCTURAL_EFFECT", "ATTEMPT_ONLY_NO_REALIZED_EFFECT"]},
+    "reviewer": {
+      "type": "object",
+      "required": ["id", "type", "blind_to_prior_review", "blind_to_expected_mapping"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "type": {"enum": ["model", "human"]},
+        "provider": {"type": ["string", "null"]},
+        "model": {"type": ["string", "null"]},
+        "blind_to_prior_review": {"type": "boolean"},
+        "blind_to_expected_mapping": {"type": "boolean"}
+      },
+      "additionalProperties": true
+    },
+    "epistemic_transition": {
+      "enum": [
+        "NO_PROMOTION",
+        "SUPPORTED_PROMOTION",
+        "UNSUPPORTED_PROMOTION",
+        "INHERITED_HIGHER_CERTAINTY",
+        "UNCERTAIN",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "goal_relation": {
+      "enum": [
+        "ORIGINAL_GOAL",
+        "NECESSARY_DECOMPOSITION",
+        "AUTHORIZED_EXPANSION",
+        "UNAUTHORIZED_EXPANSION",
+        "UNCERTAIN",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "goal_focus_transition": {
+      "enum": [
+        "NO_MATERIAL_SHIFT",
+        "AUTHORIZED_SHIFT",
+        "UNAUTHORIZED_SHIFT",
+        "UNCERTAIN",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "local_retrospective_outcome": {
+      "enum": [
+        "NOT_REWORK",
+        "CORRECTION",
+        "PERSISTENCE",
+        "REGENERATION_C",
+        "REGENERATION_P",
+        "LEGITIMATION_CANDIDATE",
+        "LEGITIMATION_P_CANDIDATE",
+        "UNCERTAIN",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "authorization_judgment": {"enum": ["AUTHORIZED", "UNAUTHORIZED", "UNCERTAIN", "NOT_APPLICABLE"]},
+    "rationale": {"type": "string"},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "uncertainties": {"type": "array", "items": {"type": "string"}},
+    "evidence_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "context_expansion_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "context_expansion_used": {"type": "boolean"},
+    "created_at": {"type": ["string", "null"]},
+    "usage": {"type": ["object", "null"]},
+    "review_attempt_count": {"type": "integer", "minimum": 1}
+  },
+  "additionalProperties": true
+}
