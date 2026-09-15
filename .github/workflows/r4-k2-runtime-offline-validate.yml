@@ -19,10 +19,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Run K2 runtime regression tests
+      - name: Run complete Arena offline regression suite
         run: |
-          python -m unittest arena.tests.test_loop_budget_runtime -v
-          python -m unittest arena.tests.test_structural_feedback_rounds -v
+          python -m py_compile arena/*.py
+          python -m unittest discover -s arena/tests -v
+          python - <<'PY'
+          import json
+          for path in (
+              'arena/config/arena_v0.3.json',
+              'arena/config/arena_v0.3_k2_candidate.json',
+              'arena/config/loop_budget_policy_v0.1.json',
+              'schemas/evidence_batch_v0.2.schema.json',
+          ):
+              json.load(open(path, encoding='utf-8'))
+              print('JSON PASS', path)
+          PY
       - name: Run scripted K2 engineering preflight
         run: |
           mkdir -p results
@@ -34,7 +45,6 @@ jobs:
           python - <<'PY'
           import json
           trace=json.load(open('results/k2_scripted_trace.json',encoding='utf-8'))
-          assert trace['provider_model'] if False else True
           assert trace['run_status']=='LOOP_BUDGET_COMPLETE'
           assert trace['termination_reason']=='structural_feedback_round_limit_reached'
           assert trace['condition_complete'] is True
@@ -43,11 +53,12 @@ jobs:
           assert trace['loop_budget']['limit']==2
           assert trace['loop_budget']['round_count']==2
           assert trace['loop_budget']['stop_applied'] is True
+          assert trace['loop_budget']['semantic_blind'] is True
           assert 'risk' in trace['remaining_queue']
           assert 'risk' not in trace['executed_agents']
           assert all(call.get('provider_model')=='SCRIPTED_PREFLIGHT_ONLY' for call in trace['model_calls'])
           assert all(not (call.get('usage') or {}) for call in trace['model_calls'])
-          print('K2 trace boundary + no-real-provider evidence PASS')
+          print('K2 trace boundary + scripted-only provider evidence PASS')
           PY
       - name: Upload engineering-only K2 validation artifact
         uses: actions/upload-artifact@v4
