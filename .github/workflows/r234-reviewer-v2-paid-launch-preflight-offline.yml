@@ -1,0 +1,87 @@
+name: R2-R4 Reviewer v2 Paid Launch Preflight Offline
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'arena/reviewer_v2_paid_launch_preflight.py'
+      - 'arena/test_reviewer_v2_paid_launch_preflight.py'
+      - 'reviews/reviewer_system_v2/paid_launch_candidate_v0.1.json'
+      - 'reviews/reviewer_system_v2/prompts/**'
+      - 'arena/config/model_deepseek_v0.2.json'
+      - '.github/workflows/r234-reviewer-v2-paid-launch-preflight-offline.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Unit tests
+        run: python -m unittest arena.test_reviewer_v2_paid_launch_preflight
+
+      - name: Download compact v0.1 artifact for R2/R4
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34990393003
+          name: r234-reviewer-v2-compact-packets-34990393003
+          path: compact_v01
+
+      - name: Download R3 compact v0.2 artifact
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34992079531
+          name: r234-reviewer-v2-r3-compact-v02-34992079531
+          path: compact_r3_v02
+
+      - name: Zero-call launch preflight
+        run: |
+          python -m arena.reviewer_v2_paid_launch_preflight \
+            --candidate reviews/reviewer_system_v2/paid_launch_candidate_v0.1.json \
+            --r2 compact_v01/compact_r2_packets.jsonl \
+            --r3 compact_r3_v02/compact_r3_packets_v02.jsonl \
+            --r4 compact_v01/compact_r4_packets.jsonl \
+            --base-compact-summary compact_v01/compact_packet_summary.json \
+            --r3-summary compact_r3_v02/r3_compaction_v02_summary.json \
+            --repo-root . \
+            --out reviewer_v2_paid_launch_preflight_manifest.json
+
+      - name: Final fail-closed gates
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x = json.loads(Path('reviewer_v2_paid_launch_preflight_manifest.json').read_text())
+          assert x['status'] == 'PASS'
+          assert x['provider_calls'] == 0
+          assert x['paid_api_authorized'] is False
+          assert x['population'] == {
+              'R2': 70, 'R3': 70, 'R4': 4, 'total': 144,
+              'selection_rule': 'FULL_FROZEN_BASE_POPULATION'
+          }
+          assert x['spend_policy']['launch_max_spend_usd'] is None
+          assert x['spend_policy']['repository_level_absolute_ceiling_usd'] == 2.0
+          assert x['runtime_policy']['max_workers'] == 1
+          assert x['runtime_policy']['subject_rerun_on_reviewer_failure'] is False
+          assert x['errors'] == []
+          assert x['next_gate'] == 'CREATE_SEPARATE_AUTHORIZED_IMMUTABLE_LAUNCH_RECORD'
+          print(json.dumps(x, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload preflight manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: r234-reviewer-v2-paid-launch-preflight-${{ github.run_id }}
+          path: reviewer_v2_paid_launch_preflight_manifest.json
+          retention-days: 90
