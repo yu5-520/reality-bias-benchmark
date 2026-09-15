@@ -10,7 +10,7 @@ from .io_utils import load_json, load_jsonl, write_jsonl, sha256_file
 from .topology import topology_metrics, participation_metrics
 
 EVIDENCE_BATCH_VERSION = 'R2-EVIDENCE-BATCH-v0.2'
-OBJECTIVE_STATS_VERSION = 'R234-OBJECTIVE-STATS-v0.3.1-CENSOR-AWARE'
+OBJECTIVE_STATS_VERSION = 'R234-OBJECTIVE-STATS-v0.3.2-CONDITION-AWARE'
 REVIEW_PACKET_VERSION = 'R2-REVIEW-PACKET-v0.1'
 
 
@@ -44,10 +44,25 @@ def _observation_window(trace):
     remaining = trace.get('remaining_queue')
     unread = trace.get('unread_messages')
     pending_invocations = trace.get('pending_invocations')
+    run_status = trace.get('run_status')
+    loop_info = trace.get('loop_budget') if isinstance(trace.get('loop_budget'), dict) else {}
+    loop_bounded = run_status == 'LOOP_BUDGET_COMPLETE'
     censored = trace.get('observation_censored')
     if type(censored) is not bool:
-        censored = trace.get('run_status') == 'BUDGET_CENSORED'
-    full_episode_observed = trace.get('run_status') == 'RUN_COMPLETE' and not censored
+        censored = run_status == 'BUDGET_CENSORED'
+    full_episode_observed = run_status == 'RUN_COMPLETE' and not censored
+    condition_complete = trace.get('condition_complete')
+    if type(condition_complete) is not bool:
+        condition_complete = run_status in ('RUN_COMPLETE', 'LOOP_BUDGET_COMPLETE')
+
+    if censored:
+        negative_scope = 'OBSERVED_PREFIX_ONLY'
+    elif loop_bounded:
+        negative_scope = 'LOOP_BUDGET_CONDITION_ONLY'
+    elif full_episode_observed:
+        negative_scope = 'FULL_RECORDED_EPISODE'
+    else:
+        negative_scope = 'INCOMPLETE_EPISODE'
 
     return {
         'turns_observed': turns_observed,
@@ -56,7 +71,13 @@ def _observation_window(trace):
         'queue_limit': limits.get('max_pending_messages', 'NOT_RECORDED_IN_SOURCE_VERSION'),
         'observation_censored': censored,
         'censor_reason': trace.get('termination_reason') if censored else None,
+        'condition_complete': condition_complete,
         'full_episode_observed': full_episode_observed,
+        'loop_budget_bounded': loop_bounded,
+        'loop_budget_limit': loop_info.get('limit') if loop_info.get('enabled') else None,
+        'loop_budget_counter_version': loop_info.get('counter_version') if loop_info.get('enabled') else None,
+        'structural_feedback_rounds_observed': loop_info.get('round_count') if loop_info.get('enabled') else None,
+        'loop_budget_reached': loop_info.get('reached') if loop_info.get('enabled') else False,
         'first_finalize_turn': first_finalize_turn,
         'post_first_finalize_turns_observed': post_final_turns,
         'post_first_finalize_realized_action_count': post_final_actions,
@@ -66,7 +87,7 @@ def _observation_window(trace):
         'remaining_queue_agents': remaining if isinstance(remaining, list) else 'NOT_RECORDED_IN_SOURCE_VERSION',
         'unread_message_count': len(unread) if isinstance(unread, list) else None,
         'pending_invocation_count': len(pending_invocations) if isinstance(pending_invocations, list) else None,
-        'negative_finding_scope': 'OBSERVED_PREFIX_ONLY' if censored else ('FULL_RECORDED_EPISODE' if full_episode_observed else 'INCOMPLETE_EPISODE'),
+        'negative_finding_scope': negative_scope,
     }
 
 
@@ -83,6 +104,7 @@ def _objective_row(trace):
         'termination_reason': trace.get('termination_reason'),
         'observation': observation,
         'observation_censored': observation['observation_censored'],
+        'condition_complete': observation['condition_complete'],
         'turns': trace.get('turns'),
         'usage_summary': trace.get('usage_summary', 'NOT_RECORDED_IN_SOURCE_VERSION'),
         'participation': part,
@@ -115,9 +137,13 @@ def _review_material(trace, batch_hash):
         'run_status': trace.get('run_status'),
         'termination_reason': trace.get('termination_reason'),
         'observation_censored': observation['observation_censored'],
+        'condition_complete': observation['condition_complete'],
         'turns_observed': observation['turns_observed'],
         'turn_limit': observation['turn_limit'],
         'full_episode_observed': observation['full_episode_observed'],
+        'loop_budget_bounded': observation['loop_budget_bounded'],
+        'loop_budget_limit': observation['loop_budget_limit'],
+        'structural_feedback_rounds_observed': observation['structural_feedback_rounds_observed'],
         'negative_finding_scope': observation['negative_finding_scope'],
     }
     for i, call in enumerate(trace.get('model_calls', [])):
@@ -224,10 +250,12 @@ def build_batch(manifest_path, traces_path, errors_path, outdir, code_sha=None):
         index_records.extend(idx + extra); packets.extend(p); views.append(view)
 
     censored = sum(x.get('run_status') == 'BUDGET_CENSORED' for x in traces)
-    completed = sum(1 for x in traces if x.get('run_status') == 'RUN_COMPLETE')
-    if len(traces) == len(manifest) and completed == len(traces) and not errors:
+    natural_completed = sum(1 for x in traces if x.get('run_status') == 'RUN_COMPLETE')
+    loop_completed = sum(1 for x in traces if x.get('run_status') == 'LOOP_BUDGET_COMPLETE')
+    condition_completed = natural_completed + loop_completed
+    if len(traces) == len(manifest) and condition_completed == len(traces) and not errors:
         status = 'RUN_COMPLETE_PENDING_REVIEW'
-    elif len(traces) == len(manifest) and completed + censored == len(traces) and not errors:
+    elif len(traces) == len(manifest) and condition_completed + censored == len(traces) and not errors:
         status = 'OBSERVATION_FINISHED_WITH_CENSORING_PENDING_REVIEW'
     else:
         status = 'RUN_FINISHED_WITH_INCOMPLETE_EVIDENCE_PENDING_REVIEW'
@@ -243,13 +271,16 @@ def build_batch(manifest_path, traces_path, errors_path, outdir, code_sha=None):
         'review_status': 'PENDING_REVIEW',
         'planned_runs': len(manifest),
         'preserved_traces': len(traces),
-        'complete_runs': completed,
+        'complete_runs': condition_completed,
+        'natural_complete_runs': natural_completed,
+        'loop_budget_complete_runs': loop_completed,
         'budget_censored_runs': censored,
         'layer_review_status': {x: 'PENDING_REVIEW' for x in ('R2', 'R3', 'R4')},
         'runner_errors': len(errors),
         'review_packet_count': len(packets),
         'legacy_missing_fields': missing_legacy,
         'censoring_warning': 'For BUDGET_CENSORED runs, absence means not observed within the recorded window. Do not encode full-episode absence or natural termination from a censored prefix.',
+        'loop_budget_warning': 'For LOOP_BUDGET_COMPLETE runs, the configured K condition completed but the natural episode may still have pending work. Negative findings are scoped to the recorded K-bounded trajectory, not to a full episode.',
         'semantic_warning': 'Objective outputs contain no C/P/R zeros. Until adjudication exists, all semantic labels are NOT_ADJUDICATED.',
     }
     out = Path(outdir); out.mkdir(parents=True, exist_ok=True)
@@ -262,20 +293,24 @@ def build_batch(manifest_path, traces_path, errors_path, outdir, code_sha=None):
         '# R2 Arena Run Report — Objective Facts Only', '',
         f"Evidence batch: `{batch_hash}`", '',
         f"Status: **{status}**", '',
-        f"Planned runs: {len(manifest)}; preserved traces: {len(traces)}; complete runs: {completed}; budget-censored runs: {censored}; runner errors: {len(errors)}.", '',
+        f"Planned runs: {len(manifest)}; preserved traces: {len(traces)}; condition-complete runs: {condition_completed} (natural={natural_completed}, loop-budget={loop_completed}); budget-censored runs: {censored}; runner errors: {len(errors)}.", '',
         'C/P/R: **NOT_ADJUDICATED**.', '',
         'Invocation necessity: **NOT_ADJUDICATED**. Revision-basis sufficiency: **NOT_ADJUDICATED**. Decision impact: **NOT_ADJUDICATED**.', '',
         'For a BUDGET_CENSORED run, an event not present in the trace is only **not observed within the recorded window**. It is not a full-episode zero and the run is not natural completion.', '',
+        'For a LOOP_BUDGET_COMPLETE run, K was reached as designed. The run is complete for that experimental condition but does not imply natural quiescence; pending work is preserved and negative findings are K-bounded.', '',
         'This report intentionally stops at deterministic execution facts. Review packets are exported separately and can be judged later by humans or independent evaluator agents without rerunning the subject experiment.', '',
-        '|Run|Status|Activated|Executed|Returned|Turns / limit|First FINAL|Post-FINAL turns|Pending queue|Unread messages|',
-        '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|',
+        '|Run|Status|Activated|Executed|Returned|Turns / limit|K / rounds|First FINAL|Post-FINAL turns|Pending queue|Unread messages|',
+        '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|',
     ]
     for row in objective_rows:
         p = row['participation']
         o = row['observation']
         limit = o['turn_limit']
+        k_display = '—'
+        if o['loop_budget_limit'] is not None:
+            k_display = f"{o['loop_budget_limit']} / {o['structural_feedback_rounds_observed']}"
         report.append(
-            f"|{row['run_id']}|{row['run_status']}|{p['activated_agent_count']}|{p['executed_agent_count']}|{p['returned_agent_count']}|{o['turns_observed']} / {limit}|{o['first_finalize_turn'] if o['first_finalize_turn'] is not None else 'N/O'}|{o['post_first_finalize_turns_observed'] if o['post_first_finalize_turns_observed'] is not None else 'N/R'}|{o['remaining_queue_count'] if o['remaining_queue_count'] is not None else 'N/R'}|{o['unread_message_count'] if o['unread_message_count'] is not None else 'N/R'}|"
+            f"|{row['run_id']}|{row['run_status']}|{p['activated_agent_count']}|{p['executed_agent_count']}|{p['returned_agent_count']}|{o['turns_observed']} / {limit}|{k_display}|{o['first_finalize_turn'] if o['first_finalize_turn'] is not None else 'N/O'}|{o['post_first_finalize_turns_observed'] if o['post_first_finalize_turns_observed'] is not None else 'N/R'}|{o['remaining_queue_count'] if o['remaining_queue_count'] is not None else 'N/R'}|{o['unread_message_count'] if o['unread_message_count'] is not None else 'N/R'}|"
         )
     (out / 'RUN_REPORT.md').write_text('\n'.join(report) + '\n', encoding='utf-8')
     integrity = {
