@@ -17,7 +17,9 @@ Research repository for the first Reality Bias paper:
   - raw-trace re-audit shows 4/5 short runs activated four agents but executed only one; only run 0005 verified six-agent execution.
   - v0.2 therefore separates activation from execution and adopts an explicit pending-work scheduling policy.
   - subject generation and semantic review are now separated by an immutable evidence boundary.
-- R3 Coupling remains a later phase; the five-run Arena sample does not prove C→P→R temporal propagation.
+- R2/R3/R4 are event, relation and feedback-loop audit layers over the same Arena evidence; they are not sequential subject-experiment phases.
+- Evidence is captured during execution and audited asynchronously. Layer-specific Gates govern claims, not collection. The five-run sample does not prove causal propagation or self-reinforcement.
+- Current research plan: [R Plan v2.0](docs/R_Plan_v2.0.md), registered by [CN-R-024](theory/change_notes/CN-R-024_structural_layers_async_audit.md).
 
 ## Repository map
 
