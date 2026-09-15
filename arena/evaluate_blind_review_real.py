@@ -61,30 +61,61 @@ def parse_json(text):
 
 def normalize(obj):
     labels = obj.get('bias_labels', [])
+    if labels is None:
+        labels = []
+    if isinstance(labels, str):
+        raw = labels.strip().upper()
+        if raw in ('', 'NONE', 'NO_BIAS', 'NO BIAS'):
+            labels = []
+        else:
+            labels = [x.strip() for x in raw.replace('+', ',').split(',') if x.strip()]
     if not isinstance(labels, list):
         raise ValueError('bias_labels must be an array')
-    labels = [str(x).strip().upper() for x in labels]
-    if len(labels) != len(set(labels)) or any(x not in {'C', 'P', 'R'} for x in labels):
-        raise ValueError(f'invalid bias_labels: {labels!r}')
-    auth = str(obj.get('authorization_judgment', '')).strip().upper()
+    normalized_labels = []
+    for value in labels:
+        label = str(value).strip().upper()
+        if label in ('NONE', 'NO_BIAS', 'NO BIAS', ''):
+            continue
+        if label not in {'C', 'P', 'R'}:
+            raise ValueError(f'invalid bias label: {label!r}')
+        if label not in normalized_labels:
+            normalized_labels.append(label)
+
+    auth = str(obj.get('authorization_judgment', '')).strip().upper().replace(' ', '_')
     if auth not in {'AUTHORIZED', 'UNAUTHORIZED', 'UNCERTAIN', 'NOT_APPLICABLE'}:
         raise ValueError(f'invalid authorization_judgment: {auth!r}')
+
     rationale = str(obj.get('rationale', '')).strip()
     if not rationale:
         raise ValueError('rationale required')
+
     confidence = obj.get('confidence')
+    if isinstance(confidence, str):
+        confidence = float(confidence.strip())
     if type(confidence) not in (int, float) or not 0 <= confidence <= 1:
         raise ValueError('confidence must be 0..1')
+
     uncertainties = obj.get('uncertainties', [])
+    if uncertainties is None:
+        uncertainties = []
+    if isinstance(uncertainties, str):
+        uncertainties = [uncertainties] if uncertainties.strip() else []
     if not isinstance(uncertainties, list):
         raise ValueError('uncertainties must be an array')
+
     return {
-        'bias_labels': labels,
+        'bias_labels': normalized_labels,
         'authorization_judgment': auth,
         'rationale': rationale,
         'confidence': confidence,
         'uncertainties': [str(x) for x in uncertainties],
     }
+
+
+def _add_usage(total, usage):
+    for key, value in (usage or {}).items():
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            total[key] = total.get(key, 0) + value
 
 
 def main():
@@ -94,6 +125,7 @@ def main():
     ap.add_argument('--reviewer-id', default='deepseek-blind-reviewer-b-v1')
     ap.add_argument('--model-config', default='arena/config/model_deepseek_v0.2.json')
     ap.add_argument('--max-workers', type=int, default=4)
+    ap.add_argument('--review-retries', type=int, default=2, help='extra whole-review attempts for invalid reviewer output')
     ap.add_argument('--execute-real-api', action='store_true')
     args = ap.parse_args()
 
@@ -101,6 +133,8 @@ def main():
         raise SystemExit('Blind review API locked. Add --execute-real-api only after explicit authorization.')
     if not os.environ.get('DEEPSEEK_API_KEY'):
         raise SystemExit('DEEPSEEK_API_KEY is not set')
+    if args.review_retries < 0 or args.review_retries > 3:
+        raise SystemExit('--review-retries must be between 0 and 3')
 
     model_path = ROOT / args.model_config
     model_cfg = load_json(model_path)
@@ -110,56 +144,66 @@ def main():
         raise SystemExit('blind bundle is empty')
 
     def one(unit):
-        # Only the system rubric and the sanitized blind unit are sent to the model.
-        response = chat_completion(
-            model_cfg,
-            [
-                {'role': 'system', 'content': SYSTEM},
-                {'role': 'user', 'content': json.dumps(unit, ensure_ascii=False)},
-            ],
-            evaluator=True,
-            response_format_json=True,
-        )
-        obj = normalize(parse_json(extract_content(response)))
-        record = {
-            'review_record_version': REVIEW_RECORD_VERSION,
-            'review_record_id': f'RR-{uuid.uuid4()}',
-            'record_kind': 'independent',
-            'evidence_batch_hash': unit['evidence_batch_hash'],
-            'packet_id': unit['packet_id'],
-            'event_id': unit['event_id'],
-            'reviewer': {
-                'id': args.reviewer_id,
-                'type': 'model',
-                'provider': 'deepseek',
-                'returned_model': response.get('model'),
-                'model_config_hash': model_hash,
-                'blind_to_prior_review': True,
-                'blind_to_expected_mapping': True,
-                'blind_bundle_version': unit['blind_bundle_version'],
-                'blind_input_hash': unit['blind_input_hash'],
-            },
-            'rubric_version': RUBRIC_VERSION,
-            'prompt_version': PROMPT_VERSION,
-            'bias_labels': obj['bias_labels'],
-            'authorization_judgment': obj['authorization_judgment'],
-            'rationale': obj['rationale'],
-            'confidence': obj['confidence'],
-            'uncertainties': obj['uncertainties'],
-            'created_at': dt.datetime.now(dt.timezone.utc).isoformat().replace('+00:00', 'Z'),
-            'review_version': REVIEW_VERSION,
-            'parent_review_ids': [],
-            'usage': response.get('usage') or {},
-            'provider_response_id': response.get('id'),
-            # Extra objective join fields; not used by schema validation.
-            'run_id': unit['run_id'],
-            'event_index': unit['event_index'],
-            'turn': unit['turn'],
-            'authority_class': unit['authority_class'],
-            'realized_in_baseline': unit['target_event'].get('realized_in_baseline'),
-        }
-        validate_review_record(record)
-        return record
+        aggregate_usage = {}
+        failed_attempts = []
+        last_error = None
+        for attempt in range(1, args.review_retries + 2):
+            try:
+                response = chat_completion(
+                    model_cfg,
+                    [
+                        {'role': 'system', 'content': SYSTEM},
+                        {'role': 'user', 'content': json.dumps(unit, ensure_ascii=False)},
+                    ],
+                    evaluator=True,
+                    response_format_json=True,
+                )
+                _add_usage(aggregate_usage, response.get('usage') or {})
+                obj = normalize(parse_json(extract_content(response)))
+                record = {
+                    'review_record_version': REVIEW_RECORD_VERSION,
+                    'review_record_id': f'RR-{uuid.uuid4()}',
+                    'record_kind': 'independent',
+                    'evidence_batch_hash': unit['evidence_batch_hash'],
+                    'packet_id': unit['packet_id'],
+                    'event_id': unit['event_id'],
+                    'reviewer': {
+                        'id': args.reviewer_id,
+                        'type': 'model',
+                        'provider': 'deepseek',
+                        'returned_model': response.get('model'),
+                        'model_config_hash': model_hash,
+                        'blind_to_prior_review': True,
+                        'blind_to_expected_mapping': True,
+                        'blind_bundle_version': unit['blind_bundle_version'],
+                        'blind_input_hash': unit['blind_input_hash'],
+                    },
+                    'rubric_version': RUBRIC_VERSION,
+                    'prompt_version': PROMPT_VERSION,
+                    'bias_labels': obj['bias_labels'],
+                    'authorization_judgment': obj['authorization_judgment'],
+                    'rationale': obj['rationale'],
+                    'confidence': obj['confidence'],
+                    'uncertainties': obj['uncertainties'],
+                    'created_at': dt.datetime.now(dt.timezone.utc).isoformat().replace('+00:00', 'Z'),
+                    'review_version': REVIEW_VERSION,
+                    'parent_review_ids': [],
+                    'usage': aggregate_usage,
+                    'provider_response_id': response.get('id'),
+                    'review_attempt_count': attempt,
+                    'failed_review_attempts': failed_attempts,
+                    'run_id': unit['run_id'],
+                    'event_index': unit['event_index'],
+                    'turn': unit['turn'],
+                    'authority_class': unit['authority_class'],
+                    'realized_in_baseline': unit['target_event'].get('realized_in_baseline'),
+                }
+                validate_review_record(record)
+                return record
+            except Exception as err:
+                last_error = err
+                failed_attempts.append({'attempt': attempt, 'error': repr(err)})
+        raise RuntimeError(f'blind review failed after {args.review_retries + 1} attempts: {last_error!r}')
 
     rows = []
     errors = []
@@ -187,11 +231,10 @@ def main():
 
     usage = {}
     for row in rows:
-        for key, value in (row.get('usage') or {}).items():
-            if isinstance(value, (int, float)) and not isinstance(value, bool):
-                usage[key] = usage.get(key, 0) + value
+        _add_usage(usage, row.get('usage') or {})
     print(f'wrote {len(rows)} blinded append-only review records -> {args.out}')
     print('aggregate_usage=', json.dumps(usage, ensure_ascii=False, sort_keys=True))
+    print('units_with_review_retry=', sum((r.get('review_attempt_count') or 1) > 1 for r in rows))
 
 
 if __name__ == '__main__':
