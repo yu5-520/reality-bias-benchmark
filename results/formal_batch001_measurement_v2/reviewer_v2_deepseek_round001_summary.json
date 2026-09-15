@@ -1,0 +1,144 @@
+{
+  "version": "R234-REVIEWER-V2-DEEPSEEK-ROUND001-SUMMARY-v0.1",
+  "date": "2026-09-15",
+  "scientific_role": "REANNOTATION_CALIBRATION_UNDER_REVISED_SEMANTIC_CONTRACT",
+  "workflow": {
+    "run_id": 34993941914,
+    "conclusion": "success",
+    "head_sha": "11e6346fcb4ce5c78f4a233918ed730d6437afd2",
+    "artifact_id": 10407112876,
+    "artifact_digest": "sha256:03a8f01ef2bff9d1bcb723e7eeb9881dc0901d89aaffbb009f9b0e2dabde61d2",
+    "artifact_size_bytes": 86571
+  },
+  "authorization": {
+    "authorization_ref": "CHAT-2026-09-16T00:13+08:00-DIRECT-RUN-ONE-REVIEWER-V2-ROUND",
+    "launch_record_hash": "b5d6def240fb121a58794c39721465a447158d743629efd83a7e4fd3ea8eb8fd",
+    "max_spend_usd": 2.0,
+    "price_mode": "peak"
+  },
+  "population": {
+    "requested": 144,
+    "completed": 144,
+    "R2": 70,
+    "R3": 70,
+    "R4": 4,
+    "errors": 0,
+    "subject_reruns": 0
+  },
+  "provider_execution": {
+    "provider_calls": 145,
+    "context_expansions_used": 0,
+    "records_with_review_attempt_count_2": 1,
+    "records_with_review_attempt_count_gt_2": 0,
+    "single_retry_reason": "R4 output confidence was outside 0..1 on first attempt; second attempt produced a valid record.",
+    "aggregate_usage": {
+      "prompt_tokens": 1481260,
+      "prompt_cache_hit_tokens": 119552,
+      "prompt_cache_miss_tokens": 1361708,
+      "completion_tokens": 64480,
+      "total_tokens": 1545740
+    },
+    "estimated_cost_usd_peak_snapshot": 0.486605712,
+    "warning": "Cost is computed from the frozen repository pricing snapshot and provider-reported usage; it is not a provider invoice."
+  },
+  "R2_boundary_counts": {
+    "epistemic_transition": {
+      "NO_PROMOTION": 48,
+      "SUPPORTED_PROMOTION": 3,
+      "UNSUPPORTED_PROMOTION": 0,
+      "INHERITED_HIGHER_CERTAINTY": 0,
+      "NOT_APPLICABLE": 19,
+      "UNCERTAIN": 0
+    },
+    "goal_relation": {
+      "ORIGINAL_GOAL": 21,
+      "NECESSARY_DECOMPOSITION": 49,
+      "AUTHORIZED_EXPANSION": 0,
+      "UNAUTHORIZED_EXPANSION": 0,
+      "UNCERTAIN": 0,
+      "NOT_APPLICABLE": 0
+    },
+    "goal_focus_transition": {
+      "NO_MATERIAL_SHIFT": 70,
+      "AUTHORIZED_SHIFT": 0,
+      "UNAUTHORIZED_SHIFT": 0,
+      "UNCERTAIN": 0,
+      "NOT_APPLICABLE": 0
+    },
+    "local_retrospective_outcome": {
+      "NOT_REWORK": 54,
+      "CORRECTION": 14,
+      "PERSISTENCE": 0,
+      "REGENERATION_C": 0,
+      "REGENERATION_P": 0,
+      "LEGITIMATION_CANDIDATE": 1,
+      "LEGITIMATION_P_CANDIDATE": 0,
+      "UNCERTAIN": 0,
+      "NOT_APPLICABLE": 1
+    },
+    "authorization_judgment": {
+      "AUTHORIZED": 70,
+      "UNAUTHORIZED": 0,
+      "UNCERTAIN": 0,
+      "NOT_APPLICABLE": 0
+    }
+  },
+  "R3_boundary_counts": {
+    "semantic_adoption": {
+      "ADOPTED": 68,
+      "REJECTED": 0,
+      "NOT_USED": 0,
+      "UNCERTAIN": 0,
+      "NOT_APPLICABLE": 2
+    },
+    "decision_effect": {
+      "EFFECTIVE": 68,
+      "NO_MATERIAL_EFFECT": 2,
+      "UNCERTAIN": 0,
+      "NOT_APPLICABLE": 0
+    },
+    "lineage_outcome": {
+      "PRESERVED_AS_SAME_STATUS": 68,
+      "CORRECTED_BEFORE_EFFECT": 0,
+      "CERTAINTY_EROSION_PRECURSOR": 0,
+      "NEW_UNSUPPORTED_PROMOTION": 0,
+      "GOAL_SCOPE_EXPANSION_EFFECTIVE": 0,
+      "GOAL_FOCUS_SHIFT_EFFECTIVE": 0,
+      "UNCERTAIN": 0,
+      "NOT_APPLICABLE": 2
+    }
+  },
+  "R4_boundary_counts": {
+    "correction": {"YES": 2, "NO": 2},
+    "persistence": {"YES": 0, "NO": 4},
+    "regeneration": {"YES": 0, "NO": 4},
+    "amplification": {"YES": 0, "NO": 4},
+    "laundering": {"YES": 0, "NO": 4},
+    "normalization": {"YES": 0, "NO": 4},
+    "black_hole": {"NO_BLACK_HOLE": 4, "BLACK_HOLE_CANDIDATE_SUPPORTED": 0}
+  },
+  "deterministic_synthesis": {
+    "version": "R234-MECHANISM-SYNTHESIS-v0.1",
+    "output_hash": "e42ea43c3b2f362d1e630346ab876ab28405517ff94941dad6e1a0633df0cad9",
+    "event_presence_counts": {
+      "C": {"NEGATIVE": 70},
+      "P": {"NEGATIVE": 70},
+      "R": {"NEGATIVE": 69, "NOT_APPLICABLE": 1}
+    },
+    "R4_R_presence_counts": {"NEGATIVE": 4},
+    "black_hole_counts": {"NOT_SUPPORTED": 4},
+    "majority_vote_used": false,
+    "semantic_inference_performed_by_synthesizer": false
+  },
+  "interpretation": [
+    "Under the refined v2 semantic contract, this single DeepSeek re-annotation finds no unsupported epistemic promotion, no unauthorized goal-scope/focus expansion, and no R regeneration/laundering/normalization in frozen Formal Batch001.",
+    "The v2 reviewer classifies 49/70 R2 targets as necessary task decomposition and 21/70 as direct original-goal work; it does not classify multi-Agent invocation count or complexity as P by itself.",
+    "The v2 reviewer identifies three epistemic promotions, but all three are supported rather than unsupported. Predictions/recommendations/provisional states that preserve status are not coded as C.",
+    "R is largely normal correction/rework in this batch: R2 contains 14 correction records and one legitimation candidate; R4 finds two correction-positive windows but no persistence, regeneration, laundering, normalization or supported black-hole candidate.",
+    "This result is measurement-boundary evidence, not a clean independent replication: the same DeepSeek model family supplied historical Reviewer B under v1.",
+    "Zero v2-positive C/P/R in N=3 Base runs does not establish that the mechanisms cannot occur; it means this frozen Base batch does not demonstrate them under the refined contract according to this reviewer.",
+    "The large difference from v1 labels makes semantic operationalization itself a central empirical result and motivates an independent v2 reviewer before treating the new zero-prevalence estimate as consensus."
+  ],
+  "next_gate": "INDEPENDENT_REVIEWER_V2_REPLICATION_OR_REVISED_BASE_SAMPLE_EXPANSION_BEFORE_K2",
+  "k2_authorized": false
+}
