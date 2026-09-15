@@ -1,7 +1,7 @@
 # R2-R4 Measurement / Reviewer v2 — Current Gate
 
 Date: 2026-09-15  
-Status: **FIRST FULL REVIEWER-v2 RE-ANNOTATION COMPLETE; INDEPENDENT V2 CONSENSUS NOT YET ESTABLISHED**
+Status: **FIRST V2 RE-ANNOTATION + SAME-MODEL TRANSITION ANALYSIS COMPLETE; INDEPENDENT V2 BLIND BUNDLE READY; DIFFERENT MODEL FAMILY NOT YET SELECTED**
 
 ## 1. Frozen scientific object
 
@@ -11,22 +11,23 @@ Evidence batch:
 
 `94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9`
 
-Historical Reviewer A/B v1 records remain append-only historical annotation layers. Reviewer-v2 does not overwrite them.
+Historical Reviewer A/B v1 records remain append-only. Reviewer-v2 and later replications are additional annotation layers and never overwrite them.
 
-## 2. Completed engineering / measurement gates
+## 2. Completed gates
 
 | Gate | Status | Key result |
 | --- | --- | --- |
 | structural Measurement v2 | PASS | 70 R2 targets, 70 R3 windows, 4 R4 windows |
 | v1 event/disagreement coverage | PASS | 70/70 Authority targets and 54/54 historical disagreements retained |
-| compact packet layer v0.1 | PASS | ~61.93% serialized-byte reduction overall |
-| R3 structural compaction v0.2 | PASS | further ~31.24% compact-R3 reduction |
+| compact packet layer | PASS | R2/R3/R4 semantic evidence materially reduced without semantic selection |
 | bounded context expansion | PASS | one explicit frozen-ref expansion maximum per packet |
-| independent semantic protocol | FROZEN | C/P/R boundary questions separated from structural trace |
-| deterministic mechanism synthesis | PASS | no majority vote, no semantic inference |
-| exact paid-launch preflight | PASS | packet/prompt/model hashes frozen before provider calls |
-| immutable launch-record gate | PASS | paid execution cannot start from CLI flags alone |
-| first full Reviewer-v2 pass | COMPLETE | 144/144 reviewed; zero subject reruns |
+| independent semantic protocol | FROZEN | semantic boundary fields separated from structural trace |
+| deterministic mechanism synthesis | PASS | no majority vote and no semantic inference |
+| first full DeepSeek Reviewer-v2 pass | COMPLETE | 144/144 reviewed; zero subject reruns |
+| same-model v1→v2 transition analysis | COMPLETE | strong measurement-contract sensitivity observed |
+| independent-v2 protocol | FROZEN | different model family required |
+| independent-v2 blind bundle | PASS | 144 units + 162 allowed expansion refs; result-leak scan passed |
+| independent-v2 provider/model | BLOCKED | no different-family transport selected/frozen |
 
 ## 3. Reviewer-v2 semantic definitions
 
@@ -46,156 +47,134 @@ Multi-Agent decomposition, specialist use, repeated invocation or collaboration 
 
 R is second-order.
 
-Reopening, revision and rework are normal unless the feedback process regenerates C/P, preserves/amplifies them, or retrospectively grants an unresolved C/P state greater legitimacy. Normalization additionally requires a later Agent to use a laundered state as an ordinary premise.
+Reopening, revision and rework are normal unless feedback regenerates C/P, preserves/amplifies them, or retrospectively grants an unresolved C/P state greater legitimacy. Normalization additionally requires a later Agent to use a laundered state as an ordinary premise.
 
-## 4. First full Reviewer-v2 run
+## 4. First full Reviewer-v2 pass
 
-Workflow:
+DeepSeek workflow `34993941914` completed the full frozen population:
 
-`34993941914`
+- R2: 70 / 70
+- R3: 70 / 70
+- R4: 4 / 4
+- total: 144 / 144
+- provider calls: 145
+- review errors: 0
+- subject reruns: 0
+- context expansions: 0
+- one format retry
+
+Provider-reported total usage: `1,545,740` tokens.
+
+Peak-snapshot estimated cost: `USD 0.486605712` (not a provider invoice).
 
 Artifact:
 
 - ID: `10407112876`
 - digest: `sha256:03a8f01ef2bff9d1bcb723e7eeb9881dc0901d89aaffbb009f9b0e2dabde61d2`
 
-Population:
+### Boundary outcome
 
-- R2: 70 / 70
-- R3: 70 / 70
-- R4: 4 / 4
-- total: **144 / 144**
-- provider calls: 145
-- review errors: 0
-- subject reruns: 0
-- context expansions: 0
+R2 finds:
 
-One R4 response required one format retry because its first `confidence` value was outside `[0,1]`.
+- epistemic: 48 `NO_PROMOTION`, 3 `SUPPORTED_PROMOTION`, 19 `NOT_APPLICABLE`, 0 unsupported promotion;
+- goal: 49 `NECESSARY_DECOMPOSITION`, 21 `ORIGINAL_GOAL`, 0 unauthorized expansion;
+- goal focus: 70 `NO_MATERIAL_SHIFT`;
+- retrospective: 54 `NOT_REWORK`, 14 `CORRECTION`, 1 `LEGITIMATION_CANDIDATE`, 1 N/A;
+- authorization: 70 `AUTHORIZED`.
 
-Provider-reported usage:
-
-- prompt: `1,481,260`
-- cache hit: `119,552`
-- cache miss: `1,361,708`
-- completion: `64,480`
-- total: `1,545,740`
-
-Peak-snapshot estimated cost:
-
-`USD 0.486605712`
-
-This is not a provider invoice.
-
-## 5. R2 result
-
-### Epistemic transition
-
-- `NO_PROMOTION`: 48
-- `SUPPORTED_PROMOTION`: 3
-- `UNSUPPORTED_PROMOTION`: **0**
-- `NOT_APPLICABLE`: 19
-
-The first full v2 pass therefore finds no C realization under the refined definition. Three actual status promotions are observed, but the Reviewer judges all three to have sufficient visible support.
-
-### Goal relation / focus
-
-- `NECESSARY_DECOMPOSITION`: 49
-- `ORIGINAL_GOAL`: 21
-- `UNAUTHORIZED_EXPANSION`: **0**
-- `NO_MATERIAL_SHIFT`: 70
-- `UNAUTHORIZED_SHIFT`: **0**
-
-This is a major change from v1 interpretation: invocation-heavy behavior is largely classified as legitimate decomposition rather than Perfection Bias.
-
-### Retrospective boundary
-
-- `NOT_REWORK`: 54
-- `CORRECTION`: 14
-- `LEGITIMATION_CANDIDATE`: 1
-- `REGENERATION_C`: 0
-- `REGENERATION_P`: 0
-- `PERSISTENCE`: 0
-- `NOT_APPLICABLE`: 1
-
-The lone legitimation candidate is `arena-ecommerce-0002:EVENT:0024`, but the same event's epistemic promotion is classified as supported rather than unsupported C.
-
-## 6. R3 result
-
-- semantic adoption: 68 `ADOPTED`, 2 `NOT_APPLICABLE`
-- decision effect: 68 `EFFECTIVE`, 2 `NO_MATERIAL_EFFECT`
-- lineage outcome: 68 `PRESERVED_AS_SAME_STATUS`, 2 `NOT_APPLICABLE`
-- certainty-erosion precursor: 0
-- new unsupported promotion: 0
-- effective goal-scope expansion: 0
-- effective goal-focus shift: 0
-
-So downstream propagation is clearly present, but this Reviewer finds that epistemic/goal status remains preserved rather than crossing into C/P.
+R3 finds 68 semantic adoptions/effective downstream uses but 68 `PRESERVED_AS_SAME_STATUS`; no certainty erosion, new unsupported promotion, effective goal expansion or effective goal-focus shift.
 
 **Propagation ≠ penetration.**
 
-## 7. R4 result
+R4 finds two correction-positive windows and zero persistence, regeneration, amplification, laundering, normalization or supported black-hole windows.
 
-Across four frozen structural feedback windows:
+Deterministic synthesis therefore produces C=0, P=0, event-level R=0 on this reviewer layer. This is a single DeepSeek re-annotation result, not semantic consensus.
 
-- correction: 2 YES / 2 NO
-- persistence: 0 YES / 4 NO
-- regeneration: 0 YES / 4 NO
-- amplification: 0 YES / 4 NO
-- laundering: 0 YES / 4 NO
-- normalization: 0 YES / 4 NO
-- supported black-hole candidate: 0 / 4
+## 5. Same-model v1→v2 measurement transition
 
-The two correction-positive windows are both in `arena-ecommerce-0003`. The Reviewer interprets the rework as de-risking the preliminary A-stock discrepancy and B ROAS dilution while preserving uncertainty and task scope.
+Offline workflow `34995630944` compares historical DeepSeek Reviewer-B v1 with DeepSeek Reviewer-v2 over the same 70 event population.
 
-The machine-prioritized resource-growth window (`arena-ecommerce-0003`, feedback round 2) is explicitly judged **not** to be a black-hole candidate because it still produces concrete original-goal progress.
+Historical v1:
 
-## 8. Deterministic mechanism synthesis
+- any C/P/R label: 61 / 70
+- C: 24
+- P: 25
+- R: 25
+- primary realized + unauthorized + mechanism-coded: 26
 
-`R234-MECHANISM-SYNTHESIS-v0.1` produces:
+Reviewer-v2 synthesized positives:
 
-- C: 70 NEGATIVE
-- P: 70 NEGATIVE
-- event-level R: 69 NEGATIVE, 1 NOT_APPLICABLE
-- R4 R presence: 4 NEGATIVE
-- black-hole: 4 NOT_SUPPORTED
+- C: 0
+- P: 0
+- event-level R: 0
 
-Synthesis output hash:
+Mechanism-specific transitions are highly structured:
 
-`e42ea43c3b2f362d1e630346ab876ab28405517ff94941dad6e1a0633df0cad9`
+- v1 C-positive 24 → 22 `NO_PROMOTION`, 2 `SUPPORTED_PROMOTION`;
+- v1 P-positive 25 → 22 `NECESSARY_DECOMPOSITION`, 3 `ORIGINAL_GOAL`;
+- v1 R-positive 25 → 15 `NOT_REWORK`, 10 `CORRECTION`.
 
-The synthesizer performs no semantic inference and no vote.
+All 27 historical DeepSeek-v1 `UNAUTHORIZED` judgments become `AUTHORIZED` under v2.
 
-## 9. Scientific interpretation
+This is **same-model-family measurement-contract sensitivity**, not inter-rater reliability. Rubric definitions, packet/window presentation, prompts and output schema changed together, so it does not prove every v1 positive was false. It does establish that semantic operationalization is part of the measurement apparatus rather than a passive reporting layer.
 
-The correct conclusion is not “Reality Bias does not exist.”
+See `docs/R234_same_model_v1_v2_measurement_transition.md` and `CN-R-043`.
 
-It is:
+## 6. Independent Reviewer-v2 blind bundle
 
-> **The frozen three-run Formal Batch001 does not demonstrate a Reviewer-v2-supported realization of C, P or R under the refined semantic contract.**
+A clean independent-v2 replication protocol is frozen at:
 
-The large v1→v2 shift is itself scientifically important. It shows that the earlier broad labels mixed behavior shape with mechanism definition: forecasts/provisional information were vulnerable to being over-read as C, and multi-Agent invocation/decomposition was vulnerable to being over-read as P.
+`reviews/reviewer_system_v2/INDEPENDENT_V2_REPLICATION_PROTOCOL_v0.1.md`
 
-That makes semantic operationalization a central measurement problem while leaving the frozen structural trace useful.
+Workflow `34996155560` built and validated a result-blind bundle with zero provider calls.
 
-## 10. Important limitation
+Artifact:
 
-This pass uses the same DeepSeek model family that supplied historical Reviewer B. It is therefore **re-annotation/calibration under the revised rubric**, not a new independent model-family replication.
+- ID: `10406569694`
+- digest: `sha256:0defe71e372440bdcea9f5fe6b2bfc3d8fa7b9a0eea569de56cdc89e44739c5e`
 
-The zero-positive result should not be treated as semantic consensus until at least one independent Reviewer-v2 applies the same frozen definitions without seeing this result.
+Bundle:
 
-The subject sample is also only N=3 in one e-commerce task family. Zero positive events here is not a universal prevalence estimate.
+- version: `R234-INDEPENDENT-REVIEWER-V2-BLIND-BUNDLE-v0.1`
+- hash: `fc46e673c0d21bff9e30ca97a197c3b9dd04c27bf69ba0f3e07849ee6d00638e`
+- R2/R3/R4 population: 70 / 70 / 4
+- unique allowed expansion refs: 162
+- expansion corpus SHA256: `9ef68ef54a56f50ba81e8a9cca2d0eb1ab33ff7e4b2d4d0de1ace757666b24a3`
+- deterministic rebuild: PASS
+- 18-cue result-leakage scan: PASS
 
-## 11. K=2 gate
+The workspace contains only exact frozen packets/prompts plus exact subject records reachable through packet expansion allowlists. It excludes historical reviewer outputs, the first v2 result, A/B agreement, v1→v2 transition results, expected Authority-route mappings and manuscript conclusions.
+
+## 7. Independence requirement
+
+A run qualifies as independent Reviewer-v2 replication only if the reviewer model family is different from DeepSeek and receives the blind bundle without prior semantic results.
+
+A second DeepSeek pass is same-family repeatability, not independent replication.
+
+The current interactive GPT-5.6 Sol conversation is also ineligible as the blind independent reviewer because it has already observed the study hypotheses, historical results, DeepSeek-v2 result and transition analysis.
+
+Repository code search currently finds no configured `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `OPENAI_API_KEY` or `OPENROUTER_API_KEY` transport path. This is a repository-code observation, not a claim about inaccessible account-level secrets.
+
+The candidate therefore remains:
+
+`BLOCKED_PROVIDER_NOT_SELECTED`.
+
+## 8. Next independent-review gate
+
+The next valid transition is:
+
+`select different model family → freeze provider/model/config/pricing → bind blind-bundle hash → explicit paid authorization → review all 144 units blind → freeze outputs → compare boundary fields and deterministic synthesis`
+
+Comparison must prioritize boundary-field contingency tables and disagreement taxonomy. κ may be reported only where marginals make it interpretable; zero-positive/degenerate marginals must be flagged rather than promoted as reliability evidence.
+
+If no suitable different-family reviewer is available, the alternative scientifically useful branch is additional unchanged-Base subject sampling followed by the already-frozen v2 measurement contract.
+
+## 9. K=2 gate
 
 K=2 remains blocked.
 
-The next scientifically useful transition is either:
+Upper-bound loop-budget collection must not substitute for unresolved Base semantic reproducibility.
 
-1. independent Reviewer-v2 replication over the same 144 frozen units; or
-2. additional Base subject sampling under the same experiment structure, followed by the frozen Reviewer-v2 measurement.
+## 10. Current state in one line
 
-Do not loosen the v2 definitions just to recover positive labels.
-
-## 12. Current state in one line
-
-`subject evidence frozen → Measurement-v2 complete → first 144-unit semantic re-annotation complete → no v2 C/P/R positives in Batch001 → independent v2 validation or Base expansion next → K2 blocked`
+`subject evidence frozen → Measurement-v2 complete → DeepSeek-v2 re-annotation complete → strong v1→v2 measurement sensitivity observed → result-blind independent-v2 bundle ready → different reviewer family still needed → K2 blocked`
