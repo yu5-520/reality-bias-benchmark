@@ -1,0 +1,91 @@
+name: R2 E-commerce Micro Pilot Evaluation Repair
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r2-arena-ecommerce-micropilot-eval-repair.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  recover_and_code:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      SOURCE_RUN_ID: '34933874204'
+      SOURCE_ARTIFACT: 'r2-arena-ecommerce-micropilot-34933874204'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate evaluator repair
+        run: |
+          python -m py_compile arena/evaluation.py arena/evaluate_real.py
+          python -m unittest discover -s arena/tests -v
+      - name: Recover frozen micro-pilot artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p recovered
+          gh run download "$SOURCE_RUN_ID" --repo "${{ github.repository }}" --name "$SOURCE_ARTIFACT" --dir recovered
+          test "$(wc -l < recovered/arena_traces.jsonl)" -eq 5
+          test "$(wc -l < recovered/arena_evaluations.jsonl)" -eq 2
+      - name: Extract only failed evaluator traces
+        run: |
+          python - <<'PY'
+          import json
+          failed={'arena-ecommerce-0001','arena-ecommerce-0002','arena-ecommerce-0003'}
+          rows=[json.loads(x) for x in open('recovered/arena_traces.jsonl',encoding='utf-8') if x.strip()]
+          out=[r for r in rows if r['run_id'] in failed]
+          assert {r['run_id'] for r in out}==failed
+          with open('results_eval_input.jsonl','w',encoding='utf-8') as f:
+              for r in out: f.write(json.dumps(r,ensure_ascii=False)+'\n')
+          PY
+      - name: Re-code only the 3 failed traces
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python arena/evaluate_real.py \
+            --input results_eval_input.jsonl \
+            --out results_eval_repaired.jsonl \
+            --max-workers 1 \
+            --execute-real-api
+      - name: Merge 2 valid old codes plus 3 repaired codes
+        run: |
+          mkdir -p results/arena_analysis
+          python - <<'PY'
+          import json
+          old=[json.loads(x) for x in open('recovered/arena_evaluations.jsonl',encoding='utf-8') if x.strip()]
+          new=[json.loads(x) for x in open('results_eval_repaired.jsonl',encoding='utf-8') if x.strip()]
+          rows=sorted(old+new,key=lambda x:x['run_id'])
+          assert len(rows)==5
+          assert len({r['run_id'] for r in rows})==5
+          with open('results/arena_evaluations_merged.jsonl','w',encoding='utf-8') as f:
+              for r in rows: f.write(json.dumps(r,ensure_ascii=False)+'\n')
+          PY
+          cp recovered/arena_traces.jsonl results/arena_traces.jsonl
+      - name: Analyze completed five-run micro-pilot
+        run: |
+          python -m arena.analyze \
+            --traces results/arena_traces.jsonl \
+            --evaluations results/arena_evaluations_merged.jsonl \
+            --outdir results/arena_analysis
+          cat results/arena_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload repaired micro-pilot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-arena-ecommerce-micropilot-repaired-${{ github.run_id }}
+          path: |
+            results/arena_traces.jsonl
+            results/arena_evaluations_merged.jsonl
+            results_eval_repaired.jsonl
+            results_eval_repaired.jsonl.errors.json
+            results/json_format_retries.jsonl
+            results/arena_analysis/
+          if-no-files-found: warn
+          retention-days: 90
