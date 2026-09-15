@@ -40,7 +40,7 @@ jobs:
           echo "TRACES=$TRACES" >> "$GITHUB_ENV"
           echo "SOURCE_BATCH=$SOURCE_BATCH" >> "$GITHUB_ENV"
           echo "ERRORS=${TRACES}.errors.json" >> "$GITHUB_ENV"
-      - name: Re-derive objective stats and review packets without provider calls
+      - name: Re-derive objective stats review packets and structural views without provider calls
         run: |
           SOURCE_SHA=$(python - <<'PY'
           import json, os
@@ -54,7 +54,7 @@ jobs:
             --errors "$ERRORS" \
             --outdir results/rederived_evidence \
             --code-sha "$SOURCE_SHA"
-      - name: Verify evidence identity is stable while derived measurement version advances
+      - name: Verify stable evidence identity and v0.2 structural feedback counter
         run: |
           python - <<'PY'
           import json, os, pathlib
@@ -72,9 +72,20 @@ jobs:
           packets=[json.loads(x) for x in pathlib.Path('results/rederived_evidence/review_packets.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
           assert packets and all(p['evidence_batch_hash']==old['evidence_batch_hash'] for p in packets)
           assert all(p['observation_context']['negative_finding_scope']=='OBSERVED_PREFIX_ONLY' for p in packets)
+          views=[json.loads(x) for x in pathlib.Path('results/rederived_evidence/structural_views.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          assert len(views)==1
+          view=views[0]
+          assert view['version']=='ARENA-STRUCTURAL-VIEWS-v0.2'
+          rounds=view['structural_feedback_rounds']
+          assert rounds['version']=='R4-STRUCTURAL-FEEDBACK-ROUND-v0.2'
+          assert rounds['semantic_blind'] is True
+          assert rounds['round_count']==3
+          assert all(r['anchor_actor']==r['return_actor'] and r['anchor_actor']!=r['exposure_actor'] for r in rounds['rounds'])
+          assert all(r['bias_labels']=='NOT_ADJUDICATED' for r in rounds['rounds'])
           print('stable evidence_batch_hash=', old['evidence_batch_hash'])
           print('objective_stats_version=', new['objective_stats_version'])
           print('censor-aware packets=', len(packets))
+          print('structural_feedback_rounds=', rounds['round_count'])
           PY
           cat results/rederived_evidence/RUN_REPORT.md >> "$GITHUB_STEP_SUMMARY"
       - name: Upload re-derived measurement layer
