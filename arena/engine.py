@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timezone
 from collections import defaultdict
 from .core import ArenaState, stable_hash
 from .prompts import build_agent_messages
@@ -57,8 +58,8 @@ def _returned_agents(events):
     })
 
 
-def run_arena_once(domain, config, provider, run_id, logical_seed=None):
-    state = ArenaState(domain, config, run_id)
+def run_arena_once(domain, config, provider, run_id, logical_seed=None, recorder=None):
+    state = ArenaState(domain, config, run_id, recorder=recorder)
     amap = {a['id']: a for a in domain['agents']}
     model_calls = []
 
@@ -68,6 +69,9 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None):
         view = state.runtime_view(actor)
         messages = build_agent_messages(domain, amap[actor], view)
         call = {
+            'started_at': datetime.now(timezone.utc).isoformat(),
+            'runtime_snapshot': view,
+            'runtime_snapshot_hash': stable_hash(view),
             'agent_id': actor,
             'turn': state.turns,
             'status': 'started',
@@ -77,6 +81,8 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None):
             'input_invocation_ids': list(state.last_read_invocation_ids),
             'event_index_start': len(state.events),
         }
+        if recorder:
+            recorder({'record_type': 'call_started', 'record': call})
         try:
             response = provider.complete_agent(messages, metadata={
                 'run_id': run_id,
@@ -89,16 +95,22 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None):
                 'response_id': response.get('response_id'),
                 'provider_model': response.get('model'),
                 'usage': response.get('usage') or {},
+                'transport_latency_ms': response.get('transport_latency_ms'),
                 'raw_content': response.get('content'),
             })
             envelope = parse_envelope(response['content'])
+            if recorder:
+                recorder({'record_type': 'provider_response', 'record': call})
             call['parsed_envelope'] = envelope
             call['decision_summary'] = envelope.get('decision_summary', '')
             call['status'] = 'completed'
-            state.mark_execution(actor, state.turns, True)
             state.apply_actions(actor, envelope)
+            state.mark_execution(actor, state.turns, True)
             call['event_index_end'] = len(state.events)
+            call['completed_at'] = datetime.now(timezone.utc).isoformat()
             model_calls.append(call)
+            if recorder:
+                recorder({'record_type': 'turn_completed', 'record': call, 'ledgers': state.evidence_snapshot()})
         except Exception as err:
             call['status'] = 'failed'
             call['error'] = repr(err)
@@ -113,11 +125,13 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None):
                 'input_message_ids': list(state.last_read_message_ids),
             })
             state.termination_reason = 'model_call_failure'
+            if recorder:
+                recorder({'record_type': 'turn_failed', 'record': call, 'ledgers': state.evidence_snapshot()})
             break
 
     if state.termination_reason:
         termination_reason = state.termination_reason
-    elif state.turns >= config['max_turns']:
+    elif state.turns >= config['max_turns'] and state.queue:
         termination_reason = 'turn_budget_exhausted'
     elif not state.queue and state.final_state is not None:
         termination_reason = 'queue_empty_with_final_state'
@@ -129,6 +143,8 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None):
     returned_agents = _returned_agents(state.events)
     if state.failures:
         run_status = 'RUN_FAILED'
+    elif termination_reason in ('turn_budget_exhausted', 'invocation_budget_exhausted', 'queue_capacity_exhausted'):
+        run_status = 'BUDGET_CENSORED'
     elif state.final_state is None:
         run_status = 'RUN_INCOMPLETE'
     else:
@@ -136,7 +152,11 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None):
 
     evidence = state.evidence_snapshot()
     return {
-        'trace_schema_version': TRACE_SCHEMA_VERSION,
+        'trace_schema_version': config.get('trace_schema_version', TRACE_SCHEMA_VERSION),
+        'observation_policy': config.get('termination_policy'),
+        'budget_hits': state.budget_hits,
+        'observation_censored': run_status == 'BUDGET_CENSORED',
+        'budget_limits': {k: config[k] for k in ('max_turns', 'max_total_invocations', 'max_pending_messages')},
         'run_id': run_id,
         'domain_id': domain['domain_id'],
         'domain_label': domain['label'],
@@ -172,3 +192,4 @@ def run_arena_once(domain, config, provider, run_id, logical_seed=None):
         'events': state.events,
         'model_calls': model_calls,
     }
+

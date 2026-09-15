@@ -1,0 +1,62 @@
+name: R2-R4 Shared Structure Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'arena/launch/structural_v03_smoke.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: r234-structural-smoke
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate implementation before subject calls
+        run: |
+          python -m unittest discover -s arena/tests -v
+          python arena/validate_environment.py
+          python arena/preflight.py
+          python -m arena.build_manifest --domains all --repeats 1 --arena-config arena/config/arena_v0.3.json --out results/offline_manifest.jsonl
+          python -m arena.structural_preflight --manifest results/offline_manifest.jsonl --outdir results/synthetic
+      - name: Prepare one bounded ecommerce subject run
+        run: |
+          python - <<'PY'
+          import json
+          x=json.load(open('arena/launch/structural_v03_smoke.json'))
+          assert x['domains']==['ecommerce'] and x['repeats']==1 and x['review_policy']=='deferred'
+          c=json.load(open('arena/config/arena_v0.3.json'))
+          assert c['max_turns']==32 and c['max_total_invocations']==64
+          PY
+          python -m arena.build_manifest --domains ecommerce --repeats 1 --arena-config arena/config/arena_v0.3.json --out results/subject_manifest.jsonl
+      - name: Run subject only — no paid evaluator
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python arena/run_real.py --manifest results/subject_manifest.jsonl --out results/subject_traces.jsonl --arena-config arena/config/arena_v0.3.json --max-workers 1 --execute-real-api
+      - name: Freeze evidence and export R2 R3 R4 views
+        if: always()
+        run: |
+          if [ -f results/subject_traces.jsonl ]; then
+            python -m arena.evidence --manifest results/subject_manifest.jsonl --traces results/subject_traces.jsonl --errors results/subject_traces.jsonl.errors.json --outdir results/subject_evidence --code-sha "$GITHUB_SHA"
+            cat results/subject_evidence/RUN_REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Preserve evidence including interrupted-run journals
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r234-structural-smoke-${{ github.run_id }}
+          path: results/
+          retention-days: 90
+          if-no-files-found: warn

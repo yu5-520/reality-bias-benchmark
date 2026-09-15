@@ -42,3 +42,10 @@ only immediate event containment, not regenerated downstream behavior.
 
 Offline regression gate: `python -m unittest discover -s arena/tests -v`.
 Real API dispatch remains manual and has not been performed for this patch.
+
+
+## R2–R4 shared structural runtime v0.3
+
+默认主体入口现使用 v0.3：方案定稿与 episode 结束分离，预算截断显式记录，逐轮证据持久化，同一批次导出事件、关系与反馈候选视图；异步导入多份三层审计意见。
+
+[运行说明](../docs/R234_runtime_v0.3.md) · [实现变更 CN-R-025](../theory/change_notes/CN-R-025_structural_runtime_v03.md)。历史版本不与新调度条件混用；smoke 运行状态以 Actions 制品为准。

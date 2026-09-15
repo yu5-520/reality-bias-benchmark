@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 
 from .core import stable_hash
+from .structural_views import build_views
 from .io_utils import load_json, load_jsonl, write_jsonl, sha256_file
 from .topology import topology_metrics, participation_metrics
 
@@ -30,6 +31,7 @@ def _objective_row(trace):
         'run_status': trace.get('run_status', 'LEGACY_STATUS_UNKNOWN'),
         'review_status': trace.get('review_status', 'PENDING_REVIEW'),
         'termination_reason': trace.get('termination_reason'),
+        'observation_censored': trace.get('observation_censored', 'NOT_RECORDED_IN_SOURCE_VERSION'),
         'turns': trace.get('turns'),
         'usage_summary': trace.get('usage_summary', 'NOT_RECORDED_IN_SOURCE_VERSION'),
         'participation': part,
@@ -121,6 +123,8 @@ def build_batch(manifest_path, traces_path, errors_path, outdir, code_sha=None):
     if errors_path and Path(errors_path).exists():
         errors = json.loads(Path(errors_path).read_text(encoding='utf-8'))
     by_run = {x['run_id']: x for x in manifest}
+    if len(by_run) != len(manifest) or len({x['run_id'] for x in traces}) != len(traces):
+        raise ValueError('duplicate run ids in evidence')
     for trace in traces:
         row = by_run.get(trace['run_id'])
         if row is None:
@@ -128,7 +132,10 @@ def build_batch(manifest_path, traces_path, errors_path, outdir, code_sha=None):
         for key in ('domain_hash', 'arena_config_hash', 'model_config_hash'):
             if trace.get(key) != row.get(key):
                 raise ValueError(f"binding mismatch {trace['run_id']} {key}")
+    journal_dir = Path(str(traces_path) + '.journals')
+    journal_hashes = {p.name: sha256_file(p) for p in sorted(journal_dir.glob('*.jsonl'))} if journal_dir.exists() else {}
     source = {
+        'journal_hashes': journal_hashes,
         'version': EVIDENCE_BATCH_VERSION,
         'manifest_sha256': sha256_file(manifest_path),
         'traces_sha256': sha256_file(traces_path),
@@ -148,14 +155,18 @@ def build_batch(manifest_path, traces_path, errors_path, outdir, code_sha=None):
     }
     batch_hash = stable_hash(source)
     objective_rows = [_objective_row(x) for x in traces]
-    index_records = []; packets = []
+    index_records = []; packets = []; views = []
     for trace in traces:
         idx, p = _review_material(trace, batch_hash)
-        index_records.extend(idx); packets.extend(p)
+        extra, view = build_views(trace, batch_hash)
+        index_records.extend(idx + extra); packets.extend(p); views.append(view)
 
+    censored = sum(x.get('run_status') == 'BUDGET_CENSORED' for x in traces)
     completed = sum(1 for x in traces if x.get('run_status') == 'RUN_COMPLETE')
     if len(traces) == len(manifest) and completed == len(traces) and not errors:
         status = 'RUN_COMPLETE_PENDING_REVIEW'
+    elif len(traces) == len(manifest) and completed + censored == len(traces) and not errors:
+        status = 'OBSERVATION_FINISHED_WITH_CENSORING_PENDING_REVIEW'
     else:
         status = 'RUN_FINISHED_WITH_INCOMPLETE_EVIDENCE_PENDING_REVIEW'
     missing_legacy = sorted({
@@ -170,6 +181,8 @@ def build_batch(manifest_path, traces_path, errors_path, outdir, code_sha=None):
         'planned_runs': len(manifest),
         'preserved_traces': len(traces),
         'complete_runs': completed,
+        'budget_censored_runs': censored,
+        'layer_review_status': {x: 'PENDING_REVIEW' for x in ('R2', 'R3', 'R4')},
         'runner_errors': len(errors),
         'review_packet_count': len(packets),
         'legacy_missing_fields': missing_legacy,
@@ -177,6 +190,7 @@ def build_batch(manifest_path, traces_path, errors_path, outdir, code_sha=None):
     }
     out = Path(outdir); out.mkdir(parents=True, exist_ok=True)
     (out / 'evidence_batch.json').write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding='utf-8')
+    write_jsonl(out / 'structural_views.jsonl', views)
     write_jsonl(out / 'objective_stats.jsonl', objective_rows)
     write_jsonl(out / 'review_evidence_index.jsonl', index_records)
     write_jsonl(out / 'review_packets.jsonl', packets)
@@ -200,6 +214,8 @@ def build_batch(manifest_path, traces_path, errors_path, outdir, code_sha=None):
     integrity = {
         'evidence_batch_hash': batch_hash,
         'files': {
+            'evidence_batch.json': sha256_file(out / 'evidence_batch.json'),
+            'structural_views.jsonl': sha256_file(out / 'structural_views.jsonl'),
             'objective_stats.jsonl': sha256_file(out / 'objective_stats.jsonl'),
             'review_evidence_index.jsonl': sha256_file(out / 'review_evidence_index.jsonl'),
             'review_packets.jsonl': sha256_file(out / 'review_packets.jsonl'),
@@ -224,3 +240,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

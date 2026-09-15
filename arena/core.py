@@ -1,6 +1,7 @@
 import copy
 import hashlib
 import json
+from datetime import datetime, timezone
 from collections import deque
 
 AUTHORITY_BY_ACTION = {
@@ -40,8 +41,10 @@ def validate_domain(domain):
 
 
 class ArenaState:
-    def __init__(self, domain, config, run_id):
+    def __init__(self, domain, config, run_id, recorder=None):
         validate_domain(domain)
+        self.recorder = recorder
+        self.budget_hits = []
         self.domain = domain
         self.config = config
         self.run_id = run_id
@@ -150,6 +153,7 @@ class ArenaState:
         before = before or self._snapshot()
         event = {
             'event_index': len(self.events),
+            'recorded_at': datetime.now(timezone.utc).isoformat(),
             'actor': actor,
             'turn': self.turns,
             'action_type': action.get('type'),
@@ -169,6 +173,13 @@ class ArenaState:
             'queue_after': list(self.queue),
         }
         self.events.append(event)
+        if note in ('queue_capacity_exhausted', 'invocation_budget_exhausted'):
+            self.budget_hits.append({'reason': note, 'event_index': event['event_index'], 'turn': self.turns})
+            if self.config.get('termination_policy') == 'observe_until_quiescent':
+                self.terminated = True
+                self.termination_reason = note
+        if self.recorder:
+            self.recorder({'record_type': 'event', 'record': event})
         return event
 
     def enqueue(self, agent_id, message, sender=None, queue_position='back', invocation_id=None):
@@ -182,7 +193,15 @@ class ArenaState:
         if invocation_id:
             stored['_invocation_id'] = invocation_id
         self.inboxes[agent_id].append(stored)
-        if queue_position == 'front':
+        if self.config.get('termination_policy') == 'observe_until_quiescent':
+            if queue_position == 'front' and agent_id in self.queue:
+                self.queue.remove(agent_id)
+            if agent_id not in self.queue:
+                if queue_position == 'front':
+                    self.queue.appendleft(agent_id)
+                else:
+                    self.queue.append(agent_id)
+        elif queue_position == 'front':
             self.queue.appendleft(agent_id)
         else:
             self.queue.append(agent_id)
@@ -290,6 +309,7 @@ class ArenaState:
                     'basis': copy.deepcopy(action.get('basis')),
                     'writer': actor,
                     'event_index': len(self.events),
+            'recorded_at': datetime.now(timezone.utc).isoformat(),
                 }
                 self.log_event(actor, action, before=before)
             elif kind == 'revise_final_state':
@@ -306,6 +326,7 @@ class ArenaState:
                         'basis': action.get('reason'),
                         'writer': actor,
                         'event_index': len(self.events),
+            'recorded_at': datetime.now(timezone.utc).isoformat(),
                     }
                     self.final_state.setdefault('state_metadata', {})[key] = copy.deepcopy(self.shared_state_metadata[key])
                 self.final_state['revision_count'] = self.final_state.get('revision_count', 0) + 1
@@ -336,10 +357,14 @@ class ArenaState:
                     late_action = copy.deepcopy(late)
                     late_action['type'] = 'late_event'
                     late_action['message_id'] = late_message_id
-                    self.log_event('ENVIRONMENT', late_action, note='fixed_environment_event_after_first_finalize', before=self._snapshot())
+                    self.log_event('ENVIRONMENT', late_action, realized=bool(late_message_id), note='fixed_environment_event_after_first_finalize' if late_message_id else 'queue_capacity_exhausted', before=self._snapshot())
+                    if not late_message_id:
+                        self.late_event_delivered = False
                 else:
                     policy = self.config.get('termination_policy', 'immediate_after_late_event')
-                    if policy == 'await_pending_work_before_terminal_finalize' and self._has_pending_work():
+                    if policy == 'observe_until_quiescent':
+                        self.log_event(actor, action, note='plan_settled_episode_observation_continues', before=before)
+                    elif policy == 'await_pending_work_before_terminal_finalize' and self._has_pending_work():
                         self.log_event(actor, action, note='terminal_finalize_deferred_pending_work', before=before)
                     else:
                         self.terminated = True
@@ -361,3 +386,4 @@ class ArenaState:
             'execution_ledger': copy.deepcopy(self.execution_ledger),
             'failures': copy.deepcopy(self.failures),
         }
+

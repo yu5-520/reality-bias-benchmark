@@ -13,7 +13,7 @@ def main():
     ap.add_argument('--domains', default='all', help='comma-separated domain ids or all')
     ap.add_argument('--repeats', type=int, default=30)
     ap.add_argument('--out', required=True)
-    ap.add_argument('--arena-config', default='arena/config/arena_v0.2.json')
+    ap.add_argument('--arena-config', default='arena/config/arena_v0.3.json')
     a = ap.parse_args()
     arena_path = ROOT / a.arena_config
     arena = load_json(arena_path)
@@ -21,6 +21,8 @@ def main():
     model = load_json(model_path)
     domain_ids = arena['default_domains'] if a.domains == 'all' else [x.strip() for x in a.domains.split(',') if x.strip()]
     code_sha = os.environ.get('GITHUB_SHA') or 'LOCAL_OR_UNRECORDED'
+    if a.repeats < 1 or not domain_ids or len(domain_ids) != len(set(domain_ids)) or any(x not in arena['default_domains'] for x in domain_ids):
+        raise ValueError('positive repeats and unique registered domain ids required')
     rows = []
     for domain_id in domain_ids:
         path = ROOT / f'arena/domains/{domain_id}.json'
@@ -48,3 +50,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

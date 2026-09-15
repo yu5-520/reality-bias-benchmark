@@ -23,6 +23,10 @@ concurrency:
   group: r2-free-agent-arena-subject
   cancel-in-progress: false
 
+env:
+  ARENA_DOMAINS: ${{ inputs.domains }}
+  ARENA_REPEATS: ${{ inputs.repeats }}
+
 permissions:
   contents: read
 
@@ -35,7 +39,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate v0.2 environment
+      - name: Validate structural observation environment
         run: |
           python arena/validate_environment.py
           python arena/preflight.py
@@ -43,9 +47,9 @@ jobs:
       - name: Build exact requested manifest
         run: |
           python -m arena.build_manifest \
-            --domains '${{ inputs.domains }}' \
-            --repeats '${{ inputs.repeats }}' \
-            --arena-config arena/config/arena_v0.2.json \
+            --domains "$ARENA_DOMAINS" \
+            --repeats "$ARENA_REPEATS" \
+            --arena-config arena/config/arena_v0.3.json \
             --out results/arena_manifest.jsonl
           wc -l results/arena_manifest.jsonl
       - name: Upload prepared manifest
@@ -68,9 +72,9 @@ jobs:
       - name: Rebuild exact manifest
         run: |
           python -m arena.build_manifest \
-            --domains '${{ inputs.domains }}' \
-            --repeats '${{ inputs.repeats }}' \
-            --arena-config arena/config/arena_v0.2.json \
+            --domains "$ARENA_DOMAINS" \
+            --repeats "$ARENA_REPEATS" \
+            --arena-config arena/config/arena_v0.3.json \
             --out results/arena_manifest.jsonl
       - name: Run self-organizing multi-agent subject experiment
         env:
@@ -79,7 +83,7 @@ jobs:
           python arena/run_real.py \
             --manifest results/arena_manifest.jsonl \
             --out results/arena_traces.jsonl \
-            --arena-config arena/config/arena_v0.2.json \
+            --arena-config arena/config/arena_v0.3.json \
             --max-workers 2 \
             --execute-real-api
       - name: Validate and freeze raw evidence, compute objective facts, export review packets
@@ -101,7 +105,9 @@ jobs:
             results/arena_manifest.jsonl
             results/arena_traces.jsonl
             results/arena_traces.jsonl.errors.json
+            results/arena_traces.jsonl.journals/
             results/json_format_retries.jsonl
             results/evidence_batch/
           if-no-files-found: warn
           retention-days: 90
+

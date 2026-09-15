@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'arena/**'
+      - '.github/workflows/r234-structural-smoke.yml'
       - 'schemas/evidence_batch_v0.2.schema.json'
       - 'schemas/review_record_v0.1.schema.json'
       - 'docs/R2_free_agent_arena_design.md'
@@ -36,9 +37,14 @@ jobs:
         run: |
           python -m arena.build_manifest --domains all --repeats 2 --arena-config arena/config/arena_v0.2.json --out results/arena_manifest_preflight.jsonl
           test "$(wc -l < results/arena_manifest_preflight.jsonl)" -eq 8
+      - name: Validate shared structural views and asynchronous review import
+        run: |
+          python -m arena.build_manifest --domains all --repeats 1 --arena-config arena/config/arena_v0.3.json --out results/structural_manifest.jsonl
+          python -m arena.structural_preflight --manifest results/structural_manifest.jsonl --outdir results/structural_preflight
       - name: Upload offline preflight evidence
         uses: actions/upload-artifact@v4
         with:
           name: r2-free-agent-arena-preflight-${{ github.run_id }}
-          path: results/arena_manifest_preflight.jsonl
+          path: results/
           retention-days: 30
+
