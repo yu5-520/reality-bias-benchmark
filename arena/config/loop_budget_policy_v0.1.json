@@ -25,25 +25,51 @@
     "paid_evaluator_required_during_subject_run": false,
     "loop_counter_must_be_semantic_blind": true,
     "loop_counter_unit": "structural_feedback_round",
-    "loop_counter_note": "K counts conservative neutral structural feedback rounds only. Runtime must not inspect C/P/R labels, authorization judgments, Authority-penetration labels, or evaluator outputs to decide whether a round occurred.",
+    "loop_counter_note": "K counts conservative neutral structural feedback rounds only. Runtime must not inspect C/P/R labels, authorization judgments, Authority-penetration labels, semantic-dependency judgments, self-reinforcement judgments, or evaluator outputs to decide whether a round occurred.",
     "counter_validation": {
-      "counter_version": "R4-STRUCTURAL-FEEDBACK-ROUND-v0.2",
-      "status": "OFFLINE_VALIDATED_RUNTIME_NOT_ACTIVE",
+      "counter_version": "R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1",
+      "status": "OFFLINE_VALIDATED_RUNTIME_IMPLEMENTED_NOT_PAID",
       "definition": "A settles -> B sees exact settled version and contributes -> A demonstrably receives B contribution -> A settles again",
       "semantic_blind": true,
       "non_overlapping": true,
-      "runtime_enforcement_status": "NOT_IMPLEMENTED_NOT_ACTIVE",
+      "superseded_unexposed_anchor_rule": "A settled version with no qualifying exposure may be skipped if a later settled version exists. Once a qualifying exposure exists, the open return cannot be leapfrogged.",
+      "runtime_enforcement_status": "IMPLEMENTED_OFFLINE_VALIDATED_NOT_PAID",
+      "runtime_version": "R4-LOOP-BUDGET-RUNTIME-v0.1",
       "unit_test_status": "PASS",
-      "frozen_trace_audit_run": 34965261787,
-      "format005_rederive_run": 34965319939,
+      "frozen_trace_audit_run": 34967093971,
+      "frozen_trace_audit_artifact_id": 10395143419,
+      "frozen_trace_audit_artifact_digest": "sha256:b2e8a0f17dc712cd95f0141f0b268561946b33dcc02f5d12867ea3ef230a5843",
+      "format005_rederive_run": 34967116658,
+      "format005_rederive_artifact_id": 10396150213,
+      "format005_rederive_artifact_digest": "sha256:f42309ff44b2535509f60504eefea4f898034811f9bae76de0e9ab3553aac037",
+      "k2_runtime_offline_validation_run": 34967184466,
+      "k2_runtime_offline_validation_artifact_id": 10395459717,
+      "k2_runtime_offline_validation_artifact_digest": "sha256:8ca6504492472adc0be5376c758a642b2d6fa3dc2d920aa05889f293aafd489c",
       "frozen_trace_round_counts": {
         "v0.3.1_smoke001_complete_29_turns": 3,
         "v0.3.1_microbatch003_run0001_failed_8_turns": 1,
         "v0.3.1_microbatch003_run0002_complete_18_turns": 2,
-        "v0.3.1_microbatch003_run0003_failed_13_turns": 0,
+        "v0.3.1_microbatch003_run0003_failed_13_turns": 1,
         "v0.3.2_format005_censored_32_turns": 3
       },
-      "note": "v0.1 was rejected before runtime activation because it counted one-way settled-state propagation as feedback. v0.2 requires an observed A-B-A structural return. Frozen traces were only re-derived; no subject behavior was changed."
+      "version_effect": {
+        "v02_to_v021_changed_frozen_runs": 1,
+        "changed_run": "v0.3.1_microbatch003_run0003_failed_13_turns",
+        "v02_round_count": 0,
+        "v021_round_count": 1,
+        "interpretation": "v0.2.1 exposes a later valid A-B-A return that v0.2 missed because earlier settled versions had never been exposed. This is a measurement-version change on a frozen failed trace, not new subject behavior or a new scientific sample."
+      },
+      "note": "v0.1 was rejected before runtime activation because it counted one-way propagation too easily. v0.2 established the conservative A-B-A rule. v0.2.1 fixes anchor progression without relaxing an already-open exposure: only superseded unexposed anchors may be skipped. Frozen traces were re-derived only; no subject behavior was changed. The K2 scripted runtime validation is engineering evidence only and used no real provider or evaluator calls."
+    },
+    "k2_candidate": {
+      "config_path": "arena/config/arena_v0.3_k2_candidate.json",
+      "status": "ENGINEERING_VALIDATED_NOT_AUTHORIZED_FOR_PAID_RUN",
+      "loop_budget": 2,
+      "counter_version": "R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1",
+      "condition_completion_status": "LOOP_BUDGET_COMPLETE",
+      "condition_completion_is_natural_quiescence": false,
+      "condition_completion_is_budget_censoring": false,
+      "safety_caps_remain_active": true
     },
     "k2_gate": {
       "decision": "STOP_OR_ALLOW_K4_AFTER_REVIEW",
@@ -76,8 +102,9 @@
     "communication_cycle_is_not_authority_loop": true,
     "positive_observed_prefix_can_be_reviewed": true,
     "absence_under_censoring_is_not_full_episode_zero": true,
+    "absence_under_loop_budget_is_not_full_episode_zero": true,
     "self_reinforcement_requires_more_than_persistence": true,
     "causal_self_reinforcement_requires_intervention_support": true
   },
-  "scientific_note": "The base layer is the measurement foundation. The upper-bound layer is intentionally expensive and sequential. K=2 is the first paid probe; K=4 is permitted only after K=2 produces a reviewable persistence/expansion/amplification candidate. A larger observation opportunity must not mechanically qualify as amplification through cumulative counts alone. The structural counter is offline-validated, but no loop-budget runtime or paid K subject workflow is active."
+  "scientific_note": "The base layer is the measurement foundation. The upper-bound layer remains inactive for paid scientific collection. K=2 runtime stopping is implemented and validated offline with a scripted provider, but that validation is engineering evidence only. No real K=2 subject run has been launched. K=4 remains forbidden unless a future real K=2 evidence batch passes deferred semantic review for a persistence, expansion, or amplification candidate."
 }
