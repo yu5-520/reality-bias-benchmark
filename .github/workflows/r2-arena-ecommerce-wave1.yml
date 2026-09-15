@@ -1,0 +1,114 @@
+name: R2 Free-Agent Arena E-commerce Wave 1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r2-arena-ecommerce-wave1.yml'
+
+concurrency:
+  group: r2-free-agent-arena-ecommerce-wave1
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  real_arena:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify frozen Arena v0.1.1 environment
+        run: |
+          python arena/validate_environment.py
+          python arena/preflight.py
+          python -m unittest discover -s arena/tests -v
+          python - <<'PY'
+          import json
+          x=json.load(open('arena/FREEZE_v0.1.1.json'))
+          assert x['freeze_id']=='R2-FREE-AGENT-ARENA-v0.1.1-PRE-API'
+          assert x['status']=='OFFLINE_VERIFIED_REAL_API_NOT_RUN'
+          print('Arena v0.1.1 freeze verified.')
+          PY
+      - name: Build fixed E-commerce Wave 1 manifest
+        run: |
+          python -m arena.build_manifest \
+            --domains ecommerce \
+            --repeats 30 \
+            --out results/arena_manifest.jsonl
+          test "$(wc -l < results/arena_manifest.jsonl)" -eq 30
+      - name: Run 30 self-organizing E-commerce Arena traces
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python arena/run_real.py \
+            --manifest results/arena_manifest.jsonl \
+            --out results/arena_traces.jsonl \
+            --max-workers 4 \
+            --execute-real-api
+      - name: Blind-code naturally occurring events
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python arena/evaluate_real.py \
+            --input results/arena_traces.jsonl \
+            --out results/arena_evaluations.jsonl \
+            --max-workers 4 \
+            --execute-real-api
+      - name: Analyze topology, emergence, and 3x3 Authority routes
+        run: |
+          python -m arena.analyze \
+            --traces results/arena_traces.jsonl \
+            --evaluations results/arena_evaluations.jsonl \
+            --outdir results/arena_analysis
+          cat results/arena_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Freeze Wave 1 execution metadata
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib, os
+          def sha(path):
+              h=hashlib.sha256()
+              with open(path,'rb') as f:
+                  for chunk in iter(lambda:f.read(65536),b''): h.update(chunk)
+              return h.hexdigest()
+          rows=[json.loads(x) for x in pathlib.Path('results/arena_traces.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          evals=[json.loads(x) for x in pathlib.Path('results/arena_evaluations.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          assert len(rows)==30
+          assert len(evals)==30
+          meta={
+            'wave':'R2-FREE-AGENT-ARENA-ECOM-W1',
+            'status':'RAW_AND_BLIND_CODED_DISCOVERY_DATA_GENERATED',
+            'git_commit_sha':os.environ.get('GITHUB_SHA'),
+            'github_run_id':os.environ.get('GITHUB_RUN_ID'),
+            'domain':'ecommerce',
+            'planned_repeats':30,
+            'completed_traces':len(rows),
+            'completed_evaluations':len(evals),
+            'arena_freeze_id':'R2-FREE-AGENT-ARENA-v0.1.1-PRE-API',
+            'manifest_sha256':sha('results/arena_manifest.jsonl'),
+            'traces_sha256':sha('results/arena_traces.jsonl'),
+            'evaluations_sha256':sha('results/arena_evaluations.jsonl'),
+            'interpretation':'Discovery wave. Natural topology associations are not causal effects. Counterfactual replay estimates immediate containment only.'
+          }
+          pathlib.Path('results/arena_analysis/FREEZE_METADATA.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(meta,ensure_ascii=False,indent=2))
+          PY
+      - name: Upload E-commerce Wave 1 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-free-agent-arena-ecommerce-wave1-${{ github.run_id }}
+          path: |
+            results/arena_manifest.jsonl
+            results/arena_traces.jsonl
+            results/arena_traces.jsonl.errors.json
+            results/arena_evaluations.jsonl
+            results/arena_evaluations.jsonl.errors.json
+            results/json_format_retries.jsonl
+            results/arena_analysis/
+          if-no-files-found: warn
+          retention-days: 90
