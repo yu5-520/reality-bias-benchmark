@@ -1,0 +1,115 @@
+name: R2-R4 Independent Reviewer v2 Blind Bundle Offline
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'arena/build_independent_reviewer_v2_bundle.py'
+      - 'arena/test_build_independent_reviewer_v2_bundle.py'
+      - 'reviews/reviewer_system_v2/INDEPENDENT_V2_REPLICATION_PROTOCOL_v0.1.md'
+      - 'reviews/reviewer_system_v2/independent_v2_replication_candidate_v0.1.json'
+      - '.github/workflows/r234-independent-reviewer-v2-bundle-offline.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build-blind-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Unit tests
+        run: python -m unittest arena.test_build_independent_reviewer_v2_bundle
+
+      - name: Download frozen Batch001 subject evidence
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34970142001
+          name: r234-ecommerce-formal-joint-cpr-v1-batch001-34970142001
+          path: inputs/frozen
+
+      - name: Download frozen compact R2/R4 packets
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34990393003
+          name: r234-reviewer-v2-compact-packets-34990393003
+          path: inputs/compact_v01
+
+      - name: Download frozen compact R3 v0.2 packets
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34992079531
+          name: r234-reviewer-v2-r3-compact-v02-34992079531
+          path: inputs/r3_v02
+
+      - name: Build result-blind replication bundle
+        run: |
+          python -m arena.build_independent_reviewer_v2_bundle \
+            --r2 inputs/compact_v01/compact_r2_packets.jsonl \
+            --r3 inputs/r3_v02/compact_r3_packets_v02.jsonl \
+            --r4 inputs/compact_v01/compact_r4_packets.jsonl \
+            --r2-prompt reviews/reviewer_system_v2/prompts/R2_BOUNDARY_PROMPT_v0.1.md \
+            --r3-prompt reviews/reviewer_system_v2/prompts/R3_LINEAGE_PROMPT_v0.1.md \
+            --r4-prompt reviews/reviewer_system_v2/prompts/R4_DYNAMICS_PROMPT_v0.1.md \
+            --traces inputs/frozen/formal_subject_traces.jsonl \
+            --evidence-batch-hash 94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9 \
+            --outdir independent_v2_bundle
+
+      - name: Deterministic rebuild
+        run: |
+          python -m arena.build_independent_reviewer_v2_bundle \
+            --r2 inputs/compact_v01/compact_r2_packets.jsonl \
+            --r3 inputs/r3_v02/compact_r3_packets_v02.jsonl \
+            --r4 inputs/compact_v01/compact_r4_packets.jsonl \
+            --r2-prompt reviews/reviewer_system_v2/prompts/R2_BOUNDARY_PROMPT_v0.1.md \
+            --r3-prompt reviews/reviewer_system_v2/prompts/R3_LINEAGE_PROMPT_v0.1.md \
+            --r4-prompt reviews/reviewer_system_v2/prompts/R4_DYNAMICS_PROMPT_v0.1.md \
+            --traces inputs/frozen/formal_subject_traces.jsonl \
+            --evidence-batch-hash 94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9 \
+            --outdir independent_v2_bundle_rebuild
+
+      - name: Replication blindness gates
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          a = json.loads(Path('independent_v2_bundle/bundle_manifest.json').read_text())
+          b = json.loads(Path('independent_v2_bundle_rebuild/bundle_manifest.json').read_text())
+          assert a['bundle_version'] == 'R234-INDEPENDENT-REVIEWER-V2-BLIND-BUNDLE-v0.1'
+          assert a['bundle_hash'] == b['bundle_hash']
+          assert a['population'] == {'R2': 70, 'R3': 70, 'R4': 4, 'total': 144}
+          assert a['prior_reviewer_outputs_included'] is False
+          assert a['prior_v2_result_included'] is False
+          assert a['historical_agreement_result_included'] is False
+          assert a['expected_mechanism_mapping_included'] is False
+          assert a['manuscript_conclusion_included'] is False
+          assert a['provider_model_selected'] is False
+          assert a['provider_calls'] == 0
+          assert a['forbidden_cue_scan']['status'] == 'PASS'
+          assert a['allowed_expansion_ref_count'] == a['expansion_record_count']
+          assert a['allowed_expansion_ref_count'] > 0
+          candidate = json.loads(Path('reviews/reviewer_system_v2/independent_v2_replication_candidate_v0.1.json').read_text())
+          assert candidate['status'] == 'BLOCKED_PROVIDER_NOT_SELECTED'
+          assert candidate['execute_real_api'] is False
+          assert candidate['independence_requirements']['reviewer_family_must_differ_from_deepseek'] is True
+          assert candidate['provider_selection']['provider'] is None
+          assert candidate['k2_authorized'] is False
+          print(json.dumps(a, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload blind replication bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: r234-independent-reviewer-v2-blind-bundle-${{ github.run_id }}
+          path: independent_v2_bundle/
+          retention-days: 90
