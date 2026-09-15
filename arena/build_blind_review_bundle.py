@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 
 from .core import stable_hash
-from .io_utils import load_json, load_jsonl, write_jsonl
+from .io_utils import load_json, load_jsonl, write_jsonl, sha256_file
 
 BUNDLE_VERSION = 'R234-BLIND-REVIEW-BUNDLE-v1'
 EXCLUDED_CONCEPTS = [
@@ -95,25 +95,21 @@ def _prior_evidence(trace, target):
     rows = [e for e in trace.get('events', []) if e.get('event_index', -1) < idx and e.get('realized_in_baseline')]
     selected = []
 
-    # Always retain recent realized structural history.
     for e in rows[-12:]:
         selected.append(e)
 
-    # Add same-specialist invocation history for V judgments.
     if action_type == 'invoke_agent':
         target_agent = action.get('agent_id')
         for e in rows:
             if e.get('action_type') == 'invoke_agent' and (e.get('action') or {}).get('agent_id') == target_agent:
                 selected.append(e)
 
-    # Add same-key state provenance for I judgments.
     if action_type == 'write_state':
         key = action.get('key')
         for e in rows:
             if e.get('action_type') == 'write_state' and (e.get('action') or {}).get('key') == key:
                 selected.append(e)
 
-    # Add prior FINAL/revision sequence for T/R judgments.
     if action_type in ('revise_final_state', 'finalize'):
         for e in rows:
             if e.get('action_type') in ('finalize', 'revise_final_state'):
@@ -135,10 +131,10 @@ def build_bundle(batch_meta_path, packets_path, traces_path, domain_path, out_pa
         manifest = load_jsonl(manifest_path)
         hashes = {m.get('domain_hash') for m in manifest}
         if len(hashes) == 1:
-            actual = stable_hash(domain)
+            actual = sha256_file(domain_path)
             expected = next(iter(hashes))
             if expected and actual != expected:
-                raise ValueError(f'domain hash mismatch: expected {expected}, got {actual}')
+                raise ValueError(f'domain file hash mismatch: expected {expected}, got {actual}')
 
     units = []
     for packet in packets:
@@ -146,7 +142,7 @@ def build_bundle(batch_meta_path, packets_path, traces_path, domain_path, out_pa
         trace = by_run[run_id]
         idx = _event_index(packet['event_id'])
         event = next(e for e in trace['events'] if e.get('event_index') == idx)
-        call_idx, call = _call_for_event(trace, idx)
+        _, call = _call_for_event(trace, idx)
         if call is None:
             raise ValueError(f'no model call for {packet["event_id"]}')
         authority = event.get('authority_class')
