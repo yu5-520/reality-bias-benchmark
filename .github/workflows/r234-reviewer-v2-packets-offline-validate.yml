@@ -1,0 +1,118 @@
+name: R2-R4 Reviewer v2 Packets Offline Validate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'arena/reviewer_packets_v2.py'
+      - 'arena/test_reviewer_packets_v2.py'
+      - '.github/workflows/r234-reviewer-v2-packets-offline-validate.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Unit tests
+        run: python -m unittest arena.test_reviewer_packets_v2
+
+      - name: Download frozen Batch001 artifact
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34970142001
+          name: r234-ecommerce-formal-joint-cpr-v1-batch001-34970142001
+          path: frozen
+
+      - name: Rebuild Measurement v2 structural outputs
+        run: |
+          python -m arena.measurement_v2 \
+            --traces frozen/formal_subject_traces.jsonl \
+            --structural-views frozen/formal_evidence/structural_views.jsonl \
+            --batch-meta frozen/formal_evidence/evidence_batch.json \
+            --manifest frozen/formal_subject_manifest.jsonl \
+            --outdir measurement_v2_out
+
+      - name: Build R3 and R4 Reviewer v2 packets
+        run: |
+          python -m arena.reviewer_packets_v2 \
+            --traces frozen/formal_subject_traces.jsonl \
+            --manifest frozen/formal_subject_manifest.jsonl \
+            --r2 measurement_v2_out/r2_structural_candidates.jsonl \
+            --r3 measurement_v2_out/r3_lineage_windows.jsonl \
+            --r4 measurement_v2_out/r4_dynamics_windows.jsonl \
+            --batch-meta frozen/formal_evidence/evidence_batch.json \
+            --outdir reviewer_v2_packets_out
+
+      - name: Deterministic packet rebuild
+        run: |
+          python -m arena.reviewer_packets_v2 \
+            --traces frozen/formal_subject_traces.jsonl \
+            --manifest frozen/formal_subject_manifest.jsonl \
+            --r2 measurement_v2_out/r2_structural_candidates.jsonl \
+            --r3 measurement_v2_out/r3_lineage_windows.jsonl \
+            --r4 measurement_v2_out/r4_dynamics_windows.jsonl \
+            --batch-meta frozen/formal_evidence/evidence_batch.json \
+            --outdir reviewer_v2_packets_rebuild
+
+      - name: Packet gate checks
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          expected_batch = '94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9'
+          expected_hash = 'e8b7d3cc7d09a2bc629ed95ac130e8d9aac737bb904229171b61f21979fff5f6'
+          a = json.loads(Path('reviewer_v2_packets_out/reviewer_v2_packet_summary.json').read_text())
+          b = json.loads(Path('reviewer_v2_packets_rebuild/reviewer_v2_packet_summary.json').read_text())
+          assert a['evidence_batch_hash'] == expected_batch, a['evidence_batch_hash']
+          assert a['output_hash'] == expected_hash, a['output_hash']
+          assert b['output_hash'] == a['output_hash']
+          assert a['run_count'] == 3
+          assert a['r3_packet_count'] == 70
+          assert a['r4_packet_count'] == 4
+          assert a['r4_black_hole_review_candidate_count'] == 1
+          assert a['semantic_labels_present'] is False
+          assert a['paid_api_calls'] == 0
+
+          r3_text = Path('reviewer_v2_packets_out/reviewer_v2_r3_packets.jsonl').read_text(encoding='utf-8')
+          r4_text = Path('reviewer_v2_packets_out/reviewer_v2_r4_packets.jsonl').read_text(encoding='utf-8')
+          combined = (r3_text + r4_text).lower()
+          forbidden = [
+              'Reviewer A', 'Reviewer B', 'C→I', 'P→V', 'R→T', 'Jaccard',
+              'disagreement', 'CN-R-034', 'primary matrix'
+          ]
+          hits = [x for x in forbidden if x.lower() in combined]
+          assert not hits, hits
+
+          r3 = [json.loads(x) for x in r3_text.splitlines() if x.strip()]
+          r4 = [json.loads(x) for x in r4_text.splitlines() if x.strip()]
+          assert all(x['scope_rule'] == 'LINEAGE_LOCAL_ONLY' for x in r3)
+          assert all(x['prior_reviewer_outputs_included'] is False for x in r3 + r4)
+          assert all(x['expected_mechanism_mapping_included'] is False for x in r3 + r4)
+          assert all(set(x['boundary_fields'].values()) == {'NOT_ADJUDICATED'} for x in r3 + r4)
+          flagged = [x for x in r4 if 'BLACK_HOLE_REVIEW_CANDIDATE' in x['machine_dynamics']['structural_review_candidates']]
+          assert len(flagged) == 1
+          assert flagged[0]['machine_dynamics']['black_hole_review_trigger']['semantic_progress_required'] is True
+          assert flagged[0]['boundary_fields']['black_hole'] == 'NOT_ADJUDICATED'
+          print(json.dumps(a, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload packet artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r234-reviewer-v2-packets-offline-${{ github.run_id }}
+          path: reviewer_v2_packets_out/
+          retention-days: 90
