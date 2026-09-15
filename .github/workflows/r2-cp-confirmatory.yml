@@ -1,0 +1,78 @@
+name: R2 Partial Confirmatory C-P Mapping
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r2-cp-confirmatory.yml'
+      - 'runners/run_r2_cp_confirmatory.py'
+      - 'analysis/analyze_r2_cp_confirmatory.py'
+      - 'theory/change_notes/CN-R2-012.md'
+  workflow_dispatch:
+
+concurrency:
+  group: r2-cp-confirmatory
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  confirm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run 72 unique matched C-P traces
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python runners/run_r2_cp_confirmatory.py \
+            --benchmark benchmark/r2_primary_mapping_items_v0.7_final_candidate.jsonl \
+            --repeats 3 --max-workers 6 \
+            --out results/r2_cp_confirmatory_raw.jsonl
+      - name: Analyze 168 C-P condition cells
+        run: |
+          python analysis/analyze_r2_cp_confirmatory.py \
+            --input results/r2_cp_confirmatory_raw.jsonl \
+            --outdir results/r2_cp_confirmatory_analysis
+          cat results/r2_cp_confirmatory_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Freeze partial run metadata
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          rows=[json.loads(x) for x in pathlib.Path('results/r2_cp_confirmatory_raw.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          meta={
+            'status':'PARTIAL_CONFIRMATORY_CP_DATA_GENERATED',
+            'git_commit_sha':rows[0]['git_commit_sha'],
+            'github_run_id':rows[0]['github_run_id'],
+            'benchmark_version':rows[0]['benchmark_version'],
+            'benchmark_hash':rows[0]['benchmark_hash'],
+            'model_config_hash':rows[0]['model_config_hash'],
+            'conditions_hash':rows[0]['conditions_hash'],
+            'manifest_hash':rows[0]['manifest_hash'],
+            'configured_model_alias':rows[0]['configured_model_alias'],
+            'expected_model_version':rows[0]['expected_model_version'],
+            'evaluator_version':rows[0]['evaluator_version'],
+            'condition_cells':len(rows),
+            'unique_api_traces':len({r['shared_trace_id'] for r in rows}),
+            'scope':'C/P only; overall R2 decision remains pending R micro-workflow'
+          }
+          pathlib.Path('results/r2_cp_confirmatory_analysis/FREEZE_METADATA.json').write_text(json.dumps(meta,indent=2),encoding='utf-8')
+          print(json.dumps(meta,indent=2))
+          PY
+      - name: Upload partial confirmatory evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-cp-confirmatory-${{ github.run_id }}
+          path: |
+            results/r2_cp_confirmatory_raw.jsonl
+            results/r2_cp_confirmatory_raw.jsonl.errors.json
+            results/json_format_retries.jsonl
+            results/r2_cp_confirmatory_analysis/
+          if-no-files-found: warn
+          retention-days: 90

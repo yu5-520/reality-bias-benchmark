@@ -1,0 +1,44 @@
+name: R2 R-Micro v0.1 Counterfactual Gate Analysis
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r2-r-micro-gates-v0.1.yml'
+      - 'analysis/analyze_r2_r_micro_gate_counterfactual.py'
+      - 'theory/change_notes/CN-R2-011.md'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download frozen R-micro pilot artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: r2-r-micro-v0.1-34925617744
+          path: prior
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 34925617744
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Apply I/V/T/Full gates to exact frozen traces
+        run: |
+          python analysis/analyze_r2_r_micro_gate_counterfactual.py \
+            --input prior/r2_r_micro_v0.1_raw.jsonl \
+            --outdir results/r2_r_micro_v0.1_gate_analysis
+          cat results/r2_r_micro_v0.1_gate_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload gate analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-r-micro-gates-v0.1-${{ github.run_id }}
+          path: results/r2_r_micro_v0.1_gate_analysis/
+          if-no-files-found: error
+          retention-days: 90
