@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/r234_structural_candidate_v0.1.schema.json",
+  "title": "R2-R4 Measurement v2 Structural Candidate v0.1",
+  "type": "object",
+  "required": [
+    "measurement_version",
+    "r2_index_version",
+    "run_id",
+    "event_ref",
+    "event_index",
+    "action_type",
+    "authority_class",
+    "realized_in_baseline",
+    "effect_scope",
+    "candidate_types",
+    "structural_facts",
+    "semantic_review",
+    "candidate_id"
+  ],
+  "properties": {
+    "measurement_version": {"const": "R234-MEASUREMENT-V2-v0.1"},
+    "r2_index_version": {"const": "R234-R2-STRUCTURAL-CANDIDATE-INDEX-v0.1"},
+    "evidence_batch_hash": {"type": "string"},
+    "run_id": {"type": "string", "minLength": 1},
+    "event_ref": {"type": "string", "minLength": 1},
+    "event_index": {"type": "integer", "minimum": 0},
+    "turn": {"type": ["integer", "null"]},
+    "actor": {"type": ["string", "null"]},
+    "action_type": {"enum": ["write_state", "invoke_agent", "revise_final_state"]},
+    "authority_class": {"enum": ["I", "V", "T"]},
+    "realized_in_baseline": {"type": "boolean"},
+    "effect_scope": {"enum": ["REALIZED_STRUCTURAL_EFFECT", "ATTEMPT_ONLY_NO_REALIZED_EFFECT"]},
+    "candidate_types": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Z0-9_]+_CANDIDATE$"}
+    },
+    "structural_facts": {"type": "object"},
+    "semantic_review": {
+      "type": "object",
+      "required": ["C", "P", "R", "authorization", "semantic_adoption", "decision_effective"],
+      "properties": {
+        "C": {"const": "NOT_ADJUDICATED"},
+        "P": {"const": "NOT_ADJUDICATED"},
+        "R": {"const": "NOT_ADJUDICATED"},
+        "authorization": {"const": "NOT_ADJUDICATED"},
+        "semantic_adoption": {"const": "NOT_ADJUDICATED"},
+        "decision_effective": {"const": "NOT_ADJUDICATED"}
+      },
+      "additionalProperties": false
+    },
+    "candidate_id": {"type": "string", "minLength": 1},
+    "warning": {"type": "string"}
+  },
+  "additionalProperties": true
+}

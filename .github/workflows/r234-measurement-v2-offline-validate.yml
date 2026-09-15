@@ -1,0 +1,101 @@
+name: R2-R4 Measurement v2 Offline Validate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'arena/measurement_v2.py'
+      - 'arena/test_measurement_v2.py'
+      - 'schemas/r234_structural_candidate_v0.1.schema.json'
+      - '.github/workflows/r234-measurement-v2-offline-validate.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Unit tests
+        run: python -m unittest arena.test_measurement_v2
+
+      - name: Download frozen Batch001 artifact
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34970142001
+          name: r234-ecommerce-formal-joint-cpr-v1-batch001-34970142001
+          path: frozen
+
+      - name: Build Measurement v2 outputs
+        run: |
+          python -m arena.measurement_v2 \
+            --traces frozen/formal_subject_traces.jsonl \
+            --structural-views frozen/formal_evidence/structural_views.jsonl \
+            --batch-meta frozen/formal_evidence/evidence_batch.json \
+            --manifest frozen/formal_subject_manifest.jsonl \
+            --outdir measurement_v2_out
+
+      - name: Deterministic rebuild
+        run: |
+          python -m arena.measurement_v2 \
+            --traces frozen/formal_subject_traces.jsonl \
+            --structural-views frozen/formal_evidence/structural_views.jsonl \
+            --batch-meta frozen/formal_evidence/evidence_batch.json \
+            --manifest frozen/formal_subject_manifest.jsonl \
+            --outdir measurement_v2_rebuild
+
+      - name: Gate checks
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          expected_batch = '94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9'
+          expected_output = '9a2b966849f8b18fa553b2b425ff9723fe0d66c2b58e88260e29ad43e6f767f6'
+          a = json.loads(Path('measurement_v2_out/measurement_v2_summary.json').read_text())
+          b = json.loads(Path('measurement_v2_rebuild/measurement_v2_summary.json').read_text())
+          assert a['evidence_batch_hash'] == expected_batch, a['evidence_batch_hash']
+          assert a['output_hash'] == expected_output, a['output_hash']
+          assert b['output_hash'] == a['output_hash']
+          assert a['run_count'] == 3
+          assert a['r2_candidate_count'] == 70
+          assert a['r2_realized_candidate_count'] == 68
+          assert a['r2_attempt_only_candidate_count'] == 2
+          assert a['r3_window_count'] == 70
+          assert a['r4_window_count'] == 4
+          assert a['review_packet_count'] == 70
+          assert a['semantic_labels_present'] is False
+          assert a['paid_api_calls'] == 0
+
+          packets = Path('measurement_v2_out/reviewer_v2_r2_packets.jsonl').read_text(encoding='utf-8')
+          forbidden = [
+              'Reviewer A', 'Reviewer B', 'C→I', 'P→V', 'R→T', 'Jaccard',
+              'disagreement', 'CN-R-034', 'primary matrix', 'C_P_R'
+          ]
+          hits = [x for x in forbidden if x.lower() in packets.lower()]
+          assert not hits, hits
+
+          rows = [json.loads(x) for x in packets.splitlines() if x.strip()]
+          assert all(x.get('target_local_attribution') is True for x in rows)
+          assert all(x.get('same_response_actions_included') is False for x in rows)
+          assert sum(x['target']['effect_scope'] == 'ATTEMPT_ONLY_NO_REALIZED_EFFECT' for x in rows) == 2
+          print(json.dumps(a, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload deterministic outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: r234-measurement-v2-offline-${{ github.run_id }}
+          path: measurement_v2_out/
+          retention-days: 90
