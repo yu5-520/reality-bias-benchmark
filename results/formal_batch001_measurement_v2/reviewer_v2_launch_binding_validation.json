@@ -1,0 +1,41 @@
+{
+  "version": "R234-REVIEWER-V2-LAUNCH-BINDING-VALIDATION-v0.1",
+  "date": "2026-09-15",
+  "scientific_semantic_result": false,
+  "provider_calls": 0,
+  "workflow_run_id": 34993080553,
+  "workflow_conclusion": "success",
+  "adapter_version": "R234-REVIEWER-V2-DEEPSEEK-ADAPTER-v0.2",
+  "gates": {
+    "execute_flag_required": true,
+    "immutable_authorized_launch_record_required": true,
+    "authorization_ref_must_match_record": true,
+    "packet_file_sha256_must_match_record": true,
+    "packet_unit_count_must_match_record": true,
+    "model_config_sha256_must_match_record": true,
+    "layer_prompt_sha256_must_match_record": true,
+    "retry_ceiling_must_match_record": true,
+    "context_expansion_ceiling_must_equal_one": true,
+    "semantic_uncertainty_retry_forbidden": true,
+    "subject_rerun_forbidden": true,
+    "first_paid_pass_max_workers_must_equal_one": true,
+    "launch_spend_must_match_record_and_not_exceed_absolute_ceiling": true,
+    "price_mode_must_match_record": true,
+    "returned_model_must_be_in_frozen_allowlist": true,
+    "credential_access_after_launch_record_validation": true
+  },
+  "current_launch_template": {
+    "path": "reviews/reviewer_system_v2/AUTHORIZED_LAUNCH_RECORD_TEMPLATE_v0.1.json",
+    "status": "TEMPLATE_ONLY_NOT_AUTHORIZED",
+    "execute_real_api": false,
+    "launch_max_spend_usd": null
+  },
+  "current_paid_state": "BLOCKED",
+  "next_gate": "EXPLICIT_USER_AUTHORIZATION_THEN_CREATE_NEW_IMMUTABLE_LAUNCH_RECORD",
+  "interpretation": [
+    "The real Reviewer-v2 transport can no longer be enabled by CLI flags alone; an exact immutable launch record is also required.",
+    "Packet/config/prompt drift now fails before provider credential access.",
+    "Unexpected provider model identity is a stop condition rather than silently mixing model versions.",
+    "No paid call or new semantic finding was produced by this validation."
+  ]
+}
