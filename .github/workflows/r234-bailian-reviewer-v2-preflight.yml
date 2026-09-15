@@ -1,4 +1,4 @@
-name: R2-R4 Qwen Reviewer v2 Small Preflight
+name: R2-R4 Qwen Reviewer v2 Explicit Cache Preflight
 on:
   workflow_dispatch:
 permissions:
@@ -23,14 +23,14 @@ jobs:
           run-id: 34990393003
           name: r234-reviewer-v2-compact-packets-34990393003
           path: inputs/compact
-      - name: Run five-packet runtime preflight
+      - name: Run five-packet explicit-cache preflight
         run: |
-          python -m arena.run_bailian_reviewer_v2_preflight --r2 inputs/compact/compact_r2_packets.jsonl --count 5 --outdir qwen_preflight
+          python -m arena.run_bailian_reviewer_v2_preflight --r2 inputs/compact/compact_r2_packets.jsonl --count 5 --explicit-cache --outdir qwen_preflight
       - name: Upload preflight evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: r234-qwen-reviewer-v2-preflight-${{ github.run_id }}
+          name: r234-qwen-reviewer-v2-explicit-cache-preflight-${{ github.run_id }}
           path: qwen_preflight/
           if-no-files-found: error
           retention-days: 90
