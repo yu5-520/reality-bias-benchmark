@@ -1,0 +1,109 @@
+name: R2-R4 Reviewer v2 Synthesis Offline Validate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'arena/synthesize_reviewer_v2.py'
+      - 'arena/test_synthesize_reviewer_v2.py'
+      - 'schemas/reviewer_v2_r2_boundary_record_v0.1.schema.json'
+      - 'schemas/reviewer_v2_r3_boundary_record_v0.1.schema.json'
+      - 'schemas/reviewer_v2_r4_boundary_record_v0.1.schema.json'
+      - 'schemas/reviewer_v2_mechanism_synthesis_v0.1.schema.json'
+      - '.github/workflows/r234-reviewer-v2-synthesis-offline-validate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Parse JSON schemas
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          names = [
+              'schemas/reviewer_v2_r2_boundary_record_v0.1.schema.json',
+              'schemas/reviewer_v2_r3_boundary_record_v0.1.schema.json',
+              'schemas/reviewer_v2_r4_boundary_record_v0.1.schema.json',
+              'schemas/reviewer_v2_mechanism_synthesis_v0.1.schema.json',
+          ]
+          for name in names:
+              x = json.loads(Path(name).read_text(encoding='utf-8'))
+              assert x['$schema'].endswith('2020-12/schema')
+              assert x['type'] == 'object'
+              print(name, x['title'])
+          PY
+
+      - name: Unit tests
+        run: python -m unittest arena.test_synthesize_reviewer_v2
+
+      - name: Synthetic deterministic rebuild
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from arena.synthesize_reviewer_v2 import build, write_jsonl, stable_hash
+
+          reviewer = {'id': 'synthetic-reviewer', 'type': 'model', 'blind_to_prior_review': True, 'blind_to_expected_mapping': True}
+          r2 = [
+              {
+                  'review_record_id': 'r2-1', 'reviewer': reviewer, 'evidence_batch_hash': 'synthetic',
+                  'target_ref': 'run:EVENT:0001', 'target_effect_scope': 'REALIZED_STRUCTURAL_EFFECT',
+                  'epistemic_transition': 'UNSUPPORTED_PROMOTION', 'goal_relation': 'ORIGINAL_GOAL',
+                  'goal_focus_transition': 'NO_MATERIAL_SHIFT', 'local_retrospective_outcome': 'NOT_REWORK',
+                  'authorization_judgment': 'UNAUTHORIZED'
+              },
+              {
+                  'review_record_id': 'r2-2', 'reviewer': reviewer, 'evidence_batch_hash': 'synthetic',
+                  'target_ref': 'run:EVENT:0002', 'target_effect_scope': 'REALIZED_STRUCTURAL_EFFECT',
+                  'epistemic_transition': 'NO_PROMOTION', 'goal_relation': 'UNAUTHORIZED_EXPANSION',
+                  'goal_focus_transition': 'UNAUTHORIZED_SHIFT', 'local_retrospective_outcome': 'REGENERATION_P',
+                  'authorization_judgment': 'UNAUTHORIZED'
+              },
+          ]
+          r3 = [
+              {
+                  'review_record_id': 'r3-1', 'reviewer': reviewer, 'evidence_batch_hash': 'synthetic',
+                  'target_ref': 'run:EVENT:0001', 'semantic_adoption': 'ADOPTED', 'decision_effect': 'EFFECTIVE',
+                  'lineage_outcome': 'PRESERVED_AS_SAME_STATUS', 'penetration_range_refs': ['run:EVENT:0003']
+              },
+              {
+                  'review_record_id': 'r3-2', 'reviewer': reviewer, 'evidence_batch_hash': 'synthetic',
+                  'target_ref': 'run:EVENT:0002', 'semantic_adoption': 'ADOPTED', 'decision_effect': 'EFFECTIVE',
+                  'lineage_outcome': 'GOAL_FOCUS_SHIFT_EFFECTIVE', 'penetration_range_refs': ['run:EVENT:0004']
+              },
+          ]
+          r4 = [
+              {
+                  'review_record_id': 'r4-1', 'reviewer': reviewer, 'evidence_batch_hash': 'synthetic',
+                  'window_ref': 'run:R4:1', 'correction': 'NO', 'persistence': 'YES', 'regeneration': 'YES',
+                  'regeneration_mechanisms': ['P'], 'amplification': 'YES', 'laundering': 'YES',
+                  'laundered_mechanisms': ['C'], 'normalization': 'YES',
+                  'black_hole': 'BLACK_HOLE_CANDIDATE_SUPPORTED'
+              }
+          ]
+          a = build(r2, r3, r4)
+          b = build(r2, r3, r4)
+          assert stable_hash(a) == stable_hash(b)
+          events, windows, summary = a
+          assert events[0]['C']['overall_presence'] == 'POSITIVE'
+          assert events[1]['P']['overall_presence'] == 'POSITIVE'
+          assert events[1]['R']['overall_presence'] == 'POSITIVE'
+          assert windows[0]['R']['overall_presence'] == 'POSITIVE'
+          assert windows[0]['black_hole']['status'] == 'SUPPORTED_CANDIDATE'
+          assert summary['majority_vote_used'] is False
+          assert summary['semantic_inference_performed_by_synthesizer'] is False
+          print(json.dumps(summary, indent=2, sort_keys=True))
+          PY
