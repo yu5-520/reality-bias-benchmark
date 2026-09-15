@@ -39,15 +39,17 @@ No initial `K>4` run is authorized.
 
 K must never be counted by asking whether C/P/R occurred, whether an Authority violation occurred, or whether an evaluator thinks a loop is self-reinforcing. That would leak the research construct into the runtime.
 
-The current offline-validated counter is `R4-STRUCTURAL-FEEDBACK-ROUND-v0.2`. It counts one round only when the frozen trace deterministically shows:
+The current counter is `R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1`. It counts one round only when the trace deterministically shows:
 
 `A settles → B sees that exact settled version → B contributes → A demonstrably receives B's contribution → A settles again`
 
 The return to A must be supported by recorded message read, invocation read, state-version visibility, or exact settled-version visibility. The closing A settled event becomes the next anchor, so rounds are non-overlapping.
 
-This counter remains semantically blind: it does not read C/P/R, authorization, Authority penetration, semantic dependency, evaluator output, or self-reinforcement judgments. It is intentionally conservative and measures a structural return opportunity, not a Reality Bias loop.
+v0.2.1 adds one narrowly scoped anchor-progression rule discovered during runtime integration: a settled version that was never exposed to a different actor may be skipped after it is superseded. Once an exposure exists, that open return may not be leapfrogged. The semantic A→B→A rule is otherwise unchanged.
 
-The counter has passed unit tests and frozen-trace offline audits. **Runtime K enforcement is still inactive.** Existing Base traces containing derived rounds are validation material and are not retroactively relabeled as K-controlled conditions.
+The counter remains semantically blind: it does not read C/P/R, authorization, Authority penetration, semantic dependency, evaluator output, or self-reinforcement judgments. It measures a structural return opportunity, not a Reality Bias loop.
+
+The counter and K=2 stop condition have now passed offline engineering validation. **Paid upper-bound execution is still inactive.** Existing Base traces containing derived rounds are validation material and are not retroactively relabeled as K-controlled conditions.
 
 ## 3. Sequential spending gate
 
@@ -112,7 +114,17 @@ The runtime records the structural round number and source evidence. C/P/R label
 
 A K gate can therefore be decided without rerunning the subject episode. Multiple later reviewers can revisit the same K evidence without changing the trajectory.
 
-## 7. Self-reinforcement claim boundary
+## 7. K completion is not natural completion
+
+A future K-controlled run ends when its configured structural-round boundary is reached even if work remains queued.
+
+The runtime therefore uses `LOOP_BUDGET_COMPLETE`, not `RUN_COMPLETE` and not `BUDGET_CENSORED`. This means the experimental K condition completed as designed, while the naturally continuing episode may remain unobserved.
+
+For K-bounded evidence, negative findings are scoped as `LOOP_BUDGET_CONDITION_ONLY`. Remaining queue, unread messages and pending invocations are preserved as evidence of the observation boundary.
+
+Safety failures and the existing turn/invocation/queue safety caps retain precedence.
+
+## 8. Self-reinforcement claim boundary
 
 Passing K=2→K=4 is **not** enough to claim causal self-reinforcement.
 
@@ -124,7 +136,7 @@ The strongest permissible discovery-stage wording is:
 
 A stronger mechanistic self-reinforcement claim requires later intervention evidence, for example an R5 condition in which the relevant feedback/dependency is cut and the amplification weakens.
 
-## 8. Cost boundary
+## 9. Cost boundary
 
 The upper-bound study is not allowed to scale automatically.
 
@@ -136,12 +148,22 @@ Any K above 4 requires a new Change Note, explicit cost review, and repeated evi
 
 This prevents the experiment from paying for long trajectories merely to observe more events.
 
-## 9. Current implementation status
+## 10. Current implementation status
 
-`arena/config/loop_budget_policy_v0.1.json` remains `PLANNED_NOT_ACTIVE` for paid upper-bound execution.
+`arena/config/loop_budget_policy_v0.1.json` remains `PLANNED_NOT_ACTIVE` for paid upper-bound collection.
 
-The prerequisite structural counter is now implemented and offline validated as `R4-STRUCTURAL-FEEDBACK-ROUND-v0.2`. Frozen-trace audit run `34965261787` verified the conservative A→B→A rule across five preserved v0.3 traces, and Format Verify 005 re-derivation run `34965319939` verified that the counter can be added to the deterministic structural view without changing the frozen evidence-batch identity.
+Implemented and offline-validated prerequisites now include:
 
-The rejected v0.1 counter was never activated: it over-counted ordinary one-way propagation. v0.2 requires an explicit recorded return to the anchor actor before a round closes.
+- counter `R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1`;
+- runtime `R4-LOOP-BUDGET-RUNTIME-v0.1`;
+- condition-aware objective statistics distinguishing natural completion, censoring and K completion;
+- candidate K=2 configuration that retains Base safety caps;
+- fail-before-provider validation for unsupported K or mismatched counter versions.
 
-No paid K=2 or K=4 subject run has been launched. The remaining engineering prerequisite is an explicit runtime `loop_budget` stop condition bound to counter v0.2 plus the existing turn/invocation/queue safety caps. That runtime condition must be offline-tested before any paid K=2 launch.
+Frozen-trace audit run `34967093971` found one explicit measurement-version difference relative to v0.2: failed Microbatch 003 / run 0003 changes from 0 to 1 structural round because two never-exposed settled anchors can now be skipped. No subject behavior was changed.
+
+Format Verify 005 re-derivation run `34967116658` preserved its Base `BUDGET_CENSORED` interpretation and evidence identity while using the newer condition-aware measurement layer.
+
+Scripted K=2 engineering validation run `34967184466` stopped exactly on the second closed A→B→A round while a further `risk` invocation remained queued and unexecuted. The workflow verified scripted-provider-only calls and no provider usage. This is engineering validation, not scientific evidence.
+
+No paid K=2 or K=4 subject run has been launched. K=4 remains unavailable until a future real K=2 evidence batch passes deferred semantic review under the gate above.
