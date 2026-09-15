@@ -1,0 +1,68 @@
+name: R2-R4 Reviewer v2 Volume Profile
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'arena/profile_reviewer_v2_packet_volume.py'
+      - 'reviews/reviewer_system_v2/prompts/**'
+      - '.github/workflows/r234-reviewer-v2-volume-profile.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Download validated compact packets
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 34990393003
+          name: r234-reviewer-v2-compact-packets-34990393003
+          path: compact
+
+      - name: Profile provider-independent volume
+        run: |
+          python -m arena.profile_reviewer_v2_packet_volume \
+            --r2 compact/compact_r2_packets.jsonl \
+            --r3 compact/compact_r3_packets.jsonl \
+            --r4 compact/compact_r4_packets.jsonl \
+            --r2-prompt reviews/reviewer_system_v2/prompts/R2_BOUNDARY_PROMPT_v0.1.md \
+            --r3-prompt reviews/reviewer_system_v2/prompts/R3_LINEAGE_PROMPT_v0.1.md \
+            --r4-prompt reviews/reviewer_system_v2/prompts/R4_DYNAMICS_PROMPT_v0.1.md \
+            --out reviewer_v2_packet_volume.json
+
+      - name: Volume gates
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x = json.loads(Path('reviewer_v2_packet_volume.json').read_text())
+          assert x['version'] == 'R234-REVIEWER-V2-PACKET-VOLUME-v0.1'
+          assert x['unit_count'] == 144
+          assert x['layers']['R2']['packet']['characters']['count'] == 70
+          assert x['layers']['R3']['packet']['characters']['count'] == 70
+          assert x['layers']['R4']['packet']['characters']['count'] == 4
+          assert x['provider_calls'] == 0
+          assert x['token_estimate_present'] is False
+          assert x['monetary_estimate_present'] is False
+          assert x['full_population_serialized_request_volume_without_provider_wrapper']['combined_characters'] > 0
+          print(json.dumps(x, indent=2, sort_keys=True))
+          PY
+
+      - name: Upload volume profile
+        uses: actions/upload-artifact@v4
+        with:
+          name: r234-reviewer-v2-volume-profile-${{ github.run_id }}
+          path: reviewer_v2_packet_volume.json
+          retention-days: 90
