@@ -22,7 +22,7 @@ Research repository for the first Reality Bias paper:
 - R2/R3/R4 are event, relation and feedback-loop audit layers over the same Arena evidence; they are not sequential subject-experiment phases.
 - R4 planning now separates **base fixed-window measurement** from an expensive **upper-bound loop-budget probe**. Initial K values are restricted to 2 then 4, with K=4 allowed only after a reviewed K=2 persistence/expansion/amplification candidate. No paid K run is currently active.
 - Evidence is captured during execution and audited asynchronously. Layer-specific Gates govern claims, not collection. Existing structural runs do not by themselves prove causal propagation or self-reinforcement.
-- Current research plan: [R Plan v2.0](docs/R_Plan_v2.0.md), registered by [CN-R-024](theory/change_notes/CN-R-024_structural_layers_async_audit.md).
+- Current research plan: [R Plan v2.1](docs/R_Plan_v2.1.md), registered by [CN-R-029](theory/change_notes/CN-R-029_base_then_loop_budget_upper_bound.md).
 
 ## Repository map
 
@@ -100,7 +100,8 @@ Arena v0.1.x, v0.2 and v0.3.x use different terminal/observation or serializatio
 
 See:
 
-- [R Plan v2.0](docs/R_Plan_v2.0.md)
+- [R Plan v2.1](docs/R_Plan_v2.1.md)
+- [R Plan v2.0 — frozen predecessor](docs/R_Plan_v2.0.md)
 - [R2–R4 shared runtime v0.3](docs/R234_runtime_v0.3.md)
 - [R2–R4 observation censoring policy v0.1](docs/R234_censoring_policy_v0.1.md)
 - [R4 upper-bound loop budget protocol v0.1](docs/R4_loop_budget_protocol_v0.1.md)
