@@ -45,7 +45,7 @@ jobs:
           path: frozen/format005
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: 34962065864
-      - name: Derive rounds from every preserved trace
+      - name: Derive conservative A-B-A structural feedback rounds
         run: |
           mkdir -p results
           python - <<'PY'
@@ -60,6 +60,7 @@ jobs:
                   result=derive_structural_feedback_rounds(trace)
                   assert result['counter_status']=='RECORDED'
                   assert result['semantic_blind'] is True
+                  assert result['version']=='R4-STRUCTURAL-FEEDBACK-ROUND-v0.2'
                   row={
                       'source':source.name,
                       'run_id':trace['run_id'],
@@ -73,7 +74,7 @@ jobs:
                   rows.append(row)
                   print(json.dumps({k:v for k,v in row.items() if k!='rounds'},ensure_ascii=False))
                   for r in result['rounds']:
-                      print(f"  SFR{r['round_index']}: anchor turn {r['anchor_turn']} -> {r['exposure_actor']} turn {r['exposure_turn']} -> close turn {r['closing_turn']}")
+                      print(f"  SFR{r['round_index']}: {r['anchor_actor']}@{r['anchor_turn']} -> {r['exposure_actor']}@{r['exposure_turn']} -> {r['return_actor']}@{r['return_turn']} close@{r['closing_turn']} modes={r['return_evidence_modes']}")
           pathlib.Path('results/frozen_feedback_counter_audit.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2),encoding='utf-8')
           print('traces_checked=',len(rows))
           PY
@@ -89,6 +90,8 @@ jobs:
                   assert r['authority_penetration']=='NOT_ADJUDICATED'
                   assert r['semantic_dependency']=='NOT_ADJUDICATED'
                   assert r['self_reinforcement']=='NOT_ADJUDICATED'
+                  assert r['anchor_actor']==r['return_actor']
+                  assert r['anchor_actor']!=r['exposure_actor']
           print('frozen-trace counter audit PASS')
           PY
       - name: Upload counter audit
