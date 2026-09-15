@@ -1,0 +1,61 @@
+name: R2-R4 Reviewer v2 Contract Offline Validate
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'arena/reviewer_v2_contract.py'
+      - 'arena/test_reviewer_v2_contract.py'
+      - 'reviews/reviewer_system_v2/prompts/**'
+      - '.github/workflows/r234-reviewer-v2-contract-offline-validate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Unit tests
+        run: python -m unittest arena.test_reviewer_v2_contract
+
+      - name: Prompt blindness gates
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          files = sorted(Path('reviews/reviewer_system_v2/prompts').glob('*.md'))
+          assert len(files) == 3
+          text = '\n'.join(p.read_text(encoding='utf-8') for p in files).lower()
+          forbidden = ['reviewer a', 'reviewer b', 'jaccard', 'cn-r-034', 'primary matrix', 'c→i', 'p→v', 'r→t']
+          hits = [x for x in forbidden if x in text]
+          assert not hits, hits
+          assert 'prediction' in text
+          assert 'uncertain' in text
+          assert 'request_expansion' in text
+          print({'prompt_files': [str(x) for x in files], 'forbidden_hits': hits})
+          PY
+
+      - name: Fail-closed engineering gate
+        run: |
+          python - <<'PY'
+          import json
+          from arena import reviewer_v2_contract as c
+          summary = {
+              'contract_version': c.VERSION,
+              'provider_calls': 0,
+              'semantic_results_generated': 0,
+              'context_expansion_max_per_packet': 1,
+              'valid_uncertainty_requires_retry': False,
+              'subject_rerun_path_present': False,
+          }
+          print(json.dumps(summary, indent=2, sort_keys=True))
+          PY
