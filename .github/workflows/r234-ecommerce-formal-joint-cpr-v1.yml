@@ -1,0 +1,158 @@
+name: R2-R4 E-commerce Formal Joint C-P-R v1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'arena/launch/ecommerce_formal_joint_cpr_v1.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: r234-ecommerce-formal-joint-cpr-v1
+  cancel-in-progress: false
+
+jobs:
+  formal-base:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate formal freeze before provider calls
+        run: |
+          python -m py_compile arena/*.py
+          python -m unittest discover -s arena/tests -v
+          python arena/validate_environment.py
+          python arena/preflight.py
+          python - <<'PY'
+          import json
+          design=json.load(open('arena/config/ecommerce_formal_joint_cpr_v1.json',encoding='utf-8'))
+          launch=json.load(open('arena/launch/ecommerce_formal_joint_cpr_v1.json',encoding='utf-8'))
+          arena=json.load(open('arena/config/arena_v0.3.json',encoding='utf-8'))
+          assert design['version']=='R234-ECOMMERCE-FORMAL-JOINT-CPR-v1'
+          assert design['status']=='FROZEN_BEFORE_FIRST_FORMAL_SUBJECT_BATCH'
+          assert design['domain']=='ecommerce'
+          assert design['bias_dimensions_observed_together']==['C','P','R']
+          assert design['authority_dimensions_observed_together']==['I','V','T']
+          assert design['automatic_paid_evaluator'] is False
+          assert design['k2_in_this_batch'] is False and design['k4_in_this_batch'] is False
+          assert design['planned_first_batch_repeats']==3
+          assert launch['launch_id']=='R234-ECOMMERCE-FORMAL-JOINT-CPR-v1-BATCH-001'
+          assert launch['domains']==['ecommerce']
+          assert launch['repeats']==3
+          assert launch['review_policy']=='deferred'
+          assert launch['automatic_paid_evaluator'] is False
+          assert launch['formal_design_version']==design['version']
+          assert arena['version']=='R2-FREE-AGENT-ARENA-v0.3.2'
+          assert arena['max_turns']==32
+          assert 'loop_budget' not in arena
+          print('FORMAL FREEZE PASS: one domain, joint C/P/R observation, Base only, N=3')
+          PY
+
+      - name: Freeze protocol files and hashes
+        run: |
+          mkdir -p results/formal_freeze
+          cp arena/config/ecommerce_formal_joint_cpr_v1.json results/formal_freeze/
+          cp arena/launch/ecommerce_formal_joint_cpr_v1.json results/formal_freeze/
+          cp docs/R234_ecommerce_formal_joint_cpr_v1_protocol.md results/formal_freeze/
+          cp theory/change_notes/CN-R-032_first_formal_joint_cpr_ecommerce.md results/formal_freeze/
+          cp arena/config/arena_v0.3.json results/formal_freeze/
+          cp arena/config/model_deepseek_v0.2.json results/formal_freeze/
+          (cd results/formal_freeze && sha256sum * | sort) > results/formal_freeze/SHA256SUMS.txt
+          printf '%s\n' "$GITHUB_SHA" > results/formal_freeze/CODE_COMMIT_SHA.txt
+
+      - name: Build immutable formal manifest
+        run: |
+          python -m arena.build_manifest \
+            --domains ecommerce \
+            --repeats 3 \
+            --arena-config arena/config/arena_v0.3.json \
+            --out results/formal_subject_manifest.jsonl
+          test "$(wc -l < results/formal_subject_manifest.jsonl)" -eq 3
+          cp results/formal_subject_manifest.jsonl results/formal_freeze/
+          sha256sum results/formal_subject_manifest.jsonl > results/formal_freeze/MANIFEST_SHA256.txt
+
+      - name: Run three formal Base subject traces — no evaluator
+        id: subject
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          set +e
+          python arena/run_real.py \
+            --manifest results/formal_subject_manifest.jsonl \
+            --out results/formal_subject_traces.jsonl \
+            --arena-config arena/config/arena_v0.3.json \
+            --max-workers 1 \
+            --execute-real-api
+          RC=$?
+          echo "$RC" > results/subject_process_exit_code.txt
+          echo "subject_exit_code=$RC" >> "$GITHUB_OUTPUT"
+          # A non-zero subject process may represent preserved RUN_FAILED traces.
+          # Evidence status, not shell status, determines scientific usability.
+          exit 0
+
+      - name: Freeze evidence and export joint R2 R3 R4 review material
+        if: always()
+        run: |
+          test -f results/formal_subject_traces.jsonl
+          python -m arena.evidence \
+            --manifest results/formal_subject_manifest.jsonl \
+            --traces results/formal_subject_traces.jsonl \
+            --errors results/formal_subject_traces.jsonl.errors.json \
+            --outdir results/formal_evidence \
+            --code-sha "$GITHUB_SHA"
+          cat results/formal_evidence/RUN_REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          python - <<'PY'
+          import json, pathlib
+          meta=json.load(open('results/formal_evidence/evidence_batch.json',encoding='utf-8'))
+          traces=[json.loads(x) for x in pathlib.Path('results/formal_subject_traces.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          assert len(traces) >= 1
+          assert meta['review_status']=='PENDING_REVIEW'
+          assert meta['layer_review_status']=={'R2':'PENDING_REVIEW','R3':'PENDING_REVIEW','R4':'PENDING_REVIEW'}
+          packets=[json.loads(x) for x in pathlib.Path('results/formal_evidence/review_packets.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          assert packets
+          assert all(p['semantic_fields']['C_P_R']=='NOT_ADJUDICATED' for p in packets)
+          assert all(p['semantic_fields']['authorization_judgment']=='NOT_ADJUDICATED' for p in packets)
+          print('FORMAL EVIDENCE FREEZE PASS')
+          print('evidence_batch_hash=',meta['evidence_batch_hash'])
+          print('preserved_traces=',meta['preserved_traces'])
+          print('review_packets=',len(packets))
+          PY
+
+      - name: Record formal batch collection metadata
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, os, pathlib, datetime
+          out={
+            'formal_experiment':'R234-ECOMMERCE-FORMAL-JOINT-CPR-v1',
+            'batch_id':'BATCH-001',
+            'domain':'ecommerce',
+            'planned_runs':3,
+            'bias_dimensions':['C','P','R'],
+            'authority_dimensions':['I','V','T'],
+            'subject_condition':'BASE_FIXED_WINDOW_32',
+            'k_controlled':False,
+            'automatic_paid_evaluator_calls':0,
+            'code_commit_sha':os.environ.get('GITHUB_SHA'),
+            'workflow_run_id':os.environ.get('GITHUB_RUN_ID'),
+            'collected_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            'semantic_status':'PENDING_REVIEW'
+          }
+          pathlib.Path('results/formal_batch_metadata.json').write_text(json.dumps(out,ensure_ascii=False,indent=2),encoding='utf-8')
+          PY
+
+      - name: Upload immutable formal batch artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r234-ecommerce-formal-joint-cpr-v1-batch001-${{ github.run_id }}
+          path: results/
+          retention-days: 90
+          if-no-files-found: error
