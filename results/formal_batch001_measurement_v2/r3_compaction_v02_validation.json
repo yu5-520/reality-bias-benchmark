@@ -1,0 +1,42 @@
+{
+  "version": "R234-REVIEWER-V2-R3-COMPACTION-VALIDATION-v0.2",
+  "date": "2026-09-15",
+  "workflow_run_id": 34992079531,
+  "workflow_conclusion": "success",
+  "scientific_semantic_result": false,
+  "provider_calls": 0,
+  "packet_version": "R234-REVIEWER-V2-R3-COMPACT-PACKET-v0.2",
+  "packet_count": 70,
+  "source_compact_r3_bytes": 4307878,
+  "optimized_r3_bytes": 2962081,
+  "optimized_fraction_of_source": 0.6875963061163757,
+  "additional_reduction_fraction": 0.3124036938836243,
+  "output_hash": "b1abe2510bce774a3d9f5792aaa8353b60781090894c6ba0bade7d4f5955a765",
+  "artifact": {
+    "id": 10406156673,
+    "digest": "sha256:7f6aacd8c2330941b327510d819a159d52e67a9a05a7fb67348fbf4d771f5fc1",
+    "size_bytes": 322669
+  },
+  "gates": {
+    "deterministic_rebuild_hash_equal": true,
+    "machine_lineage_unchanged": true,
+    "target_candidate_unchanged": true,
+    "target_call_unchanged": true,
+    "boundary_fields_unchanged": true,
+    "bounded_expansion_preserved": true,
+    "semantic_selection_used": false,
+    "semantic_labels_present": false
+  },
+  "compaction_rule": {
+    "state_read_lineage": "retain structurally selected state values/metadata and shared-state hash; hash non-lineage inbox/private context",
+    "message_read_lineage": "retain inbox content because machine lineage records direct message_read_into_input",
+    "output": "retain decision_summary/actions once and retain output event refs/Authority metadata without duplicating action payload",
+    "fallback": "reviewer returns UNCERTAIN or uses the existing single bounded frozen-ref expansion"
+  },
+  "interpretation": [
+    "R3 v0.2 removes a further 31.24% of serialized R3 packet bytes relative to compact v0.1 without using semantic labels or prior reviewer outcomes.",
+    "The reduction is a serialized-byte measurement, not a token or monetary reduction claim.",
+    "The semantic review object remains the same frozen lineage; only repeated downstream-call context is deduplicated.",
+    "No new C/P/R finding is produced by this optimization."
+  ]
+}
