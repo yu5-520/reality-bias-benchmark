@@ -1,0 +1,63 @@
+{
+  "version": "R234-INDEPENDENT-REVIEWER-V2-BLIND-BUNDLE-VALIDATION-v0.1",
+  "date": "2026-09-15",
+  "scientific_semantic_result": false,
+  "provider_calls": 0,
+  "paid_api_authorized": false,
+  "workflow": {
+    "run_id": 34996155560,
+    "conclusion": "success",
+    "artifact_id": 10406569694,
+    "artifact_digest": "sha256:0defe71e372440bdcea9f5fe6b2bfc3d8fa7b9a0eea569de56cdc89e44739c5e",
+    "artifact_size_bytes": 634138
+  },
+  "bundle": {
+    "version": "R234-INDEPENDENT-REVIEWER-V2-BLIND-BUNDLE-v0.1",
+    "bundle_hash": "fc46e673c0d21bff9e30ca97a197c3b9dd04c27bf69ba0f3e07849ee6d00638e",
+    "evidence_batch_hash": "94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9",
+    "population": {
+      "R2": 70,
+      "R3": 70,
+      "R4": 4,
+      "total": 144
+    },
+    "allowed_expansion_ref_count": 162,
+    "expansion_record_count": 162,
+    "expansion_corpus_sha256": "9ef68ef54a56f50ba81e8a9cca2d0eb1ab33ff7e4b2d4d0de1ace757666b24a3"
+  },
+  "packet_hashes": {
+    "R2": "c23522f9916530b4a342c2fd4b2cc028bb8613d0b8626cdc0d76ed9bc1ded63f",
+    "R3": "7cbe61987172f6dd2fa6f547766c145ddf8782d5fc7ec1bf3762b06fb0db0151",
+    "R4": "fe0a7d24a2d8fa4f102da9883529bebbcef9be0397057f3b8a23230754ee393a"
+  },
+  "prompt_hashes": {
+    "R2": "88cc842ea12030530abd43563b8d6c9d6fb82ef25f997bcd9f55831c4794a924",
+    "R3": "e3b2aaafb0ac344b9d92ce3b0c8e0b0dd1fe2693a78b773c5bb3afd8e432373d",
+    "R4": "626ace9b857e352380801eb4d125d387af97953ee184b692aa9981b0b2ed12af"
+  },
+  "blindness_gates": {
+    "deterministic_rebuild_hash_equal": true,
+    "prior_reviewer_outputs_included": false,
+    "prior_v2_result_included": false,
+    "historical_agreement_result_included": false,
+    "expected_mechanism_mapping_included": false,
+    "manuscript_conclusion_included": false,
+    "forbidden_cue_scan_status": "PASS",
+    "forbidden_cue_count": 18
+  },
+  "independence_gate": {
+    "different_from_deepseek_model_family_required": true,
+    "provider_model_selected": false,
+    "current_interactive_gpt56_sol_eligible_as_blind_independent_reviewer": false,
+    "reason": "The current conversation has already observed the DeepSeek-v2 result, historical results, hypotheses and same-model transition analysis."
+  },
+  "candidate_status": "BLOCKED_PROVIDER_NOT_SELECTED",
+  "k2_authorized": false,
+  "next_gate": "SELECT_AND_FREEZE_A_DIFFERENT_MODEL_FAMILY_THEN_EXPLICITLY_AUTHORIZE_REPLICATION",
+  "interpretation": [
+    "The exact 144-unit Reviewer-v2 evidence interface can now be exported into a result-blind workspace without historical/current reviewer outputs.",
+    "All 162 packet-authorized expansion refs are represented by exact frozen subject records in a sanitized expansion corpus.",
+    "No provider/model is selected and no semantic review was performed by this validation.",
+    "A second DeepSeek pass would be same-family repeatability, not independent Reviewer-v2 replication."
+  ]
+}
