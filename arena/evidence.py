@@ -82,7 +82,6 @@ def _objective_row(trace):
         'review_status': trace.get('review_status', 'PENDING_REVIEW'),
         'termination_reason': trace.get('termination_reason'),
         'observation': observation,
-        # Backward-compatible top-level field retained for older consumers.
         'observation_censored': observation['observation_censored'],
         'turns': trace.get('turns'),
         'usage_summary': trace.get('usage_summary', 'NOT_RECORDED_IN_SOURCE_VERSION'),
@@ -200,7 +199,6 @@ def build_batch(manifest_path, traces_path, errors_path, outdir, code_sha=None):
     source = {
         'journal_hashes': journal_hashes,
         'version': EVIDENCE_BATCH_VERSION,
-        'objective_stats_version': OBJECTIVE_STATS_VERSION,
         'manifest_sha256': sha256_file(manifest_path),
         'traces_sha256': sha256_file(traces_path),
         'errors_sha256': sha256_file(errors_path) if errors_path and Path(errors_path).exists() else None,
@@ -239,6 +237,7 @@ def build_batch(manifest_path, traces_path, errors_path, outdir, code_sha=None):
     })
     metadata = {
         **source,
+        'objective_stats_version': OBJECTIVE_STATS_VERSION,
         'evidence_batch_hash': batch_hash,
         'status': status,
         'review_status': 'PENDING_REVIEW',
