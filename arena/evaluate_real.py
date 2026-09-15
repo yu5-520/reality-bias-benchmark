@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from adapters.deepseek_chat import chat_completion, extract_content
-from arena.evaluation import build_evaluator_messages, validate_evaluation, EVALUATOR_VERSION
+from arena.evaluation import build_evaluator_messages, normalize_evaluation, validate_evaluation, EVALUATOR_VERSION
 from arena.io_utils import load_json, load_jsonl, write_jsonl
 
 
@@ -41,7 +41,8 @@ def main():
         domain=load_json(ROOT/f"arena/domains/{trace['domain_id']}.json")
         msgs=build_evaluator_messages(domain,arena_cfg,trace)
         resp=chat_completion(model_cfg,msgs,evaluator=True,response_format_json=True)
-        obj=parse_json(extract_content(resp))
+        raw_obj=parse_json(extract_content(resp))
+        obj=normalize_evaluation(trace,raw_obj)
         validate_evaluation(trace,obj)
         return {
             'run_id':trace['run_id'],
@@ -49,6 +50,7 @@ def main():
             'evaluator_version':EVALUATOR_VERSION,
             'provider_model':resp.get('model'),
             'usage':resp.get('usage') or {},
+            'raw_evaluation':raw_obj,
             'evaluation':obj,
         }
 
