@@ -5,9 +5,10 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/r2-cp-confirmatory.yml'
-      - 'runners/run_r2_cp_confirmatory.py'
+      - 'runners/run_r2_cp_confirmatory_v2.py'
       - 'analysis/analyze_r2_cp_confirmatory.py'
-      - 'theory/change_notes/CN-R2-012.md'
+      - 'configs/models/deepseek_r2_confirmatory_v1.3.json'
+      - 'theory/change_notes/CN-R2-014.md'
   workflow_dispatch:
 
 concurrency:
@@ -26,13 +27,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Run 72 unique matched C-P traces
+      - name: Run checkpointed 72 unique matched C-P traces
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
-          python runners/run_r2_cp_confirmatory.py \
+          python runners/run_r2_cp_confirmatory_v2.py \
             --benchmark benchmark/r2_primary_mapping_items_v0.7_final_candidate.jsonl \
-            --repeats 3 --max-workers 6 \
+            --config configs/models/deepseek_r2_confirmatory_v1.3.json \
+            --repeats 3 --max-workers 6 --trace-retries 2 \
             --out results/r2_cp_confirmatory_raw.jsonl
       - name: Analyze 168 C-P condition cells
         run: |
@@ -59,7 +61,7 @@ jobs:
             'evaluator_version':rows[0]['evaluator_version'],
             'condition_cells':len(rows),
             'unique_api_traces':len({r['shared_trace_id'] for r in rows}),
-            'scope':'C/P only; overall R2 decision remains pending R micro-workflow'
+            'scope':'C/P only; overall R2 decision follows CN-R2-013'
           }
           pathlib.Path('results/r2_cp_confirmatory_analysis/FREEZE_METADATA.json').write_text(json.dumps(meta,indent=2),encoding='utf-8')
           print(json.dumps(meta,indent=2))
@@ -72,6 +74,7 @@ jobs:
           path: |
             results/r2_cp_confirmatory_raw.jsonl
             results/r2_cp_confirmatory_raw.jsonl.errors.json
+            results/r2_cp_confirmatory_raw_trace_cache.jsonl
             results/json_format_retries.jsonl
             results/r2_cp_confirmatory_analysis/
           if-no-files-found: warn

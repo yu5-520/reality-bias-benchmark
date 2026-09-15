@@ -1,0 +1,59 @@
+name: R2 R-Micro v0.1 Replication
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r2-r-micro-replication.yml'
+      - 'theory/change_notes/CN-R2-015.md'
+  workflow_dispatch:
+
+concurrency:
+  group: r2-r-micro-replication
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  replicate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run 40 frozen R micro-workflow traces
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python runners/run_r2_r_micro_pilot.py \
+            --benchmark benchmark/r2_r_micro_items_v0.1.jsonl \
+            --repeats 10 --max-workers 4 \
+            --out results/r2_r_micro_replication_raw.jsonl
+      - name: Analyze fresh replication
+        run: |
+          python analysis/analyze_r2_r_micro_pilot.py \
+            --input results/r2_r_micro_replication_raw.jsonl \
+            --outdir results/r2_r_micro_replication_analysis
+          cat results/r2_r_micro_replication_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Apply counterfactual authority gates to exact replication traces
+        run: |
+          python analysis/analyze_r2_r_micro_gate_counterfactual.py \
+            --input results/r2_r_micro_replication_raw.jsonl \
+            --outdir results/r2_r_micro_replication_gate_analysis
+          cat results/r2_r_micro_replication_gate_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload replication evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-r-micro-replication-${{ github.run_id }}
+          path: |
+            results/r2_r_micro_replication_raw.jsonl
+            results/r2_r_micro_replication_raw.jsonl.errors.json
+            results/json_format_retries.jsonl
+            results/r2_r_micro_replication_analysis/
+            results/r2_r_micro_replication_gate_analysis/
+          if-no-files-found: warn
+          retention-days: 90

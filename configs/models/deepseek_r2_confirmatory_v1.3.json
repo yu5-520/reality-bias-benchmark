@@ -1,0 +1,34 @@
+{
+  "config_version": "R2-CONFIRMATORY-DEEPSEEK-v1.3",
+  "provider": "deepseek",
+  "base_url": "https://api.deepseek.com",
+  "endpoint": "/chat/completions",
+  "model_alias": "deepseek-flash",
+  "expected_model_version": "DeepSeek-V4.1-Flash",
+  "freeze_date_utc": "2026-09-15T03:45:00Z",
+  "note": "Scientific parameters are identical to R2-W1-DEEPSEEK-v1.2. Only the evaluator JSON-format retry budget is raised from 3 to 6 after one confirmatory trace failed for malformed JSON; this is an instrumentation reliability change.",
+  "subject": {
+    "thinking": "disabled",
+    "temperature": 0.2,
+    "max_tokens": 1200
+  },
+  "evaluator": {
+    "model_alias": "deepseek-flash",
+    "thinking": "disabled",
+    "temperature": 0.0,
+    "max_tokens": 1800,
+    "blind_to_condition": true
+  },
+  "transport": {
+    "timeout_seconds": 60,
+    "max_retries": 2,
+    "retry_backoff_seconds": 2,
+    "max_workers": 6
+  },
+  "json_format_retries": 6,
+  "pricing_snapshot_usd_per_million_tokens": {
+    "source_date": "2026-09-15",
+    "off_peak": {"input_cache_hit": 0.003, "input_cache_miss": 0.15, "output": 0.6},
+    "peak": {"input_cache_hit": 0.006, "input_cache_miss": 0.3, "output": 1.2}
+  }
+}
