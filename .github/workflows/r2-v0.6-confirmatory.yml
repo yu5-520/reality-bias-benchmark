@@ -1,0 +1,153 @@
+name: R2 v0.6 Calibration Gate and Confirmatory Run
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r2-v0.6-confirmatory.yml'
+      - 'benchmark/r2_primary_mapping_items_v0.6_calibration.jsonl'
+      - 'runners/run_r2_confirmatory_v2.py'
+      - 'analysis/analyze_r2_confirmatory_v1.py'
+      - 'analysis/analyze_r2_calibration.py'
+  workflow_dispatch:
+
+concurrency:
+  group: r2-v0.6-confirmatory
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  provider_smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Smoke C/P/R with current frozen provider
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python runners/run_r2_calibration_v04.py \
+            --benchmark benchmark/r2_primary_mapping_items_v0.6_calibration.jsonl \
+            --item-ids R2-C03,R2-P01,R2-R01 \
+            --repeats 1 --max-workers 3 \
+            --out results/r2_v0.6_provider_smoke.jsonl
+      - name: Upload smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-v0.6-provider-smoke-${{ github.run_id }}
+          path: |
+            results/r2_v0.6_provider_smoke.jsonl
+            results/r2_v0.6_provider_smoke.jsonl.errors.json
+            results/json_format_retries.jsonl
+          if-no-files-found: warn
+          retention-days: 90
+
+  calibrate:
+    needs: provider_smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run fresh 60-cell Baseline calibration
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python runners/run_r2_calibration_v04.py \
+            --benchmark benchmark/r2_primary_mapping_items_v0.6_calibration.jsonl \
+            --repeats 5 --max-workers 6 \
+            --out results/r2_calibration_v0.6_raw.jsonl
+      - name: Analyze calibration
+        run: |
+          python analysis/analyze_r2_calibration.py \
+            --input results/r2_calibration_v0.6_raw.jsonl \
+            --outdir results/r2_calibration_v0.6_analysis
+          cat results/r2_calibration_v0.6_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Apply frozen CN-R2-005 gate
+        run: |
+          set -o pipefail
+          python analysis/check_r2_calibration_gate.py \
+            --csv results/r2_calibration_v0.6_analysis/item_calibration.csv \
+            | tee results/r2_calibration_v0.6_analysis/GATE.md
+          cat results/r2_calibration_v0.6_analysis/GATE.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload calibration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-calibration-v0.6-${{ github.run_id }}
+          path: |
+            results/r2_calibration_v0.6_raw.jsonl
+            results/r2_calibration_v0.6_raw.jsonl.errors.json
+            results/json_format_retries.jsonl
+            results/r2_calibration_v0.6_analysis/
+          if-no-files-found: warn
+          retention-days: 90
+
+  confirmatory:
+    needs: calibrate
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run matched R2 confirmatory matrix
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python runners/run_r2_confirmatory_v2.py \
+            --benchmark benchmark/r2_primary_mapping_items_v0.6_calibration.jsonl \
+            --repeats 3 --max-workers 6 \
+            --out results/r2_confirmatory_v2_raw.jsonl
+      - name: Analyze 252 condition cells
+        run: |
+          python analysis/analyze_r2_confirmatory_v1.py \
+            --input results/r2_confirmatory_v2_raw.jsonl \
+            --outdir results/r2_confirmatory_v2_analysis
+          cat results/r2_confirmatory_v2_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Freeze run metadata
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path('results/r2_confirmatory_v2_raw.jsonl')
+          rows=[json.loads(x) for x in p.read_text(encoding='utf-8').splitlines() if x.strip()]
+          unique={r['shared_trace_id'] for r in rows}
+          meta={
+            'status':'CONFIRMATORY_R2_DATA_GENERATED',
+            'git_commit_sha':rows[0]['git_commit_sha'],
+            'github_run_id':rows[0]['github_run_id'],
+            'benchmark_version':rows[0]['benchmark_version'],
+            'benchmark_hash':rows[0]['benchmark_hash'],
+            'model_config_hash':rows[0]['model_config_hash'],
+            'conditions_hash':rows[0]['conditions_hash'],
+            'manifest_hash':rows[0]['manifest_hash'],
+            'configured_model_alias':rows[0]['configured_model_alias'],
+            'expected_model_version':rows[0]['expected_model_version'],
+            'evaluator_version':rows[0]['evaluator_version'],
+            'condition_cells':len(rows),
+            'unique_api_traces':len(unique),
+          }
+          pathlib.Path('results/r2_confirmatory_v2_analysis/FREEZE_METADATA.json').write_text(json.dumps(meta,indent=2),encoding='utf-8')
+          print(json.dumps(meta,indent=2))
+          PY
+      - name: Upload confirmatory evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-confirmatory-v2-${{ github.run_id }}
+          path: |
+            results/r2_confirmatory_v2_raw.jsonl
+            results/r2_confirmatory_v2_raw.jsonl.errors.json
+            results/json_format_retries.jsonl
+            results/r2_confirmatory_v2_analysis/
+          if-no-files-found: warn
+          retention-days: 90
