@@ -1,0 +1,93 @@
+{
+  "launch_candidate_version": "R234-REVIEWER-V2-PAID-LAUNCH-CANDIDATE-v0.1",
+  "status": "NOT_AUTHORIZED",
+  "execute_real_api": false,
+  "scientific_role": "REANNOTATION_CALIBRATION_UNDER_REVISED_SEMANTIC_CONTRACT",
+  "evidence_batch_hash": "94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9",
+  "provider": "deepseek",
+  "model": {
+    "config_path": "arena/config/model_deepseek_v0.2.json",
+    "config_version": "R234-ARENA-DEEPSEEK-v0.2.1",
+    "model_alias": "deepseek-flash",
+    "expected_provider_model_version": "DeepSeek-V4.1-Flash",
+    "accepted_returned_model_values": ["deepseek-flash"],
+    "evaluator_temperature": 0.0,
+    "evaluator_thinking": "disabled",
+    "evaluator_max_tokens": 4000
+  },
+  "population": {
+    "selection_rule": "FULL_FROZEN_BASE_POPULATION",
+    "r2_units": 70,
+    "r3_units": 70,
+    "r4_units": 4,
+    "total_units": 144,
+    "historical_disagreement_conditioning": false,
+    "negative_controls_required": "INHERENT_IN_FULL_POPULATION"
+  },
+  "packet_sources": {
+    "r2": {
+      "artifact_run_id": 34990393003,
+      "artifact_id": 10405251940,
+      "artifact_digest": "sha256:858988eb84bd798732ae6457e78bd1485c7c46f6461bed5e5d95b11dbc61e8e9",
+      "file": "compact_r2_packets.jsonl",
+      "packet_version": "R234-REVIEWER-V2-R2-COMPACT-PACKET-v0.1",
+      "source_compact_output_hash": "21c4c91faf815fcfd5b9a83ebb2a71ecf48e62ab2ba49f8e88af790621cf8dc8"
+    },
+    "r3": {
+      "artifact_run_id": 34992079531,
+      "artifact_id": 10406156673,
+      "artifact_digest": "sha256:7f6aacd8c2330941b327510d819a159d52e67a9a05a7fb67348fbf4d771f5fc1",
+      "file": "compact_r3_packets_v02.jsonl",
+      "packet_version": "R234-REVIEWER-V2-R3-COMPACT-PACKET-v0.2",
+      "packet_set_hash": "b1abe2510bce774a3d9f5792aaa8353b60781090894c6ba0bade7d4f5955a765"
+    },
+    "r4": {
+      "artifact_run_id": 34990393003,
+      "artifact_id": 10405251940,
+      "artifact_digest": "sha256:858988eb84bd798732ae6457e78bd1485c7c46f6461bed5e5d95b11dbc61e8e9",
+      "file": "compact_r4_packets.jsonl",
+      "packet_version": "R234-REVIEWER-V2-R4-COMPACT-PACKET-v0.1",
+      "source_compact_output_hash": "21c4c91faf815fcfd5b9a83ebb2a71ecf48e62ab2ba49f7e18ca0"
+    }
+  },
+  "prompt_hashes": {
+    "R2": "88cc842ea12030530abd43563b8d6c9d6fb82ef25f997bcd9f55831c4794a924",
+    "R3": "e3b2aaafb0ac344b9d92ce3b0c8e0b0dd1fe2693a78b773c5bb3afd8e432373d",
+    "R4": "626ace9b857e352380801eb4d125d387af97953ee184b692aa9981b0b2ed12af"
+  },
+  "runtime_policy": {
+    "max_workers": 1,
+    "malformed_output_retries_max": 2,
+    "context_expansion_max_per_packet": 1,
+    "semantic_uncertainty_retry": false,
+    "subject_rerun_on_reviewer_failure": false,
+    "stop_on_first_unrecoverable_review_error": true,
+    "preserve_partial_review_records": true
+  },
+  "spend_policy": {
+    "price_snapshot_source_date": "2026-09-15",
+    "price_mode_for_ceiling": "peak",
+    "launch_max_spend_usd": null,
+    "repository_level_absolute_ceiling_usd": 2.0,
+    "ceiling_rule": "AUTHORIZED_LAUNCH_MAX_SPEND_MUST_BE_POSITIVE_AND_NOT_EXCEED_REPOSITORY_LEVEL_ABSOLUTE_CEILING",
+    "provider_usage_is_authoritative_for_post_call_cost_accounting": true,
+    "serialized_bytes_are_not_tokens": true
+  },
+  "stop_conditions": [
+    "PRELAUNCH_HASH_OR_POPULATION_MISMATCH",
+    "PACKET_EVIDENCE_BATCH_MISMATCH",
+    "PROMPT_OR_MODEL_CONFIG_HASH_MISMATCH",
+    "UNEXPECTED_RETURNED_MODEL_VALUE",
+    "SECOND_CONTEXT_EXPANSION_REQUEST",
+    "MALFORMED_OUTPUT_AFTER_RETRY_CEILING",
+    "SPEND_CEILING_REACHED_OR_EXCEEDED",
+    "PROVIDER_OR_TRANSPORT_ERROR_AFTER_RETRY_CEILING"
+  ],
+  "authorization": {
+    "authorization_ref": null,
+    "authorized_by_user": false,
+    "authorized_at": null,
+    "note": "This candidate deliberately cannot launch a paid call. Authorization requires a separate immutable launch record."
+  },
+  "k2_authorized": false
+}
