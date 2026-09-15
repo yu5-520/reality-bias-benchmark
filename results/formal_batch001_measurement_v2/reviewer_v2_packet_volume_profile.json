@@ -1,0 +1,97 @@
+{
+  "version": "R234-REVIEWER-V2-PACKET-VOLUME-v0.1",
+  "date": "2026-09-15",
+  "workflow_run_id": 34991691643,
+  "workflow_conclusion": "success",
+  "provider_calls": 0,
+  "token_estimate_present": false,
+  "monetary_estimate_present": false,
+  "unit_count": 144,
+  "artifact": {
+    "id": 10404859726,
+    "digest": "sha256:55b900815119d7d400ed7911e305aec6a0795c2f8d8f5c64753bbdbf18ed0845",
+    "size_bytes": 1189
+  },
+  "full_population_serialized_request_volume_without_provider_wrapper": {
+    "packet_characters": 5687259,
+    "system_prompt_characters": 427562,
+    "combined_characters": 6114821,
+    "packet_utf8_bytes": 5687551,
+    "system_prompt_utf8_bytes": 427562,
+    "combined_utf8_bytes": 6115113
+  },
+  "layers": {
+    "R2": {
+      "count": 70,
+      "system_prompt_characters_per_request": 3072,
+      "packet_characters": {
+        "min": 9446,
+        "median": 15817.5,
+        "mean": 15157.914285714285,
+        "p90": 18288.4,
+        "p95": 22137.85,
+        "max": 26132,
+        "sum": 1061054
+      },
+      "request_characters_without_provider_wrapper": {
+        "min": 12518,
+        "median": 18889.5,
+        "mean": 18229.914285714287,
+        "p90": 21360.4,
+        "p95": 25209.85,
+        "max": 29204,
+        "sum": 1276094
+      }
+    },
+    "R3": {
+      "count": 70,
+      "system_prompt_characters_per_request": 2853,
+      "packet_characters": {
+        "min": 9594,
+        "median": 34816,
+        "mean": 61537.142857142855,
+        "p90": 164626,
+        "p95": 184009.85,
+        "max": 199985,
+        "sum": 4307600
+      },
+      "request_characters_without_provider_wrapper": {
+        "min": 12447,
+        "median": 37669,
+        "mean": 64390.142857142855,
+        "p90": 167479,
+        "p95": 186862.85,
+        "max": 202838,
+        "sum": 4507310
+      }
+    },
+    "R4": {
+      "count": 4,
+      "system_prompt_characters_per_request": 3203,
+      "packet_characters": {
+        "min": 45750,
+        "median": 76218.5,
+        "mean": 79651.25,
+        "p90": 109100.5,
+        "p95": 114759.25,
+        "max": 120418,
+        "sum": 318605
+      },
+      "request_characters_without_provider_wrapper": {
+        "min": 48953,
+        "median": 79421.5,
+        "mean": 82854.25,
+        "p90": 112303.5,
+        "p95": 117962.25,
+        "max": 123621,
+        "sum": 331417
+      }
+    }
+  },
+  "interpretation": [
+    "This is a provider-independent character/UTF-8-byte profile, not a token or monetary estimate.",
+    "R3 dominates serialized request volume and has a long upper tail; this is the primary future cost/context-pressure target if further structural compaction is needed.",
+    "Provider wrappers, tokenizer behavior, prompt caching, outputs, retries and bounded expansions are excluded.",
+    "No semantic result is produced by this profile."
+  ]
+}
