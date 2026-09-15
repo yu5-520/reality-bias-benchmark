@@ -2,12 +2,15 @@
 
 A domain-general environment for natural multi-agent self-organization and Reality Bias observation.
 
-Offline only:
+Current Base runtime: **R2-FREE-AGENT-ARENA-v0.3.2** (`arena/config/arena_v0.3.json`).
+
+## Offline validation
 
 ```bash
 python arena/validate_environment.py
 python arena/preflight.py
-python -m arena.build_manifest --domains all --repeats 2 --out results/arena_manifest.jsonl
+python -m unittest discover -s arena/tests -v
+python -m arena.build_manifest --domains all --repeats 2 --arena-config arena/config/arena_v0.3.json --out results/arena_manifest.jsonl
 ```
 
 No command above calls a real model API.
@@ -16,36 +19,88 @@ Real execution is intentionally guarded:
 
 ```bash
 python arena/run_real.py --manifest results/arena_manifest.jsonl --out results/arena_traces.jsonl --execute-real-api
-python arena/evaluate_real.py --input results/arena_traces.jsonl --out results/arena_evaluations.jsonl --execute-real-api
-python -m arena.analyze --traces results/arena_traces.jsonl --evaluations results/arena_evaluations.jsonl --outdir results/arena_analysis
 ```
 
-Prefer the manual GitHub Actions workflow `R2 Free-Agent Arena Real API Run`. It does not call the provider unless the confirmation input is exactly `CALL_REAL_API`.
+Subject collection and semantic evaluation are separate operations. A subject run does not automatically call a paid evaluator. Any real provider run requires explicit authorization and a spending ceiling outside this README command list.
 
+## Evidence-first runtime
 
-## Evidence integrity patch v0.1.1
+The Arena records actual model inputs, raw outputs, parsed actions, message lifecycle, invocation execution, runtime snapshots, state history, FINAL/revision state, termination state, remaining work, failures and usage where supported by the source version.
 
-Current freeze: `arena/FREEZE_v0.1.1.json`; v0.1 is historical.
+Current v0.3.2 semantics:
 
-Shared values retain separate status/basis/writer metadata in agent views and FINAL snapshots.
-Traces preserve actual model inputs, communication events and per-turn event ranges.
-The evaluator must code every Authority event, including failed attempts and no-bias events;
-missing or invalid codes fail evaluation. Actual turn inputs determine knowledge availability.
+- plan FINAL and episode termination are separate;
+- the late event is delivered after first FINAL;
+- observation continues until quiescence or an explicit budget/safety condition;
+- budget censoring is not treated as natural completion;
+- semantic review is deferred and append-only;
+- historical v0.1/v0.2/v0.3 conditions are not silently pooled.
 
-Finalize ends a response and the late event is delivered on the next turn. Remaining actions
-in that response are not executed; the raw response remains recorded. Queue failures do not
-activate agents or count as successful invocations.
+Offline regression gate:
 
-Run emergence and 3×3 counts require a realized, unauthorized, mechanism-coded event.
-Failed baseline events stay separate in counterfactual replay. This replay still estimates
-only immediate event containment, not regenerated downstream behavior.
+```bash
+python -m unittest discover -s arena/tests -v
+```
 
-Offline regression gate: `python -m unittest discover -s arena/tests -v`.
-Real API dispatch remains manual and has not been performed for this patch.
+## Structural measurement boundary
 
+Deterministic code may locate structural candidates such as epistemic-status change, provenance loss, goal/scope change, invocation expansion, reopen/revision, lineage and feedback topology.
 
-## R2–R4 shared structural runtime v0.3
+It must not silently convert those structures into semantic C/P/R truth.
 
-默认主体入口现使用 v0.3：方案定稿与 episode 结束分离，预算截断显式记录，逐轮证据持久化，同一批次导出事件、关系与反馈候选视图；异步导入多份三层审计意见。
+The forward trajectory model is documented in:
 
-[运行说明](../docs/R234_runtime_v0.3.md) · [实现变更 CN-R-025](../theory/change_notes/CN-R-025_structural_runtime_v03.md)。历史版本不与新调度条件混用；smoke 运行状态以 Actions 制品为准。
+- `../theory/theory_contract_v0.3.md`
+- `../docs/trajectory_dynamics_measurement_plan_v3.md`
+
+## Minimal experimental-control layer
+
+The Arena now contains an **intervention-off-by-default** control layer for future R5/R6 work:
+
+```text
+Observe → Freeze → Replay deterministic Arena state → Branch → Intervene
+```
+
+Files:
+
+- `experimental_control.py`
+- `config/experimental_control_v0.1.json`
+- `tests/test_experimental_control.py`
+- `../docs/experimental_control_layer_v0.1.md`
+
+The layer can:
+
+- capture a content-hashed deterministic Arena state snapshot;
+- restore that recorded Arena state;
+- bind a branch to parent trace/state hashes and an intervention hash;
+- continue `run_arena_once(...)` from an explicit frozen parent state;
+- emit optional before/after-turn state anchors through a callback;
+- apply narrow deterministic state interventions;
+- evaluate an explicit fail-closed minimal commit gate.
+
+These hooks are optional. When omitted, `run_arena_once(...)` keeps the existing Free-Agent baseline behavior.
+
+A restored Arena state does **not** mean provider-internal randomness or hidden model state was replayed. Repeated continuations from one parent are new probabilistic branches and must receive separate evidence identities.
+
+## Branch experiment principle
+
+Preferred R5 form:
+
+```text
+same frozen parent state
+  ├── original continuation
+  └── one preregistered intervention → branch continuation
+```
+
+The original trajectory is never overwritten.
+
+Future R7 work may add a small structured/system-owned-routing condition over the same evidence/control substrate. That condition should remain an experimental policy, not a production workflow system.
+
+## Historical notes
+
+- v0.1.x historical method-development samples remain frozen.
+- v0.2 introduced evidence-boundary improvements.
+- v0.3 separated FINAL from episode termination and added shared R2-R4 structural runtime behavior.
+- v0.3.2 hardened strict JSON serialization after v0.3.1 malformed-response failures; it did not rewrite old traces.
+
+[Shared runtime notes](../docs/R234_runtime_v0.3.md) · [CN-R-025](../theory/change_notes/CN-R-025_structural_runtime_v03.md)
