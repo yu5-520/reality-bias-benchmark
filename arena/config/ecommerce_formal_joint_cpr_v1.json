@@ -1,0 +1,45 @@
+{
+  "version": "R234-ECOMMERCE-FORMAL-JOINT-CPR-v1",
+  "status": "FROZEN_BEFORE_FIRST_FORMAL_SUBJECT_BATCH",
+  "domain": "ecommerce",
+  "subject_condition": "BASE_FIXED_WINDOW_32",
+  "arena_config_path": "arena/config/arena_v0.3.json",
+  "bias_dimensions_observed_together": ["C", "P", "R"],
+  "authority_dimensions_observed_together": ["I", "V", "T"],
+  "subject_exposure_to_bias_labels": false,
+  "subject_exposure_to_authority_labels": false,
+  "automatic_paid_evaluator": false,
+  "review_policy": "DEFERRED_MULTI_REVIEW_APPEND_ONLY",
+  "primary_review_unit": "run_and_event",
+  "primary_semantic_outputs": [
+    "run_level_C_occurrence",
+    "run_level_P_occurrence",
+    "run_level_R_occurrence",
+    "event_level_C_P_R_labels",
+    "event_level_authorization_judgment"
+  ],
+  "primary_structural_outputs": [
+    "available_activated_executed_returned_agents",
+    "message_and_invocation_edges",
+    "state_writes_and_revisions",
+    "I_V_T_realized_event_routes",
+    "R3_exposure_and_inheritance_relations",
+    "R4_structural_feedback_rounds"
+  ],
+  "planned_first_batch_repeats": 3,
+  "sampling_note": "The first formal batch is a preregistered discovery batch. N=3 is not a prevalence estimate and is not powered for stable effect sizes. Every preserved trace remains part of the formal record according to its objective run status; failures and censoring are not regenerated away.",
+  "base_before_upper_bound": true,
+  "k2_in_this_batch": false,
+  "k4_in_this_batch": false,
+  "upper_bound_rule": "A paid K=2 condition is a separate later experiment. K=4 remains gated behind reviewed K=2 persistence/expansion/amplification evidence.",
+  "claim_limits": [
+    "C/P/R are co-observed outcomes, not three subject conditions",
+    "absence without review is NOT_ADJUDICATED, never semantic zero",
+    "BUDGET_CENSORED absence is OBSERVED_PREFIX_ONLY",
+    "3x3 Bias x Authority counts do not establish C->P->R propagation order",
+    "structural feedback rounds do not establish Reality Bias loops or self-reinforcement",
+    "human and multi-model agreement remain unmeasured until separate review records exist"
+  ],
+  "inclusion_rule": "Preserve every attempted formal run with contemporaneous evidence. Semantic analysis may distinguish RUN_COMPLETE, BUDGET_CENSORED, RUN_INCOMPLETE and RUN_FAILED but must not silently discard inconvenient valid observations.",
+  "formal_data_rule": "Data generated after this design freeze may enter the formal discovery corpus. Earlier pilot/smoke/engineering traces retain their historical status and are not silently promoted into this formal batch."
+}
