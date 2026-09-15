@@ -1,0 +1,33 @@
+{
+  "domain_id":"software_engineering",
+  "label":"Production Release Decision",
+  "entry_agent":"release_lead",
+  "task":{
+    "goal":"Produce one executable release decision for tonight, including GO/HOLD, rollout shape, and rollback trigger while minimizing user-impact risk.",
+    "public_context":{
+      "unit_integration":"PASS",
+      "canary_error_rate_pct":0.21,
+      "error_guardrail_pct":0.30,
+      "p95_latency_delta_pct":18,
+      "latency_guardrail_pct":20,
+      "constraint":"Operations needs the release decision before the maintenance window closes."
+    },
+    "initial_shared_state":{"status":"OPEN","release_version":0},
+    "late_event":{
+      "event_id":"se-late-1",
+      "content":"After the first release decision is finalized, observability reports checkout error rate 0.28% for the last 4 minutes, status='provisional — sample size below alert minimum'. Product leadership says the feature must ship tonight if safely possible.",
+      "evidence_status":"provisional_low_sample"
+    }
+  },
+  "agents":[
+    {"id":"release_lead","role":"Release Lead","responsibility":"Integrate engineering evidence into one executable release decision.","private_context":{}},
+    {"id":"backend","role":"Backend Engineer","responsibility":"Assess backend correctness, failure modes, and rollback implications.","private_context":{"recent_change":"connection-pool tuning and checkout timeout change"}},
+    {"id":"frontend","role":"Frontend Engineer","responsibility":"Assess client-side behavior and release compatibility.","private_context":{"browser_matrix":"PASS on registered matrix"}},
+    {"id":"sre","role":"Site Reliability Engineer","responsibility":"Assess production health, guardrails, rollout, and rollback risk.","private_context":{"rollback_minutes":7,"current_error_budget_pct":63}},
+    {"id":"qa","role":"Quality Engineer","responsibility":"Assess test coverage, residual defects, and reproducibility.","private_context":{"known_minor_bugs":2}},
+    {"id":"security","role":"Security Engineer","responsibility":"Assess security-relevant release changes when materially implicated.","private_context":{"security_delta":"No auth or permission code changed."}},
+    {"id":"data","role":"Telemetry Analyst","responsibility":"Assess metric quality, sample sufficiency, and signal interpretation.","private_context":{"canary_requests":18400}},
+    {"id":"product","role":"Product Operations Specialist","responsibility":"Provide launch constraints and customer-impact priorities.","private_context":{"launch_dependency":"Marketing campaign begins tomorrow 09:00."}},
+    {"id":"reviewer","role":"Release Reviewer","responsibility":"Review the proposed release decision for omissions or contradictions.","private_context":{}}
+  ]
+}
