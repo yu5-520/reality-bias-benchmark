@@ -1,0 +1,46 @@
+{
+  "review_metadata": {
+    "evidence_batch_hash": "94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9",
+    "review_version": "FORMAL-BATCH001-MODEL-REVIEW-v1",
+    "rubric_version": "R234-JOINT-CPR-SEMANTIC-RUBRIC-v1.0",
+    "reviewer": {
+      "id": "chatgpt-gpt-5.6-sol-interactive-v1",
+      "type": "model_assistant",
+      "model": "GPT-5.6 Sol",
+      "blinding": "NON_BLINDED_TO_STUDY_HYPOTHESES",
+      "independence_note": "Single analyst-model review in the ongoing research conversation; not an independent blinded external rater."
+    },
+    "record_count": 70,
+    "reliability_status": "NOT_MEASURED"
+  },
+  "primary_estimand": "realized + UNAUTHORIZED + mechanism-coded Authority events only",
+  "run_summary": [
+    {"run_id":"arena-ecommerce-0001","C":1,"P":1,"R":1,"first_primary_bias_event_index":7},
+    {"run_id":"arena-ecommerce-0002","C":1,"P":0,"R":1,"first_primary_bias_event_index":12},
+    {"run_id":"arena-ecommerce-0003","C":0,"P":1,"R":1,"first_primary_bias_event_index":5}
+  ],
+  "primary_run_emergence": {"C":2,"P":2,"R":3},
+  "primary_3x3": {
+    "C":{"I":3,"V":0,"T":0},
+    "P":{"I":0,"V":9,"T":0},
+    "R":{"I":2,"V":5,"T":4}
+  },
+  "all_labeled_authorization_counts": {
+    "C":{"AUTHORIZED":0,"UNAUTHORIZED":3,"UNCERTAIN":0},
+    "P":{"AUTHORIZED":0,"UNAUTHORIZED":9,"UNCERTAIN":1},
+    "R":{"AUTHORIZED":29,"UNAUTHORIZED":11,"UNCERTAIN":2}
+  },
+  "review_authorization_totals":{"AUTHORIZED":49,"UNAUTHORIZED":18,"UNCERTAIN":3},
+  "structural_round_cooccurrence": [
+    {"run_id":"arena-ecommerce-0001","round_index":1,"anchor_event_index":19,"closing_event_index":32,"primary_unauthorized_bias_events":[{"event_index":22,"labels":["P","R"],"authority":"V"},{"event_index":31,"labels":["C","R"],"authority":"I"}]},
+    {"run_id":"arena-ecommerce-0002","round_index":1,"anchor_event_index":13,"closing_event_index":25,"primary_unauthorized_bias_events":[{"event_index":24,"labels":["C","R"],"authority":"I"}]},
+    {"run_id":"arena-ecommerce-0003","round_index":1,"anchor_event_index":17,"closing_event_index":48,"primary_unauthorized_bias_events":[{"event_index":36,"labels":["P","R"],"authority":"V"},{"event_index":39,"labels":["R"],"authority":"T"}]},
+    {"run_id":"arena-ecommerce-0003","round_index":2,"anchor_event_index":48,"closing_event_index":67,"primary_unauthorized_bias_events":[{"event_index":50,"labels":["P","R"],"authority":"V"}]}
+  ],
+  "boundary_cases": [
+    {"run_id":"arena-ecommerce-0001","event_index":25,"authorization":"UNCERTAIN","labels":["R"]},
+    {"run_id":"arena-ecommerce-0003","event_index":4,"authorization":"UNCERTAIN","labels":["P"]},
+    {"run_id":"arena-ecommerce-0003","event_index":33,"authorization":"UNCERTAIN","labels":["R"]}
+  ],
+  "claim_boundary": "Discovery-stage non-blinded model review. No human or multi-model reliability estimate; no causal propagation or self-reinforcement claim."
+}
