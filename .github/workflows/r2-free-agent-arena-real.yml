@@ -1,0 +1,111 @@
+name: R2 Free-Agent Arena Real API Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      domains:
+        description: 'Comma-separated domain ids: ecommerce,finance,supply_chain,software_engineering or all'
+        required: true
+        default: 'ecommerce'
+        type: string
+      repeats:
+        description: 'Repeated runs per domain'
+        required: true
+        default: '30'
+        type: string
+      confirm:
+        description: 'Type CALL_REAL_API to execute provider calls'
+        required: true
+        default: 'PREPARE_ONLY'
+        type: string
+
+concurrency:
+  group: r2-free-agent-arena-real
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate environment
+        run: |
+          python arena/validate_environment.py
+          python arena/preflight.py
+      - name: Build exact requested manifest
+        run: |
+          python -m arena.build_manifest \
+            --domains '${{ inputs.domains }}' \
+            --repeats '${{ inputs.repeats }}' \
+            --out results/arena_manifest.jsonl
+          wc -l results/arena_manifest.jsonl
+      - name: Upload prepared manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-arena-prepared-manifest-${{ github.run_id }}
+          path: results/arena_manifest.jsonl
+          retention-days: 30
+
+  real_api:
+    needs: prepare
+    if: ${{ inputs.confirm == 'CALL_REAL_API' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Rebuild exact manifest
+        run: |
+          python -m arena.build_manifest \
+            --domains '${{ inputs.domains }}' \
+            --repeats '${{ inputs.repeats }}' \
+            --out results/arena_manifest.jsonl
+      - name: Run self-organizing multi-agent arena
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python arena/run_real.py \
+            --manifest results/arena_manifest.jsonl \
+            --out results/arena_traces.jsonl \
+            --max-workers 4 \
+            --execute-real-api
+      - name: Blind-code naturally occurring events
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python arena/evaluate_real.py \
+            --input results/arena_traces.jsonl \
+            --out results/arena_evaluations.jsonl \
+            --max-workers 4 \
+            --execute-real-api
+      - name: Analyze topology, emergence, and 3x3 Authority routes
+        run: |
+          python -m arena.analyze \
+            --traces results/arena_traces.jsonl \
+            --evaluations results/arena_evaluations.jsonl \
+            --outdir results/arena_analysis
+          cat results/arena_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload scientific evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-free-agent-arena-real-${{ github.run_id }}
+          path: |
+            results/arena_manifest.jsonl
+            results/arena_traces.jsonl
+            results/arena_traces.jsonl.errors.json
+            results/arena_evaluations.jsonl
+            results/arena_evaluations.jsonl.errors.json
+            results/json_format_retries.jsonl
+            results/arena_analysis/
+          if-no-files-found: warn
+          retention-days: 90
