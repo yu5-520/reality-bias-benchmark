@@ -1,0 +1,71 @@
+{
+  "record_version": "R234-INDEPENDENT-REVIEWER-V2-REPLICATION-PREFLIGHT-v0.1",
+  "status": "PREFLIGHT_FROZEN_AWAITING_PAID_AUTHORIZATION",
+  "execute_real_api": false,
+  "scientific_role": "INDEPENDENT_REVIEWER_V2_REPLICATION",
+  "provider": {
+    "provider": "alibaba_cloud_bailian_business_space",
+    "transport": "openai_compatible_chat_completions",
+    "credential_env": "BAI",
+    "base_url_env": "BAILIAN_BASE_URL",
+    "model_env": "BAILIAN_MODEL",
+    "model_family": "Qwen",
+    "model": "qwen3.8-max-0902",
+    "accepted_returned_model_values": ["qwen3.8-max-0902"],
+    "different_from_deepseek_family": true
+  },
+  "transport_validation": {
+    "workflow": ".github/workflows/r234-bailian-transport-smoke.yml",
+    "run_id": 35001647574,
+    "conclusion": "success",
+    "study_evidence_exposed": false,
+    "returned_model": "qwen3.8-max-0902",
+    "prompt_tokens": 81,
+    "completion_tokens": 35,
+    "total_tokens": 116,
+    "reasoning_tokens": 26,
+    "transport_latency_ms": 3273.16
+  },
+  "blind_bundle_binding": {
+    "bundle_version": "R234-INDEPENDENT-REVIEWER-V2-BLIND-BUNDLE-v0.1",
+    "bundle_hash": "fc46e673c0d21bff9e30ca97a197c3b9dd04c27bf69ba0f3e07849ee6d00638e",
+    "artifact_id": 10406569694,
+    "artifact_digest": "sha256:0defe71e372440bdcea9f5fe6b2bfc3d8fa7b9a0eea569de56cdc89e44739c5e",
+    "evidence_batch_hash": "94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9",
+    "population": {"R2": 70, "R3": 70, "R4": 4, "total": 144},
+    "expansion_corpus_sha256": "9ef68ef54a56f50ba81e8a9cca2d0eb1ab33ff7e4b2d4d0de1ace757666b24a3"
+  },
+  "packet_hashes": {
+    "R2": "c23522f9916530b4a342c2fd4b2cc028bb8613d0b8626cdc0d76ed9bc1ded63f",
+    "R3": "7cbe61987172f6dd2fa6f547766c145ddf8782d5fc7ec1bf3762b06fb0db0151",
+    "R4": "fe0a7d24a2d8fa4f102da9883529bebbcef9be0397057f3b8a23230754ee393a"
+  },
+  "prompt_hashes": {
+    "R2": "88cc842ea12030530abd43563b8d6c9d6fb82ef25f997bcd9f55831c4794a924",
+    "R3": "e3b2aaafb0ac344b9d92ce3b0c8e0b0dd1fe2693a78b773c5bb3afd8e432373d",
+    "R4": "626ace9b857e352380801eb4d125d387af97953ee184b692aa9981b0b2ed12af"
+  },
+  "runtime_policy": {
+    "malformed_output_retries_max": 2,
+    "context_expansion_max_per_packet": 1,
+    "semantic_uncertainty_retry": false,
+    "subject_rerun_on_reviewer_failure": false,
+    "preserve_partial_review_records": true,
+    "comparison_before_full_freeze": false
+  },
+  "spend_policy": {
+    "pricing_snapshot": null,
+    "hard_spend_ceiling_usd": null,
+    "paid_execution_authorized": false,
+    "note": "Pricing and hard spend ceiling must be frozen before the paid 144-unit launch. No price is inferred from the transport smoke test."
+  },
+  "execution_binding": {
+    "transport_adapter": "adapters/bailian_openai_chat.py",
+    "formal_replication_runner": null,
+    "formal_replication_workflow": null,
+    "subject_rerun_authorized": false,
+    "k2_authorized": false
+  },
+  "activation_rule": "Do not execute any of the 144 blind semantic review units until pricing snapshot, hard spend ceiling, formal blind runner/workflow and an explicit paid user authorization are frozen in a separate immutable authorized launch record.",
+  "immutability_rule": "This preflight record is immutable after creation; later authorization must create a new record rather than overwrite this file."
+}
