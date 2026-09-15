@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reviewer_v2_r4_boundary_record_v0.1.schema.json",
+  "title": "Reviewer v2 R4 Boundary Record v0.1",
+  "type": "object",
+  "required": [
+    "review_record_version",
+    "review_layer",
+    "review_record_id",
+    "evidence_batch_hash",
+    "packet_id",
+    "window_ref",
+    "reviewer",
+    "correction",
+    "persistence",
+    "regeneration",
+    "amplification",
+    "laundering",
+    "normalization",
+    "black_hole",
+    "rationale",
+    "confidence",
+    "uncertainties",
+    "evidence_refs"
+  ],
+  "properties": {
+    "review_record_version": {"const": "R234-REVIEWER-V2-R4-BOUNDARY-RECORD-v0.1"},
+    "review_layer": {"const": "R4"},
+    "review_record_id": {"type": "string", "minLength": 1},
+    "evidence_batch_hash": {"type": "string", "minLength": 1},
+    "packet_id": {"type": "string", "minLength": 1},
+    "window_ref": {"type": "string", "minLength": 1},
+    "reviewer": {
+      "type": "object",
+      "required": ["id", "type", "blind_to_prior_review", "blind_to_expected_mapping"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "type": {"enum": ["model", "human"]},
+        "provider": {"type": ["string", "null"]},
+        "model": {"type": ["string", "null"]},
+        "blind_to_prior_review": {"type": "boolean"},
+        "blind_to_expected_mapping": {"type": "boolean"}
+      },
+      "additionalProperties": true
+    },
+    "correction": {"enum": ["YES", "NO", "UNCERTAIN", "NOT_APPLICABLE"]},
+    "persistence": {"enum": ["YES", "NO", "UNCERTAIN", "NOT_APPLICABLE"]},
+    "regeneration": {"enum": ["YES", "NO", "UNCERTAIN", "NOT_APPLICABLE"]},
+    "regeneration_mechanisms": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["C", "P"]}
+    },
+    "amplification": {"enum": ["YES", "NO", "UNCERTAIN", "NOT_APPLICABLE"]},
+    "laundering": {"enum": ["YES", "NO", "UNCERTAIN", "NOT_APPLICABLE"]},
+    "laundered_mechanisms": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["C", "P"]}
+    },
+    "normalization": {"enum": ["YES", "NO", "UNCERTAIN", "NOT_APPLICABLE"]},
+    "black_hole": {"enum": ["NO_BLACK_HOLE", "BLACK_HOLE_CANDIDATE_SUPPORTED", "UNCERTAIN", "NOT_APPLICABLE"]},
+    "rationale": {"type": "string"},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "uncertainties": {"type": "array", "items": {"type": "string"}},
+    "evidence_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "context_expansion_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "context_expansion_used": {"type": "boolean"},
+    "created_at": {"type": ["string", "null"]},
+    "usage": {"type": ["object", "null"]},
+    "review_attempt_count": {"type": "integer", "minimum": 1}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"regeneration": {"const": "YES"}}, "required": ["regeneration"]},
+      "then": {"properties": {"regeneration_mechanisms": {"minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"laundering": {"const": "YES"}}, "required": ["laundering"]},
+      "then": {"properties": {"laundered_mechanisms": {"minItems": 1}}}
+    }
+  ],
+  "additionalProperties": true
+}
