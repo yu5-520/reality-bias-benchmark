@@ -1,0 +1,113 @@
+name: R2 Free-Agent Arena E-commerce Micro Pilot
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/r2-arena-ecommerce-micropilot.yml'
+
+concurrency:
+  group: r2-free-agent-arena-ecommerce-micropilot
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  micro_pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify repaired Arena v0.1.2 environment
+        run: |
+          python arena/validate_environment.py
+          python arena/preflight.py
+          python -m unittest discover -s arena/tests -v
+          python - <<'PY'
+          import json
+          x=json.load(open('arena/FREEZE_v0.1.2.json'))
+          assert x['freeze_id']=='R2-FREE-AGENT-ARENA-v0.1.2-PRE-API'
+          print('Arena v0.1.2 infrastructure verified.')
+          PY
+      - name: Build 5-run E-commerce micro-pilot manifest
+        run: |
+          python -m arena.build_manifest \
+            --domains ecommerce \
+            --repeats 5 \
+            --out results/arena_manifest.jsonl
+          test "$(wc -l < results/arena_manifest.jsonl)" -eq 5
+      - name: Run 5 self-organizing E-commerce traces
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python arena/run_real.py \
+            --manifest results/arena_manifest.jsonl \
+            --out results/arena_traces.jsonl \
+            --max-workers 2 \
+            --execute-real-api
+      - name: Blind-code natural events
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python arena/evaluate_real.py \
+            --input results/arena_traces.jsonl \
+            --out results/arena_evaluations.jsonl \
+            --max-workers 2 \
+            --execute-real-api
+      - name: Analyze topology and 3x3 routes
+        run: |
+          python -m arena.analyze \
+            --traces results/arena_traces.jsonl \
+            --evaluations results/arena_evaluations.jsonl \
+            --outdir results/arena_analysis
+          cat results/arena_analysis/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Freeze micro-pilot metadata
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib, os
+          def sha(path):
+              h=hashlib.sha256()
+              with open(path,'rb') as f:
+                  for chunk in iter(lambda:f.read(65536),b''): h.update(chunk)
+              return h.hexdigest()
+          traces=[json.loads(x) for x in pathlib.Path('results/arena_traces.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          evals=[json.loads(x) for x in pathlib.Path('results/arena_evaluations.jsonl').read_text(encoding='utf-8').splitlines() if x.strip()]
+          assert len(traces)==5
+          assert len(evals)==5
+          meta={
+            'wave':'R2-ARENA-ECOM-MICROPILOT-v0.1.2',
+            'status':'MICRO_PILOT_COMPLETE',
+            'git_commit_sha':os.environ.get('GITHUB_SHA'),
+            'github_run_id':os.environ.get('GITHUB_RUN_ID'),
+            'domain':'ecommerce',
+            'planned_repeats':5,
+            'completed_traces':len(traces),
+            'completed_evaluations':len(evals),
+            'arena_freeze_id':'R2-FREE-AGENT-ARENA-v0.1.2-PRE-API',
+            'manifest_sha256':sha('results/arena_manifest.jsonl'),
+            'traces_sha256':sha('results/arena_traces.jsonl'),
+            'evaluations_sha256':sha('results/arena_evaluations.jsonl'),
+            'scientific_use':'engineering/discovery micro-pilot; inspect before scaling; do not merge with invalid run 34932966766'
+          }
+          pathlib.Path('results/arena_analysis/FREEZE_METADATA.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2),encoding='utf-8')
+          print(json.dumps(meta,ensure_ascii=False,indent=2))
+          PY
+      - name: Upload micro-pilot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-arena-ecommerce-micropilot-${{ github.run_id }}
+          path: |
+            results/arena_manifest.jsonl
+            results/arena_traces.jsonl
+            results/arena_traces.jsonl.errors.json
+            results/arena_evaluations.jsonl
+            results/arena_evaluations.jsonl.errors.json
+            results/json_format_retries.jsonl
+            results/arena_analysis/
+          if-no-files-found: warn
+          retention-days: 90
