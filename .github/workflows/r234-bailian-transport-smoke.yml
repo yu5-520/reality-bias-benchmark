@@ -1,0 +1,56 @@
+name: R2-R4 Bailian Transport Smoke
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BAI: ${{ secrets.BAI }}
+      BAILIAN_BASE_URL: ${{ vars.BAILIAN_BASE_URL }}
+      BAILIAN_MODEL: ${{ vars.BAILIAN_MODEL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate runtime binding without exposing credentials
+        run: |
+          python - <<'PY'
+          import os
+          key = os.environ.get('BAI', '')
+          base = os.environ.get('BAILIAN_BASE_URL', '')
+          model = os.environ.get('BAILIAN_MODEL', '')
+          assert key, 'BAI secret is missing'
+          assert base.startswith('https://'), 'BAILIAN_BASE_URL must be https'
+          assert base.rstrip('/').endswith('/compatible-mode/v1'), 'unexpected Bailian OpenAI-compatible base URL'
+          assert model, 'BAILIAN_MODEL is missing'
+          print({'credential_present': True, 'base_url_present': True, 'model': model})
+          PY
+
+      - name: One non-study provider call
+        run: |
+          python - <<'PY'
+          import json
+          from adapters.bailian_openai_chat import chat_completion, extract_content
+          response = chat_completion([
+              {'role': 'system', 'content': 'Return only a JSON object.'},
+              {'role': 'user', 'content': 'Return exactly {"transport_ok":true}. This is an infrastructure smoke test and contains no study evidence.'},
+          ], response_format_json=True, max_tokens=64, temperature=0.0)
+          content = extract_content(response)
+          parsed = json.loads(content)
+          assert parsed.get('transport_ok') is True, parsed
+          print({
+              'transport_ok': True,
+              'returned_model': response.get('model'),
+              'response_id_present': bool(response.get('id')),
+              'usage': response.get('usage') or {},
+              'transport_latency_ms': response.get('_transport_latency_ms'),
+          })
+          PY
