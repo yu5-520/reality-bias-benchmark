@@ -16,9 +16,10 @@ Research repository for the first Reality Bias paper:
   - v0.1.x five-run E-commerce method-development sample is frozen.
   - raw-trace re-audit shows 4/5 short runs activated four agents but executed only one; only run 0005 verified six-agent execution.
   - v0.2 introduced activation/execution separation and the immutable evidence boundary.
-  - current subject runtime is **v0.3.1**, which separates plan FINAL from episode termination, observes until quiescence or budget censoring, and keeps semantic review deferred.
+  - v0.3.1 separated plan FINAL from episode termination and produced genuine multi-agent execution, but Microbatch 003 completed only 1/3 episodes because two non-truncated subject responses were malformed JSON.
+  - current subject runtime is **v0.3.2**, a serialization-only correction over the same v0.3 observation architecture; semantic review remains deferred.
 - R2/R3/R4 are event, relation and feedback-loop audit layers over the same Arena evidence; they are not sequential subject-experiment phases.
-- Evidence is captured during execution and audited asynchronously. Layer-specific Gates govern claims, not collection. The historical five-run sample and the current structural smoke do not by themselves prove causal propagation or self-reinforcement.
+- Evidence is captured during execution and audited asynchronously. Layer-specific Gates govern claims, not collection. Existing structural runs do not by themselves prove causal propagation or self-reinforcement.
 - Current research plan: [R Plan v2.0](docs/R_Plan_v2.0.md), registered by [CN-R-024](theory/change_notes/CN-R-024_structural_layers_async_audit.md).
 
 ## Repository map
@@ -26,7 +27,7 @@ Research repository for the first Reality Bias paper:
 - `theory/` — theory contract, change notes, novelty matrix.
 - `benchmark/` — R1 casebook and retained single-turn R2 pilot benchmarks.
 - `arena/` — Free-Agent Arena runtime, evidence capture, objective metrics, structural views, review packet export and optional deferred-review adapters.
-- `arena/config/arena_v0.3.json` — current Arena v0.3.1 execution policy.
+- `arena/config/arena_v0.3.json` — current Arena v0.3.2 execution policy.
 - `arena/config/model_deepseek_v0.2.json` — current subject/evaluator transport and token-budget configuration.
 - `schemas/evidence_batch_v0.2.schema.json` — immutable evidence-batch interface.
 - `schemas/review_record_v0.1.schema.json` — append-only human/model review interface.
@@ -53,7 +54,7 @@ System statistics are factual execution measurements. C/P/R, invocation necessit
 
 ## Participation terminology
 
-Arena v0.3.1 reports separately:
+Arena v0.3.2 reports separately:
 
 - **available** — present in the domain registry;
 - **activated** — entered the active collaboration set through accepted routing/invocation;
@@ -77,16 +78,18 @@ Legacy single-turn calibration workflows are manual-only and are not triggered b
 
 ## Version boundary
 
-Arena v0.1.x, v0.2 and v0.3.x use different terminal/observation policies and must not be silently pooled as one experimental condition. Current v0.3.1 uses `observe_until_quiescent`: FINAL settles a plan, while the episode continues until the work queue becomes empty or an external budget is hit.
+Arena v0.1.x, v0.2 and v0.3.x use different terminal/observation or serialization policies and must not be silently pooled as one experimental condition. Current v0.3.2 retains `observe_until_quiescent`: FINAL settles a plan, while the episode continues until the work queue becomes empty or an external budget is hit. v0.3.2 differs from v0.3.1 only in the explicit JSON serialization contract, introduced after frozen Microbatch 003 failures.
 
 See:
 
 - [R Plan v2.0](docs/R_Plan_v2.0.md)
 - [R2–R4 shared runtime v0.3](docs/R234_runtime_v0.3.md)
 - [R2–R4 v0.3.1 execution result](docs/R234_v0.3.1_execution_result.md)
+- [R2–R4 v0.3.1 Microbatch 003 result](docs/R234_v0.3.1_microbatch_003_result.md)
 - [R2 evidence and deferred review protocol v0.2](docs/R2_evidence_and_review_protocol_v0.2.md)
 - [R2 E-commerce micro-pilot report v0.2](docs/R2_ecommerce_micro_pilot_report_v0.2.md)
 - [CN-R-025 structural runtime v0.3](theory/change_notes/CN-R-025_structural_runtime_v03.md)
+- [CN-R-026 v0.3.1 serialization failure](theory/change_notes/CN-R-026_v031_microbatch_serialization_failure.md)
 - [CN-R2-023 evidence-first deferred adjudication](theory/change_notes/CN-R2-023_evidence_first_deferred_adjudication.md)
 
 Mock/dry-run/scripted-provider outputs are engineering validation only and are not scientific evidence. Human and multi-model inter-rater reliability remain unmeasured unless explicitly reported from future review records.
