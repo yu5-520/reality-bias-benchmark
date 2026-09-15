@@ -1,0 +1,115 @@
+{
+  "version": "R234-REVIEWER-V1-V2-MEASUREMENT-TRANSITION-SUMMARY-v0.1",
+  "date": "2026-09-15",
+  "comparison_type": "SAME_MODEL_FAMILY_MEASUREMENT_CONTRACT_SENSITIVITY",
+  "not_inter_rater_reliability": true,
+  "workflow": {
+    "run_id": 34995630944,
+    "conclusion": "success",
+    "artifact_id": 10407228786,
+    "artifact_digest": "sha256:1135b79bf99fc7aa57d65c46f36665d64205f8dbeeab3f1051f3ca4e34cca47b"
+  },
+  "event_population": {
+    "count": 70,
+    "same_underlying_evidence_batch": true,
+    "evidence_batch_hash": "94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9"
+  },
+  "historical_deepseek_v1": {
+    "any_bias_positive": 61,
+    "C_positive": 24,
+    "P_positive": 25,
+    "R_positive": 25,
+    "authorization": {
+      "AUTHORIZED": 42,
+      "UNAUTHORIZED": 27,
+      "NOT_APPLICABLE": 1
+    },
+    "primary_unauthorized_realized_bias_events": 26
+  },
+  "deepseek_v2": {
+    "synthesized_event_positive": {
+      "C": 0,
+      "P": 0,
+      "R": 0
+    },
+    "authorization": {
+      "AUTHORIZED": 70,
+      "UNAUTHORIZED": 0,
+      "UNCERTAIN": 0,
+      "NOT_APPLICABLE": 0
+    }
+  },
+  "v1_positive_to_v2_boundary_transition": {
+    "C": {
+      "v1_positive_count": 24,
+      "NO_PROMOTION": 22,
+      "SUPPORTED_PROMOTION": 2,
+      "UNSUPPORTED_PROMOTION": 0,
+      "v2_positive_count": 0,
+      "binary_raw_agreement": 0.6571428571428571,
+      "binary_kappa": 0.0,
+      "kappa_warning": "The v2 marginal contains zero positives, so kappa is prevalence-degenerate and should not be used as a substantive reliability claim."
+    },
+    "P": {
+      "v1_positive_count": 25,
+      "NECESSARY_DECOMPOSITION": 22,
+      "ORIGINAL_GOAL": 3,
+      "UNAUTHORIZED_EXPANSION": 0,
+      "v2_positive_count": 0,
+      "binary_raw_agreement": 0.6428571428571429,
+      "binary_kappa": 0.0,
+      "kappa_warning": "The v2 marginal contains zero positives, so kappa is prevalence-degenerate and should not be used as a substantive reliability claim."
+    },
+    "R": {
+      "v1_positive_count": 25,
+      "NOT_REWORK": 15,
+      "CORRECTION": 10,
+      "REGENERATION_C": 0,
+      "REGENERATION_P": 0,
+      "v2_positive_count": 0,
+      "binary_raw_agreement": 0.6428571428571429,
+      "binary_kappa": 0.0,
+      "kappa_warning": "The v2 marginal contains zero positives, so kappa is prevalence-degenerate and should not be used as a substantive reliability claim."
+    }
+  },
+  "authorization_transition": {
+    "AUTHORIZED_to_AUTHORIZED": 42,
+    "UNAUTHORIZED_to_AUTHORIZED": 27,
+    "NOT_APPLICABLE_to_AUTHORIZED": 1
+  },
+  "historical_v1_primary_26_to_v2": {
+    "event_count": 26,
+    "v2_any_CPR_positive": 0,
+    "epistemic_transition": {
+      "NOT_APPLICABLE": 16,
+      "NO_PROMOTION": 7,
+      "SUPPORTED_PROMOTION": 3
+    },
+    "goal_relation": {
+      "NECESSARY_DECOMPOSITION": 21,
+      "ORIGINAL_GOAL": 5
+    },
+    "goal_focus_transition": {
+      "NO_MATERIAL_SHIFT": 26
+    },
+    "retrospective_outcome": {
+      "NOT_REWORK": 21,
+      "CORRECTION": 3,
+      "LEGITIMATION_CANDIDATE": 1,
+      "NOT_APPLICABLE": 1
+    },
+    "v2_authorization": {
+      "AUTHORIZED": 26
+    }
+  },
+  "interpretation": [
+    "Holding the DeepSeek model family and frozen event population approximately constant, changing the measurement contract produces a very large label shift.",
+    "This is not inter-rater disagreement because the comparison intentionally reuses the same model family under a revised measurement system.",
+    "The transition does not prove every v1 positive was false: rubric definitions, packet design, prompts, and provider-side execution context all changed between v1 and v2.",
+    "The result strongly supports treating semantic operationalization as an empirical measurement variable rather than assuming a bias label is observer-invariant.",
+    "v1 C positives mostly collapse into no epistemic promotion; v1 P positives collapse into necessary decomposition/original-goal work; v1 R positives collapse into normal non-rework or correction.",
+    "Independent Reviewer-v2 replication is required before the zero-positive v2 result is treated as semantic consensus."
+  ],
+  "k2_authorized": false,
+  "next_gate": "INDEPENDENT_REVIEWER_V2_REPLICATION_OR_ADDITIONAL_BASE_SAMPLING"
+}
