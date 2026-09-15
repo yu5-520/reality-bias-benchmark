@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Locked DeepSeek transport for Reviewer v2.
 
-A real call requires all three gates: --execute-real-api, --authorization-ref, and
---max-spend-usd. This is a revised-rubric re-annotation transport, not automatically
-a new independent model-family replication.
+A real call requires an immutable AUTHORIZED launch record in addition to the CLI
+execute flag. The record binds packet/config/prompt hashes, retry policy and spend
+ceiling before any provider request. This is a revised-rubric re-annotation transport,
+not automatically a new independent model-family replication.
 """
 import argparse
 import datetime as dt
@@ -20,7 +21,7 @@ from adapters.deepseek_chat import chat_completion, extract_content
 from arena.io_utils import load_json, load_jsonl, write_jsonl, sha256_file
 from arena.reviewer_v2_contract import normalize, parse_json, build_ref_index, get_expansion_record, stable_hash
 
-VERSION = 'R234-REVIEWER-V2-DEEPSEEK-ADAPTER-v0.1'
+VERSION = 'R234-REVIEWER-V2-DEEPSEEK-ADAPTER-v0.2'
 PROMPTS = {
     'R2': 'reviews/reviewer_system_v2/prompts/R2_BOUNDARY_PROMPT_v0.1.md',
     'R3': 'reviews/reviewer_system_v2/prompts/R3_LINEAGE_PROMPT_v0.1.md',
@@ -57,8 +58,82 @@ def target_ref(layer, packet):
     return w.get('structural_round_id') or f"{packet.get('run_id')}:R4:{w.get('round_index')}"
 
 
+def validate_launch_record(record, layer, packets_path, model_config_path, prompt_path,
+                           authorization_ref, max_spend_usd, review_retries, price_mode):
+    """Validate all immutable launch bindings before credential/provider access."""
+    errors = []
+    if record.get('status') != 'AUTHORIZED':
+        errors.append('launch record status must be AUTHORIZED')
+    if record.get('execute_real_api') is not True:
+        errors.append('launch record execute_real_api must be true')
+    if record.get('authorization_ref') != authorization_ref:
+        errors.append('authorization_ref does not match launch record')
+    if record.get('scientific_role') != 'REANNOTATION_CALIBRATION_UNDER_REVISED_SEMANTIC_CONTRACT':
+        errors.append('unexpected scientific_role')
+
+    layer_record = (record.get('packet_files') or {}).get(layer)
+    if not layer_record:
+        errors.append(f'launch record missing packet binding for {layer}')
+    else:
+        actual_packet_hash = sha256_file(packets_path)
+        if layer_record.get('sha256') != actual_packet_hash:
+            errors.append(f'{layer} packet file SHA256 mismatch')
+        expected_count = layer_record.get('unit_count')
+        if expected_count is None:
+            errors.append(f'{layer} launch record missing unit_count')
+        else:
+            actual_count = len(load_jsonl(packets_path))
+            if actual_count != expected_count:
+                errors.append(f'{layer} unit count mismatch: expected {expected_count}, got {actual_count}')
+
+    if record.get('model_config_sha256') != sha256_file(model_config_path):
+        errors.append('model config SHA256 mismatch')
+    prompt_hash = sha256_file(prompt_path)
+    if (record.get('prompt_hashes') or {}).get(layer) != prompt_hash:
+        errors.append(f'{layer} prompt SHA256 mismatch')
+
+    runtime = record.get('runtime_policy') or {}
+    if runtime.get('malformed_output_retries_max') != review_retries:
+        errors.append('review retry ceiling differs from launch record')
+    if runtime.get('context_expansion_max_per_packet') != 1:
+        errors.append('launch record context expansion ceiling must equal 1')
+    if runtime.get('semantic_uncertainty_retry') is not False:
+        errors.append('semantic uncertainty retry must be false')
+    if runtime.get('subject_rerun_on_reviewer_failure') is not False:
+        errors.append('subject rerun on reviewer failure must be false')
+    if runtime.get('max_workers') != 1:
+        errors.append('first Reviewer-v2 paid launch must use max_workers=1')
+
+    spend = record.get('spend_policy') or {}
+    recorded_spend = spend.get('launch_max_spend_usd')
+    absolute_ceiling = spend.get('repository_level_absolute_ceiling_usd')
+    if type(recorded_spend) not in (int, float) or recorded_spend <= 0:
+        errors.append('launch record must freeze positive launch_max_spend_usd')
+    elif max_spend_usd != recorded_spend:
+        errors.append('CLI max spend does not match launch record')
+    if type(absolute_ceiling) not in (int, float) or absolute_ceiling <= 0:
+        errors.append('launch record absolute spend ceiling invalid')
+    elif type(recorded_spend) in (int, float) and recorded_spend > absolute_ceiling:
+        errors.append('launch max spend exceeds repository absolute ceiling')
+    if spend.get('price_mode_for_ceiling') != price_mode:
+        errors.append('CLI price mode does not match launch record')
+
+    accepted = record.get('accepted_returned_model_values') or []
+    if not accepted or not all(isinstance(x, str) and x for x in accepted):
+        errors.append('accepted_returned_model_values must be a non-empty string list')
+    if errors:
+        raise ValueError('; '.join(errors))
+    return {
+        'packet_sha256': sha256_file(packets_path),
+        'prompt_sha256': prompt_hash,
+        'model_config_sha256': sha256_file(model_config_path),
+        'accepted_returned_model_values': accepted,
+        'launch_record_hash': stable_hash(record),
+    }
+
+
 def make_record(layer, packet, final, reviewer_id, model_cfg_hash, prompt_hash, response, usage,
-                attempt, failures, expansion_ref, authorization_ref):
+                attempt, failures, expansion_ref, authorization_ref, launch_record_hash):
     row = {
         'review_record_version': RECORD_VERSION[layer],
         'review_layer': layer,
@@ -78,7 +153,8 @@ def make_record(layer, packet, final, reviewer_id, model_cfg_hash, prompt_hash, 
         'created_at': dt.datetime.now(dt.timezone.utc).isoformat().replace('+00:00', 'Z'),
         'usage': usage, 'review_attempt_count': attempt, 'failed_review_attempts': failures,
         'provider_response_id': response.get('id'), 'adapter_version': VERSION,
-        'authorization_ref': authorization_ref, 'packet_hash': packet.get('packet_hash'),
+        'authorization_ref': authorization_ref, 'launch_record_hash': launch_record_hash,
+        'packet_hash': packet.get('packet_hash'),
     }
     if layer == 'R2':
         row['target_ref'] = target_ref(layer, packet)
@@ -98,7 +174,8 @@ def make_record(layer, packet, final, reviewer_id, model_cfg_hash, prompt_hash, 
 
 
 def review_one(layer, packet, prompt, cfg, cfg_hash, prompt_hash, ref_index, reviewer_id,
-               retries, authorization_ref, budget, max_spend, price_mode):
+               retries, authorization_ref, budget, max_spend, price_mode, accepted_models,
+               launch_record_hash):
     failures, total_usage, last_error = [], {}, None
     for attempt in range(1, retries + 2):
         expansion_ref = None
@@ -108,6 +185,9 @@ def review_one(layer, packet, prompt, cfg, cfg_hash, prompt_hash, ref_index, rev
                 if budget['cost'] >= max_spend:
                     raise RuntimeError('hard spend ceiling reached')
                 response = chat_completion(cfg, messages, evaluator=True, response_format_json=True)
+                returned_model = response.get('model')
+                if returned_model not in accepted_models:
+                    raise RuntimeError(f'unexpected returned model: {returned_model!r}')
                 add_usage(total_usage, response.get('usage'))
                 add_usage(budget['usage'], response.get('usage'))
                 budget['cost'] = cost_usd(budget['usage'], cfg, price_mode)
@@ -126,7 +206,8 @@ def review_one(layer, packet, prompt, cfg, cfg_hash, prompt_hash, ref_index, rev
                     ]
                     continue
                 return make_record(layer, packet, parsed, reviewer_id, cfg_hash, prompt_hash, response,
-                                   total_usage, attempt, failures, expansion_ref, authorization_ref)
+                                   total_usage, attempt, failures, expansion_ref, authorization_ref,
+                                   launch_record_hash)
         except Exception as err:
             last_error = err
             failures.append({'attempt': attempt, 'error': repr(err)})
@@ -139,6 +220,7 @@ def main():
     ap.add_argument('--packets', required=True)
     ap.add_argument('--traces', required=True)
     ap.add_argument('--outdir', required=True)
+    ap.add_argument('--launch-record', required=True)
     ap.add_argument('--reviewer-id', default='deepseek-reviewer-v2-reannotation')
     ap.add_argument('--model-config', default='arena/config/model_deepseek_v0.2.json')
     ap.add_argument('--review-retries', type=int, default=2)
@@ -156,23 +238,38 @@ def main():
         raise SystemExit('--max-spend-usd required and must be > 0')
     if args.review_retries < 0 or args.review_retries > 2:
         raise SystemExit('--review-retries must be 0..2')
+
+    cfg_path = ROOT / args.model_config
+    prompt_path = ROOT / PROMPTS[args.layer]
+    launch_record = load_json(args.launch_record)
+    try:
+        launch_binding = validate_launch_record(
+            launch_record, args.layer, args.packets, cfg_path, prompt_path,
+            args.authorization_ref, args.max_spend_usd, args.review_retries, args.price_mode,
+        )
+    except Exception as err:
+        raise SystemExit(f'launch record validation failed before provider access: {err}')
+
+    # Credential access is deliberately after all immutable launch-record checks.
     if not os.environ.get('DEEPSEEK_API_KEY'):
         raise SystemExit('provider credential is not set')
 
-    cfg_path = ROOT / args.model_config
     cfg = load_json(cfg_path)
-    cfg_hash = sha256_file(cfg_path)
-    prompt_path = ROOT / PROMPTS[args.layer]
-    prompt, prompt_hash = prompt_path.read_text(encoding='utf-8'), sha256_file(prompt_path)
+    cfg_hash = launch_binding['model_config_sha256']
+    prompt, prompt_hash = prompt_path.read_text(encoding='utf-8'), launch_binding['prompt_sha256']
     packets = load_jsonl(args.packets)
     ref_index = build_ref_index(load_jsonl(args.traces))
     budget = {'usage': {}, 'cost': 0.0}
     rows, errors = [], []
     for packet in packets:
         try:
-            rows.append(review_one(args.layer, packet, prompt, cfg, cfg_hash, prompt_hash, ref_index,
-                                   args.reviewer_id, args.review_retries, args.authorization_ref,
-                                   budget, args.max_spend_usd, args.price_mode))
+            rows.append(review_one(
+                args.layer, packet, prompt, cfg, cfg_hash, prompt_hash, ref_index,
+                args.reviewer_id, args.review_retries, args.authorization_ref, budget,
+                args.max_spend_usd, args.price_mode,
+                launch_binding['accepted_returned_model_values'],
+                launch_binding['launch_record_hash'],
+            ))
         except Exception as err:
             errors.append({'packet_id': packet.get('packet_id'), 'error': repr(err)})
             break
@@ -182,6 +279,7 @@ def main():
     (out / 'review_errors.json').write_text(json.dumps(errors, ensure_ascii=False, indent=2), encoding='utf-8')
     summary = {
         'adapter_version': VERSION, 'layer': args.layer, 'authorization_ref': args.authorization_ref,
+        'launch_record_hash': launch_binding['launch_record_hash'],
         'requested_unit_count': len(packets), 'completed_unit_count': len(rows), 'error_count': len(errors),
         'aggregate_usage': budget['usage'], 'estimated_cost_usd': budget['cost'],
         'price_mode': args.price_mode, 'max_spend_usd': args.max_spend_usd,
