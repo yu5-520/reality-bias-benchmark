@@ -99,6 +99,17 @@ jobs:
           grep -q '^LINEAGE_STATUS=SOURCE_BACKED_STRUCTURAL_LINEAGE_v0.1$' results/system_behavior_lineage_preflight/SUMMARY.txt
           grep -q '^SEMANTIC_ADOPTION_STATUS=NOT_ADJUDICATED$' results/system_behavior_lineage_preflight/SUMMARY.txt
           grep -q '^AUTHORITY_PENETRATION_STATUS=NOT_ADJUDICATED$' results/system_behavior_lineage_preflight/SUMMARY.txt
+      - name: Freeze v4 R5-R6 research-interface binding — zero API calls
+        run: |
+          python -m arena.v4_binding_preflight --outdir results/v4_binding_preflight
+          test -s results/v4_binding_preflight/plan/branch_plan.json
+          test -s results/v4_binding_preflight/plan/v4_research_binding.json
+          test -s results/v4_binding_preflight/SUMMARY.txt
+          grep -q '^V4_RESEARCH_BINDING_PREFLIGHT=PASS$' results/v4_binding_preflight/SUMMARY.txt
+          grep -q '^SCIENTIFIC_EVIDENCE=NO$' results/v4_binding_preflight/SUMMARY.txt
+          grep -q '^AUTHORIZATION_STATUS=NOT_AUTHORIZED$' results/v4_binding_preflight/SUMMARY.txt
+          grep -q '^PAID_API_AUTHORIZED=NO$' results/v4_binding_preflight/SUMMARY.txt
+          grep -q '^SEMANTIC_STATUS=NOT_ADJUDICATED$' results/v4_binding_preflight/SUMMARY.txt
       - name: Build current v0.3.2 offline manifest sample
         run: |
           python -m arena.build_manifest --domains all --repeats 2 --arena-config arena/config/arena_v0.3.json --out results/arena_manifest_preflight.jsonl
