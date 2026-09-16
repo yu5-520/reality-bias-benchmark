@@ -156,12 +156,16 @@ def main() -> None:
         raise RuntimeError("v4_branch_derivation_measurement_count_mismatch")
     if len(derived["branch_anchor_views"]) != len(traces):
         raise RuntimeError("v4_branch_anchor_view_count_mismatch")
+    if len(derived["branch_anchor_review_packets"]) != len(traces):
+        raise RuntimeError("v4_branch_anchor_review_packet_count_mismatch")
     if derived["summary"]["measurement_v3_replaced"] is not False:
         raise RuntimeError("v4_branch_derivation_replaced_v3")
     if derived["summary"]["automatic_paid_evaluator_called"] is not False:
         raise RuntimeError("v4_branch_derivation_paid_evaluator_called")
     if derived["summary"]["bounded_review_packet_count"] <= 0:
         raise RuntimeError("v4_branch_derivation_expected_review_packets")
+    if derived["summary"]["branch_anchor_review_packet_count"] != len(traces):
+        raise RuntimeError("v4_branch_anchor_review_summary_count_mismatch")
     if any(row.get("semantic_status") != "NOT_ADJUDICATED" for row in derived["measurements"]):
         raise RuntimeError("v4_branch_derivation_semantic_promotion")
     if any((row.get("r5_mid") or {}).get("semantic_reliance_status") != "NOT_ADJUDICATED" for row in derived["measurements"]):
@@ -175,6 +179,32 @@ def main() -> None:
         raise RuntimeError("v4_branch_anchor_control_status_unexpected")
     if statuses.get("STATUS_DOWNGRADE_INTERVENTION") != "provisional":
         raise RuntimeError("v4_branch_anchor_intervention_status_unexpected")
+
+    measurement_by_run = {row["trajectory_id"]: row for row in derived["measurements"]}
+    for packet in derived["branch_anchor_review_packets"]:
+        if packet.get("packet_scope") != "BRANCH_START_ANCHOR_PROPAGATION":
+            raise RuntimeError("v4_branch_anchor_review_scope_invalid")
+        if packet.get("semantic_status") != "NOT_ADJUDICATED":
+            raise RuntimeError("v4_branch_anchor_review_semantic_promotion")
+        omission = packet.get("omission_report") or {}
+        if omission.get("full_trajectory_included") is not False:
+            raise RuntimeError("v4_branch_anchor_review_full_trajectory_included")
+        if omission.get("raw_model_output_included") is not False:
+            raise RuntimeError("v4_branch_anchor_review_raw_output_included")
+        if omission.get("hidden_chain_of_thought_included") is not False:
+            raise RuntimeError("v4_branch_anchor_review_hidden_cot_included")
+        if omission.get("original_phase_a_source_content_reconstructed") is not False:
+            raise RuntimeError("v4_branch_anchor_review_reconstructed_phase_a_source")
+        measurement = measurement_by_run.get(packet["trajectory_id"])
+        if measurement is None:
+            raise RuntimeError("v4_branch_anchor_review_measurement_missing")
+        if (packet.get("branch_start_anchor") or {}).get("anchor_hash") != measurement["r5_mid"]["branch_start_anchor_hash"]:
+            raise RuntimeError("v4_branch_anchor_review_anchor_hash_mismatch")
+        if packet.get("evidence_batch_hash") != evidence["evidence_batch_hash"]:
+            raise RuntimeError("v4_branch_anchor_review_evidence_hash_mismatch")
+        if packet.get("v4_research_binding_hash") != binding["binding_hash"]:
+            raise RuntimeError("v4_branch_anchor_review_binding_hash_mismatch")
+
     if len(derived["pair_comparisons"]) != plan_bundle["plan"]["replicates"]:
         raise RuntimeError("v4_branch_derivation_pair_comparison_count_mismatch")
     if derived["summary"]["structurally_compared_pair_count"] != len(derived["pair_comparisons"]):
@@ -189,6 +219,7 @@ def main() -> None:
     write_jsonl(outdir / "trajectory_measurements_v4.jsonl", derived["measurements"])
     write_jsonl(outdir / "branch_anchor_lineage_views_v4.jsonl", derived["branch_anchor_views"])
     write_jsonl(outdir / "bounded_review_packets_v4.jsonl", derived["review_packets"])
+    write_jsonl(outdir / "branch_anchor_review_packets_v4.jsonl", derived["branch_anchor_review_packets"])
     write_jsonl(outdir / "pair_structural_comparisons_v4.jsonl", derived["pair_comparisons"])
     _write_json(outdir / "summary.json", derived["summary"])
     summary_text = (
@@ -200,11 +231,16 @@ def main() -> None:
         "SEMANTIC_STATUS=NOT_ADJUDICATED\n"
         "BRANCH_ANCHOR_SEMANTIC_RELIANCE_STATUS=NOT_ADJUDICATED\n"
         "BRANCH_ANCHOR_AUTHORITY_PENETRATION_STATUS=NOT_ADJUDICATED\n"
+        "BRANCH_ANCHOR_REVIEW_STATUS=NOT_ADJUDICATED\n"
+        "BRANCH_ANCHOR_REVIEW_FULL_TRAJECTORY_INCLUDED=NO\n"
+        "BRANCH_ANCHOR_REVIEW_RAW_MODEL_OUTPUT_INCLUDED=NO\n"
+        "BRANCH_ANCHOR_REVIEW_HIDDEN_COT_INCLUDED=NO\n"
         "CAUSAL_EFFECT_STATUS=NOT_ADJUDICATED\n"
         f"TRACE_COUNT={len(traces)}\n"
         f"MEASUREMENT_V4_COUNT={len(derived['measurements'])}\n"
         f"BRANCH_ANCHOR_LINEAGE_VIEW_COUNT={len(derived['branch_anchor_views'])}\n"
         f"BOUNDED_REVIEW_PACKET_COUNT={len(derived['review_packets'])}\n"
+        f"BRANCH_ANCHOR_REVIEW_PACKET_COUNT={len(derived['branch_anchor_review_packets'])}\n"
         f"PAIRED_STRUCTURAL_COMPARISON_COUNT={len(derived['pair_comparisons'])}\n"
         f"V4_RESEARCH_BINDING_HASH={binding['binding_hash']}\n"
         f"SUMMARY_HASH={derived['summary']['summary_hash']}\n"
