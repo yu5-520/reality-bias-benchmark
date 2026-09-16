@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/behavior_event_v0.1.schema.json",
+  "title": "Reality Bias Behavior Event v0.1",
+  "type": "object",
+  "required": [
+    "schema",
+    "behavior_event_id",
+    "trajectory_id",
+    "event_index",
+    "turn",
+    "boundary_id",
+    "actor",
+    "action_type",
+    "realization_status",
+    "state_before_hash",
+    "state_after_hash",
+    "source_refs",
+    "parent_event_refs"
+  ],
+  "properties": {
+    "schema": {"const": "RB-BEHAVIOR-EVENT-v0.1"},
+    "behavior_event_id": {"type": "string", "minLength": 1},
+    "trajectory_id": {"type": "string", "minLength": 1},
+    "branch_id": {"type": ["string", "null"]},
+    "event_index": {"type": "integer", "minimum": 0},
+    "turn": {"type": "integer", "minimum": 0},
+    "node_id": {"type": ["string", "null"]},
+    "boundary_id": {"type": "string", "minLength": 1},
+    "actor": {"type": "string", "minLength": 1},
+    "action_type": {
+      "type": "string",
+      "enum": ["read", "write", "message", "invoke", "commit", "reopen", "revise", "inherit", "finalize", "other"]
+    },
+    "target_ref": {"type": ["string", "null"]},
+    "realization_status": {
+      "type": "string",
+      "enum": ["PROPOSAL", "REALIZED", "BLOCKED", "FAILED"]
+    },
+    "state_before_hash": {"type": ["string", "null"]},
+    "state_after_hash": {"type": ["string", "null"]},
+    "authority_before": {
+      "type": "array",
+      "items": {"type": "string", "enum": ["I", "V", "T", "OTHER"]},
+      "uniqueItems": true
+    },
+    "authority_after": {
+      "type": "array",
+      "items": {"type": "string", "enum": ["I", "V", "T", "OTHER"]},
+      "uniqueItems": true
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "parent_event_refs": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "raw_event_ref": {"type": ["string", "null"]},
+    "structured_diff": {"type": ["object", "null"]},
+    "semantic_status": {
+      "type": "string",
+      "enum": ["NOT_ADJUDICATED", "ADJUDICATED"]
+    },
+    "notes": {"type": ["string", "null"]}
+  },
+  "additionalProperties": true
+}
