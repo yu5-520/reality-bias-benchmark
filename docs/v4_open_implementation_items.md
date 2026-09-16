@@ -13,28 +13,36 @@ The v4 theory/measurement layer is additive. The items below are not claims of s
 - current message-read and invocation-read lifecycle mapping;
 - shared-state / invocation / message / FINAL-reopen boundary mapping;
 - synchronized v4 trajectory record emitted from the same source trajectory;
-- CI runs both registry preflight and real Arena-v0.3 scripted-trace adapter preflight;
-- adapter fails closed on unsupported source trace schemas;
-- Jump detector remains explicitly `NOT_RUN_DETECTOR_NOT_FROZEN` rather than silently assigning Jump truth.
+- frozen `structural_jump_detector_v0.1` structural-candidate rules;
+- frozen `operational_boundary_set_v0.1` mechanical crossing rules;
+- event-level Jump candidates may carry multiple structural types without becoming multiple events;
+- branch continuation slicing primitive using `behavior_event.turn > branch_start_turn`;
+- synchronized R2/R3/R4 structural dynamics view with semantic Jump/R/penetration kept unadjudicated;
+- CI runs registry, adapter and dynamics preflights;
+- adapter/detector fail closed on unsupported source or registry boundaries.
 
 Current implementation:
 
 - `arena/system_behavior_adapter.py`
+- `arena/system_behavior_dynamics_v4.py`
 - `arena/system_behavior_trace_preflight.py`
+- `arena/system_behavior_dynamics_preflight.py`
 - `arena/tests/test_system_behavior_adapter.py`
+- `arena/tests/test_system_behavior_dynamics_v4.py`
+- `configs/structural_jump_detector_v0.1.json`
+- `configs/operational_boundary_set_v0.1.json`
 
 ## P0 — before new real v4 subject evidence
 
-- bind current R5/R6 branch plans to experimental-variable registry hash and measurement-boundary registry hash without rewriting historical branch-plan versions;
-- freeze a v4-compatible Jump detector for any confirmatory Jump-incidence claim;
-- define operational-boundary set/version for any formal penetration-depth claim;
-- bind new subject evidence to exact v4 measurement/registry/adapter hashes;
-- add branch-continuation-aware v4 slicing so parent history is not counted as branch outcome;
+- freeze explicit source-backed lineage rules for message/invocation/read/state visibility;
+- define the subset of lineage + operational crossings that may support a formal penetration-depth candidate;
+- bind current R5/R6 branch plans to experimental-variable registry hash, measurement-boundary registry hash, detector hash and operational-boundary-set hash without rewriting historical branch-plan versions;
+- bind new subject evidence to exact v4 measurement/registry/adapter/detector/boundary hashes;
 - add source-version adapter coverage for any future trace schema before that schema is used for v4 evidence.
 
 ## P1 — after first v4 subject evidence
 
-- derive Jump-anchored synchronized R2/R3/R4 views from one frozen trajectory;
+- derive source-backed descendant lineage rather than temporal-order proxies;
 - generate bounded semantic review windows from behavior candidates;
 - test lineage coverage for shared-state, message, invocation and FINAL/reopen events under real subject evidence;
 - freeze primary first-paper dynamic metrics;
