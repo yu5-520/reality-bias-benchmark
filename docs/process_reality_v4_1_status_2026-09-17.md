@@ -1,64 +1,66 @@
 # Process Reality v4.1 — Rollout Status
 
 Date: 2026-09-17  
-Status: PROSPECTIVE NATURAL EVIDENCE FROZEN / ROOT-SCOPED MEASUREMENT v0.3 FROZEN / FORMAL PROSPECTIVE ONE-SHOT v0.2 PREPARED / ONE-SHOT RUNTIME LIFECYCLE AUDITED OFFLINE / PAID ONE-SHOT NOT AUTHORIZED
+Status: PROSPECTIVE NATURAL RAW EVIDENCE FROZEN / THREE-LAYER MEASUREMENT v0.4 FROZEN / FORMAL PROSPECTIVE ONE-SHOT v0.3 PREPARED / EXACT RUNTIME + v0.4 ANALYSIS PATH AUDITED OFFLINE / PAID ONE-SHOT NOT AUTHORIZED
 
 ## 1. Forward research coordinate
 
-The first-paper stack remains process-reality mechanism research rather than terminal-outcome or engineering-containment evaluation.
+The forward first-paper stack is process-reality mechanism research, not terminal-outcome scoring and not an engineering-governance benchmark.
 
-Core forward contracts:
+Research order:
+
+```text
+natural emergence observation
+-> freeze a natural Jump
+-> one-shot local epistemic perturbation
+-> free downstream evolution
+-> characterize recurrence / inertia / topology
+-> only later use the mechanism as an engineering-governance benchmark
+```
+
+Core contracts:
 
 - `docs/R_Plan_v4.1.md`
 - `theory/theory_contract_v0.5.md`
 - `docs/system_behavior_measurement_plan_v4.1.md`
 - `docs/R5_R6_branch_intervention_recovery_protocol_v0.5.md`
-- `docs/experimental_control_layer_v0.3.md`
-- `configs/experimental_variable_registry_v0.2.json`
 - `configs/first_paper_mechanism_contract_v0.3.json`
 - `configs/first_paper_analysis_contract_v0.2.json`
+- `configs/process_reality_measurement_contract_v0.4.json`
 - `arena/config/r5r6_anchor_rule_v0.3.json`
 
-Historical contracts/evidence remain immutable.
+Historical contracts and artifacts remain immutable provenance.
 
-## 2. One-shot forward invariant
+## 2. One-shot experimental invariant
 
 ```text
 same frozen parent/start state
-+ one experiment-origin epistemic overlay
-+ exactly one direct exposure
-+ no persistent Arena-state mutation
-+ no experiment-origin reinjection
--> free downstream evolution
+A: natural continuation, unchanged
+B: one experiment-origin status overlay at first resumed post-Jump prompt
+   fact -> unconfirmed
+   exactly one direct exposure
+   overlay consumed immediately after delivery
+   no persistent Arena-state mutation
+   no experiment-origin reinjection
+-> both branches continue under the ordinary free-Agent runtime
 ```
 
-R2/R3/R4/R6 remain trajectory measurement dimensions. R5 is the same-parent causal branch operator.
+The experimental field is event/jump scoped, not a persistent shared-state treatment.
 
 ## 3. Prospective natural subject batch — completed
 
 Batch: `R2R6-PROSPECTIVE-NATURAL-BATCH-001`
 
-Authorized once under: `R2R6-PROSPECTIVE-NATURAL-2026-09-17-001`
-
-Authorization limits:
-
-- total ceiling: 1 USD;
-- per-run ceiling: 0.25 USD;
-- per-run max calls: 64;
-- 4 symmetric planned trajectories;
-- no paid evaluator;
-- no one-shot branch;
-- no outcome-aware rerun;
-- no rerun to manufacture an anchor.
-
 Real workflow:
 
-- run: `35124129473`;
-- job: `104888877007`;
-- head SHA: `cafc2a82da30937b4bb1fdd5461fdced711e936a`;
-- conclusion: success;
-- runner errors: 0;
-- estimated total spend: `0.199857996 USD` (engineering estimate, not provider invoice).
+- run: `35124129473`
+- job: `104888877007`
+- head SHA: `cafc2a82da30937b4bb1fdd5461fdced711e936a`
+- conclusion: success
+- runner errors: 0
+- estimated total spend: `0.199857996 USD` — engineering estimate, not provider invoice
+- paid evaluator: no
+- one-shot branch: no
 
 Observed trajectories:
 
@@ -69,257 +71,304 @@ Observed trajectories:
 | `prospective-ecommerce-natural-0003` | RUN_COMPLETE | 22 | NO_ELIGIBLE_STRUCTURAL_ANCHOR |
 | `prospective-ecommerce-natural-0004` | RUN_COMPLETE | 12 | NO_ELIGIBLE_STRUCTURAL_ANCHOR |
 
-No-anchor and censored observations were preserved and were not rerun.
+No-anchor and censored observations were preserved; none was rerun to manufacture a Jump.
 
-## 4. Frozen natural raw evidence
+Frozen raw evidence:
 
-Evidence batch hash:
-
-`15c731bffb309068e8b694b4fff3cf015b4240b658450b042f55a23509ccc82e`
-
-Raw artifact:
-
-- name: `r2r6-prospective-natural-raw-35124129473`;
-- artifact ID: `10459066205`;
-- GitHub digest: `sha256:f3a7ea0e38bb64cee9d08f52cf1111c757d8ccab872e9b762dd7ee9451c2442b`;
-- inner tar SHA-256: `d1cd3b015dd2555174f4136bd2871b6739f069c524dd7df817fb2442945a53f0`;
-- traces SHA-256: `e6bf960e90f75c4dd0dd546336e787c980ce50f6e25519de57d14fbe9703e02c`.
+- evidence batch hash: `15c731bffb309068e8b694b4fff3cf015b4240b658450b042f55a23509ccc82e`
+- artifact: `r2r6-prospective-natural-raw-35124129473`
+- artifact ID: `10459066205`
+- GitHub digest: `sha256:f3a7ea0e38bb64cee9d08f52cf1111c757d8ccab872e9b762dd7ee9451c2442b`
+- inner tar SHA-256: `d1cd3b015dd2555174f4136bd2871b6739f069c524dd7df817fb2442945a53f0`
+- traces SHA-256: `e6bf960e90f75c4dd0dd546336e787c980ce50f6e25519de57d14fbe9703e02c`
 
 Raw evidence was frozen before derived analysis.
 
-Run provenance: `manifests/r2r6_prospective_natural_run_35124129473_record.json`
-
-## 5. Selected prospective natural Jump
+## 4. Prospectively selected natural Jump J0
 
 Only run 0001 met the frozen branchable structural-anchor rule.
 
-- candidate: `prospective-ecommerce-natural-0001:R2V2:6621d1afe7f9acc3`;
-- source event: `EVENT:0032`;
-- turn: 8;
-- actor: `inventory`;
-- state key: `inventory_stockout_assessment_v1`;
-- structural transition: `provisional -> fact`;
-- frozen parent state hash: `aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c`;
-- selection record hash: `c074f01457796121028cc8697f434e5e3f0ff25f3745fdd986919d488b93665b`;
-- semantic CPR status: `NOT_ADJUDICATED`.
+- candidate: `prospective-ecommerce-natural-0001:R2V2:6621d1afe7f9acc3`
+- source event index: `32`
+- source turn: `8`
+- actor: `inventory`
+- state key: `inventory_stockout_assessment_v1`
+- natural structural transition: `provisional -> fact`
+- frozen parent/start state hash: `aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c`
+- selection record hash: `c074f01457796121028cc8697f434e5e3f0ff25f3745fdd986919d488b93665b`
+- resolved BehaviorEvent root: `prospective-ecommerce-natural-0001:arena:32:outcome`
+- semantic CPR status: `NOT_ADJUDICATED`
 
-Selection is structural and outcome-blind. It does not establish semantic C/P/R or causal importance.
+Selection is structural and outcome-blind. It does not establish C/P/R or causal importance.
 
-## 6. Derived-measurement history
+## 5. Measurement lineage
 
-### v0.1 — preserved historical derivation
+### v0.1 — historical root-binding bug
 
-v0.1 incorrectly attempted to equate source Arena event index `32` with the adapter's re-numbered BehaviorEvent index. This produced a null mechanism root. Raw evidence was not changed or rerun.
+v0.1 equated source Arena event index with the adapter's re-numbered BehaviorEvent index and therefore produced a null root. Raw subject evidence was never changed.
 
-### v0.2 — source-root binding correction
+### v0.2 — source-ref root correction
 
-v0.2 binds the frozen source Jump through:
+v0.2 binds the selected Jump by preserved source reference plus selected state key:
 
 `arena_event:<source_event_index> + selected state key`
 
-Correction workflow: `35125208452` — success, no new provider/evaluator/branch call.
+Correction run: `35125208452`, offline only.
 
-### v0.3 — current forward structural derivation
+### v0.3 — root-scoped canonical topology
 
-v0.3 additionally:
+v0.3 removed run/event/message/invocation/turn instance IDs from canonical topology and separated selected-root descendants from unrelated post-branch context.
 
-1. removes run/event/message/invocation/turn instance IDs from canonical path signatures;
-2. makes selected-root descendant topology the primary mechanism/inertia scope;
-3. keeps all post-branch activity only as context diagnostics;
-4. scopes cross-Agent inertia counts to source-backed descendants of J0.
+Run: `35126091603` — success, 137 offline tests, no provider/evaluator/branch call.
 
-Workflow:
+### v0.4 — current forward three-layer mechanism measurement
 
-- run: `35126091603`;
-- job: `104895362682`;
-- conclusion: success;
-- offline tests: 137 passed;
-- new provider calls: 0;
-- paid evaluator calls: 0;
-- one-shot branch calls: 0.
+v0.4 is the forward measurement contract frozen before any real prospective one-shot subject evidence.
 
-v0.3 artifact:
+It measures the same selected-root mechanism at three nested scales.
 
-- name: `r2r6-prospective-natural-derived-v0-3-35126091603`;
-- artifact ID: `10458873608`;
-- GitHub digest: `sha256:db737f33141e44864e628f6903f1ba2815a064fd1b5cfba65b275a71c2878b07`;
-- inner tar SHA-256: `caba1d8644d5f6567239055eab4ad37bea0374c83a610445dbc3f8f989316726`;
-- measurement hash: `4566e6a05e0347ed0b0ef7bccc2610fd0814a0407da5ed7ebbbb0a6ff5886a77`.
+**Layer 1 — Jump recurrence**
 
-Resolved structural root:
+- descendant vs independent downstream Jump classification
+- descendant re-Jump count
+- first re-Jump event distance
+- first re-Jump turn distance
+- first re-Jump lineage depth
+- actor/boundary transition
+- candidate-family continuity
+- direct experimental-exposure flag
 
-`prospective-ecommerce-natural-0001:arena:32:outcome`
+**Layer 2 — inherited structural inertia**
 
-Current forward structural observations from J0:
+- selected-root reachable event count/depth
+- source-backed cross-Agent relations
+- branch nodes
+- merge nodes
+- mechanical role re-entry candidates
+- paired shared prefix
+- first divergence
+- first canonical-signature reconvergence
+- descendant-edge survival
+- affected-Agent overlap
 
-- descendant re-Jump candidates: 6;
-- all root-reachable structural events: 52;
-- continuation root-reachable events: 52;
-- continuation root depth: 4;
-- affected Agents: `ads`, `finance`, `inventory`, `ops_lead`;
-- root-descendant cross-Agent structural relations: 31;
-- root-descendant canonical edge instances: 81;
-- root edge-multiset hash: `7d2b5b05d442bf7456bcd358698b2a1e84c68373b07b57b785ac182c85c69739`;
-- root ordered-sequence hash: `7a197480780ec795762427dad05f4b7ab47c86c150bbeeddf03f98003d6fc9dd`.
+**Layer 3 — path topology / observed path-family reorganization**
 
-These are structural process measurements only. They do not establish semantic adoption, responsibility/authority penetration, CPR truth, recovery truth or causal effect.
+- realized source-backed root-to-leaf lineage path families
+- shared/control-only/intervention-only path families
+- path-family Jaccard
+- edge-set and weighted edge-multiset overlap
+- branch/merge/re-entry changes
+- mechanical cross-Agent relation changes
 
-## 7. Formal prospective one-shot execution path
+Path-family cap: `4096`. Overflow must be marked and cannot be described as a complete realized path-family set.
 
-The forward runner now binds condition identity before the first provider call and fails closed on drift in:
+Natural-evidence v0.4 derivation:
 
-- prepared plan hash;
-- exact execution code SHA;
-- model config hash;
-- Arena config hash;
-- domain/task/Agent-registry identities;
-- parent/start state identity;
-- one-shot envelope identity;
-- direct-exposure ledger.
+- workflow run: `35129507980`
+- job: `104906704569`
+- head SHA: `19e5b0025e2d17f6c3af16baabbf53e968a46f84`
+- conclusion: success
+- offline tests: 143 passed
+- new subject provider calls: 0
+- paid evaluator calls: 0
+- one-shot branch calls: 0
 
-Direct-exposure invariant:
+Artifact:
 
-- control: 0 experiment-origin overlays;
-- intervention: exactly 1 overlay;
-- intervention delivery: `parent_turn + 1`, first resumed queued actor;
-- overlay consumed after delivery;
-- persistent mutation: false;
-- reinjection: zero.
+- name: `r2r6-prospective-natural-derived-v0-4-35129507980`
+- artifact ID: `10460348733`
+- GitHub digest: `sha256:6acf9718e75bc39257b83883f2ebcede7a345af0c9b921321e79e87ae7770f85`
+- inner tar SHA-256: `7a77cc39ff0a3dd0fe254353aa753d6cc262f7d570862d02690f93380d68294d`
+- measurement hash: `5ec7953b473e4d7b29612de18aac9992238e722e1b12ea7c6999929958b24191`
+- measurement-contract SHA-256: `cf99284e7dea053aa2f21252cc173d09649f53c7d9a0c1e970f01c2871ec7d4c`
+- root edge-multiset hash: `7d2b5b05d442bf7456bcd358698b2a1e84c68373b07b57b785ac182c85c69739`
+- root ordered-sequence hash: `7a197480780ec795762427dad05f4b7ab47c86c150bbeeddf03f98003d6fc9dd`
+- observed path-family hash: `d2865515cd1aed285c434a593e75b77ab5d3cee062f3afff07c3fd78cd62eaab`
 
-Evidence order for future real branches:
+Natural structural observations from J0:
 
-```text
-branch execution
--> freeze raw traces / journals / plan / envelope / authorization
--> upload raw frozen artifact
--> derive v0.3 root-scoped paired process measurements
--> optional semantic review later
-```
+- descendant re-Jumps: `6`
+- first descendant re-Jump: event distance `10`, turn distance `1`, lineage depth `3`
+- first re-Jump actor: `ops_lead`
+- first re-Jump boundary: `SHARED_STATE`
+- first re-Jump actor changed from J0: yes
+- first re-Jump candidate-family continuity: yes
+- continuation root-reachable structural events: `52`
+- continuation root depth: `4`
+- source-backed root-descendant cross-Agent relations: `31`
+- branch nodes: `16`
+- merge nodes: `12`
+- mechanical role re-entry candidates: `3`
+- realized source-backed root-to-leaf path families: `1721`
+- path-family overflow: false
+- root edge instances: `81`
 
-The formal real-run gate is now distinct:
+The `1721` path families are **not 1721 independent samples** and are **not an exhaustive counterfactual possibility space**. They are realized source-backed lineage paths inside one frozen trajectory graph.
 
-`CALL_REAL_R5MID_PROSPECTIVE_ONESHOT_API`
+Provenance: `manifests/r2r6_prospective_natural_rederive_v0_4_record_2026-09-17.json`
 
-## 8. Formal prospective one-shot v0.2 — offline prepared
+## 6. Formal prospective one-shot v0.3 — current prepared plan
+
+The historical v0.2 formal prepare and readiness artifacts are preserved as provenance but are no longer the forward execution target. v0.3 keeps the same intervention mechanics and binds future A/B analysis to measurement v0.4.
 
 Prepare workflow:
 
-- run: `35126705786`;
-- job: `104897406121`;
-- head SHA / branch execution commit: `1ae76d2394897517e9f07a01b897ed34be1cdffd`;
-- conclusion: success;
-- offline tests: 140 passed;
-- exact raw natural artifact verified;
-- exact v0.3 measurement artifact verified;
-- exact forward-runner preflight: PASS;
-- provider calls: 0.
+- run: `35129957603`
+- job: `104908215351`
+- head SHA / exact branch execution commit: `8a33444741c9f9e016ffbd72aa5955a6da81187d`
+- conclusion: success
+- offline tests: 143 passed
+- exact raw natural artifact verified
+- exact v0.4 measurement artifact verified
+- exact formal-runner preflight: PASS
+- provider calls: 0
 
 Formal plan:
 
-- plan hash: `624cdc84e9c0d7eb4b44f0c916c96bcee9a562a46b19bb70978b4b51b7c5c71d`;
-- source measurement binding: `BOUND_ROOT_SCOPED_CANONICAL_V0.3`;
-- parent/start state hash: `aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c`;
-- one-shot envelope hash: `2df29b96dfde9e2328ba84e1b4e6451f5daaec33ac4cca399626522936084cc9`;
-- intervention: `inventory_stockout_assessment_v1.status: fact -> unconfirmed`;
-- delivery policy: `FIRST_POST_JUMP_AGENT_TURN`;
-- temporal scope: one direct exposure only;
-- persistent state mutation: false;
-- 2 replicate pairs / 4 prepared continuations;
-- pair 1: control first;
-- pair 2: intervention first;
-- semantic CPR status: `NOT_ADJUDICATED`;
-- causal claim status: `NOT_TESTED_PREPARED_ONLY`;
-- paid one-shot authorization: `NOT_AUTHORIZED`.
+- formal prepare version: `0.3`
+- plan hash: `a24c98901422bbccfc9a040a6bc14575b1c710edd518c0d9c2facf7a57926351`
+- source measurement binding: `BOUND_THREE_LAYER_PROCESS_TOPOLOGY_V0.4`
+- downstream measurement schema: `RB-PROCESS-REALITY-MECHANISM-MEASUREMENT-v0.4`
+- downstream derivation module: `arena.derive_one_shot_process_measurements_v0_4`
+- parent/start state hash: `aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c`
+- one-shot envelope hash: `2df29b96dfde9e2328ba84e1b4e6451f5daaec33ac4cca399626522936084cc9`
+- intervention: `inventory_stockout_assessment_v1.status: fact -> unconfirmed`
+- delivery: first resumed post-Jump Agent turn only
+- direct exposure limit: `1`
+- persistent state mutation: false
+- 2 replicate pairs / 4 continuations
+- pair 1: control first
+- pair 2: intervention first
+- semantic CPR status: `NOT_ADJUDICATED`
+- causal claim status: `NOT_TESTED_PREPARED_ONLY`
+- paid one-shot authorization: `NOT_AUTHORIZED`
 
-Formal prepared artifact:
+Prepared artifact:
 
-- name: `r5mid-prospective-one-shot-prepared-v0-2-35126705786`;
-- artifact ID: `10458734543`;
-- GitHub digest: `sha256:64bd48dfc8109b1ea5ed27aaa0930b53be0cb5f3cd0b0b9d2de7d2f9a76e5c9e`;
-- inner tar SHA-256: `26f97e7be568c8259e571fb9991a1049784d7ed4f9c04b6c76ebd5dd97b3477a`;
-- expires: `2026-12-15T17:12:14Z`.
+- name: `r5mid-prospective-one-shot-prepared-v0-3-35129957603`
+- artifact ID: `10460981306`
+- GitHub digest: `sha256:f861db077ebac88f67badd7605c0547c602d067b9d0f3af72b4c9a44ba8503c8`
+- inner tar SHA-256: `3f780b2c0cc88c59fa5c149e6c3b987ba73e8a97aefb0970c89ce5e32f6b1988`
+- expires: `2026-12-15T17:43:36Z`
 
-Formal prepare provenance:
+Provenance: `manifests/r5mid_prospective_one_shot_prepare_v0_3_record_2026-09-17.json`
 
-`manifests/r5mid_prospective_one_shot_prepare_v0_2_record_2026-09-17.json`
+## 7. Exact runtime + v0.4 derivation readiness audit v0.3
 
-## 9. Exact-runtime one-shot lifecycle readiness audit v0.2
-
-The exact prepared plan and exact frozen execution commit were audited again with an offline fake provider. This is an engineering/runtime lifecycle audit only; it is not subject evidence and does not test a causal effect.
+The exact v0.3 prepared artifact and exact frozen branch execution commit were audited with a deterministic fake provider. The audit checks both the one-shot runtime lifecycle and the new v0.4 paired derivation path.
 
 Workflow:
 
-- run: `35128564676`;
-- job: `104903584139`;
-- head SHA: `844e7d7efae9a196a84c6b84c73cb9ddb9c43437`;
-- exact checked-out branch execution commit: `1ae76d2394897517e9f07a01b897ed34be1cdffd`;
-- conclusion: success;
-- exact-code offline tests: 140 passed;
-- real provider calls: 0;
-- paid evaluator calls: 0.
+- run: `35130183819`
+- job: `104908956696`
+- head SHA: `137f5cf8c77b25eccd81afdf931b1fcbea82b56b`
+- exact checked-out execution commit: `8a33444741c9f9e016ffbd72aa5955a6da81187d`
+- conclusion: success
+- exact-code offline tests: 143 passed
+- real provider calls: 0
+- paid evaluator calls: 0
 
-The audit forced an identical second downstream resume in A and B using a deterministic fake provider so that one-shot consumption could be checked directly rather than inferred.
-
-Observed runtime lifecycle:
-
-- first resumed actor: `ops_lead`;
-- first resumed turn: 9;
-- control direct experiment-origin exposure count: 0;
-- intervention direct experiment-origin exposure count: 1;
-- first A/B prompt-view delta path: exactly `shared_state_metadata.inventory_stockout_assessment_v1.status`;
-- first control status: `fact`;
-- first intervention status: `unconfirmed`;
-- forced second-resume target Agent: `ads`;
-- second A/B prompt-view delta paths: none;
-- second control status: `fact`;
-- second intervention status: `fact`;
-- experiment-origin reinjection count: 0;
-- persistent frozen parent state mutation: false.
-
-Therefore the forward implementation now has an explicit offline verification of the intended experimental lifecycle:
+Runtime lifecycle result:
 
 ```text
-A first prompt: fact
-B first prompt: unconfirmed
-        ↓ one direct exposure consumed
+A first resumed prompt: fact
+B first resumed prompt: unconfirmed
+only delta: shared_state_metadata.inventory_stockout_assessment_v1.status
+                ↓ overlay consumed
+forced second resume
 A second prompt: fact
 B second prompt: fact
-        ↓
-no experiment-origin field remains in active runtime context
+A/B second prompt delta: none
+experiment-origin reinjection: 0
+frozen parent mutation: false
 ```
 
-This does not establish that a real subject trajectory will diverge, reconverge, regenerate a Jump, or change CPR. It establishes only that any future downstream difference is not produced by the framework repeatedly re-injecting the experimental status field.
+The fake pair was then passed through the exact forward v0.4 branch derivation path:
+
+- v0.4 branch measurements: `2`
+- complete paired comparison: `1`
+- integrity failures: `0`
+- pair status: `COMPLETE_ROOT_RESOLVED_THREE_LAYER_PAIR`
+- comparison schema: `RB-PROCESS-REALITY-PAIRED-COMPARISON-v0.4`
+- Layer 1/2/3 outputs all present
+- terminal outcome primary: false
+
+This proves the future real raw branch traces can flow from the exact one-shot runtime into root-resolved three-layer measurement without relying on a post-hoc interface patch. It is still an offline fake-provider audit, not subject evidence and not a causal result.
 
 Readiness artifact:
 
-- name: `r5mid-prospective-one-shot-readiness-audit-v0-2-35128564676`;
-- artifact ID: `10460217318`;
-- GitHub digest: `sha256:03d5d8ce200565c34925116973f344d23ca23a899fb058d34781e499aaefca8a`;
-- inner tar SHA-256: `f43f106424ae59999b256d3de9622b2206e7bafbec39d31f6c8f7de244ae9329`;
-- expires: `2026-12-15T17:30:05Z`.
+- name: `r5mid-prospective-one-shot-readiness-audit-v0-3-35130183819`
+- artifact ID: `10460746799`
+- GitHub digest: `sha256:99d1dc01aefa542ccdf19b78383a6de8fe39c3934cec12deab7e21abd32fbbaa`
+- inner tar SHA-256: `09701fa26f10d7f813df35d78571adeea3f5736ed099714d306f709fbcf3573b`
+- expires: `2026-12-15T17:45:46Z`
 
-Readiness provenance:
+Provenance: `manifests/r5mid_prospective_one_shot_readiness_audit_v0_3_record_2026-09-17.json`
 
-`manifests/r5mid_prospective_one_shot_readiness_audit_v0_2_record_2026-09-17.json`
+## 8. Future paid gate — frozen but not authorized
+
+The paid workflow has been promoted to the current v0.3/v0.4 stack. A future paid authorization must bind all of the following before the first provider call:
+
+- exact prepared v0.3 artifact and inner tar hash
+- plan hash `a24c98901422bbccfc9a040a6bc14575b1c710edd518c0d9c2facf7a57926351`
+- exact execution commit `8a33444741c9f9e016ffbd72aa5955a6da81187d`
+- source v0.4 measurement hash and measurement-contract hash
+- exact readiness v0.3 artifact and inner tar hash
+- readiness provenance commit
+- 4 planned branches / 2 replicate pairs
+- positive symmetric per-branch call ceiling
+- positive symmetric per-branch USD ceiling
+- positive total USD ceiling
+- automatic paid evaluator = false
+- historical Phase-B authorization reuse = false
+- prospective-natural authorization reuse = false
+
+Authorization schema:
+
+`schemas/r5mid_prospective_one_shot_paid_authorization_v0.2.schema.json`
+
+Required phrase:
+
+`CALL_REAL_R5MID_PROSPECTIVE_ONESHOT_API`
+
+The trigger file `manifests/r5mid_prospective_one_shot_paid_authorization_2026-09-17.json` does **not** exist and must not be created from a generic “继续/执行”.
+
+## 9. Evidence ordering for the future real one-shot batch
+
+```text
+new explicit paid authorization
+-> verify readiness artifact
+-> verify prepared artifact
+-> checkout exact execution commit
+-> exact-code offline tests
+-> exact prepared-plan preflight
+-> real A/B subject continuations
+-> freeze raw traces / journals / plan / envelope / authorization / readiness binding
+-> upload raw frozen artifact
+-> only then derive v0.4 three-layer paired measurements
+-> semantic review remains deferred / append-only
+```
+
+If a real branch is censored, missing, or fails, its partial raw evidence is preserved. Censoring is not zero, and branches are not rerun to obtain a desired topology or complete-pair threshold.
 
 ## 10. Current stop point
 
-Current state:
+Current forward state:
 
-- post-freeze prospective natural evidence: frozen;
-- no-anchor/censored/null observations: preserved;
-- natural structural Jump: prospectively selected;
-- source-backed root/inertia/re-Jump topology v0.3: frozen;
-- formal same-parent one-shot A/B plan: hash-bound and offline-preflighted;
-- first-prompt single-field A/B perturbation: verified offline on the exact frozen execution commit;
-- one-shot consumption across a forced second resume: verified offline;
-- experiment-origin reinjection after first exposure: verified absent in the offline lifecycle audit;
-- frozen parent persistent state: verified unchanged by the one-shot runtime overlay;
-- semantic CPR adjudication: pending;
-- causal effect: not tested;
-- paid one-shot execution: **not authorized**;
-- paid evaluator: not authorized.
+- prospective natural raw evidence: frozen
+- no-anchor/censored trajectories: preserved
+- natural Jump J0: prospectively selected under structural/outcome-blind rule
+- natural three-layer measurement v0.4: frozen
+- formal same-parent one-shot plan v0.3: frozen and hash-bound
+- first-prompt single-field perturbation: verified offline
+- second-resume removal of experimental field: verified offline
+- experiment-origin reinjection after first exposure: verified absent
+- frozen parent persistent mutation: verified absent
+- v0.4 branch-analysis path: verified offline with one complete fake A/B pair
+- future paid gate: bound to exact prepared + readiness + measurement identities
+- semantic CPR adjudication: `NOT_ADJUDICATED`
+- causal effect: `NOT_TESTED`
+- paid one-shot subject execution: **NOT AUTHORIZED**
+- paid evaluator: **NOT AUTHORIZED**
 
-The consumed prospective-natural authorization and the historical Phase-B authorization cannot be reused.
-
-The next real subject action requires a new explicit authorization for `CALL_REAL_R5MID_PROSPECTIVE_ONESHOT_API` with a positive total USD ceiling, positive symmetric per-branch USD ceiling, and positive symmetric per-branch call ceiling.
+The consumed prospective-natural authorization and historical Phase-B authorization cannot be reused. The next real subject action requires a new explicit `CALL_REAL_R5MID_PROSPECTIVE_ONESHOT_API` authorization plus positive total USD, symmetric per-branch USD and symmetric per-branch call ceilings.
