@@ -1,0 +1,34 @@
+{
+  "schema": "RB-V4-REVIEW-PACKET-POLICY-v0.1",
+  "version": "0.1",
+  "status": "FROZEN_OFFLINE_REVIEW_INTERFACE",
+  "selection_policy": "ONE_PACKET_PER_STRUCTURAL_JUMP_CANDIDATE",
+  "caps": {
+    "descendant_behavior_events": 16,
+    "lineage_relations": 24,
+    "operational_crossings": 12,
+    "downstream_agent_calls": 6,
+    "retrospective_events": 8,
+    "structured_actions_per_call": 8,
+    "string_chars": 1200,
+    "serialized_visible_input_chars": 6000
+  },
+  "context_policy": {
+    "include_full_trajectory": false,
+    "include_hidden_chain_of_thought": false,
+    "include_raw_model_output": false,
+    "include_decision_summary": true,
+    "include_parsed_action_envelope": true,
+    "include_recorded_agent_visible_context": true,
+    "include_machine_lineage": true,
+    "include_mechanical_operational_crossings": true,
+    "include_review_contract_definitions": true,
+    "report_truncation_and_missingness": true
+  },
+  "non_claims": [
+    "Packet selection does not adjudicate C/P/R.",
+    "Packet selection does not adjudicate semantic adoption or Authority Penetration.",
+    "Truncation must be explicit and preserved in omission_report.",
+    "A reviewer may return UNCERTAIN or INSUFFICIENT rather than infer missing evidence."
+  ]
+}
