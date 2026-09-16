@@ -61,10 +61,9 @@ def validate_review_contract(contract: Mapping[str, Any]) -> bool:
     return True
 
 
-def _behavior_by_id(lineage_view: Mapping[str, Any], adapter_result: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
-    events = adapter_result.get("behavior_events") or []
+def _behavior_by_id(adapter_result: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
     out = {}
-    for row in events:
+    for row in adapter_result.get("behavior_events") or []:
         event_id = row.get("behavior_event_id")
         if isinstance(event_id, str):
             out[event_id] = dict(row)
@@ -82,8 +81,7 @@ def _source_event_by_index(source_trace: Mapping[str, Any]) -> dict[int, dict[st
 
 
 def _source_event_index(behavior_event: Mapping[str, Any]) -> int | None:
-    diff = behavior_event.get("structured_diff") or {}
-    value = diff.get("source_event_index")
+    value = (behavior_event.get("structured_diff") or {}).get("source_event_index")
     return value if isinstance(value, int) else None
 
 
@@ -154,17 +152,15 @@ def _agent_contracts(domain: Mapping[str, Any] | None, actor_ids: Iterable[str])
     if not isinstance(domain, Mapping):
         return []
     wanted = set(actor_ids)
-    out = []
-    for row in domain.get("agents") or []:
-        if row.get("id") in wanted:
-            out.append(
-                {
-                    "agent_id": row.get("id"),
-                    "role": row.get("role"),
-                    "responsibility": row.get("responsibility"),
-                }
-            )
-    return out
+    return [
+        {
+            "agent_id": row.get("id"),
+            "role": row.get("role"),
+            "responsibility": row.get("responsibility"),
+        }
+        for row in domain.get("agents") or []
+        if row.get("id") in wanted
+    ]
 
 
 def _task_contract(domain: Mapping[str, Any] | None) -> dict[str, Any]:
@@ -186,7 +182,7 @@ def _prioritized_event_ids(
     event_by_id: Mapping[str, Mapping[str, Any]],
     crossing_event_ids: set[str],
 ) -> list[str]:
-    ordered = []
+    ordered: list[str] = []
 
     def add(event_id: str) -> None:
         if event_id in event_by_id and event_id not in ordered:
@@ -197,12 +193,10 @@ def _prioritized_event_ids(
         if event_id in crossing_event_ids:
             add(event_id)
     for event_id in descendants:
-        row = event_by_id.get(event_id) or {}
-        if row.get("boundary_id") == "AGENT_TURN":
+        if (event_by_id.get(event_id) or {}).get("boundary_id") == "AGENT_TURN":
             add(event_id)
     for event_id in descendants:
-        row = event_by_id.get(event_id) or {}
-        if row.get("action_type") in {"write", "invoke", "revise", "finalize"}:
+        if (event_by_id.get(event_id) or {}).get("action_type") in {"write", "invoke", "revise", "finalize"}:
             add(event_id)
     for event_id in descendants:
         add(event_id)
@@ -213,6 +207,7 @@ def _packet_for_candidate(
     *,
     source_trace: Mapping[str, Any],
     adapter_result: Mapping[str, Any],
+    dynamics_view: Mapping[str, Any],
     lineage_view: Mapping[str, Any],
     candidate: Mapping[str, Any],
     candidate_metrics: Mapping[str, Any],
@@ -221,14 +216,13 @@ def _packet_for_candidate(
     evidence_batch_hash: str | None,
     v4_research_binding_hash: str | None,
 ) -> dict[str, Any]:
-    event_by_id = _behavior_by_id(lineage_view, adapter_result)
+    event_by_id = _behavior_by_id(adapter_result)
     source_events = _source_event_by_index(source_trace)
     root_id = candidate["behavior_event_id"]
     root = event_by_id.get(root_id)
     _require(root is not None, f"review_root_behavior_event_missing:{root_id}")
 
     descendants = list(candidate_metrics.get("descendant_behavior_event_ids") or [])
-    descendant_set = set(descendants)
     relevant_ids = {root_id, *descendants}
     all_relations = [
         row
@@ -236,29 +230,15 @@ def _packet_for_candidate(
         if row.get("source_behavior_event_id") in relevant_ids
         and row.get("target_behavior_event_id") in relevant_ids
     ]
-    all_crossings = [
+    exact_crossings = [
         row
-        for row in (lineage_view.get("system_trajectory_measurement") or {}).get("_unused", [])
+        for row in dynamics_view.get("operational_crossings") or []
+        if row.get("behavior_event_id") in relevant_ids
     ]
-    # Operational crossings live in the dynamics-derived view used to build lineage and
-    # are copied into lineage candidate metrics only as aggregate values. Re-derive the
-    # event set from the mechanical crossing classes recorded by candidate metrics and
-    # event action/boundary identity in the effective BehaviorEvent set.
-    crossing_like_ids = {
-        event_id
-        for event_id in relevant_ids
-        if event_id in event_by_id
-        and event_by_id[event_id].get("realization_status") == "REALIZED"
-        and (
-            (event_by_id[event_id].get("boundary_id") == "SHARED_STATE" and event_by_id[event_id].get("action_type") == "write")
-            or (event_by_id[event_id].get("boundary_id") == "INVOCATION" and event_by_id[event_id].get("action_type") == "invoke")
-            or (event_by_id[event_id].get("boundary_id") == "FINAL_REOPEN" and event_by_id[event_id].get("action_type") in {"revise", "finalize"})
-            or (event_by_id[event_id].get("boundary_id") in {"COMMIT_GATE", "AUTHORITY_CONVERSION"} and event_by_id[event_id].get("action_type") == "commit")
-        )
-    }
+    crossing_event_ids = {row["behavior_event_id"] for row in exact_crossings}
 
     bounds = contract["packet_bounds"]
-    ordered_ids = _prioritized_event_ids(root_id, descendants, event_by_id, crossing_like_ids)
+    ordered_ids = _prioritized_event_ids(root_id, descendants, event_by_id, crossing_event_ids)
     selected_ids = ordered_ids[: bounds["max_behavior_events"]]
     selected_set = set(selected_ids)
 
@@ -268,12 +248,14 @@ def _packet_for_candidate(
         if row.get("source_behavior_event_id") in selected_set
         and row.get("target_behavior_event_id") in selected_set
     ][: bounds["max_lineage_relations"]]
-
-    operational_events = [
-        event_by_id[event_id]
-        for event_id in selected_ids
-        if event_id in crossing_like_ids
+    selected_crossings = [
+        row for row in exact_crossings if row.get("behavior_event_id") in selected_set
     ][: bounds["max_operational_crossings"]]
+    operational_events = [
+        event_by_id[row["behavior_event_id"]]
+        for row in selected_crossings
+        if row.get("behavior_event_id") in event_by_id
+    ]
 
     retrospective_events = [
         event_by_id[event_id]
@@ -283,7 +265,7 @@ def _packet_for_candidate(
         and int(event_by_id[event_id].get("event_index", -1)) > int(root.get("event_index", -1))
     ]
 
-    source_indices = []
+    source_indices: list[int] = []
     for event_id in selected_ids:
         source_index = _source_event_index(event_by_id[event_id])
         if isinstance(source_index, int) and source_index not in source_indices:
@@ -294,7 +276,7 @@ def _packet_for_candidate(
         if index in source_events
     ]
 
-    call_indices = []
+    call_indices: list[int] = []
     for source_index in source_indices:
         call_index = _call_index_for_source_event(source_trace, source_index)
         if isinstance(call_index, int) and call_index not in call_indices:
@@ -313,15 +295,23 @@ def _packet_for_candidate(
     omitted_event_ids = [event_id for event_id in ordered_ids if event_id not in selected_set]
     selected_relation_ids = {row.get("relation_id") for row in selected_relations}
     omitted_relation_ids = [
-        row.get("relation_id") for row in all_relations if row.get("relation_id") not in selected_relation_ids
+        row.get("relation_id")
+        for row in all_relations
+        if row.get("relation_id") not in selected_relation_ids
     ]
-    expansion_refs = []
-    for ref in [*omitted_event_ids, *omitted_relation_ids]:
+    selected_crossing_ids = {row.get("crossing_id") for row in selected_crossings}
+    omitted_crossing_ids = [
+        row.get("crossing_id")
+        for row in exact_crossings
+        if row.get("crossing_id") not in selected_crossing_ids
+    ]
+    expansion_refs: list[str] = []
+    for ref in [*omitted_event_ids, *omitted_relation_ids, *omitted_crossing_ids]:
         if isinstance(ref, str) and ref not in expansion_refs:
             expansion_refs.append(ref)
     expansion_refs = expansion_refs[: bounds["max_allowed_expansion_refs"]]
 
-    contract_hash = content_hash(contract)
+    reached_classes = list(candidate_metrics.get("operational_authority_classes_reached") or [])
     packet = {
         "schema": PACKET_SCHEMA,
         "version": "0.1",
@@ -334,7 +324,7 @@ def _packet_for_candidate(
         "review_contract_binding": {
             "schema": contract["schema"],
             "version": contract["version"],
-            "hash": contract_hash,
+            "hash": content_hash(contract),
         },
         "task_contract": _task_contract(domain),
         "agent_contracts": _agent_contracts(domain, actor_ids),
@@ -354,13 +344,15 @@ def _packet_for_candidate(
             "truncated": len(ordered_ids) > len(selected_ids) or len(all_relations) > len(selected_relations),
         },
         "operational_window": {
+            "mechanical_crossings": copy.deepcopy(selected_crossings),
             "mechanical_crossing_events": copy.deepcopy(operational_events),
+            "mechanical_crossing_count_total": len(exact_crossings),
             "mechanical_penetration_depth_candidate": candidate_metrics.get("mechanical_penetration_depth_candidate"),
-            "operational_authority_classes_reached": list(candidate_metrics.get("operational_authority_classes_reached") or []),
+            "operational_authority_classes_reached": reached_classes,
             "authority_penetration_status": NOT_ADJUDICATED,
             "authority_criteria": {
                 authority_class: copy.deepcopy(contract["authority_criteria"].get(authority_class))
-                for authority_class in candidate_metrics.get("operational_authority_classes_reached") or []
+                for authority_class in reached_classes
                 if authority_class in contract["authority_criteria"]
             },
         },
@@ -383,6 +375,7 @@ def _packet_for_candidate(
             "one_expansion_round_max": True,
             "omitted_event_count": len(omitted_event_ids),
             "omitted_relation_count": len(omitted_relation_ids),
+            "omitted_crossing_count": len(omitted_crossing_ids),
         },
         "review_status": "PENDING_REVIEW",
         "scientific_status": "BOUNDED_EVIDENCE_PACKET_ONLY_NOT_SEMANTIC_CONCLUSION",
@@ -398,6 +391,7 @@ def _packet_for_candidate(
 def build_bounded_review_packets(
     source_trace: Mapping[str, Any],
     adapter_result: Mapping[str, Any],
+    dynamics_view: Mapping[str, Any],
     lineage_view: Mapping[str, Any],
     *,
     domain: Mapping[str, Any] | None = None,
@@ -407,22 +401,24 @@ def build_bounded_review_packets(
 ) -> list[dict[str, Any]]:
     contract_cfg = dict(contract or load_review_contract())
     validate_review_contract(contract_cfg)
-    candidates = {row["candidate_id"]: row for row in lineage_view.get("jump_candidates") or []}
+    _require(dynamics_view.get("trajectory_id") == lineage_view.get("trajectory_id"), "review_dynamics_lineage_trajectory_mismatch")
+    _require(dynamics_view.get("source_trace_hash") == lineage_view.get("source_trace_hash"), "review_dynamics_lineage_source_hash_mismatch")
+    candidates = {row["candidate_id"]: row for row in dynamics_view.get("jump_candidates") or []}
     metrics = {
         row["jump_candidate_id"]: row
         for row in lineage_view.get("jump_candidate_lineage_metrics") or []
     }
     packets = []
     for candidate_id in sorted(candidates, key=lambda value: candidates[value].get("event_index", 0)):
-        candidate = candidates[candidate_id]
         candidate_metrics = metrics.get(candidate_id)
         if candidate_metrics is None:
             continue
         packet = _packet_for_candidate(
             source_trace=source_trace,
             adapter_result=adapter_result,
+            dynamics_view=dynamics_view,
             lineage_view=lineage_view,
-            candidate=candidate,
+            candidate=candidates[candidate_id],
             candidate_metrics=candidate_metrics,
             contract=contract_cfg,
             domain=domain,
@@ -445,22 +441,13 @@ def verify_review_packet(packet: Mapping[str, Any], contract: Mapping[str, Any] 
     _require(binding.get("version") == contract_cfg["version"], "review_packet_contract_version_mismatch")
     _require(binding.get("hash") == content_hash(contract_cfg), "review_packet_contract_hash_mismatch")
     _require(packet.get("review_status") == "PENDING_REVIEW", "review_packet_status_must_be_pending")
-    _require(
-        all(value == NOT_ADJUDICATED for value in (packet.get("boundary_fields") or {}).values()),
-        "review_packet_semantic_contamination",
-    )
-    _require(
-        (packet.get("operational_window") or {}).get("authority_penetration_status") == NOT_ADJUDICATED,
-        "review_packet_authority_promoted",
-    )
-    _require(
-        (packet.get("retrospective_window") or {}).get("semantic_r_status") == NOT_ADJUDICATED,
-        "review_packet_r_promoted",
-    )
+    _require(all(value == NOT_ADJUDICATED for value in (packet.get("boundary_fields") or {}).values()), "review_packet_semantic_contamination")
+    _require((packet.get("operational_window") or {}).get("authority_penetration_status") == NOT_ADJUDICATED, "review_packet_authority_promoted")
+    _require((packet.get("retrospective_window") or {}).get("semantic_r_status") == NOT_ADJUDICATED, "review_packet_r_promoted")
     bounds = contract_cfg["packet_bounds"]
     _require(len((packet.get("lineage_window") or {}).get("behavior_events") or []) <= bounds["max_behavior_events"], "review_packet_behavior_bound_exceeded")
     _require(len((packet.get("lineage_window") or {}).get("relations") or []) <= bounds["max_lineage_relations"], "review_packet_lineage_bound_exceeded")
-    _require(len((packet.get("operational_window") or {}).get("mechanical_crossing_events") or []) <= bounds["max_operational_crossings"], "review_packet_crossing_bound_exceeded")
+    _require(len((packet.get("operational_window") or {}).get("mechanical_crossings") or []) <= bounds["max_operational_crossings"], "review_packet_crossing_bound_exceeded")
     _require(len((packet.get("source_context") or {}).get("source_model_calls") or []) <= bounds["max_source_model_calls"], "review_packet_source_call_bound_exceeded")
     _require(len((packet.get("context_expansion") or {}).get("allowed_refs") or []) <= bounds["max_allowed_expansion_refs"], "review_packet_expansion_bound_exceeded")
     return True
@@ -498,9 +485,8 @@ def normalize_review_output(
         return record
 
     _require(status == "FINAL", "review_status_must_be_final_or_request_expansion")
-    enums = contract["output_enums"]
     normalized = {}
-    for key, allowed in enums.items():
+    for key, allowed in contract["output_enums"].items():
         value = str(reviewer_output.get(key) or "").upper()
         _require(value in allowed, f"review_output_enum_invalid:{key}:{value}")
         normalized[key] = value
