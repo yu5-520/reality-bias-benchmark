@@ -1,0 +1,52 @@
+{
+  "protocol_id": "RB-R7-STRUCTURAL-INERTIA-CONTROL-v1.0",
+  "frozen_parent": {
+    "parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c",
+    "source_run_id": "35132777581",
+    "code_sha": "8a33444741c9f9e016ffbd72aa5955a6da81187d"
+  },
+  "jump": {
+    "jump_id": "J0",
+    "source_event": "E32",
+    "actor": "inventory",
+    "target_path": "shared_state_metadata.inventory_stockout_assessment_v1.status"
+  },
+  "semantic_payload": {
+    "payload_id": "inventory_stockout_assessment_v1.status.fact_to_unconfirmed.v1",
+    "target_path": "shared_state_metadata.inventory_stockout_assessment_v1.status",
+    "operation": "replace_prompt_visible_value",
+    "from": "fact",
+    "to": "unconfirmed"
+  },
+  "arms": {
+    "C1_ONE_SHOT": {
+      "mode": "one_shot_free_continuation",
+      "propagation_policy": "first_post_jump_agent_turn_only",
+      "max_exposures": 1,
+      "persistent_parent_mutation": false
+    },
+    "C2_PERSISTENT_FIELD": {
+      "mode": "persistent_field_propagation",
+      "propagation_policy": "inject_same_payload_into_each_eligible_post_jump_turn",
+      "max_exposures": null,
+      "persistent_parent_mutation": false
+    },
+    "C3_ALR": {
+      "mode": "authority_localized_recovery",
+      "propagation_policy": "structural_recovery",
+      "authority_anchor_policy": "earliest_authority_violating_ancestor",
+      "closure_policy": "registered_dependency_closure",
+      "preserve_unaffected": true,
+      "revision_required": true,
+      "persistent_parent_mutation": false
+    }
+  },
+  "measurement_schema": "RB-PROCESS-REALITY-MECHANISM-MEASUREMENT-v0.4",
+  "integrity": {
+    "semantic_payload_equal_across_arms": true,
+    "same_parent": true,
+    "same_jump": true,
+    "same_horizon": true,
+    "fail_closed": true
+  }
+}
