@@ -2,49 +2,48 @@
 
 Date: 2026-09-16
 
-The current `R2-ARENA-TRACE-v0.3` source adapter, structural Jump-candidate detector, operational-boundary set, branch-continuation slicing, source-backed lineage rules and additive R5/R6 v4 research binding are now implemented offline.
+The current R5-MID / first-paper path is now frozen offline through subject-evidence interpretation.
 
-The current frozen preparation chain is:
+Implemented preparation chain:
 
 ```text
 Phase-B branch plan
-→ v4 research-interface binding
-→ exact code/interface hashes
-→ guarded future subject run
-→ binding hash embedded in subject evidence
+→ exact v4 research-interface binding
+→ bounded review-interface binding
+→ first-paper analysis-contract binding
+→ guarded subject collection boundary
 ```
 
-The structural measurement chain remains:
+Implemented post-freeze chain:
 
 ```text
-BehaviorEvent v0.1
-→ Structural Jump Candidate
-→ source-backed lineage relation
-→ mechanical operational crossing
-→ mechanical penetration-depth candidate
+frozen subject traces
+→ standard evidence batch
+→ Measurement v3 (parallel historical layer)
+→ System Behavior v4
+→ branch-start anchor exposure lineage
+→ exact mechanical operational crossings
+→ paired v4 structural comparisons
+→ bounded Reviewer-v4 packets
+→ frozen first-paper structural analysis
 ```
 
-Semantic adoption, C/P/R and Authority Penetration remain independently unadjudicated.
+The first-paper R5-MID analysis contract is `RB-FIRST-PAPER-ANALYSIS-CONTRACT-v0.1` and is frozen before new v4 subject evidence. Its primary confirmatory structural endpoint is the paired intervention-minus-control difference in branch-anchor downstream operational-crossing count. Mechanical reach is explicitly not semantic Authority Penetration.
 
-The next offline scientific-interface boundary is:
+The v4 research binding now freezes the exact structural measurement, review and first-paper analysis interfaces used for a future batch. A prepared batch therefore identifies not only its subject code/model/branch plan, but also the exact detector, boundary, lineage, review-packet and analysis definitions under which it will later be interpreted.
 
-```text
-localized Jump candidate
-+ source-backed lineage window
-+ operational-crossing window
-+ task/evidence/authority contract excerpt
-→ bounded semantic / Authority review packet
-→ append-only reviewer judgment
-```
+## Current boundary
 
-The packet generator should not ask a reviewer to rediscover events from a full trajectory. It should freeze the localized source evidence needed to adjudicate:
+For the current `R2-ARENA-TRACE-v0.3` + R5-MID status-downgrade design, no additional measurement definition should be changed merely to improve expected results.
 
-- whether the structural Jump candidate is semantic C/P or neither;
-- whether downstream lineage indicates semantic adoption or only visibility/consumption;
-- whether an operational crossing satisfies the Authority Penetration definition;
-- whether a later revision window is R, ordinary correction, or unresolved;
-- reviewer confidence, evidence sufficiency and missingness.
+The next new scientific evidence step is a guarded real Phase-B subject batch. That step is **not authorized by offline completion**. It still requires an explicit provider/model, positive call cap, positive spending ceiling/currency and the exact paid-run authorization phrase required by the runner.
 
-A separate forward derivation command should also transform completed Phase-B frozen traces into System Behavior Measurement v4 / lineage outputs while preserving Measurement v3 as historical/parallel evidence.
+Until such authorization exists, safe work is limited to regression validation, documentation synchronization, future-version additive design, and review/analysis tooling that does not inspect new subject outcomes.
 
-These are offline engineering steps and do not require paid API authorization.
+## After a future authorized subject batch
+
+Subject evidence is frozen first. Structural derivation and the frozen first-paper analysis then run without a paid evaluator. Semantic Reviewer-v4 adjudication remains asynchronous and append-only; reviewer disagreement, uncertainty and missingness do not trigger subject reruns and are never converted into negative outcomes.
+
+PRE Tension-source experiments, POST stabilization experiments, dose/response work, topology scaling and cross-domain replications remain later research branches. Tension remains an upstream explanatory construct rather than the direct measurement target of this first R5-MID paper.
+
+No paid API call is authorized by this document.
