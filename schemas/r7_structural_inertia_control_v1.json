@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-R7-STRUCTURAL-INERTIA-CONTROL-v1.0",
+  "title": "R7 Structural Inertia Control Protocol",
+  "type": "object",
+  "required": [
+    "protocol_id",
+    "frozen_parent",
+    "jump",
+    "semantic_payload",
+    "arms",
+    "measurement_schema",
+    "integrity"
+  ],
+  "properties": {
+    "protocol_id": {"const": "RB-R7-STRUCTURAL-INERTIA-CONTROL-v1.0"},
+    "frozen_parent": {
+      "type": "object",
+      "required": ["parent_state_hash", "source_run_id"],
+      "properties": {
+        "parent_state_hash": {"type": "string", "minLength": 16},
+        "source_run_id": {"type": ["string", "integer"]},
+        "code_sha": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "jump": {
+      "type": "object",
+      "required": ["jump_id", "source_event", "actor", "target_path"],
+      "properties": {
+        "jump_id": {"type": "string"},
+        "source_event": {"type": "string"},
+        "actor": {"type": "string"},
+        "target_path": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "semantic_payload": {
+      "type": "object",
+      "required": ["payload_id", "target_path", "operation", "from", "to"],
+      "properties": {
+        "payload_id": {"type": "string"},
+        "target_path": {"type": "string"},
+        "operation": {"type": "string"},
+        "from": {},
+        "to": {}
+      },
+      "additionalProperties": true
+    },
+    "arms": {
+      "type": "object",
+      "required": ["C1_ONE_SHOT", "C2_PERSISTENT_FIELD", "C3_ALR"],
+      "properties": {
+        "C1_ONE_SHOT": {"$ref": "#/$defs/arm"},
+        "C2_PERSISTENT_FIELD": {"$ref": "#/$defs/arm"},
+        "C3_ALR": {"$ref": "#/$defs/alrArm"}
+      },
+      "additionalProperties": false
+    },
+    "measurement_schema": {
+      "type": "string",
+      "minLength": 1
+    },
+    "integrity": {
+      "type": "object",
+      "required": ["semantic_payload_equal_across_arms", "same_parent", "same_jump", "same_horizon", "fail_closed"],
+      "properties": {
+        "semantic_payload_equal_across_arms": {"const": true},
+        "same_parent": {"const": true},
+        "same_jump": {"const": true},
+        "same_horizon": {"const": true},
+        "fail_closed": {"const": true}
+      },
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "arm": {
+      "type": "object",
+      "required": ["mode", "propagation_policy"],
+      "properties": {
+        "mode": {"type": "string"},
+        "propagation_policy": {"type": "string"},
+        "max_exposures": {"type": ["integer", "null"], "minimum": 1},
+        "persistent_parent_mutation": {"const": false}
+      },
+      "additionalProperties": true
+    },
+    "alrArm": {
+      "type": "object",
+      "required": ["mode", "propagation_policy", "authority_anchor_policy", "closure_policy", "preserve_unaffected", "revision_required"],
+      "properties": {
+        "mode": {"const": "authority_localized_recovery"},
+        "propagation_policy": {"const": "structural_recovery"},
+        "authority_anchor_policy": {"const": "earliest_authority_violating_ancestor"},
+        "closure_policy": {"const": "registered_dependency_closure"},
+        "preserve_unaffected": {"const": true},
+        "revision_required": {"const": true},
+        "persistent_parent_mutation": {"const": false}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
