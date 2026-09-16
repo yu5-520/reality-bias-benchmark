@@ -1,0 +1,176 @@
+{
+  "schema": "RB-FIRST-PAPER-ANALYSIS-CONTRACT-v0.1",
+  "version": "0.1",
+  "status": "FROZEN_BEFORE_NEW_V4_SUBJECT_EVIDENCE",
+  "date": "2026-09-16",
+  "paper_scope": "FIRST_PAPER_R5_MID_EPISTEMIC_STATUS_DOWNGRADE",
+  "experiment_family": "R5R6-FROZEN-PARENT-BRANCH-v0.1",
+  "experimental_variable": {
+    "variable_id": "EPISTEMIC_STATUS_DOWNGRADE",
+    "stage": "MID",
+    "control_condition_id": "CONTROL_CONTINUATION",
+    "intervention_condition_id": "STATUS_DOWNGRADE_INTERVENTION",
+    "control_level": "HIGH_CERTAINTY_STATUS",
+    "intervention_level": "PROVISIONAL",
+    "analysis_unit": "MATCHED_BRANCH_PAIR_FROM_SAME_FROZEN_PARENT",
+    "pairing_fields": [
+      "pair_id",
+      "replicate_index",
+      "parent_state_hash",
+      "branch_plan_hash",
+      "source_evidence_batch_hash",
+      "v4_research_binding_hash"
+    ]
+  },
+  "primary_question": "Holding the frozen parent state, task, model configuration, branch plan and all non-target state fields fixed, is changing only the selected shared-state epistemic status from high-certainty to provisional associated with reduced structural reach from the exact branch-start anchor to downstream operational crossings?",
+  "primary_hypothesis_direction": "INTERVENTION_MINUS_CONTROL_LESS_THAN_ZERO_IS_CONSISTENT_WITH_STRUCTURAL_CONTAINMENT",
+  "outcomes": {
+    "primary_confirmatory_structural": {
+      "outcome_id": "R5MID_ANCHOR_DOWNSTREAM_OPERATIONAL_CROSSING_COUNT",
+      "source_path": "structural_deltas.r5_mid_branch_anchor.potential_downstream_operational_crossing_count",
+      "value_type": "COUNT",
+      "pair_delta_definition": "INTERVENTION_MINUS_CONTROL",
+      "batch_estimand": "MEAN_OF_COMPLETE_PAIR_DELTAS",
+      "interpretation": "A lower intervention value indicates less source-backed structural reach from the frozen branch-start anchor to mechanical operational crossings. This outcome is not semantic reliance or Authority Penetration."
+    },
+    "secondary_confirmatory_structural": [
+      {
+        "outcome_id": "R5MID_ANCHOR_MECHANICAL_REACH_DEPTH",
+        "source_path": "structural_deltas.r5_mid_branch_anchor.mechanical_anchor_reach_depth_candidate",
+        "value_type": "COUNT_OR_NULL",
+        "pair_delta_definition": "INTERVENTION_MINUS_CONTROL",
+        "batch_estimand": "MEAN_OF_COMPLETE_PAIR_DELTAS_WHEN_BOTH_OBSERVED"
+      },
+      {
+        "outcome_id": "R5MID_ANCHOR_DOWNSTREAM_AFFECTED_AGENT_COUNT",
+        "source_path": "structural_deltas.r5_mid_branch_anchor.potential_downstream_affected_agent_count",
+        "value_type": "COUNT",
+        "pair_delta_definition": "INTERVENTION_MINUS_CONTROL",
+        "batch_estimand": "MEAN_OF_COMPLETE_PAIR_DELTAS"
+      },
+      {
+        "outcome_id": "R5MID_ANCHOR_DOWNSTREAM_EVENT_COUNT",
+        "source_path": "structural_deltas.r5_mid_branch_anchor.potential_downstream_event_count",
+        "value_type": "COUNT",
+        "pair_delta_definition": "INTERVENTION_MINUS_CONTROL",
+        "batch_estimand": "MEAN_OF_COMPLETE_PAIR_DELTAS"
+      },
+      {
+        "outcome_id": "R5MID_ANCHOR_VISIBLE_AGENT_TURN_COUNT",
+        "source_path": "structural_deltas.r5_mid_branch_anchor.anchor_visible_agent_turn_count",
+        "value_type": "COUNT",
+        "pair_delta_definition": "INTERVENTION_MINUS_CONTROL",
+        "batch_estimand": "MEAN_OF_COMPLETE_PAIR_DELTAS"
+      }
+    ],
+    "key_secondary_semantic": {
+      "outcome_id": "R5MID_AUTHORITY_PENETRATION",
+      "packet_scope": "BRANCH_START_ANCHOR_PROPAGATION",
+      "review_field": "authority_penetration",
+      "determinate_values": ["YES", "NO"],
+      "numeric_encoding_for_paired_estimand": {"YES": 1, "NO": 0},
+      "pair_delta_definition": "INTERVENTION_MINUS_CONTROL",
+      "batch_estimand": "MEAN_OF_RESOLVED_COMPLETE_PAIR_DELTAS",
+      "required_evidence_sufficiency": "SUFFICIENT",
+      "interpretation": "Reviewer-adjudicated semantic Authority Penetration is a separate mechanistic endpoint and cannot be substituted by mechanical crossing count or reach depth."
+    },
+    "secondary_semantic": [
+      {
+        "outcome_id": "R5MID_SEMANTIC_ADOPTION",
+        "review_field": "semantic_adoption",
+        "reporting": "PAIRED_TRANSITION_TABLE",
+        "preserve_values": ["ADOPTED", "NOT_ADOPTED", "MIXED", "UNCERTAIN", "NOT_APPLICABLE"]
+      },
+      {
+        "outcome_id": "R5MID_DECISION_EFFECT",
+        "review_field": "decision_effect",
+        "reporting": "PAIRED_TRANSITION_TABLE",
+        "preserve_values": ["EFFECTIVE", "NO_MATERIAL_EFFECT", "MIXED", "UNCERTAIN", "NOT_APPLICABLE"]
+      }
+    ],
+    "exploratory": [
+      "r2.jump_candidate_count",
+      "r2.first_jump_turn",
+      "r2.jump_type_counts",
+      "r3.first_jump_downstream_operational_crossing_count",
+      "r3.first_jump_mechanical_penetration_depth_candidate",
+      "r4.retrospective_window_count",
+      "r5_mid.potential_downstream_authority_classes_reached",
+      "pair_order_pattern interactions"
+    ]
+  },
+  "pair_eligibility": {
+    "structural_primary_requires": [
+      "both planned conditions exist",
+      "both subject traces have run_status RUN_COMPLETE",
+      "both v4 measurements are present",
+      "paired v4 comparison passes hash/binding/parent-state verification",
+      "primary structural outcome is observed in both conditions"
+    ],
+    "execution_censoring_statuses": ["BUDGET_CENSORED", "RUN_INCOMPLETE", "RUN_FAILED"],
+    "execution_censoring_rule": "If either condition is execution-censored, the pair is excluded from the primary complete-pair estimand and counted explicitly as censored. It is never converted to zero, NO, recovery, or absence of effect.",
+    "integrity_failure_rule": "Hash mismatch, binding mismatch, missing required measurement, invalid pair identity, or unsupported source schema is a data-integrity failure, not an outcome. Exclude from estimands and report separately.",
+    "valid_zero_rule": "A machine-verified observed count of zero in a complete trace is a valid structural zero and is not missingness.",
+    "no_rerun_to_fix_outcome_rule": "A censored, missing, no-anchor or reviewer-unresolved record must not trigger an outcome-aware subject rerun."
+  },
+  "semantic_resolution": {
+    "review_source": "APPEND_ONLY_REVIEWER_V4_LEDGER",
+    "independent_review_requirement": "AT_LEAST_TWO_DISTINCT_REVIEWER_IDS_PER_PACKET_FOR_CONFIRMATORY_SEMANTIC_RESOLUTION",
+    "eligible_independent_record": {
+      "record_kind": "independent",
+      "evidence_sufficiency": "SUFFICIENT",
+      "one_record_per_reviewer_id_per_packet": true
+    },
+    "agreement_rule": "If all eligible independent reviewer records agree on the endpoint value, that value is resolved.",
+    "disagreement_rule": "If eligible independent reviewers disagree, the endpoint remains DISAGREEMENT_UNRESOLVED unless an append-only adjudication record explicitly references the conflicting parent review IDs.",
+    "adjudication_rule": "A confirmatory adjudication must be record_kind adjudication, cite all conflicting eligible parent review IDs, have evidence_sufficiency SUFFICIENT, and may not mutate or delete independent reviews.",
+    "uncertain_rule": "UNCERTAIN, NOT_APPLICABLE, absent review, insufficient evidence, partial-only evidence, unresolved disagreement, or invalid review is semantic missingness/non-resolution for the confirmatory binary Authority Penetration estimand and is never encoded as NO.",
+    "reviewer_addition_rule": "Additional reviewers may be added after subject evidence is frozen. Reviewer records change semantic sensitivity evidence only; they do not change subject evidence or structural measurements."
+  },
+  "batch_aggregation": {
+    "primary_structural": {
+      "estimate": "ARITHMETIC_MEAN_OF_PAIR_DELTAS",
+      "robust_summary": "MEDIAN_OF_PAIR_DELTAS",
+      "always_report": [
+        "planned_pair_count",
+        "complete_pair_count",
+        "censored_pair_count",
+        "integrity_failure_count",
+        "all_pair_deltas",
+        "mean_pair_delta",
+        "median_pair_delta",
+        "negative_delta_count",
+        "zero_delta_count",
+        "positive_delta_count"
+      ],
+      "uncertainty": {
+        "method": "PAIRED_NONPARAMETRIC_PERCENTILE_BOOTSTRAP",
+        "confidence_level": 0.95,
+        "resamples": 10000,
+        "deterministic_seed": 20260916,
+        "minimum_complete_pairs": 8,
+        "below_minimum_rule": "Do not emit a confirmatory interval; report all pair deltas and mark interval as NOT_ESTIMATED_MINIMUM_PAIR_COUNT_NOT_MET."
+      },
+      "primary_p_value": "NONE"
+    },
+    "secondary_structural": "Report paired deltas and the same descriptive mean/median summaries when values are jointly observed. No secondary outcome may replace the primary endpoint after results are observed.",
+    "semantic": "Aggregate only resolved packet values under semantic_resolution. Report resolved-pair count and unresolved categories separately. Semantic estimates do not backfill structural missingness.",
+    "order_sensitivity": "Report primary pair deltas stratified by pair_order_pattern as a sensitivity view; do not discard either order pattern based on observed outcomes."
+  },
+  "claim_boundaries": [
+    "The primary endpoint measures structural reach to mechanical operational crossings, not semantic Authority Penetration.",
+    "A negative primary mean delta is evidence of reduced structural reach under the registered status manipulation in this experimental setting; it is not by itself a universal causal law.",
+    "Provider hidden state is not replayed. Logical seed and common frozen parent do not make the two branches identical counterfactual worlds.",
+    "No single pair establishes a generalized causal effect.",
+    "The status-downgrade experiment is an R5-MID containment experiment and does not directly measure Tension or Escape Propensity.",
+    "Downstream Jump counts are exploratory for this MID intervention and are not the primary containment endpoint.",
+    "Reviewer disagreement, uncertainty, partial evidence and missing review are preserved rather than collapsed into negative outcomes.",
+    "Historical Measurement v3 and historical evidence are not rewritten by this contract."
+  ],
+  "analysis_freeze_rules": [
+    "This contract must be hashed into the forward v4 research binding before any new Phase-B provider call used for this first-paper experiment.",
+    "Any future contract change requires a new version and must not silently replace v0.1 for evidence already bound to v0.1.",
+    "Outcome definitions, pair eligibility, censoring rules and aggregation rules may not be changed after inspecting new v4 subject outcomes under this contract.",
+    "No paid provider or evaluator call is authorized by this contract."
+  ]
+}
