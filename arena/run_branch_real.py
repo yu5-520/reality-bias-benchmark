@@ -15,6 +15,7 @@ from arena.engine import run_arena_once
 from arena.io_utils import load_json, load_jsonl, sha256_file
 from arena.journal import Journal
 from arena.providers import provider_from_config
+from arena.v4_experiment_binding import load_and_verify_v4_binding
 
 
 AUTH_PHRASE = 'CALL_REAL_R5R6_BRANCH_API'
@@ -112,7 +113,7 @@ def validate_execution_bindings(bundle, *, provider_name, model_config_path, cod
     return model_config, load_json(arena_path), load_json(domain_path)
 
 
-def _authorization_record(args, bundle, model_config, code_sha):
+def _authorization_record(args, bundle, model_config, code_sha, v4_binding):
     plan = bundle['plan']
     policy = pricing_policy(model_config)
     record = {
@@ -125,6 +126,9 @@ def _authorization_record(args, bundle, model_config, code_sha):
         'model_config_version': model_config.get('config_version'),
         'model_alias': model_config.get('model_alias'),
         'branch_plan_hash': plan['plan_hash'],
+        'v4_research_binding_hash': v4_binding['binding_hash'],
+        'v4_experimental_variable_id': v4_binding['experimental_variable_id'],
+        'v4_interface_bindings': v4_binding['interface_bindings'],
         'source_trace_hash': (plan.get('common_identity') or {}).get('source_trace_hash'),
         'source_evidence_hash': (plan.get('common_identity') or {}).get('source_evidence_hash'),
         'selection_record_hash': (plan.get('common_identity') or {}).get('selection_record_hash'),
@@ -174,6 +178,11 @@ def main():
 
     code_sha = args.code_sha or os.environ.get('GITHUB_SHA') or 'LOCAL_OR_UNRECORDED'
     bundle = load_plan_bundle(args.plan_dir)
+    v4_binding = load_and_verify_v4_binding(
+        args.plan_dir,
+        bundle,
+        code_sha=code_sha,
+    )
     model_config, arena_config, domain = validate_execution_bindings(
         bundle,
         provider_name=args.provider,
@@ -186,8 +195,9 @@ def main():
     if outdir.exists():
         raise ValueError('refusing to overwrite R5/R6 branch output directory; choose a new path')
     outdir.mkdir(parents=True, exist_ok=False)
-    auth = _authorization_record(args, bundle, model_config, code_sha)
+    auth = _authorization_record(args, bundle, model_config, code_sha, v4_binding)
     _write_json(outdir / 'authorization_record.json', auth)
+    _write_json(outdir / 'v4_research_binding.json', v4_binding)
 
     upstream = provider_from_config(model_config)
     provider = BudgetedProvider(
@@ -227,6 +237,8 @@ def main():
                     'manifest_row': row,
                     'branch_manifest': manifest,
                     'branch_plan_hash': bundle['plan']['plan_hash'],
+                    'v4_research_binding_hash': v4_binding['binding_hash'],
+                    'v4_experimental_variable_id': v4_binding['experimental_variable_id'],
                     'authorization_hash': auth['authorization_hash'],
                     'arena_config': arena_config,
                     'model_config': model_config,
@@ -245,6 +257,7 @@ def main():
                     'record_type': 'r5r6_branch_run_finished',
                     'run_status': trace['run_status'],
                     'termination_reason': trace['termination_reason'],
+                    'v4_research_binding_hash': v4_binding['binding_hash'],
                     'budget_summary': provider.summary(),
                 })
 
@@ -256,6 +269,9 @@ def main():
                 'pair_order_pattern': row['pair_order_pattern'],
                 'execution_order': row['execution_order'],
                 'branch_plan_hash': bundle['plan']['plan_hash'],
+                'v4_research_binding_hash': v4_binding['binding_hash'],
+                'v4_experimental_variable_id': v4_binding['experimental_variable_id'],
+                'v4_interface_bindings': v4_binding['interface_bindings'],
                 'source_selection_record_hash': row['source_selection_record_hash'],
                 'code_commit_sha': code_sha,
                 'domain_hash': row['domain_hash'],
@@ -282,6 +298,7 @@ def main():
                 'run_id': row['run_id'],
                 'pair_id': row['pair_id'],
                 'condition_id': row['condition_id'],
+                'v4_research_binding_hash': v4_binding['binding_hash'],
                 'error': repr(err),
                 'budget_summary': provider.summary(),
             }
@@ -293,6 +310,8 @@ def main():
     summary = {
         'schema': 'RB-R5R6-BRANCH-RUN-SUMMARY-v0.1',
         'branch_plan_hash': bundle['plan']['plan_hash'],
+        'v4_research_binding_hash': v4_binding['binding_hash'],
+        'v4_experimental_variable_id': v4_binding['experimental_variable_id'],
         'authorization_hash': auth['authorization_hash'],
         'attempted_run_ids': attempted_run_ids,
         'recorded_run_ids': recorded_run_ids,
