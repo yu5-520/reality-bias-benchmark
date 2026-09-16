@@ -1,6 +1,14 @@
 name: R5-R6 Baseline Snapshot Subject Run
 
 on:
+  push:
+    paths:
+      - 'manifests/r5mid_first_v4_subject_batch_v0.1.json'
+      - '.github/workflows/r5r6-baseline-snapshot-real.yml'
+      - 'arena/build_branch_baseline_manifest.py'
+      - 'arena/config/arena_v0.3.json'
+      - 'arena/config/model_deepseek_v0.2.json'
+      - 'arena/config/r5r6_anchor_rule_v0.2.json'
   workflow_dispatch:
     inputs:
       repeats:
@@ -47,12 +55,12 @@ permissions:
   contents: read
 
 env:
-  R5R6_REPEATS: ${{ inputs.repeats }}
-  R5R6_PROVIDER: ${{ inputs.provider }}
-  R5R6_MODEL_CONFIG: ${{ inputs.model_config }}
-  R5R6_SPENDING_CEILING: ${{ inputs.spending_ceiling }}
-  R5R6_CURRENCY: ${{ inputs.currency }}
-  R5R6_MAX_SUBJECT_CALLS: ${{ inputs.max_subject_calls }}
+  R5R6_REPEATS: ${{ inputs.repeats || '2' }}
+  R5R6_PROVIDER: ${{ inputs.provider || 'deepseek' }}
+  R5R6_MODEL_CONFIG: ${{ inputs.model_config || 'arena/config/model_deepseek_v0.2.json' }}
+  R5R6_SPENDING_CEILING: ${{ inputs.spending_ceiling || '0' }}
+  R5R6_CURRENCY: ${{ inputs.currency || 'USD' }}
+  R5R6_MAX_SUBJECT_CALLS: ${{ inputs.max_subject_calls || '64' }}
   R5R6_ANCHOR_RULE: arena/config/r5r6_anchor_rule_v0.2.json
   R5MID_FIRST_BATCH_FREEZE: manifests/r5mid_first_v4_subject_batch_v0.1.json
 
@@ -109,10 +117,11 @@ jobs:
               'spending_ceiling_input': os.environ['R5R6_SPENDING_CEILING'],
               'currency_input': os.environ['R5R6_CURRENCY'],
               'max_subject_calls_input': os.environ['R5R6_MAX_SUBJECT_CALLS'],
-              'confirm_is_real_authorization_phrase': '${{ inputs.confirm }}' == 'CALL_REAL_R5R6_BASELINE_API',
+              'confirm_is_real_authorization_phrase': '${{ github.event_name == 'workflow_dispatch' && inputs.confirm == 'CALL_REAL_R5R6_BASELINE_API' }}' == 'true',
+              'github_event_name': '${{ github.event_name }}',
               'github_sha': '${{ github.sha }}',
               'branch_continuation_authorized': False,
-              'note': 'Prepare output is not paid-run authorization. Baseline subject job and runner independently enforce the explicit gate; branch continuation remains separately unauthorized. The first-v4 scientific structure is frozen by the repository manifest while spending remains an explicit later authorization boundary.'
+              'note': 'Push runs are prepare-only by construction. Workflow-dispatch real baseline execution remains separately gated by exact authorization phrase plus positive spending ceiling. The first-v4 scientific structure is frozen by the repository manifest.'
           }
           pathlib.Path('results/r5r6_workflow_request.json').write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
@@ -129,7 +138,7 @@ jobs:
 
   subject_run:
     needs: prepare
-    if: ${{ inputs.confirm == 'CALL_REAL_R5R6_BASELINE_API' && inputs.provider != 'UNRESOLVED' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.confirm == 'CALL_REAL_R5R6_BASELINE_API' && inputs.provider != 'UNRESOLVED' }}
     runs-on: ubuntu-latest
     timeout-minutes: 240
     steps:
