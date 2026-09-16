@@ -112,13 +112,26 @@ Historical subject/reviewer evidence, old contracts, old prepared bundles and th
 
 Repository updates do not authorize paid provider calls. Any future real one-shot branch execution requires a new explicit paid authorization and a new spending ceiling.
 
+## Reporting standard
+
+Publication-facing Process Reality reports now follow a frozen reporting contract rather than ad-hoc summary formatting:
+
+- **[Process Reality Report Standard v1.0](docs/reporting/process_reality_report_standard_v1.md)** — canonical English-only reporting, time-causal figure grammar, T/E/M/J notation, evidence-provenance rules and report profiles;
+- **[Process Reality Report Template v1.0](schemas/process_reality_report_template_v1.json)** — machine-readable report contract;
+- **[Formal R5-MID report bundle — 2026-09-17](docs/reports/2026-09-17/README.md)** — first finalized Control, One-Shot and Matched A/B mechanism-validation report set;
+- **[Report bundle manifest](manifests/r5mid_report_bundle_2026-09-17_v1.json)** — binds the report set and finalized DOCX export hashes to frozen evidence.
+
+The reporting chain is `frozen raw trace -> frozen structural derivation -> report figure/table`. A report is a human-readable evidence projection and does not authorize reruns, semantic promotion or mutation of frozen evidence.
+
 ## Repository map
 
 - `theory/` — theory contracts and change notes;
 - `docs/R_Plan_v4.1.md` — current forward research plan;
 - `docs/system_behavior_measurement_plan_v4.1.md` — current process-dynamics measurement plan;
+- `docs/reporting/` — canonical Process Reality report standards;
+- `docs/reports/` — frozen report sources and report-set indexes;
 - `configs/experimental_variable_registry_v0.2.json` — current forward experimental-variable registry;
 - `arena/` — runtime, evidence capture, branch control, measurements and preflights;
-- `schemas/` — evidence and experimental interfaces;
+- `schemas/` — evidence, experimental and report-template interfaces;
 - `reviews/` — append-only semantic review infrastructure;
 - `.github/workflows/` — reproducible offline and guarded real-provider entry points.
