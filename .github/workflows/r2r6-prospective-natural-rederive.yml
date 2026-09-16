@@ -1,0 +1,117 @@
+name: R2-R6 Prospective Natural Rederive v0.2
+
+on:
+  push:
+    paths:
+      - 'manifests/r2r6_prospective_natural_rederive_2026-09-17.json'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: r2r6-prospective-natural-rederive-v02
+  cancel-in-progress: false
+
+jobs:
+  rederive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify offline correction manifest
+        run: |
+          python - <<'PY'
+          import json
+          p='manifests/r2r6_prospective_natural_rederive_2026-09-17.json'
+          m=json.load(open(p))
+          assert m['scope']=='OFFLINE_DERIVATION_CORRECTION_ONLY'
+          assert m['raw_evidence_mutation'] is False
+          assert m['new_subject_provider_call'] is False
+          assert m['paid_evaluator_call'] is False
+          assert m['one_shot_branch_call'] is False
+          assert m['old_derived_artifact_preserved'] is True
+          print('REDERIVE_SCOPE=OFFLINE_ONLY')
+          PY
+      - name: Run full offline tests
+        run: |
+          python arena/validate_environment.py
+          python -m unittest discover -s arena/tests -v
+      - name: Verify exact frozen raw artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          m=json.load(open('manifests/r2r6_prospective_natural_rederive_2026-09-17.json'))
+          payload=json.loads(subprocess.check_output(['gh','api',f"repos/${{ github.repository }}/actions/runs/{m['source_workflow_run_id']}/artifacts"],text=True))
+          matches=[x for x in payload['artifacts'] if x['id']==m['source_raw_artifact_id'] and x['name']==m['source_raw_artifact_name']]
+          assert len(matches)==1
+          a=matches[0]
+          assert a.get('digest')==m['source_raw_artifact_digest']
+          assert not a.get('expired')
+          print('RAW_ARTIFACT=EXACT_MATCH')
+          PY
+      - name: Download and verify raw frozen bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source_artifact
+          gh run download 35124129473 --repo '${{ github.repository }}' --name r2r6-prospective-natural-raw-35124129473 --dir source_artifact
+          cd source_artifact
+          sha256sum -c prospective_natural_raw_bundle.tar.gz.sha256
+          cd ..
+          mkdir -p frozen_raw
+          tar -xzf source_artifact/prospective_natural_raw_bundle.tar.gz -C frozen_raw
+          python - <<'PY'
+          import json
+          m=json.load(open('manifests/r2r6_prospective_natural_rederive_2026-09-17.json'))
+          e=json.load(open('frozen_raw/results/prospective_natural_raw/evidence_batch.json'))
+          assert e['evidence_batch_hash']==m['source_evidence_batch_hash']
+          assert e['raw_evidence_frozen_before_derived_analysis'] is True
+          print('RAW_EVIDENCE_BATCH=VERIFIED_IMMUTABLE')
+          PY
+      - name: Rederive v0.2 from frozen raw evidence
+        run: |
+          python -m arena.derive_prospective_natural_measurements_v0_2 \
+            --raw-dir frozen_raw/results/prospective_natural_raw \
+            --evidence-batch frozen_raw/results/prospective_natural_raw/evidence_batch.json \
+            --outdir results/prospective_natural_measurements_v0_2
+      - name: Verify selected natural Jump root resolves exactly
+        run: |
+          python - <<'PY'
+          import json
+          rows=[json.loads(x) for x in open('results/prospective_natural_measurements_v0_2/prospective_process_measurements_v0.2.jsonl')]
+          assert len(rows)==1
+          r=rows[0]
+          assert r['trajectory_id']=='prospective-ecommerce-natural-0001'
+          assert r['target_candidate_id']=='prospective-ecommerce-natural-0001:R2V2:6621d1afe7f9acc3'
+          assert r['target_source_event_index']==32
+          assert r['target_state_key']=='inventory_stockout_assessment_v1'
+          assert r['root_resolution']['status']=='RESOLVED_EXACT_SOURCE_EVENT'
+          assert r['root_resolution']['source_event_ref']=='arena_event:32'
+          assert r['target_root_behavior_event_id'] is not None
+          assert r['r2_jump_recurrence']['descendant_rejump_count'] is not None
+          assert r['r3_inherited_inertia']['root_reachable_event_count'] is not None
+          print('SELECTED_JUMP_ROOT=RESOLVED_EXACT_SOURCE_EVENT')
+          print('ROOT_BEHAVIOR_EVENT='+r['target_root_behavior_event_id'])
+          print('DESCENDANT_REJUMPS='+str(r['r2_jump_recurrence']['descendant_rejump_count']))
+          print('ROOT_REACHABLE_EVENTS='+str(r['r3_inherited_inertia']['root_reachable_event_count']))
+          print('ROOT_REACH_DEPTH='+str(r['r3_inherited_inertia']['root_reach_depth']))
+          PY
+      - name: Archive corrected derived evidence
+        run: |
+          cp manifests/r2r6_prospective_natural_rederive_2026-09-17.json results/prospective_natural_measurements_v0_2/
+          tar -czf prospective_natural_derived_v0_2_bundle.tar.gz results/prospective_natural_measurements_v0_2
+          sha256sum prospective_natural_derived_v0_2_bundle.tar.gz > prospective_natural_derived_v0_2_bundle.tar.gz.sha256
+      - name: Upload corrected derived artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2r6-prospective-natural-derived-v0-2-${{ github.run_id }}
+          path: |
+            prospective_natural_derived_v0_2_bundle.tar.gz
+            prospective_natural_derived_v0_2_bundle.tar.gz.sha256
+          retention-days: 90
