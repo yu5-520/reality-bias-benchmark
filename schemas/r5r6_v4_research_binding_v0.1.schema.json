@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/r5r6_v4_research_binding_v0.1.schema.json",
+  "title": "Reality Bias R5/R6 v4 Research Binding v0.1",
+  "type": "object",
+  "required": [
+    "schema",
+    "version",
+    "experiment_family",
+    "branch_plan_hash",
+    "experimental_variable_id",
+    "code_sha",
+    "interface_bindings",
+    "authorization_status",
+    "semantic_status",
+    "binding_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-R5R6-V4-RESEARCH-BINDING-v0.1"},
+    "version": {"const": "0.1"},
+    "experiment_family": {"const": "R5R6-FROZEN-PARENT-BRANCH-v0.1"},
+    "branch_plan_hash": {"type": "string", "minLength": 1},
+    "branch_plan_file_sha256": {"type": "string", "minLength": 64, "maxLength": 64},
+    "experimental_variable_id": {"type": "string", "minLength": 1},
+    "intervention_family": {"type": "string", "minLength": 1},
+    "code_sha": {"type": "string", "minLength": 1},
+    "interface_bindings": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["path", "sha256", "identity"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "minLength": 64, "maxLength": 64},
+          "identity": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "authorization_status": {"const": "NOT_AUTHORIZED"},
+    "semantic_status": {"const": "NOT_ADJUDICATED"},
+    "scientific_status": {"type": "string"},
+    "binding_hash": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": true
+}
