@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/source_lineage_rules_v0.1.schema.json",
+  "title": "Reality Bias Source Lineage Rules v0.1",
+  "type": "object",
+  "required": ["schema", "version", "status", "scientific_scope", "source_behavior_schema", "relations", "non_claims"],
+  "properties": {
+    "schema": {"const": "RB-SOURCE-LINEAGE-RULES-v0.1"},
+    "version": {"const": "0.1"},
+    "status": {"type": "string"},
+    "scientific_scope": {"const": "SOURCE_BACKED_STRUCTURAL_LINEAGE_ONLY"},
+    "source_behavior_schema": {"const": "RB-BEHAVIOR-EVENT-v0.1"},
+    "relations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["relation_type", "family", "evidence_basis", "strength"],
+        "properties": {
+          "relation_type": {"type": "string", "minLength": 1},
+          "family": {"type": "string", "minLength": 1},
+          "evidence_basis": {"type": "string", "minLength": 1},
+          "strength": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "non_claims": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}
