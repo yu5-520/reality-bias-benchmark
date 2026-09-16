@@ -2,6 +2,20 @@
 
 Date: 2026-09-16
 
-Before any real provider call, the next engineering step is to implement source-version-specific adapters from the current Arena trace/journal into `RB-BEHAVIOR-EVENT-v0.1`, then validate synchronized R2/R3/R4 derivation offline.
+The current `R2-ARENA-TRACE-v0.3` source adapter is now implemented and CI-validated.
 
-This is an offline engineering step and does not require paid API authorization.
+Before any real provider call, the next engineering boundary is:
+
+```text
+BehaviorEvent v0.1
+→ frozen structural Jump-candidate detector
+→ frozen operational-boundary set
+→ branch-continuation-aware v4 slicing
+→ exact registry / adapter / measurement hash binding
+```
+
+The Jump detector must remain structural and candidate-only. It must not promote state changes, invocations or revisions directly into semantic C/P/R or Authority Penetration.
+
+The operational-boundary set must define what can be mechanically counted before any formal penetration-depth claim is made.
+
+These are offline engineering steps and do not require paid API authorization.
