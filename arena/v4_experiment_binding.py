@@ -61,6 +61,10 @@ INTERFACE_SPECS = {
         "path": "schemas/first_paper_analysis_contract_v0.1.schema.json",
         "identity": "RB-FIRST-PAPER-ANALYSIS-CONTRACT-v0.1",
     },
+    "first_paper_structural_analysis_schema": {
+        "path": "schemas/first_paper_structural_analysis_v0.1.schema.json",
+        "identity": "RB-FIRST-PAPER-STRUCTURAL-ANALYSIS-v0.1",
+    },
 }
 
 
