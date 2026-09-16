@@ -17,14 +17,32 @@ class OrchestrationManifestTest(unittest.TestCase):
                 {'EMERGENT_FREE_ROUTING', 'STRUCTURED_SYSTEM_OWNED_ROUTING'},
                 {row['condition_id'] for row in pair},
             )
+            self.assertEqual({1, 2}, {row['pair_execution_order'] for row in pair})
+            self.assertEqual(1, len({row['pair_order_pattern'] for row in pair}))
             self.assertEqual(1, len({row['logical_seed'] for row in pair}))
             self.assertEqual(1, len({row['task_hash'] for row in pair}))
             self.assertEqual(1, len({row['agent_pool_hash'] for row in pair}))
+            self.assertEqual(1, len({row['structured_policy_hash'] for row in pair}))
             self.assertTrue(all(row['automatic_paid_evaluator'] is False for row in pair))
             self.assertTrue(all(
                 row['scientific_status'] == 'CANDIDATE_UNTIL_EXPLICIT_REAL_RUN_FREEZE_AND_API_AUTHORIZATION'
                 for row in pair
             ))
+
+        self.assertEqual('FREE_THEN_STRUCTURED', pairs['r7-ecommerce-pair-0001'][0]['pair_order_pattern'])
+        self.assertEqual('EMERGENT_FREE_ROUTING', pairs['r7-ecommerce-pair-0001'][0]['condition_id'])
+        self.assertEqual('STRUCTURED_THEN_FREE', pairs['r7-ecommerce-pair-0002'][0]['pair_order_pattern'])
+        self.assertEqual('STRUCTURED_SYSTEM_OWNED_ROUTING', pairs['r7-ecommerce-pair-0002'][0]['condition_id'])
+
+    def test_explicit_model_config_binding(self):
+        rows = build_rows(
+            repeats=1,
+            code_sha='TEST_SHA',
+            model_config_path='arena/config/model_deepseek_v0.2.json',
+        )
+        self.assertTrue(verify_pairing(rows))
+        self.assertTrue(all(row['model_config_path'] == 'arena/config/model_deepseek_v0.2.json' for row in rows))
+        self.assertTrue(all(row['model_provider'] == 'deepseek' for row in rows))
 
     def test_invalid_repeat_count_is_rejected(self):
         with self.assertRaises(ValueError):
