@@ -46,26 +46,30 @@ class ExperimentalControlTest(unittest.TestCase):
         self.assertEqual(snapshot['state_hash'], roundtrip['state_hash'])
         self.assertFalse(roundtrip['provider_internal_state_captured'])
 
-    def test_branch_manifest_binds_parent_and_intervention(self):
+    def test_branch_manifest_binds_parent_and_post_intervention_start(self):
         snapshot = capture_state(self.state, anchor_ref='A0', parent_trace_hash='trace:test')
         intervention = {
             'type': 'set_shared_state_status',
             'key': next(iter(snapshot['shared_state_metadata'])),
             'status': 'provisional',
         }
+        changed = apply_state_intervention(snapshot, intervention)
         manifest = make_branch_manifest(
             branch_id='B-001',
             parent_trace_hash='trace:test',
             parent_snapshot=snapshot,
+            branch_start_snapshot=changed,
             intervention_spec=intervention,
             replicate_index=0,
             model_identity={'model': 'scripted'},
             config_identity={'arena': self.config['version']},
             code_identity={'commit': 'TEST'},
         )
-        self.assertTrue(verify_branch_manifest(manifest, snapshot))
-        changed = apply_state_intervention(snapshot, intervention)
+        self.assertTrue(verify_branch_manifest(manifest, snapshot, changed))
         self.assertNotEqual(snapshot['state_hash'], changed['state_hash'])
+        self.assertEqual(snapshot['state_hash'], manifest['parent_state_hash'])
+        self.assertEqual(changed['state_hash'], manifest['branch_start_state_hash'])
+        self.assertTrue(manifest['intervention_applied_before_continuation'])
         self.assertEqual(changed['shared_state_metadata'][intervention['key']]['status'], 'provisional')
 
     def test_commit_gate_is_fail_closed_and_state_bound(self):
@@ -92,13 +96,21 @@ class ExperimentalControlTest(unittest.TestCase):
         self.assertEqual('BLOCK', blocked['decision'])
         self.assertIn('STATE_HASH_MISMATCH', blocked['reasons'])
 
-    def test_engine_continues_from_frozen_parent_with_branch_identity(self):
+    def test_engine_continues_from_intervened_state_without_losing_parent_identity(self):
         snapshot = capture_state(self.state, anchor_ref='A0', parent_trace_hash='trace:test')
-        intervention = {'type': 'set_shared_state_status', 'key': next(iter(snapshot['shared_state_metadata'])), 'status': 'initial'}
+        key = next(iter(snapshot['shared_state_metadata']))
+        intervention = {
+            'type': 'set_shared_state_status',
+            'key': key,
+            'status': 'provisional',
+            'result_anchor_ref': 'A0:status-downgraded',
+        }
+        changed = apply_state_intervention(snapshot, intervention)
         manifest = make_branch_manifest(
             branch_id='B-CONTINUE-001',
             parent_trace_hash='trace:test',
             parent_snapshot=snapshot,
+            branch_start_snapshot=changed,
             intervention_spec=intervention,
             replicate_index=1,
             model_identity={'model': 'scripted'},
@@ -116,13 +128,15 @@ class ExperimentalControlTest(unittest.TestCase):
             scripted,
             'branch-run-001',
             logical_seed=1,
-            initial_state_snapshot=snapshot,
+            initial_state_snapshot=changed,
             branch_manifest=manifest,
             state_snapshot_callback=anchors.append,
         )
         self.assertEqual('RUN_COMPLETE', trace['run_status'])
         self.assertEqual('B-CONTINUE-001', trace['experimental_branch']['branch_id'])
         self.assertEqual(snapshot['state_hash'], trace['experimental_branch']['parent_state_hash'])
+        self.assertEqual(changed['state_hash'], trace['experimental_branch']['branch_start_state_hash'])
+        self.assertTrue(trace['experimental_branch']['intervention_applied_before_continuation'])
         self.assertFalse(trace['experimental_branch']['provider_internal_state_replayed'])
         self.assertGreaterEqual(len(anchors), 2)
         self.assertTrue(all(verify_state_snapshot(anchor) for anchor in anchors))
