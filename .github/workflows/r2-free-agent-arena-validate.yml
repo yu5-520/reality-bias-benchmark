@@ -165,6 +165,31 @@ jobs:
           assert row['primary_interval_status'] == 'NOT_ESTIMATED_MINIMUM_PAIR_COUNT_NOT_MET'
           print('FIRST_PAPER_ANALYSIS_FIXTURE=PASS')
           PY
+      - name: Validate first-paper semantic aggregation with no reviewers — no evaluator calls
+        run: |
+          : > results/v4_branch_derivation_preflight/empty_reviews_v4.jsonl
+          python -m arena.analyze_first_paper_semantic_r5mid \
+            --packets results/v4_branch_derivation_preflight/branch_anchor_review_packets_v4.jsonl \
+            --reviews results/v4_branch_derivation_preflight/empty_reviews_v4.jsonl \
+            --derivation-summary results/v4_branch_derivation_preflight/summary.json \
+            --out results/v4_branch_derivation_preflight/first_paper_semantic_analysis_v0.1.json
+          test -s results/v4_branch_derivation_preflight/first_paper_semantic_analysis_v0.1.json
+          python - <<'PY'
+          import json
+          p = 'results/v4_branch_derivation_preflight/first_paper_semantic_analysis_v0.1.json'
+          row = json.load(open(p, encoding='utf-8'))
+          assert row['schema'] == 'RB-FIRST-PAPER-SEMANTIC-ANALYSIS-v0.1'
+          assert row['packet_scope'] == 'BRANCH_START_ANCHOR_PROPAGATION'
+          assert row['key_secondary_outcome_id'] == 'R5MID_AUTHORITY_PENETRATION'
+          assert row['resolved_pair_count'] == 0
+          assert row['unresolved_pair_count'] == row['planned_pair_count']
+          assert row['authority_penetration']['mean_resolved_pair_delta'] is None
+          assert row['authority_penetration']['estimate_status'] == 'NOT_ESTIMATED_NO_RESOLVED_PAIRS'
+          assert row['primary_structural_endpoint_unchanged'] is True
+          assert row['source_evidence_mutated'] is False
+          assert row['automatic_paid_evaluator_called'] is False
+          print('FIRST_PAPER_SEMANTIC_NO_REVIEW_FIXTURE=PASS')
+          PY
       - name: Build current v0.3.2 offline manifest sample
         run: |
           python -m arena.build_manifest --domains all --repeats 2 --arena-config arena/config/arena_v0.3.json --out results/arena_manifest_preflight.jsonl
