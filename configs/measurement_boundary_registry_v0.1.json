@@ -1,0 +1,70 @@
+{
+  "schema": "RB-MEASUREMENT-BOUNDARY-REGISTRY-v0.1",
+  "version": "0.1",
+  "status": "FORWARD_CANDIDATE",
+  "boundaries": [
+    {
+      "boundary_id": "AGENT_TURN",
+      "family": "NODE_EXECUTION",
+      "description": "One recorded Agent execution turn or equivalent model-driven decision node.",
+      "observable_fields": ["actor", "input_refs", "raw_output_ref", "parsed_action_refs", "turn", "event_index"],
+      "supports_anchor_classes": ["ANTECEDENT_ANCHOR", "TRANSITION_ANCHOR"]
+    },
+    {
+      "boundary_id": "MESSAGE_HANDOFF",
+      "family": "TRANSMISSION",
+      "description": "Message send, delivery, read or handoff boundary between system actors.",
+      "observable_fields": ["sender", "recipient", "message_ref", "send_event_ref", "delivery_event_ref", "read_event_ref"],
+      "supports_anchor_classes": ["TRANSITION_ANCHOR", "PENETRATION_ANCHOR"]
+    },
+    {
+      "boundary_id": "SHARED_STATE",
+      "family": "STATE_MUTATION",
+      "description": "Read or write boundary for shared task state or metadata.",
+      "observable_fields": ["state_key", "state_before_hash", "state_after_hash", "status_before", "status_after", "provenance_refs"],
+      "supports_anchor_classes": ["TRANSITION_ANCHOR", "PENETRATION_ANCHOR", "CHALLENGE_RECOVERY_ANCHOR"]
+    },
+    {
+      "boundary_id": "CONTEXT_RAG_HANDOFF",
+      "family": "CONTEXT",
+      "description": "Boundary where external evidence, RAG material or compressed context is introduced into the next decision node.",
+      "observable_fields": ["context_refs", "source_refs", "context_version", "provenance_refs"],
+      "supports_anchor_classes": ["ANTECEDENT_ANCHOR", "TRANSITION_ANCHOR"]
+    },
+    {
+      "boundary_id": "INVOCATION",
+      "family": "ROUTING",
+      "description": "Proposal or realization of an Agent/tool/stage invocation edge.",
+      "observable_fields": ["caller", "callee", "proposal_ref", "realization_status", "policy_ref"],
+      "supports_anchor_classes": ["TRANSITION_ANCHOR", "PENETRATION_ANCHOR"]
+    },
+    {
+      "boundary_id": "COMMIT_GATE",
+      "family": "OPERATIONAL_CONVERSION",
+      "description": "Boundary converting a proposal or provisional state into an operational or authority-bearing state.",
+      "observable_fields": ["proposal_ref", "decision", "gate_rule_ref", "state_before_hash", "state_after_hash"],
+      "supports_anchor_classes": ["TRANSITION_ANCHOR", "PENETRATION_ANCHOR"]
+    },
+    {
+      "boundary_id": "FINAL_REOPEN",
+      "family": "TEMPORAL_STATE",
+      "description": "FINAL, reopen, revision or historical-state mutation boundary.",
+      "observable_fields": ["final_state_ref", "reopen_ref", "revision_ref", "temporal_authority_ref"],
+      "supports_anchor_classes": ["TRANSITION_ANCHOR", "CHALLENGE_RECOVERY_ANCHOR"]
+    },
+    {
+      "boundary_id": "AUTHORITY_CONVERSION",
+      "family": "AUTHORITY",
+      "description": "Explicit Information, Invocation or Temporal Authority conversion boundary.",
+      "observable_fields": ["authority_class", "source_ref", "conversion_rule_ref", "provenance_ref", "resulting_state_ref"],
+      "supports_anchor_classes": ["TRANSITION_ANCHOR", "PENETRATION_ANCHOR"]
+    },
+    {
+      "boundary_id": "RECOVERY_CHECKPOINT",
+      "family": "RECOVERY",
+      "description": "Checkpoint, challenge, correction or reconstruction boundary used for recovery experiments.",
+      "observable_fields": ["anchor_ref", "challenge_ref", "correction_ref", "reconstruction_ref", "recovery_strategy"],
+      "supports_anchor_classes": ["CHALLENGE_RECOVERY_ANCHOR"]
+    }
+  ]
+}
