@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Freeze and verify explicit prospective one-shot authorization
+      - name: Freeze and verify explicit prospective one-shot authorization v0.2
         id: auth
         shell: bash
         run: |
@@ -32,23 +32,35 @@ jobs:
           import json, os
           p=os.path.join(os.environ['RUNNER_TEMP'],'one_shot_authorization.json')
           a=json.load(open(p))
-          assert a['schema']=='RB-R5MID-PROSPECTIVE-ONESHOT-PAID-AUTHORIZATION-v0.1'
+          assert a['schema']=='RB-R5MID-PROSPECTIVE-ONESHOT-PAID-AUTHORIZATION-v0.2'
           assert a['authorization_phrase']=='CALL_REAL_R5MID_PROSPECTIVE_ONESHOT_API'
           assert a['spending_ceiling_usd'] > 0
           assert a['per_branch_spending_ceiling_usd'] > 0
           assert a['per_branch_max_calls'] > 0
           assert a['planned_branch_count']==4
+          assert a['replicate_pairs']==2
           assert a['automatic_paid_evaluator'] is False
           assert a['prospective_natural_authorization_reused'] is False
           assert a['old_phase_b_authorization_reused'] is False
           assert a['authorization_is_one_time'] is True
           assert a['runtime_readiness_required'] is True
           assert a['runtime_readiness_verified_offline'] is True
-          assert a['readiness_audit_workflow_run_id']==35128564676
-          assert a['readiness_audit_artifact_id']==10460217318
-          assert a['readiness_audit_artifact_name']=='r5mid-prospective-one-shot-readiness-audit-v0-2-35128564676'
-          assert a['readiness_audit_artifact_digest']=='sha256:03d5d8ce200565c34925116973f344d23ca23a899fb058d34781e499aaefca8a'
-          assert a['readiness_audit_record_commit']=='9f1e0479514cfb7a1c758b43bb5b2474a0ce090f'
+          assert a['prepared_workflow_run_id']==35129957603
+          assert a['prepared_artifact_id']==10460981306
+          assert a['prepared_artifact_name']=='r5mid-prospective-one-shot-prepared-v0-3-35129957603'
+          assert a['prepared_artifact_digest']=='sha256:f861db077ebac88f67badd7605c0547c602d067b9d0f3af72b4c9a44ba8503c8'
+          assert a['prepared_inner_tar_sha256']=='3f780b2c0cc88c59fa5c149e6c3b987ba73e8a97aefb0970c89ce5e32f6b1988'
+          assert a['plan_hash']=='a24c98901422bbccfc9a040a6bc14575b1c710edd518c0d9c2facf7a57926351'
+          assert a['branch_execution_commit']=='8a33444741c9f9e016ffbd72aa5955a6da81187d'
+          assert a['source_measurement_version']=='v0.4_THREE_LAYER_PROCESS_TOPOLOGY'
+          assert a['source_measurement_hash']=='5ec7953b473e4d7b29612de18aac9992238e722e1b12ea7c6999929958b24191'
+          assert a['measurement_contract_sha256']=='cf99284e7dea053aa2f21252cc173d09649f53c7d9a0c1e970f01c2871ec7d4c'
+          assert a['readiness_audit_workflow_run_id']==35130183819
+          assert a['readiness_audit_artifact_id']==10460746799
+          assert a['readiness_audit_artifact_name']=='r5mid-prospective-one-shot-readiness-audit-v0-3-35130183819'
+          assert a['readiness_audit_artifact_digest']=='sha256:99d1dc01aefa542ccdf19b78383a6de8fe39c3934cec12deab7e21abd32fbbaa'
+          assert a['readiness_audit_inner_tar_sha256']=='09701fa26f10d7f813df35d78571adeea3f5736ed099714d306f709fbcf3573b'
+          assert a['readiness_audit_record_commit']=='e632d9ed7b4c8dc54bacc7a94c299356946f24c5'
           print('global_ceiling='+str(a['spending_ceiling_usd']))
           print('per_branch_ceiling='+str(a['per_branch_spending_ceiling_usd']))
           print('per_branch_max_calls='+str(a['per_branch_max_calls']))
@@ -56,14 +68,18 @@ jobs:
           print('prepared_artifact_id='+str(a['prepared_artifact_id']))
           print('prepared_artifact_name='+a['prepared_artifact_name'])
           print('prepared_artifact_digest='+a['prepared_artifact_digest'])
+          print('prepared_inner_tar_sha256='+a['prepared_inner_tar_sha256'])
           print('plan_hash='+a['plan_hash'])
           print('execution_code_sha='+a['branch_execution_commit'])
+          print('source_measurement_hash='+a['source_measurement_hash'])
+          print('measurement_contract_sha256='+a['measurement_contract_sha256'])
           print('readiness_run_id='+str(a['readiness_audit_workflow_run_id']))
           print('readiness_artifact_id='+str(a['readiness_audit_artifact_id']))
           print('readiness_artifact_name='+a['readiness_audit_artifact_name'])
           print('readiness_artifact_digest='+a['readiness_audit_artifact_digest'])
+          print('readiness_inner_tar_sha256='+a['readiness_audit_inner_tar_sha256'])
           PY
-      - name: Verify exact offline runtime-readiness artifact
+      - name: Verify exact offline runtime and v0.4 derivation readiness artifact
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -75,19 +91,18 @@ jobs:
           assert len(rows)==1
           assert rows[0].get('digest')==a['readiness_audit_artifact_digest']
           assert not rows[0].get('expired')
-          print('RUNTIME_READINESS_ARTIFACT=EXACT_MATCH')
+          print('RUNTIME_AND_V04_READINESS_ARTIFACT=EXACT_MATCH')
           PY
-          mkdir -p "$RUNNER_TEMP/readiness_artifact"
+          mkdir -p "$RUNNER_TEMP/readiness_artifact" "$RUNNER_TEMP/readiness"
           gh run download '${{ steps.auth.outputs.readiness_run_id }}' --repo '${{ github.repository }}' --name '${{ steps.auth.outputs.readiness_artifact_name }}' --dir "$RUNNER_TEMP/readiness_artifact"
           cd "$RUNNER_TEMP/readiness_artifact"
-          sha256sum -c r5mid_prospective_one_shot_readiness_audit_v0_2.tar.gz.sha256
-          test "$(sha256sum r5mid_prospective_one_shot_readiness_audit_v0_2.tar.gz | awk '{print $1}')" = 'f43f106424ae59999b256d3de9622b2206e7bafbec39d31f6c8f7de244ae9329'
-          mkdir -p "$RUNNER_TEMP/readiness"
-          tar -xzf r5mid_prospective_one_shot_readiness_audit_v0_2.tar.gz -C "$RUNNER_TEMP/readiness"
+          sha256sum -c r5mid_prospective_one_shot_readiness_audit_v0_3.tar.gz.sha256
+          test "$(sha256sum r5mid_prospective_one_shot_readiness_audit_v0_3.tar.gz | awk '{print $1}')" = '${{ steps.auth.outputs.readiness_inner_tar_sha256 }}'
+          tar -xzf r5mid_prospective_one_shot_readiness_audit_v0_3.tar.gz -C "$RUNNER_TEMP/readiness"
           cd "$GITHUB_WORKSPACE"
           python - <<'PY'
           import json, os
-          r=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'readiness/readiness_report_v0_2.json')))
+          r=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'readiness/readiness_report_v0_3.json')))
           a=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'one_shot_authorization.json')))
           assert r['plan_hash']==a['plan_hash']
           assert r['branch_execution_commit']==a['branch_execution_commit']
@@ -103,10 +118,15 @@ jobs:
           assert r['intervention_direct_experiment_origin_exposure_count']==1
           assert r['experiment_origin_reinjection_count']==0
           assert r['persistent_parent_state_unchanged'] is True
-          assert r['one_shot_consumption_verified_across_forced_second_resume'] is True
-          print('RUNTIME_READINESS_LIFECYCLE=VERIFIED')
+          assert r['v0_4_measurement_count']==2
+          assert r['v0_4_complete_pair_comparison_count']==1
+          assert r['v0_4_integrity_failure_count']==0
+          assert r['v0_4_pair_status']=='COMPLETE_ROOT_RESOLVED_THREE_LAYER_PAIR'
+          assert r['v0_4_comparison_schema']=='RB-PROCESS-REALITY-PAIRED-COMPARISON-v0.4'
+          assert r['v0_4_three_layers_present'] is True
+          print('RUNTIME_LIFECYCLE_AND_V04_ANALYSIS_PATH=VERIFIED')
           PY
-      - name: Verify and download exact prepared artifact
+      - name: Verify and download exact prepared v0.3 artifact
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -115,25 +135,32 @@ jobs:
           a=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'one_shot_authorization.json')))
           payload=json.loads(subprocess.check_output(['gh','api',f"repos/${{ github.repository }}/actions/runs/{a['prepared_workflow_run_id']}/artifacts"],text=True))
           rows=[x for x in payload['artifacts'] if x['id']==a['prepared_artifact_id'] and x['name']==a['prepared_artifact_name']]
-          assert len(rows)==1 and rows[0].get('digest')==a['prepared_artifact_digest'] and not rows[0].get('expired')
-          print('PREPARED_ARTIFACT=EXACT_MATCH')
+          assert len(rows)==1
+          assert rows[0].get('digest')==a['prepared_artifact_digest']
+          assert not rows[0].get('expired')
+          print('PREPARED_V03_ARTIFACT=EXACT_MATCH')
           PY
           mkdir -p "$RUNNER_TEMP/prepared_artifact" "$RUNNER_TEMP/prepared_plan"
           gh run download '${{ steps.auth.outputs.prepared_run_id }}' --repo '${{ github.repository }}' --name '${{ steps.auth.outputs.prepared_artifact_name }}' --dir "$RUNNER_TEMP/prepared_artifact"
           cd "$RUNNER_TEMP/prepared_artifact"
-          sha256sum -c r5mid_prospective_one_shot_prepared_v0_2.tar.gz.sha256
-          test "$(sha256sum r5mid_prospective_one_shot_prepared_v0_2.tar.gz | awk '{print $1}')" = '26f97e7be568c8259e571fb9991a1049784d7ed4f9c04b6c76ebd5dd97b3477a'
-          tar -xzf r5mid_prospective_one_shot_prepared_v0_2.tar.gz -C "$RUNNER_TEMP/prepared_plan"
+          sha256sum -c r5mid_prospective_one_shot_prepared_v0_3.tar.gz.sha256
+          test "$(sha256sum r5mid_prospective_one_shot_prepared_v0_3.tar.gz | awk '{print $1}')" = '${{ steps.auth.outputs.prepared_inner_tar_sha256 }}'
+          tar -xzf r5mid_prospective_one_shot_prepared_v0_3.tar.gz -C "$RUNNER_TEMP/prepared_plan"
           cd "$GITHUB_WORKSPACE"
           python - <<'PY'
           import json, os
           a=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'one_shot_authorization.json')))
-          p=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'prepared_plan/results/r5mid_prospective_one_shot_plan_v0_2/branch_plan.json')))
+          p=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'prepared_plan/results/r5mid_prospective_one_shot_plan_v0_3/branch_plan.json')))
+          assert p['formal_prepare_version']=='0.3'
           assert p['plan_hash']==a['plan_hash']
           assert p['code_identity']['branch_execution_commit']==a['branch_execution_commit']
           assert p['source_measurement_binding']['measurement_hash']==a['source_measurement_hash']
+          assert p['source_measurement_binding']['measurement_contract_sha256']==a['measurement_contract_sha256']
+          assert p['source_measurement_binding_status']=='BOUND_THREE_LAYER_PROCESS_TOPOLOGY_V0.4'
+          assert p['downstream_measurement_version']=='RB-PROCESS-REALITY-MECHANISM-MEASUREMENT-v0.4'
+          assert p['downstream_derivation_module']=='arena.derive_one_shot_process_measurements_v0_4'
           assert p['paid_one_shot_authorization_status']=='NOT_AUTHORIZED'
-          print('PREPARED_PLAN_BINDING=VERIFIED')
+          print('PREPARED_V03_PLAN_BINDING=VERIFIED')
           PY
       - name: Checkout exact prepared execution code
         run: |
@@ -144,10 +171,10 @@ jobs:
         run: |
           python arena/validate_environment.py
           python -m unittest discover -s arena/tests -v
-      - name: Preflight exact prepared plan and symmetric budgets
+      - name: Preflight exact prepared v0.3 plan and symmetric budgets
         run: |
           python -m arena.run_branch_one_shot_real \
-            --plan-dir "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_2" \
+            --plan-dir "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_3" \
             --model-config arena/config/model_deepseek_v0.2.json \
             --provider deepseek \
             --execution-code-sha '${{ steps.auth.outputs.execution_code_sha }}' \
@@ -156,12 +183,12 @@ jobs:
             --global-spending-ceiling '${{ steps.auth.outputs.global_ceiling }}' \
             --currency USD \
             --preflight-only
-      - name: Collect formal prospective one-shot branch evidence
+      - name: Collect formal prospective one-shot subject evidence
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
           python -m arena.run_branch_one_shot_real \
-            --plan-dir "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_2" \
+            --plan-dir "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_3" \
             --outdir results/r5mid_prospective_one_shot_raw \
             --model-config arena/config/model_deepseek_v0.2.json \
             --provider deepseek \
@@ -178,13 +205,13 @@ jobs:
           if [ -f results/r5mid_prospective_one_shot_raw/traces.jsonl ]; then
             python -m arena.freeze_one_shot_evidence \
               --raw-dir results/r5mid_prospective_one_shot_raw \
-              --plan-dir "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_2" \
+              --plan-dir "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_3" \
               --authorization-record "$RUNNER_TEMP/one_shot_authorization.json" \
               --out results/r5mid_prospective_one_shot_raw/evidence_batch.json
             mkdir -p frozen_binding
-            cp -r "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_2" frozen_binding/plan
+            cp -r "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_3" frozen_binding/plan
             cp "$RUNNER_TEMP/one_shot_authorization.json" frozen_binding/authorization.json
-            cp "$RUNNER_TEMP/readiness/readiness_report_v0_2.json" frozen_binding/readiness_report_v0_2.json
+            cp "$RUNNER_TEMP/readiness/readiness_report_v0_3.json" frozen_binding/readiness_report_v0_3.json
             tar -czf r5mid_prospective_one_shot_raw_bundle.tar.gz results/r5mid_prospective_one_shot_raw frozen_binding
             sha256sum r5mid_prospective_one_shot_raw_bundle.tar.gz > r5mid_prospective_one_shot_raw_bundle.tar.gz.sha256
           fi
@@ -198,25 +225,26 @@ jobs:
             r5mid_prospective_one_shot_raw_bundle.tar.gz.sha256
           if-no-files-found: ignore
           retention-days: 90
-      - name: Derive v0.3 root-scoped paired mechanism measurements
+      - name: Derive v0.4 three-layer paired mechanism measurements
         if: success()
         run: |
-          python -m arena.derive_one_shot_process_measurements \
-            --plan-dir "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_2" \
+          python -m arena.derive_one_shot_process_measurements_v0_4 \
+            --plan-dir "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_3" \
             --traces results/r5mid_prospective_one_shot_raw/traces.jsonl \
             --evidence-batch results/r5mid_prospective_one_shot_raw/evidence_batch.json \
-            --outdir results/r5mid_prospective_one_shot_measurements_v0_3
-      - name: Archive and upload derived paired measurements
+            --outdir results/r5mid_prospective_one_shot_measurements_v0_4
+      - name: Archive v0.4 paired measurements
         if: success()
         run: |
-          tar -czf r5mid_prospective_one_shot_derived_v0_3_bundle.tar.gz results/r5mid_prospective_one_shot_measurements_v0_3
-          sha256sum r5mid_prospective_one_shot_derived_v0_3_bundle.tar.gz > r5mid_prospective_one_shot_derived_v0_3_bundle.tar.gz.sha256
-      - name: Upload derived paired measurements
+          cp "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_3/process_reality_measurement_contract_v0.4.json" results/r5mid_prospective_one_shot_measurements_v0_4/
+          tar -czf r5mid_prospective_one_shot_derived_v0_4_bundle.tar.gz results/r5mid_prospective_one_shot_measurements_v0_4
+          sha256sum r5mid_prospective_one_shot_derived_v0_4_bundle.tar.gz > r5mid_prospective_one_shot_derived_v0_4_bundle.tar.gz.sha256
+      - name: Upload v0.4 paired measurements
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: r5mid-prospective-one-shot-derived-v0-3-${{ github.run_id }}
+          name: r5mid-prospective-one-shot-derived-v0-4-${{ github.run_id }}
           path: |
-            r5mid_prospective_one_shot_derived_v0_3_bundle.tar.gz
-            r5mid_prospective_one_shot_derived_v0_3_bundle.tar.gz.sha256
+            r5mid_prospective_one_shot_derived_v0_4_bundle.tar.gz
+            r5mid_prospective_one_shot_derived_v0_4_bundle.tar.gz.sha256
           retention-days: 90
