@@ -56,6 +56,16 @@ def _changed_keys(before: Any, after: Any) -> list[str]:
     return sorted(key for key in keys if before.get(key) != after.get(key))
 
 
+def _final_identity(value: Any) -> tuple[str | None, int | None]:
+    if not isinstance(value, Mapping):
+        return None, None
+    revision_count = value.get("revision_count")
+    return (
+        value.get("state_id") if isinstance(value.get("state_id"), str) else None,
+        revision_count if isinstance(revision_count, int) else None,
+    )
+
+
 def _structured_diff(event: Mapping[str, Any]) -> dict[str, Any]:
     before_state = event.get("shared_state_before") or {}
     after_state = event.get("shared_state_after") or {}
@@ -66,6 +76,8 @@ def _structured_diff(event: Mapping[str, Any]) -> dict[str, Any]:
     before_queue = event.get("queue_before") or []
     after_queue = event.get("queue_after") or []
     action = event.get("action") or {}
+    final_before_id, final_before_revision = _final_identity(event.get("final_state_before"))
+    final_after_id, final_after_revision = _final_identity(event.get("final_state_after"))
 
     out = {
         "source_action_type": event.get("action_type"),
@@ -74,6 +86,10 @@ def _structured_diff(event: Mapping[str, Any]) -> dict[str, Any]:
         "shared_state_changed_keys": _changed_keys(before_state, after_state),
         "shared_state_metadata_changed_keys": _changed_keys(before_meta, after_meta),
         "final_state_changed": event.get("final_state_before") != event.get("final_state_after"),
+        "final_state_before_id": final_before_id,
+        "final_state_after_id": final_after_id,
+        "final_state_before_revision_count": final_before_revision,
+        "final_state_after_revision_count": final_after_revision,
         "active_agents_added": sorted(after_agents - before_agents),
         "active_agents_removed": sorted(before_agents - after_agents),
         "queue_length_before": len(before_queue),
@@ -82,6 +98,32 @@ def _structured_diff(event: Mapping[str, Any]) -> dict[str, Any]:
     for key in ("key", "status", "agent_id", "to", "message_id", "invocation_id"):
         if key in action:
             out[f"action_{key}"] = copy.deepcopy(action.get(key))
+    return out
+
+
+def _visible_shared_state_origins(call: Mapping[str, Any]) -> list[dict[str, Any]]:
+    runtime = call.get("runtime_snapshot") or {}
+    metadata = runtime.get("shared_state_metadata") or {}
+    state = runtime.get("shared_state") or {}
+    out = []
+    if not isinstance(metadata, Mapping) or not isinstance(state, Mapping):
+        return out
+    for key in sorted(metadata):
+        meta = metadata.get(key)
+        if not isinstance(meta, Mapping):
+            continue
+        source_event_index = meta.get("event_index")
+        if not isinstance(source_event_index, int):
+            continue
+        out.append(
+            {
+                "key": str(key),
+                "source_event_index": source_event_index,
+                "writer": meta.get("writer"),
+                "status": meta.get("status"),
+                "value_hash": content_hash(state.get(key)),
+            }
+        )
     return out
 
 
@@ -304,6 +346,8 @@ def _stage_agent_turns(trace: Mapping[str, Any]) -> list[dict[str, Any]]:
         source_refs = [f"model_call:turn:{turn}:agent:{actor}"]
         source_refs.extend(f"message:{mid}" for mid in (call.get("input_message_ids") or []))
         source_refs.extend(f"invocation:{iid}" for iid in (call.get("input_invocation_ids") or []))
+        runtime = call.get("runtime_snapshot") or {}
+        final_visible_id, final_visible_revision = _final_identity(runtime.get("final_state"))
         staged.append(
             {
                 "sort_key": (turn, 90, row_index),
@@ -330,6 +374,9 @@ def _stage_agent_turns(trace: Mapping[str, Any]) -> list[dict[str, Any]]:
                         "event_index_end": call.get("event_index_end"),
                         "input_message_ids": list(call.get("input_message_ids") or []),
                         "input_invocation_ids": list(call.get("input_invocation_ids") or []),
+                        "visible_shared_state_origins": _visible_shared_state_origins(call),
+                        "visible_final_state_id": final_visible_id,
+                        "visible_final_revision_count": final_visible_revision,
                         "call_status": status,
                     },
                 },
