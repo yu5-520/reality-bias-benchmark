@@ -11,6 +11,8 @@ python arena/validate_environment.py
 python arena/preflight.py
 python -m unittest discover -s arena/tests -v
 python -m arena.build_manifest --domains all --repeats 2 --arena-config arena/config/arena_v0.3.json --out results/arena_manifest.jsonl
+python -m arena.orchestration_preflight --outdir results/orchestration_preflight
+python -m arena.build_orchestration_manifest --repeats 2 --out results/r7_orchestration_manifest_candidate.jsonl
 ```
 
 No command above calls a real model API.
@@ -125,6 +127,45 @@ ads → inventory → finance → ops_lead
 The full domain Agent registry remains unchanged, but executable routing is system-owned for this condition. Dynamic `invoke_agent` proposals are preserved inside `provider_response.structured_routing.original_subject_envelope` and blocked from operational realization. This keeps proposal evidence separate from realized graph expansion.
 
 The condition is an experimental policy, not a production workflow system, and it does not establish that structured routing is safer or better than Free Routing.
+
+## R7 offline comparison bundle
+
+`orchestration_preflight.py` now executes a zero-provider-call scripted comparison and writes:
+
+- `free_trace.json`
+- `structured_trace.json`
+- `comparison.json`
+- `SUMMARY.txt`
+
+`orchestration_compare.py` normalizes both conditions into one evidence shape containing topology, participation, proposal counts, blocked-action counts and realized-action counts.
+
+The structured scripted fixture deliberately proposes an extra `invoke_agent`; the policy preserves that original proposal while blocking operational realization. This is a control-path test only. The fixture scripts are not identical and the resulting mechanical deltas are explicitly marked `ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE`.
+
+Evidence schema:
+
+- `../schemas/orchestration_comparison_v0.1.schema.json`
+
+## Paired future R7 manifest
+
+`build_orchestration_manifest.py` prepares exactly two rows per future trial:
+
+```text
+pair_id
+  ├── EMERGENT_FREE_ROUTING
+  └── STRUCTURED_SYSTEM_OWNED_ROUTING
+```
+
+Within each pair it binds the same task, Agent pool, Arena config, model config and logical-seed identity. The structured policy hash is also frozen as comparison metadata.
+
+Prepared rows remain:
+
+`CANDIDATE_UNTIL_EXPLICIT_REAL_RUN_FREEZE_AND_API_AUTHORIZATION`
+
+The unresolved real-run fields and authorization gate are documented in:
+
+- `../docs/R7_real_run_freeze_template_v0.1.md`
+
+No default repeat count, provider choice, or prior workflow setting silently authorizes a paid R7 batch.
 
 ## Historical notes
 
