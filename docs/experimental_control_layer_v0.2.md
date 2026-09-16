@@ -32,11 +32,18 @@ v0.2 therefore records both identities explicitly:
 - `branch_start_state_hash` — the exact state supplied to the continuation runtime;
 - `intervention_applied_before_continuation` — true iff those hashes differ.
 
+It also freezes the trajectory cut boundary:
+
+- `parent_turn`;
+- `branch_start_turn`;
+- `parent_event_count`;
+- `branch_start_event_count`.
+
 This preserves the causal form:
 
 `same parent history + one explicit intervention → changed branch start → continuation`
 
-without relabeling the post-intervention state as if it were the original parent.
+without relabeling the post-intervention state as if it were the original parent, and without recounting frozen parent events as branch outcomes.
 
 ## 3. State Snapshot
 
@@ -67,6 +74,7 @@ and bind:
 - parent trace hash;
 - parent state hash;
 - branch-start state hash;
+- parent and branch-start turn/event-count boundaries;
 - parent and branch-start anchor refs;
 - intervention spec/hash;
 - whether the intervention changed the start state;
@@ -84,14 +92,39 @@ The historical v0.1 schema remains preserved for old engineering records.
 
 `run_arena_once(...)` validates the supplied continuation snapshot against `branch_start_state_hash` while preserving the original `parent_state_hash` in branch evidence.
 
-A post-intervention branch trace therefore exposes both:
+A post-intervention branch trace therefore exposes:
 
 - where the branch came from;
-- what exact state the model actually received when the branch resumed.
+- what exact state the model actually received when the branch resumed;
+- the exact turn and event boundary where continuation measurement begins.
 
 This distinction is required for R5 causal interpretation.
 
-## 6. Offline R5/R6 preflight
+## 6. Measurement-v3 continuation slicing
+
+`arena/trajectory_measurement_v3.py` uses `branch_start_turn` and `branch_start_event_count` to measure only the continuation segment.
+
+It currently derives deterministic branch structure including:
+
+- continuation turns/calls/events;
+- realized events and action types;
+- actors participating after branch start;
+- realized Authority-class events;
+- realized operational events;
+- Measurement-v2 structural candidates limited to the continuation;
+- final-state/final-answer hashes;
+- usage summary.
+
+For control/intervention comparison it requires the same `parent_trace_hash` and `parent_state_hash` before computing structural deltas.
+
+Schemas:
+
+- `schemas/branch_trajectory_measurement_v3.schema.json`
+- `schemas/branch_trajectory_comparison_v3.schema.json`
+
+C/P/R, semantic adoption, Authority Penetration, recovery and general causal effect remain `NOT_ADJUDICATED` at this deterministic layer.
+
+## 7. Offline R5/R6 preflight
 
 Current offline implementation:
 
@@ -107,11 +140,13 @@ The deterministic fixture:
 5. continues both branches with an engineering-only state-responsive provider;
 6. verifies that both branches retain the same parent hash but have different branch-start hashes;
 7. verifies that the downstream continuation can observe the changed state;
-8. emits a recovery record with semantic R status left `NOT_ADJUDICATED`.
+8. derives Measurement-v3 continuation records for both branches;
+9. derives one structural branch comparison;
+10. emits a recovery record with semantic R status left `NOT_ADJUDICATED`.
 
 This proves instrumentation behavior only. It does not estimate real-model Jump probability or intervention effectiveness.
 
-## 7. Scientific boundary
+## 8. Scientific boundary
 
 - Existing frozen subject traces are never rewritten.
 - New branch behavior is new evidence.
@@ -119,9 +154,10 @@ This proves instrumentation behavior only. It does not estimate real-model Jump 
 - Semantic Reviewer labels do not select confirmatory anchors.
 - A deterministic state replay is not a claim of provider-randomness replay.
 - The baseline Free-Agent condition remains intervention-off unless a named protocol activates a branch condition.
+- Structural branch divergence is not automatically semantic Reality Bias or causal proof.
 - Paid provider execution remains separately authorized.
 
-## 8. Forward R5 use
+## 9. Forward R5 use
 
 The preferred confirmatory form remains:
 
@@ -137,7 +173,7 @@ Candidate ΔX classes:
 
 Primary measurements must keep proposal generation separate from operational realization.
 
-## 9. Forward R6 use
+## 10. Forward R6 use
 
 Recovery branches can be created at increasing distances after a Jump candidate while preserving parent/start identity separately.
 
