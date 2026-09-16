@@ -1,0 +1,41 @@
+{
+  "schema": "RB-PROSPECTIVE-NATURAL-COLLECTION-CONTRACT-v0.1",
+  "version": "0.1",
+  "date": "2026-09-17",
+  "status": "FROZEN_BEFORE_PROSPECTIVE_SUBJECT_EVIDENCE",
+  "batch_id": "R2R6-PROSPECTIVE-NATURAL-BATCH-001",
+  "purpose": "Prospective natural multi-Agent trajectory collection after Process Reality v4.1 / Theory v0.5 freeze.",
+  "domain_id": "ecommerce",
+  "planned_repeats": 4,
+  "same_input_same_goal": true,
+  "free_agent_structure": true,
+  "subject_prompt_exposes_cpr_labels": false,
+  "subject_prompt_exposes_jump_hypothesis": false,
+  "subject_prompt_exposes_authority_labels": false,
+  "anchor_rule": "arena/config/r5r6_anchor_rule_v0.3.json",
+  "selection": {
+    "timing": "AFTER_RAW_SUBJECT_TRACE_IS_FROZEN",
+    "scope": "STRUCTURAL_ONLY_OUTCOME_BLIND",
+    "semantic_review_used": false,
+    "branch_outcomes_visible": false,
+    "no_anchor_preserved": true,
+    "no_outcome_aware_rerun": true,
+    "no_rerun_to_manufacture_anchor": true
+  },
+  "evidence_order": [
+    "subject_runtime",
+    "raw_trace_and_snapshots",
+    "integrity_freeze",
+    "structural_anchor_selection",
+    "R2_R3_R4_R6_structural_derivation",
+    "bounded_semantic_review_later"
+  ],
+  "censoring": {
+    "preserve_budget_censored": true,
+    "absence_in_censored_window_is_not_full_episode_absence": true
+  },
+  "automatic_paid_evaluator": false,
+  "r9_required": false,
+  "paid_subject_execution_authorized": false,
+  "future_paid_gate": "CALL_REAL_R2R6_PROSPECTIVE_NATURAL_API"
+}
