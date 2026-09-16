@@ -222,6 +222,12 @@ def main() -> None:
     write_jsonl(outdir / "branch_anchor_review_packets_v4.jsonl", derived["branch_anchor_review_packets"])
     write_jsonl(outdir / "pair_structural_comparisons_v4.jsonl", derived["pair_comparisons"])
     _write_json(outdir / "summary.json", derived["summary"])
+    _write_json(outdir / 'first_paper_mechanism_analysis_v0.2.json', derived['mechanism_analysis'])
+    write_jsonl(outdir / 'mechanism_observations_v0.2.jsonl', derived['mechanism_observations'])
+    write_jsonl(outdir / 'mechanism_review_packets_v0.2.jsonl', derived['mechanism_review_packets'])
+    assert derived['mechanism_analysis']['parent_count'] == 1
+    assert derived['mechanism_analysis']['primary_interval'] is None
+    assert all(o['task_completion'] == 'NOT_ADJUDICATED' for o in derived['mechanism_observations'])
     summary_text = (
         "V4_BRANCH_DERIVATION_PREFLIGHT=PASS\n"
         "SCIENTIFIC_EVIDENCE=NO\n"

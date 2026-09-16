@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Mechanism artifacts v0.2",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "schema",
+        "parent_state_hash",
+        "source_trace_hash",
+        "state_key",
+        "evidence",
+        "input_missing",
+        "input_truncated",
+        "branch_outcomes_included",
+        "packet_hash"
+      ],
+      "properties": {
+        "schema": {
+          "const": "RB-ANCHOR-SOURCE-PACKET-v0.2"
+        },
+        "branch_outcomes_included": {
+          "const": false
+        },
+        "classification_used_for_selection": {
+          "const": false
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "schema",
+        "trajectory_id",
+        "pair_id",
+        "condition_id",
+        "parent_state_hash",
+        "run_status",
+        "observation_hash"
+      ],
+      "properties": {
+        "schema": {
+          "const": "RB-MECHANISM-OBSERVATION-v0.2"
+        },
+        "task_completion": {
+          "const": "NOT_ADJUDICATED"
+        },
+        "R_status": {
+          "const": "NOT_ADJUDICATED"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "schema",
+        "trajectory_id",
+        "evidence",
+        "questions",
+        "packet_hash"
+      ],
+      "properties": {
+        "schema": {
+          "const": "RB-MECHANISM-REVIEW-PACKET-v0.2"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "schema",
+        "contract_hash",
+        "planned_pair_count",
+        "complete_pair_count",
+        "parent_count",
+        "parent_groups",
+        "pairs",
+        "primary_interval",
+        "analysis_hash"
+      ],
+      "properties": {
+        "schema": {
+          "const": "RB-FIRST-PAPER-MECHANISM-ANALYSIS-v0.2"
+        },
+        "primary_interval": {
+          "type": "null"
+        },
+        "automatic_paid_evaluator_called": {
+          "const": false
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "schema",
+        "parent_groups",
+        "source_clusters",
+        "parent_count",
+        "baseline_source_count",
+        "summary_hash"
+      ],
+      "properties": {
+        "schema": {
+          "const": "RB-MECHANISM-MULTIPARENT-SUMMARY-v0.2"
+        },
+        "primary_interval": {
+          "type": "null"
+        }
+      }
+    }
+  ]
+}

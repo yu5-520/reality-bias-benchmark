@@ -108,6 +108,7 @@ jobs:
           test -s results/r5r6_branch_plan/branch_plan.json
           test -s results/r5r6_branch_plan/branch_execution_manifest.jsonl
           test -s results/r5r6_branch_plan/branch_manifests.jsonl
+          test -s results/r5r6_branch_plan/anchor_source_packets_v0.2.jsonl
       - name: Freeze exact v4 research-interface binding — zero API calls
         run: |
           python -m arena.v4_experiment_binding \
@@ -122,6 +123,7 @@ jobs:
           assert row['paid_api_authorized'] is False
           assert row['semantic_status'] == 'NOT_ADJUDICATED'
           assert row['code_sha'] == '${{ github.sha }}'
+          assert row['anchor_source_packets_sha256']
           for required in (
               'v4_review_contract',
               'v4_review_packet_policy',
@@ -266,30 +268,21 @@ jobs:
           else
             echo 'System Behavior v4 derivation skipped because frozen trace/evidence batch is unavailable.' >> "$GITHUB_STEP_SUMMARY"
           fi
-      - name: Apply frozen first-paper structural analysis contract — no evaluator
+      - name: Verify forward parent-aware mechanism analysis — no evaluator
         if: always()
         run: |
-          if [ -e results/r5r6_branch_real/system_behavior_v4/pair_structural_comparisons_v4.jsonl ] && [ -s results/r5r6_branch_real/system_behavior_v4/summary.json ]; then
-            python -m arena.analyze_first_paper_r5mid \
-              --comparisons results/r5r6_branch_real/system_behavior_v4/pair_structural_comparisons_v4.jsonl \
-              --derivation-summary results/r5r6_branch_real/system_behavior_v4/summary.json \
-              --out results/r5r6_branch_real/system_behavior_v4/first_paper_structural_analysis_v0.1.json
-            test -s results/r5r6_branch_real/system_behavior_v4/first_paper_structural_analysis_v0.1.json
-            python - <<'PY'
+          if [ -s results/r5r6_branch_real/system_behavior_v4/summary.json ]; then
+            python - <<'PYTHON'
             import json
-            p = 'results/r5r6_branch_real/system_behavior_v4/first_paper_structural_analysis_v0.1.json'
+            p = 'results/r5r6_branch_real/system_behavior_v4/first_paper_mechanism_analysis_v0.2.json'
             row = json.load(open(p, encoding='utf-8'))
-            assert row['schema'] == 'RB-FIRST-PAPER-STRUCTURAL-ANALYSIS-v0.1'
-            assert row['primary_outcome_id'] == 'R5MID_ANCHOR_DOWNSTREAM_OPERATIONAL_CROSSING_COUNT'
-            assert row['primary_p_value'] is None
-            assert row['semantic_status'] == 'NOT_INCLUDED_IN_STRUCTURAL_ANALYSIS'
-            assert row['causal_claim_status'] == 'NOT_ESTABLISHED_BY_STRUCTURAL_ANALYSIS_ALONE'
-            print('FIRST_PAPER_STRUCTURAL_ANALYSIS_HASH=' + row['analysis_hash'])
-            print('PRIMARY_INTERVAL_STATUS=' + row['primary_interval_status'])
-            PY
-            echo 'Frozen first-paper structural analysis emitted; semantic endpoint remains asynchronous.' >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo 'First-paper structural analysis skipped because v4 comparison/summary artifacts are unavailable.' >> "$GITHUB_STEP_SUMMARY"
+            assert row['schema'] == 'RB-FIRST-PAPER-MECHANISM-ANALYSIS-v0.2'
+            assert row['primary_interval'] is None
+            assert row['automatic_paid_evaluator_called'] is False
+            print('Parent groups:', row['parent_count'], 'Complete pairs:', row['complete_pair_count'])
+            print('Parent-balanced structural delta:', row['parent_balanced_mean_delta'])
+            print('Task completion and semantic mechanisms remain pending review.')
+            PYTHON
           fi
       - name: Upload immutable Phase-B subject evidence
         if: always()

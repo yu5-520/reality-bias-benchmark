@@ -17,6 +17,18 @@ BINDING_SCHEMA = "RB-R5R6-V4-RESEARCH-BINDING-v0.1"
 EXPERIMENT_FAMILY = "R5R6-FROZEN-PARENT-BRANCH-v0.1"
 
 INTERFACE_SPECS = {
+    "first_paper_mechanism_schema": {
+        "path": "schemas/first_paper_mechanism_v0.2.schema.json",
+        "identity": "RB-FIRST-PAPER-MECHANISM-ARTIFACTS-v0.2",
+    },
+    "first_paper_mechanism_contract": {
+        "path": "configs/first_paper_mechanism_contract_v0.2.json",
+        "identity": "RB-FIRST-PAPER-MECHANISM-CONTRACT-v0.2",
+    },
+    "first_paper_mechanism_implementation": {
+        "path": "arena/first_paper_mechanism.py",
+        "identity": "RB-FIRST-PAPER-MECHANISM-ANALYSIS-v0.2",
+    },
     "experimental_variable_registry": {
         "path": "configs/experimental_variable_registry_v0.1.json",
         "identity": "RB-EXPERIMENTAL-VARIABLE-REGISTRY-v0.1",
@@ -295,6 +307,10 @@ def prepare_v4_binding(
         root=root,
     )
     destination = Path(out_path) if out_path else plan_dir / "v4_research_binding.json"
+    source_packets = plan_dir / 'anchor_source_packets_v0.2.jsonl'
+    if source_packets.is_file():
+        binding['anchor_source_packets_sha256'] = sha256_file(source_packets)
+        binding['binding_hash'] = _hash_without(binding, 'binding_hash')
     if destination.exists():
         raise ValueError("refusing_to_overwrite_v4_research_binding")
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -313,6 +329,9 @@ def load_and_verify_v4_binding(
     binding_path = plan_dir / "v4_research_binding.json"
     _require(binding_path.is_file(), "v4_research_binding_required")
     binding = load_json(binding_path)
+    if 'anchor_source_packets_sha256' in binding:
+        source_packets = plan_dir / 'anchor_source_packets_v0.2.jsonl'
+        _require(source_packets.is_file() and sha256_file(source_packets) == binding['anchor_source_packets_sha256'], 'anchor_source_packet_hash_mismatch')
     verify_v4_research_binding(
         binding,
         bundle,

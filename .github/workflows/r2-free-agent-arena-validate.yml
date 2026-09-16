@@ -146,6 +146,11 @@ jobs:
           grep -q '^SEMANTIC_STATUS=NOT_ADJUDICATED$' results/v4_branch_derivation_preflight/SUMMARY.txt
           grep -q '^BRANCH_ANCHOR_REVIEW_HIDDEN_COT_INCLUDED=NO$' results/v4_branch_derivation_preflight/SUMMARY.txt
           grep -q '^CAUSAL_EFFECT_STATUS=NOT_ADJUDICATED$' results/v4_branch_derivation_preflight/SUMMARY.txt
+      - name: Verify parent-aware v0.2 mechanism artifacts
+        run: |
+          test -s results/v4_branch_derivation_preflight/first_paper_mechanism_analysis_v0.2.json
+          test -s results/v4_branch_derivation_preflight/mechanism_observations_v0.2.jsonl
+          test -s results/v4_branch_derivation_preflight/mechanism_review_packets_v0.2.jsonl
       - name: Execute frozen first-paper R5-MID structural analysis contract on fixture pairs
         run: |
           python -m arena.analyze_first_paper_r5mid \
@@ -241,3 +246,4 @@ jobs:
           name: r2-free-agent-arena-preflight-${{ github.run_id }}
           path: results/
           retention-days: 30
+

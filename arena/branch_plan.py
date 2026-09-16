@@ -363,6 +363,8 @@ def prepare_from_files(*, selection_package_path, baseline_traces_path, replicat
     (out / 'intervention_start_snapshot.json').write_text(json.dumps(bundle['intervention_start_snapshot'], ensure_ascii=False, indent=2, sort_keys=True) + '\n', encoding='utf-8')
     write_jsonl(out / 'branch_execution_manifest.jsonl', bundle['branch_rows'])
     write_jsonl(out / 'branch_manifests.jsonl', bundle['branch_manifests'])
+    from .first_paper_mechanism import build_source_packet
+    write_jsonl(out / 'anchor_source_packets_v0.2.jsonl', [build_source_packet(bundle, baseline)])
     return bundle
 
 

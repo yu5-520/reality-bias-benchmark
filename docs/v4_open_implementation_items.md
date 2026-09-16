@@ -1,5 +1,7 @@
 # System Behavior v4 — Remaining Implementation Items
 
+Forward update: [Mechanism contract v0.2](first_paper_mechanism_contract_v0.2.md) implements source-only anchor packets, activity diagnostics, grouped parent estimates, baseline-cluster summaries and optional append-only mechanism reviews. The v0.1 pair-bootstrap statements below describe the earlier freeze; forward real runs use descriptive v0.2 reporting. Real collection and independent semantic review remain pending.
+
 Date: 2026-09-16  
 Status: OPEN IMPLEMENTATION TRACKER
 

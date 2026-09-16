@@ -21,6 +21,7 @@ from .system_behavior_lineage_v4 import build_system_lineage_view
 from .v4_branch_anchor_review_packets import build_branch_anchor_review_packet
 from .v4_experiment_binding import load_and_verify_v4_binding
 from .v4_review_packets import build_bounded_review_packets
+from .first_paper_mechanism import continuation_observations, grouped_analysis, sealed
 
 
 SUMMARY_SCHEMA = "RB-R5R6-BRANCH-MEASUREMENT-V4-SUMMARY-v0.1"
@@ -205,6 +206,8 @@ def derive_v4_bundle(
     branch_anchor_views = []
     packets = []
     anchor_packets = []
+    mechanism_observations = []
+    mechanism_packets = []
     run_index = []
     measurement_by_run = {}
     trace_status_by_run = {}
@@ -274,6 +277,22 @@ def derive_v4_bundle(
             evidence_batch_hash=evidence_hash,
             v4_research_binding_hash=binding["binding_hash"],
         )
+        observation = continuation_observations(trace, adapted, dynamics, branch_anchor_view)
+        mechanism_observations.append(observation)
+        mechanism_packets.append(sealed({
+            'schema': 'RB-MECHANISM-REVIEW-PACKET-v0.2',
+            'trajectory_id': run_id, 'pair_id': row['pair_id'],
+            'condition_id': row['condition_id'],
+            'parent_state_hash': row['parent_state_hash'],
+            'source_evidence_batch_hash': evidence_hash,
+            'v4_research_binding_hash': binding['binding_hash'],
+            'evidence': [
+                {'ref': 'bounded:anchor-propagation', 'value': branch_anchor_packet},
+                {'ref': 'structural:continuation', 'value': observation},
+            ],
+            'questions': ['task_completion', 'adoption', 'verification', 'correction', 'inheritance', 'recertification', 'challenge_present'],
+            'rule': 'Judge only recorded evidence. Natural termination is not task success; missing challenge is NOT_OBSERVED. Structural status rewrites are not R. Use INSUFFICIENT_EVIDENCE when bounded context cannot settle a question.',
+        }, 'packet_hash'))
 
         dynamics_out = copy.deepcopy(dynamics)
         dynamics_out["source_evidence_batch_hash"] = evidence_hash
@@ -365,7 +384,16 @@ def derive_v4_bundle(
         ),
     }
     summary["summary_hash"] = content_hash(summary)
+    mechanism_analysis = grouped_analysis(pair_comparisons, summary, mechanism_observations)
+    mechanism_analysis.pop('analysis_hash')
+    mechanism_analysis['source_trace_hash'] = plan['common_identity']['source_trace_hash']
+    mechanism_analysis['v4_research_binding_hash'] = binding['binding_hash']
+    mechanism_analysis['source_evidence_batch_hash'] = evidence_hash
+    mechanism_analysis = sealed(mechanism_analysis, 'analysis_hash')
     return {
+        "mechanism_analysis": mechanism_analysis,
+        "mechanism_observations": mechanism_observations,
+        "mechanism_review_packets": mechanism_packets,
         "measurements": measurements,
         "dynamics_views": dynamics_views,
         "lineage_views": lineage_views,
@@ -394,6 +422,9 @@ def main() -> None:
         raise ValueError("refusing_to_overwrite_branch_measurement_v4_outdir")
     outdir.mkdir(parents=True, exist_ok=False)
     write_jsonl(outdir / "trajectory_measurements_v4.jsonl", bundle["measurements"])
+    write_jsonl(outdir / 'mechanism_observations_v0.2.jsonl', bundle['mechanism_observations'])
+    write_jsonl(outdir / 'mechanism_review_packets_v0.2.jsonl', bundle['mechanism_review_packets'])
+    (outdir / 'first_paper_mechanism_analysis_v0.2.json').write_text(json.dumps(bundle['mechanism_analysis'], ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     write_jsonl(outdir / "system_dynamics_views_v4.jsonl", bundle["dynamics_views"])
     write_jsonl(outdir / "system_lineage_views_v4.jsonl", bundle["lineage_views"])
     write_jsonl(outdir / "branch_anchor_lineage_views_v4.jsonl", bundle["branch_anchor_views"])

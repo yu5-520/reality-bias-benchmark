@@ -1,5 +1,7 @@
 # First-Paper Scope under System Behavior v4
 
+Forward refinement: [Mechanism contract v0.2](first_paper_mechanism_contract_v0.2.md) supersedes the aggregation/execution position below for new subject evidence. It preserves the intervention and endpoint, groups by frozen parent, reports descriptive estimates without an independence claim, and adds source classification plus activity/task/mechanism diagnostics. The v0.1 description below is retained as the preceding freeze.
+
 Date: 2026-09-16  
 Status: FROZEN EMPIRICAL CORE / FORWARD THEORY CONTEXT
 

@@ -4,6 +4,8 @@ Research repository for the Reality Bias research program and first-paper mechan
 
 ## Current forward research layer
 
+The forward first-paper implementation now uses [Mechanism refinement v0.2](docs/first_paper_mechanism_contract_v0.2.md): outcome-blind source-anchor classification, task/activity diagnostics, parent-aware descriptive estimates and optional bounded mechanism reviews. The R5-MID intervention and structural endpoint remain unchanged. v0.1 analysis is preserved historically; its pair-level bootstrap is not the forward uncertainty rule. R9 remains supplementary.
+
 The current forward planning layer is:
 
 - **[R Plan v4.0](docs/R_Plan_v4.0.md)** — system-behavior research program;
