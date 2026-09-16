@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RB Process Reality Mechanism Measurement v0.3",
+  "type": "object",
+  "required": [
+    "schema",
+    "trajectory_id",
+    "run_status",
+    "root_resolution",
+    "r2_jump_recurrence",
+    "r3_inherited_inertia",
+    "root_descendant_topology",
+    "full_post_context_topology",
+    "r6_recovery",
+    "terminal_outcome",
+    "measurement_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-PROCESS-REALITY-MECHANISM-MEASUREMENT-v0.3"},
+    "direct_experiment_origin_exposure_count": {"type": "integer", "minimum": 0, "maximum": 1},
+    "root_resolution": {"type": "object"},
+    "r2_jump_recurrence": {"type": "object"},
+    "r3_inherited_inertia": {"type": "object"},
+    "root_descendant_topology": {"type": "object"},
+    "full_post_context_topology": {"type": "object"},
+    "r6_recovery": {"type": "object"},
+    "terminal_outcome": {"type": "object"},
+    "measurement_hash": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": true
+}
