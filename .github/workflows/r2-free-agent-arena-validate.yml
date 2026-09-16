@@ -84,6 +84,21 @@ jobs:
           grep -q '^JUMP_TRUTH_STATUS=NOT_ADJUDICATED$' results/system_behavior_dynamics_preflight/SUMMARY.txt
           grep -q '^PENETRATION_STATUS=NOT_ADJUDICATED$' results/system_behavior_dynamics_preflight/SUMMARY.txt
           grep -q '^LINEAGE_STATUS=NOT_DERIVED_POST_CANDIDATE_ORDER_ONLY$' results/system_behavior_dynamics_preflight/SUMMARY.txt
+      - name: Derive v4 source-backed lineage and mechanical penetration-depth candidates
+        run: |
+          python -m arena.system_behavior_lineage_preflight --outdir results/system_behavior_lineage_preflight
+          test -s results/system_behavior_lineage_preflight/source_trace.json
+          test -s results/system_behavior_lineage_preflight/behavior_events_v0.1.jsonl
+          test -s results/system_behavior_lineage_preflight/structural_jump_candidates_v0.1.jsonl
+          test -s results/system_behavior_lineage_preflight/source_lineage_relations_v0.1.jsonl
+          test -s results/system_behavior_lineage_preflight/system_lineage_view_v4.json
+          test -s results/system_behavior_lineage_preflight/system_trajectory_measurement_v4.json
+          test -s results/system_behavior_lineage_preflight/SUMMARY.txt
+          grep -q '^SYSTEM_BEHAVIOR_LINEAGE_PREFLIGHT=PASS$' results/system_behavior_lineage_preflight/SUMMARY.txt
+          grep -q '^SCIENTIFIC_EVIDENCE=NO$' results/system_behavior_lineage_preflight/SUMMARY.txt
+          grep -q '^LINEAGE_STATUS=SOURCE_BACKED_STRUCTURAL_LINEAGE_v0.1$' results/system_behavior_lineage_preflight/SUMMARY.txt
+          grep -q '^SEMANTIC_ADOPTION_STATUS=NOT_ADJUDICATED$' results/system_behavior_lineage_preflight/SUMMARY.txt
+          grep -q '^AUTHORITY_PENETRATION_STATUS=NOT_ADJUDICATED$' results/system_behavior_lineage_preflight/SUMMARY.txt
       - name: Build current v0.3.2 offline manifest sample
         run: |
           python -m arena.build_manifest --domains all --repeats 2 --arena-config arena/config/arena_v0.3.json --out results/arena_manifest_preflight.jsonl
