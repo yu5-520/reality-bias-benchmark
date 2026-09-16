@@ -72,6 +72,8 @@ def verify_state_snapshot(snapshot):
     _require(snapshot.get('provider_internal_state_captured') is False, 'provider_state_claim_must_be_false')
     _require(isinstance(snapshot.get('queue'), list), 'snapshot_queue_missing')
     _require(isinstance(snapshot.get('inboxes'), dict), 'snapshot_inboxes_missing')
+    _require(isinstance(snapshot.get('events'), list), 'snapshot_events_missing')
+    _require(isinstance(snapshot.get('turns'), int) and snapshot.get('turns') >= 0, 'snapshot_turns_invalid')
     return True
 
 
@@ -145,6 +147,10 @@ def make_branch_manifest(
         'parent_trace_hash': parent_trace_hash,
         'parent_state_hash': parent_hash,
         'branch_start_state_hash': start_hash,
+        'parent_turn': int(parent_snapshot['turns']),
+        'branch_start_turn': int(branch_start_snapshot['turns']),
+        'parent_event_count': len(parent_snapshot['events']),
+        'branch_start_event_count': len(branch_start_snapshot['events']),
         'anchor_ref': parent_snapshot.get('anchor_ref'),
         'branch_start_anchor_ref': branch_start_snapshot.get('anchor_ref'),
         'intervention_spec': copy.deepcopy(intervention_spec),
@@ -172,6 +178,8 @@ def verify_branch_manifest(manifest, parent_snapshot=None, branch_start_snapshot
 
     if schema == BRANCH_SCHEMA:
         _require(manifest.get('branch_start_state_hash'), 'branch_start_state_hash_required')
+        for key in ('parent_turn', 'branch_start_turn', 'parent_event_count', 'branch_start_event_count'):
+            _require(isinstance(manifest.get(key), int) and manifest.get(key) >= 0, f'{key}_invalid')
         expected_applied = manifest.get('parent_state_hash') != manifest.get('branch_start_state_hash')
         _require(
             manifest.get('intervention_applied_before_continuation') is expected_applied,
@@ -181,11 +189,17 @@ def verify_branch_manifest(manifest, parent_snapshot=None, branch_start_snapshot
     if parent_snapshot is not None:
         verify_state_snapshot(parent_snapshot)
         _require(manifest.get('parent_state_hash') == parent_snapshot.get('state_hash'), 'branch_parent_state_hash_mismatch')
+        if schema == BRANCH_SCHEMA:
+            _require(manifest.get('parent_turn') == parent_snapshot.get('turns'), 'branch_parent_turn_mismatch')
+            _require(manifest.get('parent_event_count') == len(parent_snapshot.get('events') or []), 'branch_parent_event_count_mismatch')
 
     if branch_start_snapshot is not None:
         verify_state_snapshot(branch_start_snapshot)
         expected_start = manifest.get('branch_start_state_hash') if schema == BRANCH_SCHEMA else manifest.get('parent_state_hash')
         _require(expected_start == branch_start_snapshot.get('state_hash'), 'branch_start_state_hash_mismatch')
+        if schema == BRANCH_SCHEMA:
+            _require(manifest.get('branch_start_turn') == branch_start_snapshot.get('turns'), 'branch_start_turn_mismatch')
+            _require(manifest.get('branch_start_event_count') == len(branch_start_snapshot.get('events') or []), 'branch_start_event_count_mismatch')
     return True
 
 
