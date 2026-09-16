@@ -142,7 +142,7 @@ jobs:
         working-directory: bound_code
         run: |
           python - <<'PY'
-          import json, os, sys
+          import os, sys
           sys.path.insert(0, '.')
           from arena.run_branch_real import load_plan_bundle
           from arena.v4_experiment_binding import load_and_verify_v4_binding
@@ -219,28 +219,38 @@ jobs:
       - name: Verify no semantic overclaim or automatic paid evaluator
         if: always()
         run: |
-          if [ -s results/r5r6_branch_real/system_behavior_v4/first_paper_mechanism_analysis_v0.2.json ]; then
-            python - <<'PY'
-            import json
-            row = json.load(open('results/r5r6_branch_real/system_behavior_v4/first_paper_mechanism_analysis_v0.2.json', encoding='utf-8'))
-            assert row['schema'] == 'RB-FIRST-PAPER-MECHANISM-ANALYSIS-v0.2'
-            assert row['primary_interval'] is None
-            assert row['automatic_paid_evaluator_called'] is False
-            print('PARENT_GROUPS=' + str(row['parent_count']))
-            print('COMPLETE_PAIRS=' + str(row['complete_pair_count']))
-            print('PARENT_BALANCED_MEAN_DELTA=' + str(row['parent_balanced_mean_delta']))
-            print('SEMANTIC_MECHANISMS=PENDING_REVIEW')
-            PY
-          fi
-      - name: Upload immutable authorized Phase-B evidence
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('results/r5r6_branch_real/system_behavior_v4/first_paper_mechanism_analysis_v0.2.json')
+          if not p.exists():
+              print('MECHANISM_ANALYSIS_PRESENT=NO')
+              raise SystemExit(0)
+          row = json.loads(p.read_text(encoding='utf-8'))
+          assert row['schema'] == 'RB-FIRST-PAPER-MECHANISM-ANALYSIS-v0.2'
+          assert row['primary_interval'] is None
+          assert row['automatic_paid_evaluator_called'] is False
+          print('PARENT_GROUPS=' + str(row['parent_count']))
+          print('COMPLETE_PAIRS=' + str(row['complete_pair_count']))
+          print('PARENT_BALANCED_MEAN_DELTA=' + str(row['parent_balanced_mean_delta']))
+          print('SEMANTIC_MECHANISMS=PENDING_REVIEW')
+          PY
+      - name: Archive evidence with filesystem-safe outer name
+        if: always()
+        run: |
+          tar -czf phase_b_evidence_bundle.tar.gz \
+            manifests/r5mid_phase_b_paid_authorization_2026-09-16.json \
+            prepared/results/r5r6_branch_plan \
+            prepared/results/r5r6_branch_prepared_state.json \
+            results/r5r6_branch_real
+          sha256sum phase_b_evidence_bundle.tar.gz > phase_b_evidence_bundle.sha256
+      - name: Upload immutable authorized Phase-B evidence archive
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: r5mid-phase-b-subject-evidence-${{ github.run_id }}
           path: |
-            manifests/r5mid_phase_b_paid_authorization_2026-09-16.json
-            prepared/results/r5r6_branch_plan/
-            prepared/results/r5r6_branch_prepared_state.json
-            results/r5r6_branch_real/
-          if-no-files-found: warn
+            phase_b_evidence_bundle.tar.gz
+            phase_b_evidence_bundle.sha256
+          if-no-files-found: error
           retention-days: 90
