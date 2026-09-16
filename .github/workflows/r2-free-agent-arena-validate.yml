@@ -5,20 +5,26 @@ on:
     branches: [main]
     paths:
       - 'arena/**'
+      - 'configs/**'
+      - 'schemas/**'
       - '.github/workflows/r234-structural-smoke.yml'
       - '.github/workflows/r5r6-baseline-snapshot-real.yml'
       - '.github/workflows/r5r6-frozen-parent-branch-real.yml'
-      - 'schemas/**'
       - 'docs/R2_free_agent_arena_design.md'
       - 'docs/experimental_control_layer_v0.1.md'
       - 'docs/experimental_control_layer_v0.2.md'
       - 'docs/R5_R6_branch_intervention_recovery_protocol_v0.1.md'
       - 'docs/R5_R6_branch_intervention_recovery_protocol_v0.2.md'
       - 'docs/R5_R6_branch_intervention_recovery_protocol_v0.3.md'
+      - 'docs/R5_R6_branch_intervention_recovery_protocol_v0.4.md'
       - 'docs/R5_R6_real_run_freeze_template_v0.1.md'
+      - 'docs/R5_R6_real_run_freeze_template_v0.2.md'
       - 'docs/R7_orchestration_protocol_v0.1.md'
       - 'docs/R7_real_run_freeze_template_v0.1.md'
       - 'docs/trajectory_dynamics_measurement_plan_v3.md'
+      - 'docs/system_behavior_measurement_plan_v4.md'
+      - 'docs/R_Plan_v4.0.md'
+      - 'theory/theory_contract_v0.4.md'
       - 'theory/change_notes/**'
       - '.github/workflows/r2-free-agent-arena-validate.yml'
   workflow_dispatch:
@@ -43,6 +49,14 @@ jobs:
         run: python arena/preflight.py
       - name: Validate state, evidence, control-layer and legacy regression cases
         run: python -m unittest discover -s arena/tests -v
+      - name: Validate System Behavior v4 registries and deterministic preflight
+        run: |
+          python -m arena.system_behavior_preflight --outdir results/system_behavior_preflight
+          test -s results/system_behavior_preflight/behavior_events.jsonl
+          test -s results/system_behavior_preflight/system_trajectory_measurement_v4.json
+          test -s results/system_behavior_preflight/SUMMARY.txt
+          grep -q '^SYSTEM_BEHAVIOR_PREFLIGHT=PASS$' results/system_behavior_preflight/SUMMARY.txt
+          grep -q '^SCIENTIFIC_EVIDENCE=NO$' results/system_behavior_preflight/SUMMARY.txt
       - name: Build current v0.3.2 offline manifest sample
         run: |
           python -m arena.build_manifest --domains all --repeats 2 --arena-config arena/config/arena_v0.3.json --out results/arena_manifest_preflight.jsonl
