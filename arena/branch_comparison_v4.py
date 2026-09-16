@@ -57,6 +57,14 @@ def _single_variable(measurement: Mapping[str, Any]) -> Mapping[str, Any]:
     return rows[0]
 
 
+def _metric(control: Mapping[str, Any], intervention: Mapping[str, Any], key: str) -> dict[str, Any]:
+    return {
+        "control": control.get(key),
+        "intervention": intervention.get(key),
+        "delta_intervention_minus_control": _numeric_delta(intervention.get(key), control.get(key)),
+    }
+
+
 def build_branch_comparison_v4(
     control: Mapping[str, Any],
     intervention: Mapping[str, Any],
@@ -90,72 +98,53 @@ def build_branch_comparison_v4(
     i_r3 = intervention.get("r3") or {}
     c_r4 = control.get("r4") or {}
     i_r4 = intervention.get("r4") or {}
+    c_r5 = control.get("r5_mid") or {}
+    i_r5 = intervention.get("r5_mid") or {}
+    _require(c_r5 and i_r5, "v4_comparison_r5_mid_anchor_metrics_required")
+    _require(c_r5.get("state_key") == i_r5.get("state_key"), "v4_comparison_r5_mid_state_key_mismatch")
+    _require(c_r5.get("semantic_reliance_status") == NOT_ADJUDICATED, "v4_comparison_control_anchor_semantic_promoted")
+    _require(i_r5.get("semantic_reliance_status") == NOT_ADJUDICATED, "v4_comparison_intervention_anchor_semantic_promoted")
 
     structural_deltas = {
-        "behavior_event_count": {
-            "control": control.get("behavior_event_count"),
-            "intervention": intervention.get("behavior_event_count"),
-            "delta_intervention_minus_control": _numeric_delta(intervention.get("behavior_event_count"), control.get("behavior_event_count")),
-        },
+        "behavior_event_count": _metric(control, intervention, "behavior_event_count"),
         "r2": {
-            "jump_candidate_count": {
-                "control": c_r2.get("jump_candidate_count"),
-                "intervention": i_r2.get("jump_candidate_count"),
-                "delta_intervention_minus_control": _numeric_delta(i_r2.get("jump_candidate_count"), c_r2.get("jump_candidate_count")),
-            },
-            "first_jump_turn": {
-                "control": c_r2.get("first_jump_turn"),
-                "intervention": i_r2.get("first_jump_turn"),
-                "delta_intervention_minus_control": _numeric_delta(i_r2.get("first_jump_turn"), c_r2.get("first_jump_turn")),
-            },
+            "jump_candidate_count": _metric(c_r2, i_r2, "jump_candidate_count"),
+            "first_jump_turn": _metric(c_r2, i_r2, "first_jump_turn"),
             "jump_type_count_delta": _count_delta_map(
                 i_r2.get("jump_type_counts") or {},
                 c_r2.get("jump_type_counts") or {},
             ),
         },
         "r3": {
-            "descendant_event_count": {
-                "control": c_r3.get("descendant_event_count"),
-                "intervention": i_r3.get("descendant_event_count"),
-                "delta_intervention_minus_control": _numeric_delta(i_r3.get("descendant_event_count"), c_r3.get("descendant_event_count")),
-            },
-            "affected_agent_count": {
-                "control": c_r3.get("affected_agent_count"),
-                "intervention": i_r3.get("affected_agent_count"),
-                "delta_intervention_minus_control": _numeric_delta(i_r3.get("affected_agent_count"), c_r3.get("affected_agent_count")),
-            },
-            "operational_boundary_crossing_count": {
-                "control": c_r3.get("operational_boundary_crossing_count"),
-                "intervention": i_r3.get("operational_boundary_crossing_count"),
-                "delta_intervention_minus_control": _numeric_delta(i_r3.get("operational_boundary_crossing_count"), c_r3.get("operational_boundary_crossing_count")),
-            },
-            "first_jump_downstream_operational_crossing_count": {
-                "control": c_r3.get("first_jump_downstream_operational_crossing_count"),
-                "intervention": i_r3.get("first_jump_downstream_operational_crossing_count"),
-                "delta_intervention_minus_control": _numeric_delta(
-                    i_r3.get("first_jump_downstream_operational_crossing_count"),
-                    c_r3.get("first_jump_downstream_operational_crossing_count"),
-                ),
-            },
-            "first_jump_mechanical_penetration_depth_candidate": {
-                "control": c_r3.get("first_jump_mechanical_penetration_depth_candidate"),
-                "intervention": i_r3.get("first_jump_mechanical_penetration_depth_candidate"),
-                "delta_intervention_minus_control": _numeric_delta(
-                    i_r3.get("first_jump_mechanical_penetration_depth_candidate"),
-                    c_r3.get("first_jump_mechanical_penetration_depth_candidate"),
-                ),
-            },
+            "descendant_event_count": _metric(c_r3, i_r3, "descendant_event_count"),
+            "affected_agent_count": _metric(c_r3, i_r3, "affected_agent_count"),
+            "operational_boundary_crossing_count": _metric(c_r3, i_r3, "operational_boundary_crossing_count"),
+            "first_jump_downstream_operational_crossing_count": _metric(c_r3, i_r3, "first_jump_downstream_operational_crossing_count"),
+            "first_jump_mechanical_penetration_depth_candidate": _metric(c_r3, i_r3, "first_jump_mechanical_penetration_depth_candidate"),
             "operational_authority_classes_reached": _authority_class_delta(
                 i_r3.get("first_jump_operational_authority_classes_reached") or [],
                 c_r3.get("first_jump_operational_authority_classes_reached") or [],
             ),
         },
         "r4": {
-            "retrospective_window_count": {
-                "control": c_r4.get("retrospective_window_count"),
-                "intervention": i_r4.get("retrospective_window_count"),
-                "delta_intervention_minus_control": _numeric_delta(i_r4.get("retrospective_window_count"), c_r4.get("retrospective_window_count")),
-            }
+            "retrospective_window_count": _metric(c_r4, i_r4, "retrospective_window_count"),
+        },
+        "r5_mid_branch_anchor": {
+            "state_key": c_r5.get("state_key"),
+            "control_state_status": c_r5.get("state_status"),
+            "intervention_state_status": i_r5.get("state_status"),
+            "anchor_visible_agent_turn_count": _metric(c_r5, i_r5, "anchor_visible_agent_turn_count"),
+            "potential_downstream_event_count": _metric(c_r5, i_r5, "potential_downstream_event_count"),
+            "potential_downstream_relation_count": _metric(c_r5, i_r5, "potential_downstream_relation_count"),
+            "potential_downstream_affected_agent_count": _metric(c_r5, i_r5, "potential_downstream_affected_agent_count"),
+            "potential_downstream_operational_crossing_count": _metric(c_r5, i_r5, "potential_downstream_operational_crossing_count"),
+            "mechanical_anchor_reach_depth_candidate": _metric(c_r5, i_r5, "mechanical_anchor_reach_depth_candidate"),
+            "potential_downstream_authority_classes_reached": _authority_class_delta(
+                i_r5.get("potential_downstream_authority_classes_reached") or [],
+                c_r5.get("potential_downstream_authority_classes_reached") or [],
+            ),
+            "semantic_reliance_status": NOT_ADJUDICATED,
+            "authority_penetration_status": NOT_ADJUDICATED,
         },
     }
 
@@ -183,7 +172,8 @@ def build_branch_comparison_v4(
         "scientific_status": "PAIRED_STRUCTURAL_DIFFERENCE_ONLY",
         "warning": (
             "This record compares two bound branch trajectories from the same frozen parent. "
-            "A structural delta is not by itself semantic C/P/R, Authority Penetration, recovery, or a generalized causal effect."
+            "R5-MID branch-anchor fields are rooted at the exact branch-start state and measure structural exposure/reach. "
+            "A structural delta is not by itself semantic reliance, C/P/R, Authority Penetration, recovery, or a generalized causal effect."
         ),
     }
     comparison["comparison_hash"] = content_hash(comparison)
@@ -210,6 +200,7 @@ def verify_branch_comparison_v4(comparison: Mapping[str, Any]) -> bool:
     _require(comparison.get("semantic_status") == NOT_ADJUDICATED, "v4_comparison_semantic_status_invalid")
     _require(comparison.get("causal_effect_status") == NOT_ADJUDICATED, "v4_comparison_causal_status_invalid")
     _require(isinstance(comparison.get("structural_deltas"), Mapping), "v4_comparison_structural_deltas_required")
+    _require(isinstance((comparison.get("structural_deltas") or {}).get("r5_mid_branch_anchor"), Mapping), "v4_comparison_r5_mid_deltas_required")
     material = copy.deepcopy(dict(comparison))
     supplied_hash = material.pop("comparison_hash", None)
     _require(supplied_hash == content_hash(material), "v4_comparison_hash_mismatch")
