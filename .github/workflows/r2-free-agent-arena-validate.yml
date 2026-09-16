@@ -69,6 +69,21 @@ jobs:
           grep -q '^SOURCE_TRACE_SCHEMA=R2-ARENA-TRACE-v0.3$' results/system_behavior_trace_preflight/SUMMARY.txt
           grep -q '^SCIENTIFIC_EVIDENCE=NO$' results/system_behavior_trace_preflight/SUMMARY.txt
           grep -q '^JUMP_DETECTOR=NOT_RUN_DETECTOR_NOT_FROZEN$' results/system_behavior_trace_preflight/SUMMARY.txt
+      - name: Detect v4 structural Jump candidates and operational crossings
+        run: |
+          python -m arena.system_behavior_dynamics_preflight --outdir results/system_behavior_dynamics_preflight
+          test -s results/system_behavior_dynamics_preflight/source_trace.json
+          test -s results/system_behavior_dynamics_preflight/behavior_events_v0.1.jsonl
+          test -s results/system_behavior_dynamics_preflight/structural_jump_candidates_v0.1.jsonl
+          test -s results/system_behavior_dynamics_preflight/operational_boundary_crossings_v0.1.jsonl
+          test -s results/system_behavior_dynamics_preflight/system_trajectory_measurement_v4.json
+          test -s results/system_behavior_dynamics_preflight/system_dynamics_view_v4.json
+          test -s results/system_behavior_dynamics_preflight/SUMMARY.txt
+          grep -q '^SYSTEM_BEHAVIOR_DYNAMICS_PREFLIGHT=PASS$' results/system_behavior_dynamics_preflight/SUMMARY.txt
+          grep -q '^SCIENTIFIC_EVIDENCE=NO$' results/system_behavior_dynamics_preflight/SUMMARY.txt
+          grep -q '^JUMP_TRUTH_STATUS=NOT_ADJUDICATED$' results/system_behavior_dynamics_preflight/SUMMARY.txt
+          grep -q '^PENETRATION_STATUS=NOT_ADJUDICATED$' results/system_behavior_dynamics_preflight/SUMMARY.txt
+          grep -q '^LINEAGE_STATUS=NOT_DERIVED_POST_CANDIDATE_ORDER_ONLY$' results/system_behavior_dynamics_preflight/SUMMARY.txt
       - name: Build current v0.3.2 offline manifest sample
         run: |
           python -m arena.build_manifest --domains all --repeats 2 --arena-config arena/config/arena_v0.3.json --out results/arena_manifest_preflight.jsonl
