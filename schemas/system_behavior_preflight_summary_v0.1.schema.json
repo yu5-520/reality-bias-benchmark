@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/system_behavior_preflight_summary_v0.1.schema.json",
+  "title": "Reality Bias System Behavior Preflight Summary v0.1",
+  "type": "object",
+  "required": ["schema", "status", "scientific_evidence", "behavior_event_count", "measurement_hash"],
+  "properties": {
+    "schema": {"const": "RB-SYSTEM-BEHAVIOR-PREFLIGHT-SUMMARY-v0.1"},
+    "status": {"const": "PASS"},
+    "scientific_evidence": {"const": false},
+    "behavior_event_count": {"type": "integer", "minimum": 0},
+    "measurement_hash": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}
