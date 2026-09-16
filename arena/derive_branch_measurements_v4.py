@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
+from .branch_comparison_v4 import build_branch_comparison_v4
 from .io_utils import load_json, load_jsonl, sha256_file, write_jsonl
 from .run_branch_real import load_plan_bundle
 from .system_behavior import content_hash
@@ -18,6 +19,7 @@ from .v4_review_packets import build_bounded_review_packets
 
 SUMMARY_SCHEMA = "RB-R5R6-BRANCH-MEASUREMENT-V4-SUMMARY-v0.1"
 VALID_TRACE_STATUSES = {"RUN_COMPLETE", "BUDGET_CENSORED", "RUN_INCOMPLETE", "RUN_FAILED"}
+PAIR_COMPARABLE_STATUSES = {"RUN_COMPLETE"}
 
 
 class BranchMeasurementV4Error(ValueError):
@@ -104,6 +106,71 @@ def _verify_source_freeze(
     _require(evidence_code_sha == binding.get("code_sha"), "v4_derivation_evidence_code_sha_mismatch")
 
 
+def _build_pair_comparisons(
+    *,
+    plan_bundle: Mapping[str, Any],
+    measurement_by_run: Mapping[str, Mapping[str, Any]],
+    trace_status_by_run: Mapping[str, str],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    comparisons = []
+    pair_index = []
+    pair_ids = sorted({row["pair_id"] for row in plan_bundle["branch_rows"]})
+    for pair_id in pair_ids:
+        rows = [row for row in plan_bundle["branch_rows"] if row["pair_id"] == pair_id]
+        by_condition = {row["condition_id"]: row for row in rows}
+        control_row = by_condition.get("CONTROL_CONTINUATION")
+        intervention_row = by_condition.get("STATUS_DOWNGRADE_INTERVENTION")
+        if control_row is None or intervention_row is None:
+            pair_index.append({
+                "pair_id": pair_id,
+                "pair_status": "PAIR_NOT_COMPARABLE_PLAN_CONDITION_MISSING",
+                "semantic_status": "NOT_ADJUDICATED",
+                "causal_effect_status": "NOT_ADJUDICATED",
+            })
+            continue
+        control = measurement_by_run.get(control_row["run_id"])
+        intervention = measurement_by_run.get(intervention_row["run_id"])
+        if control is None or intervention is None:
+            pair_index.append({
+                "pair_id": pair_id,
+                "pair_status": "PAIR_NOT_COMPARABLE_MEASUREMENT_MISSING",
+                "recorded_conditions": sorted(
+                    condition
+                    for condition, row in by_condition.items()
+                    if row["run_id"] in measurement_by_run
+                ),
+                "semantic_status": "NOT_ADJUDICATED",
+                "causal_effect_status": "NOT_ADJUDICATED",
+            })
+            continue
+        control_status = trace_status_by_run.get(control_row["run_id"])
+        intervention_status = trace_status_by_run.get(intervention_row["run_id"])
+        if control_status not in PAIR_COMPARABLE_STATUSES or intervention_status not in PAIR_COMPARABLE_STATUSES:
+            pair_index.append({
+                "pair_id": pair_id,
+                "pair_status": "PAIR_NOT_COMPARABLE_NONCOMPLETE_TRACE",
+                "control_run_status": control_status,
+                "intervention_run_status": intervention_status,
+                "semantic_status": "NOT_ADJUDICATED",
+                "causal_effect_status": "NOT_ADJUDICATED",
+            })
+            continue
+        comparison = build_branch_comparison_v4(
+            control,
+            intervention,
+            comparison_id=f"{pair_id}:V4STRUCTURAL",
+        )
+        comparisons.append(comparison)
+        pair_index.append({
+            "pair_id": pair_id,
+            "pair_status": "PAIR_COMPARED_STRUCTURALLY_V4",
+            "comparison_hash": comparison["comparison_hash"],
+            "semantic_status": "NOT_ADJUDICATED",
+            "causal_effect_status": "NOT_ADJUDICATED",
+        })
+    return comparisons, pair_index
+
+
 def derive_v4_bundle(
     *,
     plan_dir: str | Path,
@@ -129,6 +196,8 @@ def derive_v4_bundle(
     lineage_views = []
     packets = []
     run_index = []
+    measurement_by_run = {}
+    trace_status_by_run = {}
 
     for trace in traces:
         run_id = trace.get("run_id")
@@ -182,6 +251,8 @@ def derive_v4_bundle(
         )
 
         measurements.append(measurement)
+        measurement_by_run[run_id] = measurement
+        trace_status_by_run[run_id] = trace.get("run_status")
         dynamics_views.append(dynamics_out)
         lineage_views.append(lineage_out)
         packets.extend(review_packets)
@@ -199,6 +270,12 @@ def derive_v4_bundle(
             }
         )
 
+    pair_comparisons, pair_index = _build_pair_comparisons(
+        plan_bundle=plan_bundle,
+        measurement_by_run=measurement_by_run,
+        trace_status_by_run=trace_status_by_run,
+    )
+
     summary = {
         "schema": SUMMARY_SCHEMA,
         "version": "0.1",
@@ -213,7 +290,10 @@ def derive_v4_bundle(
         "dynamics_view_count": len(dynamics_views),
         "lineage_view_count": len(lineage_views),
         "bounded_review_packet_count": len(packets),
+        "planned_pair_count": len({row["pair_id"] for row in plan_bundle["branch_rows"]}),
+        "structurally_compared_pair_count": len(pair_comparisons),
         "run_index": run_index,
+        "pair_index": pair_index,
         "measurement_v3_replaced": False,
         "automatic_paid_evaluator_called": False,
         "semantic_review": "DEFERRED_APPEND_ONLY",
@@ -223,7 +303,7 @@ def derive_v4_bundle(
         "scientific_status": "POST_FREEZE_STRUCTURAL_DERIVATION_FROM_SUBJECT_EVIDENCE",
         "warning": (
             "System Behavior v4 outputs are deterministic post-freeze derivations from the bound subject trace file. "
-            "They do not replace Measurement v3 and do not by themselves establish C/P/R, semantic adoption, Authority Penetration, recovery, or causal effect."
+            "Paired v4 comparisons report structural differences only. They do not replace Measurement v3 and do not by themselves establish C/P/R, semantic adoption, Authority Penetration, recovery, or causal effect."
         ),
     }
     summary["summary_hash"] = content_hash(summary)
@@ -232,6 +312,7 @@ def derive_v4_bundle(
         "dynamics_views": dynamics_views,
         "lineage_views": lineage_views,
         "review_packets": packets,
+        "pair_comparisons": pair_comparisons,
         "summary": summary,
     }
 
@@ -256,6 +337,7 @@ def main() -> None:
     write_jsonl(outdir / "system_dynamics_views_v4.jsonl", bundle["dynamics_views"])
     write_jsonl(outdir / "system_lineage_views_v4.jsonl", bundle["lineage_views"])
     write_jsonl(outdir / "bounded_review_packets_v4.jsonl", bundle["review_packets"])
+    write_jsonl(outdir / "pair_structural_comparisons_v4.jsonl", bundle["pair_comparisons"])
     (outdir / "summary.json").write_text(
         json.dumps(bundle["summary"], ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -263,7 +345,8 @@ def main() -> None:
     print(
         f"derived_v4_measurements={len(bundle['measurements'])} "
         f"review_packets={len(bundle['review_packets'])} "
-        "semantic_review=DEFERRED_APPEND_ONLY paid_evaluator=NO measurement_v3_replaced=NO"
+        f"structurally_compared_pairs={len(bundle['pair_comparisons'])} "
+        "semantic_review=DEFERRED_APPEND_ONLY causal_effect=NOT_ADJUDICATED paid_evaluator=NO measurement_v3_replaced=NO"
     )
 
 
