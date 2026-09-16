@@ -233,6 +233,23 @@ jobs:
           else
             echo 'Measurement-v3 derivation skipped because frozen trace/evidence batch is unavailable.' >> "$GITHUB_STEP_SUMMARY"
           fi
+      - name: Derive System Behavior v4 and bounded review packets — no evaluator
+        if: always()
+        run: |
+          if [ -s results/r5r6_branch_real/traces.jsonl ] && [ -s results/r5r6_branch_real/evidence_batch/evidence_batch.json ]; then
+            python -m arena.derive_branch_measurements_v4 \
+              --plan-dir prepared/r5r6_branch_plan \
+              --traces results/r5r6_branch_real/traces.jsonl \
+              --evidence-batch results/r5r6_branch_real/evidence_batch/evidence_batch.json \
+              --outdir results/r5r6_branch_real/system_behavior_v4
+            test -s results/r5r6_branch_real/system_behavior_v4/trajectory_measurements_v4.jsonl
+            test -s results/r5r6_branch_real/system_behavior_v4/system_dynamics_views_v4.jsonl
+            test -s results/r5r6_branch_real/system_behavior_v4/system_lineage_views_v4.jsonl
+            test -s results/r5r6_branch_real/system_behavior_v4/summary.json
+            echo 'System Behavior v4 structural derivation complete; semantic/Authority review remains deferred.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'System Behavior v4 derivation skipped because frozen trace/evidence batch is unavailable.' >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Upload immutable Phase-B subject evidence
         if: always()
         uses: actions/upload-artifact@v4
