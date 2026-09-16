@@ -1,0 +1,212 @@
+name: R5-R6 Frozen-Parent Branch Subject Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      phase_a_run_id:
+        description: 'GitHub Actions run id of a completed R5-R6 Phase-A baseline subject workflow'
+        required: true
+        type: string
+      baseline_run_id:
+        description: 'Exact Phase-A baseline run_id whose selection package has ANCHOR_SELECTED'
+        required: true
+        type: string
+      replicates:
+        description: 'Frozen-parent branch replicate pairs; each pair runs control and intervention once'
+        required: true
+        default: '2'
+        type: string
+      provider:
+        description: 'Exact provider id; must match the frozen Phase-A model binding; keep UNRESOLVED for prepare-only'
+        required: true
+        default: 'UNRESOLVED'
+        type: string
+      model_config:
+        description: 'Exact repository subject model-config path; must match the frozen Phase-A binding'
+        required: true
+        default: 'arena/config/model_deepseek_v0.2.json'
+        type: string
+      spending_ceiling:
+        description: 'Explicit total Phase-B paid-subject ceiling; must be >0 for real execution'
+        required: true
+        default: '0'
+        type: string
+      currency:
+        description: 'Must match the frozen model-config pricing snapshot, e.g. USD or CNY'
+        required: true
+        default: 'USD'
+        type: string
+      max_subject_calls:
+        description: 'Hard paid subject-call cap across the whole Phase-B batch; must be >0 for real execution'
+        required: true
+        default: '0'
+        type: string
+      confirm:
+        description: 'Type CALL_REAL_R5R6_BRANCH_API to authorize Phase-B provider calls; PREPARE_ONLY never calls a provider'
+        required: true
+        default: 'PREPARE_ONLY'
+        type: string
+
+concurrency:
+  group: r5r6-frozen-parent-branch-subject
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  PHASE_A_RUN_ID: ${{ inputs.phase_a_run_id }}
+  BASELINE_RUN_ID: ${{ inputs.baseline_run_id }}
+  R5R6_BRANCH_REPLICATES: ${{ inputs.replicates }}
+  R5R6_PROVIDER: ${{ inputs.provider }}
+  R5R6_MODEL_CONFIG: ${{ inputs.model_config }}
+  R5R6_SPENDING_CEILING: ${{ inputs.spending_ceiling }}
+  R5R6_CURRENCY: ${{ inputs.currency }}
+  R5R6_MAX_SUBJECT_CALLS: ${{ inputs.max_subject_calls }}
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate offline branch machinery
+        run: |
+          python arena/validate_environment.py
+          python -m unittest discover -s arena/tests -v
+          python -m arena.branch_recovery_preflight --outdir results/branch_recovery_preflight
+      - name: Download exact Phase-A subject evidence artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p phase_a
+          gh run download "$PHASE_A_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "r5r6-baseline-subject-evidence-$PHASE_A_RUN_ID" \
+            --dir phase_a
+          test -s phase_a/results/r5r6_baseline_real/traces.jsonl
+          test -s "phase_a/results/r5r6_baseline_real/selection_packages/$BASELINE_RUN_ID.json"
+      - name: Build frozen Phase-B branch plan — zero API calls
+        run: |
+          python -m arena.branch_plan \
+            --selection-package "phase_a/results/r5r6_baseline_real/selection_packages/$BASELINE_RUN_ID.json" \
+            --baseline-traces phase_a/results/r5r6_baseline_real/traces.jsonl \
+            --replicates "$R5R6_BRANCH_REPLICATES" \
+            --branch-code-sha '${{ github.sha }}' \
+            --outdir results/r5r6_branch_plan
+          cp "phase_a/results/r5r6_baseline_real/selection_packages/$BASELINE_RUN_ID.json" \
+            results/r5r6_branch_plan/source_selection_package.json
+          if [ -s phase_a/results/r5r6_baseline_real/evidence_batch/evidence_batch.json ]; then
+            cp phase_a/results/r5r6_baseline_real/evidence_batch/evidence_batch.json \
+              results/r5r6_branch_plan/source_phase_a_evidence_batch.json
+          fi
+          test -s results/r5r6_branch_plan/branch_plan.json
+          test -s results/r5r6_branch_plan/branch_execution_manifest.jsonl
+          test -s results/r5r6_branch_plan/branch_manifests.jsonl
+      - name: Record requested Phase-B gate without treating it as authorization
+        run: |
+          python - <<'PY'
+          import json, os, pathlib
+          record = {
+              'schema': 'RB-R5R6-BRANCH-WORKFLOW-REQUEST-v0.1',
+              'phase_a_run_id': os.environ['PHASE_A_RUN_ID'],
+              'baseline_run_id': os.environ['BASELINE_RUN_ID'],
+              'replicates_input': os.environ['R5R6_BRANCH_REPLICATES'],
+              'provider_input': os.environ['R5R6_PROVIDER'],
+              'model_config_input': os.environ['R5R6_MODEL_CONFIG'],
+              'spending_ceiling_input': os.environ['R5R6_SPENDING_CEILING'],
+              'currency_input': os.environ['R5R6_CURRENCY'],
+              'max_subject_calls_input': os.environ['R5R6_MAX_SUBJECT_CALLS'],
+              'confirm_is_real_authorization_phrase': '${{ inputs.confirm }}' == 'CALL_REAL_R5R6_BRANCH_API',
+              'github_sha': '${{ github.sha }}',
+              'phase_a_rerun_authorized': False,
+              'automatic_paid_evaluator': False,
+              'note': 'This prepare record is not paid-run authorization. Phase-B execution independently enforces the exact authorization phrase, provider/model binding, code SHA, call cap, and spending ceiling.'
+          }
+          pathlib.Path('results/r5r6_branch_workflow_request.json').write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+      - name: Upload prepared Phase-B bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5r6-branch-prepared-${{ github.run_id }}
+          path: |
+            results/r5r6_branch_plan/
+            results/r5r6_branch_workflow_request.json
+            results/branch_recovery_preflight/
+          retention-days: 90
+
+  subject_run:
+    needs: prepare
+    if: ${{ inputs.confirm == 'CALL_REAL_R5R6_BRANCH_API' && inputs.provider != 'UNRESOLVED' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download exact prepared Phase-B plan
+        uses: actions/download-artifact@v4
+        with:
+          name: r5r6-branch-prepared-${{ github.run_id }}
+          path: prepared
+      - name: Execute guarded frozen-parent branch continuations only
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          BAI: ${{ secrets.BAI }}
+          BAILIAN_BASE_URL: ${{ secrets.BAILIAN_BASE_URL }}
+          BAILIAN_MODEL: ${{ secrets.BAILIAN_MODEL }}
+        run: |
+          python -m arena.run_branch_real \
+            --plan-dir prepared/r5r6_branch_plan \
+            --outdir results/r5r6_branch_real \
+            --provider "$R5R6_PROVIDER" \
+            --model-config "$R5R6_MODEL_CONFIG" \
+            --spending-ceiling "$R5R6_SPENDING_CEILING" \
+            --currency "$R5R6_CURRENCY" \
+            --max-subject-calls "$R5R6_MAX_SUBJECT_CALLS" \
+            --authorization-phrase CALL_REAL_R5R6_BRANCH_API \
+            --code-sha '${{ github.sha }}' \
+            --execute-real-api
+      - name: Freeze standard subject evidence — no paid evaluator
+        if: always()
+        run: |
+          if [ -s results/r5r6_branch_real/traces.jsonl ]; then
+            python -m arena.evidence \
+              --manifest prepared/r5r6_branch_plan/branch_execution_manifest.jsonl \
+              --traces results/r5r6_branch_real/traces.jsonl \
+              --errors results/r5r6_branch_real/errors.json \
+              --outdir results/r5r6_branch_real/evidence_batch \
+              --code-sha '${{ github.sha }}'
+            cat results/r5r6_branch_real/evidence_batch/RUN_REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'No Phase-B subject trace was produced; preserving authorization/error artifacts only.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Derive continuation-only Measurement-v3 records
+        if: always()
+        run: |
+          if [ -s results/r5r6_branch_real/traces.jsonl ] && [ -s results/r5r6_branch_real/evidence_batch/evidence_batch.json ]; then
+            python -m arena.derive_branch_measurements \
+              --plan-dir prepared/r5r6_branch_plan \
+              --traces results/r5r6_branch_real/traces.jsonl \
+              --evidence-batch results/r5r6_branch_real/evidence_batch/evidence_batch.json \
+              --outdir results/r5r6_branch_real/trajectory_measurement_v3
+          else
+            echo 'Measurement-v3 derivation skipped because frozen trace/evidence batch is unavailable.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload immutable Phase-B subject evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5r6-branch-subject-evidence-${{ github.run_id }}
+          path: |
+            prepared/r5r6_branch_plan/
+            prepared/r5r6_branch_workflow_request.json
+            results/r5r6_branch_real/
+            results/json_format_retries.jsonl
+          if-no-files-found: warn
+          retention-days: 90
