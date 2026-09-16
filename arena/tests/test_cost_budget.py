@@ -1,7 +1,14 @@
 import unittest
 from pathlib import Path
 
-from arena.cost_budget import BudgetExceeded, BudgetedProvider, observed_cost_from_usage, pricing_policy
+from arena.cost_budget import (
+    BudgetExceeded,
+    BudgetedProvider,
+    conservative_call_reservation,
+    observed_cost_from_usage,
+    pricing_policy,
+    provider_attempt_reservation_multiplier,
+)
 from arena.io_utils import load_json
 from arena.providers import ScriptedProvider
 
@@ -19,6 +26,12 @@ class CostBudgetTest(unittest.TestCase):
         self.assertEqual('configured_peak_price', policy['mode'])
         self.assertGreater(policy['output_per_million'], 0)
 
+    def test_reservation_covers_configured_format_attempts(self):
+        self.assertEqual(2, provider_attempt_reservation_multiplier(self.model))
+        reservation = conservative_call_reservation([{'role': 'user', 'content': 'short test'}], self.model)
+        self.assertEqual(2, reservation['provider_attempts_reserved'])
+        self.assertGreater(reservation['reserved_cost'], 0)
+
     def test_observed_cost_uses_provider_usage(self):
         cost = observed_cost_from_usage({
             'prompt_tokens': 1000,
@@ -35,6 +48,7 @@ class CostBudgetTest(unittest.TestCase):
         response = wrapped.complete_agent([{'role': 'user', 'content': 'short test'}], metadata={'run_id': 'x'})
         self.assertIn('content', response)
         self.assertEqual(1, wrapped.calls_completed)
+        self.assertEqual(2, wrapped.summary()['provider_attempt_reservation_multiplier'])
 
     def test_budget_guard_rejects_tiny_ceiling_before_call(self):
         upstream = ScriptedProvider([{'decision_summary': 'must not run', 'actions': []}])
@@ -43,6 +57,7 @@ class CostBudgetTest(unittest.TestCase):
             wrapped.complete_agent([{'role': 'user', 'content': 'short test'}], metadata={'run_id': 'x'})
         self.assertEqual(0, wrapped.calls_started)
         self.assertEqual(0, upstream.index)
+        self.assertIsNotNone(wrapped.budget_stop_reason)
 
     def test_currency_mismatch_is_rejected(self):
         with self.assertRaises(ValueError):
