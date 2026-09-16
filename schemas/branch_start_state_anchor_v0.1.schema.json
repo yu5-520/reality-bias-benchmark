@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/branch_start_state_anchor_v0.1.schema.json",
+  "title": "Reality Bias Branch Start State Anchor v0.1",
+  "type": "object",
+  "required": [
+    "schema",
+    "version",
+    "trajectory_id",
+    "pair_id",
+    "condition_id",
+    "parent_state_hash",
+    "branch_start_state_hash",
+    "state_key",
+    "state_value_hash",
+    "state_status",
+    "source_event_index",
+    "experimental_variable_id",
+    "semantic_status",
+    "anchor_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-BRANCH-START-STATE-ANCHOR-v0.1"},
+    "version": {"const": "0.1"},
+    "trajectory_id": {"type": "string", "minLength": 1},
+    "pair_id": {"type": "string", "minLength": 1},
+    "condition_id": {"type": "string", "minLength": 1},
+    "parent_state_hash": {"type": "string", "minLength": 1},
+    "branch_start_state_hash": {"type": "string", "minLength": 1},
+    "state_key": {"type": "string", "minLength": 1},
+    "state_value_hash": {"type": "string", "minLength": 1},
+    "state_status": {"type": "string", "minLength": 1},
+    "source_event_index": {"type": "integer", "minimum": 0},
+    "writer": {"type": ["string", "null"]},
+    "experimental_variable_id": {"type": "string", "minLength": 1},
+    "semantic_status": {"const": "NOT_ADJUDICATED"},
+    "anchor_hash": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": true
+}
