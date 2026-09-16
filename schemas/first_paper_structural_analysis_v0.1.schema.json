@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/first_paper_structural_analysis_v0.1.schema.json",
+  "title": "Reality Bias First Paper Structural Analysis v0.1",
+  "type": "object",
+  "required": [
+    "schema",
+    "version",
+    "analysis_contract_hash",
+    "paper_scope",
+    "experimental_variable_id",
+    "primary_outcome_id",
+    "pair_delta_definition",
+    "planned_pair_count",
+    "complete_pair_count",
+    "censored_pair_count",
+    "integrity_failure_count",
+    "all_pair_deltas",
+    "mean_pair_delta",
+    "median_pair_delta",
+    "negative_delta_count",
+    "zero_delta_count",
+    "positive_delta_count",
+    "primary_interval_status",
+    "primary_p_value",
+    "semantic_status",
+    "causal_claim_status",
+    "analysis_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-FIRST-PAPER-STRUCTURAL-ANALYSIS-v0.1"},
+    "version": {"const": "0.1"},
+    "analysis_contract_hash": {"type": "string", "minLength": 1},
+    "paper_scope": {"const": "FIRST_PAPER_R5_MID_EPISTEMIC_STATUS_DOWNGRADE"},
+    "experimental_variable_id": {"const": "EPISTEMIC_STATUS_DOWNGRADE"},
+    "primary_outcome_id": {"const": "R5MID_ANCHOR_DOWNSTREAM_OPERATIONAL_CROSSING_COUNT"},
+    "pair_delta_definition": {"const": "INTERVENTION_MINUS_CONTROL"},
+    "planned_pair_count": {"type": "integer", "minimum": 0},
+    "complete_pair_count": {"type": "integer", "minimum": 0},
+    "censored_pair_count": {"type": "integer", "minimum": 0},
+    "integrity_failure_count": {"type": "integer", "minimum": 0},
+    "all_pair_deltas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["pair_id", "delta"],
+        "properties": {
+          "pair_id": {"type": "string", "minLength": 1},
+          "pair_order_pattern": {"type": ["string", "null"]},
+          "delta": {"type": "number"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "mean_pair_delta": {"type": ["number", "null"]},
+    "median_pair_delta": {"type": ["number", "null"]},
+    "negative_delta_count": {"type": "integer", "minimum": 0},
+    "zero_delta_count": {"type": "integer", "minimum": 0},
+    "positive_delta_count": {"type": "integer", "minimum": 0},
+    "primary_interval_status": {"enum": ["ESTIMATED", "NOT_ESTIMATED_MINIMUM_PAIR_COUNT_NOT_MET"]},
+    "primary_interval": {"type": ["object", "null"]},
+    "primary_p_value": {"const": null},
+    "order_sensitivity": {"type": "object"},
+    "pair_index": {"type": "array", "items": {"type": "object"}},
+    "semantic_status": {"const": "NOT_INCLUDED_IN_STRUCTURAL_ANALYSIS"},
+    "causal_claim_status": {"const": "NOT_ESTABLISHED_BY_STRUCTURAL_ANALYSIS_ALONE"},
+    "scientific_status": {"const": "FROZEN_CONTRACT_STRUCTURAL_ESTIMATE"},
+    "warning": {"type": "string"},
+    "analysis_hash": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": true
+}
