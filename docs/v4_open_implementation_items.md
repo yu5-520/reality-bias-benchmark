@@ -25,7 +25,7 @@ The v4 theory/measurement layer is additive. The items below are not claims of s
 - synchronized R2/R3/R4 structural dynamics view with semantic Jump/adoption/R/Authority Penetration kept unadjudicated;
 - exact frozen branch-start state anchors for R5-MID status intervention, including runtime visibility, potential downstream lineage and mechanical reach metrics;
 - additive `RB-R5R6-V4-RESEARCH-BINDING-v0.1` freezes branch-plan identity, code SHA and exact v4 instrument hashes without rewriting historical branch-plan schemas;
-- research binding now includes structural measurement interfaces, branch-anchor/comparison schemas, canonical Reviewer-v4 contract/policy/schema/generators, and first-paper analysis contract/schema identities;
+- research binding includes structural measurement interfaces, branch-anchor/comparison schemas, canonical Reviewer-v4 contract/policy/schema/generators, and first-paper structural/semantic analysis schema identities;
 - forward Phase-B workflow prepares and verifies `v4_research_binding.json` before any provider call;
 - forward Phase-B authorization/journal/trace/error/summary artifacts carry the v4 binding hash;
 - frozen `RB-V4-SEMANTIC-AUTHORITY-REVIEW-CONTRACT-v0.1` and `RB-V4-REVIEW-PACKET-POLICY-v0.1`;
@@ -39,8 +39,11 @@ The v4 theory/measurement layer is additive. The items below are not claims of s
 - frozen `RB-FIRST-PAPER-ANALYSIS-CONTRACT-v0.1` defines primary/secondary/exploratory outcomes, pair eligibility, censoring, missingness, semantic resolution and batch aggregation before new v4 subject evidence;
 - primary first-paper endpoint is `R5MID_ANCHOR_DOWNSTREAM_OPERATIONAL_CROSSING_COUNT`; intervention-minus-control pair deltas are aggregated by arithmetic mean with median as robust summary;
 - primary uncertainty rule is a deterministic paired nonparametric percentile bootstrap only when the frozen minimum complete-pair count is met; no primary p-value is invented;
-- real Phase-B workflow now emits all v4 structural artifacts and applies the frozen first-paper structural analysis after evidence freeze, without a paid evaluator;
-- CI executes the same first-paper analysis contract against deterministic fixture pair comparisons;
+- first-paper semantic aggregation resolves only append-only Reviewer-v4 endpoints under the frozen two-reviewer/adjudication rule;
+- semantic Authority Penetration uses only resolved determinate `YES/NO` pairs; disagreement, `UNCERTAIN`, `NOT_APPLICABLE`, insufficient evidence, missing packets and execution censoring remain non-resolution and are never encoded as `NO`;
+- semantic adoption and decision effect are retained as paired transition tables rather than collapsed into the primary structural endpoint;
+- real Phase-B workflow emits all v4 structural artifacts and applies the frozen first-paper structural analysis after evidence freeze, without a paid evaluator;
+- CI covers the structural/semantic analysis logic and the bound review/analysis interface stack;
 - adapter/detector/lineage/binding/review/analysis layers fail closed on unsupported sources, drifted hashes, unknown evidence refs, invalid pair identity or semantic promotion.
 
 Current implementation includes:
@@ -58,6 +61,8 @@ Current implementation includes:
 - `arena/branch_comparison_v4.py`
 - `arena/first_paper_analysis_contract.py`
 - `arena/analyze_first_paper_r5mid.py`
+- `arena/first_paper_semantic_analysis.py`
+- `arena/analyze_first_paper_semantic_r5mid.py`
 - `arena/v4_review_preflight.py`
 - `arena/v4_branch_derivation_preflight.py`
 - `configs/structural_jump_detector_v0.1.json`
@@ -73,10 +78,11 @@ Current implementation includes:
 - `schemas/branch_trajectory_comparison_v4.schema.json`
 - `schemas/first_paper_analysis_contract_v0.1.schema.json`
 - `schemas/first_paper_structural_analysis_v0.1.schema.json`
+- `schemas/first_paper_semantic_analysis_v0.1.schema.json`
 
 ## P0 — before new real v4 subject evidence
 
-For the current `R2-ARENA-TRACE-v0.3` R5-MID status-downgrade design, the mandatory offline measurement/analysis definitions are now frozen.
+For the current `R2-ARENA-TRACE-v0.3` R5-MID status-downgrade design, the mandatory offline measurement/review/analysis definitions are now frozen.
 
 Remaining pre-subject conditions are execution conditions rather than new outcome design:
 
@@ -94,6 +100,7 @@ No extra subject run should be created to manufacture a minimum pair count, repa
 - inspect execution censoring, packet truncation and missingness rates before semantic conclusions;
 - apply the frozen structural analysis contract without changing primary/secondary outcome definitions;
 - perform independent bounded Reviewer-v4 adjudication asynchronously; do not rerun subject evidence for reviewer disagreement;
+- append review records through the Reviewer-v4 ledger and apply the frozen semantic aggregation logic only after eligible reviews exist;
 - compare mechanical penetration/reach candidates with semantic Authority adjudication without treating them as interchangeable;
 - estimate Reviewer agreement as a sensitivity layer, not a source-evidence layer;
 - aggregate only preregistered complete/resolved pairs according to the frozen rules;
