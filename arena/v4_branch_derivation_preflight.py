@@ -162,9 +162,18 @@ def main() -> None:
         raise RuntimeError("v4_branch_derivation_expected_review_packets")
     if any(row.get("semantic_status") != "NOT_ADJUDICATED" for row in derived["measurements"]):
         raise RuntimeError("v4_branch_derivation_semantic_promotion")
+    if len(derived["pair_comparisons"]) != plan_bundle["plan"]["replicates"]:
+        raise RuntimeError("v4_branch_derivation_pair_comparison_count_mismatch")
+    if derived["summary"]["structurally_compared_pair_count"] != len(derived["pair_comparisons"]):
+        raise RuntimeError("v4_branch_derivation_summary_pair_count_mismatch")
+    if any(row.get("semantic_status") != "NOT_ADJUDICATED" for row in derived["pair_comparisons"]):
+        raise RuntimeError("v4_branch_comparison_semantic_promotion")
+    if any(row.get("causal_effect_status") != "NOT_ADJUDICATED" for row in derived["pair_comparisons"]):
+        raise RuntimeError("v4_branch_comparison_causal_promotion")
 
     write_jsonl(outdir / "trajectory_measurements_v4.jsonl", derived["measurements"])
     write_jsonl(outdir / "bounded_review_packets_v4.jsonl", derived["review_packets"])
+    write_jsonl(outdir / "pair_structural_comparisons_v4.jsonl", derived["pair_comparisons"])
     _write_json(outdir / "summary.json", derived["summary"])
     summary_text = (
         "V4_BRANCH_DERIVATION_PREFLIGHT=PASS\n"
@@ -173,9 +182,11 @@ def main() -> None:
         "PAID_EVALUATOR_CALLED=NO\n"
         "MEASUREMENT_V3_REPLACED=NO\n"
         "SEMANTIC_STATUS=NOT_ADJUDICATED\n"
+        "CAUSAL_EFFECT_STATUS=NOT_ADJUDICATED\n"
         f"TRACE_COUNT={len(traces)}\n"
         f"MEASUREMENT_V4_COUNT={len(derived['measurements'])}\n"
         f"BOUNDED_REVIEW_PACKET_COUNT={len(derived['review_packets'])}\n"
+        f"PAIRED_STRUCTURAL_COMPARISON_COUNT={len(derived['pair_comparisons'])}\n"
         f"V4_RESEARCH_BINDING_HASH={binding['binding_hash']}\n"
         f"SUMMARY_HASH={derived['summary']['summary_hash']}\n"
     )
