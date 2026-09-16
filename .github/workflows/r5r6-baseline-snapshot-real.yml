@@ -53,7 +53,7 @@ env:
   R5R6_SPENDING_CEILING: ${{ inputs.spending_ceiling }}
   R5R6_CURRENCY: ${{ inputs.currency }}
   R5R6_MAX_SUBJECT_CALLS: ${{ inputs.max_subject_calls }}
-  R5R6_ANCHOR_RULE: arena/config/r5r6_anchor_rule_v0.1.json
+  R5R6_ANCHOR_RULE: arena/config/r5r6_anchor_rule_v0.2.json
 
 jobs:
   prepare:
@@ -95,7 +95,7 @@ jobs:
               'confirm_is_real_authorization_phrase': '${{ inputs.confirm }}' == 'CALL_REAL_R5R6_BASELINE_API',
               'github_sha': '${{ github.sha }}',
               'branch_continuation_authorized': False,
-              'note': 'Prepare output is not paid-run authorization. Baseline subject job and runner independently enforce the explicit gate; branch continuation remains separately unauthorized.'
+              'note': 'Prepare output is not paid-run authorization. Baseline subject job and runner independently enforce the explicit gate; branch continuation remains separately unauthorized. Anchor rule v0.2 additionally requires pending executable work at the selected post-turn snapshot.'
           }
           pathlib.Path('results/r5r6_workflow_request.json').write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
