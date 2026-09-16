@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/system_trajectory_measurement_v4.schema.json",
+  "title": "Reality Bias System Trajectory Measurement v4",
+  "type": "object",
+  "required": [
+    "schema",
+    "measurement_id",
+    "trajectory_id",
+    "source_trace_hash",
+    "source_version",
+    "termination_status",
+    "behavior_event_count",
+    "behavior_event_refs",
+    "r2",
+    "r3",
+    "r4",
+    "semantic_status"
+  ],
+  "properties": {
+    "schema": {"const": "RB-SYSTEM-TRAJECTORY-MEASUREMENT-v4.0"},
+    "measurement_id": {"type": "string", "minLength": 1},
+    "trajectory_id": {"type": "string", "minLength": 1},
+    "branch_id": {"type": ["string", "null"]},
+    "parent_trace_hash": {"type": ["string", "null"]},
+    "parent_state_hash": {"type": ["string", "null"]},
+    "branch_start_state_hash": {"type": ["string", "null"]},
+    "source_trace_hash": {"type": "string", "minLength": 1},
+    "source_evidence_batch_hash": {"type": ["string", "null"]},
+    "source_version": {"type": "string", "minLength": 1},
+    "measurement_contract": {"type": "string", "default": "System Behavior Measurement v4"},
+    "model_config_hash": {"type": ["string", "null"]},
+    "code_sha": {"type": ["string", "null"]},
+    "termination_status": {"type": "string"},
+    "behavior_event_count": {"type": "integer", "minimum": 0},
+    "behavior_event_refs": {"type": "array", "items": {"type": "string"}},
+    "r2": {
+      "type": "object",
+      "required": ["jump_candidate_count", "first_jump_candidate_ref"],
+      "properties": {
+        "jump_candidate_count": {"type": "integer", "minimum": 0},
+        "jump_candidate_refs": {"type": "array", "items": {"type": "string"}},
+        "first_jump_candidate_ref": {"type": ["string", "null"]},
+        "first_jump_turn": {"type": ["integer", "null"], "minimum": 0},
+        "jump_type_counts": {"type": "object"}
+      },
+      "additionalProperties": true
+    },
+    "r3": {
+      "type": "object",
+      "required": ["descendant_event_count", "affected_agent_count"],
+      "properties": {
+        "descendant_event_count": {"type": "integer", "minimum": 0},
+        "affected_agent_count": {"type": "integer", "minimum": 0},
+        "operational_boundary_crossing_count": {"type": "integer", "minimum": 0},
+        "penetration_status": {"type": "string"},
+        "post_jump_persistence": {"type": ["number", "integer", "string", "null"]},
+        "provenance_retention_status": {"type": ["string", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "r4": {
+      "type": "object",
+      "required": ["retrospective_window_count", "semantic_r_status"],
+      "properties": {
+        "retrospective_window_count": {"type": "integer", "minimum": 0},
+        "retrospective_window_refs": {"type": "array", "items": {"type": "string"}},
+        "semantic_r_status": {"type": "string"},
+        "recovery_status": {"type": ["string", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "experimental_variables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["variable_id", "stage", "registry_version"],
+        "properties": {
+          "variable_id": {"type": "string"},
+          "stage": {"type": "string", "enum": ["PRE", "MID", "POST", "STRUCTURE"]},
+          "condition": {},
+          "registry_version": {"type": "string"},
+          "intervention_hash": {"type": ["string", "null"]}
+        },
+        "additionalProperties": true
+      }
+    },
+    "semantic_status": {"type": "string", "enum": ["NOT_ADJUDICATED", "PARTIALLY_ADJUDICATED", "ADJUDICATED"]},
+    "measurement_hash": {"type": ["string", "null"]}
+  },
+  "additionalProperties": true
+}
