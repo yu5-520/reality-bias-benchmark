@@ -55,7 +55,7 @@ The forward trajectory model is documented in:
 
 ## Minimal experimental-control layer
 
-The Arena now contains an **intervention-off-by-default** control layer for future R5/R6 work:
+The Arena contains an **intervention-off-by-default** control layer for R5/R6 work:
 
 ```text
 Observe → Freeze → Replay deterministic Arena state → Branch → Intervene
@@ -64,9 +64,18 @@ Observe → Freeze → Replay deterministic Arena state → Branch → Intervene
 Files:
 
 - `experimental_control.py`
+- `branch_protocol.py`
 - `config/experimental_control_v0.1.json`
 - `tests/test_experimental_control.py`
+- `tests/test_branch_protocol.py`
 - `../docs/experimental_control_layer_v0.1.md`
+- `../docs/R5_R6_branch_intervention_recovery_protocol_v0.1.md`
+
+Evidence interfaces:
+
+- `../schemas/experimental_branch_manifest_v0.1.schema.json`
+- `../schemas/anchor_selection_record_v0.1.schema.json`
+- `../schemas/recovery_record_v0.1.schema.json`
 
 The layer can:
 
@@ -76,7 +85,9 @@ The layer can:
 - continue `run_arena_once(...)` from an explicit frozen parent state;
 - emit optional before/after-turn state anchors through a callback;
 - apply narrow deterministic state interventions;
-- evaluate an explicit fail-closed minimal commit gate.
+- evaluate an explicit fail-closed minimal commit gate;
+- freeze a structural-only anchor-selection record before branch outcomes are visible;
+- freeze a hashed recovery record without turning semantic R into a machine label.
 
 These hooks are optional. When omitted, `run_arena_once(...)` keeps the existing Free-Agent baseline behavior.
 
@@ -94,7 +105,26 @@ same frozen parent state
 
 The original trajectory is never overwritten.
 
-Future R7 work may add a small structured/system-owned-routing condition over the same evidence/control substrate. That condition should remain an experimental policy, not a production workflow system.
+Confirmatory anchor selection is structural-only and must be frozen before branch outcomes are visible. Reviewer labels cannot be used to cherry-pick the confirmatory branch anchor.
+
+## Minimal structured / system-owned routing condition
+
+R7 now has an offline engineering candidate on the same Arena substrate:
+
+- `structured_routing.py`
+- `config/structured_ecommerce_v0.1.json`
+- `tests/test_structured_routing.py`
+- `../docs/R7_orchestration_protocol_v0.1.md`
+
+The v0.1 E-commerce condition schedules a fixed four-stage chain:
+
+```text
+ads → inventory → finance → ops_lead
+```
+
+The full domain Agent registry remains unchanged, but executable routing is system-owned for this condition. Dynamic `invoke_agent` proposals are preserved inside `provider_response.structured_routing.original_subject_envelope` and blocked from operational realization. This keeps proposal evidence separate from realized graph expansion.
+
+The condition is an experimental policy, not a production workflow system, and it does not establish that structured routing is safer or better than Free Routing.
 
 ## Historical notes
 
