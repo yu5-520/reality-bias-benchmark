@@ -7,12 +7,14 @@ on:
       - 'arena/**'
       - '.github/workflows/r234-structural-smoke.yml'
       - '.github/workflows/r5r6-baseline-snapshot-real.yml'
+      - '.github/workflows/r5r6-frozen-parent-branch-real.yml'
       - 'schemas/**'
       - 'docs/R2_free_agent_arena_design.md'
       - 'docs/experimental_control_layer_v0.1.md'
       - 'docs/experimental_control_layer_v0.2.md'
       - 'docs/R5_R6_branch_intervention_recovery_protocol_v0.1.md'
       - 'docs/R5_R6_branch_intervention_recovery_protocol_v0.2.md'
+      - 'docs/R5_R6_branch_intervention_recovery_protocol_v0.3.md'
       - 'docs/R5_R6_real_run_freeze_template_v0.1.md'
       - 'docs/R7_orchestration_protocol_v0.1.md'
       - 'docs/R7_real_run_freeze_template_v0.1.md'
@@ -65,14 +67,14 @@ jobs:
           test -s results/branch_recovery_preflight/branch_comparison.json
           test -s results/branch_recovery_preflight/recovery_record.json
           test -s results/branch_recovery_preflight/SUMMARY.txt
-      - name: Build R5-R6 baseline snapshot candidate manifest — no API calls
+      - name: Build branchable R5-R6 baseline snapshot candidate manifest — no API calls
         run: |
           python -m arena.build_branch_baseline_manifest \
             --repeats 2 \
             --domain ecommerce \
             --arena-config arena/config/arena_v0.3.json \
             --model-config arena/config/model_deepseek_v0.2.json \
-            --anchor-rule arena/config/r5r6_anchor_rule_v0.1.json \
+            --anchor-rule arena/config/r5r6_anchor_rule_v0.2.json \
             --out results/r5r6_baseline_manifest_candidate.jsonl
           test "$(wc -l < results/r5r6_baseline_manifest_candidate.jsonl)" -eq 2
       - name: Build Free-vs-Structured offline comparison evidence
