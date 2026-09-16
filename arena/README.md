@@ -11,19 +11,14 @@ python arena/validate_environment.py
 python arena/preflight.py
 python -m unittest discover -s arena/tests -v
 python -m arena.build_manifest --domains all --repeats 2 --arena-config arena/config/arena_v0.3.json --out results/arena_manifest.jsonl
+python -m arena.branch_recovery_preflight --outdir results/branch_recovery_preflight
 python -m arena.orchestration_preflight --outdir results/orchestration_preflight
 python -m arena.build_orchestration_manifest --repeats 2 --out results/r7_orchestration_manifest_candidate.jsonl
 ```
 
 No command above calls a real model API.
 
-Real execution is intentionally guarded:
-
-```bash
-python arena/run_real.py --manifest results/arena_manifest.jsonl --out results/arena_traces.jsonl --execute-real-api
-```
-
-Subject collection and semantic evaluation are separate operations. A subject run does not automatically call a paid evaluator. Any real provider run requires explicit authorization and a spending ceiling outside this README command list.
+Subject collection and semantic evaluation are separate operations. A subject run does not automatically call a paid evaluator. Real provider execution is separately guarded and requires an explicit provider/model binding, call/spending limits, and a dedicated authorization phrase.
 
 ## Evidence-first runtime
 
@@ -38,87 +33,93 @@ Current v0.3.2 semantics:
 - semantic review is deferred and append-only;
 - historical v0.1/v0.2/v0.3 conditions are not silently pooled.
 
-Offline regression gate:
-
-```bash
-python -m unittest discover -s arena/tests -v
-```
-
 ## Structural measurement boundary
 
 Deterministic code may locate structural candidates such as epistemic-status change, provenance loss, goal/scope change, invocation expansion, reopen/revision, lineage and feedback topology.
 
 It must not silently convert those structures into semantic C/P/R truth.
 
-The forward trajectory model is documented in:
+Forward trajectory measurement:
 
 - `../theory/theory_contract_v0.3.md`
 - `../docs/trajectory_dynamics_measurement_plan_v3.md`
+- `trajectory_measurement_v3.py`
 
 ## Minimal experimental-control layer
 
 The Arena contains an **intervention-off-by-default** control layer for R5/R6 work:
 
 ```text
-Observe → Freeze → Replay deterministic Arena state → Branch → Intervene
+Observe → Freeze → Replay deterministic Arena state → Intervene → Branch → Measure
 ```
 
-Files:
+Forward files:
 
 - `experimental_control.py`
 - `branch_protocol.py`
+- `branch_recovery_preflight.py`
+- `trajectory_measurement_v3.py`
 - `config/experimental_control_v0.1.json`
 - `tests/test_experimental_control.py`
 - `tests/test_branch_protocol.py`
-- `../docs/experimental_control_layer_v0.1.md`
+- `tests/test_branch_recovery_preflight.py`
+- `../docs/experimental_control_layer_v0.2.md`
 - `../docs/R5_R6_branch_intervention_recovery_protocol_v0.1.md`
 
 Evidence interfaces:
 
-- `../schemas/experimental_branch_manifest_v0.1.schema.json`
+- `../schemas/experimental_branch_manifest_v0.2.schema.json`
 - `../schemas/anchor_selection_record_v0.1.schema.json`
+- `../schemas/branch_trajectory_measurement_v3.schema.json`
+- `../schemas/branch_trajectory_comparison_v3.schema.json`
 - `../schemas/recovery_record_v0.1.schema.json`
 
-The layer can:
+Historical `experimental_branch_manifest_v0.1.schema.json` remains preserved.
 
-- capture a content-hashed deterministic Arena state snapshot;
-- restore that recorded Arena state;
-- bind a branch to parent trace/state hashes and an intervention hash;
-- continue `run_arena_once(...)` from an explicit frozen parent state;
-- emit optional before/after-turn state anchors through a callback;
-- apply narrow deterministic state interventions;
-- evaluate an explicit fail-closed minimal commit gate;
-- freeze a structural-only anchor-selection record before branch outcomes are visible;
-- freeze a hashed recovery record without turning semantic R into a machine label.
+### Parent versus branch-start identity
 
-These hooks are optional. When omitted, `run_arena_once(...)` keeps the existing Free-Agent baseline behavior.
-
-A restored Arena state does **not** mean provider-internal randomness or hidden model state was replayed. Repeated continuations from one parent are new probabilistic branches and must receive separate evidence identities.
-
-## Branch experiment principle
-
-Preferred R5 form:
+For an intervention branch:
 
 ```text
-same frozen parent state
-  ├── original continuation
-  └── one preregistered intervention → branch continuation
+frozen parent S_t --ΔX--> branch start S'_t --> continuation
 ```
 
-The original trajectory is never overwritten.
+v0.2 binds both:
 
-Confirmatory anchor selection is structural-only and must be frozen before branch outcomes are visible. Reviewer labels cannot be used to cherry-pick the confirmatory branch anchor.
+- `parent_state_hash`
+- `branch_start_state_hash`
+- `parent_turn` / `branch_start_turn`
+- `parent_event_count` / `branch_start_event_count`
+
+This prevents a changed post-intervention state from being mislabeled as the unchanged parent and allows Measurement v3 to slice continuation-only events deterministically.
+
+A restored Arena state does **not** mean provider-internal randomness or hidden model state was replayed. Repeated continuations from one parent are new probabilistic branches and receive separate evidence identities.
+
+## R5/R6 offline branch preflight
+
+`branch_recovery_preflight.py` runs a zero-provider-call fixture that:
+
+1. builds a baseline trajectory;
+2. freezes a structural-only anchor;
+3. creates an unchanged control branch;
+4. changes one state-status field in the intervention branch;
+5. resumes both branches from the same frozen parent identity;
+6. verifies the intervention is visible downstream;
+7. emits branch Measurement-v3 records and a structural comparison;
+8. emits a recovery record while semantic R remains `NOT_ADJUDICATED`.
+
+This is instrumentation validation only and is never counted as scientific subject evidence.
 
 ## Minimal structured / system-owned routing condition
 
-R7 now has an offline engineering candidate on the same Arena substrate:
+R7 has an offline engineering condition on the same Arena substrate:
 
 - `structured_routing.py`
 - `config/structured_ecommerce_v0.1.json`
 - `tests/test_structured_routing.py`
 - `../docs/R7_orchestration_protocol_v0.1.md`
 
-The v0.1 E-commerce condition schedules a fixed four-stage chain:
+The v0.1 E-commerce chain is:
 
 ```text
 ads → inventory → finance → ops_lead
@@ -130,7 +131,7 @@ The condition is an experimental policy, not a production workflow system, and i
 
 ## R7 offline comparison bundle
 
-`orchestration_preflight.py` now executes a zero-provider-call scripted comparison and writes:
+`orchestration_preflight.py` executes a zero-provider-call scripted comparison and writes:
 
 - `free_trace.json`
 - `structured_trace.json`
@@ -139,15 +140,11 @@ The condition is an experimental policy, not a production workflow system, and i
 
 `orchestration_compare.py` normalizes both conditions into one evidence shape containing topology, participation, proposal counts, blocked-action counts and realized-action counts.
 
-The structured scripted fixture deliberately proposes an extra `invoke_agent`; the policy preserves that original proposal while blocking operational realization. This is a control-path test only. The fixture scripts are not identical and the resulting mechanical deltas are explicitly marked `ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE`.
+The structured fixture deliberately proposes an extra `invoke_agent`; the policy preserves that original proposal while blocking operational realization. Fixture scripts are not identical, so these mechanical deltas are explicitly `ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE`.
 
-Evidence schema:
+## Paired future R7 manifest and real-run guard
 
-- `../schemas/orchestration_comparison_v0.1.schema.json`
-
-## Paired future R7 manifest
-
-`build_orchestration_manifest.py` prepares exactly two rows per future trial:
+`build_orchestration_manifest.py` prepares exactly two rows per trial:
 
 ```text
 pair_id
@@ -155,17 +152,18 @@ pair_id
   └── STRUCTURED_SYSTEM_OWNED_ROUTING
 ```
 
-Within each pair it binds the same task, Agent pool, Arena config, model config and logical-seed identity. The structured policy hash is also frozen as comparison metadata.
-
-Prepared rows remain:
+Within each pair it binds the same task, Agent pool, Arena config, model config and logical-seed identity. Pair execution order is counterbalanced across trials. Prepared rows remain:
 
 `CANDIDATE_UNTIL_EXPLICIT_REAL_RUN_FREEZE_AND_API_AUTHORIZATION`
 
-The unresolved real-run fields and authorization gate are documented in:
+The future real-run path is guarded by:
 
+- `run_orchestration_real.py`
+- `cost_budget.py`
+- `../.github/workflows/r7-orchestration-paired-real.yml`
 - `../docs/R7_real_run_freeze_template_v0.1.md`
 
-No default repeat count, provider choice, or prior workflow setting silently authorizes a paid R7 batch.
+Real execution requires `CALL_REAL_R7_API`, a named provider/model config, positive call cap, matching currency, and an explicit positive spending ceiling. Repository-update instructions do not satisfy that gate.
 
 ## Historical notes
 
@@ -173,5 +171,6 @@ No default repeat count, provider choice, or prior workflow setting silently aut
 - v0.2 introduced evidence-boundary improvements.
 - v0.3 separated FINAL from episode termination and added shared R2-R4 structural runtime behavior.
 - v0.3.2 hardened strict JSON serialization after v0.3.1 malformed-response failures; it did not rewrite old traces.
+- branch-manifest v0.1 remains historical; forward intervention work uses v0.2 parent/start separation.
 
 [Shared runtime notes](../docs/R234_runtime_v0.3.md) · [CN-R-025](../theory/change_notes/CN-R-025_structural_runtime_v03.md)
