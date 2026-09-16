@@ -79,6 +79,7 @@ jobs:
           python arena/validate_environment.py
           python -m unittest discover -s arena/tests -v
           python -m arena.branch_recovery_preflight --outdir results/branch_recovery_preflight
+          python -m arena.v4_binding_preflight --outdir results/v4_binding_preflight
       - name: Download exact Phase-A subject evidence artifact
         env:
           GH_TOKEN: ${{ github.token }}
@@ -107,10 +108,27 @@ jobs:
           test -s results/r5r6_branch_plan/branch_plan.json
           test -s results/r5r6_branch_plan/branch_execution_manifest.jsonl
           test -s results/r5r6_branch_plan/branch_manifests.jsonl
+      - name: Freeze exact v4 research-interface binding — zero API calls
+        run: |
+          python -m arena.v4_experiment_binding \
+            --plan-dir results/r5r6_branch_plan \
+            --code-sha '${{ github.sha }}'
+          test -s results/r5r6_branch_plan/v4_research_binding.json
+          python - <<'PY'
+          import json
+          p = 'results/r5r6_branch_plan/v4_research_binding.json'
+          row = json.load(open(p, encoding='utf-8'))
+          assert row['authorization_status'] == 'NOT_AUTHORIZED'
+          assert row['paid_api_authorized'] is False
+          assert row['semantic_status'] == 'NOT_ADJUDICATED'
+          assert row['code_sha'] == '${{ github.sha }}'
+          print('v4_binding_hash=' + row['binding_hash'])
+          PY
       - name: Record requested Phase-B gate without treating it as authorization
         run: |
           python - <<'PY'
           import json, os, pathlib
+          binding = json.load(open('results/r5r6_branch_plan/v4_research_binding.json', encoding='utf-8'))
           record = {
               'schema': 'RB-R5R6-BRANCH-WORKFLOW-REQUEST-v0.1',
               'phase_a_run_id': os.environ['PHASE_A_RUN_ID'],
@@ -123,9 +141,11 @@ jobs:
               'max_subject_calls_input': os.environ['R5R6_MAX_SUBJECT_CALLS'],
               'confirm_is_real_authorization_phrase': '${{ inputs.confirm }}' == 'CALL_REAL_R5R6_BRANCH_API',
               'github_sha': '${{ github.sha }}',
+              'v4_research_binding_hash': binding['binding_hash'],
+              'v4_experimental_variable_id': binding['experimental_variable_id'],
               'phase_a_rerun_authorized': False,
               'automatic_paid_evaluator': False,
-              'note': 'This prepare record is not paid-run authorization. Phase-B execution independently enforces the exact authorization phrase, provider/model binding, code SHA, call cap, and spending ceiling.'
+              'note': 'This prepare record is not paid-run authorization. Phase-B execution independently enforces the exact authorization phrase, provider/model binding, code SHA, v4 research binding, call cap, and spending ceiling.'
           }
           pathlib.Path('results/r5r6_branch_workflow_request.json').write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
@@ -137,6 +157,7 @@ jobs:
             results/r5r6_branch_plan/
             results/r5r6_branch_workflow_request.json
             results/branch_recovery_preflight/
+            results/v4_binding_preflight/
           retention-days: 90
 
   subject_run:
@@ -154,6 +175,20 @@ jobs:
         with:
           name: r5r6-branch-prepared-${{ github.run_id }}
           path: prepared
+      - name: Verify prepared v4 binding before any provider call
+        run: |
+          test -s prepared/r5r6_branch_plan/v4_research_binding.json
+          python - <<'PY'
+          from arena.run_branch_real import load_plan_bundle
+          from arena.v4_experiment_binding import load_and_verify_v4_binding
+          bundle = load_plan_bundle('prepared/r5r6_branch_plan')
+          binding = load_and_verify_v4_binding(
+              'prepared/r5r6_branch_plan',
+              bundle,
+              code_sha='${{ github.sha }}',
+          )
+          print('V4_RESEARCH_BINDING_VERIFIED=' + binding['binding_hash'])
+          PY
       - name: Execute guarded frozen-parent branch continuations only
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
