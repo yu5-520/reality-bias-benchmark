@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 from pathlib import Path
 
@@ -18,7 +19,7 @@ def _rehash_plan(plan):
     plan['plan_hash'] = stable_hash(material)
 
 
-def build(selection, baseline, *, replicates, branch_code_sha):
+def build(selection, baseline, *, replicates, branch_code_sha, source_measurement_binding=None):
     if baseline.get('prospective_evidence') is not True:
         raise ValueError('prospective_one_shot_requires_post_freeze_prospective_trace')
     bundle = build_one_shot_branch_plan(
@@ -35,10 +36,13 @@ def build(selection, baseline, *, replicates, branch_code_sha):
     plan['paid_one_shot_authorization_status'] = 'NOT_AUTHORIZED'
     plan['causal_claim_status'] = 'NOT_TESTED_PREPARED_ONLY'
     plan['raw_source_evidence_mutated'] = False
+    plan['source_measurement_binding'] = copy.deepcopy(source_measurement_binding) if source_measurement_binding else None
+    plan['source_measurement_binding_status'] = 'BOUND_ROOT_SCOPED_CANONICAL_V0.3' if source_measurement_binding else 'UNBOUND'
     for row in bundle['branch_rows']:
         row['scientific_status'] = FORWARD_STATUS
         row['source_evidence_role'] = 'POST_FREEZE_PROSPECTIVE_NATURAL_TRAJECTORY'
         row['semantic_cpr_status'] = 'NOT_ADJUDICATED'
+        row['source_measurement_version'] = (source_measurement_binding or {}).get('measurement_version')
     _rehash_plan(plan)
     verify_one_shot_branch_plan(bundle)
     return bundle
@@ -50,12 +54,20 @@ def main():
     ap.add_argument('--baseline-traces', required=True)
     ap.add_argument('--replicates', type=int, default=2)
     ap.add_argument('--branch-code-sha', required=True)
+    ap.add_argument('--source-measurement-binding')
     ap.add_argument('--outdir', required=True)
     args = ap.parse_args()
     selection = load_json(args.selection_package)
     traces = load_jsonl(args.baseline_traces)
     baseline = _selected_trace(selection, traces)
-    bundle = build(selection, baseline, replicates=args.replicates, branch_code_sha=args.branch_code_sha)
+    measurement_binding = load_json(args.source_measurement_binding) if args.source_measurement_binding else None
+    bundle = build(
+        selection,
+        baseline,
+        replicates=args.replicates,
+        branch_code_sha=args.branch_code_sha,
+        source_measurement_binding=measurement_binding,
+    )
     out = Path(args.outdir)
     if out.exists():
         raise ValueError('refusing_to_overwrite_prospective_one_shot_plan')
@@ -68,6 +80,7 @@ def main():
     print('PROSPECTIVE_ONE_SHOT_PLAN=PREPARED_OFFLINE')
     print('PLAN_HASH=' + bundle['plan']['plan_hash'])
     print('SOURCE_RUN=' + str(baseline.get('run_id')))
+    print('SOURCE_MEASUREMENT_BINDING=' + bundle['plan']['source_measurement_binding_status'])
     print('SEMANTIC_CPR_STATUS=NOT_ADJUDICATED')
     print('PAID_ONE_SHOT_AUTHORIZED=NO')
 
