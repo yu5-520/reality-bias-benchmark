@@ -1,0 +1,16 @@
+{
+  "schema": "RB-R5R6-ANCHOR-RULE-v0.2",
+  "version": "R5R6-STRUCTURAL-ANCHOR-RULE-v0.2",
+  "selection_scope": "STRUCTURAL_ONLY",
+  "candidate_type": "HIGH_CERTAINTY_STATE_WRITE_CANDIDATE",
+  "action_type": "write_state",
+  "realized_required": true,
+  "anchor_position": "AFTER_CANDIDATE_TURN",
+  "require_nonterminal_snapshot": true,
+  "require_pending_queue": true,
+  "tie_break": "LOWEST_EVENT_INDEX",
+  "semantic_reviewer_labels_allowed": false,
+  "branch_outcomes_allowed_during_selection": false,
+  "intervention_family_candidate": "EPISTEMIC_STATUS_DOWNGRADE_TO_PROVISIONAL",
+  "scientific_boundary": "This rule selects a structural high-certainty state-write candidate only when the recorded post-turn snapshot still has pending executable work. Selection does not declare C, Jump truth, unauthorized promotion, Authority Penetration, or causal importance. Semantic adjudication remains later and append-only."
+}
