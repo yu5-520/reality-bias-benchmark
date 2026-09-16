@@ -6,6 +6,10 @@ from .topology import participation_metrics, topology_metrics
 
 
 SCHEMA = 'RB-ORCHESTRATION-COMPARISON-v0.1'
+ALLOWED_SCIENTIFIC_STATUS = {
+    'ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE',
+    'SUBJECT_EVIDENCE_PENDING_SEMANTIC_REVIEW',
+}
 
 
 def _action_type_counts(actions):
@@ -127,7 +131,11 @@ def build_comparison_record(
     comparison_id,
     fixture_identity=None,
     code_identity=None,
+    scientific_status='ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE',
 ):
+    if scientific_status not in ALLOWED_SCIENTIFIC_STATUS:
+        raise ValueError('comparison_scientific_status_invalid')
+
     free = summarize_condition(free_trace, 'EMERGENT_FREE_ROUTING')
     structured = summarize_condition(structured_trace, 'STRUCTURED_SYSTEM_OWNED_ROUTING')
 
@@ -138,10 +146,19 @@ def build_comparison_record(
     if not same_registry:
         raise ValueError('orchestration_comparison_agent_registry_hash_mismatch')
 
+    interpretation = (
+        'Mechanical deltas validate evidence shape and proposal-versus-realization accounting only. '
+        'They are not an estimate that either orchestration condition is safer, better, or lower-bias.'
+        if scientific_status == 'ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE'
+        else
+        'This record contains frozen real-subject structural evidence pending semantic review. '
+        'Mechanical deltas describe the paired conditions; they do not rank either architecture as safer, better, or lower-bias.'
+    )
+
     record = {
         'schema': SCHEMA,
         'comparison_id': comparison_id,
-        'scientific_status': 'ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE',
+        'scientific_status': scientific_status,
         'same_task_hash': same_task,
         'same_agent_registry_hash': same_registry,
         'task_hash': free['task_hash'],
@@ -180,10 +197,7 @@ def build_comparison_record(
             ),
             'turns': structured['turns'] - free['turns'] if isinstance(structured['turns'], int) and isinstance(free['turns'], int) else None,
         },
-        'interpretation_boundary': (
-            'Mechanical deltas validate evidence shape and proposal-versus-realization accounting only. '
-            'They are not an estimate that either orchestration condition is safer, better, or lower-bias.'
-        ),
+        'interpretation_boundary': interpretation,
     }
     material = copy.deepcopy(record)
     record['comparison_hash'] = stable_hash(material)
@@ -195,7 +209,7 @@ def verify_comparison_record(record):
         raise ValueError('comparison_record_must_be_object')
     if record.get('schema') != SCHEMA:
         raise ValueError('comparison_schema_invalid')
-    if record.get('scientific_status') != 'ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE':
+    if record.get('scientific_status') not in ALLOWED_SCIENTIFIC_STATUS:
         raise ValueError('comparison_scientific_status_invalid')
     if record.get('same_task_hash') is not True:
         raise ValueError('comparison_task_binding_invalid')
