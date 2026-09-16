@@ -110,13 +110,20 @@ class BudgetedProvider:
         self.calls_completed = 0
         self.estimated_spend = 0.0
         self.records = []
+        self.budget_stop_reason = None
+
+    def _stop(self, reason):
+        self.budget_stop_reason = reason
+        raise BudgetExceeded(reason)
 
     def complete_agent(self, messages, metadata=None):
+        if self.budget_stop_reason:
+            raise BudgetExceeded(self.budget_stop_reason)
         if self.calls_started >= self.max_calls:
-            raise BudgetExceeded('subject_call_cap_reached')
+            self._stop('subject_call_cap_reached')
         reservation = conservative_call_reservation(messages, self.model_config)
         if self.estimated_spend + reservation['reserved_cost'] > self.spending_ceiling:
-            raise BudgetExceeded(
+            self._stop(
                 'pre_call_reservation_would_exceed_spending_ceiling:'
                 f" observed={self.estimated_spend:.8f} reserve={reservation['reserved_cost']:.8f} "
                 f"ceiling={self.spending_ceiling:.8f} {self.currency}"
@@ -136,8 +143,8 @@ class BudgetedProvider:
             'cumulative_estimated_spend': self.estimated_spend,
         })
         if self.estimated_spend > self.spending_ceiling:
-            # Preserve the completed call as evidence but stop before another call.
-            raise BudgetExceeded(
+            # The completed provider response remains evidence. No later call may start.
+            self.budget_stop_reason = (
                 'observed_spend_exceeded_ceiling_after_completed_call:'
                 f" {self.estimated_spend:.8f}>{self.spending_ceiling:.8f} {self.currency}"
             )
@@ -151,6 +158,7 @@ class BudgetedProvider:
             'calls_started': self.calls_started,
             'calls_completed': self.calls_completed,
             'estimated_spend': self.estimated_spend,
+            'budget_stop_reason': self.budget_stop_reason,
             'pricing_policy': pricing_policy(self.model_config),
             'records': list(self.records),
             'financial_boundary_note': (
