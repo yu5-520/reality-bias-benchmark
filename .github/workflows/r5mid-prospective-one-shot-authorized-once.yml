@@ -1,0 +1,166 @@
+name: R5-MID Prospective One-Shot Authorized Once
+
+on:
+  push:
+    paths:
+      - 'manifests/r5mid_prospective_one_shot_paid_authorization_2026-09-17.json'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  AUTH_MANIFEST: manifests/r5mid_prospective_one_shot_paid_authorization_2026-09-17.json
+
+jobs:
+  subject:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Freeze and verify explicit prospective one-shot authorization
+        id: auth
+        shell: bash
+        run: |
+          cp "$AUTH_MANIFEST" "$RUNNER_TEMP/one_shot_authorization.json"
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          p=os.path.join(os.environ['RUNNER_TEMP'],'one_shot_authorization.json')
+          a=json.load(open(p))
+          assert a['schema']=='RB-R5MID-PROSPECTIVE-ONESHOT-PAID-AUTHORIZATION-v0.1'
+          assert a['authorization_phrase']=='CALL_REAL_R5MID_PROSPECTIVE_ONESHOT_API'
+          assert a['spending_ceiling_usd'] > 0
+          assert a['per_branch_spending_ceiling_usd'] > 0
+          assert a['per_branch_max_calls'] > 0
+          assert a['planned_branch_count']==4
+          assert a['automatic_paid_evaluator'] is False
+          assert a['prospective_natural_authorization_reused'] is False
+          assert a['old_phase_b_authorization_reused'] is False
+          assert a['authorization_is_one_time'] is True
+          print('global_ceiling='+str(a['spending_ceiling_usd']))
+          print('per_branch_ceiling='+str(a['per_branch_spending_ceiling_usd']))
+          print('per_branch_max_calls='+str(a['per_branch_max_calls']))
+          print('prepared_run_id='+str(a['prepared_workflow_run_id']))
+          print('prepared_artifact_id='+str(a['prepared_artifact_id']))
+          print('prepared_artifact_name='+a['prepared_artifact_name'])
+          print('prepared_artifact_digest='+a['prepared_artifact_digest'])
+          print('plan_hash='+a['plan_hash'])
+          print('execution_code_sha='+a['branch_execution_commit'])
+          PY
+      - name: Verify and download exact prepared artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          a=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'one_shot_authorization.json')))
+          payload=json.loads(subprocess.check_output(['gh','api',f"repos/${{ github.repository }}/actions/runs/{a['prepared_workflow_run_id']}/artifacts"],text=True))
+          rows=[x for x in payload['artifacts'] if x['id']==a['prepared_artifact_id'] and x['name']==a['prepared_artifact_name']]
+          assert len(rows)==1 and rows[0].get('digest')==a['prepared_artifact_digest'] and not rows[0].get('expired')
+          print('PREPARED_ARTIFACT=EXACT_MATCH')
+          PY
+          mkdir -p "$RUNNER_TEMP/prepared_artifact" "$RUNNER_TEMP/prepared_plan"
+          gh run download '${{ steps.auth.outputs.prepared_run_id }}' --repo '${{ github.repository }}' --name '${{ steps.auth.outputs.prepared_artifact_name }}' --dir "$RUNNER_TEMP/prepared_artifact"
+          cd "$RUNNER_TEMP/prepared_artifact"
+          sha256sum -c r5mid_prospective_one_shot_prepared_v0_2.tar.gz.sha256
+          tar -xzf r5mid_prospective_one_shot_prepared_v0_2.tar.gz -C "$RUNNER_TEMP/prepared_plan"
+          cd "$GITHUB_WORKSPACE"
+          python - <<'PY'
+          import json, os
+          a=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'one_shot_authorization.json')))
+          p=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'prepared_plan/results/r5mid_prospective_one_shot_plan_v0_2/branch_plan.json')))
+          assert p['plan_hash']==a['plan_hash']
+          assert p['code_identity']['branch_execution_commit']==a['branch_execution_commit']
+          assert p['source_measurement_binding']['measurement_hash']==a['source_measurement_hash']
+          assert p['paid_one_shot_authorization_status']=='NOT_AUTHORIZED'
+          print('PREPARED_PLAN_BINDING=VERIFIED')
+          PY
+      - name: Checkout exact prepared execution code
+        run: |
+          git fetch --depth=1 origin '${{ steps.auth.outputs.execution_code_sha }}'
+          git checkout --detach '${{ steps.auth.outputs.execution_code_sha }}'
+          test "$(git rev-parse HEAD)" = '${{ steps.auth.outputs.execution_code_sha }}'
+      - name: Run exact-code offline tests before provider access
+        run: |
+          python arena/validate_environment.py
+          python -m unittest discover -s arena/tests -v
+      - name: Preflight exact prepared plan and symmetric budgets
+        run: |
+          python -m arena.run_branch_one_shot_real \
+            --plan-dir "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_2" \
+            --model-config arena/config/model_deepseek_v0.2.json \
+            --provider deepseek \
+            --execution-code-sha '${{ steps.auth.outputs.execution_code_sha }}' \
+            --per-branch-max-calls '${{ steps.auth.outputs.per_branch_max_calls }}' \
+            --per-branch-spending-ceiling '${{ steps.auth.outputs.per_branch_ceiling }}' \
+            --global-spending-ceiling '${{ steps.auth.outputs.global_ceiling }}' \
+            --currency USD \
+            --preflight-only
+      - name: Collect formal prospective one-shot branch evidence
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python -m arena.run_branch_one_shot_real \
+            --plan-dir "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_2" \
+            --outdir results/r5mid_prospective_one_shot_raw \
+            --model-config arena/config/model_deepseek_v0.2.json \
+            --provider deepseek \
+            --execution-code-sha '${{ steps.auth.outputs.execution_code_sha }}' \
+            --per-branch-max-calls '${{ steps.auth.outputs.per_branch_max_calls }}' \
+            --per-branch-spending-ceiling '${{ steps.auth.outputs.per_branch_ceiling }}' \
+            --global-spending-ceiling '${{ steps.auth.outputs.global_ceiling }}' \
+            --currency USD \
+            --authorization-phrase CALL_REAL_R5MID_PROSPECTIVE_ONESHOT_API \
+            --execute-real-api
+      - name: Freeze raw branch evidence before derived analysis
+        if: always()
+        run: |
+          if [ -f results/r5mid_prospective_one_shot_raw/traces.jsonl ]; then
+            python -m arena.freeze_one_shot_evidence \
+              --raw-dir results/r5mid_prospective_one_shot_raw \
+              --plan-dir "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_2" \
+              --authorization-record "$RUNNER_TEMP/one_shot_authorization.json" \
+              --out results/r5mid_prospective_one_shot_raw/evidence_batch.json
+            mkdir -p frozen_binding
+            cp -r "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_2" frozen_binding/plan
+            cp "$RUNNER_TEMP/one_shot_authorization.json" frozen_binding/authorization.json
+            tar -czf r5mid_prospective_one_shot_raw_bundle.tar.gz results/r5mid_prospective_one_shot_raw frozen_binding
+            sha256sum r5mid_prospective_one_shot_raw_bundle.tar.gz > r5mid_prospective_one_shot_raw_bundle.tar.gz.sha256
+          fi
+      - name: Upload raw frozen branch evidence before derivation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5mid-prospective-one-shot-raw-${{ github.run_id }}
+          path: |
+            r5mid_prospective_one_shot_raw_bundle.tar.gz
+            r5mid_prospective_one_shot_raw_bundle.tar.gz.sha256
+          if-no-files-found: ignore
+          retention-days: 90
+      - name: Derive v0.3 root-scoped paired mechanism measurements
+        if: success()
+        run: |
+          python -m arena.derive_one_shot_process_measurements \
+            --plan-dir "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_2" \
+            --traces results/r5mid_prospective_one_shot_raw/traces.jsonl \
+            --evidence-batch results/r5mid_prospective_one_shot_raw/evidence_batch.json \
+            --outdir results/r5mid_prospective_one_shot_measurements_v0_3
+      - name: Archive and upload derived paired measurements
+        if: success()
+        run: |
+          tar -czf r5mid_prospective_one_shot_derived_v0_3_bundle.tar.gz results/r5mid_prospective_one_shot_measurements_v0_3
+          sha256sum r5mid_prospective_one_shot_derived_v0_3_bundle.tar.gz > r5mid_prospective_one_shot_derived_v0_3_bundle.tar.gz.sha256
+      - name: Upload derived paired measurements
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5mid-prospective-one-shot-derived-v0-3-${{ github.run_id }}
+          path: |
+            r5mid_prospective_one_shot_derived_v0_3_bundle.tar.gz
+            r5mid_prospective_one_shot_derived_v0_3_bundle.tar.gz.sha256
+          retention-days: 90

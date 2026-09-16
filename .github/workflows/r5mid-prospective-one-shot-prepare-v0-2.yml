@@ -1,0 +1,167 @@
+name: R5-MID Prospective One-Shot Prepare v0.2
+
+on:
+  push:
+    paths:
+      - 'manifests/r5mid_prospective_one_shot_prepare_v0_2_2026-09-17.json'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: r5mid-prospective-one-shot-prepare-v02
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify offline-only formal prepare scope
+        run: |
+          python - <<'PY'
+          import json
+          m=json.load(open('manifests/r5mid_prospective_one_shot_prepare_v0_2_2026-09-17.json'))
+          assert m['schema']=='RB-R5MID-PROSPECTIVE-ONESHOT-PREPARE-v0.2'
+          assert m['scope']=='OFFLINE_FORMAL_PROSPECTIVE_ONESHOT_PREPARE_ONLY'
+          assert m['paid_one_shot_authorized'] is False
+          assert m['paid_evaluator_authorized'] is False
+          assert m['new_subject_provider_call'] is False
+          assert m['measurement_version']=='v0.3_ROOT_SCOPED_CANONICAL_TOPOLOGY'
+          print('FORMAL_ONESHOT_PREPARE=OFFLINE_ONLY')
+          PY
+      - name: Run full offline tests
+        run: |
+          python arena/validate_environment.py
+          python -m unittest discover -s arena/tests -v
+      - name: Verify exact raw and v0.3 measurement artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          m=json.load(open('manifests/r5mid_prospective_one_shot_prepare_v0_2_2026-09-17.json'))
+          checks=[
+            (m['source_natural_workflow_run_id'],m['source_raw_artifact_id'],m['source_raw_artifact_name'],m['source_raw_artifact_digest']),
+            (m['source_measurement_workflow_run_id'],m['source_measurement_artifact_id'],m['source_measurement_artifact_name'],m['source_measurement_artifact_digest']),
+          ]
+          for run_id,aid,name,digest in checks:
+            payload=json.loads(subprocess.check_output(['gh','api',f'repos/${{ github.repository }}/actions/runs/{run_id}/artifacts'],text=True))
+            rows=[x for x in payload['artifacts'] if x['id']==aid and x['name']==name]
+            assert len(rows)==1 and rows[0].get('digest')==digest and not rows[0].get('expired')
+          print('FORMAL_SOURCE_ARTIFACTS=VERIFIED')
+          PY
+      - name: Download immutable raw and measurement artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source_raw source_measurement
+          gh run download 35124129473 --repo '${{ github.repository }}' --name r2r6-prospective-natural-raw-35124129473 --dir source_raw
+          gh run download 35126091603 --repo '${{ github.repository }}' --name r2r6-prospective-natural-derived-v0-3-35126091603 --dir source_measurement
+          cd source_raw && sha256sum -c prospective_natural_raw_bundle.tar.gz.sha256 && cd ..
+          cd source_measurement && sha256sum -c prospective_natural_derived_v0_3_bundle.tar.gz.sha256 && cd ..
+          mkdir -p frozen_source frozen_measurement
+          tar -xzf source_raw/prospective_natural_raw_bundle.tar.gz -C frozen_source
+          tar -xzf source_measurement/prospective_natural_derived_v0_3_bundle.tar.gz -C frozen_measurement
+      - name: Verify selected natural Jump and v0.3 root-scoped measurement
+        run: |
+          python - <<'PY'
+          import json
+          m=json.load(open('manifests/r5mid_prospective_one_shot_prepare_v0_2_2026-09-17.json'))
+          s=json.load(open('frozen_source/results/prospective_natural_raw/selection_packages/prospective-ecommerce-natural-0001.json'))
+          assert s['selection_status']=='ANCHOR_SELECTED'
+          assert s['selection_record']['record_hash']==m['source_selection_record_hash']
+          assert s['selected_candidate']['candidate_id']==m['source_selected_candidate_id']
+          assert s['selected_candidate']['event_index']==m['source_selected_event_index']
+          assert s['selected_candidate']['structural_facts']['state_key']==m['source_selected_state_key']
+          assert s['selected_snapshot']['state_hash']==m['source_selected_state_hash']
+          rows=[json.loads(x) for x in open('frozen_measurement/results/prospective_natural_measurements_v0_3/prospective_process_measurements_v0.3.jsonl')]
+          assert len(rows)==1
+          r=rows[0]
+          assert r['measurement_hash']==m['source_measurement_hash']
+          assert r['target_root_behavior_event_id']==m['resolved_root_behavior_event_id']
+          assert r['root_descendant_topology']['edge_multiset_hash']==m['root_edge_multiset_hash']
+          assert r['root_descendant_topology']['ordered_sequence_hash']==m['root_ordered_sequence_hash']
+          assert r['r2_jump_recurrence']['descendant_rejump_count']==m['descendant_rejump_count']
+          assert r['r3_inherited_inertia']['continuation_root_reachable_event_count']==m['continuation_root_reachable_event_count']
+          assert r['r3_inherited_inertia']['continuation_root_reach_depth']==m['continuation_root_reach_depth']
+          assert r['r3_inherited_inertia']['root_descendant_cross_actor_relation_count']==m['root_descendant_cross_actor_relation_count']
+          binding={
+            'measurement_version':m['measurement_version'],
+            'measurement_workflow_run_id':m['source_measurement_workflow_run_id'],
+            'measurement_artifact_id':m['source_measurement_artifact_id'],
+            'measurement_artifact_digest':m['source_measurement_artifact_digest'],
+            'measurement_hash':m['source_measurement_hash'],
+            'resolved_root_behavior_event_id':m['resolved_root_behavior_event_id'],
+            'root_edge_multiset_hash':m['root_edge_multiset_hash'],
+            'root_ordered_sequence_hash':m['root_ordered_sequence_hash'],
+            'descendant_rejump_count':m['descendant_rejump_count'],
+            'continuation_root_reachable_event_count':m['continuation_root_reachable_event_count'],
+            'continuation_root_reach_depth':m['continuation_root_reach_depth'],
+            'root_descendant_cross_actor_relation_count':m['root_descendant_cross_actor_relation_count'],
+            'semantic_cpr_status':'NOT_ADJUDICATED',
+          }
+          open('source_measurement_binding.json','w').write(json.dumps(binding,indent=2)+'\n')
+          print('SOURCE_JUMP_AND_V03_MEASUREMENT=VERIFIED')
+          PY
+      - name: Build formal prospective one-shot plan
+        run: |
+          python -m arena.prepare_prospective_one_shot_plan \
+            --selection-package frozen_source/results/prospective_natural_raw/selection_packages/prospective-ecommerce-natural-0001.json \
+            --baseline-traces frozen_source/results/prospective_natural_raw/traces.jsonl \
+            --replicates 2 \
+            --branch-code-sha '${{ github.sha }}' \
+            --source-measurement-binding source_measurement_binding.json \
+            --outdir results/r5mid_prospective_one_shot_plan_v0_2
+      - name: Verify formal runner against exact prepared bindings without provider call
+        run: |
+          python -m arena.run_branch_one_shot_real \
+            --plan-dir results/r5mid_prospective_one_shot_plan_v0_2 \
+            --model-config arena/config/model_deepseek_v0.2.json \
+            --provider deepseek \
+            --execution-code-sha '${{ github.sha }}' \
+            --per-branch-max-calls 64 \
+            --per-branch-spending-ceiling 0.25 \
+            --global-spending-ceiling 1.0 \
+            --currency USD \
+            --preflight-only
+      - name: Verify formal plan invariants
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('results/r5mid_prospective_one_shot_plan_v0_2/branch_plan.json'))
+          e=json.load(open('results/r5mid_prospective_one_shot_plan_v0_2/one_shot_intervention_envelope.json'))
+          rows=[json.loads(x) for x in open('results/r5mid_prospective_one_shot_plan_v0_2/branch_execution_manifest.jsonl')]
+          assert p['source_evidence_role']=='POST_FREEZE_PROSPECTIVE_NATURAL_TRAJECTORY'
+          assert p['source_measurement_binding_status']=='BOUND_ROOT_SCOPED_CANONICAL_V0.3'
+          assert p['source_measurement_binding']['measurement_hash']=='4566e6a05e0347ed0b0ef7bccc2610fd0814a0407da5ed7ebbbb0a6ff5886a77'
+          assert p['paid_one_shot_authorization_status']=='NOT_AUTHORIZED'
+          assert p['causal_claim_status']=='NOT_TESTED_PREPARED_ONLY'
+          assert p['parent_snapshot_hash']==p['branch_start_snapshot_hash']
+          assert e['state_key']=='inventory_stockout_assessment_v1'
+          assert e['from_status']=='fact' and e['to_status']=='unconfirmed'
+          assert e['direct_exposure_limit']==1 and e['persistent_state_mutation'] is False
+          assert len(rows)==4
+          assert all(r['parent_state_hash']==r['branch_start_state_hash'] for r in rows)
+          print('FORMAL_PROSPECTIVE_ONESHOT_INVARIANTS=VERIFIED')
+          print('PAID_ONE_SHOT_AUTHORIZED=NO')
+          PY
+      - name: Archive formal prepared plan
+        run: |
+          cp manifests/r5mid_prospective_one_shot_prepare_v0_2_2026-09-17.json results/r5mid_prospective_one_shot_plan_v0_2/
+          cp source_measurement_binding.json results/r5mid_prospective_one_shot_plan_v0_2/
+          tar -czf r5mid_prospective_one_shot_prepared_v0_2.tar.gz results/r5mid_prospective_one_shot_plan_v0_2
+          sha256sum r5mid_prospective_one_shot_prepared_v0_2.tar.gz > r5mid_prospective_one_shot_prepared_v0_2.tar.gz.sha256
+      - name: Upload formal prepared plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5mid-prospective-one-shot-prepared-v0-2-${{ github.run_id }}
+          path: |
+            r5mid_prospective_one_shot_prepared_v0_2.tar.gz
+            r5mid_prospective_one_shot_prepared_v0_2.tar.gz.sha256
+          retention-days: 90
