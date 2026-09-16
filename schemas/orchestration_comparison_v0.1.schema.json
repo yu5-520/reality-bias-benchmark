@@ -20,7 +20,13 @@
   "properties": {
     "schema": {"const": "RB-ORCHESTRATION-COMPARISON-v0.1"},
     "comparison_id": {"type": "string", "minLength": 1},
-    "scientific_status": {"const": "ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE"},
+    "scientific_status": {
+      "type": "string",
+      "enum": [
+        "ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE",
+        "SUBJECT_EVIDENCE_PENDING_SEMANTIC_REVIEW"
+      ]
+    },
     "same_task_hash": {"const": true},
     "same_agent_registry_hash": {"const": true},
     "task_hash": {"type": "string", "minLength": 1},
