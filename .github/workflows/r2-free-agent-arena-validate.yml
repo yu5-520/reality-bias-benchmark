@@ -6,10 +6,11 @@ on:
     paths:
       - 'arena/**'
       - '.github/workflows/r234-structural-smoke.yml'
-      - 'schemas/evidence_batch_v0.2.schema.json'
-      - 'schemas/review_record_v0.1.schema.json'
+      - 'schemas/**'
       - 'docs/R2_free_agent_arena_design.md'
       - 'docs/experimental_control_layer_v0.1.md'
+      - 'docs/R5_R6_branch_intervention_recovery_protocol_v0.1.md'
+      - 'docs/R7_orchestration_protocol_v0.1.md'
       - 'theory/change_notes/**'
       - '.github/workflows/r2-free-agent-arena-validate.yml'
   workflow_dispatch:
@@ -42,6 +43,13 @@ jobs:
         run: |
           python -m arena.build_manifest --domains all --repeats 1 --arena-config arena/config/arena_v0.3.json --out results/structural_manifest.jsonl
           python -m arena.structural_preflight --manifest results/structural_manifest.jsonl --outdir results/structural_preflight
+      - name: Build Free-vs-Structured offline comparison evidence
+        run: |
+          python -m arena.orchestration_preflight --outdir results/orchestration_preflight
+          test -s results/orchestration_preflight/free_trace.json
+          test -s results/orchestration_preflight/structured_trace.json
+          test -s results/orchestration_preflight/comparison.json
+          test -s results/orchestration_preflight/SUMMARY.txt
       - name: Upload offline preflight evidence
         uses: actions/upload-artifact@v4
         with:
