@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/first_paper_analysis_contract_v0.1.schema.json",
+  "title": "Reality Bias First Paper Analysis Contract v0.1",
+  "type": "object",
+  "required": [
+    "schema",
+    "version",
+    "status",
+    "paper_scope",
+    "experiment_family",
+    "experimental_variable",
+    "primary_question",
+    "primary_hypothesis_direction",
+    "outcomes",
+    "pair_eligibility",
+    "semantic_resolution",
+    "batch_aggregation",
+    "claim_boundaries",
+    "analysis_freeze_rules"
+  ],
+  "properties": {
+    "schema": {"const": "RB-FIRST-PAPER-ANALYSIS-CONTRACT-v0.1"},
+    "version": {"const": "0.1"},
+    "status": {"const": "FROZEN_BEFORE_NEW_V4_SUBJECT_EVIDENCE"},
+    "date": {"type": "string"},
+    "paper_scope": {"const": "FIRST_PAPER_R5_MID_EPISTEMIC_STATUS_DOWNGRADE"},
+    "experiment_family": {"const": "R5R6-FROZEN-PARENT-BRANCH-v0.1"},
+    "experimental_variable": {
+      "type": "object",
+      "required": [
+        "variable_id",
+        "stage",
+        "control_condition_id",
+        "intervention_condition_id",
+        "control_level",
+        "intervention_level",
+        "analysis_unit",
+        "pairing_fields"
+      ],
+      "properties": {
+        "variable_id": {"const": "EPISTEMIC_STATUS_DOWNGRADE"},
+        "stage": {"const": "MID"},
+        "control_condition_id": {"const": "CONTROL_CONTINUATION"},
+        "intervention_condition_id": {"const": "STATUS_DOWNGRADE_INTERVENTION"},
+        "control_level": {"const": "HIGH_CERTAINTY_STATUS"},
+        "intervention_level": {"const": "PROVISIONAL"},
+        "analysis_unit": {"const": "MATCHED_BRANCH_PAIR_FROM_SAME_FROZEN_PARENT"},
+        "pairing_fields": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true}
+      },
+      "additionalProperties": false
+    },
+    "primary_question": {"type": "string", "minLength": 1},
+    "primary_hypothesis_direction": {"const": "INTERVENTION_MINUS_CONTROL_LESS_THAN_ZERO_IS_CONSISTENT_WITH_STRUCTURAL_CONTAINMENT"},
+    "outcomes": {
+      "type": "object",
+      "required": ["primary_confirmatory_structural", "secondary_confirmatory_structural", "key_secondary_semantic", "secondary_semantic", "exploratory"],
+      "properties": {
+        "primary_confirmatory_structural": {
+          "type": "object",
+          "required": ["outcome_id", "source_path", "value_type", "pair_delta_definition", "batch_estimand", "interpretation"],
+          "properties": {
+            "outcome_id": {"const": "R5MID_ANCHOR_DOWNSTREAM_OPERATIONAL_CROSSING_COUNT"},
+            "source_path": {"const": "structural_deltas.r5_mid_branch_anchor.potential_downstream_operational_crossing_count"},
+            "value_type": {"const": "COUNT"},
+            "pair_delta_definition": {"const": "INTERVENTION_MINUS_CONTROL"},
+            "batch_estimand": {"const": "MEAN_OF_COMPLETE_PAIR_DELTAS"},
+            "interpretation": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": false
+        },
+        "secondary_confirmatory_structural": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+        "key_secondary_semantic": {
+          "type": "object",
+          "required": ["outcome_id", "packet_scope", "review_field", "determinate_values", "numeric_encoding_for_paired_estimand", "pair_delta_definition", "batch_estimand", "required_evidence_sufficiency", "interpretation"],
+          "properties": {
+            "outcome_id": {"const": "R5MID_AUTHORITY_PENETRATION"},
+            "packet_scope": {"const": "BRANCH_START_ANCHOR_PROPAGATION"},
+            "review_field": {"const": "authority_penetration"},
+            "determinate_values": {"type": "array", "items": {"enum": ["YES", "NO"]}, "minItems": 2, "maxItems": 2, "uniqueItems": true},
+            "numeric_encoding_for_paired_estimand": {
+              "type": "object",
+              "required": ["YES", "NO"],
+              "properties": {"YES": {"const": 1}, "NO": {"const": 0}},
+              "additionalProperties": false
+            },
+            "pair_delta_definition": {"const": "INTERVENTION_MINUS_CONTROL"},
+            "batch_estimand": {"const": "MEAN_OF_RESOLVED_COMPLETE_PAIR_DELTAS"},
+            "required_evidence_sufficiency": {"const": "SUFFICIENT"},
+            "interpretation": {"type": "string", "minLength": 1}
+          },
+          "additionalProperties": false
+        },
+        "secondary_semantic": {"type": "array", "items": {"type": "object"}},
+        "exploratory": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      },
+      "additionalProperties": false
+    },
+    "pair_eligibility": {"type": "object", "required": ["structural_primary_requires", "execution_censoring_statuses", "execution_censoring_rule", "integrity_failure_rule", "valid_zero_rule", "no_rerun_to_fix_outcome_rule"]},
+    "semantic_resolution": {"type": "object", "required": ["review_source", "independent_review_requirement", "eligible_independent_record", "agreement_rule", "disagreement_rule", "adjudication_rule", "uncertain_rule", "reviewer_addition_rule"]},
+    "batch_aggregation": {
+      "type": "object",
+      "required": ["primary_structural", "secondary_structural", "semantic", "order_sensitivity"],
+      "properties": {
+        "primary_structural": {
+          "type": "object",
+          "required": ["estimate", "robust_summary", "always_report", "uncertainty", "primary_p_value"],
+          "properties": {
+            "estimate": {"const": "ARITHMETIC_MEAN_OF_PAIR_DELTAS"},
+            "robust_summary": {"const": "MEDIAN_OF_PAIR_DELTAS"},
+            "always_report": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+            "uncertainty": {
+              "type": "object",
+              "required": ["method", "confidence_level", "resamples", "deterministic_seed", "minimum_complete_pairs", "below_minimum_rule"],
+              "properties": {
+                "method": {"const": "PAIRED_NONPARAMETRIC_PERCENTILE_BOOTSTRAP"},
+                "confidence_level": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+                "resamples": {"type": "integer", "minimum": 1000},
+                "deterministic_seed": {"type": "integer"},
+                "minimum_complete_pairs": {"type": "integer", "minimum": 2},
+                "below_minimum_rule": {"type": "string", "minLength": 1}
+              },
+              "additionalProperties": false
+            },
+            "primary_p_value": {"const": "NONE"}
+          },
+          "additionalProperties": false
+        },
+        "secondary_structural": {"type": "string"},
+        "semantic": {"type": "string"},
+        "order_sensitivity": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "claim_boundaries": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "analysis_freeze_rules": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}
