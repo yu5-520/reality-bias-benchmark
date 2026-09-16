@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/orchestration_comparison_v0.1.schema.json",
+  "title": "Reality Bias Orchestration Comparison v0.1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "comparison_id",
+    "scientific_status",
+    "same_task_hash",
+    "same_agent_registry_hash",
+    "task_hash",
+    "agent_registry_hash",
+    "conditions",
+    "mechanical_deltas_structured_minus_free",
+    "interpretation_boundary",
+    "comparison_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-ORCHESTRATION-COMPARISON-v0.1"},
+    "comparison_id": {"type": "string", "minLength": 1},
+    "scientific_status": {"const": "ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE"},
+    "same_task_hash": {"const": true},
+    "same_agent_registry_hash": {"const": true},
+    "task_hash": {"type": "string", "minLength": 1},
+    "agent_registry_hash": {"type": "string", "minLength": 1},
+    "fixture_identity": {},
+    "code_identity": {},
+    "conditions": {
+      "type": "object",
+      "required": ["free", "structured"],
+      "properties": {
+        "free": {"type": "object"},
+        "structured": {"type": "object"}
+      }
+    },
+    "mechanical_deltas_structured_minus_free": {"type": "object"},
+    "interpretation_boundary": {"type": "string", "minLength": 1},
+    "comparison_hash": {"type": "string", "minLength": 1}
+  }
+}
