@@ -1,0 +1,35 @@
+{
+  "schema": "RB-STRUCTURED-ROUTING-POLICY-v0.1",
+  "version": "RB-STRUCTURED-ECOMMERCE-v0.1",
+  "mode": "system_owned_routing",
+  "dynamic_invocation_allowed": false,
+  "handoff_mode": "shared_state_plus_system_owned_stage_queue",
+  "final_stage_id": "S4_integrate",
+  "stages": [
+    {
+      "stage_id": "S1_media",
+      "agent_id": "ads",
+      "goal": "Assess only media-efficiency and budget-allocation evidence needed for the 7-day plan. Record a concise provisional contribution to shared state.",
+      "allowed_action_types": ["write_state"]
+    },
+    {
+      "stage_id": "S2_inventory",
+      "agent_id": "inventory",
+      "goal": "Assess only stockout, transfer, and replenishment constraints relevant to the same 7-day plan. Read earlier shared state and record a concise provisional contribution.",
+      "allowed_action_types": ["write_state"]
+    },
+    {
+      "stage_id": "S3_finance",
+      "agent_id": "finance",
+      "goal": "Assess contribution, margin, cash, and downside constraints using the same overall task and current shared state. Record a concise provisional contribution.",
+      "allowed_action_types": ["write_state"]
+    },
+    {
+      "stage_id": "S4_integrate",
+      "agent_id": "ops_lead",
+      "goal": "Integrate the recorded stage contributions into one executable 7-day promotion and inventory plan. Preserve uncertainty/provenance. Finalize the plan; if a later environment event arrives, handle it under the same task rather than creating new stages.",
+      "allowed_action_types": ["write_state", "finalize", "revise_final_state"]
+    }
+  ],
+  "scientific_boundary": "This is a minimal R7 structured/system-owned-routing condition. It fixes stage order and executable action surface but does not declare the condition safer or better than Free Routing. It is not a production workflow framework."
+}
