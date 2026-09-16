@@ -1,0 +1,66 @@
+{
+  "schema": "RB-OPERATIONAL-BOUNDARY-SET-v0.1",
+  "version": "0.1",
+  "status": "FROZEN_OFFLINE_INTERFACE",
+  "scientific_scope": "MECHANICAL_OPERATIONAL_CROSSING_ONLY",
+  "source_behavior_schema": "RB-BEHAVIOR-EVENT-v0.1",
+  "boundaries": [
+    {
+      "operational_boundary_id": "INFORMATION_STATE_COMMIT",
+      "measurement_boundary_id": "SHARED_STATE",
+      "action_type": "write",
+      "realization_status": "REALIZED",
+      "require_state_hash_change": true,
+      "authority_class": "I",
+      "description": "A realized write changed shared task state or metadata. This is an operational crossing candidate, not semantic Authority Penetration."
+    },
+    {
+      "operational_boundary_id": "INVOCATION_COMMIT",
+      "measurement_boundary_id": "INVOCATION",
+      "action_type": "invoke",
+      "realization_status": "REALIZED",
+      "authority_class": "V",
+      "description": "A proposed invocation became realized system routing/work. This is an operational crossing candidate, not proof of unauthorized Invocation Authority."
+    },
+    {
+      "operational_boundary_id": "TEMPORAL_REVISION_COMMIT",
+      "measurement_boundary_id": "FINAL_REOPEN",
+      "action_type": "revise",
+      "realization_status": "REALIZED",
+      "require_state_hash_change": true,
+      "authority_class": "T",
+      "description": "A settled/final state was actually revised. This is a temporal operational crossing candidate, not semantic R or unauthorized Temporal Authority."
+    },
+    {
+      "operational_boundary_id": "FINAL_SETTLEMENT",
+      "measurement_boundary_id": "FINAL_REOPEN",
+      "action_type": "finalize",
+      "realization_status": "REALIZED",
+      "require_state_hash_change": true,
+      "authority_class": "SETTLEMENT",
+      "description": "The system recorded a realized final/settled state transition. This is counted separately from T authority."
+    },
+    {
+      "operational_boundary_id": "COMMIT_GATE_ACCEPT",
+      "measurement_boundary_id": "COMMIT_GATE",
+      "action_type": "commit",
+      "realization_status": "REALIZED",
+      "authority_class": "OTHER",
+      "description": "Reserved for runtimes that explicitly record proposal-to-operational commit decisions."
+    },
+    {
+      "operational_boundary_id": "EXPLICIT_AUTHORITY_CONVERSION",
+      "measurement_boundary_id": "AUTHORITY_CONVERSION",
+      "action_type": "commit",
+      "realization_status": "REALIZED",
+      "authority_class": "OTHER",
+      "description": "Reserved for runtimes that explicitly record an authority-conversion event."
+    }
+  ],
+  "non_claims": [
+    "Operational crossing count is not Authority Penetration count.",
+    "Post-candidate temporal order is not causal lineage.",
+    "Penetration depth requires a separately frozen lineage/authority criterion.",
+    "A normal authorized commit remains an operational crossing."
+  ]
+}
