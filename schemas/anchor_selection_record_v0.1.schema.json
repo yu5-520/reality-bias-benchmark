@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/anchor_selection_record_v0.1.schema.json",
+  "title": "Reality Bias Structural Anchor Selection Record v0.1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "selection_id",
+    "source_evidence_batch_hash",
+    "source_trace_hash",
+    "selection_rule",
+    "selection_rule_hash",
+    "candidate_event_refs",
+    "selected_anchor_ref",
+    "selected_state_hash",
+    "selection_scope",
+    "reviewer_labels_used_for_selection",
+    "branch_outcomes_visible_at_selection",
+    "record_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-ANCHOR-SELECTION-v0.1"},
+    "selection_id": {"type": "string", "minLength": 1},
+    "source_evidence_batch_hash": {"type": "string", "minLength": 1},
+    "source_trace_hash": {"type": "string", "minLength": 1},
+    "selection_rule": {"type": "object"},
+    "selection_rule_hash": {"type": "string", "minLength": 1},
+    "candidate_event_refs": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "selected_anchor_ref": {"type": "string", "minLength": 1},
+    "selected_state_hash": {"type": "string", "minLength": 1},
+    "jump_candidate_ref": {"type": ["string", "null"]},
+    "selection_scope": {"const": "STRUCTURAL_ONLY"},
+    "reviewer_labels_used_for_selection": {"const": false},
+    "branch_outcomes_visible_at_selection": {"const": false},
+    "notes": {"type": ["string", "null"]},
+    "record_hash": {"type": "string", "minLength": 1}
+  }
+}
