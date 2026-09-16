@@ -1,0 +1,246 @@
+name: R5-MID Phase-B Authorized Once
+
+on:
+  push:
+    paths:
+      - 'manifests/r5mid_phase_b_paid_authorization_2026-09-16.json'
+
+concurrency:
+  group: r5mid-phase-b-authorized-once
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  AUTH_MANIFEST: manifests/r5mid_phase_b_paid_authorization_2026-09-16.json
+  EXPECTED_AUTH_SHA256: 9789670a4eb03561208f14566119d029658949d79f87790a8d8a12eab1fb08d9
+  PREPARED_RUN_ID: '35107601970'
+  PREPARED_ARTIFACT_NAME: r5mid-phase-b-prepared-35107601970
+  EXPECTED_PREPARED_ARTIFACT_DIGEST: sha256:2990ef4dccf091516eb9d06e204c457270c09af2559313549a1cef2f53d1a7f6
+  BOUND_BRANCH_CODE_SHA: 6318692a3fd4ae043692f9edd45bd739251e5b62
+  EXPECTED_V4_BINDING_HASH: 34d8aa92995d2dee5fcd0a5b1354ff6dc5e85a3cda65ac2d6bdc33dc2ef15c06
+  EXPECTED_ANALYSIS_CONTRACT_HASH: 2c45edb4758392f582205a1a760ce126bbcab955b1d18e3b7a44d81752b5bcf7
+  R5R6_PROVIDER: deepseek
+  R5R6_MODEL_CONFIG: arena/config/model_deepseek_v0.2.json
+  R5R6_SPENDING_CEILING: '2'
+  R5R6_CURRENCY: USD
+  R5R6_MAX_SUBJECT_CALLS: '128'
+
+jobs:
+  phase_b_subject_run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify one-shot Phase-B paid authorization before provider access
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          if '${{ github.event_name }}' != 'push':
+              raise SystemExit('authorization workflow only accepts push event')
+          if '${{ github.run_attempt }}' != '1':
+              raise SystemExit('one-shot Phase-B authorization refuses workflow reruns')
+          raw = Path(os.environ['AUTH_MANIFEST']).read_bytes()
+          if hashlib.sha256(raw).hexdigest() != os.environ['EXPECTED_AUTH_SHA256']:
+              raise SystemExit('authorization manifest hash mismatch')
+          row = json.loads(raw)
+          expected = {
+              'schema': 'RB-R5MID-PHASE-B-PAID-AUTHORIZATION-v0.1',
+              'authorization_id': 'R5MID-PHASEB-2026-09-16-001',
+              'scope': 'PHASE_B_FROZEN_PARENT_BRANCH_SUBJECT_COLLECTION_ONLY',
+              'authorization_phrase': 'CALL_REAL_R5R6_BRANCH_API',
+              'prepared_run_id': os.environ['PREPARED_RUN_ID'],
+              'prepared_artifact_name': os.environ['PREPARED_ARTIFACT_NAME'],
+              'prepared_artifact_digest': os.environ['EXPECTED_PREPARED_ARTIFACT_DIGEST'],
+              'bound_branch_code_sha': os.environ['BOUND_BRANCH_CODE_SHA'],
+              'v4_research_binding_hash': os.environ['EXPECTED_V4_BINDING_HASH'],
+              'first_paper_analysis_contract_hash': os.environ['EXPECTED_ANALYSIS_CONTRACT_HASH'],
+              'replicate_pairs': 2,
+              'branch_rows': 4,
+              'provider': os.environ['R5R6_PROVIDER'],
+              'model_config': os.environ['R5R6_MODEL_CONFIG'],
+              'max_subject_calls': int(os.environ['R5R6_MAX_SUBJECT_CALLS']),
+              'spending_ceiling': float(os.environ['R5R6_SPENDING_CEILING']),
+              'currency': os.environ['R5R6_CURRENCY'],
+              'automatic_paid_evaluator': False,
+              'phase_a_rerun_authorized': False,
+              'one_shot': True,
+          }
+          for key, value in expected.items():
+              if row.get(key) != value:
+                  raise SystemExit(f'authorization field mismatch: {key}')
+          print('PHASE_B_PAID_AUTHORIZATION=VERIFIED')
+          print('SPENDING_CEILING=2 USD')
+          print('PAID_EVALUATOR_AUTHORIZED=NO')
+          print('PHASE_A_RERUN_AUTHORIZED=NO')
+          PY
+      - name: Verify and download immutable Phase-B prepared artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          repo = os.environ['GITHUB_REPOSITORY']
+          run_id = os.environ['PREPARED_RUN_ID']
+          payload = subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{run_id}/artifacts'], text=True)
+          rows = json.loads(payload)['artifacts']
+          matches = [x for x in rows if x['name'] == os.environ['PREPARED_ARTIFACT_NAME']]
+          if len(matches) != 1:
+              raise SystemExit('exact prepared artifact not found uniquely')
+          a = matches[0]
+          if a.get('digest') != os.environ['EXPECTED_PREPARED_ARTIFACT_DIGEST']:
+              raise SystemExit('prepared artifact digest mismatch')
+          if a.get('expired'):
+              raise SystemExit('prepared artifact expired')
+          print('PREPARED_ARTIFACT_VERIFIED=' + a['name'])
+          print('PREPARED_ARTIFACT_DIGEST=' + a['digest'])
+          PY
+          mkdir -p prepared
+          gh run download "$PREPARED_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "$PREPARED_ARTIFACT_NAME" \
+            --dir prepared
+          test -s prepared/results/r5r6_branch_plan/branch_plan.json
+          test -s prepared/results/r5r6_branch_plan/branch_execution_manifest.jsonl
+          test -s prepared/results/r5r6_branch_plan/v4_research_binding.json
+          test -s prepared/results/r5r6_branch_prepared_state.json
+      - name: Verify frozen plan and binding before exact-code checkout
+        run: |
+          python - <<'PY'
+          import json, os
+          state = json.load(open('prepared/results/r5r6_branch_prepared_state.json', encoding='utf-8'))
+          binding = json.load(open('prepared/results/r5r6_branch_plan/v4_research_binding.json', encoding='utf-8'))
+          if state['branch_code_sha'] != os.environ['BOUND_BRANCH_CODE_SHA']:
+              raise SystemExit('prepared branch code SHA mismatch')
+          if state['v4_research_binding_hash'] != os.environ['EXPECTED_V4_BINDING_HASH']:
+              raise SystemExit('prepared v4 binding hash mismatch')
+          if state['first_paper_analysis_contract_hash'] != os.environ['EXPECTED_ANALYSIS_CONTRACT_HASH']:
+              raise SystemExit('prepared analysis contract hash mismatch')
+          if state['branch_rows'] != 4 or state['replicate_pairs'] != 2:
+              raise SystemExit('prepared branch cardinality mismatch')
+          if state['paid_api_authorized'] is not False or state['phase_b_real_authorized'] is not False:
+              raise SystemExit('prepared bundle must itself remain unauthorized')
+          if binding['binding_hash'] != os.environ['EXPECTED_V4_BINDING_HASH']:
+              raise SystemExit('v4 binding payload mismatch')
+          if binding['code_sha'] != os.environ['BOUND_BRANCH_CODE_SHA']:
+              raise SystemExit('v4 binding code SHA mismatch')
+          print('IMMUTABLE_PHASE_B_PLAN=VERIFIED')
+          PY
+      - name: Checkout exact bound experiment code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BOUND_BRANCH_CODE_SHA }}
+          path: bound_code
+          fetch-depth: 1
+      - name: Re-verify exact bound research interfaces — zero provider calls
+        working-directory: bound_code
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          sys.path.insert(0, '.')
+          from arena.run_branch_real import load_plan_bundle
+          from arena.v4_experiment_binding import load_and_verify_v4_binding
+          plan_dir = '../prepared/results/r5r6_branch_plan'
+          bundle = load_plan_bundle(plan_dir)
+          binding = load_and_verify_v4_binding(plan_dir, bundle, code_sha=os.environ['BOUND_BRANCH_CODE_SHA'])
+          if binding['binding_hash'] != os.environ['EXPECTED_V4_BINDING_HASH']:
+              raise SystemExit('binding hash mismatch after exact-code checkout')
+          if binding['first_paper_analysis_contract_hash'] != os.environ['EXPECTED_ANALYSIS_CONTRACT_HASH']:
+              raise SystemExit('analysis contract hash mismatch after exact-code checkout')
+          print('V4_RESEARCH_BINDING_VERIFIED=' + binding['binding_hash'])
+          print('BOUND_CODE_SHA=' + os.environ['BOUND_BRANCH_CODE_SHA'])
+          PY
+      - name: Execute authorized frozen-parent Phase-B continuations only
+        working-directory: bound_code
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          BAI: ${{ secrets.BAI }}
+          BAILIAN_BASE_URL: ${{ secrets.BAILIAN_BASE_URL }}
+          BAILIAN_MODEL: ${{ secrets.BAILIAN_MODEL }}
+        run: |
+          python -m arena.run_branch_real \
+            --plan-dir ../prepared/results/r5r6_branch_plan \
+            --outdir ../results/r5r6_branch_real \
+            --provider "$R5R6_PROVIDER" \
+            --model-config "$R5R6_MODEL_CONFIG" \
+            --spending-ceiling "$R5R6_SPENDING_CEILING" \
+            --currency "$R5R6_CURRENCY" \
+            --max-subject-calls "$R5R6_MAX_SUBJECT_CALLS" \
+            --authorization-phrase CALL_REAL_R5R6_BRANCH_API \
+            --code-sha "$BOUND_BRANCH_CODE_SHA" \
+            --execute-real-api
+      - name: Freeze standard Phase-B evidence — no paid evaluator
+        if: always()
+        working-directory: bound_code
+        run: |
+          if [ -s ../results/r5r6_branch_real/traces.jsonl ]; then
+            python -m arena.evidence \
+              --manifest ../prepared/results/r5r6_branch_plan/branch_execution_manifest.jsonl \
+              --traces ../results/r5r6_branch_real/traces.jsonl \
+              --errors ../results/r5r6_branch_real/errors.json \
+              --outdir ../results/r5r6_branch_real/evidence_batch \
+              --code-sha "$BOUND_BRANCH_CODE_SHA"
+            cat ../results/r5r6_branch_real/evidence_batch/RUN_REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'No Phase-B subject trace produced; preserving authorization/error artifacts only.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Derive continuation-only Measurement-v3 records
+        if: always()
+        working-directory: bound_code
+        run: |
+          if [ -s ../results/r5r6_branch_real/traces.jsonl ] && [ -s ../results/r5r6_branch_real/evidence_batch/evidence_batch.json ]; then
+            python -m arena.derive_branch_measurements \
+              --plan-dir ../prepared/results/r5r6_branch_plan \
+              --traces ../results/r5r6_branch_real/traces.jsonl \
+              --evidence-batch ../results/r5r6_branch_real/evidence_batch/evidence_batch.json \
+              --outdir ../results/r5r6_branch_real/trajectory_measurement_v3
+          fi
+      - name: Derive System Behavior v4 and frozen first-paper structural analysis — no evaluator
+        if: always()
+        working-directory: bound_code
+        run: |
+          if [ -s ../results/r5r6_branch_real/traces.jsonl ] && [ -s ../results/r5r6_branch_real/evidence_batch/evidence_batch.json ]; then
+            python -m arena.derive_branch_measurements_v4 \
+              --plan-dir ../prepared/results/r5r6_branch_plan \
+              --traces ../results/r5r6_branch_real/traces.jsonl \
+              --evidence-batch ../results/r5r6_branch_real/evidence_batch/evidence_batch.json \
+              --outdir ../results/r5r6_branch_real/system_behavior_v4
+            test -s ../results/r5r6_branch_real/system_behavior_v4/trajectory_measurements_v4.jsonl
+            test -s ../results/r5r6_branch_real/system_behavior_v4/branch_anchor_lineage_views_v4.jsonl
+            test -e ../results/r5r6_branch_real/system_behavior_v4/pair_structural_comparisons_v4.jsonl
+            test -s ../results/r5r6_branch_real/system_behavior_v4/first_paper_mechanism_analysis_v0.2.json
+          fi
+      - name: Verify no semantic overclaim or automatic paid evaluator
+        if: always()
+        run: |
+          if [ -s results/r5r6_branch_real/system_behavior_v4/first_paper_mechanism_analysis_v0.2.json ]; then
+            python - <<'PY'
+            import json
+            row = json.load(open('results/r5r6_branch_real/system_behavior_v4/first_paper_mechanism_analysis_v0.2.json', encoding='utf-8'))
+            assert row['schema'] == 'RB-FIRST-PAPER-MECHANISM-ANALYSIS-v0.2'
+            assert row['primary_interval'] is None
+            assert row['automatic_paid_evaluator_called'] is False
+            print('PARENT_GROUPS=' + str(row['parent_count']))
+            print('COMPLETE_PAIRS=' + str(row['complete_pair_count']))
+            print('PARENT_BALANCED_MEAN_DELTA=' + str(row['parent_balanced_mean_delta']))
+            print('SEMANTIC_MECHANISMS=PENDING_REVIEW')
+            PY
+          fi
+      - name: Upload immutable authorized Phase-B evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5mid-phase-b-subject-evidence-${{ github.run_id }}
+          path: |
+            manifests/r5mid_phase_b_paid_authorization_2026-09-16.json
+            prepared/results/r5r6_branch_plan/
+            prepared/results/r5r6_branch_prepared_state.json
+            results/r5r6_branch_real/
+          if-no-files-found: warn
+          retention-days: 90
