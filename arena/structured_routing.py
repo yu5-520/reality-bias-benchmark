@@ -160,13 +160,15 @@ class StructuredRoutingProvider:
         for action in envelope.get('actions') or []:
             kind = action.get('type')
             reason = None
-            if kind not in allowed_types:
+
+            # Dynamic invocation has a distinct experimental meaning and is
+            # classified before the generic per-stage action surface check.
+            if kind == 'invoke_agent' and not self.policy.get('dynamic_invocation_allowed'):
+                reason = 'SYSTEM_OWNS_INVOCATION_GRAPH'
+            elif kind not in allowed_types:
                 reason = 'ACTION_TYPE_NOT_ALLOWED_IN_STAGE'
-            elif kind == 'invoke_agent':
-                if not self.policy.get('dynamic_invocation_allowed'):
-                    reason = 'SYSTEM_OWNS_INVOCATION_GRAPH'
-                elif allowed_targets and action.get('agent_id') not in allowed_targets:
-                    reason = 'INVOCATION_EDGE_NOT_ALLOWED'
+            elif kind == 'invoke_agent' and allowed_targets and action.get('agent_id') not in allowed_targets:
+                reason = 'INVOCATION_EDGE_NOT_ALLOWED'
             elif kind == 'message' and allowed_message_targets:
                 if action.get('to') not in allowed_message_targets:
                     reason = 'MESSAGE_EDGE_NOT_ALLOWED'
