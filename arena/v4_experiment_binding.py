@@ -53,6 +53,14 @@ INTERFACE_SPECS = {
         "path": "docs/system_behavior_measurement_plan_v4.md",
         "identity": "SYSTEM-BEHAVIOR-MEASUREMENT-PLAN-v4",
     },
+    "first_paper_analysis_contract": {
+        "path": "configs/first_paper_analysis_contract_v0.1.json",
+        "identity": "RB-FIRST-PAPER-ANALYSIS-CONTRACT-v0.1",
+    },
+    "first_paper_analysis_contract_schema": {
+        "path": "schemas/first_paper_analysis_contract_v0.1.schema.json",
+        "identity": "RB-FIRST-PAPER-ANALYSIS-CONTRACT-v0.1",
+    },
 }
 
 
@@ -100,6 +108,16 @@ def _registered_variable(root: Path, variable_id: str) -> dict[str, Any]:
     return rows[0]
 
 
+def _first_paper_analysis_contract(root: Path) -> dict[str, Any]:
+    contract = load_json(root / INTERFACE_SPECS["first_paper_analysis_contract"]["path"])
+    _require(contract.get("schema") == "RB-FIRST-PAPER-ANALYSIS-CONTRACT-v0.1", "v4_binding_first_paper_contract_schema_invalid")
+    _require(contract.get("status") == "FROZEN_BEFORE_NEW_V4_SUBJECT_EVIDENCE", "v4_binding_first_paper_contract_not_frozen")
+    variable = contract.get("experimental_variable") or {}
+    _require(variable.get("variable_id") == "EPISTEMIC_STATUS_DOWNGRADE", "v4_binding_first_paper_variable_mismatch")
+    _require(variable.get("stage") == "MID", "v4_binding_first_paper_stage_mismatch")
+    return contract
+
+
 def build_v4_research_binding(
     bundle: Mapping[str, Any],
     *,
@@ -125,6 +143,12 @@ def build_v4_research_binding(
         intervention_family == "EPISTEMIC_STATUS_DOWNGRADE_TO_PROVISIONAL",
         "v4_binding_intervention_family_unexpected",
     )
+    first_paper_contract = _first_paper_analysis_contract(root)
+    _require(
+        (first_paper_contract.get("experimental_variable") or {}).get("variable_id") == experimental_variable_id,
+        "v4_binding_first_paper_variable_does_not_match_binding",
+    )
+    interfaces = _interface_bindings(root)
 
     binding = {
         "schema": BINDING_SCHEMA,
@@ -142,16 +166,18 @@ def build_v4_research_binding(
         "experimental_variable_stage": variable.get("stage"),
         "target_boundary_family": list(variable.get("target_boundary_family") or []),
         "intervention_family": intervention_family,
+        "first_paper_analysis_contract_hash": stable_hash(first_paper_contract),
+        "first_paper_analysis_contract_file_sha256": interfaces["first_paper_analysis_contract"]["sha256"],
         "code_sha": code_sha,
-        "interface_bindings": _interface_bindings(root),
+        "interface_bindings": interfaces,
         "authorization_status": "NOT_AUTHORIZED",
         "semantic_status": "NOT_ADJUDICATED",
         "scientific_status": "CANDIDATE_UNTIL_EXPLICIT_REAL_RUN_FREEZE_AND_API_AUTHORIZATION",
         "paid_api_authorized": False,
         "automatic_paid_evaluator": False,
         "warning": (
-            "This binding freezes the research interfaces used to interpret a future Phase-B subject batch. "
-            "It is not paid-run authorization and does not establish semantic C/P/R, adoption, or Authority Penetration."
+            "This binding freezes the research and first-paper analysis interfaces used to interpret a future Phase-B subject batch. "
+            "It is not paid-run authorization and does not establish semantic C/P/R, adoption, Authority Penetration, or a causal effect."
         ),
     }
     binding["binding_hash"] = _hash_without(binding, "binding_hash")
@@ -193,8 +219,14 @@ def verify_v4_research_binding(
     _require(binding.get("experimental_variable_stage") == variable.get("stage"), "v4_binding_variable_stage_mismatch")
     _require(binding.get("target_boundary_family") == list(variable.get("target_boundary_family") or []), "v4_binding_target_boundary_family_mismatch")
 
+    first_paper_contract = _first_paper_analysis_contract(root)
+    _require(binding.get("first_paper_analysis_contract_hash") == stable_hash(first_paper_contract), "v4_binding_first_paper_contract_hash_mismatch")
     expected_interfaces = _interface_bindings(root)
     _require(binding.get("interface_bindings") == expected_interfaces, "v4_binding_research_interface_hash_mismatch")
+    _require(
+        binding.get("first_paper_analysis_contract_file_sha256") == expected_interfaces["first_paper_analysis_contract"]["sha256"],
+        "v4_binding_first_paper_contract_file_sha256_mismatch",
+    )
     return True
 
 
@@ -264,6 +296,7 @@ def main() -> None:
         out_path=args.out,
     )
     print(f"V4_RESEARCH_BINDING=PASS hash={binding['binding_hash']}")
+    print(f"FIRST_PAPER_ANALYSIS_CONTRACT_HASH={binding['first_paper_analysis_contract_hash']}")
     print("AUTHORIZATION_STATUS=NOT_AUTHORIZED")
     print("PAID_API_AUTHORIZED=NO")
     print("SEMANTIC_STATUS=NOT_ADJUDICATED")
