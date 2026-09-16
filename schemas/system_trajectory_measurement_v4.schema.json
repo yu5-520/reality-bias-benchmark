@@ -106,12 +106,15 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["variable_id", "stage", "registry_version"],
+        "required": ["variable_id", "stage", "registry_hash"],
         "properties": {
           "variable_id": {"type": "string"},
+          "family": {"type": ["string", "null"]},
           "stage": {"type": "string", "enum": ["PRE", "MID", "POST", "STRUCTURE"]},
-          "condition": {},
-          "registry_version": {"type": "string"},
+          "assignment": {"type": ["string", "null"]},
+          "level": {},
+          "target_boundary_family": {"type": "array", "items": {"type": "string"}},
+          "registry_hash": {"type": "string", "minLength": 1},
           "intervention_hash": {"type": ["string", "null"]}
         },
         "additionalProperties": true
