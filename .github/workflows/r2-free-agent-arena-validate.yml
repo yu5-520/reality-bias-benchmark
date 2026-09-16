@@ -19,10 +19,13 @@ on:
       - 'docs/R5_R6_branch_intervention_recovery_protocol_v0.4.md'
       - 'docs/R5_R6_real_run_freeze_template_v0.1.md'
       - 'docs/R5_R6_real_run_freeze_template_v0.2.md'
+      - 'docs/R5_R6_v4_research_binding_v0.1.md'
       - 'docs/R7_orchestration_protocol_v0.1.md'
       - 'docs/R7_real_run_freeze_template_v0.1.md'
       - 'docs/trajectory_dynamics_measurement_plan_v3.md'
       - 'docs/system_behavior_measurement_plan_v4.md'
+      - 'docs/v4_open_implementation_items.md'
+      - 'docs/v4_next_safe_step.md'
       - 'docs/R_Plan_v4.0.md'
       - 'theory/theory_contract_v0.4.md'
       - 'theory/change_notes/**'
@@ -110,6 +113,33 @@ jobs:
           grep -q '^AUTHORIZATION_STATUS=NOT_AUTHORIZED$' results/v4_binding_preflight/SUMMARY.txt
           grep -q '^PAID_API_AUTHORIZED=NO$' results/v4_binding_preflight/SUMMARY.txt
           grep -q '^SEMANTIC_STATUS=NOT_ADJUDICATED$' results/v4_binding_preflight/SUMMARY.txt
+      - name: Build bounded v4 semantic and Authority review packets — zero evaluator calls
+        run: |
+          python -m arena.v4_review_preflight --outdir results/v4_review_preflight
+          test -s results/v4_review_preflight/bounded_review_packets_v4.jsonl
+          test -s results/v4_review_preflight/review_contract_fixture.json
+          test -s results/v4_review_preflight/SUMMARY.txt
+          grep -q '^V4_BOUNDED_REVIEW_PREFLIGHT=PASS$' results/v4_review_preflight/SUMMARY.txt
+          grep -q '^SCIENTIFIC_EVIDENCE=NO$' results/v4_review_preflight/SUMMARY.txt
+          grep -q '^SEMANTIC_REVIEW_PERFORMED=NO$' results/v4_review_preflight/SUMMARY.txt
+          grep -q '^PAID_EVALUATOR_CALLED=NO$' results/v4_review_preflight/SUMMARY.txt
+          grep -q '^FULL_TRAJECTORY_IN_PACKET=NO$' results/v4_review_preflight/SUMMARY.txt
+          grep -q '^RAW_MODEL_OUTPUT_IN_PACKET=NO$' results/v4_review_preflight/SUMMARY.txt
+          grep -q '^HIDDEN_CHAIN_OF_THOUGHT_IN_PACKET=NO$' results/v4_review_preflight/SUMMARY.txt
+      - name: Derive v4 branch measurements and review packets from frozen fixture evidence
+        run: |
+          python -m arena.v4_branch_derivation_preflight --outdir results/v4_branch_derivation_preflight
+          test -s results/v4_branch_derivation_preflight/evidence_batch.json
+          test -s results/v4_branch_derivation_preflight/trajectory_measurements_v4.jsonl
+          test -s results/v4_branch_derivation_preflight/bounded_review_packets_v4.jsonl
+          test -s results/v4_branch_derivation_preflight/summary.json
+          test -s results/v4_branch_derivation_preflight/SUMMARY.txt
+          grep -q '^V4_BRANCH_DERIVATION_PREFLIGHT=PASS$' results/v4_branch_derivation_preflight/SUMMARY.txt
+          grep -q '^SCIENTIFIC_EVIDENCE=NO$' results/v4_branch_derivation_preflight/SUMMARY.txt
+          grep -q '^PAID_API_CALLS=0$' results/v4_branch_derivation_preflight/SUMMARY.txt
+          grep -q '^PAID_EVALUATOR_CALLED=NO$' results/v4_branch_derivation_preflight/SUMMARY.txt
+          grep -q '^MEASUREMENT_V3_REPLACED=NO$' results/v4_branch_derivation_preflight/SUMMARY.txt
+          grep -q '^SEMANTIC_STATUS=NOT_ADJUDICATED$' results/v4_branch_derivation_preflight/SUMMARY.txt
       - name: Build current v0.3.2 offline manifest sample
         run: |
           python -m arena.build_manifest --domains all --repeats 2 --arena-config arena/config/arena_v0.3.json --out results/arena_manifest_preflight.jsonl
