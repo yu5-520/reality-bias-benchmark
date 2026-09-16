@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/branch_trajectory_comparison_v4.schema.json",
+  "title": "Reality Bias Branch Trajectory Comparison v4",
+  "type": "object",
+  "required": [
+    "schema",
+    "version",
+    "comparison_id",
+    "pair_id",
+    "control_measurement_hash",
+    "intervention_measurement_hash",
+    "common_parent_state_hash",
+    "experimental_variable_id",
+    "structural_deltas",
+    "semantic_status",
+    "causal_effect_status",
+    "comparison_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-BRANCH-TRAJECTORY-COMPARISON-v4.0"},
+    "version": {"const": "4.0"},
+    "comparison_id": {"type": "string", "minLength": 1},
+    "pair_id": {"type": "string", "minLength": 1},
+    "control_run_id": {"type": "string", "minLength": 1},
+    "intervention_run_id": {"type": "string", "minLength": 1},
+    "control_measurement_hash": {"type": "string", "minLength": 1},
+    "intervention_measurement_hash": {"type": "string", "minLength": 1},
+    "common_parent_state_hash": {"type": "string", "minLength": 1},
+    "branch_plan_hash": {"type": "string", "minLength": 1},
+    "source_evidence_batch_hash": {"type": "string", "minLength": 1},
+    "v4_research_binding_hash": {"type": "string", "minLength": 1},
+    "experimental_variable_id": {"type": "string", "minLength": 1},
+    "structural_deltas": {"type": "object"},
+    "semantic_status": {"const": "NOT_ADJUDICATED"},
+    "causal_effect_status": {"const": "NOT_ADJUDICATED"},
+    "comparison_hash": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": true
+}
