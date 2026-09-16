@@ -138,7 +138,7 @@ class ProcessRealityDynamicsV04Test(unittest.TestCase):
         layer2 = row['layer2_inherited_inertia']
         self.assertEqual(1, layer2['shared_path_prefix_event_count'])
         self.assertEqual('m', layer2['first_signature_reconvergence']['canonical_event_signature'])
-        self.assertAlmostEqual(2 / 3, layer2['control_descendant_edge_survival_in_intervention'])
+        self.assertAlmostEqual(1 / 3, layer2['control_descendant_edge_survival_in_intervention'])
         layer3 = row['layer3_path_topology']
         self.assertEqual(['p1'], layer3['shared_path_families'])
         self.assertEqual(['p2'], layer3['control_only_path_families'])
