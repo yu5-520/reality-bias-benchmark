@@ -17,9 +17,9 @@ on:
         default: '2'
         type: string
       provider:
-        description: 'Exact provider id; must match the frozen Phase-A model binding; keep UNRESOLVED for prepare-only'
+        description: 'Exact provider id frozen for the first v4 R5-MID subject batch; must match Phase-A binding'
         required: true
-        default: 'UNRESOLVED'
+        default: 'deepseek'
         type: string
       model_config:
         description: 'Exact repository subject model-config path; must match the frozen Phase-A binding'
@@ -37,9 +37,9 @@ on:
         default: 'USD'
         type: string
       max_subject_calls:
-        description: 'Hard paid subject-call cap across the whole Phase-B batch; must be >0 for real execution'
+        description: 'Frozen hard subject-call cap per eligible-parent Phase-B batch'
         required: true
-        default: '0'
+        default: '128'
         type: string
       confirm:
         description: 'Type CALL_REAL_R5R6_BRANCH_API to authorize Phase-B provider calls; PREPARE_ONLY never calls a provider'
@@ -64,6 +64,7 @@ env:
   R5R6_SPENDING_CEILING: ${{ inputs.spending_ceiling }}
   R5R6_CURRENCY: ${{ inputs.currency }}
   R5R6_MAX_SUBJECT_CALLS: ${{ inputs.max_subject_calls }}
+  R5MID_FIRST_BATCH_FREEZE: manifests/r5mid_first_v4_subject_batch_v0.1.json
 
 jobs:
   prepare:
@@ -74,6 +75,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Enforce first v4 R5-MID Phase-B scientific freeze — zero API calls
+        run: |
+          python - <<'PY'
+          import json, os
+          freeze = json.load(open(os.environ['R5MID_FIRST_BATCH_FREEZE'], encoding='utf-8'))
+          phase = freeze['phase_b']
+          assert freeze['paid_api_authorized'] is False
+          assert os.environ['R5R6_BRANCH_REPLICATES'] == str(phase['replicate_pairs_per_eligible_parent'])
+          assert os.environ['R5R6_PROVIDER'] == freeze['provider']
+          assert os.environ['R5R6_MODEL_CONFIG'] == freeze['subject_model_config']
+          assert os.environ['R5R6_CURRENCY'].upper() == phase['currency']
+          assert os.environ['R5R6_MAX_SUBJECT_CALLS'] == str(phase['max_subject_calls_per_parent_batch'])
+          print('FIRST_V4_R5MID_PHASE_B_FREEZE=PASS')
+          print('PAID_API_AUTHORIZED=NO')
+          PY
       - name: Validate offline branch machinery
         run: |
           python arena/validate_environment.py
@@ -143,6 +159,7 @@ jobs:
           binding = json.load(open('results/r5r6_branch_plan/v4_research_binding.json', encoding='utf-8'))
           record = {
               'schema': 'RB-R5R6-BRANCH-WORKFLOW-REQUEST-v0.1',
+              'first_v4_subject_freeze': os.environ['R5MID_FIRST_BATCH_FREEZE'],
               'phase_a_run_id': os.environ['PHASE_A_RUN_ID'],
               'baseline_run_id': os.environ['BASELINE_RUN_ID'],
               'replicates_input': os.environ['R5R6_BRANCH_REPLICATES'],
@@ -158,7 +175,7 @@ jobs:
               'first_paper_analysis_contract_hash': binding['first_paper_analysis_contract_hash'],
               'phase_a_rerun_authorized': False,
               'automatic_paid_evaluator': False,
-              'note': 'This prepare record is not paid-run authorization. Phase-B execution independently enforces the exact authorization phrase, provider/model binding, code SHA, v4 research binding, call cap, and spending ceiling.'
+              'note': 'This prepare record is not paid-run authorization. Phase-B execution independently enforces the exact authorization phrase, provider/model binding, code SHA, v4 research binding, call cap, and spending ceiling. The first-v4 scientific structure is frozen by the repository manifest.'
           }
           pathlib.Path('results/r5r6_branch_workflow_request.json').write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
@@ -167,6 +184,7 @@ jobs:
         with:
           name: r5r6-branch-prepared-${{ github.run_id }}
           path: |
+            manifests/r5mid_first_v4_subject_batch_v0.1.json
             results/r5r6_branch_plan/
             results/r5r6_branch_workflow_request.json
             results/branch_recovery_preflight/
