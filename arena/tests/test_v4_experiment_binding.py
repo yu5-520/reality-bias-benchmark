@@ -132,8 +132,23 @@ class V4ExperimentBindingTests(unittest.TestCase):
         self.assertEqual(BINDING_SCHEMA, binding["schema"])
         self.assertEqual("EPISTEMIC_STATUS_DOWNGRADE", binding["experimental_variable_id"])
         self.assertEqual("MID", binding["experimental_variable_stage"])
-        self.assertIn("source_lineage_rules", binding["interface_bindings"])
-        self.assertIn("measurement_contract", binding["interface_bindings"])
+        required_interfaces = {
+            "source_lineage_rules",
+            "measurement_contract",
+            "branch_start_state_anchor_schema",
+            "branch_trajectory_comparison_schema",
+            "v4_review_contract",
+            "v4_review_packet_policy",
+            "v4_bounded_review_packet_schema",
+            "v4_semantic_authority_review_schema",
+            "v4_review_packet_generator",
+            "v4_branch_anchor_review_packet_generator",
+            "first_paper_analysis_contract",
+            "first_paper_analysis_contract_schema",
+            "first_paper_structural_analysis_schema",
+        }
+        self.assertTrue(required_interfaces.issubset(binding["interface_bindings"]))
+        self.assertTrue(binding["first_paper_analysis_contract_hash"])
         self.assertFalse(binding["paid_api_authorized"])
         self.assertEqual("NOT_ADJUDICATED", binding["semantic_status"])
         self.assertTrue(
@@ -153,7 +168,7 @@ class V4ExperimentBindingTests(unittest.TestCase):
             branch_plan_file_sha256="b" * 64,
         )
         tampered = copy.deepcopy(binding)
-        tampered["interface_bindings"]["source_lineage_rules"]["sha256"] = "0" * 64
+        tampered["interface_bindings"]["v4_review_contract"]["sha256"] = "0" * 64
         tampered["binding_hash"] = stable = __import__("arena.core", fromlist=["stable_hash"]).stable_hash(
             {k: v for k, v in tampered.items() if k != "binding_hash"}
         )
