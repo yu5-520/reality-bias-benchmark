@@ -9,9 +9,11 @@ on:
       - 'schemas/**'
       - 'docs/R2_free_agent_arena_design.md'
       - 'docs/experimental_control_layer_v0.1.md'
+      - 'docs/experimental_control_layer_v0.2.md'
       - 'docs/R5_R6_branch_intervention_recovery_protocol_v0.1.md'
       - 'docs/R7_orchestration_protocol_v0.1.md'
       - 'docs/R7_real_run_freeze_template_v0.1.md'
+      - 'docs/trajectory_dynamics_measurement_plan_v3.md'
       - 'theory/change_notes/**'
       - '.github/workflows/r2-free-agent-arena-validate.yml'
   workflow_dispatch:
@@ -44,7 +46,7 @@ jobs:
         run: |
           python -m arena.build_manifest --domains all --repeats 1 --arena-config arena/config/arena_v0.3.json --out results/structural_manifest.jsonl
           python -m arena.structural_preflight --manifest results/structural_manifest.jsonl --outdir results/structural_preflight
-      - name: Build R5-R6 frozen-parent branch and recovery preflight
+      - name: Build R5-R6 frozen-parent branch and Measurement-v3 recovery preflight
         run: |
           python -m arena.branch_recovery_preflight --outdir results/branch_recovery_preflight
           test -s results/branch_recovery_preflight/baseline_trace.json
@@ -55,6 +57,9 @@ jobs:
           test -s results/branch_recovery_preflight/intervened_start_snapshot.json
           test -s results/branch_recovery_preflight/control_trace.json
           test -s results/branch_recovery_preflight/intervention_trace.json
+          test -s results/branch_recovery_preflight/control_measurement.json
+          test -s results/branch_recovery_preflight/intervention_measurement.json
+          test -s results/branch_recovery_preflight/branch_comparison.json
           test -s results/branch_recovery_preflight/recovery_record.json
           test -s results/branch_recovery_preflight/SUMMARY.txt
       - name: Build Free-vs-Structured offline comparison evidence
