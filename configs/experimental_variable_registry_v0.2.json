@@ -1,0 +1,72 @@
+{
+  "schema": "RB-EXPERIMENTAL-VARIABLE-REGISTRY-v0.2",
+  "version": "0.2",
+  "status": "FORWARD_PROCESS_REALITY_MECHANISM",
+  "historical_note": "The v0.1 persistent EPISTEMIC_STATUS_DOWNGRADE remains historical and is not silently redefined.",
+  "variables": [
+    {
+      "variable_id": "ONE_SHOT_JUMP_EPISTEMIC_PERTURBATION",
+      "family": "LOCAL_MECHANISM_PROBE",
+      "stage": "MID",
+      "target_boundary_family": ["AGENT_TURN", "SHARED_STATE"],
+      "control_level": "RECORDED_PARENT_STATUS",
+      "manipulation_level": "UNCONFIRMED_ONE_EXPOSURE",
+      "temporal_scope": "ONE_EXPOSURE_ONLY",
+      "max_experiment_origin_deliveries": 1,
+      "persistent_state_mutation": false,
+      "post_exposure_reinjection": "FORBIDDEN",
+      "natural_downstream_regeneration": "ALLOWED_AND_MEASURED",
+      "delivery_policy": "FIRST_POST_JUMP_AGENT_TURN",
+      "held_constant_fields": [
+        "parent_state_hash",
+        "branch_start_state_hash",
+        "task_identity",
+        "model_config",
+        "agent_pool",
+        "queue",
+        "inboxes",
+        "shared_state_value",
+        "persistent_shared_state_metadata",
+        "unrelated_runtime_state"
+      ],
+      "expected_observable_family": [
+        "JUMP_RECURRENCE",
+        "INHERITED_INERTIA",
+        "PATH_TOPOLOGY_REORGANIZATION",
+        "RECOVERY_RESIDUAL_RECURRENCE"
+      ],
+      "evidence_requirements": [
+        "common_parent_state_hash",
+        "same_branch_start_state_hash",
+        "one_shot_envelope_hash",
+        "delivery_ledger",
+        "direct_exposure_count",
+        "reinjection_count",
+        "behavior_events",
+        "source_backed_lineage"
+      ]
+    },
+    {
+      "variable_id": "ORCHESTRATION_STRUCTURE",
+      "family": "SYSTEM_STRUCTURE",
+      "stage": "STRUCTURE",
+      "target_boundary_family": ["INVOCATION", "MESSAGE_HANDOFF", "COMMIT_GATE"],
+      "control_level": "EMERGENT_FREE_ROUTING",
+      "manipulation_level": "STRUCTURED_SYSTEM_OWNED_ROUTING",
+      "held_constant_fields": ["overall_task_intent", "domain", "agent_pool", "model_config"],
+      "expected_observable_family": ["JUMP_EMERGENCE", "INHERITED_INERTIA", "PATH_TOPOLOGY_REORGANIZATION"],
+      "evidence_requirements": ["paired_manifest", "routing_policy", "behavior_events"]
+    },
+    {
+      "variable_id": "CHALLENGE_DELAY",
+      "family": "RECOVERY_STABILIZATION",
+      "stage": "POST",
+      "target_boundary_family": ["FINAL_REOPEN", "RECOVERY_CHECKPOINT"],
+      "control_level": "BASELINE_DELAY",
+      "manipulation_level": "PREREGISTERED_DELAY",
+      "held_constant_fields": ["source_deviation", "challenge_content", "model_config"],
+      "expected_observable_family": ["RECOVERY", "RESIDUAL", "RECURRENCE"],
+      "evidence_requirements": ["prior_deviation_ref", "challenge_ref", "behavior_events"]
+    }
+  ]
+}
