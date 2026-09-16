@@ -1,7 +1,7 @@
 # Process Reality v4.1 — Rollout Status
 
 Date: 2026-09-17  
-Status: PROSPECTIVE NATURAL EVIDENCE FROZEN / ROOT-SCOPED MEASUREMENT v0.3 FROZEN / FORMAL PROSPECTIVE ONE-SHOT v0.2 PREPARED / PAID ONE-SHOT NOT AUTHORIZED
+Status: PROSPECTIVE NATURAL EVIDENCE FROZEN / ROOT-SCOPED MEASUREMENT v0.3 FROZEN / FORMAL PROSPECTIVE ONE-SHOT v0.2 PREPARED / ONE-SHOT RUNTIME LIFECYCLE AUDITED OFFLINE / PAID ONE-SHOT NOT AUTHORIZED
 
 ## 1. Forward research coordinate
 
@@ -243,7 +243,66 @@ Formal prepare provenance:
 
 `manifests/r5mid_prospective_one_shot_prepare_v0_2_record_2026-09-17.json`
 
-## 9. Current stop point
+## 9. Exact-runtime one-shot lifecycle readiness audit v0.2
+
+The exact prepared plan and exact frozen execution commit were audited again with an offline fake provider. This is an engineering/runtime lifecycle audit only; it is not subject evidence and does not test a causal effect.
+
+Workflow:
+
+- run: `35128564676`;
+- job: `104903584139`;
+- head SHA: `844e7d7efae9a196a84c6b84c73cb9ddb9c43437`;
+- exact checked-out branch execution commit: `1ae76d2394897517e9f07a01b897ed34be1cdffd`;
+- conclusion: success;
+- exact-code offline tests: 140 passed;
+- real provider calls: 0;
+- paid evaluator calls: 0.
+
+The audit forced an identical second downstream resume in A and B using a deterministic fake provider so that one-shot consumption could be checked directly rather than inferred.
+
+Observed runtime lifecycle:
+
+- first resumed actor: `ops_lead`;
+- first resumed turn: 9;
+- control direct experiment-origin exposure count: 0;
+- intervention direct experiment-origin exposure count: 1;
+- first A/B prompt-view delta path: exactly `shared_state_metadata.inventory_stockout_assessment_v1.status`;
+- first control status: `fact`;
+- first intervention status: `unconfirmed`;
+- forced second-resume target Agent: `ads`;
+- second A/B prompt-view delta paths: none;
+- second control status: `fact`;
+- second intervention status: `fact`;
+- experiment-origin reinjection count: 0;
+- persistent frozen parent state mutation: false.
+
+Therefore the forward implementation now has an explicit offline verification of the intended experimental lifecycle:
+
+```text
+A first prompt: fact
+B first prompt: unconfirmed
+        ↓ one direct exposure consumed
+A second prompt: fact
+B second prompt: fact
+        ↓
+no experiment-origin field remains in active runtime context
+```
+
+This does not establish that a real subject trajectory will diverge, reconverge, regenerate a Jump, or change CPR. It establishes only that any future downstream difference is not produced by the framework repeatedly re-injecting the experimental status field.
+
+Readiness artifact:
+
+- name: `r5mid-prospective-one-shot-readiness-audit-v0-2-35128564676`;
+- artifact ID: `10460217318`;
+- GitHub digest: `sha256:03d5d8ce200565c34925116973f344d23ca23a899fb058d34781e499aaefca8a`;
+- inner tar SHA-256: `f43f106424ae59999b256d3de9622b2206e7bafbec39d31f6c8f7de244ae9329`;
+- expires: `2026-12-15T17:30:05Z`.
+
+Readiness provenance:
+
+`manifests/r5mid_prospective_one_shot_readiness_audit_v0_2_record_2026-09-17.json`
+
+## 10. Current stop point
 
 Current state:
 
@@ -252,6 +311,10 @@ Current state:
 - natural structural Jump: prospectively selected;
 - source-backed root/inertia/re-Jump topology v0.3: frozen;
 - formal same-parent one-shot A/B plan: hash-bound and offline-preflighted;
+- first-prompt single-field A/B perturbation: verified offline on the exact frozen execution commit;
+- one-shot consumption across a forced second resume: verified offline;
+- experiment-origin reinjection after first exposure: verified absent in the offline lifecycle audit;
+- frozen parent persistent state: verified unchanged by the one-shot runtime overlay;
 - semantic CPR adjudication: pending;
 - causal effect: not tested;
 - paid one-shot execution: **not authorized**;
