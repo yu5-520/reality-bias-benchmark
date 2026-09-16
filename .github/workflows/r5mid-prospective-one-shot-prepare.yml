@@ -1,0 +1,121 @@
+name: R5-MID Prospective One-Shot Prepare
+
+on:
+  push:
+    paths:
+      - 'manifests/r5mid_prospective_one_shot_prepare_2026-09-17.json'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: r5mid-prospective-one-shot-prepare
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify prepare-only scope
+        run: |
+          python - <<'PY'
+          import json
+          m=json.load(open('manifests/r5mid_prospective_one_shot_prepare_2026-09-17.json'))
+          assert m['scope']=='OFFLINE_PROSPECTIVE_ONESHOT_PREPARE_ONLY'
+          assert m['paid_one_shot_authorized'] is False
+          assert m['paid_evaluator_authorized'] is False
+          assert m['new_subject_provider_call'] is False
+          assert m['persistent_state_mutation'] is False
+          assert m['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('PROSPECTIVE_ONESHOT_PREPARE=OFFLINE_ONLY')
+          PY
+      - name: Run full offline tests
+        run: |
+          python arena/validate_environment.py
+          python -m unittest discover -s arena/tests -v
+      - name: Verify source raw and corrected derived artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          m=json.load(open('manifests/r5mid_prospective_one_shot_prepare_2026-09-17.json'))
+          checks=[
+            (m['source_natural_workflow_run_id'],m['source_raw_artifact_id'],m['source_raw_artifact_name'],m['source_raw_artifact_digest']),
+            (m['corrected_derivation_workflow_run_id'],m['corrected_derived_artifact_id'],m['corrected_derived_artifact_name'],m['corrected_derived_artifact_digest']),
+          ]
+          for run_id,aid,name,digest in checks:
+            payload=json.loads(subprocess.check_output(['gh','api',f'repos/${{ github.repository }}/actions/runs/{run_id}/artifacts'],text=True))
+            rows=[x for x in payload['artifacts'] if x['id']==aid and x['name']==name]
+            assert len(rows)==1 and rows[0].get('digest')==digest and not rows[0].get('expired')
+          print('SOURCE_ARTIFACTS=VERIFIED')
+          PY
+      - name: Download frozen raw evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source_raw
+          gh run download 35124129473 --repo '${{ github.repository }}' --name r2r6-prospective-natural-raw-35124129473 --dir source_raw
+          cd source_raw && sha256sum -c prospective_natural_raw_bundle.tar.gz.sha256 && cd ..
+          mkdir -p frozen_source
+          tar -xzf source_raw/prospective_natural_raw_bundle.tar.gz -C frozen_source
+      - name: Verify exact source Jump and build one-shot plan
+        run: |
+          python - <<'PY'
+          import json
+          m=json.load(open('manifests/r5mid_prospective_one_shot_prepare_2026-09-17.json'))
+          p='frozen_source/results/prospective_natural_raw/selection_packages/prospective-ecommerce-natural-0001.json'
+          s=json.load(open(p))
+          assert s['selection_status']=='ANCHOR_SELECTED'
+          assert s['selection_record']['record_hash']==m['source_selection_record_hash']
+          assert s['selected_candidate']['candidate_id']==m['source_selected_candidate_id']
+          assert s['selected_candidate']['event_index']==m['source_selected_event_index']
+          assert s['selected_candidate']['structural_facts']['state_key']==m['source_selected_state_key']
+          assert s['selected_snapshot']['state_hash']==m['source_selected_state_hash']
+          print('SOURCE_NATURAL_JUMP=VERIFIED')
+          PY
+          python -m arena.prepare_prospective_one_shot_plan \
+            --selection-package frozen_source/results/prospective_natural_raw/selection_packages/prospective-ecommerce-natural-0001.json \
+            --baseline-traces frozen_source/results/prospective_natural_raw/traces.jsonl \
+            --replicates 2 \
+            --branch-code-sha '${{ github.sha }}' \
+            --outdir results/r5mid_prospective_one_shot_plan
+      - name: Verify forward one-shot invariants
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('results/r5mid_prospective_one_shot_plan/branch_plan.json'))
+          e=json.load(open('results/r5mid_prospective_one_shot_plan/one_shot_intervention_envelope.json'))
+          rows=[json.loads(x) for x in open('results/r5mid_prospective_one_shot_plan/branch_execution_manifest.jsonl')]
+          assert p['source_evidence_role']=='POST_FREEZE_PROSPECTIVE_NATURAL_TRAJECTORY'
+          assert p['semantic_cpr_status']=='NOT_ADJUDICATED'
+          assert p['paid_one_shot_authorization_status']=='NOT_AUTHORIZED'
+          assert p['causal_claim_status']=='NOT_TESTED_PREPARED_ONLY'
+          assert p['parent_snapshot_hash']==p['branch_start_snapshot_hash']
+          assert e['state_key']=='inventory_stockout_assessment_v1'
+          assert e['from_status']=='fact' and e['to_status']=='unconfirmed'
+          assert e['direct_exposure_limit']==1 and e['persistent_state_mutation'] is False
+          assert len(rows)==4
+          assert all(r['parent_state_hash']==r['branch_start_state_hash'] for r in rows)
+          print('PROSPECTIVE_ONESHOT_INVARIANTS=VERIFIED')
+          print('PAID_ONE_SHOT_AUTHORIZED=NO')
+          PY
+      - name: Archive prepared plan
+        run: |
+          cp manifests/r5mid_prospective_one_shot_prepare_2026-09-17.json results/r5mid_prospective_one_shot_plan/
+          tar -czf r5mid_prospective_one_shot_prepared.tar.gz results/r5mid_prospective_one_shot_plan
+          sha256sum r5mid_prospective_one_shot_prepared.tar.gz > r5mid_prospective_one_shot_prepared.tar.gz.sha256
+      - name: Upload prepared plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5mid-prospective-one-shot-prepared-${{ github.run_id }}
+          path: |
+            r5mid_prospective_one_shot_prepared.tar.gz
+            r5mid_prospective_one_shot_prepared.tar.gz.sha256
+          retention-days: 90
