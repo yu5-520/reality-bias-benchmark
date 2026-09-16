@@ -19,6 +19,12 @@ from .experimental_control import (
 )
 from .io_utils import load_json
 from .providers import ScriptedProvider
+from .trajectory_measurement_v3 import (
+    compare_branch_measurements,
+    measure_branch_trace,
+    verify_branch_comparison,
+    verify_branch_measurement,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -220,6 +226,17 @@ def build_branch_recovery_preflight():
     if 'PROVISIONAL_PATH' not in intervention_answer:
         raise RuntimeError('intervention_continuation_did_not_observe_provisional_status')
 
+    control_measurement = measure_branch_trace(control_trace)
+    intervention_measurement = measure_branch_trace(intervention_trace)
+    verify_branch_measurement(control_measurement)
+    verify_branch_measurement(intervention_measurement)
+    branch_comparison = compare_branch_measurements(
+        control_measurement,
+        intervention_measurement,
+        comparison_id='R5R6-OFFLINE-BRANCH-COMPARISON-v0.1',
+    )
+    verify_branch_comparison(branch_comparison)
+
     recovery = make_recovery_record(
         recovery_id='R6-OFFLINE-RECOVERY-RECORD-v0.1',
         parent_branch_id=intervention_manifest['branch_id'],
@@ -242,10 +259,12 @@ def build_branch_recovery_preflight():
     verify_recovery_record(recovery)
 
     summary = {
-        'schema': 'RB-R5R6-OFFLINE-BRANCH-PREFLIGHT-v0.1',
+        'schema': 'RB-R5R6-OFFLINE-BRANCH-PREFLIGHT-v0.2',
         'scientific_status': 'ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE',
         'baseline_trace_hash': baseline_trace_hash,
         'parent_state_hash': parent_snapshot['state_hash'],
+        'parent_turn': parent_snapshot['turns'],
+        'parent_event_count': len(parent_snapshot['events']),
         'control_branch_start_state_hash': control_manifest['branch_start_state_hash'],
         'intervention_branch_start_state_hash': intervention_manifest['branch_start_state_hash'],
         'same_frozen_parent': control_manifest['parent_state_hash'] == intervention_manifest['parent_state_hash'],
@@ -255,10 +274,14 @@ def build_branch_recovery_preflight():
         'anchor_selection_hash': selection['record_hash'],
         'control_branch_hash': control_manifest['branch_hash'],
         'intervention_branch_hash': intervention_manifest['branch_hash'],
+        'control_measurement_hash': control_measurement['measurement_hash'],
+        'intervention_measurement_hash': intervention_measurement['measurement_hash'],
+        'branch_comparison_hash': branch_comparison['comparison_hash'],
+        'final_state_hash_changed': branch_comparison['final_state_hash_changed'],
         'recovery_record_hash': recovery['record_hash'],
         'semantic_r_status': recovery['regeneration_semantic_status'],
         'interpretation_boundary': (
-            'This deterministic fixture proves branch identity, intervention application, downstream state visibility, and recovery-record plumbing only. '
+            'This deterministic fixture proves branch identity, intervention application, downstream state visibility, Measurement-v3 continuation slicing, and recovery-record plumbing only. '
             'It is not evidence for Reality Bias incidence or intervention effectiveness in a real model.'
         ),
     }
@@ -273,6 +296,9 @@ def build_branch_recovery_preflight():
         'intervened_start_snapshot': intervened_start,
         'control_trace': control_trace,
         'intervention_trace': intervention_trace,
+        'control_measurement': control_measurement,
+        'intervention_measurement': intervention_measurement,
+        'branch_comparison': branch_comparison,
         'recovery_record': recovery,
         'summary': summary,
     }
@@ -281,7 +307,7 @@ def build_branch_recovery_preflight():
 def _human_summary(bundle):
     s = bundle['summary']
     return '\n'.join([
-        'R5/R6 OFFLINE BRANCH + RECOVERY PREFLIGHT v0.1',
+        'R5/R6 OFFLINE BRANCH + RECOVERY PREFLIGHT v0.2',
         'STATUS: ENGINEERING ONLY — NOT SCIENTIFIC EVIDENCE',
         '',
         f"same_frozen_parent={s['same_frozen_parent']}",
@@ -291,6 +317,7 @@ def _human_summary(bundle):
         f"intervention_start_hash={s['intervention_branch_start_state_hash']}",
         f"control_final_answer={s['control_final_answer']}",
         f"intervention_final_answer={s['intervention_final_answer']}",
+        f"final_state_hash_changed={s['final_state_hash_changed']}",
         f"semantic_r_status={s['semantic_r_status']}",
         '',
         s['interpretation_boundary'],
