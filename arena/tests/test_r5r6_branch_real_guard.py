@@ -17,7 +17,7 @@ class R5R6BranchRealGuardTest(unittest.TestCase):
         self.domain_path = ROOT / 'arena/domains/ecommerce.json'
         self.arena_path = ROOT / 'arena/config/arena_v0.3.json'
         self.model_path = ROOT / 'arena/config/model_deepseek_v0.2.json'
-        self.rule_path = ROOT / 'arena/config/r5r6_anchor_rule_v0.1.json'
+        self.rule_path = ROOT / 'arena/config/r5r6_anchor_rule_v0.2.json'
         self.domain = load_json(self.domain_path)
         self.config = load_json(self.arena_path)
         self.rule = load_json(self.rule_path)
@@ -33,14 +33,21 @@ class R5R6BranchRealGuardTest(unittest.TestCase):
                     'actions': [{'type': 'invoke_agent', 'agent_id': 'inventory', 'request': 'Check stock.'}],
                 },
                 {
-                    'decision_summary': 'write candidate',
-                    'actions': [{
-                        'type': 'write_state',
-                        'key': 'inventory_view',
-                        'value': 'Stockout certain',
-                        'status': 'fact',
-                        'basis': 'guard fixture',
-                    }],
+                    'decision_summary': 'write candidate and return work',
+                    'actions': [
+                        {
+                            'type': 'write_state',
+                            'key': 'inventory_view',
+                            'value': 'Stockout certain',
+                            'status': 'fact',
+                            'basis': 'guard fixture',
+                        },
+                        {
+                            'type': 'message',
+                            'to': 'ops_lead',
+                            'content': 'Candidate recorded; continue planning.',
+                        },
+                    ],
                 },
                 {'decision_summary': 'finish', 'actions': [{'type': 'finalize', 'answer': 'Plan.'}]},
                 {'decision_summary': 'finish late', 'actions': [{'type': 'finalize', 'answer': 'Plan late.'}]},
@@ -58,7 +65,7 @@ class R5R6BranchRealGuardTest(unittest.TestCase):
             'model_config_path': 'arena/config/model_deepseek_v0.2.json',
             'model_config_version': load_json(self.model_path).get('config_version'),
             'model_config_hash': sha256_file(self.model_path),
-            'anchor_rule_path': 'arena/config/r5r6_anchor_rule_v0.1.json',
+            'anchor_rule_path': 'arena/config/r5r6_anchor_rule_v0.2.json',
             'anchor_rule_hash': sha256_file(self.rule_path),
             'code_commit_sha': 'BASELINE_TEST_SHA',
         })
@@ -69,6 +76,8 @@ class R5R6BranchRealGuardTest(unittest.TestCase):
             evidence_hash='guard-fixture-evidence',
             selection_id='GUARD-FIXTURE-SEL',
         )
+        self.assertEqual('ANCHOR_SELECTED', selection['selection_status'])
+        self.assertTrue(selection['selected_snapshot']['queue'])
         return build_branch_plan(
             selection,
             trace,
