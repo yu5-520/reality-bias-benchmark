@@ -9,6 +9,7 @@ from .measurement_v2 import build_r2_candidate_index
 RULE_SCHEMAS = {
     'RB-R5R6-ANCHOR-RULE-v0.1',
     'RB-R5R6-ANCHOR-RULE-v0.2',
+    'RB-R5R6-ANCHOR-RULE-v0.3',
 }
 
 
@@ -20,15 +21,21 @@ def _require(condition, message):
 def validate_anchor_rule(rule):
     _require(isinstance(rule, dict), 'anchor_rule_must_be_object')
     _require(rule.get('schema') in RULE_SCHEMAS, 'anchor_rule_schema_invalid')
-    _require(rule.get('selection_scope') == 'STRUCTURAL_ONLY', 'anchor_rule_scope_invalid')
+    allowed_scopes = {'STRUCTURAL_ONLY'}
+    if rule.get('schema') == 'RB-R5R6-ANCHOR-RULE-v0.3':
+        allowed_scopes.add('STRUCTURAL_ONLY_OUTCOME_BLIND')
+    _require(rule.get('selection_scope') in allowed_scopes, 'anchor_rule_scope_invalid')
     _require(rule.get('candidate_type'), 'anchor_rule_candidate_type_required')
     _require(rule.get('action_type'), 'anchor_rule_action_type_required')
     _require(rule.get('anchor_position') == 'AFTER_CANDIDATE_TURN', 'anchor_rule_position_invalid')
     _require(rule.get('tie_break') == 'LOWEST_EVENT_INDEX', 'anchor_rule_tie_break_invalid')
     _require(rule.get('semantic_reviewer_labels_allowed') is False, 'anchor_rule_semantic_contamination')
     _require(rule.get('branch_outcomes_allowed_during_selection') is False, 'anchor_rule_outcome_contamination')
-    if rule.get('schema') == 'RB-R5R6-ANCHOR-RULE-v0.2':
-        _require(rule.get('require_pending_queue') is True, 'anchor_rule_v02_pending_queue_required')
+    if rule.get('schema') in ('RB-R5R6-ANCHOR-RULE-v0.2', 'RB-R5R6-ANCHOR-RULE-v0.3'):
+        _require(rule.get('require_pending_queue') is True, 'anchor_rule_pending_queue_required')
+    if rule.get('schema') == 'RB-R5R6-ANCHOR-RULE-v0.3':
+        _require(rule.get('forward_intervention_family') == 'ONE_SHOT_JUMP_EPISTEMIC_PERTURBATION', 'anchor_rule_v03_intervention_family_invalid')
+        _require(rule.get('persistent_state_mutation') is False, 'anchor_rule_v03_persistent_state_mutation_forbidden')
     return True
 
 
@@ -85,7 +92,7 @@ def eligible_anchor_candidates(trace, snapshots, rule, *, evidence_hash=None):
 
 
 def select_anchor(trace, snapshots, rule, *, evidence_hash=None, selection_id=None):
-    """Select one replayable structural anchor without semantic labels or branch outcomes."""
+    """Select one replayable structural target without semantic labels or branch outcomes."""
     validate_anchor_rule(rule)
     trace_hash = stable_hash(trace)
     evidence_hash = evidence_hash or stable_hash({
@@ -119,8 +126,8 @@ def select_anchor(trace, snapshots, rule, *, evidence_hash=None, selection_id=No
         reviewer_labels_used_for_selection=False,
         branch_outcomes_visible_at_selection=False,
         notes=(
-            'Selected by a frozen structural-only rule. Candidate eligibility establishes replayability and, where required, pending continuation work; '
-            'it does not establish semantic C/P/R, unauthorized promotion, Jump truth, Authority Penetration, or causal importance.'
+            'Selected by a frozen structural-only outcome-blind rule. Eligibility establishes replayability and pending continuation work where required; '
+            'it does not establish semantic C/P/R, unauthorized promotion, Jump truth, Authority Penetration, causal importance, or task failure.'
         ),
     )
     verify_anchor_selection_record(record)

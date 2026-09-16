@@ -1,0 +1,114 @@
+name: R2-R6 Prospective Natural Authorized Once
+
+on:
+  push:
+    paths:
+      - 'manifests/r2r6_prospective_natural_paid_authorization_2026-09-17.json'
+
+permissions:
+  contents: read
+
+env:
+  AUTH_MANIFEST: manifests/r2r6_prospective_natural_paid_authorization_2026-09-17.json
+
+jobs:
+  subject:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify explicit one-shot authorization manifest
+        id: auth
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os
+          p=os.environ['AUTH_MANIFEST']
+          a=json.load(open(p))
+          assert a['schema']=='RB-R2R6-PROSPECTIVE-NATURAL-PAID-AUTHORIZATION-v0.1'
+          assert a['authorization_phrase']=='CALL_REAL_R2R6_PROSPECTIVE_NATURAL_API'
+          assert a['spending_ceiling_usd'] > 0
+          assert a['per_run_spending_ceiling_usd'] > 0
+          assert a['per_run_max_calls'] > 0
+          assert a['planned_repeats']==4
+          assert a['automatic_paid_evaluator'] is False
+          assert a['one_shot_branch_authorized'] is False
+          assert a['no_outcome_aware_rerun'] is True
+          assert a['one_shot_authorization_consumed_by_this_manifest'] is True
+          print('global_ceiling='+str(a['spending_ceiling_usd']))
+          print('per_run_ceiling='+str(a['per_run_spending_ceiling_usd']))
+          print('per_run_max_calls='+str(a['per_run_max_calls']))
+          print('AUTHORIZATION=VERIFIED')
+          PY
+      - name: Run full offline tests before provider access
+        run: |
+          python arena/validate_environment.py
+          python -m unittest discover -s arena/tests -v
+      - name: Rebuild exact bound subject manifest
+        run: |
+          mkdir -p frozen_input
+          python -m arena.build_prospective_natural_manifest \
+            --contract configs/prospective_natural_collection_contract_v0.1.json \
+            --arena-config arena/config/arena_v0.3.json \
+            --model-config arena/config/model_deepseek_v0.2.json \
+            --code-sha '${{ github.sha }}' \
+            --out frozen_input/subject_manifest.jsonl
+      - name: Collect prospective natural subject evidence
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python -m arena.run_prospective_natural_real \
+            --manifest frozen_input/subject_manifest.jsonl \
+            --outdir results/prospective_natural_raw \
+            --provider deepseek \
+            --per-run-max-calls '${{ steps.auth.outputs.per_run_max_calls }}' \
+            --per-run-spending-ceiling '${{ steps.auth.outputs.per_run_ceiling }}' \
+            --global-spending-ceiling '${{ steps.auth.outputs.global_ceiling }}' \
+            --currency USD \
+            --authorization-phrase CALL_REAL_R2R6_PROSPECTIVE_NATURAL_API \
+            --execute-real-api
+      - name: Freeze raw evidence before any derived analysis
+        if: always()
+        run: |
+          if [ -f results/prospective_natural_raw/traces.jsonl ]; then
+            python -m arena.freeze_prospective_evidence \
+              --raw-dir results/prospective_natural_raw \
+              --manifest frozen_input/subject_manifest.jsonl \
+              --out results/prospective_natural_raw/evidence_batch.json
+            tar -czf prospective_natural_raw_bundle.tar.gz results/prospective_natural_raw frozen_input "$AUTH_MANIFEST"
+            sha256sum prospective_natural_raw_bundle.tar.gz > prospective_natural_raw_bundle.tar.gz.sha256
+          fi
+      - name: Upload raw frozen evidence before derivation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2r6-prospective-natural-raw-${{ github.run_id }}
+          path: |
+            prospective_natural_raw_bundle.tar.gz
+            prospective_natural_raw_bundle.tar.gz.sha256
+          if-no-files-found: ignore
+          retention-days: 90
+      - name: Derive structural process measurements after raw freeze
+        if: success()
+        run: |
+          python -m arena.derive_prospective_natural_measurements \
+            --raw-dir results/prospective_natural_raw \
+            --evidence-batch results/prospective_natural_raw/evidence_batch.json \
+            --outdir results/prospective_natural_measurements
+      - name: Archive derived measurements
+        if: success()
+        run: |
+          tar -czf prospective_natural_derived_bundle.tar.gz results/prospective_natural_measurements
+          sha256sum prospective_natural_derived_bundle.tar.gz > prospective_natural_derived_bundle.tar.gz.sha256
+      - name: Upload derived measurements
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2r6-prospective-natural-derived-${{ github.run_id }}
+          path: |
+            prospective_natural_derived_bundle.tar.gz
+            prospective_natural_derived_bundle.tar.gz.sha256
+          retention-days: 90

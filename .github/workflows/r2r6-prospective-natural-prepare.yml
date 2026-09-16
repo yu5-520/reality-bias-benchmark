@@ -1,0 +1,75 @@
+name: R2-R6 Prospective Natural Prepare
+
+on:
+  push:
+    paths:
+      - 'manifests/r2r6_prospective_natural_prepare_2026-09-17.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: r2r6-prospective-natural-prepare
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify prepare-only manifest
+        run: |
+          python - <<'PY'
+          import json
+          row=json.load(open('manifests/r2r6_prospective_natural_prepare_2026-09-17.json'))
+          assert row['scope']=='OFFLINE_PROSPECTIVE_NATURAL_PREPARE_ONLY'
+          assert row['planned_repeats']==4
+          assert row['paid_api_authorized'] is False
+          assert row['automatic_paid_evaluator'] is False
+          assert row['one_shot_branch_authorized'] is False
+          assert row['no_outcome_aware_rerun'] is True
+          print('PROSPECTIVE_PREPARE_MANIFEST=VERIFIED')
+          PY
+      - name: Run offline tests
+        run: |
+          python arena/validate_environment.py
+          python -m unittest discover -s arena/tests -v
+      - name: Build frozen prospective subject manifest
+        run: |
+          mkdir -p results/prospective_natural_prepare
+          python -m arena.build_prospective_natural_manifest \
+            --contract configs/prospective_natural_collection_contract_v0.1.json \
+            --arena-config arena/config/arena_v0.3.json \
+            --model-config arena/config/model_deepseek_v0.2.json \
+            --code-sha '${{ github.sha }}' \
+            --out results/prospective_natural_prepare/subject_manifest.jsonl
+      - name: Verify no provider execution path was entered
+        run: |
+          python - <<'PY'
+          import json
+          rows=[json.loads(x) for x in open('results/prospective_natural_prepare/subject_manifest.jsonl')]
+          assert len(rows)==4
+          assert all(r['scientific_status']=='PROSPECTIVE_NATURAL_SUBJECT_CANDIDATE_AWAITING_EXPLICIT_PAID_AUTHORIZATION' for r in rows)
+          assert all(r['automatic_paid_evaluator'] is False for r in rows)
+          assert all(r['selection_scope']=='STRUCTURAL_ONLY_OUTCOME_BLIND' for r in rows)
+          print('PROSPECTIVE_SUBJECT_ROWS=4')
+          print('PAID_API_AUTHORIZED=NO')
+          PY
+      - name: Archive prepared manifest
+        run: |
+          cp manifests/r2r6_prospective_natural_prepare_2026-09-17.json results/prospective_natural_prepare/
+          cp configs/prospective_natural_collection_contract_v0.1.json results/prospective_natural_prepare/
+          tar -czf r2r6_prospective_natural_prepared.tar.gz results/prospective_natural_prepare
+          sha256sum r2r6_prospective_natural_prepared.tar.gz > r2r6_prospective_natural_prepared.tar.gz.sha256
+      - name: Upload prepared prospective bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2r6-prospective-natural-prepared-${{ github.run_id }}
+          path: |
+            r2r6_prospective_natural_prepared.tar.gz
+            r2r6_prospective_natural_prepared.tar.gz.sha256
+          retention-days: 90
