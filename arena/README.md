@@ -12,6 +12,7 @@ python arena/preflight.py
 python -m unittest discover -s arena/tests -v
 python -m arena.build_manifest --domains all --repeats 2 --arena-config arena/config/arena_v0.3.json --out results/arena_manifest.jsonl
 python -m arena.branch_recovery_preflight --outdir results/branch_recovery_preflight
+python -m arena.build_branch_baseline_manifest --repeats 2 --model-config arena/config/model_deepseek_v0.2.json --out results/r5r6_baseline_manifest_candidate.jsonl
 python -m arena.orchestration_preflight --outdir results/orchestration_preflight
 python -m arena.build_orchestration_manifest --repeats 2 --out results/r7_orchestration_manifest_candidate.jsonl
 ```
@@ -64,7 +65,7 @@ Forward files:
 - `tests/test_branch_protocol.py`
 - `tests/test_branch_recovery_preflight.py`
 - `../docs/experimental_control_layer_v0.2.md`
-- `../docs/R5_R6_branch_intervention_recovery_protocol_v0.1.md`
+- `../docs/R5_R6_branch_intervention_recovery_protocol_v0.2.md`
 
 Evidence interfaces:
 
@@ -74,7 +75,7 @@ Evidence interfaces:
 - `../schemas/branch_trajectory_comparison_v3.schema.json`
 - `../schemas/recovery_record_v0.1.schema.json`
 
-Historical `experimental_branch_manifest_v0.1.schema.json` remains preserved.
+Historical `experimental_branch_manifest_v0.1.schema.json` and protocol v0.1 remain preserved.
 
 ### Parent versus branch-start identity
 
@@ -109,6 +110,38 @@ A restored Arena state does **not** mean provider-internal randomness or hidden 
 8. emits a recovery record while semantic R remains `NOT_ADJUDICATED`.
 
 This is instrumentation validation only and is never counted as scientific subject evidence.
+
+## R5/R6 guarded real baseline phase
+
+Real R5/R6 work is deliberately split into two paid phases. Only **Phase A infrastructure** is currently prepared.
+
+Phase A:
+
+```text
+real baseline subject run
+  → before/after-turn state snapshots
+  → frozen structural candidate index
+  → structural-only replayable anchor selection
+  → STOP before any branch continuation
+```
+
+Files:
+
+- `config/r5r6_anchor_rule_v0.1.json`
+- `anchor_selection.py`
+- `build_branch_baseline_manifest.py`
+- `run_branch_baseline_real.py`
+- `tests/test_anchor_selection.py`
+- `tests/test_branch_baseline_manifest.py`
+- `tests/test_r5r6_real_guard.py`
+- `../.github/workflows/r5r6-baseline-snapshot-real.yml`
+- `../docs/R5_R6_real_run_freeze_template_v0.1.md`
+
+The frozen structural rule currently targets the first replayable `HIGH_CERTAINTY_STATE_WRITE_CANDIDATE` by event index. That selection is a structural branch candidate only; it does not itself establish C, Jump truth, unauthorized promotion, penetration or causal importance.
+
+Baseline collection preserves `ANCHOR_SELECTED`, `NO_ELIGIBLE_STRUCTURAL_ANCHOR`, and non-complete runs rather than regenerating until a convenient anchor appears.
+
+Real Phase-A execution requires the exact phrase `CALL_REAL_R5R6_BASELINE_API`, a resolved provider/model config, positive call cap, matching currency, and an explicit positive spending ceiling. **Phase-A authorization never authorizes Phase-B branch continuation.**
 
 ## Minimal structured / system-owned routing condition
 
