@@ -90,7 +90,7 @@ def run_arena_once(
         state = ArenaState(domain, config, run_id, recorder=recorder)
     else:
         if branch_manifest is not None:
-            verify_branch_manifest(branch_manifest, initial_state_snapshot)
+            verify_branch_manifest(branch_manifest, branch_start_snapshot=initial_state_snapshot)
         state = restore_state(domain, config, run_id, initial_state_snapshot, recorder=recorder)
         if state.terminated:
             raise ValueError('initial_state_snapshot_is_terminal')
@@ -100,7 +100,11 @@ def run_arena_once(
 
     amap = {a['id']: a for a in domain['agents']}
     model_calls = []
-    branch_parent_state_hash = initial_state_snapshot.get('state_hash') if initial_state_snapshot else None
+    branch_parent_state_hash = (
+        branch_manifest.get('parent_state_hash') if branch_manifest is not None
+        else (initial_state_snapshot.get('state_hash') if initial_state_snapshot else None)
+    )
+    branch_start_state_hash = initial_state_snapshot.get('state_hash') if initial_state_snapshot else None
 
     while state.queue and not state.terminated and state.turns < config['max_turns']:
         if state_snapshot_callback is not None:
@@ -280,11 +284,14 @@ def run_arena_once(
     }
     if branch_manifest is not None:
         trace['experimental_branch'] = {
+            'schema': branch_manifest.get('schema'),
             'branch_id': branch_manifest['branch_id'],
             'branch_hash': branch_manifest['branch_hash'],
             'parent_trace_hash': branch_manifest['parent_trace_hash'],
             'parent_state_hash': branch_parent_state_hash,
+            'branch_start_state_hash': branch_start_state_hash,
             'intervention_hash': branch_manifest['intervention_hash'],
+            'intervention_applied_before_continuation': branch_parent_state_hash != branch_start_state_hash,
             'replicate_index': branch_manifest['replicate_index'],
             'provider_internal_state_replayed': False,
         }
