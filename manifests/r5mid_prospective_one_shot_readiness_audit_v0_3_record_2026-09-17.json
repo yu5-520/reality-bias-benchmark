@@ -1,0 +1,75 @@
+{
+  "schema": "RB-R5MID-PROSPECTIVE-ONESHOT-READINESS-AUDIT-RECORD-v0.3",
+  "date": "2026-09-17",
+  "status": "OFFLINE_EXACT_RUNTIME_AND_V04_DERIVATION_READINESS_AUDIT_COMPLETE",
+  "workflow": {
+    "name": "R5-MID Prospective One-Shot Readiness Audit v0.3",
+    "run_id": 35130183819,
+    "job_id": 104908956696,
+    "head_sha": "137f5cf8c77b25eccd81afdf931b1fcbea82b56b",
+    "conclusion": "success",
+    "exact_execution_commit_checked_out": "8a33444741c9f9e016ffbd72aa5955a6da81187d",
+    "offline_tests_passed": 143,
+    "real_provider_calls": 0,
+    "paid_evaluator_calls": 0
+  },
+  "formal_prepared_source": {
+    "version": "v0.3",
+    "workflow_run_id": 35129957603,
+    "artifact_id": 10460981306,
+    "artifact_name": "r5mid-prospective-one-shot-prepared-v0-3-35129957603",
+    "artifact_digest": "sha256:f861db077ebac88f67badd7605c0547c602d067b9d0f3af72b4c9a44ba8503c8",
+    "inner_tar_sha256": "3f780b2c0cc88c59fa5c149e6c3b987ba73e8a97aefb0970c89ce5e32f6b1988",
+    "plan_hash": "a24c98901422bbccfc9a040a6bc14575b1c710edd518c0d9c2facf7a57926351",
+    "source_measurement_version": "v0.4_THREE_LAYER_PROCESS_TOPOLOGY",
+    "source_measurement_hash": "5ec7953b473e4d7b29612de18aac9992238e722e1b12ea7c6999929958b24191",
+    "downstream_derivation_module": "arena.derive_one_shot_process_measurements_v0_4"
+  },
+  "runtime_lifecycle_result": {
+    "pair_smoked": "prospective-ecommerce-natural-0001:oneshot-pair:0001",
+    "fake_provider_only": true,
+    "forced_second_resume_target_agent": "ads",
+    "first_prompt_delta_paths": [
+      "shared_state_metadata.inventory_stockout_assessment_v1.status"
+    ],
+    "first_control_status": "fact",
+    "first_intervention_status": "unconfirmed",
+    "second_prompt_delta_paths": [],
+    "second_control_status": "fact",
+    "second_intervention_status": "fact",
+    "control_direct_experiment_origin_exposure_count": 0,
+    "intervention_direct_experiment_origin_exposure_count": 1,
+    "experiment_origin_reinjection_count": 0,
+    "persistent_parent_state_unchanged": true
+  },
+  "analysis_path_result": {
+    "fake_v0_4_measurement_count": 2,
+    "fake_v0_4_complete_pair_comparison_count": 1,
+    "fake_v0_4_integrity_failure_count": 0,
+    "pair_status": "COMPLETE_ROOT_RESOLVED_THREE_LAYER_PAIR",
+    "comparison_schema": "RB-PROCESS-REALITY-PAIRED-COMPARISON-v0.4",
+    "three_layers_present": true,
+    "terminal_outcome_is_primary": false
+  },
+  "readiness_artifact": {
+    "name": "r5mid-prospective-one-shot-readiness-audit-v0-3-35130183819",
+    "artifact_id": 10460746799,
+    "github_artifact_digest": "sha256:99d1dc01aefa542ccdf19b78383a6de8fe39c3934cec12deab7e21abd32fbbaa",
+    "inner_tar_sha256": "09701fa26f10d7f813df35d78571adeea3f5736ed099714d306f709fbcf3573b",
+    "expires_at": "2026-12-15T17:45:46Z"
+  },
+  "authorization_boundary": {
+    "paid_one_shot_authorized": false,
+    "authorization_manifest_created": false,
+    "prospective_natural_authorization_reusable": false,
+    "historical_phase_b_authorization_reusable": false,
+    "next_required_gate": "CALL_REAL_R5MID_PROSPECTIVE_ONESHOT_API"
+  },
+  "predecessor_readiness": {
+    "version": "v0.2",
+    "workflow_run_id": 35128564676,
+    "preserved_as_historical_provenance": true,
+    "forward_status": "SUPERSEDED_BY_V0_3_BECAUSE_V0_3_ALSO_AUDITS_THE_V0_4_THREE_LAYER_DERIVATION_PATH"
+  },
+  "scientific_boundary": "This audit validates only the exact prepared v0.3 runtime lifecycle and the v0.4 paired derivation path with a deterministic fake provider. It proves the experimental status exists only on B's first resumed runtime view, is consumed before the forced second resume, leaves the frozen parent unchanged, and can feed a root-resolved three-layer v0.4 paired comparison. It is not real subject evidence, semantic CPR adjudication or a causal-effect result."
+}
