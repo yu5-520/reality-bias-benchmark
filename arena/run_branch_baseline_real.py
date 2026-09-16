@@ -166,8 +166,10 @@ def main():
     )
 
     traces_path = outdir / 'traces.jsonl'
+    journal_dir = Path(str(traces_path) + '.journals')
     selection_index_path = outdir / 'selection_index.jsonl'
     errors_path = outdir / 'errors.jsonl'
+    errors_array_path = outdir / 'errors.json'
     attempted_run_ids = []
     unattempted_run_ids = []
     errors = []
@@ -183,7 +185,7 @@ def main():
         domain = load_json(domain_path)
         snapshots = []
         snapshot_path = outdir / 'snapshots' / f"{row['run_id']}.jsonl"
-        journal_path = outdir / 'journals' / f"{row['run_id']}.jsonl"
+        journal_path = journal_dir / f"{row['run_id']}.jsonl"
 
         def save_snapshot(snapshot):
             snapshots.append(snapshot)
@@ -292,6 +294,7 @@ def main():
             _append_jsonl(errors_path, error)
             print(f"ERROR {row['run_id']}: {err}", file=sys.stderr, flush=True)
 
+    _write_json(errors_array_path, errors)
     summary = {
         'schema': 'RB-R5R6-BASELINE-SNAPSHOT-SUMMARY-v0.1',
         'authorization_hash': auth['authorization_hash'],
