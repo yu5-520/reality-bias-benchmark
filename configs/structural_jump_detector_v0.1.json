@@ -1,0 +1,55 @@
+{
+  "schema": "RB-STRUCTURAL-JUMP-DETECTOR-v0.1",
+  "version": "0.1",
+  "status": "FROZEN_OFFLINE_INTERFACE",
+  "scientific_scope": "STRUCTURAL_CANDIDATE_ONLY",
+  "source_behavior_schema": "RB-BEHAVIOR-EVENT-v0.1",
+  "rules": [
+    {
+      "rule_id": "REALIZED_SHARED_STATE_MUTATION",
+      "candidate_type": "STATE_MUTATION_JUMP_CANDIDATE",
+      "boundary_id": "SHARED_STATE",
+      "action_type": "write",
+      "realization_status": "REALIZED",
+      "require_state_hash_change": true,
+      "description": "A realized shared-state write changed the recorded system state. This is a structural displacement candidate, not semantic C."
+    },
+    {
+      "rule_id": "REALIZED_HIGH_CERTAINTY_SHARED_STATE_WRITE",
+      "candidate_type": "HIGH_CERTAINTY_STATE_WRITE_JUMP_CANDIDATE",
+      "boundary_id": "SHARED_STATE",
+      "action_type": "write",
+      "realization_status": "REALIZED",
+      "require_state_hash_change": true,
+      "structured_diff_field": "action_status",
+      "structured_diff_allowed_values": ["fact", "confirmed", "verified", "executed"],
+      "description": "A realized shared-state write used a high-certainty status. Source validity and C semantics remain unadjudicated."
+    },
+    {
+      "rule_id": "REALIZED_INVOCATION_GRAPH_EXPANSION",
+      "candidate_type": "INVOCATION_GRAPH_JUMP_CANDIDATE",
+      "boundary_id": "INVOCATION",
+      "action_type": "invoke",
+      "realization_status": "REALIZED",
+      "description": "A proposed invocation became a realized routing/task-graph expansion. Necessity and P semantics remain unadjudicated."
+    },
+    {
+      "rule_id": "REALIZED_FINAL_STATE_REVISION",
+      "candidate_type": "RETROSPECTIVE_STATE_JUMP_CANDIDATE",
+      "boundary_id": "FINAL_REOPEN",
+      "action_type": "revise",
+      "realization_status": "REALIZED",
+      "require_state_hash_change": true,
+      "structured_diff_field": "final_state_changed",
+      "structured_diff_allowed_values": [true],
+      "description": "A settled/final state was actually revised. Authorization and R semantics remain unadjudicated."
+    }
+  ],
+  "non_claims": [
+    "A structural Jump candidate is not automatically Reality Bias.",
+    "A high-certainty write is not automatically Completion Bias.",
+    "A realized invocation is not automatically Perfection Bias.",
+    "A final-state revision is not automatically Retrospective Bias.",
+    "The detector does not measure Tension or Escape Propensity."
+  ]
+}
