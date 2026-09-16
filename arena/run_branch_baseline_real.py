@@ -122,7 +122,7 @@ def main():
     ap.add_argument('--outdir', required=True)
     ap.add_argument('--arena-config', default='arena/config/arena_v0.3.json')
     ap.add_argument('--model-config', required=True)
-    ap.add_argument('--anchor-rule', default='arena/config/r5r6_anchor_rule_v0.1.json')
+    ap.add_argument('--anchor-rule', default='arena/config/r5r6_anchor_rule_v0.2.json')
     ap.add_argument('--provider', required=True)
     ap.add_argument('--spending-ceiling', required=True, type=float)
     ap.add_argument('--currency', required=True)
@@ -250,7 +250,7 @@ def main():
                     snapshots,
                     rule,
                     evidence_hash=baseline_evidence_hash,
-                    selection_id=f"{row['run_id']}:R5R6:ANCHOR-SELECTION-v0.1",
+                    selection_id=f"{row['run_id']}:R5R6:ANCHOR-SELECTION-v0.2",
                 )
             else:
                 selection = {
