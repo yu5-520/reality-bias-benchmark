@@ -2,7 +2,7 @@
 
 版本：Trajectory Measurement v3  
 日期：2026-09-16  
-状态：DESIGN FREEZE CANDIDATE  
+状态：DESIGN FREEZE CANDIDATE / OFFLINE BRANCH MEASUREMENT IMPLEMENTED  
 依赖：`docs/R_Plan_v3.2.md`、`theory/theory_contract_v0.3.md`  
 历史兼容：`docs/R234_measurement_plan_v2.md` 继续作为 Batch001 的冻结结构测量合同，不被重写。
 
@@ -20,6 +20,14 @@ v3 不替换历史 frozen subject behavior。它在现有 Jump / Range / Dynamic
 原则：
 
 > **机器负责可验证结构；语义 Reviewer 负责 C/P/R、semantic adoption、legitimation 等语义判断；实验控制层负责冻结、分支和单变量干预。**
+
+当前已实现的 branch-level deterministic adapter：
+
+- `arena/trajectory_measurement_v3.py`
+- `schemas/branch_trajectory_measurement_v3.schema.json`
+- `schemas/branch_trajectory_comparison_v3.schema.json`
+
+这些实现先解决“从同一冻结父节点开始，如何只统计 branch continuation 的结构差异”，不自动宣称 semantic Bias、Authority Penetration 或 causal effect 已经成立。
 
 ## 2. 新的结构主键
 
@@ -68,6 +76,8 @@ Escape Propensity 不直接观测。对于同一冻结父状态和同一实验�
 
 不同实验条件比较时不得把 provider failure 当作 Jump negative。
 
+当前 branch adapter 只输出 structural candidate 数量/类型；正式 `jump_positive` 判定器和 repeated-branch hazard estimator 仍需在真实确认性协议前单独冻结。
+
 ## 4. Propagation 与 Penetration 分离
 
 ### 4.1 Propagation
@@ -96,6 +106,8 @@ Penetration 至少要求 Jump-derived information/goal/action 获得新的 opera
 - `DECISION_EFFECTIVE`
 - `AUTHORITY_INHERITED`
 - `LAUNDERED_AS_VALID`
+
+branch deterministic adapter 可统计 realized Authority-class events / operational events，但这些数字本身仍不等于 Authority Penetration。
 
 ### 4.3 Penetration depth
 
@@ -155,34 +167,81 @@ R 的测量入口必须先绑定一个 prior C/P deviation 或 unresolved C/P-de
 
 - parent run identity；
 - parent trace hash；
-- anchor event index / call boundary；
+- anchor event/call/turn boundary；
 - frozen runtime state；
 - state hash；
 - relevant queue/inbox/active-agent state where recorded；
+- event count / turn count；
 - model/config/code identity；
 - source evidence refs。
 
 只有来源中真实存在的数据可进入 anchor。无法恢复的内部 provider state 不得伪造。
 
-## 8. Branch Manifest
+## 8. Branch Manifest v0.2
 
-每个分支必须绑定：
+Forward branch work 使用 `RB-EXPERIMENTAL-BRANCH-v0.2`。
+
+每个分支至少绑定：
 
 - `branch_id`
 - `parent_trace_hash`
 - `parent_state_hash`
+- `branch_start_state_hash`
+- `parent_turn`
+- `branch_start_turn`
+- `parent_event_count`
+- `branch_start_event_count`
 - `anchor_ref`
-- `intervention_type`
+- `branch_start_anchor_ref`
 - `intervention_spec`
 - `intervention_hash`
+- `intervention_applied_before_continuation`
 - `replicate_index`
 - `created_from_frozen_parent = true`
 - model/config/code identity
-- output evidence refs/hashes after completion
+- `provider_internal_state_replayed = false`
+
+关键关系：
+
+`frozen parent S_t → ΔX → branch start S'_t → continuation`
+
+如果 ΔX 改变状态：
+
+`parent_state_hash != branch_start_state_hash`
+
+两者不得混为同一个“父节点”。历史 v0.1 manifest 保留，不回写。
 
 原 trajectory 不被 branch 覆盖。
 
-## 9. R5 intervention metrics
+## 9. Branch continuation slicing
+
+`arena/trajectory_measurement_v3.py` 使用：
+
+- `branch_start_event_count`
+- `branch_start_turn`
+
+只切出 continuation，而不把 parent history 再次计入 intervention outcome。
+
+当前 deterministic branch record 输出：
+
+- continuation turns/calls/events；
+- realized events；
+- action-type counts；
+- continuation actors；
+- realized Authority-class event count；
+- realized operational event count；
+- Measurement-v2 structural candidate count/type；
+- final-state / final-answer hash；
+- usage summary；
+- C/P/R/semantic adoption/penetration/recovery 全部 `NOT_ADJUDICATED`。
+
+Control / intervention comparison 要求：
+
+`same parent trace hash + same parent state hash`
+
+然后才比较 branch-start state 和 continuation structure。
+
+## 10. R5 intervention metrics
 
 R5 每个 intervention 优先只改变一个控制变量。
 
@@ -202,7 +261,9 @@ R5 每个 intervention 优先只改变一个控制变量。
 
 这代表 containment effect，而不是 generation suppression。
 
-## 10. R6 recovery metrics
+当前 Measurement-v3 branch adapter 只提供这些指标所需的一部分 deterministic substrate，不把 generic event count 冒充上述语义/动力学指标。
+
+## 11. R6 recovery metrics
 
 Recovery branch 至少记录：
 
@@ -219,7 +280,9 @@ Recovery branch 至少记录：
 
 恢复距离的精确定义需在正式 protocol 中冻结，避免与 R（Retrospective）符号冲突。
 
-## 11. R7 orchestration comparison
+当前 offline branch/recovery preflight 保持 recovery 语义状态为 `NOT_EVALUATED` / `NOT_ADJUDICATED`，只验证证据接口和分支机制。
+
+## 12. R7 orchestration comparison
 
 最小优先比较：
 
@@ -249,15 +312,16 @@ Recovery branch 至少记录：
 
 `goal fixed/staged × context continuous/reset-or-compressed`
 
-## 12. Statistical caution
+## 13. Statistical caution
 
 - Escape hazard 是行为层 repeated-branch estimate，不是内部神经变量。
 - Branches from the same parent are not automatically independent; dependence assumptions must be stated.
 - Small-N results remain exploratory unless the protocol explicitly supports stronger inference.
 - Censored runs must remain censored and cannot be silently counted as negatives.
-- Multiple metrics require claim discipline; no post-hoc cherry-picking of the most favorable dynamic quantity.
+- Multiple metrics require claim discipline；不得 post-hoc 挑最有利的 dynamic quantity。
+- deterministic branch divergence 只说明在给定 intervention 条件下记录到结构差异，不自动证明一般 causal effect。
 
-## 13. Historical evidence compatibility
+## 14. Historical evidence compatibility
 
 Batch001 和旧 trace 可以用于：
 
@@ -268,12 +332,30 @@ Batch001 和旧 trace 可以用于：
 
 它们不能被 retroactively declared as preregistered Escape-hazard experiments or branch experiments。
 
-## 14. Execution boundary
+没有完整 snapshot/event/queue/inbox state 的历史节点不能为了 replay 目的事后补造。
 
-本计划本身不授权：
+## 15. Current offline implementation status
+
+已实现并纳入 CI：
+
+- branch parent/start hash separation；
+- branch parent/start turn/event-count boundaries；
+- structural-only anchor selection；
+- deterministic control/intervention continuation；
+- Measurement-v3 continuation slicing；
+- branch structural comparison；
+- recovery-record plumbing；
+- Free-vs-Structured R7 offline evidence shape；
+- paired R7 future-run manifest preparation。
+
+这些均为 engineering validation，不是新的 real-model scientific evidence。
+
+## 16. Execution boundary
+
+本计划及 offline implementation 不授权：
 
 - 任何新的 paid subject call；
 - 任何 paid Reviewer call；
 - 任何历史 evidence rewrite。
 
-先完成 offline deterministic validation，再冻结新 behavior protocol，再单独授权真实 provider run。
+先完成 offline deterministic validation，再冻结真实 behavior protocol，再单独授权 provider/model/run count/spending ceiling。
