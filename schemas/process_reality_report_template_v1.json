@@ -1,0 +1,113 @@
+{
+  "schema": "RB-PROCESS-REALITY-REPORT-TEMPLATE-v1.0",
+  "status": "ACTIVE",
+  "language": "en",
+  "report_standard": "RB-PROCESS-REALITY-REPORT-STANDARD-v1.0",
+  "visual_direction": "publication-oriented scientific figure grammar; Nature Machine Intelligence-style reference, not a journal production template",
+  "notation": {
+    "T": "executed agent turn",
+    "E": "recorded source event",
+    "M": "recorded message or handoff reference",
+    "J": "structural Jump or descendant re-Jump",
+    "J0": "selected structural root",
+    "OS": "one-shot intervention exposure"
+  },
+  "main_figure_rule": {
+    "primary_axis": "time",
+    "direction": "left_to_right",
+    "show_complete_message_graph": false,
+    "show_causally_salient_handoffs": true,
+    "long_cross_turn_dependencies": "reference_by_message_id_instead_of_long_arc",
+    "preferred_lanes": [
+      "agent_execution",
+      "message_or_decision_handoff",
+      "shared_state_evolution",
+      "jump_lineage"
+    ]
+  },
+  "edge_semantics": {
+    "solid_directed": "realized temporal or causal handoff",
+    "dashed_directed": "invocation or activation when distinguished from message delivery",
+    "jump_lineage": "structural inheritance or descendant relation",
+    "return_edge": "role re-entry or return",
+    "branch": "one upstream node produces multiple realized downstream paths",
+    "merge": "multiple realized paths reconverge"
+  },
+  "evidence_requirements": [
+    "workflow_run_id",
+    "run_or_pair_id",
+    "evidence_batch_hash",
+    "raw_traces_sha256",
+    "source_parent_state_hash",
+    "plan_hash",
+    "execution_code_sha",
+    "measurement_schema",
+    "measurement_hash",
+    "report_standard_version"
+  ],
+  "representative_trajectory": {
+    "allowed": true,
+    "selection_rule_must_be_declared": true,
+    "non_visualized_runs_remain_in_evidence": true,
+    "remaining_runs_require_index_or_trace_table": true
+  },
+  "report_profiles": {
+    "control_process_evidence": [
+      "scope_and_evidence_binding",
+      "control_condition_definition",
+      "representative_temporal_causal_trajectory",
+      "jump_lineage_and_post_root_spine",
+      "agent_communication_action_ledger",
+      "state_and_structural_event_ledger",
+      "remaining_run_evidence_index",
+      "within_control_structural_variability",
+      "structural_measurements",
+      "terminal_outcome",
+      "interpretation_boundary",
+      "evidence_provenance"
+    ],
+    "one_shot_process_evidence": [
+      "scope_and_evidence_binding",
+      "intervention_integrity",
+      "representative_temporal_causal_trajectory",
+      "exact_intervention_position_relative_to_J0",
+      "post_intervention_process_spine",
+      "agent_communication_action_ledger",
+      "state_and_structural_event_ledger",
+      "remaining_run_evidence_index",
+      "structural_measurements",
+      "terminal_outcome",
+      "interpretation_boundary",
+      "evidence_provenance"
+    ],
+    "matched_ab_mechanism_validation": [
+      "scientific_question_and_matched_design",
+      "experimental_integrity",
+      "pair1_time_aligned_causal_contrast",
+      "pair2_time_aligned_causal_contrast",
+      "first_divergence_analysis",
+      "structural_change_filter",
+      "cross_pair_structural_invariants",
+      "structural_measurement_matrix",
+      "process_terminal_decoupling",
+      "theory_proposition_mapping",
+      "claims_supported_and_not_established",
+      "evidence_provenance"
+    ]
+  },
+  "structural_change_filter": [
+    "surface_variation",
+    "execution_variation",
+    "state_variation",
+    "local_structural_change",
+    "propagated_structural_change"
+  ],
+  "integrity_constraints": {
+    "no_frozen_branch_rerun_for_reporting": true,
+    "no_invented_missing_events": true,
+    "no_silent_run_exclusion": true,
+    "no_semantic_promotion_without_adjudication": true,
+    "no_monotonic_effect_claim_when_pair_direction_reverses": true,
+    "terminal_outcome_is_not_primary_process_measure": true
+  }
+}
