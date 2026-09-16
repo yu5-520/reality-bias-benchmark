@@ -1,0 +1,171 @@
+name: R5-R6 Baseline Snapshot Subject Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      repeats:
+        description: 'Baseline trajectories to collect with before/after-turn state snapshots'
+        required: true
+        default: '2'
+        type: string
+      provider:
+        description: 'Exact provider id from chosen model config; keep UNRESOLVED for prepare-only'
+        required: true
+        default: 'UNRESOLVED'
+        type: string
+      model_config:
+        description: 'Exact repository subject model-config path'
+        required: true
+        default: 'arena/config/model_deepseek_v0.2.json'
+        type: string
+      spending_ceiling:
+        description: 'Explicit total baseline-subject ceiling; must be >0 for real execution'
+        required: true
+        default: '0'
+        type: string
+      currency:
+        description: 'Must match selected model-config pricing snapshot, e.g. USD or CNY'
+        required: true
+        default: 'USD'
+        type: string
+      max_subject_calls:
+        description: 'Hard paid subject-call cap across baseline batch; must be >0 for real execution'
+        required: true
+        default: '0'
+        type: string
+      confirm:
+        description: 'Type CALL_REAL_R5R6_BASELINE_API to authorize baseline provider calls; PREPARE_ONLY never calls a provider'
+        required: true
+        default: 'PREPARE_ONLY'
+        type: string
+
+concurrency:
+  group: r5r6-baseline-snapshot-subject
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  R5R6_REPEATS: ${{ inputs.repeats }}
+  R5R6_PROVIDER: ${{ inputs.provider }}
+  R5R6_MODEL_CONFIG: ${{ inputs.model_config }}
+  R5R6_SPENDING_CEILING: ${{ inputs.spending_ceiling }}
+  R5R6_CURRENCY: ${{ inputs.currency }}
+  R5R6_MAX_SUBJECT_CALLS: ${{ inputs.max_subject_calls }}
+  R5R6_ANCHOR_RULE: arena/config/r5r6_anchor_rule_v0.1.json
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate offline branch instrumentation
+        run: |
+          python arena/validate_environment.py
+          python arena/preflight.py
+          python -m unittest discover -s arena/tests -v
+          python -m arena.branch_recovery_preflight --outdir results/branch_recovery_preflight
+      - name: Build exact R5-R6 baseline candidate manifest — zero API calls
+        run: |
+          python -m arena.build_branch_baseline_manifest \
+            --repeats "$R5R6_REPEATS" \
+            --domain ecommerce \
+            --arena-config arena/config/arena_v0.3.json \
+            --model-config "$R5R6_MODEL_CONFIG" \
+            --anchor-rule "$R5R6_ANCHOR_RULE" \
+            --out results/r5r6_baseline_manifest.jsonl
+          wc -l results/r5r6_baseline_manifest.jsonl
+      - name: Record requested execution gate without treating it as authorization
+        run: |
+          python - <<'PY'
+          import json, os, pathlib
+          record = {
+              'schema': 'RB-R5R6-BASELINE-WORKFLOW-REQUEST-v0.1',
+              'provider_input': os.environ['R5R6_PROVIDER'],
+              'model_config_input': os.environ['R5R6_MODEL_CONFIG'],
+              'anchor_rule': os.environ['R5R6_ANCHOR_RULE'],
+              'spending_ceiling_input': os.environ['R5R6_SPENDING_CEILING'],
+              'currency_input': os.environ['R5R6_CURRENCY'],
+              'max_subject_calls_input': os.environ['R5R6_MAX_SUBJECT_CALLS'],
+              'confirm_is_real_authorization_phrase': '${{ inputs.confirm }}' == 'CALL_REAL_R5R6_BASELINE_API',
+              'github_sha': '${{ github.sha }}',
+              'branch_continuation_authorized': False,
+              'note': 'Prepare output is not paid-run authorization. Baseline subject job and runner independently enforce the explicit gate; branch continuation remains separately unauthorized.'
+          }
+          pathlib.Path('results/r5r6_workflow_request.json').write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+      - name: Upload prepared R5-R6 baseline bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5r6-baseline-prepared-${{ github.run_id }}
+          path: |
+            results/r5r6_baseline_manifest.jsonl
+            results/r5r6_workflow_request.json
+            results/branch_recovery_preflight/
+          retention-days: 90
+
+  subject_run:
+    needs: prepare
+    if: ${{ inputs.confirm == 'CALL_REAL_R5R6_BASELINE_API' && inputs.provider != 'UNRESOLVED' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download exact prepared manifest
+        uses: actions/download-artifact@v4
+        with:
+          name: r5r6-baseline-prepared-${{ github.run_id }}
+          path: prepared
+      - name: Execute guarded baseline snapshot collection only
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          BAI: ${{ secrets.BAI }}
+          BAILIAN_BASE_URL: ${{ secrets.BAILIAN_BASE_URL }}
+          BAILIAN_MODEL: ${{ secrets.BAILIAN_MODEL }}
+        run: |
+          python -m arena.run_branch_baseline_real \
+            --manifest prepared/r5r6_baseline_manifest.jsonl \
+            --outdir results/r5r6_baseline_real \
+            --arena-config arena/config/arena_v0.3.json \
+            --model-config "$R5R6_MODEL_CONFIG" \
+            --anchor-rule "$R5R6_ANCHOR_RULE" \
+            --provider "$R5R6_PROVIDER" \
+            --spending-ceiling "$R5R6_SPENDING_CEILING" \
+            --currency "$R5R6_CURRENCY" \
+            --max-subject-calls "$R5R6_MAX_SUBJECT_CALLS" \
+            --authorization-phrase CALL_REAL_R5R6_BASELINE_API \
+            --execute-real-api
+      - name: Freeze standard baseline evidence — no paid evaluator
+        if: always()
+        run: |
+          if [ -s results/r5r6_baseline_real/traces.jsonl ]; then
+            python -m arena.evidence \
+              --manifest prepared/r5r6_baseline_manifest.jsonl \
+              --traces results/r5r6_baseline_real/traces.jsonl \
+              --errors results/r5r6_baseline_real/errors.json \
+              --outdir results/r5r6_baseline_real/evidence_batch \
+              --code-sha '${{ github.sha }}'
+            cat results/r5r6_baseline_real/evidence_batch/RUN_REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'No baseline subject trace was produced; preserving authorization/error/snapshot artifacts only.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload immutable R5-R6 baseline snapshot evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5r6-baseline-subject-evidence-${{ github.run_id }}
+          path: |
+            prepared/r5r6_baseline_manifest.jsonl
+            prepared/r5r6_workflow_request.json
+            results/r5r6_baseline_real/
+            results/json_format_retries.jsonl
+          if-no-files-found: warn
+          retention-days: 90
