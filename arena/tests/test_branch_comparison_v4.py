@@ -6,6 +6,9 @@ from arena.branch_comparison_v4 import build_branch_comparison_v4, verify_branch
 
 class BranchComparisonV4Tests(unittest.TestCase):
     def _measurement(self, condition_id, assignment, run_id, *, jump_count, descendants, depth):
+        anchor_events = 7 if assignment == "CONTROL" else 3
+        anchor_crossings = 4 if assignment == "CONTROL" else 1
+        anchor_depth = 5 if assignment == "CONTROL" else 2
         return {
             "schema": "RB-SYSTEM-TRAJECTORY-MEASUREMENT-v4.0",
             "measurement_id": run_id + ":m",
@@ -39,13 +42,30 @@ class BranchComparisonV4Tests(unittest.TestCase):
                 "retrospective_window_refs": [],
                 "semantic_r_status": "NOT_ADJUDICATED",
             },
+            "r5_mid": {
+                "branch_start_anchor_hash": run_id + ":anchor",
+                "state_key": "inventory_view",
+                "state_status": "fact" if assignment == "CONTROL" else "provisional",
+                "anchor_visible_agent_turn_count": 2,
+                "anchor_visible_agent_ids": ["ops_lead", "inventory"],
+                "potential_downstream_event_count": anchor_events,
+                "potential_downstream_relation_count": anchor_events - 1,
+                "potential_downstream_affected_agent_count": 2 if anchor_events else 0,
+                "potential_downstream_affected_agent_ids": ["ops_lead", "inventory"],
+                "potential_downstream_operational_crossing_count": anchor_crossings,
+                "potential_downstream_authority_classes_reached": ["I", "SETTLEMENT"] if anchor_crossings else [],
+                "mechanical_anchor_reach_depth_candidate": anchor_depth,
+                "semantic_reliance_status": "NOT_ADJUDICATED",
+                "authority_penetration_status": "NOT_ADJUDICATED",
+                "causal_effect_status": "NOT_ADJUDICATED",
+            },
             "experimental_variables": [
                 {
                     "variable_id": "EPISTEMIC_STATUS_DOWNGRADE",
                     "family": "CONTAINMENT",
                     "stage": "MID",
                     "assignment": assignment,
-                    "level": "UNCHANGED" if assignment == "CONTROL" else "DOWNGRADE_TO_PROVISIONAL",
+                    "level": "HIGH_CERTAINTY_STATUS" if assignment == "CONTROL" else "PROVISIONAL",
                 }
             ],
             "semantic_status": "NOT_ADJUDICATED",
@@ -53,7 +73,7 @@ class BranchComparisonV4Tests(unittest.TestCase):
             "pair_id": "PAIR-001",
             "replicate_index": 1,
             "condition_id": condition_id,
-            "pair_order_pattern": "CONTROL_THEN_INTERVENTION",
+            "pair_order_pattern": "CONTROL_FIRST",
             "branch_plan_hash": "same-plan",
             "v4_research_binding_hash": "same-binding",
         }
@@ -90,6 +110,18 @@ class BranchComparisonV4Tests(unittest.TestCase):
         self.assertEqual(
             comparison["structural_deltas"]["r3"]["first_jump_mechanical_penetration_depth_candidate"]["delta_intervention_minus_control"],
             -2,
+        )
+        self.assertEqual(
+            comparison["structural_deltas"]["r5_mid_branch_anchor"]["potential_downstream_event_count"]["delta_intervention_minus_control"],
+            -4,
+        )
+        self.assertEqual(
+            comparison["structural_deltas"]["r5_mid_branch_anchor"]["potential_downstream_operational_crossing_count"]["delta_intervention_minus_control"],
+            -3,
+        )
+        self.assertEqual(
+            comparison["structural_deltas"]["r5_mid_branch_anchor"]["mechanical_anchor_reach_depth_candidate"]["delta_intervention_minus_control"],
+            -3,
         )
 
     def test_parent_or_binding_mismatch_fails_closed(self):
