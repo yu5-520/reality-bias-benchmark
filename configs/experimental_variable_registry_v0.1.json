@@ -1,0 +1,117 @@
+{
+  "schema": "RB-EXPERIMENTAL-VARIABLE-REGISTRY-v0.1",
+  "version": "0.1",
+  "status": "FORWARD_CANDIDATE",
+  "variables": [
+    {
+      "variable_id": "GOAL_CONFLICT_LEVEL",
+      "family": "TENSION_ANTECEDENT",
+      "stage": "PRE",
+      "target_boundary_family": ["AGENT_TURN", "CONTEXT_RAG_HANDOFF"],
+      "control_level": "LOW_OR_NONE",
+      "manipulation_level": "PREREGISTERED_LEVEL",
+      "held_constant_fields": ["task_identity", "model_config", "agent_pool", "routing_policy"],
+      "expected_observable_family": ["JUMP_INCIDENCE", "FIRST_JUMP_LOCATION", "JUMP_TYPE_DISTRIBUTION"],
+      "evidence_requirements": ["trajectory_identity", "frozen_task", "condition_binding", "behavior_events"]
+    },
+    {
+      "variable_id": "EVIDENCE_CONFLICT_LEVEL",
+      "family": "TENSION_ANTECEDENT",
+      "stage": "PRE",
+      "target_boundary_family": ["CONTEXT_RAG_HANDOFF", "SHARED_STATE"],
+      "control_level": "LOW_OR_NONE",
+      "manipulation_level": "PREREGISTERED_LEVEL",
+      "held_constant_fields": ["task_identity", "model_config", "agent_pool", "routing_policy"],
+      "expected_observable_family": ["JUMP_INCIDENCE", "EPISTEMIC_JUMP_CANDIDATE"],
+      "evidence_requirements": ["source_identity", "provenance", "behavior_events"]
+    },
+    {
+      "variable_id": "CONTEXT_COMPETITION_LEVEL",
+      "family": "TENSION_ANTECEDENT",
+      "stage": "PRE",
+      "target_boundary_family": ["CONTEXT_RAG_HANDOFF", "AGENT_TURN"],
+      "control_level": "LOW_OR_NONE",
+      "manipulation_level": "PREREGISTERED_LEVEL",
+      "held_constant_fields": ["task_identity", "model_config", "agent_pool"],
+      "expected_observable_family": ["JUMP_INCIDENCE", "GOAL_FOCUS_SHIFT_CANDIDATE"],
+      "evidence_requirements": ["context_manifest", "behavior_events"]
+    },
+    {
+      "variable_id": "INFORMATION_LOAD",
+      "family": "TENSION_ANTECEDENT",
+      "stage": "PRE",
+      "target_boundary_family": ["CONTEXT_RAG_HANDOFF"],
+      "control_level": "BASELINE_LOAD",
+      "manipulation_level": "PREREGISTERED_LOAD",
+      "held_constant_fields": ["task_identity", "model_config", "goal_contract"],
+      "expected_observable_family": ["JUMP_INCIDENCE", "CALLS_TOKENS_TURNS"],
+      "evidence_requirements": ["context_manifest", "usage"]
+    },
+    {
+      "variable_id": "AUTHORITY_EDGE_BLOCK",
+      "family": "CONTAINMENT",
+      "stage": "MID",
+      "target_boundary_family": ["AUTHORITY_CONVERSION", "COMMIT_GATE"],
+      "control_level": "EDGE_ALLOWED",
+      "manipulation_level": "ONE_EDGE_BLOCKED",
+      "held_constant_fields": ["parent_state", "task_identity", "model_config", "unrelated_authority_edges"],
+      "expected_observable_family": ["OPERATIONAL_BOUNDARY_CROSSING", "DESCENDANTS", "PENETRATION_DEPTH"],
+      "evidence_requirements": ["branch_manifest", "authority_binding", "behavior_events"]
+    },
+    {
+      "variable_id": "EPISTEMIC_STATUS_DOWNGRADE",
+      "family": "CONTAINMENT",
+      "stage": "MID",
+      "target_boundary_family": ["SHARED_STATE", "AUTHORITY_CONVERSION"],
+      "control_level": "HIGH_CERTAINTY_STATUS",
+      "manipulation_level": "PROVISIONAL",
+      "held_constant_fields": ["parent_state", "shared_state_value", "queue", "inboxes", "unrelated_metadata"],
+      "expected_observable_family": ["DESCENDANTS", "OPERATIONAL_BOUNDARY_CROSSING", "POST_JUMP_PERSISTENCE"],
+      "evidence_requirements": ["parent_state_hash", "branch_start_state_hash", "single_field_diff_proof"]
+    },
+    {
+      "variable_id": "ROUTING_EDGE_BLOCK",
+      "family": "CONTAINMENT",
+      "stage": "MID",
+      "target_boundary_family": ["INVOCATION", "MESSAGE_HANDOFF"],
+      "control_level": "EDGE_ALLOWED",
+      "manipulation_level": "ONE_EDGE_BLOCKED",
+      "held_constant_fields": ["parent_state", "overall_goal", "model_config", "other_edges"],
+      "expected_observable_family": ["PROPAGATION_DEPTH", "AFFECTED_AGENTS", "REALIZED_INVOCATIONS"],
+      "evidence_requirements": ["routing_manifest", "branch_manifest", "behavior_events"]
+    },
+    {
+      "variable_id": "CHALLENGE_DELAY",
+      "family": "STABILIZATION",
+      "stage": "POST",
+      "target_boundary_family": ["FINAL_REOPEN", "RECOVERY_CHECKPOINT"],
+      "control_level": "BASELINE_DELAY",
+      "manipulation_level": "PREREGISTERED_DELAY",
+      "held_constant_fields": ["source_deviation", "challenge_content", "model_config"],
+      "expected_observable_family": ["PERSISTENCE", "RETROSPECTIVE_OUTCOME", "RECOVERY_DISTANCE"],
+      "evidence_requirements": ["prior_deviation_ref", "challenge_ref", "behavior_events"]
+    },
+    {
+      "variable_id": "PROVENANCE_RESTORE",
+      "family": "STABILIZATION",
+      "stage": "POST",
+      "target_boundary_family": ["SHARED_STATE", "RECOVERY_CHECKPOINT"],
+      "control_level": "CURRENT_PROVENANCE_STATE",
+      "manipulation_level": "SOURCE_PROVENANCE_RESTORED",
+      "held_constant_fields": ["state_value", "task_identity", "model_config"],
+      "expected_observable_family": ["RECOVERY", "RESIDUAL_DESCENDANTS", "RETROSPECTIVE_OUTCOME"],
+      "evidence_requirements": ["source_refs", "branch_manifest", "behavior_events"]
+    },
+    {
+      "variable_id": "ORCHESTRATION_STRUCTURE",
+      "family": "SYSTEM_STRUCTURE",
+      "stage": "STRUCTURE",
+      "target_boundary_family": ["INVOCATION", "MESSAGE_HANDOFF", "COMMIT_GATE"],
+      "control_level": "EMERGENT_FREE_ROUTING",
+      "manipulation_level": "STRUCTURED_SYSTEM_OWNED_ROUTING",
+      "held_constant_fields": ["overall_task_intent", "domain", "agent_pool", "model_config"],
+      "expected_observable_family": ["FIRST_JUMP_LOCATION", "PROPAGATION_TOPOLOGY", "OPERATIONAL_BOUNDARY_CROSSING", "POST_JUMP_PERSISTENCE"],
+      "evidence_requirements": ["paired_manifest", "routing_policy", "behavior_events"]
+    }
+  ]
+}
