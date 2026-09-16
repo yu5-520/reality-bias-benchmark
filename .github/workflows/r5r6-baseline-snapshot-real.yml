@@ -9,9 +9,9 @@ on:
         default: '2'
         type: string
       provider:
-        description: 'Exact provider id from chosen model config; keep UNRESOLVED for prepare-only'
+        description: 'Exact provider id frozen for the first v4 R5-MID subject batch'
         required: true
-        default: 'UNRESOLVED'
+        default: 'deepseek'
         type: string
       model_config:
         description: 'Exact repository subject model-config path'
@@ -29,9 +29,9 @@ on:
         default: 'USD'
         type: string
       max_subject_calls:
-        description: 'Hard paid subject-call cap across baseline batch; must be >0 for real execution'
+        description: 'Frozen hard subject-call cap for the first v4 baseline batch'
         required: true
-        default: '0'
+        default: '64'
         type: string
       confirm:
         description: 'Type CALL_REAL_R5R6_BASELINE_API to authorize baseline provider calls; PREPARE_ONLY never calls a provider'
@@ -54,6 +54,7 @@ env:
   R5R6_CURRENCY: ${{ inputs.currency }}
   R5R6_MAX_SUBJECT_CALLS: ${{ inputs.max_subject_calls }}
   R5R6_ANCHOR_RULE: arena/config/r5r6_anchor_rule_v0.2.json
+  R5MID_FIRST_BATCH_FREEZE: manifests/r5mid_first_v4_subject_batch_v0.1.json
 
 jobs:
   prepare:
@@ -64,6 +65,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Enforce first v4 R5-MID Phase-A scientific freeze — zero API calls
+        run: |
+          python - <<'PY'
+          import json, os
+          freeze = json.load(open(os.environ['R5MID_FIRST_BATCH_FREEZE'], encoding='utf-8'))
+          phase = freeze['phase_a']
+          assert freeze['paid_api_authorized'] is False
+          assert os.environ['R5R6_REPEATS'] == str(phase['baseline_repeats'])
+          assert os.environ['R5R6_PROVIDER'] == freeze['provider']
+          assert os.environ['R5R6_MODEL_CONFIG'] == freeze['subject_model_config']
+          assert os.environ['R5R6_CURRENCY'].upper() == phase['currency']
+          assert os.environ['R5R6_MAX_SUBJECT_CALLS'] == str(phase['max_subject_calls'])
+          print('FIRST_V4_R5MID_PHASE_A_FREEZE=PASS')
+          print('PAID_API_AUTHORIZED=NO')
+          PY
       - name: Validate offline branch instrumentation
         run: |
           python arena/validate_environment.py
@@ -86,6 +102,7 @@ jobs:
           import json, os, pathlib
           record = {
               'schema': 'RB-R5R6-BASELINE-WORKFLOW-REQUEST-v0.1',
+              'first_v4_subject_freeze': os.environ['R5MID_FIRST_BATCH_FREEZE'],
               'provider_input': os.environ['R5R6_PROVIDER'],
               'model_config_input': os.environ['R5R6_MODEL_CONFIG'],
               'anchor_rule': os.environ['R5R6_ANCHOR_RULE'],
@@ -95,7 +112,7 @@ jobs:
               'confirm_is_real_authorization_phrase': '${{ inputs.confirm }}' == 'CALL_REAL_R5R6_BASELINE_API',
               'github_sha': '${{ github.sha }}',
               'branch_continuation_authorized': False,
-              'note': 'Prepare output is not paid-run authorization. Baseline subject job and runner independently enforce the explicit gate; branch continuation remains separately unauthorized. Anchor rule v0.2 additionally requires pending executable work at the selected post-turn snapshot.'
+              'note': 'Prepare output is not paid-run authorization. Baseline subject job and runner independently enforce the explicit gate; branch continuation remains separately unauthorized. The first-v4 scientific structure is frozen by the repository manifest while spending remains an explicit later authorization boundary.'
           }
           pathlib.Path('results/r5r6_workflow_request.json').write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
@@ -104,6 +121,7 @@ jobs:
         with:
           name: r5r6-baseline-prepared-${{ github.run_id }}
           path: |
+            manifests/r5mid_first_v4_subject_batch_v0.1.json
             results/r5r6_baseline_manifest.jsonl
             results/r5r6_workflow_request.json
             results/branch_recovery_preflight/
