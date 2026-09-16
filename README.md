@@ -1,39 +1,41 @@
 # reality-bias-benchmark
 
-Research repository for the first Reality Bias paper:
+Research repository for the Reality Bias research program and first-paper mechanism study.
 
-**Reality Bias × Authority Penetration × Multi-Agent Dynamics**
+## Current forward research layer
 
-## Canonical research scope
+The current forward planning layer is:
 
-The current forward plan is **[R Plan v3.2](docs/R_Plan_v3.2.md)**.
+- **[R Plan v4.0](docs/R_Plan_v4.0.md)** — system-behavior research program;
+- **[Theory Contract v0.4](theory/theory_contract_v0.4.md)** — System–Node–Behavior–Transition–Tension–Escape–Jump–CPR ontology;
+- **[System Behavior Measurement Plan v4](docs/system_behavior_measurement_plan_v4.md)** — behavior-first measurement contract;
+- **[CN-R-054](theory/change_notes/CN-R-054_system_behavior_measurement_reframe.md)** — records the v3.2 → v4 coordinate change.
 
-The first paper is a **structural existence / mechanism study**, not an exhaustive industrial Multi-Agent benchmark. The current environment intentionally favors a minimal role-responsibility Multi-Agent system so interaction-level mechanisms can be studied with fewer confounds from heterogeneous models, tool ecosystems, long-term memory, dynamic orchestration, MCP/A2A and external environments.
+R Plan v3.2, Theory Contract v0.3 and Trajectory Measurement v3 remain preserved as the preceding trajectory-dynamics layer and are not rewritten.
 
-The current program separates three evidence layers:
+## Core research position
 
-1. **Structural emergence** — what actually happened in frozen subject trajectories.
-2. **Semantic identification** — how later reviewers classify fixed structures as C/P/R, authorization, adoption, laundering, etc.
-3. **Measurement sensitivity** — how those classifications change across contracts, packets, reviewers or model families.
-
-Reviewer disagreement can change layers 2–3. It does not rewrite layer 1.
-
-R Plan v3.1 restored the structural/mechanistic dependency DAG. R Plan v3.2 keeps that DAG and adds a trajectory-dynamics interpretation plus a minimal offline experimental-control layer for future R5/R6/R7 work. The relevant forward theory is **[Theory Contract v0.3](theory/theory_contract_v0.3.md)** and the new measurement extension is **[Trajectory Dynamics Measurement Plan v3](docs/trajectory_dynamics_measurement_plan_v3.md)**.
-
-The v3.1 correction is registered by **[CN-R-045](theory/change_notes/CN-R-045_r_plan_v31_dependency_correction.md)**. The trajectory/control alignment is registered by **[CN-R-046](theory/change_notes/CN-R-046_trajectory_dynamics_and_experimental_control.md)**.
-
-## Unified trajectory model
-
-The forward mechanism model is:
+The primary research object is no longer a model output sentence or isolated CPR label. The forward measurement hierarchy is:
 
 ```text
-multi-source context / probabilistic synthesis
+System Trajectory        = experimental / analysis unit
+Node / Boundary          = measurement location
+Behavior / Transition    = primary observable
+C / P / R                = post-hoc semantic annotation layer
+```
+
+The forward mechanism chain is:
+
+```text
+controllable antecedents X_pre
+        ↓
+structural / interaction Tension
         ↓
 latent Escape Propensity
         ↓ realization
 observable Jump
         ↓
-first-order C/P state deviation candidate
+first-order C/P state-deviation candidate
         ↓
 adoption / commit
         ↓
@@ -42,228 +44,212 @@ propagation / Authority Penetration / inherited inertia
 challenge / correction / retrospective operation
         ↓
 second-order R dynamics or recovery
+        ↓
+system outcome
 ```
 
-**Escape Propensity is a theoretical latent variable.** The repository does not claim to read a neural/internal “escape probability.” It observes recorded Jump events and can later estimate behavior-level Jump incidence/hazard under repeated frozen conditions.
+**Tension and Escape Propensity are theoretical latent constructs.** The repository does not claim to read hidden chain-of-thought, neural state or an internal escape probability. It records behavior and state transitions, and can estimate behavior-level Jump incidence/hazard under repeated frozen conditions.
 
-C and P are treated as first-order deviation mechanisms. R is second-order: reopen/rework/revision alone is not R; R requires an existing C/P deviation or unresolved C/P-derived state plus persistence, regeneration, amplification, laundering, legitimation or normalization. Normal correction is recovery evidence, not an R-positive case.
+The default measurement principle is:
 
-A key distinction remains:
+> **Behavior first, semantic label second.**
 
-`reasoning/proposal ≠ operational reality`
+## CPR position
 
-and:
+C/P/R remain important but are no longer treated as isolated end labels.
 
-`propagation ≠ Authority Penetration`
+- **C** — first-order epistemic-state deviation;
+- **P** — first-order goal/scope/focus deviation;
+- **R** — second-order persistence/regeneration/amplification/legitimation/laundering/normalization of an existing C/P-derived deviation.
 
-## Current research state
+Normal correction is recovery evidence, not R-positive evidence.
 
-- R0 Theory Freeze: historical v0.2 remains frozen; forward contract is v0.3.
-- R1 Theory Stress Test: **PASS WITH CONTRACT PATCH** (CN-R1-001); v0.3 adds trajectory-level falsifiability without rewriting R1 history.
-- Historical R2 Primary Mapping: **PASS WITH CONTRACT REVISION** (CN-R2-016).
-- R2 Free-Agent Arena:
-  - v0.1.x five-run E-commerce method-development sample is frozen.
-  - raw-trace re-audit shows 4/5 short runs activated four agents but executed only one; only run 0005 verified six-agent execution.
-  - v0.2 introduced activation/execution separation and the immutable evidence boundary.
-  - v0.3.1 separated plan FINAL from episode termination and produced genuine multi-agent execution, but Microbatch 003 completed only 1/3 episodes because two non-truncated subject responses were malformed JSON.
-  - current Base subject runtime is **v0.3.2**, which hardens JSON serialization and preserves the same v0.3 social/observation architecture.
-  - Format Verify 005 passed transport: 32/32 subject calls were valid on the first response, but the episode reached the 32-turn observation cap with work still queued and is therefore `BUDGET_CENSORED`, not complete.
-- **First formal joint C/P/R collection is complete.** `R234-ECOMMERCE-FORMAL-JOINT-CPR-v1` Batch 001 ran three preregistered E-commerce Base traces under one subject condition. All three naturally completed after 9, 8 and 17 turns with executed/returned Agent counts 4, 4 and 6. Evidence batch: `94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9`.
-- Measurement v2 remains the historical structural measurement contract over frozen Batch001 evidence:
-  - C v2 = unauthorized epistemic-state promotion.
-  - P v2 = unauthorized goal-scope or goal-focus expansion.
-  - R v2 = unauthorized retrospective legitimation/regeneration of C/P.
-  - R2 = Structural Emergence / Jump Detection.
-  - R3 = Propagation / Lineage / Penetration Structure.
-  - R4 = Feedback / Loop / Laundering / Black-Hole Dynamics.
-- Measurement v3 extends future work toward Jump incidence, penetration depth, post-Jump inertia, branch intervention and recovery without retroactively declaring old runs to have been preregistered for those metrics.
-- Deterministic machinery may emit structural `*_CANDIDATE` records but must not declare semantic C/P/R truth.
-- The existing `R4-STRUCTURAL-FEEDBACK-ROUND-v0.2.1` remains semantic-blind and is retained as the neutral loop locator. A structural loop is not automatically a Reality Bias loop.
-- Evidence and review records are append-only. Historical Reviewer A/B v1, Measurement/Reviewer-v2 outputs and all Qwen/Bailian work remain preserved.
+A structural candidate does not automatically establish semantic C/P/R truth.
 
-## R0-R9 dependency boundary
+## R2–R4: simultaneous views over one trajectory
 
-Under v3.2:
+R2, R3 and R4 are not required to be separate sequential subject experiments.
 
 ```text
-R0 / R1
-   ↓
-Frozen Subject Evidence
-   ├── R2 Jump / Structural Emergence
-   ├── R3 Propagation / Penetration / Inertia
-   └── R4 Feedback / Second-order R Dynamics
-            ↓
-           R5 Surgical Causal Interruption
-            ↓
-           R6 Recovery / Recurrence
-            ↓
-           R7 Boundary Conditions / Orchestration Structure
-            ↓
-           R8 Reproducibility Freeze
-            ↓
-      Main-paper evidence
-            │
-            ├── Manuscript Claim–Evidence Matrix
-            │
-            └── R9 Supplementary Robustness / External Replication
+                   ┌─ R2: Behavior / Jump emergence
+System Trajectory ├─ R3: Transmission / Penetration / Inertia
+                   └─ R4: Retrospective / R dynamics
 ```
 
-R9 contains cross-reviewer and cross-model semantic robustness, future human IRR and later external/laboratory replication. **R9 does not gate permission to continue R2-R8.**
+One frozen subject trajectory may support all three structural views, followed by asynchronous semantic review.
 
-A reviewer result may strengthen, qualify or limit a claim. Semantic disagreement alone is not an evidence-integrity defect. Hash mismatches, corrupt source records, wrong bindings or deterministic extraction bugs still trigger the normal evidence-audit process.
+## R5–R7: experimental directions
 
-The historical file [`docs/R234_v2_current_gate.md`](docs/R234_v2_current_gate.md) is retained as a snapshot of the previous Reviewer-v2 critical-path state. Its current interpretation is explicitly recorded in [`docs/R234_v2_gate_supersession_note.md`](docs/R234_v2_gate_supersession_note.md).
+### R5 — Multi-position causal manipulation
 
-## Evidence-first Arena lifecycle
+R5 now separates:
 
-The default Arena chain remains:
+- **PRE** — manipulate antecedents before Jump realization;
+- **MID** — manipulate realization / propagation / containment;
+- **POST** — manipulate stabilization after propagation or penetration.
 
-`prepare → subject run → save raw evidence → integrity validation → objective statistics → machine structural index → export semantic review windows → append independent reviews later`
+The existing high-certainty-status → provisional branch experiment remains the first implemented **MID** intervention family. It is not the definition of all R5 work.
 
-A subject run does **not** automatically call a paid evaluator.
+Forward protocol: [R5/R6 Protocol v0.4](docs/R5_R6_branch_intervention_recovery_protocol_v0.4.md).
 
-Raw evidence binds task/agent/model/config/code versions and hashes. Current traces record model inputs, raw outputs, parsed actions, message lifecycle, invocation execution, runtime snapshots, state history, FINAL/revision state, termination, remaining queue, failures, usage and incremental journal records where supported by the source version.
+### R6 — Recovery / Recurrence
 
-System statistics are factual execution measurements. C/P/R, goal necessity, semantic adoption, decision effect, retrospective laundering, Authority Penetration, self-reinforcement and decision impact remain semantic/contractual adjudications where structure alone is insufficient.
+R6 studies recovery from different historical distances and penetration depths, including residual descendants, recurrence, recovery cost and provenance reconstruction.
 
-Current objective termination states remain distinct:
+### R7 — System Structure / Boundary Conditions
 
-- `RUN_COMPLETE` — natural recorded completion;
-- `BUDGET_CENSORED` — observation/safety boundary reached with unfinished work; negative findings are prefix-scoped;
-- `LOOP_BUDGET_COMPLETE` — configured K condition reached; condition-complete but not natural quiescence or full-episode completion.
+R7 treats topology/orchestration as system-level variables, including routing ownership, stage boundaries, context handoff, proposal/commit separation, Agent count and shared-state visibility.
 
-## Minimal experimental-control layer
+The existing Free Routing vs Structured/System-Owned Routing comparison remains the first R7 condition family.
 
-The repository now includes an **offline experimental instrument**, not a product framework:
+## Behavior-first instrumentation
 
-`Observe → Freeze → Replay deterministic Arena state → Branch → Intervene`
+Forward machine-readable registries:
 
-Implemented primitives:
+- `configs/experimental_variable_registry_v0.1.json`
+- `configs/measurement_boundary_registry_v0.1.json`
 
-- `arena/experimental_control.py`
-- `arena/config/experimental_control_v0.1.json`
-- `arena/tests/test_experimental_control.py`
-- `docs/experimental_control_layer_v0.1.md`
+Forward evidence schemas:
 
-The layer is **intervention-off by default** and does not alter the current Free-Agent baseline. It freezes deterministic Arena state, verifies content hashes, creates parent-bound branch manifests, supports narrow explicit state interventions, and provides a fail-closed minimal commit gate for future R5 experiments.
+- `schemas/behavior_event_v0.1.schema.json`
+- `schemas/system_trajectory_measurement_v4.schema.json`
+- `schemas/experimental_variable_registry_v0.1.schema.json`
+- `schemas/measurement_boundary_registry_v0.1.schema.json`
 
-A deterministic Arena-state replay does **not** claim replay of provider-internal randomness or hidden model state. New continuations from one frozen parent are new probabilistic branches and receive independent evidence identities.
+Forward implementation:
 
-This enables a future causal form closer to:
+- `arena/system_behavior.py`
+- `arena/system_behavior_preflight.py`
+- `arena/tests/test_system_behavior.py`
 
-`same frozen history + one preregistered intervention → branched continuation`
+Offline preflight:
 
-instead of comparing two runs whose early histories may already differ.
+```bash
+python -m arena.system_behavior_preflight --outdir results/system_behavior_preflight
+```
 
-## R5 / R6 forward design
+This produces deterministic engineering-validation artifacts only. It is not scientific subject evidence.
 
-R5 prioritizes surgical intervention over whole-system replacement. Candidate interventions include blocking one Authority route, removing one context/source item, downgrading one epistemic status, blocking one invocation edge, inserting one deterministic state-commit check, or changing one reopen/transition permission.
+## Experimental control layer
 
-Proposal generation and operational realization are measured separately. A valid containment result may look like:
+The existing experimental instrument remains active:
 
-`proposal Jump incidence ≈ unchanged`
+```text
+Observe → Freeze → Replay deterministic Arena state → Branch → Intervene → Measure
+```
 
-while:
+Important invariants remain:
 
-`penetration depth / descendants / downstream effect ↓`
+- original trajectory is never overwritten by a branch;
+- parent state and branch-start state have separate hashes;
+- provider hidden state is not claimed replayed;
+- semantic Reviewer results cannot rewrite frozen structural evidence;
+- failed/censored provider runs are not silently counted as negative evidence.
 
-R6 compares recovery from different distances after a Jump, including checkpoint recovery, local state correction and full rerun where scientifically justified. Recovery metrics include residual descendants, recurrence/regeneration, turns/calls/tokens and provenance reconstruction.
+For the current Arena scheduler:
 
-## R7 orchestration boundary
+> **nonterminal snapshot ≠ automatically branchable snapshot**
 
-The first high-value organization comparison is:
+A continuation anchor must also have pending executable work where required by the runtime.
 
-- **Emergent / Free Routing:** overall goal is given and Agents may dynamically decompose/invoke within policy.
-- **Structured / System-Owned Routing:** overall task remains fixed while stage goals, allowed edges and handoff points are externally defined.
+Forward R5/R6 real-run template: [v0.2](docs/R5_R6_real_run_freeze_template_v0.2.md).
 
-The research question is not which architecture is universally “better.” It is whether orchestration structure changes first-Jump location, propagation topology, Authority Penetration, inertia and recovery.
+## Current real-run implementation status
 
-A larger `goal fixed/staged × context continuous/reset-or-compressed` 2×2 design is conditional and should only be added if the smaller comparison leaves those factors confounded.
+### R5/R6 Phase A
 
-## First formal joint C/P/R experiment
+Prepared guarded baseline path:
 
-Batch 001 (`workflow run 34970142001`) produced three natural `RUN_COMPLETE` traces and no runner error or censoring. The dedicated workflow froze protocol, manifest, task/Agent/config hashes, raw journals, traces, objective statistics, structural views and review packets in artifact `10397420968` with digest `sha256:ea8ccab5fd890a94dc8e6db3f91f703f0eb09202c3a4278548ffcae0d33b64e5`.
+- `arena/config/r5r6_anchor_rule_v0.2.json`
+- `arena/anchor_selection.py`
+- `arena/build_branch_baseline_manifest.py`
+- `arena/run_branch_baseline_real.py`
+- `.github/workflows/r5r6-baseline-snapshot-real.yml`
 
-The subject prompts did not expose Bias labels or the expected mapping. This does not mean the environment had no designed pressure: FINAL/late-event structure can intentionally create opportunities for retrospective behavior. Natural-emergence claims therefore rely on semantic non-contamination plus temporal separation, not on pretending the experimental environment is pressure-free.
+The v0.2 selector requires a replayable structural candidate **and pending continuation work**.
 
-## Historical semantic review layers and R9 material
+Exact paid authorization phrase:
 
-Reviewer A (GPT-5.6 Sol interactive, non-blinded) and Reviewer B (DeepSeek isolated blind bundle) remain preserved as historical v1 annotation layers. Their agreement was not high enough to claim semantic consensus, and human inter-rater reliability remains unmeasured.
+`CALL_REAL_R5R6_BASELINE_API`
 
-Reviewer-v2 introduced a stricter boundary-state contract over the same frozen evidence. The first full DeepSeek Reviewer-v2 pass completed 144/144 units; same-model v1→v2 comparison showed strong measurement-contract sensitivity. Those results are measurement-apparatus observations and do not alter the frozen subject trajectories.
+### R5/R6 Phase B
 
-A result-blind independent-v2 bundle was subsequently prepared, followed by Bailian/Qwen transport, runner, launch/preflight, checkpoint, explicit-cache, thinking-control and reasoning-latency engineering. Under v3.2 these assets remain **R9 supplementary robustness infrastructure/material**, not a prerequisite for R4/R5/R6/R7/R8.
+Prepared guarded branch path:
 
-## Current forward execution direction
+- `arena/branch_plan.py`
+- `arena/run_branch_real.py`
+- `arena/derive_branch_measurements.py`
+- `.github/workflows/r5r6-frozen-parent-branch-real.yml`
 
-The current priority is structural/mechanistic density and experimental control rather than model-coverage density:
+Exact paid authorization phrase:
 
-`align theory/measurement → validate offline state-control layer → consolidate R2/R3/R4 structural observations → freeze intervention protocol → R5 branch intervention → R6 recovery → R7 limited orchestration boundary → R8 reproducibility freeze`
+`CALL_REAL_R5R6_BRANCH_API`
 
-R4 Base and upper-bound studies retain different jobs:
+Phase-A authorization never authorizes Phase B.
 
-- **Base fixed window:** establishes event/relation measurement under a common observation horizon.
-- **Upper-bound loop budget:** uses a semantic-blind structural feedback counter to look farther into persistence/expansion dynamics.
-- A different-family reviewer is **not** a prerequisite for K=2.
-- Any real paid K=2 subject run still requires frozen runtime/evidence-integrity conditions plus explicit provider authorization and a spending ceiling.
-- K=4 may remain gated by a preregistered R4-internal persistence/expansion/amplification criterion and cost policy; cross-model reviewer consensus is not required.
+### R7
 
-## Supplementary reflexive case
+Prepared Free-vs-Structured comparison infrastructure:
 
-The repository preserves a non-experimental research-history case in which reviewer robustness work gradually moved onto the structural program's critical path before v3.1 corrected the dependency DAG:
+- `arena/structured_routing.py`
+- `arena/orchestration_compare.py`
+- `arena/orchestration_preflight.py`
+- `arena/build_orchestration_manifest.py`
+- `arena/run_orchestration_real.py`
+- `.github/workflows/r7-orchestration-paired-real.yml`
 
-- [`docs/supplementary/NML_Supplementary_Note_S1_perfection_like_planning_drift.md`](docs/supplementary/NML_Supplementary_Note_S1_perfection_like_planning_drift.md)
+Exact paid authorization phrase:
 
-This note is explicitly **not** R2-R8 evidence and is not included in C/P/R statistics. It is a provenance-backed reflexive illustration and future hypothesis source only.
+`CALL_REAL_R7_API`
+
+No generic repository-update instruction satisfies any paid gate.
+
+## Historical evidence boundary
+
+Historical subject/reviewer evidence remains append-only.
+
+The first formal joint C/P/R collection remains frozen under its original contracts. Evidence batch:
+
+`94c6e884fc3b0122e67d613f9bf956a5fab2ad52a6c49b7ada8dfc5dde9c4ed9`
+
+Historical Measurement v2, Reviewer-v2 and R9 robustness materials remain historical/supplementary evidence layers. New v4 terminology must not be backdated as if it were preregistered for those runs.
+
+## Evidence-first lifecycle
+
+Default Arena lifecycle:
+
+```text
+prepare
+→ subject run
+→ save raw evidence
+→ integrity validation
+→ objective statistics
+→ machine structural/behavior index
+→ export small semantic review windows
+→ append independent reviews later
+```
+
+A subject run does not automatically call a paid evaluator.
+
+Current objective termination states remain distinct, including natural completion, budget censoring and configured loop-budget completion. Missing historical fields are never semantically reconstructed as if they had been recorded.
 
 ## Repository map
 
 - `theory/` — theory contracts, change notes and novelty material.
-- `theory/theory_contract_v0.3.md` — forward Escape/Jump/C/P/R/Authority/Inertia/Recovery contract.
-- `benchmark/` — R1 casebook and retained single-turn R2 pilot benchmarks.
-- `arena/` — Free-Agent Arena runtime, evidence capture, objective metrics, structural views and review packet export.
-- `arena/experimental_control.py` — deterministic state snapshot/restore, branch identity and minimal commit-gate primitives.
-- `arena/structural_feedback.py` — semantic-blind structural feedback-round derivation.
-- `arena/loop_budget.py` — explicit K-condition runtime binding and stop logic.
-- `arena/config/arena_v0.3.json` — current Base Arena v0.3.2 execution policy.
-- `arena/config/experimental_control_v0.1.json` — intervention-off experimental-control policy.
-- `arena/config/ecommerce_formal_joint_cpr_v1.json` — frozen first formal E-commerce joint C/P/R design.
-- `arena/config/arena_v0.3_k2_candidate.json` — engineering-validated K=2 candidate; not paid-run authorization.
-- `reviews/` — append-only semantic-review infrastructure/records; forward cross-model role is R9.
-- `schemas/evidence_batch_v0.2.schema.json` — immutable evidence-batch interface.
-- `schemas/review_record_v0.1.schema.json` — append-only human/model review interface.
-- `docs/R_Plan_v3.2.md` — current forward research plan.
-- `docs/trajectory_dynamics_measurement_plan_v3.md` — forward Jump/penetration/inertia/branch/recovery measurement extension.
-- `docs/R234_measurement_plan_v2.md` — historical/current-for-Batch001 R2-R4 structural measurement contract.
-- `docs/experimental_control_layer_v0.1.md` — minimal experiment-instrument specification.
-- `.github/workflows/` — reproducible subject, offline and isolated review entry points.
+- `docs/R_Plan_v4.0.md` — current forward research plan.
+- `docs/system_behavior_measurement_plan_v4.md` — current behavior-first measurement plan.
+- `configs/experimental_variable_registry_v0.1.json` — experimental variable registry.
+- `configs/measurement_boundary_registry_v0.1.json` — node/boundary registry.
+- `arena/` — subject runtime, evidence capture, branch control, measurements and offline preflights.
+- `schemas/` — evidence, branch, behavior, measurement and registry interfaces.
+- `reviews/` — append-only semantic-review infrastructure/records.
+- `.github/workflows/` — reproducible offline and guarded real-provider entry points.
 
-## API and authorization boundaries
+## Version / non-retroactivity rule
 
-- Offline validation: no provider API.
-- Subject collection and semantic review remain separate operations.
-- Evaluation/reviewer failure cannot trigger a subject rerun.
-- Multiple later human/model review records may bind to the same frozen evidence batch.
-- Any new paid model review or paid subject run requires explicit authorization and an explicit spending ceiling.
-- Repository planning/code updates do not constitute paid API authorization.
-
-## Version boundary
-
-Arena v0.1.x, v0.2 and v0.3.x use different terminal/observation or serialization policies and must not be silently pooled. Structural feedback counter versions also remain explicit. Re-deriving deterministic measurements never rewrites frozen subject behavior.
-
-Theory/measurement/planning versions are append-only in meaning:
-
-- [R Plan v3.2 — current forward plan](docs/R_Plan_v3.2.md)
-- [R Plan v3.1 — dependency correction baseline](docs/R_Plan_v3.1.md)
-- [R Plan v3.0 — historical pre-correction](docs/R_Plan_v3.0.md)
-- [Theory Contract v0.3](theory/theory_contract_v0.3.md)
-- [Theory Contract v0.2 — historical](theory/theory_contract_v0.2.md)
-- [Trajectory Dynamics Measurement Plan v3](docs/trajectory_dynamics_measurement_plan_v3.md)
-- [R2-R4 Measurement Plan v2](docs/R234_measurement_plan_v2.md)
-- [CN-R-045 dependency correction](theory/change_notes/CN-R-045_r_plan_v31_dependency_correction.md)
-- [CN-R-046 trajectory/control alignment](theory/change_notes/CN-R-046_trajectory_dynamics_and_experimental_control.md)
-- [Historical Reviewer-v2 current gate snapshot](docs/R234_v2_current_gate.md)
-- [Reviewer-v2 gate supersession note](docs/R234_v2_gate_supersession_note.md)
-- [NML Supplementary Note S1](docs/supplementary/NML_Supplementary_Note_S1_perfection_like_planning_drift.md)
-
-Mock/dry-run/scripted-provider outputs and experimental-control unit tests are engineering validation only and are not scientific evidence. Human inter-rater reliability remains unmeasured until a human review is actually performed.
+- R Plan v3.2 and earlier remain historical records.
+- Theory v0.3 and earlier remain historical contracts.
+- Measurement v3 and Measurement v2 remain valid for their original evidence boundaries.
+- New deterministic metrics may read old evidence only when required source fields truly exist.
+- New v4 behavior evidence requires new versioned subject/intervention records.
+- Repository updates do not constitute paid API authorization.
