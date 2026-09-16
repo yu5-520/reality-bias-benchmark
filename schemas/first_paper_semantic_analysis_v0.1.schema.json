@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/first_paper_semantic_analysis_v0.1.schema.json",
+  "title": "Reality Bias First-Paper Semantic Analysis v0.1",
+  "type": "object",
+  "required": [
+    "schema",
+    "version",
+    "analysis_contract_hash",
+    "packet_scope",
+    "key_secondary_outcome_id",
+    "planned_pair_count",
+    "resolved_pair_count",
+    "unresolved_pair_count",
+    "pair_index",
+    "authority_penetration",
+    "secondary_transition_tables",
+    "source_evidence_mutated",
+    "automatic_paid_evaluator_called",
+    "analysis_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-FIRST-PAPER-SEMANTIC-ANALYSIS-v0.1"},
+    "version": {"const": "0.1"},
+    "analysis_contract_hash": {"type": "string", "minLength": 1},
+    "packet_scope": {"const": "BRANCH_START_ANCHOR_PROPAGATION"},
+    "key_secondary_outcome_id": {"const": "R5MID_AUTHORITY_PENETRATION"},
+    "planned_pair_count": {"type": "integer", "minimum": 0},
+    "resolved_pair_count": {"type": "integer", "minimum": 0},
+    "unresolved_pair_count": {"type": "integer", "minimum": 0},
+    "pair_index": {"type": "array", "items": {"type": "object"}},
+    "authority_penetration": {"type": "object"},
+    "secondary_transition_tables": {"type": "object"},
+    "source_evidence_mutated": {"const": false},
+    "automatic_paid_evaluator_called": {"const": false},
+    "analysis_hash": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": true
+}
