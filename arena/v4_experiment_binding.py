@@ -53,6 +53,38 @@ INTERFACE_SPECS = {
         "path": "docs/system_behavior_measurement_plan_v4.md",
         "identity": "SYSTEM-BEHAVIOR-MEASUREMENT-PLAN-v4",
     },
+    "branch_start_state_anchor_schema": {
+        "path": "schemas/branch_start_state_anchor_v0.1.schema.json",
+        "identity": "RB-BRANCH-START-STATE-ANCHOR-v0.1",
+    },
+    "branch_trajectory_comparison_schema": {
+        "path": "schemas/branch_trajectory_comparison_v4.schema.json",
+        "identity": "RB-BRANCH-TRAJECTORY-COMPARISON-v4.0",
+    },
+    "v4_review_contract": {
+        "path": "configs/v4_semantic_authority_review_contract_v0.1.json",
+        "identity": "RB-V4-SEMANTIC-AUTHORITY-REVIEW-CONTRACT-v0.1",
+    },
+    "v4_review_packet_policy": {
+        "path": "configs/v4_review_packet_policy_v0.1.json",
+        "identity": "RB-V4-REVIEW-PACKET-POLICY-v0.1",
+    },
+    "v4_bounded_review_packet_schema": {
+        "path": "schemas/v4_bounded_review_packet_v0.1.schema.json",
+        "identity": "RB-V4-BOUNDED-REVIEW-PACKET-v0.1",
+    },
+    "v4_semantic_authority_review_schema": {
+        "path": "schemas/v4_semantic_authority_review_v0.1.schema.json",
+        "identity": "RB-V4-SEMANTIC-AUTHORITY-REVIEW-v0.1",
+    },
+    "v4_review_packet_generator": {
+        "path": "arena/v4_review_packets.py",
+        "identity": "RB-V4-REVIEW-PACKET-GENERATOR-v0.1",
+    },
+    "v4_branch_anchor_review_packet_generator": {
+        "path": "arena/v4_branch_anchor_review_packets.py",
+        "identity": "RB-V4-BRANCH-ANCHOR-REVIEW-PACKET-GENERATOR-v0.1",
+    },
     "first_paper_analysis_contract": {
         "path": "configs/first_paper_analysis_contract_v0.1.json",
         "identity": "RB-FIRST-PAPER-ANALYSIS-CONTRACT-v0.1",
@@ -180,7 +212,7 @@ def build_v4_research_binding(
         "paid_api_authorized": False,
         "automatic_paid_evaluator": False,
         "warning": (
-            "This binding freezes the research and first-paper analysis interfaces used to interpret a future Phase-B subject batch. "
+            "This binding freezes the structural measurement, bounded review and first-paper analysis interfaces used to interpret a future Phase-B subject batch. "
             "It is not paid-run authorization and does not establish semantic C/P/R, adoption, Authority Penetration, or a causal effect."
         ),
     }
