@@ -12,41 +12,49 @@ The v4 theory/measurement layer is additive. The items below are not claims of s
 - immutable-source check: adapter does not rewrite source trace;
 - current message-read and invocation-read lifecycle mapping;
 - shared-state / invocation / message / FINAL-reopen boundary mapping;
+- runtime-snapshot state-origin exposure for source-backed visibility lineage;
 - synchronized v4 trajectory record emitted from the same source trajectory;
 - frozen `structural_jump_detector_v0.1` structural-candidate rules;
 - frozen `operational_boundary_set_v0.1` mechanical crossing rules;
+- frozen `source_lineage_rules_v0.1` source-backed lineage rules;
+- exact proposal→realization, message/invocation→read, read→Agent-turn, state-mutation→later-runtime-visibility, and final-state-version ancestry edges;
+- source-backed descendant/affected-actor derivation from structural Jump roots;
+- mechanical penetration-depth candidates derived only from source-backed lineage + operational crossings;
 - event-level Jump candidates may carry multiple structural types without becoming multiple events;
 - branch continuation slicing primitive using `behavior_event.turn > branch_start_turn`;
-- synchronized R2/R3/R4 structural dynamics view with semantic Jump/R/penetration kept unadjudicated;
-- CI runs registry, adapter and dynamics preflights;
-- adapter/detector fail closed on unsupported source or registry boundaries.
+- synchronized R2/R3/R4 structural dynamics view with semantic Jump/adoption/R/Authority Penetration kept unadjudicated;
+- CI runs registry, adapter, dynamics and lineage preflights;
+- adapter/detector/lineage layers fail closed on unsupported source or unregistered interfaces.
 
 Current implementation:
 
 - `arena/system_behavior_adapter.py`
 - `arena/system_behavior_dynamics_v4.py`
+- `arena/system_behavior_lineage_v4.py`
 - `arena/system_behavior_trace_preflight.py`
 - `arena/system_behavior_dynamics_preflight.py`
+- `arena/system_behavior_lineage_preflight.py`
 - `arena/tests/test_system_behavior_adapter.py`
 - `arena/tests/test_system_behavior_dynamics_v4.py`
+- `arena/tests/test_system_behavior_lineage_v4.py`
 - `configs/structural_jump_detector_v0.1.json`
 - `configs/operational_boundary_set_v0.1.json`
+- `configs/source_lineage_rules_v0.1.json`
 
 ## P0 — before new real v4 subject evidence
 
-- freeze explicit source-backed lineage rules for message/invocation/read/state visibility;
-- define the subset of lineage + operational crossings that may support a formal penetration-depth candidate;
-- bind current R5/R6 branch plans to experimental-variable registry hash, measurement-boundary registry hash, detector hash and operational-boundary-set hash without rewriting historical branch-plan versions;
-- bind new subject evidence to exact v4 measurement/registry/adapter/detector/boundary hashes;
+- bind current R5/R6 branch plans to experimental-variable registry hash, measurement-boundary registry hash, adapter identity, detector hash, operational-boundary-set hash and lineage-rules hash without rewriting historical branch-plan versions;
+- bind new subject evidence to exact v4 measurement/registry/adapter/detector/boundary/lineage hashes;
+- define the confirmatory semantic/Authority adjudication contract that converts only eligible mechanical penetration-depth candidates into Authority Penetration judgments;
 - add source-version adapter coverage for any future trace schema before that schema is used for v4 evidence.
 
 ## P1 — after first v4 subject evidence
 
-- derive source-backed descendant lineage rather than temporal-order proxies;
-- generate bounded semantic review windows from behavior candidates;
+- generate bounded semantic review windows from localized Jump + lineage + operational-crossing evidence;
 - test lineage coverage for shared-state, message, invocation and FINAL/reopen events under real subject evidence;
 - freeze primary first-paper dynamic metrics;
-- add v4 branch comparison adapter without replacing Measurement v3 historical records.
+- add v4 branch comparison adapter without replacing Measurement v3 historical records;
+- compare mechanical penetration-depth candidates with later semantic Authority adjudication rather than treating them as interchangeable.
 
 ## P2 — future research expansion
 
