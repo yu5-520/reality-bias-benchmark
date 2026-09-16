@@ -1,0 +1,140 @@
+name: R2-R6 Prospective Natural Rederive v0.4
+
+on:
+  push:
+    paths:
+      - 'manifests/r2r6_prospective_natural_rederive_v0_4_2026-09-17.json'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: r2r6-prospective-natural-rederive-v04
+  cancel-in-progress: false
+
+jobs:
+  rederive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify offline three-layer scope
+        run: |
+          python - <<'PY'
+          import json
+          m=json.load(open('manifests/r2r6_prospective_natural_rederive_v0_4_2026-09-17.json'))
+          assert m['schema']=='RB-R2R6-PROSPECTIVE-NATURAL-REDERIVE-v0.4'
+          assert m['scope']=='OFFLINE_THREE_LAYER_MEASUREMENT_DERIVATION_ONLY'
+          assert m['raw_evidence_mutation'] is False
+          assert m['new_subject_provider_call'] is False
+          assert m['paid_evaluator_call'] is False
+          assert m['one_shot_branch_call'] is False
+          assert m['old_derived_artifacts_preserved'] is True
+          print('V04_THREE_LAYER_SCOPE=OFFLINE_ONLY')
+          PY
+      - name: Run full offline tests
+        run: |
+          python arena/validate_environment.py
+          python -m unittest discover -s arena/tests -v
+      - name: Verify exact frozen raw artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          m=json.load(open('manifests/r2r6_prospective_natural_rederive_v0_4_2026-09-17.json'))
+          payload=json.loads(subprocess.check_output(['gh','api',f"repos/${{ github.repository }}/actions/runs/{m['source_workflow_run_id']}/artifacts"],text=True))
+          rows=[x for x in payload['artifacts'] if x['id']==m['source_raw_artifact_id'] and x['name']==m['source_raw_artifact_name']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==m['source_raw_artifact_digest']
+          assert not rows[0].get('expired')
+          print('RAW_ARTIFACT_V04=EXACT_MATCH')
+          PY
+      - name: Download and verify immutable raw evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p source_artifact
+          gh run download 35124129473 --repo '${{ github.repository }}' --name r2r6-prospective-natural-raw-35124129473 --dir source_artifact
+          cd source_artifact
+          sha256sum -c prospective_natural_raw_bundle.tar.gz.sha256
+          cd ..
+          mkdir -p frozen_raw
+          tar -xzf source_artifact/prospective_natural_raw_bundle.tar.gz -C frozen_raw
+          python - <<'PY'
+          import json
+          m=json.load(open('manifests/r2r6_prospective_natural_rederive_v0_4_2026-09-17.json'))
+          e=json.load(open('frozen_raw/results/prospective_natural_raw/evidence_batch.json'))
+          assert e['evidence_batch_hash']==m['source_evidence_batch_hash']
+          assert e['raw_evidence_frozen_before_derived_analysis'] is True
+          print('RAW_EVIDENCE_V04=VERIFIED_IMMUTABLE')
+          PY
+      - name: Derive v0.4 three-layer structural measurement
+        run: |
+          python -m arena.derive_prospective_natural_measurements_v0_4 \
+            --raw-dir frozen_raw/results/prospective_natural_raw \
+            --evidence-batch frozen_raw/results/prospective_natural_raw/evidence_batch.json \
+            --outdir results/prospective_natural_measurements_v0_4
+      - name: Verify three-layer metrics and print structural summary
+        run: |
+          python - <<'PY'
+          import json
+          rows=[json.loads(x) for x in open('results/prospective_natural_measurements_v0_4/prospective_process_measurements_v0.4.jsonl')]
+          assert len(rows)==1
+          r=rows[0]
+          assert r['trajectory_id']=='prospective-ecommerce-natural-0001'
+          assert r['target_candidate_id']=='prospective-ecommerce-natural-0001:R2V2:6621d1afe7f9acc3'
+          assert r['root_resolution']['status']=='RESOLVED_EXACT_SOURCE_EVENT'
+          assert r['target_source_event_index']==32
+          assert r['target_state_key']=='inventory_stockout_assessment_v1'
+          assert r['r2_jump_recurrence']['descendant_rejump_count']==6
+          assert r['r2_jump_recurrence']['first_descendant_rejump'] is not None
+          assert r['r2_jump_recurrence']['first_rejump_event_distance'] is not None
+          assert r['r2_jump_recurrence']['first_rejump_turn_distance'] is not None
+          inertia=r['r3_inherited_inertia']
+          assert inertia['continuation_root_reachable_event_count']==52
+          assert inertia['continuation_root_reach_depth']==4
+          assert inertia['root_descendant_cross_actor_relation_count']==31
+          assert inertia['branch_merge_metrics'] is not None
+          assert inertia['role_reentry'] is not None
+          paths=r['root_descendant_topology']['observed_path_families']
+          assert paths['observed_path_family_count'] > 0
+          assert paths['path_family_overflow'] is False
+          text='\n'.join(paths['observed_path_family_signatures'])
+          assert 'prospective-ecommerce-natural-0001' not in text
+          assert ':EVENT:' not in text
+          assert 'turn:' not in text
+          print('THREE_LAYER_V04=VERIFIED')
+          print('MEASUREMENT_HASH='+r['measurement_hash'])
+          print('ROOT_EDGE_MULTISET_HASH='+r['root_descendant_topology']['edge_multiset_hash'])
+          print('ROOT_ORDERED_SEQUENCE_HASH='+r['root_descendant_topology']['ordered_sequence_hash'])
+          print('PATH_FAMILY_HASH='+paths['path_family_hash'])
+          print('DESCENDANT_REJUMPS='+str(r['r2_jump_recurrence']['descendant_rejump_count']))
+          print('FIRST_REJUMP_EVENT_DISTANCE='+str(r['r2_jump_recurrence']['first_rejump_event_distance']))
+          print('FIRST_REJUMP_TURN_DISTANCE='+str(r['r2_jump_recurrence']['first_rejump_turn_distance']))
+          print('FIRST_REJUMP_DEPTH='+str(r['r2_jump_recurrence']['first_descendant_rejump_depth']))
+          print('BRANCH_NODES='+str(inertia['branch_merge_metrics']['branch_node_count']))
+          print('MERGE_NODES='+str(inertia['branch_merge_metrics']['merge_node_count']))
+          print('ROLE_REENTRIES='+str(inertia['role_reentry']['role_reentry_count']))
+          print('OBSERVED_PATH_FAMILIES='+str(paths['observed_path_family_count']))
+          print('ROOT_EDGE_INSTANCES='+str(r['root_descendant_topology']['canonical_edge_instance_count']))
+          PY
+      - name: Archive v0.4 derived evidence and contract
+        run: |
+          cp manifests/r2r6_prospective_natural_rederive_v0_4_2026-09-17.json results/prospective_natural_measurements_v0_4/
+          cp configs/process_reality_measurement_contract_v0.4.json results/prospective_natural_measurements_v0_4/
+          sha256sum configs/process_reality_measurement_contract_v0.4.json > results/prospective_natural_measurements_v0_4/process_reality_measurement_contract_v0.4.json.sha256
+          tar -czf prospective_natural_derived_v0_4_bundle.tar.gz results/prospective_natural_measurements_v0_4
+          sha256sum prospective_natural_derived_v0_4_bundle.tar.gz > prospective_natural_derived_v0_4_bundle.tar.gz.sha256
+      - name: Upload v0.4 derived artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2r6-prospective-natural-derived-v0-4-${{ github.run_id }}
+          path: |
+            prospective_natural_derived_v0_4_bundle.tar.gz
+            prospective_natural_derived_v0_4_bundle.tar.gz.sha256
+          retention-days: 90
