@@ -42,6 +42,13 @@ jobs:
           assert a['prospective_natural_authorization_reused'] is False
           assert a['old_phase_b_authorization_reused'] is False
           assert a['authorization_is_one_time'] is True
+          assert a['runtime_readiness_required'] is True
+          assert a['runtime_readiness_verified_offline'] is True
+          assert a['readiness_audit_workflow_run_id']==35128564676
+          assert a['readiness_audit_artifact_id']==10460217318
+          assert a['readiness_audit_artifact_name']=='r5mid-prospective-one-shot-readiness-audit-v0-2-35128564676'
+          assert a['readiness_audit_artifact_digest']=='sha256:03d5d8ce200565c34925116973f344d23ca23a899fb058d34781e499aaefca8a'
+          assert a['readiness_audit_record_commit']=='9f1e0479514cfb7a1c758b43bb5b2474a0ce090f'
           print('global_ceiling='+str(a['spending_ceiling_usd']))
           print('per_branch_ceiling='+str(a['per_branch_spending_ceiling_usd']))
           print('per_branch_max_calls='+str(a['per_branch_max_calls']))
@@ -51,6 +58,53 @@ jobs:
           print('prepared_artifact_digest='+a['prepared_artifact_digest'])
           print('plan_hash='+a['plan_hash'])
           print('execution_code_sha='+a['branch_execution_commit'])
+          print('readiness_run_id='+str(a['readiness_audit_workflow_run_id']))
+          print('readiness_artifact_id='+str(a['readiness_audit_artifact_id']))
+          print('readiness_artifact_name='+a['readiness_audit_artifact_name'])
+          print('readiness_artifact_digest='+a['readiness_audit_artifact_digest'])
+          PY
+      - name: Verify exact offline runtime-readiness artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          a=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'one_shot_authorization.json')))
+          payload=json.loads(subprocess.check_output(['gh','api',f"repos/${{ github.repository }}/actions/runs/{a['readiness_audit_workflow_run_id']}/artifacts"],text=True))
+          rows=[x for x in payload['artifacts'] if x['id']==a['readiness_audit_artifact_id'] and x['name']==a['readiness_audit_artifact_name']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==a['readiness_audit_artifact_digest']
+          assert not rows[0].get('expired')
+          print('RUNTIME_READINESS_ARTIFACT=EXACT_MATCH')
+          PY
+          mkdir -p "$RUNNER_TEMP/readiness_artifact"
+          gh run download '${{ steps.auth.outputs.readiness_run_id }}' --repo '${{ github.repository }}' --name '${{ steps.auth.outputs.readiness_artifact_name }}' --dir "$RUNNER_TEMP/readiness_artifact"
+          cd "$RUNNER_TEMP/readiness_artifact"
+          sha256sum -c r5mid_prospective_one_shot_readiness_audit_v0_2.tar.gz.sha256
+          test "$(sha256sum r5mid_prospective_one_shot_readiness_audit_v0_2.tar.gz | awk '{print $1}')" = 'f43f106424ae59999b256d3de9622b2206e7bafbec39d31f6c8f7de244ae9329'
+          mkdir -p "$RUNNER_TEMP/readiness"
+          tar -xzf r5mid_prospective_one_shot_readiness_audit_v0_2.tar.gz -C "$RUNNER_TEMP/readiness"
+          cd "$GITHUB_WORKSPACE"
+          python - <<'PY'
+          import json, os
+          r=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'readiness/readiness_report_v0_2.json')))
+          a=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'one_shot_authorization.json')))
+          assert r['plan_hash']==a['plan_hash']
+          assert r['branch_execution_commit']==a['branch_execution_commit']
+          assert r['fake_provider_only'] is True
+          assert r['real_provider_calls']==0
+          assert r['first_prompt_delta_paths']==['shared_state_metadata.inventory_stockout_assessment_v1.status']
+          assert r['second_prompt_delta_paths']==[]
+          assert r['first_control_status']=='fact'
+          assert r['first_intervention_status']=='unconfirmed'
+          assert r['second_control_status']=='fact'
+          assert r['second_intervention_status']=='fact'
+          assert r['control_direct_experiment_origin_exposure_count']==0
+          assert r['intervention_direct_experiment_origin_exposure_count']==1
+          assert r['experiment_origin_reinjection_count']==0
+          assert r['persistent_parent_state_unchanged'] is True
+          assert r['one_shot_consumption_verified_across_forced_second_resume'] is True
+          print('RUNTIME_READINESS_LIFECYCLE=VERIFIED')
           PY
       - name: Verify and download exact prepared artifact
         env:
@@ -68,6 +122,7 @@ jobs:
           gh run download '${{ steps.auth.outputs.prepared_run_id }}' --repo '${{ github.repository }}' --name '${{ steps.auth.outputs.prepared_artifact_name }}' --dir "$RUNNER_TEMP/prepared_artifact"
           cd "$RUNNER_TEMP/prepared_artifact"
           sha256sum -c r5mid_prospective_one_shot_prepared_v0_2.tar.gz.sha256
+          test "$(sha256sum r5mid_prospective_one_shot_prepared_v0_2.tar.gz | awk '{print $1}')" = '26f97e7be568c8259e571fb9991a1049784d7ed4f9c04b6c76ebd5dd97b3477a'
           tar -xzf r5mid_prospective_one_shot_prepared_v0_2.tar.gz -C "$RUNNER_TEMP/prepared_plan"
           cd "$GITHUB_WORKSPACE"
           python - <<'PY'
@@ -129,6 +184,7 @@ jobs:
             mkdir -p frozen_binding
             cp -r "$RUNNER_TEMP/prepared_plan/results/r5mid_prospective_one_shot_plan_v0_2" frozen_binding/plan
             cp "$RUNNER_TEMP/one_shot_authorization.json" frozen_binding/authorization.json
+            cp "$RUNNER_TEMP/readiness/readiness_report_v0_2.json" frozen_binding/readiness_report_v0_2.json
             tar -czf r5mid_prospective_one_shot_raw_bundle.tar.gz results/r5mid_prospective_one_shot_raw frozen_binding
             sha256sum r5mid_prospective_one_shot_raw_bundle.tar.gz > r5mid_prospective_one_shot_raw_bundle.tar.gz.sha256
           fi
