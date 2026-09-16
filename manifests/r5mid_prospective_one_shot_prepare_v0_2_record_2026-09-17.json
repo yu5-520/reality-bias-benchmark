@@ -1,0 +1,112 @@
+{
+  "schema": "RB-R5MID-PROSPECTIVE-ONESHOT-PREPARE-RECORD-v0.2",
+  "date": "2026-09-17",
+  "status": "FORMAL_OFFLINE_PREPARE_COMPLETE",
+  "workflow": {
+    "name": "R5-MID Prospective One-Shot Prepare v0.2",
+    "run_id": 35126705786,
+    "job_id": 104897406121,
+    "head_sha": "1ae76d2394897517e9f07a01b897ed34be1cdffd",
+    "conclusion": "success",
+    "offline_test_count": 140,
+    "provider_calls": 0,
+    "paid_evaluator_calls": 0
+  },
+  "source_natural_evidence": {
+    "workflow_run_id": 35124129473,
+    "raw_artifact_id": 10459066205,
+    "raw_artifact_digest": "sha256:f3a7ea0e38bb64cee9d08f52cf1111c757d8ccab872e9b762dd7ee9451c2442b",
+    "evidence_batch_hash": "15c731bffb309068e8b694b4fff3cf015b4240b658450b042f55a23509ccc82e",
+    "run_id": "prospective-ecommerce-natural-0001",
+    "selection_record_hash": "c074f01457796121028cc8697f434e5e3f0ff25f3745fdd986919d488b93665b",
+    "selected_candidate_id": "prospective-ecommerce-natural-0001:R2V2:6621d1afe7f9acc3",
+    "source_event_index": 32,
+    "source_state_key": "inventory_stockout_assessment_v1",
+    "parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c"
+  },
+  "source_measurement_binding": {
+    "measurement_version": "v0.3_ROOT_SCOPED_CANONICAL_TOPOLOGY",
+    "workflow_run_id": 35126091603,
+    "artifact_id": 10458873608,
+    "artifact_name": "r2r6-prospective-natural-derived-v0-3-35126091603",
+    "artifact_digest": "sha256:db737f33141e44864e628f6903f1ba2815a064fd1b5cfba65b275a71c2878b07",
+    "inner_tar_sha256": "caba1d8644d5f6567239055eab4ad37bea0374c83a610445dbc3f8f989316726",
+    "measurement_hash": "4566e6a05e0347ed0b0ef7bccc2610fd0814a0407da5ed7ebbbb0a6ff5886a77",
+    "resolved_root_behavior_event_id": "prospective-ecommerce-natural-0001:arena:32:outcome",
+    "root_edge_multiset_hash": "7d2b5b05d442bf7456bcd358698b2a1e84c68373b07b57b785ac182c85c69739",
+    "root_ordered_sequence_hash": "7a197480780ec795762427dad05f4b7ab47c86c150bbeeddf03f98003d6fc9dd",
+    "descendant_rejump_count": 6,
+    "continuation_root_reachable_event_count": 52,
+    "continuation_root_reach_depth": 4,
+    "root_descendant_cross_actor_relation_count": 31,
+    "root_descendant_canonical_edge_instance_count": 81,
+    "semantic_cpr_status": "NOT_ADJUDICATED"
+  },
+  "formal_plan": {
+    "plan_hash": "624cdc84e9c0d7eb4b44f0c916c96bcee9a562a46b19bb70978b4b51b7c5c71d",
+    "branch_execution_commit": "1ae76d2394897517e9f07a01b897ed34be1cdffd",
+    "parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c",
+    "branch_start_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c",
+    "one_shot_envelope_hash": "2df29b96dfde9e2328ba84e1b4e6451f5daaec33ac4cca399626522936084cc9",
+    "state_key": "inventory_stockout_assessment_v1",
+    "from_status": "fact",
+    "to_status": "unconfirmed",
+    "delivery_policy": "FIRST_POST_JUMP_AGENT_TURN",
+    "direct_exposure_limit": 1,
+    "persistent_state_mutation": false,
+    "replicate_pairs": 2,
+    "planned_branch_count": 4,
+    "paid_one_shot_authorization_status": "NOT_AUTHORIZED",
+    "causal_claim_status": "NOT_TESTED_PREPARED_ONLY",
+    "semantic_cpr_status": "NOT_ADJUDICATED"
+  },
+  "branch_rows": [
+    {
+      "run_id": "prospective-ecommerce-natural-0001:oneshot-pair:0001:control_continuation",
+      "pair_id": "prospective-ecommerce-natural-0001:oneshot-pair:0001",
+      "condition_id": "CONTROL_CONTINUATION",
+      "execution_order": 1,
+      "pair_order_pattern": "CONTROL_FIRST",
+      "branch_hash": "8db65579c1fb9df48f6bb598a8ade4494bd4744b2b35f5ba179c2adcdb7367ab"
+    },
+    {
+      "run_id": "prospective-ecommerce-natural-0001:oneshot-pair:0001:one_shot_jump_intervention",
+      "pair_id": "prospective-ecommerce-natural-0001:oneshot-pair:0001",
+      "condition_id": "ONE_SHOT_JUMP_INTERVENTION",
+      "execution_order": 2,
+      "pair_order_pattern": "CONTROL_FIRST",
+      "branch_hash": "6301f0102ec69bcb2cc83a447c6129affe98f1d68e6441bb7dd6ea048a4203d8"
+    },
+    {
+      "run_id": "prospective-ecommerce-natural-0001:oneshot-pair:0002:one_shot_jump_intervention",
+      "pair_id": "prospective-ecommerce-natural-0001:oneshot-pair:0002",
+      "condition_id": "ONE_SHOT_JUMP_INTERVENTION",
+      "execution_order": 1,
+      "pair_order_pattern": "INTERVENTION_FIRST",
+      "branch_hash": "d384f0d003ad16eb49999ed9471afd5134e72d79403150da57f824346c625875"
+    },
+    {
+      "run_id": "prospective-ecommerce-natural-0001:oneshot-pair:0002:control_continuation",
+      "pair_id": "prospective-ecommerce-natural-0001:oneshot-pair:0002",
+      "condition_id": "CONTROL_CONTINUATION",
+      "execution_order": 2,
+      "pair_order_pattern": "INTERVENTION_FIRST",
+      "branch_hash": "bab4b977a7dca530af2816b19f020ffff43fe0e8db0e542eb872ce1d526a3434"
+    }
+  ],
+  "prepared_artifact": {
+    "name": "r5mid-prospective-one-shot-prepared-v0-2-35126705786",
+    "artifact_id": 10458734543,
+    "github_artifact_digest": "sha256:64bd48dfc8109b1ea5ed27aaa0930b53be0cb5f3cd0b0b9d2de7d2f9a76e5c9e",
+    "inner_tar_sha256": "26f97e7be568c8259e571fb9991a1049784d7ed4f9c04b6c76ebd5dd97b3477a",
+    "expires_at": "2026-12-15T17:12:14Z"
+  },
+  "next_paid_gate": "CALL_REAL_R5MID_PROSPECTIVE_ONESHOT_API",
+  "authorization_boundary": {
+    "prospective_natural_authorization_reusable": false,
+    "old_phase_b_authorization_reusable": false,
+    "repository_update_authorizes_paid_run": false,
+    "new_explicit_authorization_required": true
+  },
+  "scientific_boundary": "This is a formal offline prepare bound to post-freeze prospective natural evidence and v0.3 root-scoped canonical measurement. It does not establish semantic CPR or a causal effect and does not authorize any provider call."
+}
