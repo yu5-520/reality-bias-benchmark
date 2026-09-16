@@ -1,7 +1,7 @@
 # Process Reality v4.1 — Rollout Status
 
 Date: 2026-09-17  
-Status: OFFLINE FORWARD STACK IMPLEMENTED / ONE-SHOT PREPARED / PROSPECTIVE NATURAL PATH PREPARED / NO NEW PAID API
+Status: OFFLINE FORWARD STACK IMPLEMENTED / ONE-SHOT PREPARED / PROSPECTIVE NATURAL OFFLINE PREPARED / NO NEW PAID API
 
 ## 1. Research-coordinate update
 
@@ -82,14 +82,13 @@ Prepared artifact:
 
 - artifact: `r5mid-one-shot-prepared-35122637983`;
 - artifact ID: `10457562997`;
-- digest: `sha256:e8655163ada6924c473e45b1e01558fa6a3cb3fd1436f124729fba6782db3454`;
-- safe outer archive strategy: tar.gz bundle + SHA-256 file.
+- digest: `sha256:e8655163ada6924c473e45b1e01558fa6a3cb3fd1436f124729fba6782db3454`.
 
 ## 4. Prospective natural evidence path
 
-A new subject path is prepared separately from the historical R5/R6 baseline runner.
+The prospective path is separate from the historical R5/R6 baseline runner and is frozen after Theory v0.5 / R Plan v4.1.
 
-Forward collection contract:
+Collection contract:
 
 - batch: `R2R6-PROSPECTIVE-NATURAL-BATCH-001`;
 - domain: ecommerce;
@@ -115,30 +114,87 @@ New implementation:
 
 The v0.3 structural selector is now supported by `arena/anchor_selection.py` while v0.1/v0.2 remain backward compatible.
 
-Raw subject evidence is required to freeze before derived R2/R3/R4/R6 structural measurements. The future authorized workflow uploads the raw frozen archive before derived analysis.
+## 5. Prospective offline prepare result
 
-## 5. Prospective paid boundary
+Prepare workflow:
+
+- run: `35123705888`;
+- head SHA: `fd7a99422180d7beb45fd01662af88ccea7ff04d`;
+- conclusion: success;
+- offline tests: success;
+- provider execution: none.
+
+Frozen subject rows:
+
+- `prospective-ecommerce-natural-0001`;
+- `prospective-ecommerce-natural-0002`;
+- `prospective-ecommerce-natural-0003`;
+- `prospective-ecommerce-natural-0004`.
+
+Frozen bindings:
+
+- collection contract SHA-256: `a9dee880eb0d0302dcbd778e8c534e0146a4e2eef7b316bceb79502c8be90fd9`;
+- Theory v0.5 SHA-256: `e0b12ab52ea9d59223f1100a5fb787f6fb200b7c33a5f09cdc0e0425127e17aa`;
+- Measurement v4.1 SHA-256: `c7f1ce683ac70507a5d50c8eacc575f2fd3843562d7293781d13983231945f57`;
+- task hash: `849de0b4ab9874e0adf328b6f4f3768790215ad565a891e4c0a1dc1a9069f61b`;
+- Agent-pool hash: `d2e2ab7c6996098850bff7a6b24bd65b61567fe3bebb6c484c7024c67c020f26`;
+- arena config SHA-256: `8e33288516fc47f116d20f4579ca84410a3cdefecef7c99c5bf2bb31e5d14002`;
+- model config SHA-256: `fe7bbafda1c4c12b1d1f5dca963d1a45cbe503713aaa486fac09f569d1b5f8c5`;
+- anchor-rule SHA-256: `ac54ed7b31584f11ec96b9ad0ec5683f5562efc569ab0f693e33cae9eec58788`.
+
+Prepared artifact:
+
+- name: `r2r6-prospective-natural-prepared-35123705888`;
+- artifact ID: `10457404885`;
+- GitHub artifact digest: `sha256:9e0067d57d532f5c4e58b1caed70cfa35b198534885a0333200f90e4431d70c3`;
+- inner prepared tar SHA-256: `25d887967a3353fc62d948985a1ecd54dfcaabfdb1837b8ad08d3561e2277091`;
+- expires: `2026-12-15T16:43:30Z`.
+
+Repository provenance record:
+
+`manifests/r2r6_prospective_natural_prepare_record_2026-09-17.json`
+
+## 6. Evidence ordering for the future real prospective batch
+
+```text
+real subject run
+-> preserve raw traces / snapshots / journals / failures
+-> freeze raw evidence batch + hashes
+-> upload raw frozen artifact
+-> only then derive R2/R3/R4/R6 structural measurements
+-> semantic review remains append-only and deferred
+```
+
+No-anchor, censored and null trajectories remain part of the planned evidence set.
+
+## 7. Prospective paid boundary
 
 The new real-run gate is:
 
 `CALL_REAL_R2R6_PROSPECTIVE_NATURAL_API`
 
-No authorization manifest exists at this status point, so the prospective real-provider workflow cannot start. A valid future authorization must separately provide a positive global spending ceiling, symmetric per-run spending ceiling and symmetric per-run call ceiling. It authorizes natural subject collection only and does not authorize one-shot branching or a paid evaluator.
+No paid authorization manifest exists. A valid future authorization must separately provide:
 
-## 6. Scientific boundary
+- positive total USD ceiling;
+- positive symmetric per-run USD ceiling;
+- positive symmetric per-run call ceiling.
 
-The old Phase-A parent and its one-shot prepared compatibility bundle are **not** independent prospective confirmation. The theory/contracts were refined after inspecting earlier exploratory evidence.
+It authorizes prospective natural subject collection only. It does not authorize one-shot branching and does not authorize a paid evaluator.
 
-The new prospective-natural batch is the first path intended to generate post-freeze natural trajectories suitable for prospective validation. Only after those raw trajectories are collected and frozen may their natural Jumps be selected for a later formal one-shot perturbation batch.
+## 8. Scientific boundary
 
-## 7. Current stop point
+The old Phase-A parent and its one-shot compatibility bundle are not independent prospective confirmation. The theory/contracts were refined after inspecting earlier exploratory evidence.
+
+`R2R6-PROSPECTIVE-NATURAL-BATCH-001` is the first post-freeze natural-trajectory path intended for prospective validation. Only after those raw trajectories are collected and frozen may their natural Jumps become candidates for a later formal one-shot perturbation batch.
+
+## 9. Current stop point
 
 P0 theory/contracts: complete.  
 P1 transient runtime: initial implementation complete.  
 P2 recurrence/inertia/path-topology measurement: initial deterministic implementation complete.  
 P3 execution symmetry/evidence durability: initial implementation complete.  
 P4 existing-source one-shot compatibility prepare: complete and artifact frozen.  
-P5 prospective natural collection path: implementation complete; offline prepare triggered by repository update; real provider collection not authorized.  
+P5 prospective natural collection path: implementation complete and offline subject plan frozen. Real provider collection remains unauthorized.  
 P6 prospective Jump-derived formal one-shot batch: not started.
 
 No new paid subject or paid Reviewer call was authorized by this repository update.
