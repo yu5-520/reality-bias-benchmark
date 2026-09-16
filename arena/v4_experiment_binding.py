@@ -97,6 +97,10 @@ INTERFACE_SPECS = {
         "path": "schemas/first_paper_structural_analysis_v0.1.schema.json",
         "identity": "RB-FIRST-PAPER-STRUCTURAL-ANALYSIS-v0.1",
     },
+    "first_paper_semantic_analysis_schema": {
+        "path": "schemas/first_paper_semantic_analysis_v0.1.schema.json",
+        "identity": "RB-FIRST-PAPER-SEMANTIC-ANALYSIS-v0.1",
+    },
 }
 
 
