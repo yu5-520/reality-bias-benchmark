@@ -1,7 +1,7 @@
 # Process Reality v4.1 — Rollout Status
 
 Date: 2026-09-17  
-Status: OFFLINE FORWARD STACK IMPLEMENTED / ONE-SHOT PREPARED / NO PAID API
+Status: OFFLINE FORWARD STACK IMPLEMENTED / ONE-SHOT PREPARED / PROSPECTIVE NATURAL PATH PREPARED / NO NEW PAID API
 
 ## 1. Research-coordinate update
 
@@ -18,6 +18,7 @@ Implemented forward contracts:
 - `configs/first_paper_mechanism_contract_v0.3.json`
 - `configs/first_paper_analysis_contract_v0.2.json`
 - `arena/config/r5r6_anchor_rule_v0.3.json`
+- `configs/prospective_natural_collection_contract_v0.1.json`
 
 Historical contracts/evidence remain immutable.
 
@@ -44,20 +45,18 @@ same frozen parent/start state
 -> free downstream evolution
 ```
 
-## 3. Offline validation
+## 3. Existing-source one-shot compatibility prepare
 
 Code commit used for the first offline one-shot prepare:
 
 `0f15fcfd0f392af16f989d5e59795e8f0b003462`
 
-Two validation workflows completed successfully:
+Validation workflows completed successfully:
 
 - R5-MID One-Shot Phase-B Prepare — run `35122637983`;
 - R2 Free-Agent Arena Offline Validation — run `35122637992`.
 
 The latter also passed legacy/control/v4 regression paths, so adding the runtime-view transform hook did not replace or silently break historical execution paths.
-
-## 4. Prepared compatibility plan
 
 The offline prepare reused immutable Phase-A source evidence only as a mechanism-development compatibility parent:
 
@@ -79,34 +78,67 @@ Prepared one-shot identities:
 - authorization status: `NOT_AUTHORIZED`;
 - prospective confirmation status: `NOT_ESTABLISHED_EXISTING_PHASE_A_SOURCE`.
 
-## 5. Prepared artifact
-
-Workflow run `35122637983` uploaded:
+Prepared artifact:
 
 - artifact: `r5mid-one-shot-prepared-35122637983`;
 - artifact ID: `10457562997`;
 - digest: `sha256:e8655163ada6924c473e45b1e01558fa6a3cb3fd1436f124729fba6782db3454`;
 - safe outer archive strategy: tar.gz bundle + SHA-256 file.
 
+## 4. Prospective natural evidence path
+
+A new subject path is prepared separately from the historical R5/R6 baseline runner.
+
+Forward collection contract:
+
+- batch: `R2R6-PROSPECTIVE-NATURAL-BATCH-001`;
+- domain: ecommerce;
+- planned repeats: 4;
+- same input / same goal;
+- free-Agent structure;
+- CPR/Jump/authority research labels hidden from subject prompts;
+- structural-only outcome-blind anchor selection after raw trace collection;
+- no-anchor preserved;
+- censored traces preserved;
+- no outcome-aware rerun;
+- no rerun to manufacture an anchor;
+- automatic paid evaluator disabled.
+
+New implementation:
+
+- `arena/build_prospective_natural_manifest.py`;
+- `arena/run_prospective_natural_real.py`;
+- `arena/freeze_prospective_evidence.py`;
+- `arena/derive_prospective_natural_measurements.py`;
+- `.github/workflows/r2r6-prospective-natural-prepare.yml`;
+- `.github/workflows/r2r6-prospective-natural-authorized-once.yml`.
+
+The v0.3 structural selector is now supported by `arena/anchor_selection.py` while v0.1/v0.2 remain backward compatible.
+
+Raw subject evidence is required to freeze before derived R2/R3/R4/R6 structural measurements. The future authorized workflow uploads the raw frozen archive before derived analysis.
+
+## 5. Prospective paid boundary
+
+The new real-run gate is:
+
+`CALL_REAL_R2R6_PROSPECTIVE_NATURAL_API`
+
+No authorization manifest exists at this status point, so the prospective real-provider workflow cannot start. A valid future authorization must separately provide a positive global spending ceiling, symmetric per-run spending ceiling and symmetric per-run call ceiling. It authorizes natural subject collection only and does not authorize one-shot branching or a paid evaluator.
+
 ## 6. Scientific boundary
 
-This prepared bundle is **not** independent prospective confirmation. The theory/contracts were refined after inspecting earlier exploratory evidence, so the existing Phase-A parent is used only to verify that the new one-shot mechanism machinery can bind to real frozen source evidence.
+The old Phase-A parent and its one-shot prepared compatibility bundle are **not** independent prospective confirmation. The theory/contracts were refined after inspecting earlier exploratory evidence.
 
-For first-paper prospective validation, new natural trajectories must be collected after the new definitions/contracts are frozen. A later one-shot perturbation batch can then be derived from those prospectively collected natural Jumps.
+The new prospective-natural batch is the first path intended to generate post-freeze natural trajectories suitable for prospective validation. Only after those raw trajectories are collected and frozen may their natural Jumps be selected for a later formal one-shot perturbation batch.
 
-## 7. Paid boundary
-
-No paid subject or paid Reviewer API was called by this rollout.
-
-The historical Phase-B authorization is consumed and cannot authorize the new protocol. A future real one-shot run requires a new explicit authorization using the new one-shot gate plus a new positive spending ceiling.
-
-## 8. Current stop point
+## 7. Current stop point
 
 P0 theory/contracts: complete.  
 P1 transient runtime: initial implementation complete.  
 P2 recurrence/inertia/path-topology measurement: initial deterministic implementation complete.  
 P3 execution symmetry/evidence durability: initial implementation complete.  
-P4 offline one-shot prepare: complete and artifact frozen.  
-P5 new prospective natural evidence / real one-shot evidence: **not started**.
+P4 existing-source one-shot compatibility prepare: complete and artifact frozen.  
+P5 prospective natural collection path: implementation complete; offline prepare triggered by repository update; real provider collection not authorized.  
+P6 prospective Jump-derived formal one-shot batch: not started.
 
-This is the intentional stop point before any new paid subject execution.
+No new paid subject or paid Reviewer call was authorized by this repository update.
