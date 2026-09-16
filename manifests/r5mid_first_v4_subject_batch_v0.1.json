@@ -1,0 +1,91 @@
+{
+  "schema": "RB-R5MID-FIRST-V4-SUBJECT-BATCH-v0.1",
+  "date": "2026-09-16",
+  "status": "SCIENTIFIC_STRUCTURE_FROZEN_PREPARE_ONLY",
+  "paid_api_authorized": false,
+  "automatic_paid_evaluator": false,
+  "preparation_parent_head_sha": "43837a497ade8dbd504b05e3a18bd0009d69b46a",
+  "execution_commit_policy": "USE_EXACT_COMMIT_CONTAINING_THIS_MANIFEST_AND_REQUIRE_GREEN_OFFLINE_VALIDATION",
+  "paper_scope": "FIRST_PAPER_R5_MID",
+  "research_question": "Does downgrading one frozen high-certainty shared-state item to provisional status change its downstream operational reach under otherwise matched continuation?",
+  "domain": "ecommerce",
+  "arena_config": "arena/config/arena_v0.3.json",
+  "arena_version": "R2-FREE-AGENT-ARENA-v0.3.2",
+  "trace_schema": "R2-ARENA-TRACE-v0.3",
+  "subject_model_config": "arena/config/model_deepseek_v0.2.json",
+  "provider": "deepseek",
+  "model_alias": "deepseek-flash",
+  "expected_model_version": "DeepSeek-V4.1-Flash",
+  "anchor_rule": "arena/config/r5r6_anchor_rule_v0.2.json",
+  "experimental_variable_id": "EPISTEMIC_STATUS_DOWNGRADE",
+  "intervention": {
+    "target": "selected frozen parent shared-state metadata status",
+    "control": "unchanged frozen parent continuation",
+    "intervention_value": "provisional",
+    "held_constant_policy": "ONLY_NAMED_STATUS_FIELD_MAY_CHANGE_BEFORE_CONTINUATION_EXCEPT_DERIVED_STATE_HASH"
+  },
+  "phase_a": {
+    "workflow": ".github/workflows/r5r6-baseline-snapshot-real.yml",
+    "baseline_repeats": 2,
+    "execution_order": "FROZEN_MANIFEST_ORDER",
+    "max_subject_calls": 64,
+    "spending_ceiling": 0,
+    "currency": "USD",
+    "confirm": "PREPARE_ONLY",
+    "real_authorization_phrase_required_later": "CALL_REAL_R5R6_BASELINE_API",
+    "preserve_no_anchor_outcomes": true,
+    "rerun_to_manufacture_anchor": false
+  },
+  "phase_b": {
+    "workflow": ".github/workflows/r5r6-frozen-parent-branch-real.yml",
+    "eligible_parent_policy": "BRANCH_EVERY_PHASE_A_ANCHOR_SELECTED_PARENT_WITHOUT_OUTCOME_BASED_FILTERING",
+    "replicate_pairs_per_eligible_parent": 2,
+    "pair_members": [
+      "CONTROL_CONTINUATION",
+      "STATUS_DOWNGRADE_INTERVENTION"
+    ],
+    "execution_order": "USE_FROZEN_BRANCH_EXECUTION_MANIFEST_ORDER",
+    "max_subject_calls_per_parent_batch": 128,
+    "spending_ceiling_per_parent_batch": 0,
+    "currency": "USD",
+    "confirm": "PREPARE_ONLY",
+    "real_authorization_phrase_required_later": "CALL_REAL_R5R6_BRANCH_API",
+    "phase_a_rerun_authorized": false
+  },
+  "analysis": {
+    "forward_contract": "configs/first_paper_mechanism_contract_v0.2.json",
+    "primary_outcome": "R5MID_ANCHOR_DOWNSTREAM_OPERATIONAL_CROSSING_COUNT",
+    "parent_group": "common_parent_state_hash",
+    "baseline_cluster": "source_trace_hash",
+    "forward_estimand": "EQUAL_WEIGHT_MEAN_OF_PARENT_MEAN_PAIR_DELTAS",
+    "uncertainty": "DESCRIPTIVE_ONLY_NO_INDEPENDENT_PARENT_SAMPLING_DESIGN_FROZEN",
+    "semantic_review": "ASYNCHRONOUS_APPEND_ONLY",
+    "subject_rerun_for_reviewer_disagreement": false
+  },
+  "evidence_freeze_order": [
+    "SUBJECT_TRACES_AND_JOURNALS",
+    "STANDARD_EVIDENCE_BATCH",
+    "MEASUREMENT_V3_PARALLEL_HISTORICAL_LAYER",
+    "SYSTEM_BEHAVIOR_V4",
+    "BRANCH_ANCHOR_LINEAGE",
+    "PAIR_STRUCTURAL_COMPARISONS",
+    "PARENT_AWARE_MECHANISM_ANALYSIS",
+    "BOUNDED_SEMANTIC_REVIEW_LATER"
+  ],
+  "stopping_and_censoring": {
+    "budget_or_call_cap_stop_is_preserved": true,
+    "provider_or_transport_failure_is_preserved": true,
+    "incomplete_pair_is_not_imputed": true,
+    "missing_is_not_zero_or_no": true,
+    "no_new_runs_to_hit_a_result_threshold": true
+  },
+  "nonclaims": [
+    "RUN_COMPLETE is not task success",
+    "mechanical reach is not semantic Authority Penetration",
+    "status promotion is not semantic recertification",
+    "within-parent repeats are not independent scenarios",
+    "distinct parents from one baseline source are not automatically independent samples"
+  ],
+  "financial_authorization_state": "NOT_AUTHORIZED_SPENDING_CEILINGS_INTENTIONALLY_ZERO",
+  "next_state": "READY_FOR_PREPARE_ONLY_BASELINE_DISPATCH; REAL_PROVIDER_CALLS_REQUIRE_EXPLICIT_POSITIVE_SPENDING_CEILING_AND_EXACT_AUTHORIZATION_PHRASE"
+}
