@@ -1,0 +1,213 @@
+name: R5-MID Prospective One-Shot Readiness Audit
+
+on:
+  push:
+    paths:
+      - 'manifests/r5mid_prospective_one_shot_readiness_audit_2026-09-17.json'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: r5mid-prospective-one-shot-readiness-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Freeze offline readiness request
+        run: |
+          cp manifests/r5mid_prospective_one_shot_readiness_audit_2026-09-17.json "$RUNNER_TEMP/readiness_request.json"
+          python - <<'PY'
+          import json, os
+          p=os.path.join(os.environ['RUNNER_TEMP'],'readiness_request.json')
+          m=json.load(open(p))
+          assert m['schema']=='RB-R5MID-PROSPECTIVE-ONESHOT-READINESS-AUDIT-v0.1'
+          assert m['scope']=='OFFLINE_EXACT_PREPARED_RUNTIME_AUDIT_ONLY'
+          assert m['real_provider_call'] is False
+          assert m['paid_one_shot_authorized'] is False
+          assert m['paid_evaluator_authorized'] is False
+          assert m['authorization_manifest_created'] is False
+          print('READINESS_AUDIT_SCOPE=OFFLINE_ONLY')
+          PY
+      - name: Verify exact formal prepared artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          m=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'readiness_request.json')))
+          payload=json.loads(subprocess.check_output(['gh','api',f"repos/${{ github.repository }}/actions/runs/{m['prepared_workflow_run_id']}/artifacts"],text=True))
+          rows=[x for x in payload['artifacts'] if x['id']==m['prepared_artifact_id'] and x['name']==m['prepared_artifact_name']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==m['prepared_artifact_digest']
+          assert not rows[0].get('expired')
+          print('FORMAL_PREPARED_ARTIFACT=EXACT_MATCH')
+          PY
+          mkdir -p "$RUNNER_TEMP/prepared_artifact" "$RUNNER_TEMP/prepared"
+          gh run download 35126705786 --repo '${{ github.repository }}' --name r5mid-prospective-one-shot-prepared-v0-2-35126705786 --dir "$RUNNER_TEMP/prepared_artifact"
+          cd "$RUNNER_TEMP/prepared_artifact"
+          sha256sum -c r5mid_prospective_one_shot_prepared_v0_2.tar.gz.sha256
+          test "$(sha256sum r5mid_prospective_one_shot_prepared_v0_2.tar.gz | awk '{print $1}')" = '26f97e7be568c8259e571fb9991a1049784d7ed4f9c04b6c76ebd5dd97b3477a'
+          tar -xzf r5mid_prospective_one_shot_prepared_v0_2.tar.gz -C "$RUNNER_TEMP/prepared"
+          cd "$GITHUB_WORKSPACE"
+          python - <<'PY'
+          import json, os
+          m=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'readiness_request.json')))
+          p=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'prepared/results/r5mid_prospective_one_shot_plan_v0_2/branch_plan.json')))
+          assert p['plan_hash']==m['plan_hash']
+          assert p['code_identity']['branch_execution_commit']==m['branch_execution_commit']
+          assert p['source_measurement_binding']['measurement_hash']==m['source_measurement_hash']
+          assert p['source_measurement_binding_status']=='BOUND_ROOT_SCOPED_CANONICAL_V0.3'
+          assert p['paid_one_shot_authorization_status']=='NOT_AUTHORIZED'
+          print('FORMAL_PREPARED_PLAN=VERIFIED')
+          PY
+      - name: Checkout exact frozen execution commit
+        run: |
+          git fetch --depth=1 origin 1ae76d2394897517e9f07a01b897ed34be1cdffd
+          git checkout --detach 1ae76d2394897517e9f07a01b897ed34be1cdffd
+          test "$(git rev-parse HEAD)" = '1ae76d2394897517e9f07a01b897ed34be1cdffd'
+      - name: Re-run exact-code offline tests
+        run: |
+          python arena/validate_environment.py
+          python -m unittest discover -s arena/tests -v
+      - name: Audit exact A/B first-resume runtime semantics with fake provider
+        run: |
+          python - <<'PY'
+          import copy, json, os
+          from pathlib import Path
+          from arena.engine import run_arena_once
+          from arena.io_utils import load_json
+          from arena.one_shot_intervention import OneShotRuntimeViewTransform, CONTROL_CONDITION, INTERVENTION_CONDITION
+          from arena.run_branch_one_shot_real import load_plan_bundle, verify_trace_exposure_invariants
+          from arena.core import stable_hash
+
+          plan_dir=Path(os.environ['RUNNER_TEMP'])/'prepared/results/r5mid_prospective_one_shot_plan_v0_2'
+          bundle=load_plan_bundle(plan_dir)
+          plan=bundle['plan']
+          parent=bundle['parent_snapshot']
+          envelope=bundle['one_shot_envelope']
+          rows=bundle['branch_rows']
+          pair_id=sorted({r['pair_id'] for r in rows})[0]
+          control=next(r for r in rows if r['pair_id']==pair_id and r['condition_id']==CONTROL_CONDITION)
+          intervention=next(r for r in rows if r['pair_id']==pair_id and r['condition_id']==INTERVENTION_CONDITION)
+
+          class FakeProvider:
+              def __init__(self): self.calls=0
+              def complete_agent(self, messages, metadata=None):
+                  self.calls += 1
+                  return {
+                      'response_id': f'offline-{self.calls}',
+                      'provider_response': {'offline_fake': True},
+                      'finish_reason': 'stop',
+                      'model': 'OFFLINE_FAKE_PROVIDER',
+                      'usage': {},
+                      'transport_latency_ms': 0,
+                      'content': json.dumps({'decision_summary':'offline readiness audit','actions':[]}),
+                  }
+
+          domain=load_json(Path('arena/domains')/(plan['config_identity']['domain_id']+'.json'))
+          config=load_json(plan['config_identity']['arena_config_path'])
+          parent_before=copy.deepcopy(parent)
+          parent_hash_before=stable_hash(parent_before)
+
+          c_trace=run_arena_once(
+              domain, config, FakeProvider(), control['run_id'], control.get('logical_seed'),
+              initial_state_snapshot=parent,
+          )
+          transform=OneShotRuntimeViewTransform(envelope)
+          i_trace=run_arena_once(
+              domain, config, FakeProvider(), intervention['run_id'], intervention.get('logical_seed'),
+              initial_state_snapshot=parent,
+              runtime_view_transform=transform,
+          )
+          transform.verify_finished()
+          c_integrity=verify_trace_exposure_invariants(trace=c_trace,row=control,envelope=envelope,parent_snapshot=parent)
+          i_integrity=verify_trace_exposure_invariants(trace=i_trace,row=intervention,envelope=envelope,parent_snapshot=parent)
+          assert c_integrity['direct_experiment_origin_exposure_count']==0
+          assert i_integrity['direct_experiment_origin_exposure_count']==1
+          assert c_trace['model_calls'] and i_trace['model_calls']
+
+          cv=c_trace['model_calls'][0]['runtime_snapshot']
+          iv=i_trace['model_calls'][0]['runtime_snapshot']
+          key=envelope['state_key']
+          assert cv['shared_state_metadata'][key]['status']==envelope['from_status']=='fact'
+          assert iv['shared_state_metadata'][key]['status']==envelope['to_status']=='unconfirmed'
+
+          def diff_paths(a,b,path=''):
+              if type(a) is not type(b): return [path or '$']
+              if isinstance(a,dict):
+                  out=[]
+                  for k in sorted(set(a)|set(b)):
+                      p=f'{path}.{k}' if path else k
+                      if k not in a or k not in b: out.append(p)
+                      else: out.extend(diff_paths(a[k],b[k],p))
+                  return out
+              if isinstance(a,list):
+                  if len(a)!=len(b): return [path]
+                  out=[]
+                  for n,(x,y) in enumerate(zip(a,b)): out.extend(diff_paths(x,y,f'{path}[{n}]'))
+                  return out
+              return [] if a==b else [path]
+
+          paths=diff_paths(cv,iv)
+          expected=f'shared_state_metadata.{key}.status'
+          assert paths==[expected], (paths, expected)
+          assert parent['shared_state_metadata'][key]['status']=='fact'
+          assert stable_hash(parent)==parent_hash_before
+          assert parent==parent_before
+          assert len(i_trace['runtime_transform_records'])==1
+          assert i_trace['runtime_transform_records'][0]['actor']==parent['queue'][0]
+          assert i_trace['runtime_transform_records'][0]['turn']==parent['turns']+1
+          if len(i_trace['model_calls'])>1:
+              assert i_trace['model_calls'][1]['runtime_snapshot']['shared_state_metadata'][key]['status']=='fact'
+
+          report={
+              'schema':'RB-R5MID-PROSPECTIVE-ONESHOT-RUNTIME-READINESS-REPORT-v0.1',
+              'plan_hash':plan['plan_hash'],
+              'branch_execution_commit':'1ae76d2394897517e9f07a01b897ed34be1cdffd',
+              'pair_smoked':pair_id,
+              'fake_provider_only':True,
+              'real_provider_calls':0,
+              'control_direct_experiment_origin_exposure_count':0,
+              'intervention_direct_experiment_origin_exposure_count':1,
+              'first_prompt_delta_paths':paths,
+              'expected_only_delta_path':expected,
+              'first_resumed_actor':parent['queue'][0],
+              'first_resumed_turn':parent['turns']+1,
+              'persistent_parent_state_unchanged':True,
+              'second_intervention_prompt_observed':len(i_trace['model_calls'])>1,
+              'second_intervention_prompt_status':i_trace['model_calls'][1]['runtime_snapshot']['shared_state_metadata'][key]['status'] if len(i_trace['model_calls'])>1 else None,
+              'semantic_cpr_status':'NOT_ADJUDICATED',
+              'causal_effect_status':'NOT_TESTED_OFFLINE_SMOKE_ONLY',
+              'paid_one_shot_authorized':False,
+          }
+          Path('readiness_report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+          print('FIRST_PROMPT_DELTA_PATH='+expected)
+          print('CONTROL_DIRECT_EXPOSURE=0')
+          print('INTERVENTION_DIRECT_EXPOSURE=1')
+          print('PERSISTENT_PARENT_STATE_UNCHANGED=YES')
+          print('REAL_PROVIDER_CALLS=0')
+          PY
+      - name: Archive readiness audit
+        run: |
+          cp "$RUNNER_TEMP/readiness_request.json" readiness_request.json
+          tar -czf r5mid_prospective_one_shot_readiness_audit.tar.gz readiness_report.json readiness_request.json
+          sha256sum r5mid_prospective_one_shot_readiness_audit.tar.gz > r5mid_prospective_one_shot_readiness_audit.tar.gz.sha256
+      - name: Upload readiness audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5mid-prospective-one-shot-readiness-audit-${{ github.run_id }}
+          path: |
+            r5mid_prospective_one_shot_readiness_audit.tar.gz
+            r5mid_prospective_one_shot_readiness_audit.tar.gz.sha256
+          retention-days: 90
