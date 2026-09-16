@@ -2,29 +2,33 @@
 
 Date: 2026-09-16
 
-The current `R2-ARENA-TRACE-v0.3` source adapter, structural Jump-candidate detector, operational-boundary set and branch-continuation slicing primitive are now implemented offline.
+The current `R2-ARENA-TRACE-v0.3` source adapter, structural Jump-candidate detector, operational-boundary set, branch-continuation slicing and source-backed lineage rules are now implemented offline.
 
-Before any real provider call, the next engineering boundary is:
+The current structural chain is:
 
 ```text
 BehaviorEvent v0.1
 → Structural Jump Candidate
 → source-backed lineage relation
 → mechanical operational crossing
-→ penetration-depth candidate
-→ bounded semantic review
+→ mechanical penetration-depth candidate
 ```
 
-The next layer should freeze explicit lineage rules from evidence that the runtime actually records, prioritizing:
+Semantic adoption, C/P/R and Authority Penetration remain independently unadjudicated.
 
-- message send/delivery/read;
-- invocation proposal/queue/read/execution;
-- proposal → realization parent refs;
-- shared-state visibility to later Agent turns where source evidence supports it;
-- FINAL/revision temporal ancestry.
+Before any real provider call, the next engineering boundary is to bind every new v4 R5/R6 real-run plan/evidence package to the exact research interfaces used to interpret it:
 
-Temporal order alone must not be promoted into descendant lineage. Operational crossing alone must not be promoted into Authority Penetration.
+- experimental-variable registry hash;
+- measurement-boundary registry hash;
+- source-adapter identity/hash;
+- structural Jump-detector hash;
+- operational-boundary-set hash;
+- source-lineage-rules hash;
+- System Behavior Measurement v4 contract/hash;
+- code SHA.
 
-After lineage rules are frozen, new R5/R6 branch plans can bind exact variable-registry, boundary-registry, adapter, Jump-detector, operational-boundary and lineage-rule hashes before any real subject collection.
+Historical branch-plan schemas must remain unchanged. Forward v4 binding should use a new additive manifest/binding layer rather than rewriting old frozen records.
+
+After that binding layer is green, the next scientific-interface task is a bounded semantic/Authority review packet that receives localized Jump + lineage + operational-crossing evidence instead of a full reasoning transcript.
 
 These are offline engineering steps and do not require paid API authorization.
