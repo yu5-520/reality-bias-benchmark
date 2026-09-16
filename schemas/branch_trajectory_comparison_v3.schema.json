@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/branch_trajectory_comparison_v3.schema.json",
+  "title": "Reality Bias Branch Trajectory Comparison v3.0.1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "measurement_version",
+    "comparison_id",
+    "scientific_status",
+    "same_parent_trace_hash",
+    "same_parent_state_hash",
+    "parent_trace_hash",
+    "parent_state_hash",
+    "control_branch_id",
+    "intervention_branch_id",
+    "control_branch_start_state_hash",
+    "intervention_branch_start_state_hash",
+    "intervention_changed_start_state",
+    "delta_intervention_minus_control",
+    "final_state_hash_changed",
+    "semantic_status",
+    "warning",
+    "comparison_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-BRANCH-TRAJECTORY-COMPARISON-v3.0.1"},
+    "measurement_version": {"const": "RB-TRAJECTORY-MEASUREMENT-v3.0.1"},
+    "comparison_id": {"type": "string", "minLength": 1},
+    "scientific_status": {"const": "STRUCTURAL_MEASUREMENT_ONLY_PENDING_SEMANTIC_REVIEW"},
+    "same_parent_trace_hash": {"const": true},
+    "same_parent_state_hash": {"const": true},
+    "parent_trace_hash": {"type": ["string", "null"]},
+    "parent_state_hash": {"type": ["string", "null"]},
+    "control_branch_id": {"type": ["string", "null"]},
+    "intervention_branch_id": {"type": ["string", "null"]},
+    "control_branch_start_state_hash": {"type": ["string", "null"]},
+    "intervention_branch_start_state_hash": {"type": ["string", "null"]},
+    "intervention_changed_start_state": {"type": "boolean"},
+    "delta_intervention_minus_control": {"type": "object"},
+    "control_final_state_hash": {"type": ["string", "null"]},
+    "intervention_final_state_hash": {"type": ["string", "null"]},
+    "final_state_hash_changed": {"type": "boolean"},
+    "semantic_status": {
+      "type": "object",
+      "required": ["C", "P", "R", "causal_effect"],
+      "properties": {
+        "C": {"const": "NOT_ADJUDICATED"},
+        "P": {"const": "NOT_ADJUDICATED"},
+        "R": {"const": "NOT_ADJUDICATED"},
+        "causal_effect": {"const": "NOT_ADJUDICATED"}
+      }
+    },
+    "warning": {"type": "string", "minLength": 1},
+    "comparison_hash": {"type": "string", "minLength": 1}
+  }
+}
