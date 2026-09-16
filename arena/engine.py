@@ -75,15 +75,16 @@ def run_arena_once(
     initial_state_snapshot=None,
     branch_manifest=None,
     state_snapshot_callback=None,
+    runtime_view_transform=None,
 ):
     """Run one Arena continuation.
 
-    `initial_state_snapshot`, `branch_manifest`, and `state_snapshot_callback` are
-    experimental-control hooks. They are optional and therefore do not change the
-    historical Free-Agent baseline when omitted.
+    runtime_view_transform is an optional experimental instrumentation hook. It may
+    transform only the copied runtime view passed to prompt construction and return
+    either a view or (view, evidence_record). It must not mutate Arena persistent
+    state. Historical runs are unchanged when the hook is omitted.
     """
     loop_settings = validate_loop_budget_config(config)
-
     if initial_state_snapshot is None:
         if branch_manifest is not None:
             raise ValueError('branch_manifest_requires_initial_state_snapshot')
@@ -94,30 +95,34 @@ def run_arena_once(
         state = restore_state(domain, config, run_id, initial_state_snapshot, recorder=recorder)
         if state.terminated:
             raise ValueError('initial_state_snapshot_is_terminal')
-
     loop_runtime = evaluate_loop_budget(run_id, state.events, [], loop_settings)
     loop_runtime['stop_applied'] = False
-
     amap = {a['id']: a for a in domain['agents']}
     model_calls = []
-    branch_parent_state_hash = (
-        branch_manifest.get('parent_state_hash') if branch_manifest is not None
-        else (initial_state_snapshot.get('state_hash') if initial_state_snapshot else None)
-    )
+    runtime_transform_records = []
+    branch_parent_state_hash = branch_manifest.get('parent_state_hash') if branch_manifest is not None else (initial_state_snapshot.get('state_hash') if initial_state_snapshot else None)
     branch_start_state_hash = initial_state_snapshot.get('state_hash') if initial_state_snapshot else None
 
     while state.queue and not state.terminated and state.turns < config['max_turns']:
         if state_snapshot_callback is not None:
-            anchor = capture_state(
-                state,
-                anchor_ref=f'before_turn:{state.turns + 1}',
-                parent_trace_hash=(branch_manifest or {}).get('parent_trace_hash'),
-            )
+            anchor = capture_state(state, anchor_ref=f'before_turn:{state.turns + 1}', parent_trace_hash=(branch_manifest or {}).get('parent_trace_hash'))
             state_snapshot_callback(anchor)
-
         actor = state.queue.popleft()
         state.turns += 1
         view = state.runtime_view(actor)
+        if runtime_view_transform is not None:
+            transformed = runtime_view_transform(actor=actor, turn=state.turns, runtime_view=view)
+            transform_record = None
+            if isinstance(transformed, tuple) and len(transformed) == 2:
+                view, transform_record = transformed
+            else:
+                view = transformed
+            if not isinstance(view, dict):
+                raise ValueError('runtime_view_transform_must_return_view_dict')
+            if transform_record is not None:
+                runtime_transform_records.append(transform_record)
+                if recorder:
+                    recorder({'record_type': 'runtime_view_transformed', 'record': transform_record})
         messages = build_agent_messages(domain, amap[actor], view)
         call = {
             'started_at': datetime.now(timezone.utc).isoformat(),
@@ -166,15 +171,9 @@ def run_arena_once(
             model_calls.append(call)
             if recorder:
                 recorder({'record_type': 'turn_completed', 'record': call, 'ledgers': state.evidence_snapshot()})
-
             if state_snapshot_callback is not None:
-                anchor = capture_state(
-                    state,
-                    anchor_ref=f'after_turn:{state.turns}',
-                    parent_trace_hash=(branch_manifest or {}).get('parent_trace_hash'),
-                )
+                anchor = capture_state(state, anchor_ref=f'after_turn:{state.turns}', parent_trace_hash=(branch_manifest or {}).get('parent_trace_hash'))
                 state_snapshot_callback(anchor)
-
             loop_runtime = evaluate_loop_budget(run_id, state.events, model_calls, loop_settings)
             loop_runtime['stop_applied'] = False
             if loop_runtime['reached'] and not state.termination_reason:
@@ -192,13 +191,7 @@ def run_arena_once(
             call['event_index_end'] = len(state.events)
             model_calls.append(call)
             state.mark_execution(actor, state.turns, False, repr(err))
-            state.failures.append({
-                'turn': state.turns,
-                'agent_id': actor,
-                'stage': 'provider_or_parse',
-                'error': repr(err),
-                'input_message_ids': list(state.last_read_message_ids),
-            })
+            state.failures.append({'turn': state.turns, 'agent_id': actor, 'stage': 'provider_or_parse', 'error': repr(err), 'input_message_ids': list(state.last_read_message_ids)})
             state.termination_reason = 'model_call_failure'
             if recorder:
                 recorder({'record_type': 'turn_failed', 'record': call, 'ledgers': state.evidence_snapshot()})
@@ -212,7 +205,6 @@ def run_arena_once(
         termination_reason = 'queue_empty_with_final_state'
     else:
         termination_reason = 'queue_empty_without_final_state'
-
     executed_agents = sorted({x['agent_id'] for x in state.execution_ledger if x['status'] == 'completed'})
     model_response_agents = sorted({x['agent_id'] for x in model_calls if x.get('status') == 'completed'})
     returned_agents = _returned_agents(state.events)
@@ -226,7 +218,6 @@ def run_arena_once(
         run_status = 'RUN_INCOMPLETE'
     else:
         run_status = 'RUN_COMPLETE'
-
     evidence = state.evidence_snapshot()
     condition_limits = {}
     if loop_runtime.get('enabled'):
@@ -275,6 +266,7 @@ def run_arena_once(
         'usage_summary': _sum_usage(model_calls),
         'events': state.events,
         'model_calls': model_calls,
+        'runtime_transform_records': runtime_transform_records,
     }
     if branch_manifest is not None:
         trace['experimental_branch'] = {

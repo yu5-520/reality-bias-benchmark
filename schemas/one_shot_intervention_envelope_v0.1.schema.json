@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RB One-Shot Jump Intervention v0.1",
+  "type": "object",
+  "required": ["schema", "variable_id", "target_jump_ref", "target_candidate_id", "state_key", "source_event_index", "from_status", "to_status", "delivery_policy", "temporal_scope", "direct_exposure_limit", "persistent_state_mutation", "experiment_origin_reinjection_forbidden", "envelope_hash"],
+  "properties": {
+    "schema": {"const": "RB-ONE-SHOT-JUMP-INTERVENTION-v0.1"},
+    "variable_id": {"const": "ONE_SHOT_JUMP_EPISTEMIC_PERTURBATION"},
+    "delivery_policy": {"const": "FIRST_POST_JUMP_AGENT_TURN"},
+    "temporal_scope": {"const": "ONE_EXPOSURE_ONLY"},
+    "direct_exposure_limit": {"const": 1},
+    "persistent_state_mutation": {"const": false},
+    "experiment_origin_reinjection_forbidden": {"const": true},
+    "source_event_index": {"type": "integer", "minimum": 0},
+    "envelope_hash": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": true
+}

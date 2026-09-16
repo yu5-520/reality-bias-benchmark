@@ -1,0 +1,96 @@
+name: R5-MID One-Shot Phase-B Prepare
+
+on:
+  push:
+    paths:
+      - 'manifests/r5mid_one_shot_phase_b_prepare_2026-09-17.json'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: r5mid-one-shot-phase-b-prepare
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify offline-only prepare manifest
+        run: |
+          python - <<'PY'
+          import json
+          p='manifests/r5mid_one_shot_phase_b_prepare_2026-09-17.json'
+          row=json.load(open(p,encoding='utf-8'))
+          assert row['scope']=='OFFLINE_ONE_SHOT_PHASE_B_PREPARE_ONLY'
+          assert row['paid_api_authorized'] is False
+          assert row['automatic_paid_evaluator'] is False
+          assert row['old_phase_b_authorization_reused'] is False
+          assert row['persistent_state_mutation'] is False
+          assert row['prospective_confirmation'] is False
+          print('PREPARE_MANIFEST=VERIFIED_OFFLINE_ONLY')
+          PY
+      - name: Run full offline tests
+        run: |
+          python arena/validate_environment.py
+          python -m unittest discover -s arena/tests -v
+      - name: Verify exact Phase-A artifact and download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          m=json.load(open('manifests/r5mid_one_shot_phase_b_prepare_2026-09-17.json'))
+          payload=json.loads(subprocess.check_output(['gh','api',f"repos/${{ github.repository }}/actions/runs/{m['source_phase_a_run_id']}/artifacts"],text=True))
+          matches=[x for x in payload['artifacts'] if x['name']==m['source_phase_a_artifact_name']]
+          assert len(matches)==1
+          assert matches[0].get('digest')==m['source_phase_a_artifact_digest']
+          assert not matches[0].get('expired')
+          print('PHASE_A_ARTIFACT=VERIFIED')
+          PY
+          mkdir -p phase_a
+          gh run download 35106356084 --repo '${{ github.repository }}' --name r5mid-phase-a-subject-evidence-35106356084 --dir phase_a
+      - name: Build new one-shot plan from immutable Phase-A source
+        run: |
+          python -m arena.branch_plan_one_shot \
+            --selection-package phase_a/results/r5r6_baseline_real/selection_packages/r5r6-ecommerce-baseline-0002.json \
+            --baseline-traces phase_a/results/r5r6_baseline_real/traces.jsonl \
+            --replicates 2 \
+            --branch-code-sha '${{ github.sha }}' \
+            --outdir results/r5mid_one_shot_plan
+      - name: Verify one-shot invariants
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('results/r5mid_one_shot_plan/branch_plan.json'))
+          e=json.load(open('results/r5mid_one_shot_plan/one_shot_intervention_envelope.json'))
+          rows=[json.loads(x) for x in open('results/r5mid_one_shot_plan/branch_execution_manifest.jsonl')]
+          assert p['authorization_status']=='NOT_AUTHORIZED'
+          assert p['parent_snapshot_hash']==p['branch_start_snapshot_hash']
+          assert e['temporal_scope']=='ONE_EXPOSURE_ONLY'
+          assert e['persistent_state_mutation'] is False
+          assert e['direct_exposure_limit']==1
+          assert all(r['parent_state_hash']==r['branch_start_state_hash'] for r in rows)
+          assert sum(r['condition_id']=='ONE_SHOT_JUMP_INTERVENTION' for r in rows)==2
+          print('ONE_SHOT_INVARIANTS=VERIFIED')
+          print('PAID_API_AUTHORIZED=NO')
+          PY
+      - name: Archive prepared evidence safely
+        run: |
+          cp manifests/r5mid_one_shot_phase_b_prepare_2026-09-17.json results/r5mid_one_shot_plan/
+          tar -czf r5mid_one_shot_prepared_bundle.tar.gz results/r5mid_one_shot_plan
+          sha256sum r5mid_one_shot_prepared_bundle.tar.gz > r5mid_one_shot_prepared_bundle.tar.gz.sha256
+      - name: Upload immutable prepared bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5mid-one-shot-prepared-${{ github.run_id }}
+          path: |
+            r5mid_one_shot_prepared_bundle.tar.gz
+            r5mid_one_shot_prepared_bundle.tar.gz.sha256
+          retention-days: 90

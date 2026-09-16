@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RB Experimental Branch v0.3",
+  "type": "object",
+  "required": ["schema", "branch_id", "condition_id", "parent_state_hash", "branch_start_state_hash", "intervention_hash", "intervention_temporal_scope", "direct_exposure_limit", "persistent_state_mutation", "provider_internal_state_replayed", "branch_hash"],
+  "properties": {
+    "schema": {"const": "RB-EXPERIMENTAL-BRANCH-v0.3"},
+    "condition_id": {"enum": ["CONTROL_CONTINUATION", "ONE_SHOT_JUMP_INTERVENTION"]},
+    "persistent_state_mutation": {"const": false},
+    "provider_internal_state_replayed": {"const": false},
+    "intervention_applied_before_continuation": {"const": false},
+    "direct_exposure_limit": {"type": "integer", "minimum": 0, "maximum": 1}
+  },
+  "additionalProperties": true
+}
