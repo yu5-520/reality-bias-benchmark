@@ -167,12 +167,15 @@ def main():
     )
 
     traces_path = outdir / 'traces.jsonl'
-    errors_path = outdir / 'errors.jsonl'
+    errors_jsonl_path = outdir / 'errors.jsonl'
+    errors_array_path = outdir / 'errors.json'
+    journal_dir = Path(str(traces_path) + '.journals')
     comparisons_path = outdir / 'pair_comparisons.jsonl'
     pair_index_path = outdir / 'pair_index.json'
     traces_by_pair = {}
     attempted_run_ids = []
     unattempted_run_ids = []
+    errors = []
 
     for row_index, row in enumerate(rows):
         if provider.budget_stop_reason:
@@ -182,7 +185,7 @@ def main():
         attempted_run_ids.append(row['run_id'])
         domain_path = ROOT / f"arena/domains/{row['domain_id']}.json"
         domain = load_json(domain_path)
-        journal_path = outdir / 'journals' / f"{row['pair_id']}--{row['condition_id']}.jsonl"
+        journal_path = journal_dir / f"{row['pair_id']}--{row['condition_id']}.jsonl"
         try:
             with Journal(journal_path) as journal:
                 journal({
@@ -251,14 +254,18 @@ def main():
                 flush=True,
             )
         except Exception as err:
-            _append_jsonl(errors_path, {
+            error = {
                 'run_id': row['run_id'],
                 'pair_id': row['pair_id'],
                 'condition_id': row['condition_id'],
                 'error': repr(err),
                 'budget_summary': provider.summary(),
-            })
+            }
+            errors.append(error)
+            _append_jsonl(errors_jsonl_path, error)
             print(f"ERROR {row['run_id']}: {err}", file=sys.stderr, flush=True)
+
+    _write_json(errors_array_path, errors)
 
     pair_index = []
     for pair_id in sorted({row['pair_id'] for row in rows}):
@@ -294,6 +301,7 @@ def main():
         'attempted_run_ids': attempted_run_ids,
         'unattempted_run_ids': unattempted_run_ids,
         'pair_index': pair_index,
+        'runner_errors': len(errors),
         'budget_summary': provider.summary(),
         'review_status': 'PENDING_REVIEW',
         'automatic_paid_evaluator_called': False,
@@ -303,8 +311,8 @@ def main():
 
     if provider.budget_stop_reason:
         raise SystemExit('R7 subject collection stopped by budget guard; preserved partial evidence.')
-    if any(item['pair_status'] != 'PAIR_RECORDED' for item in pair_index):
-        raise SystemExit('R7 subject collection has incomplete pair(s); preserved all available evidence.')
+    if errors or any(item['pair_status'] != 'PAIR_RECORDED' for item in pair_index):
+        raise SystemExit('R7 subject collection has errors or incomplete pair(s); preserved all available evidence.')
 
     print('R7 paired subject collection complete; semantic review remains deferred.')
 
