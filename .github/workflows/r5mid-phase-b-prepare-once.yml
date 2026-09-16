@@ -1,0 +1,196 @@
+name: R5-MID Phase-B Prepare Once
+
+on:
+  push:
+    paths:
+      - 'manifests/r5mid_phase_b_prepare_2026-09-16.json'
+
+concurrency:
+  group: r5mid-phase-b-prepare-once
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  PREPARE_MANIFEST: manifests/r5mid_phase_b_prepare_2026-09-16.json
+  EXPECTED_PREPARE_SHA256: 83205aa8c06e9957e965f7d146d48ee5e6fc223bda3e39d39112cf925321f767
+  R5MID_FIRST_BATCH_FREEZE: manifests/r5mid_first_v4_subject_batch_v0.1.json
+  PHASE_A_RUN_ID: '35106356084'
+  PHASE_A_ARTIFACT_NAME: r5mid-phase-a-subject-evidence-35106356084
+  EXPECTED_PHASE_A_ARTIFACT_DIGEST: sha256:4b802f3936618212f3a0950067c913948c72dd697165be72df2c346a380da352
+  BASELINE_RUN_ID: r5r6-ecommerce-baseline-0002
+  EXPECTED_SELECTED_CANDIDATE_ID: r5r6-ecommerce-baseline-0002:R2V2:36030171fcfa588e
+  EXPECTED_SELECTION_RECORD_HASH: ffbb090265c0584255fcfeec8d320136d96da942d3bfb23b94b99cf0cf95fecd
+  EXPECTED_FROZEN_PARENT_STATE_HASH: 9bd705d76b15726b64b941d16604a83933cd1b635bb1af9845e82aa9581a05ce
+  R5R6_BRANCH_REPLICATES: '2'
+  R5R6_PROVIDER: deepseek
+  R5R6_MODEL_CONFIG: arena/config/model_deepseek_v0.2.json
+  R5R6_CURRENCY: USD
+  R5R6_MAX_SUBJECT_CALLS: '128'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify one-shot Phase-B prepare manifest — zero provider calls
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          if '${{ github.event_name }}' != 'push':
+              raise SystemExit('prepare workflow only accepts push event')
+          if '${{ github.run_attempt }}' != '1':
+              raise SystemExit('one-shot prepare refuses workflow reruns')
+          raw = Path(os.environ['PREPARE_MANIFEST']).read_bytes()
+          if hashlib.sha256(raw).hexdigest() != os.environ['EXPECTED_PREPARE_SHA256']:
+              raise SystemExit('prepare manifest hash mismatch')
+          row = json.loads(raw)
+          assert row['scope'] == 'PHASE_B_PREPARE_ONLY'
+          assert row['phase_a_run_id'] == os.environ['PHASE_A_RUN_ID']
+          assert row['phase_a_artifact_name'] == os.environ['PHASE_A_ARTIFACT_NAME']
+          assert row['phase_a_artifact_digest'] == os.environ['EXPECTED_PHASE_A_ARTIFACT_DIGEST']
+          assert row['baseline_run_id'] == os.environ['BASELINE_RUN_ID']
+          assert row['selected_candidate_id'] == os.environ['EXPECTED_SELECTED_CANDIDATE_ID']
+          assert row['selection_record_hash'] == os.environ['EXPECTED_SELECTION_RECORD_HASH']
+          assert row['frozen_parent_state_hash'] == os.environ['EXPECTED_FROZEN_PARENT_STATE_HASH']
+          assert row['replicate_pairs'] == int(os.environ['R5R6_BRANCH_REPLICATES'])
+          assert row['provider'] == os.environ['R5R6_PROVIDER']
+          assert row['model_config'] == os.environ['R5R6_MODEL_CONFIG']
+          assert row['currency'] == os.environ['R5R6_CURRENCY']
+          assert row['max_subject_calls_per_parent_batch'] == int(os.environ['R5R6_MAX_SUBJECT_CALLS'])
+          assert row['paid_api_authorized'] is False
+          assert row['phase_b_real_authorized'] is False
+          assert row['automatic_paid_evaluator'] is False
+          print('PHASE_B_PREPARE_MANIFEST=VERIFIED')
+          print('PROVIDER_CALLS_AUTHORIZED=NO')
+          PY
+      - name: Validate exact offline branch machinery
+        run: |
+          python arena/validate_environment.py
+          python -m unittest discover -s arena/tests -v
+          python -m arena.branch_recovery_preflight --outdir results/branch_recovery_preflight
+          python -m arena.v4_binding_preflight --outdir results/v4_binding_preflight
+      - name: Verify and download exact Phase-A evidence artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          repo = os.environ['GITHUB_REPOSITORY']
+          run_id = os.environ['PHASE_A_RUN_ID']
+          payload = subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{run_id}/artifacts'], text=True)
+          rows = json.loads(payload)['artifacts']
+          matches = [x for x in rows if x['name'] == os.environ['PHASE_A_ARTIFACT_NAME']]
+          if len(matches) != 1:
+              raise SystemExit('exact Phase-A artifact not found uniquely')
+          a = matches[0]
+          if a.get('digest') != os.environ['EXPECTED_PHASE_A_ARTIFACT_DIGEST']:
+              raise SystemExit('Phase-A artifact digest mismatch')
+          if a.get('expired'):
+              raise SystemExit('Phase-A artifact expired')
+          print('PHASE_A_ARTIFACT_VERIFIED=' + a['name'])
+          print('PHASE_A_ARTIFACT_DIGEST=' + a['digest'])
+          PY
+          mkdir -p phase_a
+          gh run download "$PHASE_A_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "$PHASE_A_ARTIFACT_NAME" \
+            --dir phase_a
+          test -s phase_a/results/r5r6_baseline_real/traces.jsonl
+          test -s "phase_a/results/r5r6_baseline_real/selection_packages/$BASELINE_RUN_ID.json"
+      - name: Verify frozen selected parent before branch-plan construction
+        run: |
+          python - <<'PY'
+          import json, os
+          p = f"phase_a/results/r5r6_baseline_real/selection_packages/{os.environ['BASELINE_RUN_ID']}.json"
+          row = json.load(open(p, encoding='utf-8'))
+          assert row['selection_status'] == 'ANCHOR_SELECTED'
+          assert row['selected_candidate']['candidate_id'] == os.environ['EXPECTED_SELECTED_CANDIDATE_ID']
+          assert row['selection_record']['selection_record_hash'] == os.environ['EXPECTED_SELECTION_RECORD_HASH']
+          assert row['selected_snapshot']['state_hash'] == os.environ['EXPECTED_FROZEN_PARENT_STATE_HASH']
+          assert row['selected_snapshot']['terminated'] is False
+          assert len(row['selected_snapshot']['queue']) == 2
+          assert row['selected_candidate']['structural_facts']['status_after'] == 'fact'
+          print('FROZEN_PARENT=VERIFIED')
+          print('PARENT_STATE_HASH=' + row['selected_snapshot']['state_hash'])
+          print('PENDING_QUEUE=' + str(len(row['selected_snapshot']['queue'])))
+          PY
+      - name: Build frozen Phase-B branch plan — zero provider calls
+        run: |
+          python -m arena.branch_plan \
+            --selection-package "phase_a/results/r5r6_baseline_real/selection_packages/$BASELINE_RUN_ID.json" \
+            --baseline-traces phase_a/results/r5r6_baseline_real/traces.jsonl \
+            --replicates "$R5R6_BRANCH_REPLICATES" \
+            --branch-code-sha '${{ github.sha }}' \
+            --outdir results/r5r6_branch_plan
+          cp "phase_a/results/r5r6_baseline_real/selection_packages/$BASELINE_RUN_ID.json" \
+            results/r5r6_branch_plan/source_selection_package.json
+          cp phase_a/results/r5r6_baseline_real/evidence_batch/evidence_batch.json \
+            results/r5r6_branch_plan/source_phase_a_evidence_batch.json
+          test -s results/r5r6_branch_plan/branch_plan.json
+          test -s results/r5r6_branch_plan/branch_execution_manifest.jsonl
+          test -s results/r5r6_branch_plan/branch_manifests.jsonl
+          test -s results/r5r6_branch_plan/anchor_source_packets_v0.2.jsonl
+          test "$(wc -l < results/r5r6_branch_plan/branch_execution_manifest.jsonl)" = '4'
+      - name: Freeze exact v4 research-interface binding — zero provider calls
+        run: |
+          python -m arena.v4_experiment_binding \
+            --plan-dir results/r5r6_branch_plan \
+            --code-sha '${{ github.sha }}'
+          python - <<'PY'
+          import json, os
+          row = json.load(open('results/r5r6_branch_plan/v4_research_binding.json', encoding='utf-8'))
+          assert row['authorization_status'] == 'NOT_AUTHORIZED'
+          assert row['paid_api_authorized'] is False
+          assert row['semantic_status'] == 'NOT_ADJUDICATED'
+          assert row['code_sha'] == '${{ github.sha }}'
+          assert row['experimental_variable_id'] == 'EPISTEMIC_STATUS_DOWNGRADE'
+          assert row['anchor_source_packets_sha256']
+          print('V4_RESEARCH_BINDING=' + row['binding_hash'])
+          print('FIRST_PAPER_ANALYSIS_CONTRACT=' + row['first_paper_analysis_contract_hash'])
+          PY
+      - name: Record Phase-B prepared state
+        run: |
+          python - <<'PY'
+          import json, os, pathlib
+          plan = json.load(open('results/r5r6_branch_plan/branch_plan.json', encoding='utf-8'))
+          binding = json.load(open('results/r5r6_branch_plan/v4_research_binding.json', encoding='utf-8'))
+          record = {
+              'schema': 'RB-R5MID-PHASE-B-PREPARED-STATE-v0.1',
+              'phase_a_run_id': os.environ['PHASE_A_RUN_ID'],
+              'phase_a_artifact_name': os.environ['PHASE_A_ARTIFACT_NAME'],
+              'phase_a_artifact_digest': os.environ['EXPECTED_PHASE_A_ARTIFACT_DIGEST'],
+              'baseline_run_id': os.environ['BASELINE_RUN_ID'],
+              'frozen_parent_state_hash': os.environ['EXPECTED_FROZEN_PARENT_STATE_HASH'],
+              'replicate_pairs': int(os.environ['R5R6_BRANCH_REPLICATES']),
+              'branch_rows': 4,
+              'branch_code_sha': '${{ github.sha }}',
+              'v4_research_binding_hash': binding['binding_hash'],
+              'first_paper_analysis_contract_hash': binding['first_paper_analysis_contract_hash'],
+              'experimental_variable_id': binding['experimental_variable_id'],
+              'phase_b_real_authorized': False,
+              'paid_api_authorized': False,
+              'automatic_paid_evaluator': False,
+              'status': 'PREPARED_FROZEN_AWAITING_SEPARATE_REAL_AUTHORIZATION'
+          }
+          pathlib.Path('results/r5r6_branch_prepared_state.json').write_text(json.dumps(record, indent=2) + '\n', encoding='utf-8')
+          PY
+      - name: Upload immutable Phase-B prepared bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5mid-phase-b-prepared-${{ github.run_id }}
+          path: |
+            manifests/r5mid_phase_b_prepare_2026-09-16.json
+            manifests/r5mid_first_v4_subject_batch_v0.1.json
+            results/r5r6_branch_plan/
+            results/r5r6_branch_prepared_state.json
+            results/branch_recovery_preflight/
+            results/v4_binding_preflight/
+          retention-days: 90
