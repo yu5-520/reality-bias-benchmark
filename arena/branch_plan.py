@@ -66,6 +66,7 @@ def validate_phase_a_selection(selection_package, baseline_trace):
     )
     _require(selected_candidate.get('realized_in_baseline') is True, 'phase_b_v01_requires_realized_candidate')
     _require(parent_snapshot.get('terminated') is False, 'phase_b_parent_snapshot_must_be_nonterminal')
+    _require(bool(parent_snapshot.get('queue')), 'phase_b_parent_snapshot_requires_pending_queue')
 
     facts = selected_candidate.get('structural_facts') or {}
     state_key = facts.get('state_key')
@@ -302,6 +303,7 @@ def verify_branch_plan(bundle):
     _require(plan.get('plan_hash') == _hash_without(plan, 'plan_hash'), 'branch_plan_hash_mismatch')
     verify_state_snapshot(parent)
     verify_state_snapshot(intervention)
+    _require(bool(parent.get('queue')), 'branch_plan_parent_snapshot_requires_pending_queue')
     _require(plan.get('parent_snapshot_hash') == parent.get('state_hash'), 'branch_plan_parent_snapshot_hash_mismatch')
     _require(plan.get('intervention_start_snapshot_hash') == intervention.get('state_hash'), 'branch_plan_intervention_snapshot_hash_mismatch')
     _require(parent.get('state_hash') != intervention.get('state_hash'), 'branch_plan_intervention_state_must_differ')
