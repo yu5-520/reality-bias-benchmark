@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/measurement_boundary_registry_v0.1.schema.json",
+  "title": "Reality Bias Measurement Boundary Registry v0.1",
+  "type": "object",
+  "required": ["schema", "version", "status", "boundaries"],
+  "properties": {
+    "schema": {"const": "RB-MEASUREMENT-BOUNDARY-REGISTRY-v0.1"},
+    "version": {"const": "0.1"},
+    "status": {"type": "string"},
+    "boundaries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["boundary_id", "family", "description", "observable_fields", "supports_anchor_classes"],
+        "properties": {
+          "boundary_id": {"type": "string", "minLength": 1},
+          "family": {"type": "string", "minLength": 1},
+          "description": {"type": "string", "minLength": 1},
+          "observable_fields": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "supports_anchor_classes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["ANTECEDENT_ANCHOR", "TRANSITION_ANCHOR", "PENETRATION_ANCHOR", "CHALLENGE_RECOVERY_ANCHOR"]
+            },
+            "uniqueItems": true
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
