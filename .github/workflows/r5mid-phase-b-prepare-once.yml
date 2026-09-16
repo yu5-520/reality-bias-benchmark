@@ -15,7 +15,7 @@ permissions:
 
 env:
   PREPARE_MANIFEST: manifests/r5mid_phase_b_prepare_2026-09-16.json
-  EXPECTED_PREPARE_SHA256: 83205aa8c06e9957e965f7d146d48ee5e6fc223bda3e39d39112cf925321f767
+  EXPECTED_PREPARE_SHA256: 31106666a20f6669939818a20042e75d9a9fe10c2310ae2f7d070fca3392d703
   R5MID_FIRST_BATCH_FREEZE: manifests/r5mid_first_v4_subject_batch_v0.1.json
   PHASE_A_RUN_ID: '35106356084'
   PHASE_A_ARTIFACT_NAME: r5mid-phase-a-subject-evidence-35106356084
@@ -68,6 +68,9 @@ jobs:
           assert row['paid_api_authorized'] is False
           assert row['phase_b_real_authorized'] is False
           assert row['automatic_paid_evaluator'] is False
+          retry = row.get('engineering_retry') or {}
+          assert retry.get('scientific_fields_changed') is False
+          assert retry.get('phase_a_evidence_changed') is False
           print('PHASE_B_PREPARE_MANIFEST=VERIFIED')
           print('PROVIDER_CALLS_AUTHORIZED=NO')
           PY
@@ -99,10 +102,7 @@ jobs:
           print('PHASE_A_ARTIFACT_DIGEST=' + a['digest'])
           PY
           mkdir -p phase_a
-          gh run download "$PHASE_A_RUN_ID" \
-            --repo "$GITHUB_REPOSITORY" \
-            --name "$PHASE_A_ARTIFACT_NAME" \
-            --dir phase_a
+          gh run download "$PHASE_A_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$PHASE_A_ARTIFACT_NAME" --dir phase_a
           test -s phase_a/results/r5r6_baseline_real/traces.jsonl
           test -s "phase_a/results/r5r6_baseline_real/selection_packages/$BASELINE_RUN_ID.json"
       - name: Verify frozen selected parent before branch-plan construction
@@ -113,7 +113,7 @@ jobs:
           row = json.load(open(p, encoding='utf-8'))
           assert row['selection_status'] == 'ANCHOR_SELECTED'
           assert row['selected_candidate']['candidate_id'] == os.environ['EXPECTED_SELECTED_CANDIDATE_ID']
-          assert row['selection_record']['selection_record_hash'] == os.environ['EXPECTED_SELECTION_RECORD_HASH']
+          assert row['selection_record']['record_hash'] == os.environ['EXPECTED_SELECTION_RECORD_HASH']
           assert row['selected_snapshot']['state_hash'] == os.environ['EXPECTED_FROZEN_PARENT_STATE_HASH']
           assert row['selected_snapshot']['terminated'] is False
           assert len(row['selected_snapshot']['queue']) == 2
@@ -130,10 +130,8 @@ jobs:
             --replicates "$R5R6_BRANCH_REPLICATES" \
             --branch-code-sha '${{ github.sha }}' \
             --outdir results/r5r6_branch_plan
-          cp "phase_a/results/r5r6_baseline_real/selection_packages/$BASELINE_RUN_ID.json" \
-            results/r5r6_branch_plan/source_selection_package.json
-          cp phase_a/results/r5r6_baseline_real/evidence_batch/evidence_batch.json \
-            results/r5r6_branch_plan/source_phase_a_evidence_batch.json
+          cp "phase_a/results/r5r6_baseline_real/selection_packages/$BASELINE_RUN_ID.json" results/r5r6_branch_plan/source_selection_package.json
+          cp phase_a/results/r5r6_baseline_real/evidence_batch/evidence_batch.json results/r5r6_branch_plan/source_phase_a_evidence_batch.json
           test -s results/r5r6_branch_plan/branch_plan.json
           test -s results/r5r6_branch_plan/branch_execution_manifest.jsonl
           test -s results/r5r6_branch_plan/branch_manifests.jsonl
@@ -141,11 +139,9 @@ jobs:
           test "$(wc -l < results/r5r6_branch_plan/branch_execution_manifest.jsonl)" = '4'
       - name: Freeze exact v4 research-interface binding — zero provider calls
         run: |
-          python -m arena.v4_experiment_binding \
-            --plan-dir results/r5r6_branch_plan \
-            --code-sha '${{ github.sha }}'
+          python -m arena.v4_experiment_binding --plan-dir results/r5r6_branch_plan --code-sha '${{ github.sha }}'
           python - <<'PY'
-          import json, os
+          import json
           row = json.load(open('results/r5r6_branch_plan/v4_research_binding.json', encoding='utf-8'))
           assert row['authorization_status'] == 'NOT_AUTHORIZED'
           assert row['paid_api_authorized'] is False
@@ -160,7 +156,6 @@ jobs:
         run: |
           python - <<'PY'
           import json, os, pathlib
-          plan = json.load(open('results/r5r6_branch_plan/branch_plan.json', encoding='utf-8'))
           binding = json.load(open('results/r5r6_branch_plan/v4_research_binding.json', encoding='utf-8'))
           record = {
               'schema': 'RB-R5MID-PHASE-B-PREPARED-STATE-v0.1',
