@@ -1,0 +1,96 @@
+{
+  "schema": "RB-R5MID-PHASE-B-OBSERVED-RUN-RECORD-v0.1",
+  "date": "2026-09-16",
+  "run_id": "35108633026",
+  "job_id": "104836256305",
+  "workflow": "R5-MID Phase-B Authorized Once",
+  "authorization_id": "R5MID-PHASEB-2026-09-16-001",
+  "prepared_run_id": "35107601970",
+  "prepared_artifact_digest": "sha256:2990ef4dccf091516eb9d06e204c457270c09af2559313549a1cef2f53d1a7f6",
+  "bound_branch_code_sha": "6318692a3fd4ae043692f9edd45bd739251e5b62",
+  "v4_research_binding_hash": "34d8aa92995d2dee5fcd0a5b1354ff6dc5e85a3cda65ac2d6bdc33dc2ef15c06",
+  "subject_execution_status": "COMPLETED",
+  "subject_execution_runner_errors": 0,
+  "automatic_paid_evaluator_called": false,
+  "phase_a_rerun_called": false,
+  "final_engineering_estimated_spend_usd": 0.10734904,
+  "branch_runs": [
+    {
+      "run_id": "r5r6-ecommerce-baseline-0002:branch-pair:0001:control_continuation",
+      "condition": "CONTROL_CONTINUATION",
+      "status": "RUN_COMPLETE",
+      "turns": 13,
+      "cumulative_estimated_spend_usd_after_run": 0.00475357
+    },
+    {
+      "run_id": "r5r6-ecommerce-baseline-0002:branch-pair:0001:status_downgrade_intervention",
+      "condition": "STATUS_DOWNGRADE_INTERVENTION",
+      "status": "RUN_COMPLETE",
+      "turns": 30,
+      "cumulative_estimated_spend_usd_after_run": 0.04865027
+    },
+    {
+      "run_id": "r5r6-ecommerce-baseline-0002:branch-pair:0002:status_downgrade_intervention",
+      "condition": "STATUS_DOWNGRADE_INTERVENTION",
+      "status": "RUN_COMPLETE",
+      "turns": 16,
+      "cumulative_estimated_spend_usd_after_run": 0.05756413
+    },
+    {
+      "run_id": "r5r6-ecommerce-baseline-0002:branch-pair:0002:control_continuation",
+      "condition": "CONTROL_CONTINUATION",
+      "status": "BUDGET_CENSORED",
+      "turns": 32,
+      "cumulative_estimated_spend_usd_after_run": 0.10734904
+    }
+  ],
+  "evidence_batch": {
+    "version": "R2-EVIDENCE-BATCH-v0.2",
+    "status": "OBSERVATION_FINISHED_WITH_CENSORING_PENDING_REVIEW",
+    "review_status": "PENDING_REVIEW",
+    "planned_runs": 4,
+    "preserved_traces_before_runner_teardown": 4,
+    "complete_runs": 3,
+    "natural_complete_runs": 3,
+    "budget_censored_runs": 1,
+    "runner_errors": 0,
+    "review_packet_count": 111,
+    "manifest_sha256": "cab3ba8d819a34ec778518dd620ddaf3994e8774da2f5fbbfe4c781ad66971b5",
+    "traces_sha256": "1f68db98c1744c14eb4c3bc95f862851456b7c6d4403ed8d117583eb7a34b4b3",
+    "errors_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "evidence_batch_hash": "d1c7d3d784315a17d34d6cf908dcc3cd7d2ae94a4547e3e9cfa4b2f49f09259f",
+    "journal_hashes": {
+      "pair1_control": "34bd930ece71a4d2623216e06cfb092d89ce89d63ff8a9177b8d5d4511b2600b",
+      "pair1_intervention": "00515ab21a0fd3bd0830473d44e0fc196d4c41a333ef3cbf879b312de3e861a2",
+      "pair2_control": "2d61f06db158726d1a7d3b573220fe6763813ad4843b90c614ca4e3450a3ce8b",
+      "pair2_intervention": "2609127caa77d71bba54e2ae9a931ad3d002fe258acdf0f12a4474b81f07bfbc"
+    }
+  },
+  "measurement_v3": {
+    "derived_branch_measurements": 4,
+    "complete_pair_comparisons": 1,
+    "semantic_review": "DEFERRED_APPEND_ONLY"
+  },
+  "system_behavior_v4": {
+    "derived_measurements": 4,
+    "branch_anchor_views": 4,
+    "bounded_review_packets": 39,
+    "branch_anchor_review_packets": 4,
+    "structurally_compared_pairs": 1,
+    "semantic_review": "DEFERRED_APPEND_ONLY",
+    "causal_effect": "NOT_ADJUDICATED",
+    "paid_evaluator": "NO",
+    "measurement_v3_replaced": "NO"
+  },
+  "persistence_failure": {
+    "raw_subject_evidence_artifact_persisted": false,
+    "github_artifact_count_for_run": 0,
+    "reason": "actions/upload-artifact rejected journal filenames containing colon characters after subject evidence and analyses had completed",
+    "secondary_verification_step_failure": "shell heredoc delimiter indentation error in post-analysis verification step",
+    "subject_run_reexecution_triggered": false,
+    "paid_rerun_authorized": false
+  },
+  "scientific_use_status": "EXECUTION_OBSERVED_BUT_RAW_EVIDENCE_NOT_DURABLY_PERSISTED",
+  "primary_outcome_recoverable_from_job_log": false,
+  "instruction": "Do not treat this run as a fully frozen primary-analysis evidence batch. Preserve it as an observed execution/provenance record. Any re-collection must be a separately authorized new evidence batch and must not overwrite this record."
+}
