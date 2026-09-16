@@ -24,6 +24,7 @@ on:
       - 'docs/R7_real_run_freeze_template_v0.1.md'
       - 'docs/trajectory_dynamics_measurement_plan_v3.md'
       - 'docs/system_behavior_measurement_plan_v4.md'
+      - 'docs/first_paper_v4_scope.md'
       - 'docs/v4_open_implementation_items.md'
       - 'docs/v4_next_safe_step.md'
       - 'docs/R_Plan_v4.0.md'
@@ -131,7 +132,10 @@ jobs:
           python -m arena.v4_branch_derivation_preflight --outdir results/v4_branch_derivation_preflight
           test -s results/v4_branch_derivation_preflight/evidence_batch.json
           test -s results/v4_branch_derivation_preflight/trajectory_measurements_v4.jsonl
+          test -s results/v4_branch_derivation_preflight/branch_anchor_lineage_views_v4.jsonl
           test -s results/v4_branch_derivation_preflight/bounded_review_packets_v4.jsonl
+          test -s results/v4_branch_derivation_preflight/branch_anchor_review_packets_v4.jsonl
+          test -s results/v4_branch_derivation_preflight/pair_structural_comparisons_v4.jsonl
           test -s results/v4_branch_derivation_preflight/summary.json
           test -s results/v4_branch_derivation_preflight/SUMMARY.txt
           grep -q '^V4_BRANCH_DERIVATION_PREFLIGHT=PASS$' results/v4_branch_derivation_preflight/SUMMARY.txt
@@ -140,6 +144,27 @@ jobs:
           grep -q '^PAID_EVALUATOR_CALLED=NO$' results/v4_branch_derivation_preflight/SUMMARY.txt
           grep -q '^MEASUREMENT_V3_REPLACED=NO$' results/v4_branch_derivation_preflight/SUMMARY.txt
           grep -q '^SEMANTIC_STATUS=NOT_ADJUDICATED$' results/v4_branch_derivation_preflight/SUMMARY.txt
+          grep -q '^BRANCH_ANCHOR_REVIEW_HIDDEN_COT_INCLUDED=NO$' results/v4_branch_derivation_preflight/SUMMARY.txt
+          grep -q '^CAUSAL_EFFECT_STATUS=NOT_ADJUDICATED$' results/v4_branch_derivation_preflight/SUMMARY.txt
+      - name: Execute frozen first-paper R5-MID structural analysis contract on fixture pairs
+        run: |
+          python -m arena.analyze_first_paper_r5mid \
+            --comparisons results/v4_branch_derivation_preflight/pair_structural_comparisons_v4.jsonl \
+            --derivation-summary results/v4_branch_derivation_preflight/summary.json \
+            --out results/v4_branch_derivation_preflight/first_paper_structural_analysis_v0.1.json
+          test -s results/v4_branch_derivation_preflight/first_paper_structural_analysis_v0.1.json
+          python - <<'PY'
+          import json
+          p = 'results/v4_branch_derivation_preflight/first_paper_structural_analysis_v0.1.json'
+          row = json.load(open(p, encoding='utf-8'))
+          assert row['schema'] == 'RB-FIRST-PAPER-STRUCTURAL-ANALYSIS-v0.1'
+          assert row['primary_outcome_id'] == 'R5MID_ANCHOR_DOWNSTREAM_OPERATIONAL_CROSSING_COUNT'
+          assert row['primary_p_value'] is None
+          assert row['semantic_status'] == 'NOT_INCLUDED_IN_STRUCTURAL_ANALYSIS'
+          assert row['causal_claim_status'] == 'NOT_ESTABLISHED_BY_STRUCTURAL_ANALYSIS_ALONE'
+          assert row['primary_interval_status'] == 'NOT_ESTIMATED_MINIMUM_PAIR_COUNT_NOT_MET'
+          print('FIRST_PAPER_ANALYSIS_FIXTURE=PASS')
+          PY
       - name: Build current v0.3.2 offline manifest sample
         run: |
           python -m arena.build_manifest --domains all --repeats 2 --arena-config arena/config/arena_v0.3.json --out results/arena_manifest_preflight.jsonl
