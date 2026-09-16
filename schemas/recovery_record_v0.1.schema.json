@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/recovery_record_v0.1.schema.json",
+  "title": "Reality Bias Recovery Record v0.1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "recovery_id",
+    "parent_branch_id",
+    "parent_trace_hash",
+    "parent_state_hash",
+    "recovery_anchor_ref",
+    "recovery_strategy",
+    "recovery_status",
+    "residual_descendant_count",
+    "recurrence_detected",
+    "recovery_turns",
+    "recovery_calls",
+    "provider_internal_state_replayed",
+    "record_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-RECOVERY-RECORD-v0.1"},
+    "recovery_id": {"type": "string", "minLength": 1},
+    "parent_branch_id": {"type": ["string", "null"]},
+    "parent_trace_hash": {"type": "string", "minLength": 1},
+    "parent_state_hash": {"type": "string", "minLength": 1},
+    "recovery_anchor_ref": {"type": "string", "minLength": 1},
+    "jump_ref": {"type": ["string", "null"]},
+    "recovery_anchor_distance": {"type": ["integer", "null"], "minimum": 0},
+    "recovery_strategy": {
+      "type": "string",
+      "enum": [
+        "FULL_RERUN",
+        "CHECKPOINT_RECOVERY",
+        "LOCAL_STATE_CORRECTION",
+        "VERSIONED_STATE_ADVANCE"
+      ]
+    },
+    "recovery_status": {
+      "type": "string",
+      "enum": ["RECOVERED", "PARTIAL", "FAILED", "CENSORED", "NOT_EVALUATED"]
+    },
+    "residual_descendant_count": {"type": "integer", "minimum": 0},
+    "recurrence_detected": {"type": "boolean"},
+    "regeneration_semantic_status": {
+      "type": "string",
+      "enum": ["NOT_ADJUDICATED", "PRESENT", "ABSENT", "NOT_APPLICABLE"]
+    },
+    "recovery_turns": {"type": "integer", "minimum": 0},
+    "recovery_calls": {"type": "integer", "minimum": 0},
+    "recovery_tokens": {"type": ["integer", "number", "null"], "minimum": 0},
+    "provenance_reconstruction_status": {
+      "type": "string",
+      "enum": ["COMPLETE", "PARTIAL", "FAILED", "NOT_EVALUATED"]
+    },
+    "provider_internal_state_replayed": {"const": false},
+    "notes": {"type": ["string", "null"]},
+    "record_hash": {"type": "string", "minLength": 1}
+  }
+}
