@@ -6,7 +6,10 @@ from .experimental_control import verify_state_snapshot
 from .measurement_v2 import build_r2_candidate_index
 
 
-RULE_SCHEMA = 'RB-R5R6-ANCHOR-RULE-v0.1'
+RULE_SCHEMAS = {
+    'RB-R5R6-ANCHOR-RULE-v0.1',
+    'RB-R5R6-ANCHOR-RULE-v0.2',
+}
 
 
 def _require(condition, message):
@@ -16,7 +19,7 @@ def _require(condition, message):
 
 def validate_anchor_rule(rule):
     _require(isinstance(rule, dict), 'anchor_rule_must_be_object')
-    _require(rule.get('schema') == RULE_SCHEMA, 'anchor_rule_schema_invalid')
+    _require(rule.get('schema') in RULE_SCHEMAS, 'anchor_rule_schema_invalid')
     _require(rule.get('selection_scope') == 'STRUCTURAL_ONLY', 'anchor_rule_scope_invalid')
     _require(rule.get('candidate_type'), 'anchor_rule_candidate_type_required')
     _require(rule.get('action_type'), 'anchor_rule_action_type_required')
@@ -24,6 +27,8 @@ def validate_anchor_rule(rule):
     _require(rule.get('tie_break') == 'LOWEST_EVENT_INDEX', 'anchor_rule_tie_break_invalid')
     _require(rule.get('semantic_reviewer_labels_allowed') is False, 'anchor_rule_semantic_contamination')
     _require(rule.get('branch_outcomes_allowed_during_selection') is False, 'anchor_rule_outcome_contamination')
+    if rule.get('schema') == 'RB-R5R6-ANCHOR-RULE-v0.2':
+        _require(rule.get('require_pending_queue') is True, 'anchor_rule_v02_pending_queue_required')
     return True
 
 
@@ -60,6 +65,8 @@ def eligible_anchor_candidates(trace, snapshots, rule, *, evidence_hash=None):
         if snapshot is None:
             continue
         if rule.get('require_nonterminal_snapshot') and snapshot.get('terminated'):
+            continue
+        if rule.get('require_pending_queue') and not snapshot.get('queue'):
             continue
         eligible.append({
             'candidate': copy.deepcopy(candidate),
@@ -112,8 +119,8 @@ def select_anchor(trace, snapshots, rule, *, evidence_hash=None, selection_id=No
         reviewer_labels_used_for_selection=False,
         branch_outcomes_visible_at_selection=False,
         notes=(
-            'Selected by a frozen structural-only rule. Candidate eligibility does not establish semantic C/P/R, '
-            'unauthorized promotion, Jump truth, Authority Penetration, or causal importance.'
+            'Selected by a frozen structural-only rule. Candidate eligibility establishes replayability and, where required, pending continuation work; '
+            'it does not establish semantic C/P/R, unauthorized promotion, Jump truth, Authority Penetration, or causal importance.'
         ),
     )
     verify_anchor_selection_record(record)
