@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/r7_paired_run_summary_v0.1.schema.json",
+  "title": "Reality Bias R7 Paired Run Summary v0.1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "authorization_hash",
+    "manifest_sha256",
+    "attempted_run_ids",
+    "unattempted_run_ids",
+    "pair_index",
+    "runner_errors",
+    "budget_summary",
+    "review_status",
+    "automatic_paid_evaluator_called",
+    "summary_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-R7-PAIRED-RUN-SUMMARY-v0.1"},
+    "authorization_hash": {"type": "string", "minLength": 1},
+    "manifest_sha256": {"type": "string", "minLength": 1},
+    "attempted_run_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "unattempted_run_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "pair_index": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["pair_id", "pair_status"],
+        "properties": {
+          "pair_id": {"type": "string", "minLength": 1},
+          "pair_status": {"enum": ["PAIR_RECORDED", "PAIR_INCOMPLETE"]},
+          "comparison_hash": {"type": "string"},
+          "recorded_conditions": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "runner_errors": {"type": "integer", "minimum": 0},
+    "budget_summary": {"type": "object"},
+    "review_status": {"const": "PENDING_REVIEW"},
+    "automatic_paid_evaluator_called": {"const": false},
+    "summary_hash": {"type": "string", "minLength": 1}
+  }
+}
