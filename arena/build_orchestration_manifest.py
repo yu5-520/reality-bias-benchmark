@@ -11,7 +11,15 @@ from .structured_routing import validate_structured_policy
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def build_rows(*, repeats, domain_id='ecommerce', arena_config_path='arena/config/arena_v0.3.json', structured_policy_path='arena/config/structured_ecommerce_v0.1.json', code_sha=None):
+def build_rows(
+    *,
+    repeats,
+    domain_id='ecommerce',
+    arena_config_path='arena/config/arena_v0.3.json',
+    structured_policy_path='arena/config/structured_ecommerce_v0.1.json',
+    model_config_path=None,
+    code_sha=None,
+):
     if type(repeats) is not int or repeats < 1:
         raise ValueError('positive integer repeats required')
 
@@ -26,7 +34,8 @@ def build_rows(*, repeats, domain_id='ecommerce', arena_config_path='arena/confi
     if domain_id not in arena.get('default_domains', []):
         raise ValueError('domain_not_registered_in_arena_config')
 
-    model_path = ROOT / arena.get('model_config_path', 'arena/config/model_deepseek_v0.1.json')
+    model_config_path = model_config_path or arena.get('model_config_path', 'arena/config/model_deepseek_v0.1.json')
+    model_path = ROOT / model_config_path
     model = load_json(model_path)
     code_sha = code_sha or os.environ.get('GITHUB_SHA') or 'LOCAL_OR_UNRECORDED'
 
@@ -40,9 +49,11 @@ def build_rows(*, repeats, domain_id='ecommerce', arena_config_path='arena/confi
         'arena_config_path': arena_config_path,
         'arena_config_version': arena['version'],
         'arena_config_hash': sha256_file(arena_path),
-        'model_config_path': str(model_path.relative_to(ROOT)),
+        'model_config_path': model_config_path,
         'model_config_version': model.get('config_version'),
         'model_config_hash': sha256_file(model_path),
+        'model_provider': model.get('provider'),
+        'model_alias': model.get('model_alias'),
         'structured_policy_path': structured_policy_path,
         'structured_policy_version': policy.get('version'),
         'structured_policy_hash': sha256_file(policy_path),
@@ -57,7 +68,7 @@ def build_rows(*, repeats, domain_id='ecommerce', arena_config_path='arena/confi
     for trial in range(1, repeats + 1):
         pair_id = f'r7-ecommerce-pair-{trial:04d}'
         logical_seed = trial
-        rows.append({
+        free = {
             **shared,
             'pair_id': pair_id,
             'condition_id': 'EMERGENT_FREE_ROUTING',
@@ -66,8 +77,8 @@ def build_rows(*, repeats, domain_id='ecommerce', arena_config_path='arena/confi
             'logical_seed': logical_seed,
             'routing_owner': 'AGENT_WITHIN_ARENA_POLICY',
             'structured_policy_active': False,
-        })
-        rows.append({
+        }
+        structured = {
             **shared,
             'pair_id': pair_id,
             'condition_id': 'STRUCTURED_SYSTEM_OWNED_ROUTING',
@@ -76,7 +87,14 @@ def build_rows(*, repeats, domain_id='ecommerce', arena_config_path='arena/confi
             'logical_seed': logical_seed,
             'routing_owner': 'EXPERIMENT_SYSTEM',
             'structured_policy_active': True,
-        })
+        }
+
+        # Counterbalance condition order to reduce simple time/order confounding.
+        ordered = [free, structured] if trial % 2 == 1 else [structured, free]
+        for position, row in enumerate(ordered, 1):
+            row['pair_execution_order'] = position
+            row['pair_order_pattern'] = 'FREE_THEN_STRUCTURED' if trial % 2 == 1 else 'STRUCTURED_THEN_FREE'
+            rows.append(row)
     return rows
 
 
@@ -98,7 +116,11 @@ def verify_pairing(rows):
             raise ValueError('pair_condition_set_invalid')
         if len({row.get('logical_seed') for row in pair_rows}) != 1:
             raise ValueError('paired_logical_seed_mismatch')
-        for binding in ('domain_hash', 'task_hash', 'agent_pool_hash', 'arena_config_hash', 'model_config_hash'):
+        if {row.get('pair_execution_order') for row in pair_rows} != {1, 2}:
+            raise ValueError('paired_execution_order_invalid')
+        if len({row.get('pair_order_pattern') for row in pair_rows}) != 1:
+            raise ValueError('paired_order_pattern_mismatch')
+        for binding in ('domain_hash', 'task_hash', 'agent_pool_hash', 'arena_config_hash', 'model_config_hash', 'structured_policy_hash'):
             if len({row.get(binding) for row in pair_rows}) != 1:
                 raise ValueError('paired_binding_mismatch:' + binding)
     return True
@@ -110,6 +132,7 @@ def main():
     ap.add_argument('--domain', default='ecommerce')
     ap.add_argument('--arena-config', default='arena/config/arena_v0.3.json')
     ap.add_argument('--structured-policy', default='arena/config/structured_ecommerce_v0.1.json')
+    ap.add_argument('--model-config', default=None)
     ap.add_argument('--out', required=True)
     args = ap.parse_args()
 
@@ -118,6 +141,7 @@ def main():
         domain_id=args.domain,
         arena_config_path=args.arena_config,
         structured_policy_path=args.structured_policy,
+        model_config_path=args.model_config,
     )
     verify_pairing(rows)
     write_jsonl(args.out, rows)
