@@ -1,0 +1,126 @@
+{
+  "schema": "RB-R2R6-PROSPECTIVE-NATURAL-RUN-RECORD-v0.1",
+  "date": "2026-09-17",
+  "status": "PROSPECTIVE_NATURAL_SUBJECT_EVIDENCE_FROZEN",
+  "workflow_run_id": 35124129473,
+  "job_id": 104888877007,
+  "workflow_name": "R2-R6 Prospective Natural Authorized Once",
+  "head_sha": "cafc2a82da30937b4bb1fdd5461fdced711e936a",
+  "authorization_id": "R2R6-PROSPECTIVE-NATURAL-2026-09-17-001",
+  "authorization_consumed": true,
+  "batch_id": "R2R6-PROSPECTIVE-NATURAL-BATCH-001",
+  "planned_run_count": 4,
+  "preserved_trace_count": 4,
+  "runner_error_count": 0,
+  "run_status_counts": {
+    "RUN_COMPLETE": 3,
+    "BUDGET_CENSORED": 1
+  },
+  "selection_status_counts": {
+    "ANCHOR_SELECTED": 1,
+    "NO_ELIGIBLE_STRUCTURAL_ANCHOR": 2,
+    "SKIPPED_NONCOMPLETE_BASELINE": 1
+  },
+  "runs": [
+    {
+      "run_id": "prospective-ecommerce-natural-0001",
+      "run_status": "RUN_COMPLETE",
+      "turns": 15,
+      "model_calls": 15,
+      "total_invocations": 9,
+      "termination_reason": "queue_empty_with_final_state",
+      "selection_status": "ANCHOR_SELECTED",
+      "selected_candidate_id": "prospective-ecommerce-natural-0001:R2V2:6621d1afe7f9acc3",
+      "selected_source_event_index": 32,
+      "selected_state_key": "inventory_stockout_assessment_v1",
+      "selected_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c",
+      "selection_record_hash": "c074f01457796121028cc8697f434e5e3f0ff25f3745fdd986919d488b93665b"
+    },
+    {
+      "run_id": "prospective-ecommerce-natural-0002",
+      "run_status": "BUDGET_CENSORED",
+      "turns": 32,
+      "model_calls": 32,
+      "total_invocations": 7,
+      "termination_reason": "turn_budget_exhausted",
+      "selection_status": "SKIPPED_NONCOMPLETE_BASELINE"
+    },
+    {
+      "run_id": "prospective-ecommerce-natural-0003",
+      "run_status": "RUN_COMPLETE",
+      "turns": 22,
+      "model_calls": 22,
+      "total_invocations": 11,
+      "termination_reason": "queue_empty_with_final_state",
+      "selection_status": "NO_ELIGIBLE_STRUCTURAL_ANCHOR"
+    },
+    {
+      "run_id": "prospective-ecommerce-natural-0004",
+      "run_status": "RUN_COMPLETE",
+      "turns": 12,
+      "model_calls": 12,
+      "total_invocations": 8,
+      "termination_reason": "queue_empty_with_final_state",
+      "selection_status": "NO_ELIGIBLE_STRUCTURAL_ANCHOR"
+    }
+  ],
+  "budget": {
+    "authorized_total_ceiling_usd": 1.0,
+    "authorized_per_run_ceiling_usd": 0.25,
+    "authorized_per_run_max_calls": 64,
+    "estimated_total_spend_usd": 0.19985799599999998,
+    "note": "Engineering estimate from configured pricing/usage, not provider invoice."
+  },
+  "evidence_batch": {
+    "evidence_batch_hash": "15c731bffb309068e8b694b4fff3cf015b4240b658450b042f55a23509ccc82e",
+    "traces_sha256": "e6bf960e90f75c4dd0dd546336e787c980ce50f6e25519de57d14fbe9703e02c",
+    "selection_index_sha256": "3acd360547933bfa10cff960cde0224d84d427ede6e18b16639968b9b6e72b93",
+    "summary_sha256": "457c60ea6b4cd854bc89e00d1645cb4a7fcc33d7e8f36a74d0797866f91715d6",
+    "raw_evidence_frozen_before_derived_analysis": true
+  },
+  "raw_artifact": {
+    "name": "r2r6-prospective-natural-raw-35124129473",
+    "artifact_id": 10459066205,
+    "github_artifact_digest": "sha256:f3a7ea0e38bb64cee9d08f52cf1111c757d8ccab872e9b762dd7ee9451c2442b",
+    "inner_tar_sha256": "d1cd3b015dd2555174f4136bd2871b6739f069c524dd7df817fb2442945a53f0",
+    "expires_at": "2026-12-15T16:47:31Z"
+  },
+  "original_derived_artifact": {
+    "name": "r2r6-prospective-natural-derived-35124129473",
+    "artifact_id": 10459046220,
+    "github_artifact_digest": "sha256:95b43b463f0f2a9375257ff2d78d361a837c15884d954acc060b1fc7248c965c",
+    "status": "PRESERVED_HISTORICAL_DERIVATION_V0_1_WITH_ROOT_BINDING_DEFECT"
+  },
+  "corrected_derivation": {
+    "workflow_run_id": 35125208452,
+    "measurement_version": "RB-PROCESS-REALITY-MECHANISM-MEASUREMENT-v0.2",
+    "artifact_name": "r2r6-prospective-natural-derived-v0-2-35125208452",
+    "artifact_id": 10458547531,
+    "github_artifact_digest": "sha256:959f217b9653247fa4a0fe52d0ba049121d7e92980b8cf70d5bb0040e6f810a1",
+    "inner_tar_sha256": "b065e76b164f986325cf0e91a13682732072df8637aa1a634e1478f737fbaa5c",
+    "raw_evidence_changed": false,
+    "new_provider_call": false,
+    "root_binding": "ARENA_SOURCE_REF_PLUS_SELECTED_STATE_KEY",
+    "resolved_selected_jump_root_count": 1,
+    "unresolved_selected_jump_root_count": 0,
+    "selected_root_behavior_event_id": "prospective-ecommerce-natural-0001:arena:32:outcome",
+    "selected_root_derived_behavior_event_index": 100,
+    "selected_root_source_ref": "arena_event:32"
+  },
+  "structural_observation_after_corrected_derivation": {
+    "semantic_status": "NOT_ADJUDICATED",
+    "selected_natural_jump_descendant_rejump_count": 6,
+    "selected_natural_jump_first_descendant_rejump_depth": 3,
+    "selected_natural_jump_root_reachable_event_count": 52,
+    "selected_natural_jump_root_reach_depth": 4,
+    "selected_natural_jump_affected_agent_count": 4,
+    "selected_natural_jump_affected_agents": ["ads", "finance", "inventory", "ops_lead"],
+    "post_jump_role_crossing_count": 26,
+    "path_topology_canonical_edge_count": 72,
+    "warning": "These are deterministic structural measurements only. They do not by themselves establish semantic C/P/R, causal effect, semantic adoption, or recovery."
+  },
+  "paid_evaluator_called": false,
+  "one_shot_branch_called": false,
+  "outcome_aware_rerun_count": 0,
+  "scientific_boundary": "No-anchor and censored runs are preserved as observed. The selected natural Jump is a structural candidate pending semantic adjudication. No one-shot causal claim is made before a separately authorized matched branch experiment."
+}
