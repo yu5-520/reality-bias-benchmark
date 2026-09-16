@@ -11,6 +11,7 @@ on:
       - 'docs/experimental_control_layer_v0.1.md'
       - 'docs/R5_R6_branch_intervention_recovery_protocol_v0.1.md'
       - 'docs/R7_orchestration_protocol_v0.1.md'
+      - 'docs/R7_real_run_freeze_template_v0.1.md'
       - 'theory/change_notes/**'
       - '.github/workflows/r2-free-agent-arena-validate.yml'
   workflow_dispatch:
@@ -50,6 +51,10 @@ jobs:
           test -s results/orchestration_preflight/structured_trace.json
           test -s results/orchestration_preflight/comparison.json
           test -s results/orchestration_preflight/SUMMARY.txt
+      - name: Build paired R7 candidate manifest — no API calls
+        run: |
+          python -m arena.build_orchestration_manifest --repeats 2 --out results/r7_orchestration_manifest_candidate.jsonl
+          test "$(wc -l < results/r7_orchestration_manifest_candidate.jsonl)" -eq 4
       - name: Upload offline preflight evidence
         uses: actions/upload-artifact@v4
         with:
