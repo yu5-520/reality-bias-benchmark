@@ -1,0 +1,82 @@
+{
+  "schema": "RB-SOURCE-LINEAGE-RULES-v0.1",
+  "version": "0.1",
+  "status": "FROZEN_OFFLINE_INTERFACE",
+  "scientific_scope": "SOURCE_BACKED_STRUCTURAL_LINEAGE_ONLY",
+  "source_behavior_schema": "RB-BEHAVIOR-EVENT-v0.1",
+  "relations": [
+    {
+      "relation_type": "AGENT_TURN_TO_ACTION_PROPOSAL",
+      "family": "ACTION_GENERATION",
+      "evidence_basis": "Agent-turn event_index_start/event_index_end contains the source Arena action event index.",
+      "strength": "EXACT_SOURCE_INDEX"
+    },
+    {
+      "relation_type": "PROPOSAL_TO_REALIZATION",
+      "family": "ACTION_REALIZATION",
+      "evidence_basis": "Realization BehaviorEvent explicitly carries proposal BehaviorEvent in parent_event_refs.",
+      "strength": "EXACT_EVENT_REF"
+    },
+    {
+      "relation_type": "MESSAGE_REALIZATION_TO_READ",
+      "family": "MESSAGE_TRANSMISSION",
+      "evidence_basis": "Realized message action and read ledger share the same message_id.",
+      "strength": "EXACT_MESSAGE_ID"
+    },
+    {
+      "relation_type": "INVOCATION_REALIZATION_TO_MESSAGE_READ",
+      "family": "INVOCATION_TRANSMISSION",
+      "evidence_basis": "Realized invocation action and invocation-delivery message read share the same message_id.",
+      "strength": "EXACT_MESSAGE_ID"
+    },
+    {
+      "relation_type": "INVOCATION_REALIZATION_TO_INVOCATION_READ",
+      "family": "INVOCATION_TRANSMISSION",
+      "evidence_basis": "Realized invocation action and invocation read ledger share the same invocation_id.",
+      "strength": "EXACT_INVOCATION_ID"
+    },
+    {
+      "relation_type": "MESSAGE_READ_TO_AGENT_TURN",
+      "family": "CONTEXT_CONSUMPTION",
+      "evidence_basis": "Agent turn input_message_ids explicitly contains the read message_id.",
+      "strength": "EXACT_MESSAGE_ID"
+    },
+    {
+      "relation_type": "INVOCATION_READ_TO_AGENT_TURN",
+      "family": "CONTEXT_CONSUMPTION",
+      "evidence_basis": "Agent turn input_invocation_ids explicitly contains the read invocation_id.",
+      "strength": "EXACT_INVOCATION_ID"
+    },
+    {
+      "relation_type": "STATE_MUTATION_TO_AGENT_TURN_VISIBILITY",
+      "family": "STATE_VISIBILITY",
+      "evidence_basis": "Agent runtime_snapshot shared_state_metadata carries the exact source Arena event_index and writer for the visible state key.",
+      "strength": "EXACT_RUNTIME_SNAPSHOT_ORIGIN"
+    },
+    {
+      "relation_type": "FINAL_STATE_VERSION_TO_AGENT_TURN_VISIBILITY",
+      "family": "TEMPORAL_VISIBILITY",
+      "evidence_basis": "Agent runtime_snapshot final_state carries the same state_id and revision_count as the latest source-backed final-state version event.",
+      "strength": "EXACT_FINAL_STATE_VERSION"
+    },
+    {
+      "relation_type": "FINAL_STATE_VERSION_TO_REVISION",
+      "family": "TEMPORAL_ANCESTRY",
+      "evidence_basis": "Revision final_state_before has the same state_id and revision_count as a preceding realized final-state version event.",
+      "strength": "EXACT_FINAL_STATE_VERSION"
+    },
+    {
+      "relation_type": "FINAL_STATE_VERSION_TO_FINALIZE",
+      "family": "TEMPORAL_ANCESTRY",
+      "evidence_basis": "Finalize final_state_before has the same state_id and revision_count as a preceding realized final-state version event.",
+      "strength": "EXACT_FINAL_STATE_VERSION"
+    }
+  ],
+  "non_claims": [
+    "A structural lineage edge does not establish semantic adoption.",
+    "Visibility does not prove that the model attended to or relied on the visible state.",
+    "Message or invocation consumption does not prove agreement with its content.",
+    "Lineage does not by itself establish Authority Penetration.",
+    "Temporal ancestry is not a psychological explanation of the model's reasoning."
+  ]
+}
