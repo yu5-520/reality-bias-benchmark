@@ -47,6 +47,19 @@ def subject_max_tokens(model_config):
     return value
 
 
+def provider_attempt_reservation_multiplier(model_config):
+    """Reserve for configured paid format-recovery attempts within one Arena call.
+
+    HTTP/network retries are not counted as guaranteed paid requests because provider
+    billing for failed transports is not known from the repository. They remain an
+    explicit residual risk in the budget note.
+    """
+    provider = model_config.get('provider')
+    if provider == 'deepseek':
+        return max(1, int(model_config.get('json_format_retries', 1)))
+    return 1
+
+
 def conservative_call_reservation(messages, model_config):
     """Conservative pre-call reservation using UTF-8 byte count as input proxy.
 
@@ -56,12 +69,14 @@ def conservative_call_reservation(messages, model_config):
     policy = pricing_policy(model_config)
     payload_bytes = len(json.dumps(messages, ensure_ascii=False, separators=(',', ':')).encode('utf-8'))
     max_output = subject_max_tokens(model_config)
-    input_cost = payload_bytes * policy['input_cache_miss_per_million'] / 1_000_000
-    output_cost = max_output * policy['output_per_million'] / 1_000_000
+    attempt_multiplier = provider_attempt_reservation_multiplier(model_config)
+    input_cost_per_attempt = payload_bytes * policy['input_cache_miss_per_million'] / 1_000_000
+    output_cost_per_attempt = max_output * policy['output_per_million'] / 1_000_000
     return {
-        'input_proxy_units': payload_bytes,
-        'max_output_tokens': max_output,
-        'reserved_cost': input_cost + output_cost,
+        'input_proxy_units_per_attempt': payload_bytes,
+        'max_output_tokens_per_attempt': max_output,
+        'provider_attempts_reserved': attempt_multiplier,
+        'reserved_cost': (input_cost_per_attempt + output_cost_per_attempt) * attempt_multiplier,
         'currency': policy['currency'],
         'pricing_mode': policy['mode'],
     }
@@ -159,10 +174,12 @@ class BudgetedProvider:
             'calls_completed': self.calls_completed,
             'estimated_spend': self.estimated_spend,
             'budget_stop_reason': self.budget_stop_reason,
+            'provider_attempt_reservation_multiplier': provider_attempt_reservation_multiplier(self.model_config),
             'pricing_policy': pricing_policy(self.model_config),
             'records': list(self.records),
             'financial_boundary_note': (
-                'Pre-call reservation uses a conservative UTF-8-byte input proxy plus configured max output. '
-                'Post-call accounting uses provider-reported usage. This is an engineering guard, not a provider invoice guarantee.'
+                'Pre-call reservation uses a conservative UTF-8-byte input proxy, configured max output, and configured format-retry attempts. '
+                'Post-call accounting uses provider-reported usage. HTTP/network retry billing remains provider-dependent. '
+                'This is an engineering guard, not a provider invoice guarantee.'
             ),
         }
