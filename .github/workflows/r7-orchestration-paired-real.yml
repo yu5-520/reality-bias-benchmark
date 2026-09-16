@@ -1,0 +1,168 @@
+name: R7 Paired Orchestration Subject Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      repeats:
+        description: 'Paired trials; each pair runs Free and Structured once'
+        required: true
+        default: '2'
+        type: string
+      provider:
+        description: 'Exact provider id from the chosen model config; keep UNRESOLVED for prepare-only'
+        required: true
+        default: 'UNRESOLVED'
+        type: string
+      model_config:
+        description: 'Exact repository model-config path'
+        required: true
+        default: 'arena/config/model_deepseek_v0.2.json'
+        type: string
+      spending_ceiling:
+        description: 'Explicit total paid-subject ceiling; must be >0 for real execution'
+        required: true
+        default: '0'
+        type: string
+      currency:
+        description: 'Must match the model-config pricing snapshot, e.g. USD or CNY'
+        required: true
+        default: 'USD'
+        type: string
+      max_subject_calls:
+        description: 'Hard subject-call cap across the whole paired batch; must be >0 for real execution'
+        required: true
+        default: '0'
+        type: string
+      confirm:
+        description: 'Type CALL_REAL_R7_API to authorize paid subject calls; PREPARE_ONLY never calls a provider'
+        required: true
+        default: 'PREPARE_ONLY'
+        type: string
+
+concurrency:
+  group: r7-paired-orchestration-subject
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  R7_REPEATS: ${{ inputs.repeats }}
+  R7_PROVIDER: ${{ inputs.provider }}
+  R7_MODEL_CONFIG: ${{ inputs.model_config }}
+  R7_SPENDING_CEILING: ${{ inputs.spending_ceiling }}
+  R7_CURRENCY: ${{ inputs.currency }}
+  R7_MAX_SUBJECT_CALLS: ${{ inputs.max_subject_calls }}
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate offline experiment machinery
+        run: |
+          python arena/validate_environment.py
+          python arena/preflight.py
+          python -m unittest discover -s arena/tests -v
+          python -m arena.orchestration_preflight --outdir results/orchestration_preflight
+      - name: Build exact paired candidate manifest — zero API calls
+        run: |
+          python -m arena.build_orchestration_manifest \
+            --repeats "$R7_REPEATS" \
+            --domain ecommerce \
+            --arena-config arena/config/arena_v0.3.json \
+            --structured-policy arena/config/structured_ecommerce_v0.1.json \
+            --model-config "$R7_MODEL_CONFIG" \
+            --out results/r7_orchestration_manifest.jsonl
+          wc -l results/r7_orchestration_manifest.jsonl
+      - name: Record requested execution gate without treating it as authorization
+        run: |
+          python - <<'PY'
+          import json, os, pathlib
+          record = {
+              'schema': 'RB-R7-WORKFLOW-REQUEST-v0.1',
+              'provider_input': os.environ['R7_PROVIDER'],
+              'model_config_input': os.environ['R7_MODEL_CONFIG'],
+              'spending_ceiling_input': os.environ['R7_SPENDING_CEILING'],
+              'currency_input': os.environ['R7_CURRENCY'],
+              'max_subject_calls_input': os.environ['R7_MAX_SUBJECT_CALLS'],
+              'confirm_is_real_authorization_phrase': '${{ inputs.confirm }}' == 'CALL_REAL_R7_API',
+              'github_sha': '${{ github.sha }}',
+              'note': 'This prepare record is not itself paid-run authorization. The subject job and runner independently enforce the explicit gate.'
+          }
+          pathlib.Path('results/r7_workflow_request.json').write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+      - name: Upload prepared R7 bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-orchestration-prepared-${{ github.run_id }}
+          path: |
+            results/r7_orchestration_manifest.jsonl
+            results/r7_workflow_request.json
+            results/orchestration_preflight/
+          retention-days: 90
+
+  subject_run:
+    needs: prepare
+    if: ${{ inputs.confirm == 'CALL_REAL_R7_API' && inputs.provider != 'UNRESOLVED' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download exact prepared manifest
+        uses: actions/download-artifact@v4
+        with:
+          name: r7-orchestration-prepared-${{ github.run_id }}
+          path: prepared
+      - name: Freeze run-start request and execute guarded paired subject batch
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          BAI: ${{ secrets.BAI }}
+          BAILIAN_BASE_URL: ${{ secrets.BAILIAN_BASE_URL }}
+          BAILIAN_MODEL: ${{ secrets.BAILIAN_MODEL }}
+        run: |
+          python -m arena.run_orchestration_real \
+            --manifest prepared/r7_orchestration_manifest.jsonl \
+            --outdir results/r7_real \
+            --arena-config arena/config/arena_v0.3.json \
+            --structured-policy arena/config/structured_ecommerce_v0.1.json \
+            --model-config "$R7_MODEL_CONFIG" \
+            --provider "$R7_PROVIDER" \
+            --spending-ceiling "$R7_SPENDING_CEILING" \
+            --currency "$R7_CURRENCY" \
+            --max-subject-calls "$R7_MAX_SUBJECT_CALLS" \
+            --authorization-phrase CALL_REAL_R7_API \
+            --execute-real-api
+      - name: Freeze standard evidence batch — no paid evaluator
+        if: always()
+        run: |
+          if [ -s results/r7_real/traces.jsonl ]; then
+            python -m arena.evidence \
+              --manifest prepared/r7_orchestration_manifest.jsonl \
+              --traces results/r7_real/traces.jsonl \
+              --errors results/r7_real/errors.json \
+              --outdir results/r7_real/evidence_batch \
+              --code-sha '${{ github.sha }}'
+            cat results/r7_real/evidence_batch/RUN_REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'No subject trace was produced; preserving authorization/error artifacts only.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload immutable R7 subject evidence — semantic review remains deferred
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-orchestration-subject-evidence-${{ github.run_id }}
+          path: |
+            prepared/r7_orchestration_manifest.jsonl
+            prepared/r7_workflow_request.json
+            results/r7_real/
+            results/json_format_retries.jsonl
+          if-no-files-found: warn
+          retention-days: 90
