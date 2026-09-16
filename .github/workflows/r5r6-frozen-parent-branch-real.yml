@@ -122,7 +122,17 @@ jobs:
           assert row['paid_api_authorized'] is False
           assert row['semantic_status'] == 'NOT_ADJUDICATED'
           assert row['code_sha'] == '${{ github.sha }}'
+          for required in (
+              'v4_review_contract',
+              'v4_review_packet_policy',
+              'v4_bounded_review_packet_schema',
+              'v4_branch_anchor_review_packet_generator',
+              'first_paper_analysis_contract',
+              'first_paper_structural_analysis_schema',
+          ):
+              assert required in row['interface_bindings'], required
           print('v4_binding_hash=' + row['binding_hash'])
+          print('first_paper_analysis_contract_hash=' + row['first_paper_analysis_contract_hash'])
           PY
       - name: Record requested Phase-B gate without treating it as authorization
         run: |
@@ -143,6 +153,7 @@ jobs:
               'github_sha': '${{ github.sha }}',
               'v4_research_binding_hash': binding['binding_hash'],
               'v4_experimental_variable_id': binding['experimental_variable_id'],
+              'first_paper_analysis_contract_hash': binding['first_paper_analysis_contract_hash'],
               'phase_a_rerun_authorized': False,
               'automatic_paid_evaluator': False,
               'note': 'This prepare record is not paid-run authorization. Phase-B execution independently enforces the exact authorization phrase, provider/model binding, code SHA, v4 research binding, call cap, and spending ceiling.'
@@ -188,6 +199,7 @@ jobs:
               code_sha='${{ github.sha }}',
           )
           print('V4_RESEARCH_BINDING_VERIFIED=' + binding['binding_hash'])
+          print('FIRST_PAPER_ANALYSIS_CONTRACT_HASH=' + binding['first_paper_analysis_contract_hash'])
           PY
       - name: Execute guarded frozen-parent branch continuations only
         env:
@@ -245,10 +257,39 @@ jobs:
             test -s results/r5r6_branch_real/system_behavior_v4/trajectory_measurements_v4.jsonl
             test -s results/r5r6_branch_real/system_behavior_v4/system_dynamics_views_v4.jsonl
             test -s results/r5r6_branch_real/system_behavior_v4/system_lineage_views_v4.jsonl
+            test -s results/r5r6_branch_real/system_behavior_v4/branch_anchor_lineage_views_v4.jsonl
+            test -s results/r5r6_branch_real/system_behavior_v4/bounded_review_packets_v4.jsonl
+            test -s results/r5r6_branch_real/system_behavior_v4/branch_anchor_review_packets_v4.jsonl
+            test -e results/r5r6_branch_real/system_behavior_v4/pair_structural_comparisons_v4.jsonl
             test -s results/r5r6_branch_real/system_behavior_v4/summary.json
             echo 'System Behavior v4 structural derivation complete; semantic/Authority review remains deferred.' >> "$GITHUB_STEP_SUMMARY"
           else
             echo 'System Behavior v4 derivation skipped because frozen trace/evidence batch is unavailable.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Apply frozen first-paper structural analysis contract — no evaluator
+        if: always()
+        run: |
+          if [ -e results/r5r6_branch_real/system_behavior_v4/pair_structural_comparisons_v4.jsonl ] && [ -s results/r5r6_branch_real/system_behavior_v4/summary.json ]; then
+            python -m arena.analyze_first_paper_r5mid \
+              --comparisons results/r5r6_branch_real/system_behavior_v4/pair_structural_comparisons_v4.jsonl \
+              --derivation-summary results/r5r6_branch_real/system_behavior_v4/summary.json \
+              --out results/r5r6_branch_real/system_behavior_v4/first_paper_structural_analysis_v0.1.json
+            test -s results/r5r6_branch_real/system_behavior_v4/first_paper_structural_analysis_v0.1.json
+            python - <<'PY'
+            import json
+            p = 'results/r5r6_branch_real/system_behavior_v4/first_paper_structural_analysis_v0.1.json'
+            row = json.load(open(p, encoding='utf-8'))
+            assert row['schema'] == 'RB-FIRST-PAPER-STRUCTURAL-ANALYSIS-v0.1'
+            assert row['primary_outcome_id'] == 'R5MID_ANCHOR_DOWNSTREAM_OPERATIONAL_CROSSING_COUNT'
+            assert row['primary_p_value'] is None
+            assert row['semantic_status'] == 'NOT_INCLUDED_IN_STRUCTURAL_ANALYSIS'
+            assert row['causal_claim_status'] == 'NOT_ESTABLISHED_BY_STRUCTURAL_ANALYSIS_ALONE'
+            print('FIRST_PAPER_STRUCTURAL_ANALYSIS_HASH=' + row['analysis_hash'])
+            print('PRIMARY_INTERVAL_STATUS=' + row['primary_interval_status'])
+            PY
+            echo 'Frozen first-paper structural analysis emitted; semantic endpoint remains asynchronous.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'First-paper structural analysis skipped because v4 comparison/summary artifacts are unavailable.' >> "$GITHUB_STEP_SUMMARY"
           fi
       - name: Upload immutable Phase-B subject evidence
         if: always()
