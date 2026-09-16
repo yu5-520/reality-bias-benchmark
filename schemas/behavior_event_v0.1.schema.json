@@ -32,6 +32,11 @@
       "type": "string",
       "enum": ["read", "write", "message", "invoke", "commit", "reopen", "revise", "inherit", "finalize", "other"]
     },
+    "behavior_phase": {
+      "type": ["string", "null"],
+      "enum": ["PROPOSAL", "REALIZATION", "READ", "NODE_EXECUTION", null]
+    },
+    "source_trace_schema_version": {"type": ["string", "null"]},
     "target_ref": {"type": ["string", "null"]},
     "realization_status": {
       "type": "string",
