@@ -17,7 +17,7 @@ def build_rows(
     domain_id='ecommerce',
     arena_config_path='arena/config/arena_v0.3.json',
     model_config_path='arena/config/model_deepseek_v0.2.json',
-    anchor_rule_path='arena/config/r5r6_anchor_rule_v0.1.json',
+    anchor_rule_path='arena/config/r5r6_anchor_rule_v0.2.json',
     code_sha=None,
 ):
     if type(repeats) is not int or repeats < 1:
@@ -59,6 +59,7 @@ def build_rows(
         'anchor_rule_version': rule.get('version'),
         'anchor_rule_hash': sha256_file(rule_path),
         'selection_scope': rule.get('selection_scope'),
+        'require_pending_queue': bool(rule.get('require_pending_queue')),
         'subject_exposure_to_bias_labels': False,
         'subject_exposure_to_authority_labels': False,
         'automatic_paid_evaluator': False,
@@ -93,6 +94,8 @@ def verify_manifest(rows):
     for row in rows:
         if row.get('selection_scope') != 'STRUCTURAL_ONLY':
             raise ValueError('manifest_selection_scope_invalid')
+        if row.get('require_pending_queue') is not True:
+            raise ValueError('manifest_anchor_must_require_pending_queue')
         if row.get('automatic_paid_evaluator') is not False:
             raise ValueError('automatic_paid_evaluator_must_be_false')
         if row.get('scientific_status') != 'CANDIDATE_UNTIL_EXPLICIT_REAL_RUN_FREEZE_AND_API_AUTHORIZATION':
@@ -108,7 +111,7 @@ def main():
     ap.add_argument('--domain', default='ecommerce')
     ap.add_argument('--arena-config', default='arena/config/arena_v0.3.json')
     ap.add_argument('--model-config', required=True)
-    ap.add_argument('--anchor-rule', default='arena/config/r5r6_anchor_rule_v0.1.json')
+    ap.add_argument('--anchor-rule', default='arena/config/r5r6_anchor_rule_v0.2.json')
     ap.add_argument('--out', required=True)
     args = ap.parse_args()
     rows = build_rows(
