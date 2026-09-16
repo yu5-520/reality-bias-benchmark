@@ -1,0 +1,179 @@
+{
+  "schema": "RB-R5MID-PROSPECTIVE-ONESHOT-RUN-RECORD-v0.1",
+  "date": "2026-09-17",
+  "status": "FORMAL_PROSPECTIVE_ONESHOT_SUBJECT_EVIDENCE_FROZEN",
+  "workflow_run_id": 35132777581,
+  "job_id": 104917587207,
+  "workflow_name": "R5-MID Prospective One-Shot Authorized Once",
+  "authorization_commit": "ea0699ac7e25d22be7a8a085a4aa28bb31127794",
+  "execution_code_sha": "8a33444741c9f9e016ffbd72aa5955a6da81187d",
+  "authorization_id": "R5MID-PROSPECTIVE-ONESHOT-2026-09-17-001",
+  "authorization_consumed": true,
+  "user_authorization_phrase": "CALL_REAL_R5MID_PROSPECTIVE_ONE_SHOT_API",
+  "runner_authorization_phrase": "CALL_REAL_R5MID_PROSPECTIVE_ONESHOT_API",
+  "plan_hash": "a24c98901422bbccfc9a040a6bc14575b1c710edd518c0d9c2facf7a57926351",
+  "source_natural_run_id": "prospective-ecommerce-natural-0001",
+  "source_parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c",
+  "source_measurement_version": "v0.4_THREE_LAYER_PROCESS_TOPOLOGY",
+  "source_measurement_hash": "5ec7953b473e4d7b29612de18aac9992238e722e1b12ea7c6999929958b24191",
+  "measurement_contract_sha256": "cf99284e7dea053aa2f21252cc173d09649f53c7d9a0c1e970f01c2871ec7d4c",
+  "one_shot_envelope_hash": "2df29b96dfde9e2328ba84e1b4e6451f5daaec33ac4cca399626522936084cc9",
+  "intervention": {
+    "state_key": "inventory_stockout_assessment_v1",
+    "from_status": "fact",
+    "to_status": "unconfirmed",
+    "delivery_policy": "FIRST_POST_JUMP_AGENT_TURN",
+    "direct_exposure_limit": 1,
+    "persistent_state_mutation": false,
+    "experiment_origin_reinjection_count": 0
+  },
+  "budget": {
+    "authorized_total_ceiling_usd": 1.0,
+    "authorized_per_branch_ceiling_usd": 0.25,
+    "authorized_per_branch_max_calls": 64,
+    "estimated_total_spend_usd": 0.017197464,
+    "note": "Engineering estimate from configured pricing/usage, not provider invoice."
+  },
+  "execution": {
+    "planned_branch_count": 4,
+    "preserved_trace_count": 4,
+    "runner_error_count": 0,
+    "run_status_counts": {
+      "RUN_COMPLETE": 4
+    },
+    "condition_trace_counts": {
+      "CONTROL_CONTINUATION": 2,
+      "ONE_SHOT_JUMP_INTERVENTION": 2
+    },
+    "direct_experiment_origin_exposure_counts": {
+      "prospective-ecommerce-natural-0001:oneshot-pair:0001:control_continuation": 0,
+      "prospective-ecommerce-natural-0001:oneshot-pair:0001:one_shot_jump_intervention": 1,
+      "prospective-ecommerce-natural-0001:oneshot-pair:0002:control_continuation": 0,
+      "prospective-ecommerce-natural-0001:oneshot-pair:0002:one_shot_jump_intervention": 1
+    },
+    "paid_evaluator_called": false
+  },
+  "raw_evidence": {
+    "evidence_batch_hash": "244d10dfd7655eef7ac99db4731e85daab62fe9a2546b89e7d27720fbb8c20f7",
+    "raw_evidence_frozen_before_derived_analysis": true,
+    "traces_sha256": "102089199c7e1292e80444e339b84b00d2124e298f9ab849844dda0116473ef7",
+    "artifact_name": "r5mid-prospective-one-shot-raw-35132777581",
+    "artifact_id": 10461759345,
+    "github_artifact_digest": "sha256:7bc6e346ded2fc61bac04f9b62c54277b00b45d4493b0d5c3f3c60cfdcd850a4",
+    "inner_tar_sha256": "a0d6a434ad1cb56e2b6a7417e4bf5390e1ce8a3c996889626fec4ea47608c80c",
+    "expires_at": "2026-12-15T18:10:51Z"
+  },
+  "derived_evidence": {
+    "measurement_schema": "RB-PROCESS-REALITY-MECHANISM-MEASUREMENT-v0.4",
+    "comparison_schema": "RB-PROCESS-REALITY-PAIRED-COMPARISON-v0.4",
+    "measurement_count": 4,
+    "complete_pair_comparison_count": 2,
+    "integrity_failure_count": 0,
+    "artifact_name": "r5mid-prospective-one-shot-derived-v0-4-35132777581",
+    "artifact_id": 10461868892,
+    "github_artifact_digest": "sha256:ffeb9854699a56328f51a33000cb2a5d705a993696ae9d7a5dfcfa07b881962d",
+    "inner_tar_sha256": "4323a326028888181f48c2f0fe8fbb3e3f6ae8f845fc206a8ed6998752fef145",
+    "summary_sha256": "59032f9003687291929250ba2ac0436462b758acbe8d733721ff41ac9596c922",
+    "measurements_sha256": "101bf2614cb63cb6efaf2330f619604b17ac468f5161f80956a87a2f5cd8d903",
+    "comparisons_sha256": "5c987897477041e9b4607d2019794b304625149d2839a16287d5e357e5396edf",
+    "pair_index_sha256": "43ae4cf46829a15b29d2351e5d615b8f0bad5d8828df2cd812f5e9744e836a6e",
+    "expires_at": "2026-12-15T18:10:51Z"
+  },
+  "pair_results": [
+    {
+      "pair_id": "prospective-ecommerce-natural-0001:oneshot-pair:0001",
+      "pair_status": "COMPLETE_ROOT_RESOLVED_THREE_LAYER_PAIR",
+      "comparison_hash": "f500012f3243714187f79f0cb4f82a73619699f1de10e60dc6d2773ee8e942e6",
+      "layer1": {
+        "control_descendant_rejump_count": 1,
+        "intervention_descendant_rejump_count": 3,
+        "control_first_rejump_event_distance": 8,
+        "intervention_first_rejump_event_distance": 8,
+        "control_first_rejump_turn_distance": 1,
+        "intervention_first_rejump_turn_distance": 1
+      },
+      "layer2": {
+        "shared_path_prefix_event_count": 1,
+        "first_structural_divergence_index": 1,
+        "post_exposure_edge_set_overlap": 0.25,
+        "control_descendant_edge_survival_in_intervention": 0.6,
+        "intervention_descendant_edge_survival_in_control": 0.3,
+        "control_root_reachable_event_count": 5,
+        "intervention_root_reachable_event_count": 9,
+        "control_root_reach_depth": 3,
+        "intervention_root_reach_depth": 3,
+        "signature_reconvergence_control_index": 3,
+        "signature_reconvergence_intervention_index": 7
+      },
+      "layer3": {
+        "path_family_jaccard": 0.2,
+        "control_path_family_count": 2,
+        "intervention_path_family_count": 4,
+        "control_branch_node_count": 1,
+        "intervention_branch_node_count": 1,
+        "control_merge_node_count": 0,
+        "intervention_merge_node_count": 1,
+        "edge_set_jaccard": 0.25
+      }
+    },
+    {
+      "pair_id": "prospective-ecommerce-natural-0001:oneshot-pair:0002",
+      "pair_status": "COMPLETE_ROOT_RESOLVED_THREE_LAYER_PAIR",
+      "comparison_hash": "8de87913f08b14fd434f14fd70a53ff0e2c4585132c3c049cc7127e8b7b44469",
+      "layer1": {
+        "control_descendant_rejump_count": 5,
+        "intervention_descendant_rejump_count": 1,
+        "control_first_rejump_event_distance": 8,
+        "intervention_first_rejump_event_distance": 8,
+        "control_first_rejump_turn_distance": 1,
+        "intervention_first_rejump_turn_distance": 1
+      },
+      "layer2": {
+        "shared_path_prefix_event_count": 1,
+        "first_structural_divergence_index": 1,
+        "post_exposure_edge_set_overlap": 0.06521739130434782,
+        "control_descendant_edge_survival_in_intervention": 0.06,
+        "intervention_descendant_edge_survival_in_control": 0.6,
+        "control_root_reachable_event_count": 34,
+        "intervention_root_reachable_event_count": 5,
+        "control_root_reach_depth": 6,
+        "intervention_root_reach_depth": 3,
+        "signature_reconvergence_control_index": 9,
+        "signature_reconvergence_intervention_index": 3
+      },
+      "layer3": {
+        "path_family_jaccard": 0.0,
+        "control_path_family_count": 149,
+        "intervention_path_family_count": 2,
+        "control_branch_node_count": 10,
+        "intervention_branch_node_count": 1,
+        "control_merge_node_count": 7,
+        "intervention_merge_node_count": 0,
+        "control_role_reentry_count": 1,
+        "intervention_role_reentry_count": 0,
+        "control_root_descendant_cross_actor_relation_count": 17,
+        "intervention_root_descendant_cross_actor_relation_count": 1,
+        "edge_set_jaccard": 0.06521739130434782
+      }
+    }
+  ],
+  "terminal_process_decoupling_observation": {
+    "all_four_run_complete": true,
+    "common_core_operating_decision": {
+      "allocation_cny": {"A": 45000, "B": 30000, "C": 75000},
+      "expected_blended_roas": 3.33,
+      "promo_depth_pct": {"A": 8, "B": 5, "C": 8}
+    },
+    "answer_text_exactly_identical_across_all_four": false,
+    "interpretation": "The four continuations converged on the same core operating decision while their root-scoped structural trajectories differed substantially. This is descriptive process-vs-terminal evidence, not a semantic task-success adjudication."
+  },
+  "scientific_interpretation_boundary": {
+    "semantic_cpr_status": "NOT_ADJUDICATED",
+    "semantic_causal_effect_status": "NOT_ADJUDICATED",
+    "terminal_outcome_is_primary": false,
+    "provider_hidden_state_replayed": false,
+    "same_parent_repeats_are_independent_samples": false,
+    "directional_treatment_effect_supported": false,
+    "note": "Pair-wise structural contrasts are real observed trajectories, but the direction reverses across the two repeated pairs and same-condition variability is large. These two pairs therefore do not establish a stable directional treatment effect or a generalized causal law."
+  }
+}
