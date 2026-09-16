@@ -146,6 +146,7 @@ class V4ExperimentBindingTests(unittest.TestCase):
             "first_paper_analysis_contract",
             "first_paper_analysis_contract_schema",
             "first_paper_structural_analysis_schema",
+            "first_paper_semantic_analysis_schema",
         }
         self.assertTrue(required_interfaces.issubset(binding["interface_bindings"]))
         self.assertTrue(binding["first_paper_analysis_contract_hash"])
