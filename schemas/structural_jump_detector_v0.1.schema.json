@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/structural_jump_detector_v0.1.schema.json",
+  "title": "Reality Bias Structural Jump Detector v0.1",
+  "type": "object",
+  "required": ["schema", "version", "status", "scientific_scope", "source_behavior_schema", "rules", "non_claims"],
+  "properties": {
+    "schema": {"const": "RB-STRUCTURAL-JUMP-DETECTOR-v0.1"},
+    "version": {"const": "0.1"},
+    "status": {"type": "string"},
+    "scientific_scope": {"const": "STRUCTURAL_CANDIDATE_ONLY"},
+    "source_behavior_schema": {"const": "RB-BEHAVIOR-EVENT-v0.1"},
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["rule_id", "candidate_type", "boundary_id", "action_type", "realization_status", "description"],
+        "properties": {
+          "rule_id": {"type": "string", "minLength": 1},
+          "candidate_type": {"type": "string", "minLength": 1},
+          "boundary_id": {"type": "string", "minLength": 1},
+          "action_type": {"type": "string", "minLength": 1},
+          "realization_status": {"enum": ["PROPOSAL", "REALIZED", "BLOCKED", "FAILED"]},
+          "require_state_hash_change": {"type": "boolean"},
+          "structured_diff_field": {"type": "string"},
+          "structured_diff_allowed_values": {"type": "array", "minItems": 1},
+          "description": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "non_claims": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}
