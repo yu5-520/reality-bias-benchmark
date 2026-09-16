@@ -1,0 +1,42 @@
+name: R7 Structural Inertia Offline Validate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "configs/r7/**"
+      - "schemas/r7_structural_inertia_control_v1.json"
+      - "scripts/validate_r7_protocol.py"
+      - "docs/plans/R7_Structural_Inertia_Control_Plan.md"
+      - ".github/workflows/r7-structural-inertia-offline-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  offline-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate R7 protocol fixture
+        run: python scripts/validate_r7_protocol.py configs/r7/r7_three_arm_fixture.example.json
+
+      - name: Confirm no paid-run dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RniE 'OPENAI_API_KEY|DASHSCOPE_API_KEY|DEEPSEEK_API_KEY|api[._-]?key' \
+            scripts/validate_r7_protocol.py \
+            configs/r7/r7_three_arm_fixture.example.json \
+            schemas/r7_structural_inertia_control_v1.json; then
+            echo "R7 offline validator must not depend on provider credentials." >&2
+            exit 2
+          fi
+          echo "PASS: offline R7 contract validation requires no model/provider secret"
