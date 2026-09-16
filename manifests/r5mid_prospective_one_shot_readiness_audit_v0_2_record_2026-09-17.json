@@ -1,0 +1,58 @@
+{
+  "schema": "RB-R5MID-PROSPECTIVE-ONESHOT-READINESS-AUDIT-RECORD-v0.2",
+  "date": "2026-09-17",
+  "status": "OFFLINE_RUNTIME_LIFECYCLE_AUDIT_COMPLETE",
+  "workflow": {
+    "name": "R5-MID Prospective One-Shot Readiness Audit v0.2",
+    "run_id": 35128564676,
+    "job_id": 104903584139,
+    "head_sha": "844e7d7efae9a196a84c6b84c73cb9ddb9c43437",
+    "conclusion": "success",
+    "exact_execution_commit_checked_out": "1ae76d2394897517e9f07a01b897ed34be1cdffd",
+    "offline_tests_passed": 140,
+    "real_provider_calls": 0,
+    "paid_evaluator_calls": 0
+  },
+  "formal_prepared_source": {
+    "workflow_run_id": 35126705786,
+    "artifact_id": 10458734543,
+    "artifact_name": "r5mid-prospective-one-shot-prepared-v0-2-35126705786",
+    "artifact_digest": "sha256:64bd48dfc8109b1ea5ed27aaa0930b53be0cb5f3cd0b0b9d2de7d2f9a76e5c9e",
+    "inner_tar_sha256": "26f97e7be568c8259e571fb9991a1049784d7ed4f9c04b6c76ebd5dd97b3477a",
+    "plan_hash": "624cdc84e9c0d7eb4b44f0c916c96bcee9a562a46b19bb70978b4b51b7c5c71d",
+    "source_measurement_hash": "4566e6a05e0347ed0b0ef7bccc2610fd0814a0407da5ed7ebbbb0a6ff5886a77"
+  },
+  "runtime_lifecycle_result": {
+    "pair_smoked": "prospective-ecommerce-natural-0001:oneshot-pair:0001",
+    "fake_provider_only": true,
+    "forced_second_resume_target_agent": "ads",
+    "first_prompt_delta_paths": [
+      "shared_state_metadata.inventory_stockout_assessment_v1.status"
+    ],
+    "first_control_status": "fact",
+    "first_intervention_status": "unconfirmed",
+    "second_prompt_delta_paths": [],
+    "second_control_status": "fact",
+    "second_intervention_status": "fact",
+    "control_direct_experiment_origin_exposure_count": 0,
+    "intervention_direct_experiment_origin_exposure_count": 1,
+    "experiment_origin_reinjection_count": 0,
+    "persistent_parent_state_unchanged": true,
+    "one_shot_consumption_verified_across_forced_second_resume": true
+  },
+  "readiness_artifact": {
+    "name": "r5mid-prospective-one-shot-readiness-audit-v0-2-35128564676",
+    "artifact_id": 10460217318,
+    "github_artifact_digest": "sha256:03d5d8ce200565c34925116973f344d23ca23a899fb058d34781e499aaefca8a",
+    "inner_tar_sha256": "f43f106424ae59999b256d3de9622b2206e7bafbec39d31f6c8f7de244ae9329",
+    "expires_at": "2026-12-15T17:30:05Z"
+  },
+  "authorization_boundary": {
+    "paid_one_shot_authorized": false,
+    "authorization_manifest_created": false,
+    "prospective_natural_authorization_reusable": false,
+    "historical_phase_b_authorization_reusable": false,
+    "next_required_gate": "CALL_REAL_R5MID_PROSPECTIVE_ONESHOT_API"
+  },
+  "scientific_boundary": "This audit validates exact prepared runtime lifecycle semantics only: the B condition differs from A at the first resumed prompt by exactly one experimental status field, the overlay is consumed, a forced second resumed prompt is identical across A/B and sees the original fact status, and the frozen parent state remains unchanged. It is not subject evidence, semantic CPR adjudication, or a causal-effect result."
+}
