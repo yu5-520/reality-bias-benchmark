@@ -175,9 +175,6 @@ def run_arena_once(
                 )
                 state_snapshot_callback(anchor)
 
-            # K is evaluated only after the completed call and its realized events
-            # have been frozen into the in-memory trace. Safety failures/censoring
-            # always take precedence over a coincident K boundary.
             loop_runtime = evaluate_loop_budget(run_id, state.events, model_calls, loop_settings)
             loop_runtime['stop_applied'] = False
             if loop_runtime['reached'] and not state.termination_reason:
@@ -185,10 +182,7 @@ def run_arena_once(
                 state.termination_reason = LOOP_BUDGET_TERMINATION_REASON
                 loop_runtime['stop_applied'] = True
                 if recorder:
-                    recorder({
-                        'record_type': 'loop_budget_reached',
-                        'record': loop_runtime,
-                    })
+                    recorder({'record_type': 'loop_budget_reached', 'record': loop_runtime})
         except Exception as err:
             if getattr(err, 'provider_responses', None):
                 call['failed_provider_responses'] = err.provider_responses
@@ -290,6 +284,10 @@ def run_arena_once(
             'parent_trace_hash': branch_manifest['parent_trace_hash'],
             'parent_state_hash': branch_parent_state_hash,
             'branch_start_state_hash': branch_start_state_hash,
+            'parent_turn': branch_manifest.get('parent_turn'),
+            'branch_start_turn': branch_manifest.get('branch_start_turn'),
+            'parent_event_count': branch_manifest.get('parent_event_count'),
+            'branch_start_event_count': branch_manifest.get('branch_start_event_count'),
             'intervention_hash': branch_manifest['intervention_hash'],
             'intervention_applied_before_continuation': branch_parent_state_hash != branch_start_state_hash,
             'replicate_index': branch_manifest['replicate_index'],
