@@ -1,0 +1,285 @@
+name: R5-MID Prospective One-Shot Readiness Audit v0.3
+
+on:
+  push:
+    paths:
+      - 'manifests/r5mid_prospective_one_shot_readiness_audit_v0_3_2026-09-17.json'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: r5mid-prospective-one-shot-readiness-audit-v03
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Freeze offline readiness request v0.3
+        run: |
+          cp manifests/r5mid_prospective_one_shot_readiness_audit_v0_3_2026-09-17.json "$RUNNER_TEMP/readiness_request.json"
+          python - <<'PY'
+          import json, os
+          m=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'readiness_request.json')))
+          assert m['schema']=='RB-R5MID-PROSPECTIVE-ONESHOT-READINESS-AUDIT-v0.3'
+          assert m['scope']=='OFFLINE_EXACT_V03_PREPARED_RUNTIME_AND_V04_DERIVATION_AUDIT_ONLY'
+          assert m['real_provider_call'] is False
+          assert m['paid_one_shot_authorized'] is False
+          assert m['paid_evaluator_authorized'] is False
+          assert m['authorization_manifest_created'] is False
+          assert m['downstream_measurement_version']=='v0.4'
+          print('READINESS_AUDIT_V03_SCOPE=OFFLINE_ONLY')
+          PY
+      - name: Verify exact formal prepared v0.3 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json, os, subprocess
+          m=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'readiness_request.json')))
+          payload=json.loads(subprocess.check_output(['gh','api',f"repos/${{ github.repository }}/actions/runs/{m['prepared_workflow_run_id']}/artifacts"],text=True))
+          rows=[x for x in payload['artifacts'] if x['id']==m['prepared_artifact_id'] and x['name']==m['prepared_artifact_name']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==m['prepared_artifact_digest']
+          assert not rows[0].get('expired')
+          print('FORMAL_PREPARED_V03_ARTIFACT=EXACT_MATCH')
+          PY
+          mkdir -p "$RUNNER_TEMP/prepared_artifact" "$RUNNER_TEMP/prepared"
+          gh run download 35129957603 --repo '${{ github.repository }}' --name r5mid-prospective-one-shot-prepared-v0-3-35129957603 --dir "$RUNNER_TEMP/prepared_artifact"
+          cd "$RUNNER_TEMP/prepared_artifact"
+          sha256sum -c r5mid_prospective_one_shot_prepared_v0_3.tar.gz.sha256
+          test "$(sha256sum r5mid_prospective_one_shot_prepared_v0_3.tar.gz | awk '{print $1}')" = '3f780b2c0cc88c59fa5c149e6c3b987ba73e8a97aefb0970c89ce5e32f6b1988'
+          tar -xzf r5mid_prospective_one_shot_prepared_v0_3.tar.gz -C "$RUNNER_TEMP/prepared"
+          cd "$GITHUB_WORKSPACE"
+          python - <<'PY'
+          import json, os
+          m=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'readiness_request.json')))
+          p=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'prepared/results/r5mid_prospective_one_shot_plan_v0_3/branch_plan.json')))
+          assert p['plan_hash']==m['plan_hash']
+          assert p['code_identity']['branch_execution_commit']==m['branch_execution_commit']
+          assert p['source_measurement_binding']['measurement_hash']==m['source_measurement_hash']
+          assert p['source_measurement_binding_status']=='BOUND_THREE_LAYER_PROCESS_TOPOLOGY_V0.4'
+          assert p['downstream_measurement_version']=='RB-PROCESS-REALITY-MECHANISM-MEASUREMENT-v0.4'
+          assert p['downstream_derivation_module']=='arena.derive_one_shot_process_measurements_v0_4'
+          assert p['paid_one_shot_authorization_status']=='NOT_AUTHORIZED'
+          print('FORMAL_PREPARED_V03_PLAN=VERIFIED')
+          PY
+      - name: Checkout exact frozen execution commit
+        run: |
+          git fetch --depth=1 origin 8a33444741c9f9e016ffbd72aa5955a6da81187d
+          git checkout --detach 8a33444741c9f9e016ffbd72aa5955a6da81187d
+          test "$(git rev-parse HEAD)" = '8a33444741c9f9e016ffbd72aa5955a6da81187d'
+      - name: Re-run exact-code offline tests
+        run: |
+          python arena/validate_environment.py
+          python -m unittest discover -s arena/tests -v
+      - name: Audit one-shot lifecycle and v0.4 paired derivation with fake provider
+        run: |
+          python - <<'PY'
+          import copy, json, os
+          from pathlib import Path
+          from arena.engine import run_arena_once
+          from arena.io_utils import load_json
+          from arena.one_shot_intervention import OneShotRuntimeViewTransform, CONTROL_CONDITION, INTERVENTION_CONDITION
+          from arena.run_branch_one_shot_real import load_plan_bundle, verify_trace_exposure_invariants
+          from arena.core import stable_hash
+
+          plan_dir=Path(os.environ['RUNNER_TEMP'])/'prepared/results/r5mid_prospective_one_shot_plan_v0_3'
+          bundle=load_plan_bundle(plan_dir)
+          plan=bundle['plan']
+          parent=bundle['parent_snapshot']
+          envelope=bundle['one_shot_envelope']
+          rows=bundle['branch_rows']
+          pair_id=sorted({r['pair_id'] for r in rows})[0]
+          control=next(r for r in rows if r['pair_id']==pair_id and r['condition_id']==CONTROL_CONDITION)
+          intervention=next(r for r in rows if r['pair_id']==pair_id and r['condition_id']==INTERVENTION_CONDITION)
+          domain=load_json(Path('arena/domains')/(plan['config_identity']['domain_id']+'.json'))
+          config=load_json(plan['config_identity']['arena_config_path'])
+          first_actor=parent['queue'][0]
+          target=next(a['id'] for a in domain['agents'] if a['id']!=first_actor)
+
+          class TwoTurnFakeProvider:
+              def __init__(self): self.calls=0
+              def complete_agent(self, messages, metadata=None):
+                  self.calls += 1
+                  actions=[]
+                  if self.calls==1:
+                      actions=[{'type':'invoke_agent','agent_id':target,'request':'offline one-shot v0.4 analysis-path readiness probe'}]
+                  return {
+                      'response_id':f'offline-{self.calls}',
+                      'provider_response':{'offline_fake':True},
+                      'finish_reason':'stop',
+                      'model':'OFFLINE_FAKE_PROVIDER',
+                      'usage':{},
+                      'transport_latency_ms':0,
+                      'content':json.dumps({'decision_summary':'offline readiness audit v0.3','actions':actions}),
+                  }
+
+          parent_before=copy.deepcopy(parent)
+          parent_hash_before=stable_hash(parent_before)
+          control_trace=run_arena_once(
+              domain,config,TwoTurnFakeProvider(),control['run_id'],control.get('logical_seed'),
+              initial_state_snapshot=parent,
+          )
+          transform=OneShotRuntimeViewTransform(envelope)
+          intervention_trace=run_arena_once(
+              domain,config,TwoTurnFakeProvider(),intervention['run_id'],intervention.get('logical_seed'),
+              initial_state_snapshot=parent,runtime_view_transform=transform,
+          )
+          transform.verify_finished()
+          verify_trace_exposure_invariants(trace=control_trace,row=control,envelope=envelope,parent_snapshot=parent)
+          verify_trace_exposure_invariants(trace=intervention_trace,row=intervention,envelope=envelope,parent_snapshot=parent)
+          assert len(control_trace['model_calls'])>=2 and len(intervention_trace['model_calls'])>=2
+
+          def diff_paths(a,b,path=''):
+              if type(a) is not type(b): return [path or '$']
+              if isinstance(a,dict):
+                  out=[]
+                  for k in sorted(set(a)|set(b)):
+                      p=f'{path}.{k}' if path else k
+                      if k not in a or k not in b: out.append(p)
+                      else: out.extend(diff_paths(a[k],b[k],p))
+                  return out
+              if isinstance(a,list):
+                  if len(a)!=len(b): return [path]
+                  out=[]
+                  for n,(x,y) in enumerate(zip(a,b)): out.extend(diff_paths(x,y,f'{path}[{n}]'))
+                  return out
+              return [] if a==b else [path]
+
+          key=envelope['state_key']
+          first_control=control_trace['model_calls'][0]['runtime_snapshot']
+          first_intervention=intervention_trace['model_calls'][0]['runtime_snapshot']
+          first_paths=diff_paths(first_control,first_intervention)
+          expected=f'shared_state_metadata.{key}.status'
+          assert first_paths==[expected], (first_paths,expected)
+          assert first_control['shared_state_metadata'][key]['status']=='fact'
+          assert first_intervention['shared_state_metadata'][key]['status']=='unconfirmed'
+
+          second_control=control_trace['model_calls'][1]['runtime_snapshot']
+          second_intervention=intervention_trace['model_calls'][1]['runtime_snapshot']
+          second_paths=diff_paths(second_control,second_intervention)
+          assert second_paths==[], second_paths
+          assert second_control['shared_state_metadata'][key]['status']=='fact'
+          assert second_intervention['shared_state_metadata'][key]['status']=='fact'
+          assert len(intervention_trace['runtime_transform_records'])==1
+          assert stable_hash(parent)==parent_hash_before and parent==parent_before
+
+          raw=Path('offline_fake_one_shot_raw')
+          raw.mkdir()
+          with (raw/'traces.jsonl').open('w',encoding='utf-8') as f:
+              for trace in (control_trace,intervention_trace):
+                  f.write(json.dumps(trace,ensure_ascii=False,sort_keys=True)+'\n')
+          evidence={
+              'schema':'RB-OFFLINE-FAKE-ONE-SHOT-READINESS-EVIDENCE-v0.1',
+              'plan_hash':plan['plan_hash'],
+              'raw_evidence_frozen_before_derived_analysis':True,
+              'semantic_status':'NOT_ADJUDICATED',
+              'fake_provider_only':True,
+              'real_provider_calls':0,
+              'evidence_batch_hash':stable_hash({
+                  'plan_hash':plan['plan_hash'],
+                  'control_run_id':control_trace['run_id'],
+                  'intervention_run_id':intervention_trace['run_id'],
+                  'fake_provider_only':True,
+              }),
+          }
+          (raw/'evidence_batch.json').write_text(json.dumps(evidence,indent=2)+'\n',encoding='utf-8')
+          lifecycle={
+              'pair_id':pair_id,
+              'forced_second_resume_target_agent':target,
+              'first_prompt_delta_paths':first_paths,
+              'second_prompt_delta_paths':second_paths,
+              'first_control_status':'fact',
+              'first_intervention_status':'unconfirmed',
+              'second_control_status':'fact',
+              'second_intervention_status':'fact',
+              'control_direct_experiment_origin_exposure_count':0,
+              'intervention_direct_experiment_origin_exposure_count':1,
+              'experiment_origin_reinjection_count':0,
+              'persistent_parent_state_unchanged':True,
+          }
+          Path('lifecycle_probe.json').write_text(json.dumps(lifecycle,indent=2)+'\n',encoding='utf-8')
+          print('FIRST_PROMPT_ONLY_DELTA='+expected)
+          print('SECOND_PROMPT_DELTA_COUNT=0')
+          print('PERSISTENT_PARENT_STATE_UNCHANGED=YES')
+          print('OFFLINE_FAKE_RAW_READY=YES')
+          PY
+          python -m arena.derive_one_shot_process_measurements_v0_4 \
+            --plan-dir "$RUNNER_TEMP/prepared/results/r5mid_prospective_one_shot_plan_v0_3" \
+            --traces offline_fake_one_shot_raw/traces.jsonl \
+            --evidence-batch offline_fake_one_shot_raw/evidence_batch.json \
+            --outdir offline_fake_v0_4_derivation
+          python - <<'PY'
+          import json
+          life=json.load(open('lifecycle_probe.json'))
+          summary=json.load(open('offline_fake_v0_4_derivation/summary.json'))
+          pairs=[json.loads(x) for x in open('offline_fake_v0_4_derivation/pair_index_v0.4.jsonl')]
+          measurements=[json.loads(x) for x in open('offline_fake_v0_4_derivation/process_reality_measurements_v0.4.jsonl')]
+          comparisons=[json.loads(x) for x in open('offline_fake_v0_4_derivation/paired_process_comparisons_v0.4.jsonl')]
+          failures=[json.loads(x) for x in open('offline_fake_v0_4_derivation/integrity_failures.jsonl') if x.strip()]
+          assert summary['measurement_count']==2
+          assert summary['integrity_failure_count']==0
+          assert len(failures)==0
+          assert len(measurements)==2
+          assert all(m['schema']=='RB-PROCESS-REALITY-MECHANISM-MEASUREMENT-v0.4' for m in measurements)
+          assert all(m['mechanism_measurement_status']=='ROOT_RESOLVED' for m in measurements)
+          assert all(m['root_descendant_topology']['observed_path_families'] is not None for m in measurements)
+          pair1=next(x for x in pairs if x['pair_id']==life['pair_id'])
+          assert pair1['root_resolution_ok'] is True
+          assert pair1['exposure_integrity_ok'] is True
+          assert pair1['comparison_generated'] is True
+          assert pair1['pair_status']=='COMPLETE_ROOT_RESOLVED_THREE_LAYER_PAIR'
+          assert len(comparisons)==1
+          comp=comparisons[0]
+          assert comp['schema']=='RB-PROCESS-REALITY-PAIRED-COMPARISON-v0.4'
+          assert 'layer1_jump_recurrence' in comp
+          assert 'layer2_inherited_inertia' in comp
+          assert 'layer3_path_topology' in comp
+          assert comp['terminal_outcome_comparison_is_primary'] is False
+          report={
+              'schema':'RB-R5MID-PROSPECTIVE-ONESHOT-RUNTIME-READINESS-REPORT-v0.3',
+              'plan_hash':'a24c98901422bbccfc9a040a6bc14575b1c710edd518c0d9c2facf7a57926351',
+              'branch_execution_commit':'8a33444741c9f9e016ffbd72aa5955a6da81187d',
+              'pair_smoked':life['pair_id'],
+              'fake_provider_only':True,
+              'real_provider_calls':0,
+              **life,
+              'v0_4_measurement_count':summary['measurement_count'],
+              'v0_4_complete_pair_comparison_count':summary['complete_pair_comparison_count'],
+              'v0_4_integrity_failure_count':summary['integrity_failure_count'],
+              'v0_4_pair_status':pair1['pair_status'],
+              'v0_4_comparison_schema':comp['schema'],
+              'v0_4_three_layers_present':True,
+              'semantic_cpr_status':'NOT_ADJUDICATED',
+              'causal_effect_status':'NOT_TESTED_OFFLINE_FAKE_SMOKE_ONLY',
+              'paid_one_shot_authorized':False,
+          }
+          open('readiness_report_v0_3.json','w').write(json.dumps(report,indent=2)+'\n')
+          print('V04_OFFLINE_PAIR_DERIVATION=PASS')
+          print('V04_COMPLETE_PAIR_COMPARISONS='+str(summary['complete_pair_comparison_count']))
+          print('REAL_PROVIDER_CALLS=0')
+          PY
+      - name: Archive readiness audit v0.3
+        run: |
+          cp "$RUNNER_TEMP/readiness_request.json" readiness_request_v0_3.json
+          tar -czf r5mid_prospective_one_shot_readiness_audit_v0_3.tar.gz \
+            readiness_report_v0_3.json readiness_request_v0_3.json lifecycle_probe.json offline_fake_v0_4_derivation
+          sha256sum r5mid_prospective_one_shot_readiness_audit_v0_3.tar.gz > r5mid_prospective_one_shot_readiness_audit_v0_3.tar.gz.sha256
+      - name: Upload readiness audit v0.3
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5mid-prospective-one-shot-readiness-audit-v0-3-${{ github.run_id }}
+          path: |
+            r5mid_prospective_one_shot_readiness_audit_v0_3.tar.gz
+            r5mid_prospective_one_shot_readiness_audit_v0_3.tar.gz.sha256
+          retention-days: 90
