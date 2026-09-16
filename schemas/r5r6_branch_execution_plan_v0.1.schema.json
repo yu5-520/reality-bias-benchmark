@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/r5r6_branch_execution_plan_v0.1.schema.json",
+  "title": "Reality Bias R5/R6 Branch Execution Plan v0.1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "version",
+    "phase",
+    "scientific_status",
+    "common_identity",
+    "model_identity",
+    "config_identity",
+    "code_identity",
+    "replicates",
+    "condition_ids",
+    "execution_order_policy",
+    "intervention_spec",
+    "parent_snapshot_hash",
+    "intervention_start_snapshot_hash",
+    "branch_row_count",
+    "branch_manifest_hashes",
+    "automatic_paid_evaluator",
+    "semantic_review",
+    "authorization_status",
+    "warning",
+    "plan_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-R5R6-BRANCH-EXECUTION-PLAN-v0.1"},
+    "version": {"const": "R5R6-BRANCH-PLAN-v0.1"},
+    "phase": {"const": "BRANCH_CONTINUATION_CANDIDATE"},
+    "scientific_status": {"const": "CANDIDATE_UNTIL_EXPLICIT_REAL_RUN_FREEZE_AND_API_AUTHORIZATION"},
+    "common_identity": {
+      "type": "object",
+      "required": [
+        "baseline_run_id",
+        "source_trace_hash",
+        "source_evidence_hash",
+        "selection_record_hash",
+        "selected_candidate_id",
+        "selected_candidate_event_ref",
+        "parent_state_hash",
+        "parent_anchor_ref",
+        "state_key",
+        "original_status",
+        "target_status"
+      ]
+    },
+    "model_identity": {
+      "type": "object",
+      "required": ["provider", "model_config_path", "model_config_hash"]
+    },
+    "config_identity": {
+      "type": "object",
+      "required": ["arena_config_path", "arena_config_hash", "domain_id", "domain_hash", "task_hash", "agent_registry_hash"]
+    },
+    "code_identity": {
+      "type": "object",
+      "required": ["source_baseline_commit", "branch_execution_commit"]
+    },
+    "replicates": {"type": "integer", "minimum": 1},
+    "condition_ids": {
+      "type": "array",
+      "const": ["CONTROL_CONTINUATION", "STATUS_DOWNGRADE_INTERVENTION"]
+    },
+    "execution_order_policy": {"const": "ODD_CONTROL_FIRST_EVEN_INTERVENTION_FIRST"},
+    "intervention_spec": {
+      "type": "object",
+      "required": ["type", "key", "from_status", "status", "intervention_family", "scope"],
+      "properties": {
+        "type": {"const": "set_shared_state_status"},
+        "from_status": {"enum": ["fact", "confirmed", "verified", "executed"]},
+        "status": {"const": "provisional"},
+        "intervention_family": {"const": "EPISTEMIC_STATUS_DOWNGRADE_TO_PROVISIONAL"},
+        "scope": {"const": "ONE_BRANCH_VISIBLE_STATE_STATUS_FIELD_ONLY"}
+      }
+    },
+    "parent_snapshot_hash": {"type": "string", "minLength": 1},
+    "intervention_start_snapshot_hash": {"type": "string", "minLength": 1},
+    "branch_row_count": {"type": "integer", "minimum": 2},
+    "branch_manifest_hashes": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 2},
+    "automatic_paid_evaluator": {"const": false},
+    "semantic_review": {"const": "DEFERRED_APPEND_ONLY"},
+    "authorization_status": {"const": "NOT_AUTHORIZED"},
+    "warning": {"type": "string", "minLength": 1},
+    "plan_hash": {"type": "string", "minLength": 1}
+  }
+}
