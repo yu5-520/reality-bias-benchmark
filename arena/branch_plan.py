@@ -2,6 +2,7 @@
 import argparse
 import copy
 import json
+import os
 from pathlib import Path
 
 from .branch_protocol import verify_anchor_selection_record
@@ -50,15 +51,19 @@ def validate_phase_a_selection(selection_package, baseline_trace):
     verify_anchor_selection_record(record)
     verify_state_snapshot(parent_snapshot)
 
-    _require(selection_package.get('trace_hash') == stable_hash(baseline_trace), 'baseline_trace_hash_mismatch')
-    _require(record.get('source_trace_hash') == stable_hash(baseline_trace), 'selection_record_source_trace_hash_mismatch')
+    trace_hash = stable_hash(baseline_trace)
+    _require(selection_package.get('trace_hash') == trace_hash, 'baseline_trace_hash_mismatch')
+    _require(record.get('source_trace_hash') == trace_hash, 'selection_record_source_trace_hash_mismatch')
     _require(record.get('selected_state_hash') == parent_snapshot.get('state_hash'), 'selected_state_hash_mismatch')
     _require(record.get('selected_anchor_ref') == parent_snapshot.get('anchor_ref'), 'selected_anchor_ref_mismatch')
     _require(record.get('jump_candidate_ref') == selected_candidate.get('event_ref'), 'selected_candidate_ref_mismatch')
     _require(record.get('reviewer_labels_used_for_selection') is False, 'semantic_anchor_selection_forbidden')
     _require(record.get('branch_outcomes_visible_at_selection') is False, 'outcome_aware_anchor_selection_forbidden')
     _require(selected_candidate.get('action_type') == 'write_state', 'phase_b_v01_requires_state_write_candidate')
-    _require('HIGH_CERTAINTY_STATE_WRITE_CANDIDATE' in (selected_candidate.get('candidate_types') or []), 'phase_b_v01_requires_high_certainty_write_candidate')
+    _require(
+        'HIGH_CERTAINTY_STATE_WRITE_CANDIDATE' in (selected_candidate.get('candidate_types') or []),
+        'phase_b_v01_requires_high_certainty_write_candidate',
+    )
     _require(selected_candidate.get('realized_in_baseline') is True, 'phase_b_v01_requires_realized_candidate')
     _require(parent_snapshot.get('terminated') is False, 'phase_b_parent_snapshot_must_be_nonterminal')
 
@@ -78,11 +83,52 @@ def _baseline_binding(trace, key, fallback=None):
     return value
 
 
-def build_branch_plan(selection_package, baseline_trace, *, replicates, target_status='provisional'):
+def _verify_single_status_intervention(parent, changed, *, state_key, from_status, to_status):
+    """Prove the branch-visible runtime delta is exactly one metadata status field.
+
+    `state_hash` is excluded because it is derived. No anchor/provenance field may
+    change here; branch identity belongs in the branch manifest rather than the
+    replayed runtime snapshot.
+    """
+    verify_state_snapshot(parent)
+    verify_state_snapshot(changed)
+    p = copy.deepcopy(parent)
+    c = copy.deepcopy(changed)
+    p.pop('state_hash', None)
+    c.pop('state_hash', None)
+    p_meta = p.pop('shared_state_metadata', None)
+    c_meta = c.pop('shared_state_metadata', None)
+    _require(p == c, 'intervention_changed_non_metadata_runtime_state')
+    _require(isinstance(p_meta, dict) and isinstance(c_meta, dict), 'intervention_metadata_missing')
+    _require(set(p_meta) == set(c_meta), 'intervention_changed_metadata_keyset')
+    for key in p_meta:
+        left = copy.deepcopy(p_meta[key])
+        right = copy.deepcopy(c_meta[key])
+        if key != state_key:
+            _require(left == right, 'intervention_changed_unrelated_metadata:' + str(key))
+            continue
+        _require(isinstance(left, dict) and isinstance(right, dict), 'intervention_target_metadata_invalid')
+        _require(left.get('status') == from_status, 'intervention_source_status_mismatch')
+        _require(right.get('status') == to_status, 'intervention_target_status_mismatch')
+        left.pop('status', None)
+        right.pop('status', None)
+        _require(left == right, 'intervention_changed_target_metadata_beyond_status')
+    return True
+
+
+def build_branch_plan(
+    selection_package,
+    baseline_trace,
+    *,
+    replicates,
+    target_status='provisional',
+    branch_code_sha=None,
+):
     if type(replicates) is not int or replicates < 1:
         raise ValueError('positive integer replicates required')
     validate_phase_a_selection(selection_package, baseline_trace)
     _require(target_status == 'provisional', 'phase_b_v01_target_status_must_be_provisional')
+    branch_code_sha = branch_code_sha or os.environ.get('GITHUB_SHA') or 'LOCAL_OR_UNRECORDED'
 
     record = selection_package['selection_record']
     candidate = selection_package['selected_candidate']
@@ -95,15 +141,17 @@ def build_branch_plan(selection_package, baseline_trace, *, replicates, target_s
         'key': state_key,
         'from_status': original_status,
         'status': target_status,
-        'result_anchor_ref': f"{parent_snapshot.get('anchor_ref')}:status-{target_status}",
         'intervention_family': 'EPISTEMIC_STATUS_DOWNGRADE_TO_PROVISIONAL',
-        'scope': 'ONE_STATE_STATUS_FIELD_ONLY',
+        'scope': 'ONE_BRANCH_VISIBLE_STATE_STATUS_FIELD_ONLY',
     }
     intervention_start = apply_state_intervention(parent_snapshot, intervention_spec)
     _require(parent_snapshot['state_hash'] != intervention_start['state_hash'], 'intervention_must_change_branch_start_state')
-    _require(
-        ((intervention_start.get('shared_state_metadata') or {}).get(state_key) or {}).get('status') == target_status,
-        'intervention_target_status_not_applied',
+    _verify_single_status_intervention(
+        parent_snapshot,
+        intervention_start,
+        state_key=state_key,
+        from_status=original_status,
+        to_status=target_status,
     )
 
     source_trace_hash = stable_hash(baseline_trace)
@@ -137,13 +185,17 @@ def build_branch_plan(selection_package, baseline_trace, *, replicates, target_s
         'anchor_rule_path': baseline_trace.get('anchor_rule_path'),
         'anchor_rule_hash': baseline_trace.get('anchor_rule_hash'),
     }
-    code_identity = {'commit': baseline_trace.get('code_commit_sha')}
+    code_identity = {
+        'source_baseline_commit': baseline_trace.get('code_commit_sha'),
+        'branch_execution_commit': branch_code_sha,
+    }
 
     rows = []
     manifests = []
     for replicate in range(1, replicates + 1):
         pair_id = f"{baseline_trace['run_id']}:branch-pair:{replicate:04d}"
         order = CONDITIONS if replicate % 2 else tuple(reversed(CONDITIONS))
+        order_pattern = 'CONTROL_FIRST' if replicate % 2 else 'INTERVENTION_FIRST'
         for execution_order, condition in enumerate(order, 1):
             if condition == 'CONTROL_CONTINUATION':
                 branch_start = parent_snapshot
@@ -172,7 +224,9 @@ def build_branch_plan(selection_package, baseline_trace, *, replicates, target_s
                 'run_id': branch_id,
                 'pair_id': pair_id,
                 'replicate_index': replicate,
+                'logical_seed': replicate,
                 'execution_order': execution_order,
+                'pair_order_pattern': order_pattern,
                 'condition_id': condition,
                 'branch_id': branch_id,
                 'branch_hash': manifest['branch_hash'],
@@ -194,6 +248,8 @@ def build_branch_plan(selection_package, baseline_trace, *, replicates, target_s
                 'anchor_rule_path': baseline_trace.get('anchor_rule_path'),
                 'anchor_rule_hash': baseline_trace.get('anchor_rule_hash'),
                 'source_selection_record_hash': record['record_hash'],
+                'source_baseline_code_commit_sha': baseline_trace.get('code_commit_sha'),
+                'branch_execution_code_commit_sha': branch_code_sha,
                 'scientific_status': 'CANDIDATE_UNTIL_EXPLICIT_REAL_RUN_FREEZE_AND_API_AUTHORIZATION',
                 'automatic_paid_evaluator': False,
                 'semantic_review': 'DEFERRED_APPEND_ONLY',
@@ -249,6 +305,14 @@ def verify_branch_plan(bundle):
     _require(plan.get('parent_snapshot_hash') == parent.get('state_hash'), 'branch_plan_parent_snapshot_hash_mismatch')
     _require(plan.get('intervention_start_snapshot_hash') == intervention.get('state_hash'), 'branch_plan_intervention_snapshot_hash_mismatch')
     _require(parent.get('state_hash') != intervention.get('state_hash'), 'branch_plan_intervention_state_must_differ')
+    spec = plan.get('intervention_spec') or {}
+    _verify_single_status_intervention(
+        parent,
+        intervention,
+        state_key=spec.get('key'),
+        from_status=spec.get('from_status'),
+        to_status=spec.get('status'),
+    )
     _require(len(rows) == len(manifests) == plan.get('branch_row_count'), 'branch_plan_row_count_mismatch')
     _require(len(rows) == int(plan.get('replicates')) * 2, 'branch_plan_expected_two_conditions_per_replicate')
 
@@ -261,19 +325,31 @@ def verify_branch_plan(bundle):
         verify_branch_manifest(manifest, parent, start)
         _require(row['parent_state_hash'] == parent['state_hash'], 'branch_plan_row_parent_hash_mismatch')
         _require(row['branch_start_state_hash'] == start['state_hash'], 'branch_plan_row_start_hash_mismatch')
+        _require(row.get('logical_seed') == row.get('replicate_index'), 'branch_plan_pair_logical_seed_mismatch')
+        _require(
+            row.get('branch_execution_code_commit_sha') == (plan.get('code_identity') or {}).get('branch_execution_commit'),
+            'branch_plan_execution_code_binding_mismatch',
+        )
         pairs.setdefault(row['pair_id'], []).append(row)
     for pair_id, pair_rows in pairs.items():
         _require(len(pair_rows) == 2, 'branch_plan_pair_must_have_two_rows')
         _require({row['condition_id'] for row in pair_rows} == set(CONDITIONS), 'branch_plan_pair_conditions_invalid')
         _require(len({row['parent_state_hash'] for row in pair_rows}) == 1, 'branch_plan_pair_parent_hash_mismatch')
+        _require(len({row['logical_seed'] for row in pair_rows}) == 1, 'branch_plan_pair_seed_mismatch')
+        _require(sorted(row['execution_order'] for row in pair_rows) == [1, 2], 'branch_plan_pair_execution_order_invalid')
     return True
 
 
-def prepare_from_files(*, selection_package_path, baseline_traces_path, replicates, outdir):
+def prepare_from_files(*, selection_package_path, baseline_traces_path, replicates, outdir, branch_code_sha=None):
     selection = load_json(selection_package_path)
     traces = load_jsonl(baseline_traces_path)
     baseline = _selected_trace(selection, traces)
-    bundle = build_branch_plan(selection, baseline, replicates=replicates)
+    bundle = build_branch_plan(
+        selection,
+        baseline,
+        replicates=replicates,
+        branch_code_sha=branch_code_sha,
+    )
     verify_branch_plan(bundle)
 
     out = Path(outdir)
@@ -293,6 +369,7 @@ def main():
     ap.add_argument('--selection-package', required=True)
     ap.add_argument('--baseline-traces', required=True)
     ap.add_argument('--replicates', required=True, type=int)
+    ap.add_argument('--branch-code-sha')
     ap.add_argument('--outdir', required=True)
     args = ap.parse_args()
     bundle = prepare_from_files(
@@ -300,6 +377,7 @@ def main():
         baseline_traces_path=args.baseline_traces,
         replicates=args.replicates,
         outdir=args.outdir,
+        branch_code_sha=args.branch_code_sha,
     )
     print(f"prepared {bundle['plan']['branch_row_count']} branch rows from frozen parent {bundle['plan']['parent_snapshot_hash']}")
     print('authorization_status=NOT_AUTHORIZED')
