@@ -57,6 +57,18 @@ jobs:
           test -s results/system_behavior_preflight/SUMMARY.txt
           grep -q '^SYSTEM_BEHAVIOR_PREFLIGHT=PASS$' results/system_behavior_preflight/SUMMARY.txt
           grep -q '^SCIENTIFIC_EVIDENCE=NO$' results/system_behavior_preflight/SUMMARY.txt
+      - name: Adapt a real Arena v0.3 scripted trace into Behavior Event v0.1
+        run: |
+          python -m arena.system_behavior_trace_preflight --outdir results/system_behavior_trace_preflight
+          test -s results/system_behavior_trace_preflight/source_trace.json
+          test -s results/system_behavior_trace_preflight/behavior_events_v0.1.jsonl
+          test -s results/system_behavior_trace_preflight/adapter_summary.json
+          test -s results/system_behavior_trace_preflight/system_trajectory_measurement_v4.json
+          test -s results/system_behavior_trace_preflight/SUMMARY.txt
+          grep -q '^SYSTEM_BEHAVIOR_TRACE_ADAPTER_PREFLIGHT=PASS$' results/system_behavior_trace_preflight/SUMMARY.txt
+          grep -q '^SOURCE_TRACE_SCHEMA=R2-ARENA-TRACE-v0.3$' results/system_behavior_trace_preflight/SUMMARY.txt
+          grep -q '^SCIENTIFIC_EVIDENCE=NO$' results/system_behavior_trace_preflight/SUMMARY.txt
+          grep -q '^JUMP_DETECTOR=NOT_RUN_DETECTOR_NOT_FROZEN$' results/system_behavior_trace_preflight/SUMMARY.txt
       - name: Build current v0.3.2 offline manifest sample
         run: |
           python -m arena.build_manifest --domains all --repeats 2 --arena-config arena/config/arena_v0.3.json --out results/arena_manifest_preflight.jsonl
