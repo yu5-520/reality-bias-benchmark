@@ -18,6 +18,7 @@ from .system_behavior import content_hash
 from .system_behavior_adapter import adapt_arena_trace_v03
 from .system_behavior_dynamics_v4 import build_system_dynamics_view
 from .system_behavior_lineage_v4 import build_system_lineage_view
+from .v4_branch_anchor_review_packets import build_branch_anchor_review_packet
 from .v4_experiment_binding import load_and_verify_v4_binding
 from .v4_review_packets import build_bounded_review_packets
 
@@ -203,6 +204,7 @@ def derive_v4_bundle(
     lineage_views = []
     branch_anchor_views = []
     packets = []
+    anchor_packets = []
     run_index = []
     measurement_by_run = {}
     trace_status_by_run = {}
@@ -263,6 +265,15 @@ def derive_v4_bundle(
             evidence_batch_hash=evidence_hash,
             v4_research_binding_hash=binding["binding_hash"],
         )
+        branch_anchor_packet = build_branch_anchor_review_packet(
+            trace,
+            adapted,
+            dynamics,
+            lineage,
+            branch_anchor_view,
+            evidence_batch_hash=evidence_hash,
+            v4_research_binding_hash=binding["binding_hash"],
+        )
 
         dynamics_out = copy.deepcopy(dynamics)
         dynamics_out["source_evidence_batch_hash"] = evidence_hash
@@ -295,6 +306,7 @@ def derive_v4_bundle(
         lineage_views.append(lineage_out)
         branch_anchor_views.append(anchor_out)
         packets.extend(review_packets)
+        anchor_packets.append(branch_anchor_packet)
         run_index.append(
             {
                 "run_id": run_id,
@@ -308,6 +320,7 @@ def derive_v4_bundle(
                 "branch_anchor_potential_downstream_event_count": measurement["r5_mid"].get("potential_downstream_event_count"),
                 "branch_anchor_potential_operational_crossing_count": measurement["r5_mid"].get("potential_downstream_operational_crossing_count"),
                 "bounded_review_packet_count": len(review_packets),
+                "branch_anchor_review_packet_id": branch_anchor_packet["packet_id"],
                 "semantic_status": "NOT_ADJUDICATED",
             }
         )
@@ -333,6 +346,7 @@ def derive_v4_bundle(
         "lineage_view_count": len(lineage_views),
         "branch_anchor_lineage_view_count": len(branch_anchor_views),
         "bounded_review_packet_count": len(packets),
+        "branch_anchor_review_packet_count": len(anchor_packets),
         "planned_pair_count": len({row["pair_id"] for row in plan_bundle["branch_rows"]}),
         "structurally_compared_pair_count": len(pair_comparisons),
         "run_index": run_index,
@@ -346,8 +360,8 @@ def derive_v4_bundle(
         "scientific_status": "POST_FREEZE_STRUCTURAL_DERIVATION_FROM_SUBJECT_EVIDENCE",
         "warning": (
             "System Behavior v4 outputs are deterministic post-freeze derivations from the bound subject trace file. "
-            "R5-MID branch-anchor metrics start from the exact frozen branch-start state and measure visibility/exposure lineage only. "
-            "Paired v4 comparisons report structural differences only. They do not replace Measurement v3 and do not by themselves establish C/P/R, semantic reliance, Authority Penetration, recovery, or causal effect."
+            "R5-MID branch-anchor metrics and supplemental branch-anchor review packets start from the exact frozen branch-start state. "
+            "Paired v4 comparisons report structural differences only. Measurement v3 remains parallel historical evidence, and no v4 output by itself establishes C/P/R, semantic reliance, Authority Penetration, recovery, or causal effect."
         ),
     }
     summary["summary_hash"] = content_hash(summary)
@@ -357,6 +371,7 @@ def derive_v4_bundle(
         "lineage_views": lineage_views,
         "branch_anchor_views": branch_anchor_views,
         "review_packets": packets,
+        "branch_anchor_review_packets": anchor_packets,
         "pair_comparisons": pair_comparisons,
         "summary": summary,
     }
@@ -383,6 +398,7 @@ def main() -> None:
     write_jsonl(outdir / "system_lineage_views_v4.jsonl", bundle["lineage_views"])
     write_jsonl(outdir / "branch_anchor_lineage_views_v4.jsonl", bundle["branch_anchor_views"])
     write_jsonl(outdir / "bounded_review_packets_v4.jsonl", bundle["review_packets"])
+    write_jsonl(outdir / "branch_anchor_review_packets_v4.jsonl", bundle["branch_anchor_review_packets"])
     write_jsonl(outdir / "pair_structural_comparisons_v4.jsonl", bundle["pair_comparisons"])
     (outdir / "summary.json").write_text(
         json.dumps(bundle["summary"], ensure_ascii=False, indent=2, sort_keys=True) + "\n",
@@ -392,6 +408,7 @@ def main() -> None:
         f"derived_v4_measurements={len(bundle['measurements'])} "
         f"branch_anchor_views={len(bundle['branch_anchor_views'])} "
         f"review_packets={len(bundle['review_packets'])} "
+        f"branch_anchor_review_packets={len(bundle['branch_anchor_review_packets'])} "
         f"structurally_compared_pairs={len(bundle['pair_comparisons'])} "
         "semantic_review=DEFERRED_APPEND_ONLY causal_effect=NOT_ADJUDICATED paid_evaluator=NO measurement_v3_replaced=NO"
     )
