@@ -70,6 +70,38 @@
       },
       "additionalProperties": true
     },
+    "r5_mid": {
+      "type": "object",
+      "required": [
+        "branch_start_anchor_hash",
+        "state_key",
+        "state_status",
+        "anchor_visible_agent_turn_count",
+        "potential_downstream_event_count",
+        "potential_downstream_operational_crossing_count",
+        "semantic_reliance_status",
+        "authority_penetration_status",
+        "causal_effect_status"
+      ],
+      "properties": {
+        "branch_start_anchor_hash": {"type": "string", "minLength": 1},
+        "state_key": {"type": "string", "minLength": 1},
+        "state_status": {"type": "string", "minLength": 1},
+        "anchor_visible_agent_turn_count": {"type": "integer", "minimum": 0},
+        "anchor_visible_agent_ids": {"type": "array", "items": {"type": "string"}},
+        "potential_downstream_event_count": {"type": "integer", "minimum": 0},
+        "potential_downstream_relation_count": {"type": "integer", "minimum": 0},
+        "potential_downstream_affected_agent_count": {"type": "integer", "minimum": 0},
+        "potential_downstream_affected_agent_ids": {"type": "array", "items": {"type": "string"}},
+        "potential_downstream_operational_crossing_count": {"type": "integer", "minimum": 0},
+        "potential_downstream_authority_classes_reached": {"type": "array", "items": {"type": "string"}},
+        "mechanical_anchor_reach_depth_candidate": {"type": ["integer", "null"], "minimum": 0},
+        "semantic_reliance_status": {"const": "NOT_ADJUDICATED"},
+        "authority_penetration_status": {"const": "NOT_ADJUDICATED"},
+        "causal_effect_status": {"const": "NOT_ADJUDICATED"}
+      },
+      "additionalProperties": true
+    },
     "experimental_variables": {
       "type": "array",
       "items": {
