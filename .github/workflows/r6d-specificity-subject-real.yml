@@ -1,0 +1,172 @@
+name: R6-D Specificity Scientific Subject — Manual Only
+
+on:
+  workflow_dispatch:
+    inputs:
+      authorization_phrase:
+        description: "Exact explicit authorization phrase"
+        required: true
+        type: string
+      confirm_design_hash:
+        description: "Confirm frozen R6-D design hash"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  r6d-scientific-subject:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      DESIGN_HASH: d8783a9c3e0a264c3119ee72e63db9b61d51f0d633ff6dde66068751c31701de
+      SOURCE_RUN_ID: "35129957603"
+      SOURCE_ARTIFACT_NAME: r5mid-prospective-one-shot-prepared-v0-3-35129957603
+      SOURCE_INNER_TAR_SHA256: 3f780b2c0cc88c59fa5c149e6c3b987ba73e8a97aefb0970c89ce5e32f6b1988
+      PLAN_DIR: /tmp/r6d_runtime_plan
+      RAW_DIR: /tmp/r6d_raw_subject
+      FREEZE_DIR: /tmp/r6d_raw_freeze
+
+    steps:
+      - name: Fail closed unless exact authorization and design hash are supplied
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ inputs.authorization_phrase }}" = "CALL_REAL_R6D_SPECIFICITY_API"
+          test "${{ inputs.confirm_design_hash }}" = "$DESIGN_HASH"
+          echo "R6D_MANUAL_AUTHORIZATION_GATE=PASS"
+
+      - name: Checkout exact dispatched commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download exact frozen source preparation artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/r6d_source_artifact /tmp/r6d_source_extracted
+          mkdir -p /tmp/r6d_source_artifact /tmp/r6d_source_extracted
+          gh run download "$SOURCE_RUN_ID" -n "$SOURCE_ARTIFACT_NAME" -D /tmp/r6d_source_artifact
+          test -f /tmp/r6d_source_artifact/r5mid_prospective_one_shot_prepared_v0_3.tar.gz
+          echo "$SOURCE_INNER_TAR_SHA256  /tmp/r6d_source_artifact/r5mid_prospective_one_shot_prepared_v0_3.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/r6d_source_artifact/r5mid_prospective_one_shot_prepared_v0_3.tar.gz -C /tmp/r6d_source_extracted
+          test -f /tmp/r6d_source_extracted/results/r5mid_prospective_one_shot_plan_v0_3/parent_snapshot.json
+
+      - name: Build exact runtime plan on dispatched code SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$PLAN_DIR"
+          python -m arena.prepare_r6d_specificity_plan \
+            --source-r5-plan-dir /tmp/r6d_source_extracted/results/r5mid_prospective_one_shot_plan_v0_3 \
+            --plan-code-sha "$GITHUB_SHA" \
+            --outdir "$PLAN_DIR"
+
+      - name: Run fail-closed formal runner preflight without provider call
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m arena.run_r6d_specificity_real \
+            --plan-dir "$PLAN_DIR" \
+            --model-config arena/config/model_deepseek_v0.2.json \
+            --provider deepseek \
+            --execution-code-sha "$GITHUB_SHA" \
+            --per-branch-max-calls 64 \
+            --per-branch-spending-ceiling 0.25 \
+            --global-spending-ceiling 2.25 \
+            --currency USD \
+            --preflight-only
+
+      - name: Execute exact nine-branch R6-D scientific subject batch
+        id: subject
+        shell: bash
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          set +e
+          rm -rf "$RAW_DIR"
+          python -m arena.run_r6d_specificity_real \
+            --plan-dir "$PLAN_DIR" \
+            --outdir "$RAW_DIR" \
+            --model-config arena/config/model_deepseek_v0.2.json \
+            --provider deepseek \
+            --execution-code-sha "$GITHUB_SHA" \
+            --per-branch-max-calls 64 \
+            --per-branch-spending-ceiling 0.25 \
+            --global-spending-ceiling 2.25 \
+            --currency USD \
+            --authorization-phrase "${{ inputs.authorization_phrase }}" \
+            --execute-real-api
+          code=$?
+          echo "runner_exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Freeze raw evidence before any derivation
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$FREEZE_DIR"
+          mkdir -p "$FREEZE_DIR"
+          if test -f "$RAW_DIR/run_summary.json" && test -f "$RAW_DIR/traces.jsonl"; then
+            python -m arena.freeze_r6d_raw_evidence \
+              --plan-dir "$PLAN_DIR" \
+              --raw-dir "$RAW_DIR" \
+              --output "$FREEZE_DIR/raw_evidence_freeze.json"
+          else
+            printf '%s\n' '{"status":"RAW_SUBJECT_OUTPUT_INCOMPLETE_FREEZE_UNAVAILABLE","semantic_cpr_status":"NOT_ADJUDICATED"}' > "$FREEZE_DIR/raw_evidence_freeze_unavailable.json"
+          fi
+
+      - name: Package immutable raw subject material
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/r6d_subject_package
+          mkdir -p /tmp/r6d_subject_package
+          test -d "$PLAN_DIR" && cp -a "$PLAN_DIR" /tmp/r6d_subject_package/runtime_plan || true
+          test -d "$RAW_DIR" && cp -a "$RAW_DIR" /tmp/r6d_subject_package/raw_subject || true
+          test -d "$FREEZE_DIR" && cp -a "$FREEZE_DIR" /tmp/r6d_subject_package/raw_freeze || true
+          printf '%s\n' "$GITHUB_SHA" > /tmp/r6d_subject_package/execution_code_sha.txt
+          tar -czf /tmp/r6d-specificity-raw-subject.tar.gz -C /tmp/r6d_subject_package .
+          sha256sum /tmp/r6d-specificity-raw-subject.tar.gz > /tmp/r6d-specificity-raw-subject.tar.gz.sha256
+
+      - name: Upload raw scientific subject artifact before derivation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r6d-specificity-raw-subject-${{ github.run_id }}
+          path: |
+            /tmp/r6d-specificity-raw-subject.tar.gz
+            /tmp/r6d-specificity-raw-subject.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Fail after raw preservation if subject runner reported errors
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          code="${{ steps.subject.outputs.runner_exit_code }}"
+          if test -z "$code"; then
+            echo "subject runner did not return an exit code" >&2
+            exit 1
+          fi
+          if test "$code" != "0"; then
+            echo "R6-D subject runner failed with exit code $code after raw-preservation attempt" >&2
+            exit "$code"
+          fi
+          test -f "$FREEZE_DIR/raw_evidence_freeze.json"
+          echo "R6D_RAW_EVIDENCE_FROZEN_BEFORE_DERIVATION=YES"
+          echo "PAID_EVALUATOR_CALLED=NO"
+          echo "SEMANTIC_CPR_STATUS=NOT_ADJUDICATED"
