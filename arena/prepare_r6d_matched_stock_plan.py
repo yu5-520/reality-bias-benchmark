@@ -8,14 +8,9 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from .core import stable_hash
-from .io_utils import load_json, sha256_file, write_jsonl
+from .io_utils import load_json, load_jsonl, sha256_file, write_jsonl
 from .r5r6_specificity_atomic_preflight_v0_2 import build_preflight
-from .r5r6_specificity_atomic_v0_2 import mechanically_equivalent, verify_atomic_envelope
-
-S2 = "S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL"
-S3 = "S3_MATCHED_ORDINARY_STOCK_B_DOWNGRADE"
-S4 = "S4_MATCHED_ORDINARY_STOCK_C_DOWNGRADE"
-CONDITIONS = [S2, S3, S4]
+from .r6d_matched_stock_atomic import CONDITIONS, S2, S3, S4, mechanically_equivalent, verify_envelope
 
 PLAN_SCHEMA = "RB-R6D-MATCHED-STOCK-RUNTIME-PLAN-v0.1"
 MANIFEST_SCHEMA = "RB-R6D-MATCHED-STOCK-RUNTIME-BRANCH-MANIFEST-v0.1"
@@ -54,14 +49,16 @@ def _load_source_bundle(plan_dir: str | Path) -> dict[str, Any]:
 
 def _load_envelopes() -> dict[str, dict[str, Any]]:
     preflight = build_preflight()
-    s2 = copy.deepcopy(preflight["s2_envelope"])
-    s3 = load_json("configs/r6/r6d_s3_matched_stock_b_envelope_v0.1.json")
-    s4 = load_json("configs/r6/r6d_s4_matched_stock_c_envelope_v0.1.json")
-    for env in (s2, s3, s4):
-        verify_atomic_envelope(env)
-    mechanically_equivalent(s2, s3)
-    mechanically_equivalent(s2, s4)
-    return {S2: s2, S3: s3, S4: s4}
+    envelopes = {
+        S2: copy.deepcopy(preflight["s2_envelope"]),
+        S3: load_json("configs/r6/r6d_s3_matched_stock_b_envelope_v0.1.json"),
+        S4: load_json("configs/r6/r6d_s4_matched_stock_c_envelope_v0.1.json"),
+    }
+    for env in envelopes.values():
+        verify_envelope(env)
+    mechanically_equivalent(envelopes[S2], envelopes[S3])
+    mechanically_equivalent(envelopes[S2], envelopes[S4])
+    return envelopes
 
 
 def _bounded_arena_config(design: Mapping[str, Any]) -> dict[str, Any]:
@@ -94,11 +91,9 @@ def build_runtime_plan(*, source_r5_plan_dir: str | Path, plan_code_sha: str) ->
     source = _load_source_bundle(source_r5_plan_dir)
     parent = source["parent_snapshot"]
     _require(parent["state_hash"] == design["source_binding"]["common_parent_state_hash"], "parent_hash_mismatch_design")
-
     envelopes = _load_envelopes()
     frozen = {row["condition_id"]: row for row in design["conditions"]}
     for condition in CONDITIONS:
-        _require(condition in frozen, "missing_frozen_condition:" + condition)
         _require(envelopes[condition]["envelope_hash"] == frozen[condition]["envelope_hash"], "envelope_hash_mismatch:" + condition)
 
     env = design["environment_binding"]
@@ -110,7 +105,7 @@ def build_runtime_plan(*, source_r5_plan_dir: str | Path, plan_code_sha: str) ->
     _require(stable_hash(domain["agents"]) == env["agent_registry_hash"], "agent_registry_hash_mismatch_design")
     bounded_config = _bounded_arena_config(design)
 
-    execution_rows = []
+    rows: list[dict[str, Any]] = []
     for frozen_row in design["matched_execution_design"]["rows"]:
         condition = frozen_row["condition_id"]
         _require(condition in CONDITIONS, "unknown_matched_stock_condition")
@@ -135,7 +130,7 @@ def build_runtime_plan(*, source_r5_plan_dir: str | Path, plan_code_sha: str) ->
             "semantic_cpr_status": "NOT_ADJUDICATED",
         }
         row["manifest_hash"] = stable_hash(row)
-        execution_rows.append(row)
+        rows.append(row)
 
     plan = {
         "schema": PLAN_SCHEMA,
@@ -150,8 +145,8 @@ def build_runtime_plan(*, source_r5_plan_dir: str | Path, plan_code_sha: str) ->
         "budget_gate": copy.deepcopy(design["budget_gate"]),
         "order_policy": design["matched_execution_design"]["order_policy"],
         "replicates": design["matched_execution_design"]["replicates"],
-        "branch_row_count": len(execution_rows),
-        "execution_row_hashes": [row["manifest_hash"] for row in execution_rows],
+        "branch_row_count": len(rows),
+        "execution_row_hashes": [row["manifest_hash"] for row in rows],
         "bounded_arena_config_hash": stable_hash(bounded_config),
         "condition_envelope_hashes": {k: envelopes[k]["envelope_hash"] for k in CONDITIONS},
         "real_subject_runner_expected": "arena.run_r6d_matched_stock_real",
@@ -169,7 +164,7 @@ def build_runtime_plan(*, source_r5_plan_dir: str | Path, plan_code_sha: str) ->
         "source_parent_snapshot": parent,
         "bounded_arena_config": bounded_config,
         "condition_envelopes": envelopes,
-        "execution_rows": execution_rows,
+        "execution_rows": rows,
     }
     verify_runtime_plan(bundle)
     return bundle
@@ -196,7 +191,7 @@ def verify_runtime_plan(bundle: Mapping[str, Any]) -> bool:
     _require(plan["same_parent_repeats_are_independent_samples"] is False, "runtime_independence_overclaim_forbidden")
     _require(plan["terminal_outcome_is_primary"] is False, "runtime_terminal_primary_forbidden")
     for condition in CONDITIONS:
-        verify_atomic_envelope(envelopes[condition])
+        verify_envelope(envelopes[condition])
         _require(plan["condition_envelope_hashes"][condition] == envelopes[condition]["envelope_hash"], "runtime_envelope_hash_mismatch:" + condition)
     _require(plan["execution_row_hashes"] == [r["manifest_hash"] for r in rows], "runtime_execution_hashes_mismatch")
     for row in rows:
@@ -233,7 +228,7 @@ def load_runtime_plan(plan_dir: str | Path) -> dict[str, Any]:
             S3: load_json(p / "s3_envelope.json"),
             S4: load_json(p / "s4_envelope.json"),
         },
-        "execution_rows": [json.loads(line) for line in (p / "execution_rows.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()],
+        "execution_rows": load_jsonl(p / "execution_rows.jsonl"),
     }
     verify_runtime_plan(bundle)
     return bundle
