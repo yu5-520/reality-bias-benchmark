@@ -277,7 +277,7 @@ Forward publication reports use:
 
 Historical standards remain valid for their frozen reports:
 
-- v1.1: R6 factual/specifity-forward reporting layer;
+- v1.1: R6 factual/specificity-forward reporting layer;
 - v1.0: finalized R5-MID v3 report bundle.
 
 The reporting chain remains:
