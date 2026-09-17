@@ -219,11 +219,19 @@ jobs:
       - name: Assert readiness audit cannot execute provider calls
         run: |
           set -euo pipefail
-          if grep -nE 'DEEPSEEK_API_KEY|DASHSCOPE_API_KEY|secrets\.BAI|--execute-real-api' .github/workflows/r7-formal-readiness-audit-v0-1.yml; then
-            echo 'Readiness audit unexpectedly contains a provider-secret binding or real-execution flag.' >&2
-            exit 2
-          fi
-          echo 'PASS: readiness audit is provider-secret free and has no real-execution flag'
+          python - <<'PY'
+          from pathlib import Path
+          text=Path('.github/workflows/r7-formal-readiness-audit-v0-1.yml').read_text(encoding='utf-8')
+          forbidden=[
+              'DEEPSEEK_' + 'API_KEY',
+              'DASHSCOPE_' + 'API_KEY',
+              'secrets.' + 'BAI',
+              '--execute-' + 'real-api',
+          ]
+          found=[term for term in forbidden if term in text]
+          assert not found, 'forbidden real-call capability present: ' + repr(found)
+          print('PASS: readiness audit is provider-secret free and has no real-execution flag')
+          PY
 
       - name: Write immutable readiness report
         run: |
