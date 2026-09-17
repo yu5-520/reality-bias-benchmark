@@ -1,0 +1,83 @@
+{
+  "authorization_boundary": {
+    "cpr_semantic_adjudication_authorized": false,
+    "new_provider_call_authorized": false,
+    "paid_evaluator_authorized": false,
+    "r7_recovery_subject_authorized": false
+  },
+  "forward_correction": {
+    "corrected_points": [
+      "EXPLICIT_REFERENCE_IS_NOT_ADOPTED_CARRIER",
+      "FACT_STATUS_ON_AN_UNRELATED_CONTAINER_DOES_NOT_CONFIRM_NESTED_TARGET_PROPOSITION",
+      "REP3_E43_IS_CONTAINER_LEVEL_FACT_REASSERTION_CANDIDATE_NOT_FIELD_LEVEL_CONFIRMATION",
+      "TARGET_VALUE_PROPAGATION_IS_NOT_WITHDRAWAL_STATUS_PROPAGATION"
+    ],
+    "corrects_interpretation_only": true,
+    "does_not_mutate_raw_evidence": true,
+    "does_not_rewrite_historical_v0_1_files": true
+  },
+  "interpretation": {
+    "container_level_authority_reassertion_candidate": "OBSERVED_IN_REP3_E43",
+    "cpr": "NOT_ADJUDICATED",
+    "escape_derived_specificity": "NOT_ESTABLISHED",
+    "frozen_target_response_contrast": "RETAINED",
+    "inertia_candidate_evidence": "SUPPORTED_AT_PERSISTENT_SOURCE_STATE_CONTAINER_LEVEL",
+    "intervention_related_inertia_beyond_natural_variability": "NOT_ESTABLISHED",
+    "normal_inheritance_evidence": "SUPPORTED",
+    "post_challenge_inertia": "CANDIDATE_LEVEL_ONLY",
+    "proposition_level_authority_reconstruction": "NOT_ESTABLISHED",
+    "target_value_propagation": "OBSERVED_BUT_NOT_INTERVENTION_SPECIFIC",
+    "withdrawal_status_propagation": "NOT_OBSERVED_DOWNSTREAM"
+  },
+  "measurement_boundary": {
+    "implication": "Container authority and nested-proposition authority cannot be treated as equivalent. Field-level authority lineage is required for direct proposition-level reconstruction claims.",
+    "intervention_granularity": "NESTED_FIELD_LEVEL",
+    "state_authority_metadata_granularity": "CONTAINER_LEVEL"
+  },
+  "mechanism_findings": {
+    "s0_post_t9_observed_calls": 9,
+    "s0_post_t9_target_value_used_in_output_calls": 9,
+    "s0_t9_j0_target_used_in_output_runs": 3,
+    "s1_post_t9_target_output_calls": 0,
+    "s1_t9_target_used_in_output_runs": 0,
+    "s2_post_t9_j0_container_fact_metadata_visible_calls": 15,
+    "s2_post_t9_observed_calls": 15,
+    "s2_post_t9_target_value_used_in_output_calls": 15,
+    "s2_post_t9_target_visible_input_calls": 15,
+    "s2_post_t9_withdrawal_annotation_visible_input_calls": 0,
+    "s2_t9_exact_withdrawal_annotation_delivered_and_read_runs": 3,
+    "s2_t9_literal_unconfirmed_reexpressed_in_output_runs": 0,
+    "s2_t9_target_value_used_in_output_runs": 3,
+    "s2_target_container_fact_reassertion_events": [
+      "rep3:E43"
+    ],
+    "s2_unrelated_fact_containers_merely_carrying_target": [
+      "rep1:E39",
+      "rep1:E47",
+      "rep1:E49"
+    ]
+  },
+  "outputs": {
+    "raw_traces_remain_external_frozen_artifact": true,
+    "regenerated_run_mechanism_summary": "run_mechanism_summary.json",
+    "report": "results/reports/2026-09-17/R6D_First_Real_Carrier_Mechanism_Audit_v0_2.md",
+    "script": "arena/analyze_r6d_carrier_audit_v0_2.py"
+  },
+  "schema": "RB-R6D-FIRST-REAL-CARRIER-MECHANISM-AUDIT-BINDING-v0.2",
+  "scientific_subject": {
+    "artifact_digest": "sha256:da14f406fdc574178901a6e5129b6257496cbfb584b852da812923573f0cd927",
+    "artifact_id": 10501887185,
+    "artifact_name": "r6d-specificity-raw-subject-35232218556",
+    "design_hash": "d8783a9c3e0a264c3119ee72e63db9b61d51f0d633ff6dde66068751c31701de",
+    "evidence_batch_hash": "0d4dd464d10bfc9a5b4307856e2c070bfaa521951e00cd0f147eeb80063e4beb",
+    "execution_code_sha": "11271a20abe67ad21e0e9f6cdac92d8330930f5a",
+    "paid_evaluator_called": false,
+    "preserved_trace_count": 9,
+    "provider_calls_are_real": true,
+    "raw_evidence_frozen_before_derivation": true,
+    "runner_error_count": 0,
+    "semantic_cpr_status": "NOT_ADJUDICATED",
+    "workflow_run_id": 35232218556
+  },
+  "status": "FORWARD_CORRECTION_BOUND_TO_FROZEN_RAW_EVIDENCE"
+}
