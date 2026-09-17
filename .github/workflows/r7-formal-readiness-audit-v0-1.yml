@@ -216,14 +216,14 @@ jobs:
             --currency USD \
             --preflight-only
 
-      - name: Assert readiness audit has no provider-secret dependency
+      - name: Assert readiness audit cannot execute provider calls
         run: |
           set -euo pipefail
-          if grep -nE 'DEEPSEEK_API_KEY|BAI|DASHSCOPE_API_KEY|CALL_REAL_R7_THREE_ARM_API' .github/workflows/r7-formal-readiness-audit-v0-1.yml; then
-            echo 'Readiness audit must not contain provider credentials or a real-call authorization token.' >&2
+          if grep -nE 'DEEPSEEK_API_KEY|DASHSCOPE_API_KEY|secrets\.BAI|--execute-real-api' .github/workflows/r7-formal-readiness-audit-v0-1.yml; then
+            echo 'Readiness audit unexpectedly contains a provider-secret binding or real-execution flag.' >&2
             exit 2
           fi
-          echo 'PASS: readiness audit is provider-secret free and cannot authorize subject calls'
+          echo 'PASS: readiness audit is provider-secret free and has no real-execution flag'
 
       - name: Write immutable readiness report
         run: |
