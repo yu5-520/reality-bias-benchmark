@@ -1,0 +1,94 @@
+{
+  "schema": "RB-R5R6-SPECIFICITY-FIELD-SELECTION-CONTRACT-v0.2",
+  "version": "0.2",
+  "date": "2026-09-17",
+  "status": "FORWARD_EXACT_SOURCE_SELECTION_NO_RUN_AUTHORIZATION",
+  "predecessor": "RB-R5R6-SPECIFICITY-FIELD-SELECTION-CONTRACT-v0.1",
+  "purpose": "Select an ordinary prompt-visible factual information item outcome-blind for S1 when the exact frozen parent has no second non-J0 top-level shared-state metadata field with status fact.",
+  "source_audit": "docs/R5_R6_specificity_source_audit_2026-09-17.md",
+  "namespace": {
+    "specificity": "S",
+    "r7": "C",
+    "aliasing_forbidden": true
+  },
+  "exact_source_constraint": {
+    "common_parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c",
+    "source_t9_prompt_hash": "3152c87e0238f6cf033badd6e8ecfc01ff2e713d1d64dee2108c300f28e65225",
+    "source_t9_runtime_snapshot_hash": "776892d1214693dae2880fe197068da6dcc727974529e87e7960251f16fb67bf",
+    "selected_j0_event_ref": "E32",
+    "selected_j0_state_key": "inventory_stockout_assessment_v1",
+    "selected_j0_pre_status": "fact",
+    "alternative_top_level_non_j0_shared_state_fact_exists": false
+  },
+  "candidate_unit": {
+    "type": "ATOMIC_PROMPT_VISIBLE_FACT",
+    "must_preserve_original_value": true,
+    "must_have_stable_runtime_locator": true,
+    "must_be_visible_to_same_resumed_actor": true,
+    "must_be_source_backed": true,
+    "semantic_cpr_adjudication_required": false
+  },
+  "first_control_pool_rule": {
+    "id": "PUBLIC_CONTEXT_PRODUCT_SCALAR_NON_INVENTORY_FAMILY_v1",
+    "include": [
+      "public_context.products.*.price",
+      "public_context.products.*.gross_margin_pct",
+      "public_context.products.*.ad_roas"
+    ],
+    "exclude": [
+      "public_context.products.*.stock",
+      "public_context.products.*.daily_units",
+      "goal",
+      "public_context.constraint",
+      "your_private_context.*",
+      "shared_state.*",
+      "inbox.*"
+    ],
+    "exclusion_reason": "The first S1 control is intended to estimate generic factual-uncertainty response without becoming a second inventory/stockout-family perturbation.",
+    "future_same_family_control_may_be_added_append_only": true,
+    "future_same_family_control_must_not_replace_first_s1_after_outcomes": true
+  },
+  "selection_timing": {
+    "must_complete_before_scientific_s_arm_outputs": true,
+    "scientific_s_arm_outputs_currently_exist": false,
+    "outcome_aware_override_forbidden": true
+  },
+  "selection_rule": {
+    "id": "PARENT_HASH_SEEDED_LEXICOGRAPHIC_INDEX_v1",
+    "ordering": "LEXICOGRAPHIC_TARGET_LOCATOR",
+    "seed_material": "SHA256(common_parent_state_hash + '|' + contract_schema)",
+    "seed_hash": "7347944910449db5d12de365c29131dc86b094dee8c34cf0da53de3ed09ccbc3",
+    "pool_size": 9,
+    "selected_index_zero_based": 7,
+    "selected_locator": "public_context.products.C.gross_margin_pct",
+    "selected_value": 35,
+    "manual_override_forbidden": true
+  },
+  "intervention_equivalence": {
+    "prospective_mechanical_primitive": "ONE_SHOT_TARGET_SCOPED_EPISTEMIC_STATUS_ANNOTATION",
+    "from_status": "fact",
+    "to_status": "unconfirmed",
+    "same_envelope_schema_s1_s2_required": true,
+    "same_delivery_policy_s1_s2_required": true,
+    "same_direct_exposure_limit_s1_s2_required": true,
+    "same_reinjection_policy_s1_s2_required": true,
+    "same_persistent_mutation_policy_s1_s2_required": true,
+    "same_observation_horizon_s1_s2_required": true,
+    "original_target_value_or_content_must_not_be_replaced": true,
+    "opposite_fact_forbidden": true,
+    "replacement_conclusion_forbidden": true,
+    "desired_terminal_answer_forbidden": true
+  },
+  "historical_boundary": {
+    "historical_r5mid_operator_remains_unchanged": true,
+    "historical_ab_not_relabelled_as_s": true,
+    "v0_2_operator_is_prospective_specificity_extension": true
+  },
+  "authorization": {
+    "offline_pool_freeze": true,
+    "offline_operator_testing": true,
+    "paid_provider_run": false,
+    "paid_evaluator_run": false,
+    "semantic_cpr_adjudication": false
+  }
+}
