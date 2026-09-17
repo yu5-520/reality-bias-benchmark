@@ -1,0 +1,68 @@
+{
+  "schema": "RB-R6D-SPECIFICITY-FORMAL-SUBJECT-GATE-v0.1",
+  "version": "0.1",
+  "date": "2026-09-17",
+  "status": "GATE_CONTRACT_ONLY_NOT_AUTHORIZATION",
+  "design_freeze": {
+    "path": "manifests/r6d_specificity_preexecution_design_freeze_2026-09-17_v0_1.json",
+    "schema": "RB-R6D-SPECIFICITY-PREEXECUTION-DESIGN-FREEZE-v0.1",
+    "design_hash": "d8783a9c3e0a264c3119ee72e63db9b61d51f0d633ff6dde66068751c31701de"
+  },
+  "planned_runtime_binding": {
+    "workflow": ".github/workflows/r6d-specificity-subject-real.yml",
+    "runner": "arena.run_r6d_specificity_real",
+    "workflow_bound": false,
+    "runner_bound": false,
+    "binding_must_be_frozen_in_separate_readiness_step": true
+  },
+  "authorization_phrase": "CALL_REAL_R6D_SPECIFICITY_API",
+  "default_plan": {
+    "replicates": 3,
+    "planned_branch_count": 9,
+    "order_policy": "THREE_CONDITION_CYCLIC_LATIN_ROTATION",
+    "provider": "deepseek",
+    "model_config": "arena/config/model_deepseek_v0.2.json",
+    "currency": "USD",
+    "per_branch_spending_ceiling": 0.25,
+    "total_spending_ceiling": 2.25,
+    "per_branch_max_calls": 64,
+    "branch_start_parent_turn": 8,
+    "direct_response_turn": 9,
+    "post_consumption_start_turn": 10,
+    "absolute_turn_cap": 16
+  },
+  "methodological_gates": {
+    "exact_frozen_source_artifact_required": true,
+    "exact_common_parent_required": true,
+    "exact_s1_selection_record_required": true,
+    "exact_s1_s2_envelope_hashes_required": true,
+    "s1_s2_mechanical_equivalence_required": true,
+    "same_observation_horizon_required": true,
+    "same_environment_model_task_agent_registry_required": true,
+    "provider_hidden_state_replay_forbidden": true,
+    "cyclic_order_rotation_required": true,
+    "natural_early_termination_is_right_censoring": true,
+    "raw_evidence_freeze_before_derivation": true,
+    "raw_artifact_upload_before_derivation": true,
+    "semantic_cpr_adjudication_deferred": true,
+    "automatic_paid_evaluator": false,
+    "terminal_outcome_is_primary": false,
+    "same_parent_repeats_are_independent_samples": false,
+    "historical_r5mid_relabel_to_s_forbidden": true
+  },
+  "analysis_gate": {
+    "primary_readout": "POST_CONSUMPTION_R6_INERTIA_PROFILE",
+    "primary_contrast": "S2_MINUS_S1",
+    "auxiliary_contrasts": [
+      "S1_MINUS_S0",
+      "S2_MINUS_S0"
+    ],
+    "after_outcome_scalar_invention_forbidden": true,
+    "semantic_cpr_status": "NOT_ADJUDICATED"
+  },
+  "authorization_status": "NOT_AUTHORIZED",
+  "scientific_provider_run_authorized": false,
+  "paid_evaluator_run_authorized": false,
+  "semantic_cpr_adjudication_authorized": false,
+  "note": "This contract freezes the fail-closed boundary only. The real runner/workflow do not yet exist as an authorized scientific execution path. A later runtime-readiness freeze and an unmistakable explicit user authorization are both required before provider calls."
+}
