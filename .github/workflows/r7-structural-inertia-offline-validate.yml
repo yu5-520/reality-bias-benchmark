@@ -16,6 +16,8 @@ on:
       - "arena/prepare_r7_three_arm_plan.py"
       - "arena/r7_runtime_smoke.py"
       - "arena/run_r7_three_arm_real.py"
+      - "arena/freeze_r7_evidence.py"
+      - "arena/derive_r7_process_measurements.py"
       - "arena/tests/test_r7_structural_control_preflight.py"
       - ".github/workflows/r7-orchestration-paired-real.yml"
       - ".github/workflows/r7-structural-inertia-offline-validate.yml"
@@ -189,6 +191,45 @@ jobs:
           print('PASS: R7 engine integration smoke exercised all three mechanisms')
           PY
 
+      - name: Freeze engineering smoke before any structural derivation
+        run: |
+          set -euo pipefail
+          python -m arena.freeze_r7_evidence \
+            --raw-dir /tmp/r7_runtime_smoke \
+            --plan-dir /tmp/r7_real_parent_bound_plan \
+            --out /tmp/r7_runtime_smoke/evidence_batch.json
+          python - <<'PY'
+          import json
+          e=json.load(open('/tmp/r7_runtime_smoke/evidence_batch.json'))
+          assert e['evidence_role']=='ENGINEERING_VALIDATION_EVIDENCE'
+          assert e['raw_evidence_frozen_before_derived_analysis'] is True
+          assert e['preserved_trace_count']==3
+          assert e['authorization_record_bound'] is False
+          assert e['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('PASS: engineering evidence frozen and kept separate from subject evidence')
+          PY
+
+      - name: Derive nested R7 structural measurements only from frozen smoke evidence
+        run: |
+          set -euo pipefail
+          python -m arena.derive_r7_process_measurements \
+            --plan-dir /tmp/r7_real_parent_bound_plan \
+            --traces /tmp/r7_runtime_smoke/traces.jsonl \
+            --evidence-batch /tmp/r7_runtime_smoke/evidence_batch.json \
+            --outdir /tmp/r7_runtime_smoke_derived \
+            --allow-engineering-validation
+          python - <<'PY'
+          import json
+          s=json.load(open('/tmp/r7_runtime_smoke_derived/summary.json'))
+          assert s['source_evidence_role']=='ENGINEERING_VALIDATION_EVIDENCE'
+          assert s['scientific_status']=='ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE'
+          assert s['measurement_count']==3
+          assert s['integrity_failure_count']==0
+          assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
+          assert s['paid_evaluator_called'] is False
+          print('PASS: frozen-evidence-only R7 derivation path verified')
+          PY
+
       - name: Preflight guarded real R7 runner without credentials or provider calls
         run: |
           set -euo pipefail
@@ -227,7 +268,9 @@ jobs:
             arena/alr_recovery.py \
             arena/r7_structural_control_preflight.py \
             arena/prepare_r7_three_arm_plan.py \
-            arena/r7_runtime_smoke.py; then
+            arena/r7_runtime_smoke.py \
+            arena/freeze_r7_evidence.py \
+            arena/derive_r7_process_measurements.py; then
             echo "R7 offline validator/preflight must not depend on provider credentials." >&2
             exit 2
           fi
