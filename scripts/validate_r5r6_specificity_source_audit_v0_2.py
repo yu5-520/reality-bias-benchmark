@@ -11,6 +11,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from arena.core import stable_hash
+from arena.r5r6_specificity_atomic_v0_2 import S0, S1, S2
 
 
 def load(rel: str):
@@ -33,11 +34,21 @@ def main() -> None:
     binding = load("configs/r5r6_specificity_exact_source_binding_v0.2.json")
     selection = load("manifests/r5r6_specificity_s1_selection_2026-09-17_v0_2.json")
     source_slice = load("manifests/r5r6_specificity_source_slice_2026-09-17_v0_2.json")
+    atomic_plan_schema = load("schemas/r5r6_specificity_atomic_plan_v0.2.schema.json")
+    atomic_preflight_schema = load("schemas/r5r6_specificity_atomic_preflight_v0.2.schema.json")
 
     require(contract["schema"] == "RB-R5R6-SPECIFICITY-FIELD-SELECTION-CONTRACT-v0.2", "selection_contract_schema_invalid")
     require(binding["schema"] == "RB-R5R6-SPECIFICITY-EXACT-SOURCE-BINDING-v0.2", "exact_source_binding_schema_invalid")
     require(selection["schema"] == "RB-R5R6-SPECIFICITY-S1-SELECTION-RECORD-v0.2", "selection_record_schema_invalid")
     require(source_slice["schema"] == "RB-R5R6-SPECIFICITY-SOURCE-SLICE-v0.2", "source_slice_schema_invalid")
+    require(atomic_plan_schema["$id"] == "RB-R5R6-SPECIFICITY-ATOMIC-PLAN-v0.2", "atomic_plan_schema_invalid")
+    require(atomic_preflight_schema["$id"] == "RB-R5R6-SPECIFICITY-ATOMIC-PREFLIGHT-v0.2", "atomic_preflight_schema_invalid")
+
+    require([S0, S1, S2] == [
+        "S0_NATURAL_REFERENCE",
+        "S1_MATCHED_OR_ORDINARY_FACTUAL_INFORMATION_DOWNGRADE",
+        "S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL",
+    ], "canonical_r6d_condition_ids_invalid")
 
     statuses = source_slice["parent_shared_state_metadata_statuses"]
     facts = sorted(k for k, v in statuses.items() if v == "fact")
@@ -68,6 +79,8 @@ def main() -> None:
 
     s1 = binding["s1"]
     s2 = binding["s2"]
+    require(s1["condition"] == S1, "s1_condition_id_mismatch")
+    require(s2["condition"] == S2, "s2_condition_id_mismatch")
     require(s1["target_locator"] == selected["locator"], "s1_binding_locator_mismatch")
     require(s1["original_value"] == selected["value"], "s1_binding_value_mismatch")
     require(domain["task"]["public_context"]["products"]["C"]["gross_margin_pct"] == 35, "domain_s1_value_mismatch")
@@ -96,14 +109,23 @@ def main() -> None:
         require(auth.get("paid_evaluator_run", auth.get("paid_evaluator_call", False)) is False, "paid_evaluator_must_not_be_authorized")
         require(auth.get("semantic_cpr_adjudication") is False, "semantic_cpr_must_not_be_authorized")
 
-    require((ROOT / "docs/R5_R6_specificity_source_audit_2026-09-17.md").is_file(), "source_audit_document_missing")
-    require((ROOT / "docs/R5_R6_specificity_protocol_v0.2.md").is_file(), "specificity_protocol_v0_2_missing")
-    require((ROOT / "arena/r5r6_specificity_atomic_v0_2.py").is_file(), "atomic_operator_missing")
-    require((ROOT / "arena/r5r6_specificity_atomic_preflight_v0_2.py").is_file(), "atomic_preflight_missing")
+    required_files = [
+        "docs/R5_R6_specificity_source_audit_2026-09-17.md",
+        "docs/R5_R6_specificity_protocol_v0.3.md",
+        "arena/r5r6_specificity_atomic_v0_2.py",
+        "arena/r5r6_specificity_atomic_preflight_v0_2.py",
+        "schemas/r5r6_specificity_atomic_plan_v0.2.schema.json",
+        "schemas/r5r6_specificity_atomic_preflight_v0.2.schema.json",
+    ]
+    for rel in required_files:
+        require((ROOT / rel).is_file(), f"required_file_missing:{rel}")
 
     print("R5R6_SPECIFICITY_SOURCE_AUDIT_V0_2=PASS")
+    print("R6_D_NAMESPACE=S")
     print("EXACT_PARENT_SECOND_TOP_LEVEL_FACT=NO")
+    print("S1_CONDITION=" + S1)
     print("S1_TARGET=" + selected["locator"])
+    print("S2_CONDITION=" + S2)
     print("S2_TARGET=" + s2["target_locator"])
     print("S2_SOURCE_ORIGIN_STATUS=preliminary_unreconciled")
     print("S2_ACQUIRED_STATUS_AT_J0=fact")
