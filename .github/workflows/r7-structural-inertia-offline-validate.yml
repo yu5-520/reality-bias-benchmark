@@ -8,6 +8,11 @@ on:
       - "schemas/r7_structural_inertia_control_v1.json"
       - "scripts/validate_r7_protocol.py"
       - "docs/plans/R7_Structural_Inertia_Control_Plan.md"
+      - "docs/experiments/R7_STRUCTURAL_INERTIA_CONTROL.md"
+      - "arena/persistent_field_intervention.py"
+      - "arena/alr_recovery.py"
+      - "arena/r7_structural_control_preflight.py"
+      - "arena/tests/test_r7_structural_control_preflight.py"
       - ".github/workflows/r7-structural-inertia-offline-validate.yml"
 
 permissions:
@@ -28,6 +33,40 @@ jobs:
       - name: Validate R7 protocol fixture
         run: python scripts/validate_r7_protocol.py configs/r7/r7_three_arm_fixture.example.json
 
+      - name: Run R7 implementation preflight
+        run: |
+          set -euo pipefail
+          python -m arena.r7_structural_control_preflight --outdir /tmp/r7_structural_control_preflight
+          test -s /tmp/r7_structural_control_preflight/summary.json
+          grep -q '"paid_api_called": false' /tmp/r7_structural_control_preflight/summary.json
+          grep -q '"semantic_payload_equivalent_c1_c2_c3": true' /tmp/r7_structural_control_preflight/summary.json
+          grep -q '"semantic_cpr_status": "NOT_ADJUDICATED"' /tmp/r7_structural_control_preflight/summary.json
+
+      - name: Assert R7 condition isolation
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from arena.r7_structural_control_preflight import build_r7_preflight
+          from arena.alr_recovery import verify_alr_recovery_plan, verify_revision_lineage_record
+
+          bundle = build_r7_preflight()
+          s = bundle["summary"]
+          assert s["same_j0"] is True
+          assert s["semantic_payload_equivalent_c1_c2_c3"] is True
+          assert s["source_runtime_view_immutable"] is True
+          assert s["paid_api_called"] is False
+          assert s["c1"]["direct_exposures"] == 1
+          assert s["c1"]["reinjections"] == 0
+          assert s["c2"]["direct_exposures"] == 3
+          assert s["c2"]["reinjections"] == 2
+          plan = bundle["alr_recovery_plan"]
+          verify_alr_recovery_plan(plan)
+          verify_revision_lineage_record(bundle["alr_revision_lineage"], plan=plan)
+          assert plan["jump_ref"] in plan["reopen_node_refs"]
+          assert set(plan["reopen_node_refs"]).isdisjoint(set(plan["preserve_node_refs"]))
+          print("PASS: R7 three-condition implementation contract isolated")
+          PY
+
       - name: Confirm no paid-run dependency
         shell: bash
         run: |
@@ -35,8 +74,11 @@ jobs:
           if grep -RniE 'OPENAI_API_KEY|DASHSCOPE_API_KEY|DEEPSEEK_API_KEY|api[._-]?key' \
             scripts/validate_r7_protocol.py \
             configs/r7/r7_three_arm_fixture.example.json \
-            schemas/r7_structural_inertia_control_v1.json; then
-            echo "R7 offline validator must not depend on provider credentials." >&2
+            schemas/r7_structural_inertia_control_v1.json \
+            arena/persistent_field_intervention.py \
+            arena/alr_recovery.py \
+            arena/r7_structural_control_preflight.py; then
+            echo "R7 offline validator/preflight must not depend on provider credentials." >&2
             exit 2
           fi
-          echo "PASS: offline R7 contract validation requires no model/provider secret"
+          echo "PASS: offline R7 validation requires no model/provider secret"
