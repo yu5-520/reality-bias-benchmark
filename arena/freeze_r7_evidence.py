@@ -7,10 +7,11 @@ from pathlib import Path
 from typing import Any
 
 from .core import stable_hash
-from .io_utils import load_json, load_jsonl, sha256_file
+from .io_utils import load_jsonl, sha256_file
 from .r7_runtime_smoke import load_r7_plan_bundle
 
-EVIDENCE_SCHEMA = "RB-R7-THREE-ARM-EVIDENCE-BATCH-v0.1"
+EVIDENCE_SCHEMA = "RB-R7-THREE-ARM-EVIDENCE-BATCH-v0.2"
+ENGINEERING_STATUS = "ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE"
 
 
 def _maybe_sha(path: Path) -> str | None:
@@ -41,6 +42,8 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
     if not traces_path.exists():
         raise ValueError("r7_traces_required_for_evidence_freeze")
     traces = load_jsonl(traces_path)
+    if not traces:
+        raise ValueError("r7_at_least_one_trace_required_for_evidence_freeze")
 
     planned_ids = {row["run_id"] for row in bundle["execution_rows"]}
     trace_ids = [trace.get("run_id") for trace in traces]
@@ -48,6 +51,10 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         raise ValueError("r7_duplicate_trace_run_id")
     if any(run_id not in planned_ids for run_id in trace_ids):
         raise ValueError("r7_trace_not_in_frozen_plan")
+
+    trace_scientific_statuses = sorted({str(trace.get("scientific_status") or "SUBJECT_PROCESS_EVIDENCE") for trace in traces})
+    engineering_only = trace_scientific_statuses == [ENGINEERING_STATUS]
+    evidence_role = "ENGINEERING_VALIDATION_EVIDENCE" if engineering_only else "SUBJECT_PROCESS_EVIDENCE"
 
     arm_ids = set(bundle["plan"]["arm_ids"])
     condition_rows: list[dict[str, Any]] = []
@@ -75,6 +82,7 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
             "arm_id": arm_id,
             "condition_status": condition.get("condition_status"),
             "run_status": trace.get("run_status"),
+            "scientific_status": trace.get("scientific_status") or "SUBJECT_PROCESS_EVIDENCE",
             "runtime_transform_count": len(runtime_records),
             "action_transform_count": len(action_records),
             "revision_hash": revision.get("revision_hash") if isinstance(revision, dict) else None,
@@ -95,8 +103,13 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
     ]
     plan_hashes = {name: sha256_file(plan_path / name) for name in plan_files}
     authorization_path = Path(authorization_record) if authorization_record else None
+    if evidence_role == "SUBJECT_PROCESS_EVIDENCE" and authorization_path is None:
+        raise ValueError("r7_subject_evidence_requires_authorization_record_binding")
+
     record = {
         "schema": EVIDENCE_SCHEMA,
+        "evidence_role": evidence_role,
+        "trace_scientific_statuses": trace_scientific_statuses,
         "plan_hash": bundle["plan"]["plan_hash"],
         "protocol_id": bundle["plan"]["protocol_id"],
         "common_reference_parent_state_hash": bundle["source_parent_snapshot"]["state_hash"],
@@ -113,6 +126,7 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         "condition_records": condition_rows,
         "traces_sha256": sha256_file(traces_path),
         "run_summary_sha256": _maybe_sha(raw / "run_summary.json"),
+        "smoke_summary_sha256": _maybe_sha(raw / "summary.json"),
         "errors_sha256": _maybe_sha(raw / "errors.jsonl"),
         "journal_manifest": journals,
         "journal_manifest_hash": stable_hash(journals),
@@ -127,8 +141,9 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         "provider_internal_state_replayed": False,
         "same_parent_repeats_are_independent_samples": False,
         "interpretation_boundary": (
-            "This record freezes subject-process evidence and integrity metadata only. "
-            "It does not adjudicate semantic CPR, recovery success, steering direction, or a causal treatment effect."
+            "This record freezes raw process evidence and integrity metadata only. "
+            "Engineering-validation evidence must not be promoted to scientific subject evidence. "
+            "The freeze does not adjudicate semantic CPR, recovery success, steering direction, or a causal treatment effect."
         ),
     }
     record["evidence_batch_hash"] = stable_hash(record)
@@ -152,6 +167,7 @@ def main() -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(record, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print("R7_RAW_EVIDENCE_FROZEN=YES")
+    print("EVIDENCE_ROLE=" + record["evidence_role"])
     print("PRESERVED_TRACE_COUNT=" + str(record["preserved_trace_count"]))
     print("SEMANTIC_CPR_STATUS=NOT_ADJUDICATED")
     print("EVIDENCE_BATCH_HASH=" + record["evidence_batch_hash"])
