@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-PROCESS-INTEGRITY-RELATION-EVIDENCE-v0.1",
+  "title": "Process Integrity Relation Evidence v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "relation_id",
+    "source_ref",
+    "destination_ref",
+    "relation_type",
+    "evidence_level",
+    "evidence_refs"
+  ],
+  "properties": {
+    "schema": {"const": "RB-PROCESS-INTEGRITY-RELATION-EVIDENCE-v0.1"},
+    "relation_id": {"type": "string", "minLength": 1},
+    "source_ref": {"type": "string", "minLength": 1},
+    "destination_ref": {"type": "string", "minLength": 1},
+    "relation_type": {
+      "enum": [
+        "STRUCTURALLY_REACHABLE",
+        "DELIVERED",
+        "READ",
+        "EXPLICITLY_REFERENCED",
+        "ADOPTED_AS_DECISION_PREMISE",
+        "REJECTED_OR_ABANDONED",
+        "INHERITED_INTO_STATE_OR_ACTION",
+        "PROPAGATED_TO_DESCENDANT",
+        "SOURCE_REPLACED",
+        "REPLAY_DEPENDENCY_ONLY"
+      ]
+    },
+    "evidence_level": {
+      "enum": [
+        "REACHABLE_CARRIER",
+        "DELIVERED_OR_READ_CARRIER",
+        "ADOPTED_CARRIER",
+        "INHERITED_CARRIER",
+        "PROPAGATED_CARRIER",
+        "UNRESOLVED"
+      ]
+    },
+    "semantic_use_status": {
+      "enum": [
+        "NOT_ESTABLISHED",
+        "OBSERVED_REFERENCE_ONLY",
+        "ADOPTED_AS_PREMISE",
+        "REJECTED_OR_ABANDONED",
+        "UNRESOLVED"
+      ]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {"type": "string"},
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "actor": {"type": ["string", "null"]},
+    "turn": {"type": ["integer", "null"], "minimum": 0},
+    "notes": {"type": ["string", "null"]}
+  }
+}

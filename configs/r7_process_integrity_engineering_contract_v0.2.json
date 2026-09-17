@@ -1,0 +1,63 @@
+{
+  "schema": "RB-R7-PROCESS-INTEGRITY-ENGINEERING-CONTRACT-v0.2",
+  "version": "0.2",
+  "date": "2026-09-17",
+  "status": "ENGINEERING_IMPLICATION_OFFLINE_ONLY",
+  "predecessor": "RB-R7-PROCESS-INTEGRITY-ENGINEERING-CONTRACT-v0.1",
+  "design_targets": [
+    "LIGHTWEIGHT",
+    "PLUGGABLE",
+    "NON_INVASIVE_BY_DEFAULT",
+    "PROTOCOL_AGNOSTIC_OBSERVATION_LAYER",
+    "REAL_TIME",
+    "CONTENT_ADDRESSED",
+    "LINEAGE_AWARE",
+    "LOCALIZED_RECOVERY",
+    "AUDITABLE_REVISION"
+  ],
+  "identity_semantics": {
+    "hashes_establish_identity_and_lineage": true,
+    "hashes_alone_establish_semantic_adoption": false,
+    "relation_evidence_required_for_adoption_claim": true
+  },
+  "closure_model": {
+    "potential": "POTENTIALLY_AFFECTED_CLOSURE",
+    "evidenced": "EVIDENCE_SUPPORTED_AFFECTED_CLOSURE",
+    "repair": "REPAIR_CLOSURE",
+    "repair_rule": "EVIDENCE_SUPPORTED_AFFECTED_PLUS_MECHANICALLY_REQUIRED_REPLAY_DEPENDENCIES",
+    "replay_only_nodes_must_be_labeled": true
+  },
+  "runtime_modes": {
+    "PASSIVE": {
+      "may_modify_agent_prompt": false,
+      "may_modify_routing": false,
+      "may_force_agent_or_tool_choice": false,
+      "may_write_recovery_state": false
+    },
+    "ACTIVE_RECOVERY": {
+      "requires_explicit_gate": true,
+      "requires_named_authority_or_provenance_condition": true,
+      "requires_evidence_supported_affected_closure": true,
+      "requires_repair_closure": true,
+      "requires_native_runtime_recovery_adapter": true,
+      "requires_revision_identity": true
+    }
+  },
+  "event_types": [
+    "MessageEvent",
+    "StateEvent",
+    "InvocationEvent",
+    "EvidenceSourceEvent",
+    "RevisionEvent",
+    "RelationEvidenceRecord"
+  ],
+  "operator_semantics": {
+    "experiment_origin_persistent_state_mutation": false,
+    "endogenous_subject_state_allowed": true
+  },
+  "authorization": {
+    "paid_provider_run": false,
+    "paid_evaluator_run": false,
+    "active_recovery_on_scientific_subject": false
+  }
+}
