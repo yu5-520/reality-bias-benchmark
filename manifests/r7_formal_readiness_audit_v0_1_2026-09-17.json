@@ -1,0 +1,51 @@
+{
+  "schema": "RB-R7-FORMAL-READINESS-AUDIT-REQUEST-v0.1",
+  "date": "2026-09-17",
+  "scope": "OFFLINE_EXACT_SOURCE_R7_FORMAL_READINESS_AUDIT_ONLY",
+  "protocol_id": "RB-R7-STRUCTURAL-INERTIA-CONTROL-v1.2",
+  "measurement_schema": "RB-PROCESS-REALITY-MECHANISM-MEASUREMENT-v0.4",
+  "source_binding": {
+    "common_reference_parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c",
+    "c3_recovery_checkpoint_state_hash": "99731abb4ffd1caa2e568a6c2d90987700b3d0b7a66a1c777f811b666912a349",
+    "source_r5_plan_hash": "a24c98901422bbccfc9a040a6bc14575b1c710edd518c0d9c2facf7a57926351",
+    "natural_jump_source_event": "E32",
+    "natural_jump_actor": "inventory",
+    "natural_jump_state_key": "inventory_stockout_assessment_v1"
+  },
+  "audit_plan": {
+    "replicates": 2,
+    "planned_branch_count": 6,
+    "provider": "deepseek",
+    "model_config": "arena/config/model_deepseek_v0.2.json",
+    "currency": "USD",
+    "per_branch_spending_ceiling": 0.25,
+    "total_spending_ceiling": 1.5,
+    "per_branch_max_calls": 64
+  },
+  "required_checks": {
+    "exact_prepared_source_artifact": true,
+    "exact_raw_source_artifact": true,
+    "exact_common_reference_parent": true,
+    "exact_c3_recovery_checkpoint": true,
+    "protocol_fail_closed_validation": true,
+    "full_offline_unit_tests": true,
+    "three_arm_plan_build": true,
+    "deterministic_three_arm_runtime_smoke": true,
+    "engineering_evidence_freeze_before_derivation": true,
+    "engineering_derivation_only_with_explicit_allow_flag": true,
+    "real_runner_preflight_without_provider_call": true,
+    "c1_runtime_ready": true,
+    "c2_runtime_ready": true,
+    "c3_runtime_ready": true,
+    "provider_hidden_state_replay_forbidden": true,
+    "semantic_cpr_adjudication_deferred": true,
+    "automatic_paid_evaluator": false
+  },
+  "paid_subject_authorized": false,
+  "paid_evaluator_authorized": false,
+  "new_subject_provider_call": false,
+  "semantic_cpr_status": "NOT_ADJUDICATED",
+  "terminal_outcome_is_primary": false,
+  "same_parent_repeats_are_independent_samples": false,
+  "note": "This request authorizes only an offline readiness audit over exact frozen source artifacts and engineering-only synthetic runtime smoke. It does not authorize any subject-model provider call and cannot be promoted to scientific R7 evidence."
+}
