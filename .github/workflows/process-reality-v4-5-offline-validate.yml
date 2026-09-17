@@ -22,12 +22,16 @@ on:
       - "configs/r7_process_integrity_engineering_contract_v0.1.json"
       - "configs/cpr_definition_contract_v0.2.json"
       - "configs/cpr_adjudication_contract_v0.2.json"
+      - "configs/r5r6_specificity_exact_source_binding_v0.2.json"
       - "manifests/process_reality_v4_5_forward_stack_2026-09-17.json"
       - "schemas/process_integrity_event_v0.1.schema.json"
       - "schemas/process_integrity_lineage_record_v0.1.schema.json"
+      - "schemas/r5r6_specificity_atomic_plan_v0.2.schema.json"
+      - "schemas/r5r6_specificity_atomic_preflight_v0.2.schema.json"
       - "docs/reporting/process_reality_report_standard_v1_2.md"
       - "schemas/process_reality_report_template_v1_2.json"
       - "scripts/validate_process_reality_v4_5.py"
+      - "scripts/validate_r6d_atomic_sync_v0_1.py"
       - ".github/workflows/process-reality-v4-5-offline-validate.yml"
       - "README.md"
 
@@ -52,6 +56,9 @@ jobs:
       - name: Validate exact-source specificity v0.2
         run: python scripts/validate_r5r6_specificity_source_audit_v0_2.py
 
+      - name: Validate R6-D runtime/schema synchronization
+        run: python scripts/validate_r6d_atomic_sync_v0_1.py
+
       - name: Run atomic specificity tests
         run: python -m unittest arena.tests.test_r5r6_specificity_atomic_v0_2 -v
 
@@ -73,6 +80,7 @@ jobs:
           from pathlib import Path
           files = [
               'scripts/validate_process_reality_v4_5.py',
+              'scripts/validate_r6d_atomic_sync_v0_1.py',
               'docs/R_Plan_v4.5.md',
               'theory/theory_contract_v0.9.md',
               'docs/R6_inertia_identification_protocol_v0.3.md',
@@ -82,6 +90,7 @@ jobs:
               'configs/r7_process_integrity_engineering_contract_v0.1.json',
               'configs/cpr_definition_contract_v0.2.json',
               'configs/cpr_adjudication_contract_v0.2.json',
+              'configs/r5r6_specificity_exact_source_binding_v0.2.json',
               'manifests/process_reality_v4_5_forward_stack_2026-09-17.json',
               '.github/workflows/process-reality-v4-5-offline-validate.yml',
           ]
