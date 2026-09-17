@@ -232,12 +232,13 @@ In particular:
 
 ## Reporting standard
 
-Publication-facing Process Reality reports follow a frozen reporting contract rather than ad-hoc summary formatting:
+Publication-facing Process Reality reports follow versioned reporting contracts rather than ad-hoc summary formatting:
 
-- **[Process Reality Report Standard v1.0](docs/reporting/process_reality_report_standard_v1.md)** — canonical English-only reporting, time-causal figure grammar, T/E/M/J notation and evidence-provenance rules;
-- **[Process Reality Report Template v1.0](schemas/process_reality_report_template_v1.json)** — machine-readable report contract;
+- **[Process Reality Report Standard v1.1](docs/reporting/process_reality_report_standard_v1_1.md)** — forward standard extending v1.0 with R6 System Inertia Factual and R5-R6 Specificity Validation profiles;
+- **[Process Reality Report Template v1.1](schemas/process_reality_report_template_v1_1.json)** — machine-readable forward report contract;
+- **[Process Reality Report Standard v1.0](docs/reporting/process_reality_report_standard_v1.md)** and **[Template v1.0](schemas/process_reality_report_template_v1.json)** — preserved historical standard for finalized R5-MID v3 reports;
 - **[Formal R5-MID report bundle — 2026-09-17](docs/reports/2026-09-17/README.md)** — finalized Control, One-Shot and Matched A/B mechanism-validation report set;
-- **[Report bundle manifest](manifests/r5mid_report_bundle_2026-09-17_v1.json)** — binds the report set and finalized DOCX export hashes to frozen evidence.
+- **[Report bundle manifest](manifests/r5mid_report_bundle_2026-09-17_v1.json)** — binds the historical report set and finalized DOCX export hashes to frozen evidence.
 
 The reporting chain is:
 
