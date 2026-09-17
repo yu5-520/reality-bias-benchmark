@@ -14,8 +14,7 @@ from .one_shot_intervention import OneShotRuntimeViewTransform
 from .persistent_field_intervention import PersistentFieldRuntimeViewTransform
 from .prepare_r7_three_arm_plan import verify_r7_three_arm_plan
 
-
-SMOKE_SCHEMA = "RB-R7-RUNTIME-SMOKE-v0.1"
+SMOKE_SCHEMA = "RB-R7-RUNTIME-SMOKE-v0.2"
 
 
 def _require(ok: bool, message: str) -> None:
@@ -44,8 +43,8 @@ class R7OfflineSmokeProvider:
     """Deterministic provider used only to exercise R7 runtime plumbing.
 
     It is not a model replay and its traces are never scientific evidence. The
-    first C3 turn intentionally emits the natural J0-shaped `fact` write so the
-    ALR action transform can be verified inside the real Arena execution loop.
+    first C3 turn intentionally emits a J0-shaped `fact` write so the ALR action
+    transform can be verified inside the real Arena execution loop.
     """
 
     def complete_agent(self, messages, metadata=None):
@@ -75,11 +74,7 @@ class R7OfflineSmokeProvider:
             envelope = {
                 "decision_summary": "offline smoke: keep one downstream turn pending",
                 "actions": [
-                    {
-                        "type": "message",
-                        "to": "ads",
-                        "content": "offline smoke downstream handoff",
-                    },
+                    {"type": "message", "to": "ads", "content": "offline smoke downstream handoff"},
                     {"type": "finalize", "answer": "offline smoke turn 9"},
                 ],
             }
@@ -144,7 +139,7 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
             domain,
             config,
             provider,
-            manifest["branch_id"] + ":offline-smoke",
+            manifest["branch_id"],
             logical_seed=1,
             initial_state_snapshot=start,
             runtime_view_transform=runtime_transform,
@@ -195,6 +190,23 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
             trace["r7_revision_lineage"] = revision
             arm_summaries[arm_id] = {**action_transform.summary(), "revision_hash": revision["revision_hash"]}
 
+        trace["r7_condition"] = {
+            "schema": "RB-R7-CONDITION-TRACE-v0.1",
+            "arm_id": arm_id,
+            "triad_id": manifest["triad_id"],
+            "replicate_index": manifest["replicate_index"],
+            "execution_order": manifest["execution_order"],
+            "manifest_hash": manifest["manifest_hash"],
+            "condition_status": "OBSERVED",
+            "common_reference_parent_state_hash": bundle["source_parent_snapshot"]["state_hash"],
+            "branch_start_state_hash": start["state_hash"],
+            "semantic_payload_hash": manifest["semantic_payload_hash"],
+            "observation_horizon_id": manifest["observation_horizon_id"],
+            "transform_summary": copy.deepcopy(arm_summaries[arm_id]),
+            "provider_internal_state_replayed": False,
+            "semantic_cpr_status": "NOT_ADJUDICATED",
+            "terminal_outcome_is_primary": False,
+        }
         traces.append(trace)
 
     _require(stable_hash(bundle["source_parent_snapshot"]) == parent_material_hash, "r7_smoke_mutated_common_parent")
