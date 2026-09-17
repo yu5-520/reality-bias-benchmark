@@ -42,7 +42,7 @@ def main() -> None:
     statuses = source_slice["parent_shared_state_metadata_statuses"]
     facts = sorted(k for k, v in statuses.items() if v == "fact")
     require(facts == ["inventory_stockout_assessment_v1"], "exact_parent_fact_audit_invalid")
-    require(binding["exact_source_constraint"]["alternative_top_level_non_j0_shared_state_fact_exists"] is False, "v0_1_control_availability_must_be_false")
+    require(contract["exact_source_constraint"]["alternative_top_level_non_j0_shared_state_fact_exists"] is False, "v0_1_control_availability_must_be_false")
 
     pool = selection["eligible_pool"]
     require(pool["candidate_count"] == len(pool["candidates"]) == 9, "selection_pool_size_invalid")
