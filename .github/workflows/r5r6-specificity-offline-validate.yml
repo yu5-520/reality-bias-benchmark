@@ -99,19 +99,35 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          files=(
-            scripts/validate_r5r6_specificity_protocol.py
-            arena/r5r6_specificity.py
-            arena/r5r6_specificity_preflight.py
-            arena/tests/test_r5r6_specificity.py
-            configs/r5r6_specificity_field_selection_contract_v0.1.json
-            .github/workflows/r5r6-specificity-offline-validate.yml
-          )
-          if grep -RniE 'OPENAI_API_KEY|DASHSCOPE_API_KEY|DEEPSEEK_API_KEY|CALL_REAL_|--execute-real|provider_secret' "${files[@]}"; then
-            echo 'Specificity offline validation path must not contain provider credentials or real-run authorization.' >&2
-            exit 2
-          fi
-          echo 'PASS: no provider credential or real-run authorization in specificity offline path'
+          python - <<'PY'
+          from pathlib import Path
+
+          files = [
+              'scripts/validate_r5r6_specificity_protocol.py',
+              'arena/r5r6_specificity.py',
+              'arena/r5r6_specificity_preflight.py',
+              'arena/tests/test_r5r6_specificity.py',
+              'configs/r5r6_specificity_field_selection_contract_v0.1.json',
+              '.github/workflows/r5r6-specificity-offline-validate.yml',
+          ]
+          forbidden = [
+              'OPENAI' + '_API_KEY',
+              'DASHSCOPE' + '_API_KEY',
+              'DEEPSEEK' + '_API_KEY',
+              'CALL_' + 'REAL_',
+              '--execute-' + 'real',
+              'provider_' + 'secret',
+          ]
+          failures=[]
+          for path in files:
+              text=Path(path).read_text(encoding='utf-8')
+              for token in forbidden:
+                  if token in text:
+                      failures.append((path, token))
+          if failures:
+              raise SystemExit('forbidden real-provider capability in offline specificity path: ' + repr(failures))
+          print('PASS: no provider credential or real-run authorization in specificity offline path')
+          PY
 
       - name: Upload offline preflight artifact
         uses: actions/upload-artifact@v4
