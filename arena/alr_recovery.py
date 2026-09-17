@@ -7,6 +7,7 @@ from .core import stable_hash
 
 ALR_PLAN_SCHEMA = "RB-ALR-LOCALIZED-RECOVERY-PLAN-v0.1"
 ALR_REVISION_SCHEMA = "RB-ALR-REVISION-LINEAGE-v0.1"
+ALR_ENVELOPE_TRANSFORM_SCHEMA = "RB-ALR-AUTHORITY-ENVELOPE-TRANSFORM-v0.1"
 
 
 def _require(ok: bool, message: str) -> None:
@@ -91,7 +92,6 @@ def build_alr_recovery_plan(
             continue
         seen.add(node)
         closure.append(node)
-        # Reverse sorted push keeps deterministic forward lexical traversal.
         for nxt in sorted(adjacency.get(node, []), reverse=True):
             if nxt not in seen:
                 stack.append(nxt)
@@ -193,3 +193,111 @@ def verify_revision_lineage_record(row: Mapping[str, Any], *, plan: Mapping[str,
     _require(set(row.get("preserved_node_refs") or []).issubset(set(plan.get("preserve_node_refs") or [])), "alr_revision_preserved_outside_plan")
     _require(row.get("revision_hash") == _hash_without(row, "revision_hash"), "alr_revision_hash_mismatch")
     return True
+
+
+class AuthorityLocalizedEnvelopeTransform:
+    """Change only the targeted authority-bearing action during ALR re-execution.
+
+    The raw provider response remains evidence. This transform operates after raw
+    response parsing but before Arena action realization. It rewrites exactly one
+    predeclared write-state status field and records the structural delta.
+    """
+
+    def __init__(
+        self,
+        *,
+        target_actor: str,
+        target_turn: int,
+        state_key: str,
+        from_status: str,
+        to_status: str,
+        jump_ref: str,
+        semantic_payload_hash: str,
+    ):
+        _require(isinstance(target_actor, str) and target_actor, "alr_target_actor_required")
+        _require(isinstance(target_turn, int) and target_turn >= 1, "alr_target_turn_invalid")
+        _require(isinstance(state_key, str) and state_key, "alr_state_key_required")
+        _require(isinstance(from_status, str) and from_status, "alr_from_status_required")
+        _require(isinstance(to_status, str) and to_status, "alr_to_status_required")
+        _require(isinstance(jump_ref, str) and jump_ref, "alr_jump_ref_required")
+        _require(isinstance(semantic_payload_hash, str) and semantic_payload_hash, "alr_semantic_payload_hash_required")
+        self.target_actor = target_actor
+        self.target_turn = target_turn
+        self.state_key = state_key
+        self.from_status = from_status
+        self.to_status = to_status
+        self.jump_ref = jump_ref
+        self.semantic_payload_hash = semantic_payload_hash
+        self.records: list[dict[str, Any]] = []
+
+    @property
+    def transformed_count(self) -> int:
+        return len(self.records)
+
+    def __call__(self, *, actor: str, turn: int, envelope: Mapping[str, Any]):
+        applied = copy.deepcopy(dict(envelope))
+        if self.transformed_count:
+            return applied, None
+        if actor != self.target_actor or int(turn) != self.target_turn:
+            return applied, None
+
+        actions = applied.get("actions")
+        _require(isinstance(actions, list), "alr_envelope_actions_must_be_list")
+        matches = [
+            idx for idx, action in enumerate(actions)
+            if isinstance(action, dict)
+            and action.get("type") == "write_state"
+            and action.get("key") == self.state_key
+            and action.get("status") == self.from_status
+        ]
+        _require(len(matches) == 1, "alr_target_write_state_must_match_exactly_once")
+        idx = matches[0]
+        before_hash = stable_hash(applied)
+        original_action = copy.deepcopy(actions[idx])
+        actions[idx] = copy.deepcopy(actions[idx])
+        actions[idx]["status"] = self.to_status
+        after_hash = stable_hash(applied)
+        _require(before_hash != after_hash, "alr_envelope_transform_must_change_envelope")
+
+        record = {
+            "schema": ALR_ENVELOPE_TRANSFORM_SCHEMA,
+            "version": "0.1",
+            "jump_ref": self.jump_ref,
+            "authority_class": "I",
+            "actor": actor,
+            "turn": int(turn),
+            "state_key": self.state_key,
+            "action_index": idx,
+            "delta_path": f"actions[{idx}].status",
+            "from_status": self.from_status,
+            "to_status": self.to_status,
+            "semantic_payload_hash": self.semantic_payload_hash,
+            "raw_envelope_hash": before_hash,
+            "applied_envelope_hash": after_hash,
+            "raw_action_hash": stable_hash(original_action),
+            "applied_action_hash": stable_hash(actions[idx]),
+            "experiment_origin": True,
+            "authority_localized": True,
+            "persistent_branch_state_revision_expected": True,
+            "common_reference_parent_mutated": False,
+            "consumed_after_application": True,
+        }
+        record["transform_hash"] = _hash_without(record, "transform_hash")
+        self.records.append(copy.deepcopy(record))
+        return applied, record
+
+    def summary(self) -> dict[str, Any]:
+        return {
+            "jump_ref": self.jump_ref,
+            "state_key": self.state_key,
+            "authority_class": "I",
+            "transform_count": self.transformed_count,
+            "experiment_origin_reinjection_count": 0,
+            "common_reference_parent_mutated": False,
+            "persistent_branch_state_revision_expected": True,
+            "transform_hashes": [row["transform_hash"] for row in self.records],
+        }
+
+    def verify_finished(self) -> bool:
+        _require(self.transformed_count == 1, "alr_exactly_one_authority_transform_required")
+        return True
