@@ -14,8 +14,11 @@ Historical plans, frozen traces, reports, reviewer outputs and manifests remain 
 - **[R7 Control Protocol v0.4](docs/R7_structural_inertia_control_protocol_v0.4.md)** — C1 free continuation, C2 persistent field, C3 ALR localized recovery.
 - **[ALR Contract v0.3](docs/ALR_authority_localized_recovery_contract_v0.3.md)** — Authority-Localized Recovery with affected-closure and revision-lineage requirements.
 - **[Process Integrity Engineering Profile v0.1](docs/R7_process_integrity_engineering_profile_v0.1.md)** — lightweight, pluggable, real-time, content-addressed runtime integrity layer.
+- **[R8 Semantic Closure Protocol v0.2](docs/R8_CPR_semantic_closure_protocol_v0.2.md)** — proposition-level CPR adjudication after structural freeze.
+- **[CPR Definition Contract v0.2](configs/cpr_definition_contract_v0.2.json)** and **[Adjudication Contract v0.2](configs/cpr_adjudication_contract_v0.2.json)** — machine-readable semantic guards and review requirements.
 - **[Evidence Status Addendum v0.1](docs/evidence_status_addendum_v0.1.md)** — explicit current support/unresolved boundaries for local response, inertia, specificity, CPR and R7.
 - **[First-Paper Scope v4.5](docs/first_paper_v4.5_scope.md)** — phenomenon -> mechanism -> identification -> localized solution -> semantic closure.
+- **[Forward Stack Manifest v0.1](manifests/process_reality_v4_5_forward_stack_2026-09-17.json)** — binds the current versioned research stack and authorization boundary.
 - **[Report Standard v1.2](docs/reporting/process_reality_report_standard_v1_2.md)** and **[Template v1.2](schemas/process_reality_report_template_v1_2.json)** — reporting grammar for R6 identification and R7 localized recovery.
 
 Repository updates do **not** authorize paid provider calls, paid evaluator calls or CPR adjudication.
@@ -139,6 +142,8 @@ Relevant artifacts:
 - `manifests/r5r6_specificity_s1_selection_2026-09-17_v0_2.json`
 - `arena/r5r6_specificity_atomic_v0_2.py`
 - `arena/r5r6_specificity_atomic_preflight_v0_2.py`
+- `schemas/r5r6_specificity_atomic_plan_v0.2.schema.json`
+- `schemas/r5r6_specificity_atomic_preflight_v0.2.schema.json`
 
 ## CPR remains separate
 
@@ -148,7 +153,9 @@ Structural change does not automatically establish Process Reality bias.
 - one extra Agent/tool call alone != P;
 - same-key recurrence alone != R.
 
-CPR remains an R8 append-only semantic adjudication layer after structural evidence is frozen.
+R8 v0.2 additionally requires the reviewer to separate **fact that a report exists** from **fact that the report's substantive proposition is confirmed**.
+
+CPR remains an append-only semantic adjudication layer after structural evidence is frozen.
 
 ## R7 — localized structural risk control
 
