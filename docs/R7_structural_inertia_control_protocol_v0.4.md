@@ -9,7 +9,9 @@ Depends on: `docs/R_Plan_v4.5.md`, `theory/theory_contract_v0.9.md`, `docs/R6_in
 
 R7 tests whether a **source-backed, risk-bearing inherited-inertia carrier or affected dependency closure** can be localized, bounded or repaired while preserving unrelated process freedom.
 
-R7 is a scientific control/recovery question. Its product/engineering implications are documented separately in `docs/R7_process_integrity_engineering_profile_v0.1.md`.
+R7 is a scientific control/recovery question. Its product/engineering implication is a lightweight **Process Integrity Protocol**, documented separately in `docs/R7_process_integrity_engineering_profile_v0.1.md`.
+
+The engineering profile does not replace the scientific R7 claim and is not automatically validated by R7 readiness evidence.
 
 ## 2. Entry requirement from R6
 
