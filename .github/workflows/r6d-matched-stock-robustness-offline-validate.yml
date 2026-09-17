@@ -7,10 +7,12 @@ on:
       - "docs/R6D_matched_stock_robustness_protocol_v0.1.md"
       - "configs/r6/r6d_matched_stock_robustness_candidate_audit_v0.1.json"
       - "configs/r6/r6d_matched_stock_robustness_plan_v0.1.json"
+      - "configs/r6/r6d_matched_stock_robustness_formal_subject_gate_v0.1.json"
       - "configs/r6/r6d_s3_matched_stock_b_envelope_v0.1.json"
       - "configs/r6/r6d_s4_matched_stock_c_envelope_v0.1.json"
       - "manifests/r6d_matched_stock_robustness_design_freeze_2026-09-17_v0_1.json"
       - "scripts/validate_r6d_matched_stock_robustness_v0_1.py"
+      - "scripts/validate_r6d_matched_stock_formal_gate_v0_1.py"
       - ".github/workflows/r6d-matched-stock-robustness-offline-validate.yml"
 
 permissions:
@@ -29,11 +31,16 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Compile matched-stock validator
-        run: python -m py_compile scripts/validate_r6d_matched_stock_robustness_v0_1.py
+      - name: Compile matched-stock validators
+        run: |
+          python -m py_compile scripts/validate_r6d_matched_stock_robustness_v0_1.py
+          python -m py_compile scripts/validate_r6d_matched_stock_formal_gate_v0_1.py
 
       - name: Validate matched-stock robustness design freeze
         run: python scripts/validate_r6d_matched_stock_robustness_v0_1.py
+
+      - name: Validate fail-closed matched-stock formal subject gate
+        run: python scripts/validate_r6d_matched_stock_formal_gate_v0_1.py
 
       - name: Re-check Process Reality v4.5.1 methodological gate
         run: python scripts/validate_process_reality_v4_5_1.py
@@ -61,5 +68,5 @@ jobs:
           ]
           found=[x for x in forbidden if x in text]
           assert not found, 'forbidden real-call capability in offline workflow: '+repr(found)
-          print('PASS: matched-stock robustness freeze is provider-secret free and cannot execute a real subject')
+          print('PASS: matched-stock robustness freeze/gate CI is provider-secret free and cannot execute a real subject')
           PY
