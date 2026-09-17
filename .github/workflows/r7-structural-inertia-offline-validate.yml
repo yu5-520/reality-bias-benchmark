@@ -15,6 +15,7 @@ on:
       - "arena/r7_structural_control_preflight.py"
       - "arena/prepare_r7_three_arm_plan.py"
       - "arena/r7_runtime_smoke.py"
+      - "arena/run_r7_three_arm_real.py"
       - "arena/tests/test_r7_structural_control_preflight.py"
       - ".github/workflows/r7-orchestration-paired-real.yml"
       - ".github/workflows/r7-structural-inertia-offline-validate.yml"
@@ -188,6 +189,21 @@ jobs:
           print('PASS: R7 engine integration smoke exercised all three mechanisms')
           PY
 
+      - name: Preflight guarded real R7 runner without credentials or provider calls
+        run: |
+          set -euo pipefail
+          python -m arena.run_r7_three_arm_real \
+            --plan-dir /tmp/r7_real_parent_bound_plan \
+            --source-r5-plan-dir /tmp/r7_r5_prepared/results/r5mid_prospective_one_shot_plan_v0_3 \
+            --model-config arena/config/model_deepseek_v0.2.json \
+            --provider deepseek \
+            --execution-code-sha '${{ github.sha }}' \
+            --per-branch-max-calls 64 \
+            --per-branch-spending-ceiling 0.25 \
+            --global-spending-ceiling 0.75 \
+            --currency USD \
+            --preflight-only
+
       - name: Assert obsolete R7 paid paired route is removed
         run: |
           set -euo pipefail
@@ -198,7 +214,7 @@ jobs:
           fi
           echo 'PASS: legacy R7 Free-vs-Structured paid route removed'
 
-      - name: Confirm no paid-run dependency
+      - name: Confirm offline R7 validation path requires no provider secret
         shell: bash
         run: |
           set -euo pipefail
