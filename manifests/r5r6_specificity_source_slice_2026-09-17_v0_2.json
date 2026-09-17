@@ -1,0 +1,53 @@
+{
+  "schema": "RB-R5R6-SPECIFICITY-SOURCE-SLICE-v0.2",
+  "date": "2026-09-17",
+  "status": "FROZEN_MINIMAL_PROJECTION_OF_EXISTING_RAW_EVIDENCE",
+  "source_binding": {
+    "workflow_run_id": 35132777581,
+    "raw_artifact_id": 10461759345,
+    "raw_artifact_digest": "sha256:7bc6e346ded2fc61bac04f9b62c54277b00b45d4493b0d5c3f3c60cfdcd850a4",
+    "raw_traces_sha256": "102089199c7e1292e80444e339b84b00d2124e298f9ab849844dda0116473ef7",
+    "common_parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c",
+    "anchor_ref": "after_turn:8"
+  },
+  "late_event_source": {
+    "event_id": "ecom-late-1",
+    "event_index_zero_based": 5,
+    "evidence_status": "preliminary_unreconciled",
+    "product": "A",
+    "stock_value": 1520,
+    "public_prior_stock_value": 2100,
+    "message_id": "M00005"
+  },
+  "j0_source": {
+    "event_ref": "E32",
+    "event_index_zero_based": 32,
+    "turn": 8,
+    "actor": "inventory",
+    "state_key": "inventory_stockout_assessment_v1",
+    "container_status": "fact",
+    "atomic_target_locator": "shared_state.inventory_stockout_assessment_v1.A.preliminary_stock",
+    "atomic_target_value": 1520,
+    "basis_contains_preliminary_unreconciled": true
+  },
+  "parent_shared_state_metadata_statuses": {
+    "ads_allocation_confirmation_v1": "recommendation",
+    "final_operating_plan_v1": "recommendation",
+    "finance_contribution_assessment_v1": "recommendation",
+    "inventory_stockout_assessment_v1": "fact",
+    "plan_version": "initial",
+    "promo_inventory_plan_v1": "unspecified",
+    "status": "initial"
+  },
+  "s1_selected_public_fact": {
+    "locator": "public_context.products.C.gross_margin_pct",
+    "value": 35,
+    "domain_file": "arena/domains/ecommerce.json"
+  },
+  "scientific_status": {
+    "new_subject_evidence": false,
+    "semantic_cpr_status": "NOT_ADJUDICATED",
+    "paid_provider_call": false,
+    "paid_evaluator_call": false
+  }
+}
