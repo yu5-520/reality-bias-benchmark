@@ -14,6 +14,7 @@ on:
       - "arena/r7_structural_control_preflight.py"
       - "arena/prepare_r7_three_arm_plan.py"
       - "arena/tests/test_r7_structural_control_preflight.py"
+      - ".github/workflows/r7-orchestration-paired-real.yml"
       - ".github/workflows/r7-structural-inertia-offline-validate.yml"
 
 permissions:
@@ -129,6 +130,16 @@ jobs:
           assert [x for x in rows if x['arm_id']=='C3_ALR'][0]['execution_readiness']=='BLOCKED_PENDING_ACTIVE_ALR_EXECUTOR'
           print('PASS: R7 Phase-1 exact frozen-parent binding verified fail closed')
           PY
+
+      - name: Assert obsolete R7 paid paired route is removed
+        run: |
+          set -euo pipefail
+          grep -q '^name: R7 Three-Arm Frozen-Parent Prepare$' .github/workflows/r7-orchestration-paired-real.yml
+          if grep -nE 'CALL_REAL_R7_API|DEEPSEEK_API_KEY|BAILIAN_MODEL|run_orchestration_real' .github/workflows/r7-orchestration-paired-real.yml; then
+            echo 'Legacy R7 paired paid execution route is still present.' >&2
+            exit 2
+          fi
+          echo 'PASS: legacy R7 Free-vs-Structured paid route removed'
 
       - name: Confirm no paid-run dependency
         shell: bash
