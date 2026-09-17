@@ -1,0 +1,96 @@
+{
+  "schema": "RB-R5R6-SPECIFICITY-FIELD-SELECTION-CONTRACT-v0.1",
+  "version": "0.1",
+  "date": "2026-09-17",
+  "status": "FORWARD_OFFLINE_SELECTION_CONTRACT_NO_RUN_AUTHORIZATION",
+  "purpose": "Select the S1 matched non-J0 factual field outcome-blind before any prospective S-arm subject outcome exists.",
+  "depends_on": [
+    "docs/R_Plan_v4.4.md",
+    "theory/theory_contract_v0.8.md",
+    "docs/R5_R6_specificity_protocol_v0.1.md"
+  ],
+  "namespace": {
+    "specificity_conditions": [
+      "S0_NATURAL_REFERENCE",
+      "S1_MATCHED_FACTUAL_FIELD_DOWNGRADE",
+      "S2_J0_TARGETED_AUTHORITY_WITHDRAWAL"
+    ],
+    "reserved_r7_namespace": [
+      "C1_ONE_SHOT_FREE_CONTINUATION",
+      "C2_PERSISTENT_FIELD_PROPAGATION",
+      "C3_ALR_AUTHORITY_LOCALIZED_RECOVERY"
+    ],
+    "aliasing_s_to_c_forbidden": true
+  },
+  "selection_timing": {
+    "must_complete_before_specificity_subject_outcomes": true,
+    "outcome_aware_target_selection_forbidden": true,
+    "future_s_arm_outputs_available_to_selector": false
+  },
+  "required_source_bindings": [
+    "source_trace_hash",
+    "source_evidence_hash",
+    "common_parent_state_hash",
+    "selected_j0_candidate_id",
+    "selected_j0_event_ref",
+    "selected_j0_state_key",
+    "selected_j0_pre_status"
+  ],
+  "eligible_pool_rules": {
+    "must_exist_in_frozen_source_evidence": true,
+    "must_be_addressable_by_state_key_or_equivalent_runtime_locator": true,
+    "must_have_source_evidence_refs": true,
+    "must_have_pre_intervention_factual_status_compatible_with_s2": true,
+    "must_be_visible_at_materially_comparable_timing": true,
+    "must_support_materially_equivalent_one_shot_status_transform": true,
+    "selected_j0_target_excluded_from_s1_pool": true,
+    "semantic_non_cpr_status_not_required": true,
+    "expected_low_effect_control_selection_forbidden": true
+  },
+  "matching_features": [
+    "pre_intervention_status_class",
+    "runtime_visibility_boundary",
+    "temporal_distance_from_common_parent",
+    "state_or_interface_family",
+    "actor_or_role_accessibility",
+    "downstream_opportunity_for_inheritance",
+    "source_evidence_completeness"
+  ],
+  "selection_rule": {
+    "type": "PREREGISTERED_DETERMINISTIC_OR_SEEDED_SELECTION_FROM_ELIGIBLE_POOL",
+    "tie_breaking_must_be_frozen": true,
+    "random_seed_if_used_must_be_frozen": true,
+    "manual_outcome_aware_override_forbidden": true
+  },
+  "required_output": {
+    "pool_schema_version": "required",
+    "pool_hash": "required",
+    "candidate_count": "required",
+    "candidate_records": "required",
+    "exclusion_records": "required",
+    "selection_rule_hash": "required",
+    "selected_s1_state_key": "required",
+    "selected_s1_source_refs": "required",
+    "selected_s1_target_hash": "required",
+    "selection_record_hash": "required",
+    "selector_outcome_blind_attestation": true
+  },
+  "intervention_equivalence": {
+    "mechanical_primitive": "ONE_SHOT_EPISTEMIC_STATUS_DOWNGRADE",
+    "s1_s2_same_to_status_required": true,
+    "s1_s2_same_delivery_policy_required": true,
+    "s1_s2_same_direct_exposure_limit_required": true,
+    "s1_s2_same_reinjection_policy_required": true,
+    "s1_s2_same_persistent_mutation_policy_required": true,
+    "s1_s2_same_observation_horizon_or_censoring_rule_required": true,
+    "extra_task_solving_semantics_in_s2_forbidden": true
+  },
+  "historical_boundary": {
+    "formal_r5mid_ab_not_relabelled_as_s_conditions": true,
+    "historical_frozen_evidence_mutation_forbidden": true
+  },
+  "authorization": {
+    "paid_provider_run": false,
+    "paid_evaluator_run": false
+  }
+}

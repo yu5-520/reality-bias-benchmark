@@ -1,0 +1,60 @@
+name: Process Reality Reporting v1.1 Validate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "docs/reporting/process_reality_report_standard_v1_1.md"
+      - "schemas/process_reality_report_template_v1_1.json"
+      - "scripts/validate_process_reality_reporting_v1_1.py"
+      - ".github/workflows/process-reality-reporting-v1-1-validate.yml"
+      - "docs/reports/**"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-reporting-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate reporting standard and template
+        run: python scripts/validate_process_reality_reporting_v1_1.py
+
+      - name: Assert reporting path has no execution authorization
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          files = [
+              'docs/reporting/process_reality_report_standard_v1_1.md',
+              'schemas/process_reality_report_template_v1_1.json',
+              'scripts/validate_process_reality_reporting_v1_1.py',
+              '.github/workflows/process-reality-reporting-v1-1-validate.yml',
+          ]
+          forbidden = [
+              'CALL_' + 'REAL_',
+              'DEEPSEEK' + '_API_KEY',
+              'DASHSCOPE' + '_API_KEY',
+              'OPENAI' + '_API_KEY',
+              '--execute-' + 'real',
+          ]
+          failures=[]
+          for path in files:
+              text=Path(path).read_text(encoding='utf-8')
+              for token in forbidden:
+                  if token in text:
+                      failures.append((path, token))
+          if failures:
+              raise SystemExit('real-provider capability found in reporting layer: ' + repr(failures))
+          print('PASS: reporting layer contains no real-provider authorization route')
+          PY

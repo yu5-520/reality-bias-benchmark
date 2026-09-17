@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-R5R6-SPECIFICITY-PLAN-v0.1",
+  "title": "R5-R6 Specificity Plan v0.1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "version",
+    "scientific_status",
+    "source_binding",
+    "field_selection",
+    "mechanical_primitive",
+    "conditions",
+    "contrasts",
+    "measurement_contract",
+    "observation_horizon",
+    "authorization_status",
+    "plan_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-R5R6-SPECIFICITY-PLAN-v0.1"},
+    "version": {"const": "0.1"},
+    "scientific_status": {"type": "string"},
+    "source_binding": {
+      "type": "object",
+      "required": ["source_trace_hash", "common_parent_state_hash", "selected_j0_event_ref", "selected_j0_state_key"],
+      "properties": {
+        "source_trace_hash": {"type": "string", "minLength": 1},
+        "source_evidence_hash": {"type": ["string", "null"]},
+        "common_parent_state_hash": {"type": "string", "minLength": 1},
+        "selected_j0_candidate_id": {"type": ["string", "null"]},
+        "selected_j0_event_ref": {"type": "string", "minLength": 1},
+        "selected_j0_state_key": {"type": "string", "minLength": 1},
+        "selected_j0_pre_status": {"type": "string", "minLength": 1}
+      }
+    },
+    "field_selection": {
+      "type": "object",
+      "required": ["contract_schema", "eligible_pool_hash", "selection_rule_hash", "selected_s1_state_key", "selected_s1_target_hash", "outcome_blind_attestation"],
+      "properties": {
+        "contract_schema": {"const": "RB-R5R6-SPECIFICITY-FIELD-SELECTION-CONTRACT-v0.1"},
+        "eligible_pool_hash": {"type": "string", "minLength": 1},
+        "selection_rule_hash": {"type": "string", "minLength": 1},
+        "selected_s1_state_key": {"type": "string", "minLength": 1},
+        "selected_s1_target_hash": {"type": "string", "minLength": 1},
+        "outcome_blind_attestation": {"const": true}
+      }
+    },
+    "mechanical_primitive": {
+      "type": "object",
+      "required": ["id", "to_status", "delivery_policy", "direct_exposure_limit", "persistent_state_mutation", "reinjection_forbidden"],
+      "properties": {
+        "id": {"const": "ONE_SHOT_EPISTEMIC_STATUS_DOWNGRADE"},
+        "to_status": {"type": "string", "minLength": 1},
+        "delivery_policy": {"type": "string", "minLength": 1},
+        "direct_exposure_limit": {"const": 1},
+        "persistent_state_mutation": {"const": false},
+        "reinjection_forbidden": {"const": true}
+      }
+    },
+    "conditions": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "S0_NATURAL_REFERENCE",
+          "S1_MATCHED_FACTUAL_FIELD_DOWNGRADE",
+          "S2_J0_TARGETED_AUTHORITY_WITHDRAWAL"
+        ]
+      }
+    },
+    "contrasts": {
+      "type": "object",
+      "required": ["generic_uncertainty", "total_j0_targeted", "primary_target_specificity"],
+      "properties": {
+        "generic_uncertainty": {"const": "S1_MINUS_S0"},
+        "total_j0_targeted": {"const": "S2_MINUS_S0"},
+        "primary_target_specificity": {"const": "S2_MINUS_S1"}
+      }
+    },
+    "measurement_contract": {"const": "RB-PROCESS-REALITY-MEASUREMENT-CONTRACT-v0.7"},
+    "observation_horizon": {
+      "type": "object",
+      "required": ["policy_id"],
+      "properties": {
+        "policy_id": {"type": "string", "minLength": 1},
+        "post_consumption_turn_cap": {"type": ["integer", "null"], "minimum": 1},
+        "natural_early_termination_is_censoring": {"const": true}
+      }
+    },
+    "namespace_guard": {
+      "type": "object",
+      "properties": {
+        "specificity_namespace": {"const": "S"},
+        "r7_namespace": {"const": "C"},
+        "aliasing_forbidden": {"const": true}
+      }
+    },
+    "authorization_status": {"const": "NOT_AUTHORIZED"},
+    "paid_evaluator_authorized": {"const": false},
+    "semantic_cpr_status": {"const": "NOT_ADJUDICATED"},
+    "plan_hash": {"type": "string", "minLength": 1}
+  }
+}

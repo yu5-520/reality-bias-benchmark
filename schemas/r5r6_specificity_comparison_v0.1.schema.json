@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-R5R6-SPECIFICITY-COMPARISON-v0.1",
+  "title": "R5-R6 Specificity Structural Comparison v0.1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "version",
+    "plan_hash",
+    "comparison_id",
+    "contrast_type",
+    "left_condition",
+    "right_condition",
+    "measurement_level",
+    "structural_dimensions",
+    "censoring_status",
+    "semantic_cpr_status"
+  ],
+  "properties": {
+    "schema": {"const": "RB-R5R6-SPECIFICITY-COMPARISON-v0.1"},
+    "version": {"const": "0.1"},
+    "plan_hash": {"type": "string", "minLength": 1},
+    "comparison_id": {"type": "string", "minLength": 1},
+    "replicate_index": {"type": ["integer", "null"], "minimum": 1},
+    "contrast_type": {
+      "enum": [
+        "GENERIC_UNCERTAINTY_S1_MINUS_S0",
+        "TOTAL_J0_TARGETED_S2_MINUS_S0",
+        "PRIMARY_TARGET_SPECIFICITY_S2_MINUS_S1"
+      ]
+    },
+    "left_condition": {
+      "enum": [
+        "S0_NATURAL_REFERENCE",
+        "S1_MATCHED_FACTUAL_FIELD_DOWNGRADE",
+        "S2_J0_TARGETED_AUTHORITY_WITHDRAWAL"
+      ]
+    },
+    "right_condition": {
+      "enum": [
+        "S0_NATURAL_REFERENCE",
+        "S1_MATCHED_FACTUAL_FIELD_DOWNGRADE",
+        "S2_J0_TARGETED_AUTHORITY_WITHDRAWAL"
+      ]
+    },
+    "measurement_level": {
+      "enum": [
+        "LOCAL_PERTURBATION_RESPONSE",
+        "POST_CONSUMPTION_INERTIA_PROFILE",
+        "TARGET_SPECIFICITY_CONTRAST"
+      ]
+    },
+    "source_evidence_refs": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "structural_dimensions": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "descendant_jump_structure": {},
+        "first_descendant_distance": {},
+        "inheritance_or_transfer": {},
+        "root_reach_depth": {},
+        "affected_actor_or_field_lineage": {},
+        "branch_merge_reentry": {},
+        "cross_agent_spread": {},
+        "path_family_structure": {},
+        "state_lineage_destination": {},
+        "retrospective_return_or_rebound": {},
+        "reconvergence": {}
+      }
+    },
+    "structurally_distinguishable": {"type": ["boolean", "null"]},
+    "distinguishability_basis": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "directional_effect_claim": {"const": false},
+    "censoring_status": {
+      "enum": ["UNCENSORED", "LEFT_CENSORED", "RIGHT_CENSORED", "BOTH_CENSORED", "UNRESOLVED"]
+    },
+    "terminal_outcome": {
+      "type": ["object", "null"],
+      "description": "Secondary terminal observation, kept separate from the structural comparison."
+    },
+    "semantic_cpr_status": {"const": "NOT_ADJUDICATED"},
+    "paid_evaluator_called": {"const": false},
+    "comparison_hash": {"type": ["string", "null"]}
+  }
+}
