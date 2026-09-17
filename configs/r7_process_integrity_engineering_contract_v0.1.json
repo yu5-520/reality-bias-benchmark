@@ -1,0 +1,83 @@
+{
+  "schema": "RB-R7-PROCESS-INTEGRITY-ENGINEERING-CONTRACT-v0.1",
+  "version": "0.1",
+  "date": "2026-09-17",
+  "status": "ENGINEERING_IMPLICATION_OFFLINE_ONLY",
+  "scientific_result": false,
+  "depends_on": [
+    "R6 System Inertia Identification Protocol v0.3",
+    "R7 Structural Inertia Risk Control Protocol v0.4",
+    "ALR Authority-Localized Recovery Contract v0.3"
+  ],
+  "design_targets": [
+    "LIGHTWEIGHT",
+    "PLUGGABLE",
+    "NON_INVASIVE_BY_DEFAULT",
+    "PROTOCOL_AGNOSTIC",
+    "REAL_TIME",
+    "CONTENT_ADDRESSED",
+    "LINEAGE_AWARE",
+    "LOCALIZED_RECOVERY",
+    "AUDITABLE_REVISION"
+  ],
+  "runtime_modes": {
+    "PASSIVE": {
+      "role": "OBSERVE_REGISTER_TRACE",
+      "may_modify_agent_prompt": false,
+      "may_modify_routing": false,
+      "may_force_agent_or_tool_choice": false,
+      "may_write_recovery_state": false
+    },
+    "ACTIVE_RECOVERY": {
+      "role": "EXPLICITLY_AUTHORIZED_LOCALIZED_RECOVERY",
+      "requires_explicit_gate": true,
+      "requires_named_authority_or_provenance_condition": true,
+      "requires_affected_closure": true,
+      "requires_preserved_set": true,
+      "requires_revision_identity": true
+    }
+  },
+  "minimal_event_types": [
+    "MessageEvent",
+    "StateEvent",
+    "InvocationEvent",
+    "EvidenceSourceEvent",
+    "RevisionEvent"
+  ],
+  "content_identities": [
+    "EventHash",
+    "MessageHash",
+    "StateHash",
+    "FieldHash",
+    "SourceHash",
+    "InvocationHash",
+    "RevisionHash",
+    "ClosureHash"
+  ],
+  "adapter_rule": {
+    "native_framework_ids_preserved_as_aliases": true,
+    "replacement_agent_sdk_required": false,
+    "replacement_mcp_or_a2a_protocol_required": false,
+    "central_supervisor_required": false
+  },
+  "point_repair_rule": {
+    "repair_unit": "SMALLEST_SOURCE_BACKED_AFFECTED_CLOSURE",
+    "silent_overwrite_forbidden": true,
+    "whole_system_rerun_default": false,
+    "post_repair_lineage_verification_required": true,
+    "old_lineage_reentry_must_remain_observable": true
+  },
+  "engineering_queries": [
+    "SOURCE_OF_FIELD_OR_STATE",
+    "DOWNSTREAM_CONSUMERS",
+    "INHERITED_DESCENDANTS",
+    "AFFECTED_CLOSURE",
+    "REPLACEMENT_REVISION",
+    "OLD_LINEAGE_REENTRY"
+  ],
+  "authorization": {
+    "paid_provider_run": false,
+    "paid_evaluator_run": false,
+    "active_recovery_on_scientific_subject": false
+  }
+}
