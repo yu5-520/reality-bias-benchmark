@@ -1,0 +1,34 @@
+{
+  "schema": "RB-R7-FORMAL-SUBJECT-GATE-v0.1",
+  "status": "GATE_CONTRACT_ONLY_NOT_AUTHORIZATION",
+  "workflow": ".github/workflows/r7-three-arm-subject-real.yml",
+  "runner": "arena.run_r7_three_arm_real",
+  "authorization_phrase": "CALL_REAL_R7_THREE_ARM_API",
+  "default_plan": {
+    "replicates": 2,
+    "planned_branch_count": 6,
+    "provider": "deepseek",
+    "model_config": "arena/config/model_deepseek_v0.2.json",
+    "currency": "USD",
+    "per_branch_spending_ceiling": 0.25,
+    "total_spending_ceiling": 1.5,
+    "per_branch_max_calls": 64
+  },
+  "methodological_gates": {
+    "exact_frozen_source_artifacts_required": true,
+    "exact_common_reference_parent_required": true,
+    "exact_pre_j0_recovery_checkpoint_required": true,
+    "same_semantic_payload_required": true,
+    "same_observation_horizon_required": true,
+    "provider_hidden_state_replay_forbidden": true,
+    "c3_nonreproduction_retry_forbidden": true,
+    "raw_evidence_freeze_before_derivation": true,
+    "raw_artifact_upload_before_derivation": true,
+    "semantic_cpr_adjudication_deferred": true,
+    "automatic_paid_evaluator": false,
+    "terminal_outcome_is_primary": false,
+    "same_parent_repeats_are_independent_samples": false
+  },
+  "authorization_status": "NOT_AUTHORIZED",
+  "note": "This file defines the fail-closed formal-run gate and default ceilings only. It does not authorize provider calls. A real subject run additionally requires an explicit manual workflow dispatch containing the exact authorization phrase."
+}
