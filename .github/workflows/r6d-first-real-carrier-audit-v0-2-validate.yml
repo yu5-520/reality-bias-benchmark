@@ -1,0 +1,45 @@
+name: R6-D First Real Carrier Audit v0.2 Validate
+
+on:
+  pull_request:
+    paths:
+      - 'arena/analyze_r6d_carrier_audit_v0_2.py'
+      - 'results/reports/2026-09-17/R6D_First_Real_Carrier_Mechanism_Audit_v0_2.md'
+      - 'manifests/r6d_first_real_carrier_audit_2026-09-17_v0_2.json'
+      - 'scripts/validate_r6d_first_real_carrier_audit_v0_2.py'
+      - '.github/workflows/r6d-first-real-carrier-audit-v0-2-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-carrier-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile derivation and validator
+        run: python -m py_compile arena/analyze_r6d_carrier_audit_v0_2.py scripts/validate_r6d_first_real_carrier_audit_v0_2.py
+      - name: Validate frozen evidence binding and interpretation boundaries
+        run: python scripts/validate_r6d_first_real_carrier_audit_v0_2.py
+      - name: Re-check frozen R6-D design and v4.5.1 contracts
+        run: |
+          python scripts/validate_r6d_specificity_exact_plan_v0_1.py
+          python scripts/validate_process_reality_v4_5_1.py
+      - name: Provider-secret-free assertion
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -R -nE 'DEEPSEEK_API_KEY|OPENAI_API_KEY|ANTHROPIC_API_KEY|--execute-real-api' \
+            arena/analyze_r6d_carrier_audit_v0_2.py \
+            scripts/validate_r6d_first_real_carrier_audit_v0_2.py \
+            results/reports/2026-09-17/R6D_First_Real_Carrier_Mechanism_Audit_v0_2.md \
+            manifests/r6d_first_real_carrier_audit_2026-09-17_v0_2.json; then
+            echo 'FAIL: provider execution material found in offline carrier audit layer'
+            exit 1
+          fi
+          echo 'PASS: carrier audit layer is provider-secret-free'
