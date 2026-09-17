@@ -9,6 +9,8 @@ on:
       - "arena/run_r6d_specificity_real.py"
       - "arena/freeze_r6d_raw_evidence.py"
       - "configs/r6/r6d_specificity_formal_subject_gate_v0.2.json"
+      - "configs/r6/r6d_methodological_interpretation_gate_v0.1.json"
+      - "scripts/validate_process_reality_v4_5_1.py"
       - ".github/workflows/r6d-specificity-subject-real.yml"
       - ".github/workflows/r6d-specificity-runtime-readiness-v0-1.yml"
       - "docs/R6D_specificity_runtime_readiness_v0.1.md"
@@ -42,6 +44,9 @@ jobs:
 
       - name: Validate Process Reality v4.5 stack
         run: python scripts/validate_process_reality_v4_5.py
+
+      - name: Validate Process Reality v4.5.1 methodological closure
+        run: python scripts/validate_process_reality_v4_5_1.py
 
       - name: Validate atomic specificity synchronization
         run: python scripts/validate_r6d_atomic_sync_v0_1.py
@@ -125,6 +130,7 @@ jobs:
           from pathlib import Path
           wf=Path('.github/workflows/r6d-specificity-subject-real.yml').read_text(encoding='utf-8')
           gate=json.loads(Path('configs/r6/r6d_specificity_formal_subject_gate_v0.2.json').read_text(encoding='utf-8'))
+          method_gate=json.loads(Path('configs/r6/r6d_methodological_interpretation_gate_v0.1.json').read_text(encoding='utf-8'))
           assert 'workflow_dispatch:' in wf
           assert '\n  push:' not in wf
           assert '\n  pull_request:' not in wf
@@ -134,13 +140,16 @@ jobs:
           assert '--execute-real-api' in wf
           assert 'secrets.DEEPSEEK_API_KEY' in wf
           assert 'freeze_r6d_raw_evidence' in wf
+          assert 'validate_process_reality_v4_5_1.py' in wf
           assert 'Upload raw scientific subject artifact before derivation' in wf
           assert gate['status']=='RUNTIME_BOUND_GATE_CLOSED_NOT_AUTHORIZATION'
           assert gate['authorization_status']=='NOT_AUTHORIZED'
           assert gate['scientific_provider_run_authorized'] is False
           assert gate['paid_evaluator_run_authorized'] is False
           assert gate['semantic_cpr_adjudication_authorized'] is False
-          print('PASS: real workflow exists but remains manual, exact-gated and closed')
+          assert method_gate['status']=='REQUIRED_BEFORE_SCIENTIFIC_EXECUTION_NOT_AUTHORIZATION'
+          assert method_gate['authorization_status']=='NOT_AUTHORIZED'
+          print('PASS: real workflow exists but remains manual, exact-gated, method-gated and closed')
           PY
 
       - name: Assert readiness job itself has no provider credential or real execution
@@ -150,14 +159,15 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           text=Path('.github/workflows/r6d-specificity-runtime-readiness-v0-1.yml').read_text(encoding='utf-8')
-          forbidden=[
-              'DEEPSEEK_' + 'API_KEY',
-              'DASHSCOPE_' + 'API_KEY',
-              'OPENAI_' + 'API_KEY',
-              '--execute-' + 'real',
+          # Check executable YAML patterns, not quoted strings used to audit the real workflow.
+          forbidden_patterns=[
+              'DEEPSEEK_API_KEY: ${{ secrets.',
+              'DASHSCOPE_API_KEY: ${{ secrets.',
+              'OPENAI_API_KEY: ${{ secrets.',
+              '\n            --execute-real-api',
           ]
-          found=[x for x in forbidden if x in text]
-          assert not found, 'readiness workflow contains real-provider capability: '+repr(found)
+          found=[x for x in forbidden_patterns if x in text]
+          assert not found, 'readiness workflow contains executable real-provider capability: '+repr(found)
           print('PASS: readiness workflow is offline only')
           PY
 
@@ -179,6 +189,7 @@ jobs:
               'smoke_summary_hash':smoke['summary_hash'],
               'source_parent_immutable':smoke['source_parent_immutable'],
               'runner_preflight_passed':True,
+              'methodological_gate_passed':True,
               'real_workflow_bound':True,
               'real_workflow_manual_only':True,
               'scientific_provider_run_authorized':False,
