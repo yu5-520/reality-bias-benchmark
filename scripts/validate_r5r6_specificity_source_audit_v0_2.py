@@ -3,11 +3,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import sys
 from pathlib import Path
 
-from arena.core import stable_hash
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from arena.core import stable_hash
 
 
 def load(rel: str):
@@ -94,6 +97,7 @@ def main() -> None:
         require(auth.get("semantic_cpr_adjudication") is False, "semantic_cpr_must_not_be_authorized")
 
     require((ROOT / "docs/R5_R6_specificity_source_audit_2026-09-17.md").is_file(), "source_audit_document_missing")
+    require((ROOT / "docs/R5_R6_specificity_protocol_v0.2.md").is_file(), "specificity_protocol_v0_2_missing")
     require((ROOT / "arena/r5r6_specificity_atomic_v0_2.py").is_file(), "atomic_operator_missing")
     require((ROOT / "arena/r5r6_specificity_atomic_preflight_v0_2.py").is_file(), "atomic_preflight_missing")
 
