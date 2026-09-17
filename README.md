@@ -112,6 +112,8 @@ R6 instead measures source-backed continuation, extinction, transformation, tran
 
 A Jump phenotype can disappear while structural inertia remains in later routing, lineage, state or participation structure.
 
+The current frozen-source readout is available at **[R6 System Inertia Factual Report v2](docs/reports/2026-09-17/R6_System_Inertia_Factual_Report_v2.md)**. It creates no new subject evidence; it reorganizes the frozen R5-MID process evidence under the R6 post-consumption inertia question.
+
 ## R5-R6 — target-specificity triad
 
 The forward specificity family uses an independent **S namespace**:
@@ -237,8 +239,8 @@ Publication-facing Process Reality reports follow versioned reporting contracts 
 - **[Process Reality Report Standard v1.1](docs/reporting/process_reality_report_standard_v1_1.md)** — forward standard extending v1.0 with R6 System Inertia Factual and R5-R6 Specificity Validation profiles;
 - **[Process Reality Report Template v1.1](schemas/process_reality_report_template_v1_1.json)** — machine-readable forward report contract;
 - **[Process Reality Report Standard v1.0](docs/reporting/process_reality_report_standard_v1.md)** and **[Template v1.0](schemas/process_reality_report_template_v1.json)** — preserved historical standard for finalized R5-MID v3 reports;
-- **[Formal R5-MID report bundle — 2026-09-17](docs/reports/2026-09-17/README.md)** — finalized Control, One-Shot and Matched A/B mechanism-validation report set;
-- **[Report bundle manifest](manifests/r5mid_report_bundle_2026-09-17_v1.json)** — binds the historical report set and finalized DOCX export hashes to frozen evidence.
+- **[Formal R5-MID report bundle — 2026-09-17](docs/reports/2026-09-17/README.md)** — finalized historical reports plus the indexed R6 factual v2 readout;
+- **[Report bundle manifest](manifests/r5mid_report_bundle_2026-09-17_v1.json)** — binds the historical v1.0 report set and finalized DOCX export hashes to frozen evidence.
 
 The reporting chain is:
 
