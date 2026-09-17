@@ -23,6 +23,7 @@ The Matched A/B report is the original mechanism-validation report for time-caus
 ## Forward R6 factual report — Standard v1.1
 
 - `R6_System_Inertia_Factual_Report_v2.md`
+- manifest: `manifests/r6_system_inertia_factual_report_2026-09-17_v2.json`
 
 This report is a frozen-source factual projection under `RB-PROCESS-REALITY-REPORT-STANDARD-v1.1`.
 
