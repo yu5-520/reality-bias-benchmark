@@ -1,0 +1,74 @@
+{
+  "schema": "RB-R6D-MATCHED-STOCK-ROBUSTNESS-CANDIDATE-AUDIT-v0.1",
+  "version": "0.1",
+  "status": "FROZEN_POST_FIRST_BATCH_PRE_SECOND_BATCH",
+  "selection_timing": "POST_FIRST_BATCH_PRE_SECOND_BATCH",
+  "first_batch_outcomes_known": true,
+  "eligibility_rule_uses_first_batch_outcome": false,
+  "all_eligible_candidates_included": true,
+  "source_binding": {
+    "source_main_sha": "833aac59db6023ed3f197bad00944f7c78072d61",
+    "common_parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c",
+    "parent_anchor_ref": "after_turn:8",
+    "source_event_ref": "E32",
+    "source_container": "shared_state.inventory_stockout_assessment_v1",
+    "source_container_metadata": {
+      "writer": "inventory",
+      "event_index": 32,
+      "status": "fact"
+    },
+    "predecessor_design_hash": "d8783a9c3e0a264c3119ee72e63db9b61d51f0d633ff6dde66068751c31701de",
+    "first_batch_evidence_hash": "0d4dd464d10bfc9a5b4307856e2c070bfaa521951e00cd0f147eeb80063e4beb",
+    "first_batch_evidence_role": "KNOWN_PROVENANCE_ONLY_NOT_SELECTION_CRITERION"
+  },
+  "eligibility_rule": {
+    "container_exact": "shared_state.inventory_stockout_assessment_v1",
+    "source_event_exact": "E32",
+    "writer_exact": "inventory",
+    "container_status_exact": "fact",
+    "product_leaf_pattern": "shared_state.inventory_stockout_assessment_v1.<PRODUCT>.stock",
+    "allowed_value_type": "integer_scalar",
+    "semantic_role": "DIRECT_STOCK_QUANTITY",
+    "exclude_original_j0_target": true,
+    "exclude_preliminary_or_unreconciled_field_names": true,
+    "exclude_derived_metrics": true,
+    "exclude_recommendation_trigger_or_text_fields": true,
+    "exclude_boolean_policy_or_replenishment_fields": true,
+    "selection_mode": "INCLUDE_ALL_ELIGIBLE_CANDIDATES"
+  },
+  "candidate_inventory": [
+    {
+      "locator": "shared_state.inventory_stockout_assessment_v1.A.preliminary_stock",
+      "value": 1520,
+      "eligible": false,
+      "reason": "ORIGINAL_S2_J0_TARGET_AND_PRELIMINARY_UNRECONCILED"
+    },
+    {
+      "locator": "shared_state.inventory_stockout_assessment_v1.B.stock",
+      "value": 900,
+      "eligible": true,
+      "assigned_condition": "S3_MATCHED_ORDINARY_STOCK_B_DOWNGRADE"
+    },
+    {
+      "locator": "shared_state.inventory_stockout_assessment_v1.C.stock",
+      "value": 3400,
+      "eligible": true,
+      "assigned_condition": "S4_MATCHED_ORDINARY_STOCK_C_DOWNGRADE"
+    }
+  ],
+  "eligible_candidate_locators": [
+    "shared_state.inventory_stockout_assessment_v1.B.stock",
+    "shared_state.inventory_stockout_assessment_v1.C.stock"
+  ],
+  "included_candidate_locators": [
+    "shared_state.inventory_stockout_assessment_v1.B.stock",
+    "shared_state.inventory_stockout_assessment_v1.C.stock"
+  ],
+  "methodological_disclosure": [
+    "FIRST_BATCH_OUTCOMES_WERE_KNOWN_BEFORE_THIS_ROBUSTNESS_DESIGN",
+    "ELIGIBILITY_IS_DEFINED_FROM_FROZEN_PARENT_STRUCTURE_NOT_FIRST_BATCH_RESPONSE",
+    "ALL_ELIGIBLE_MATCHED_ORDINARY_STOCK_CONTROLS_ARE_INCLUDED",
+    "ORIGINAL_S1_REMAINS_IN_EVIDENCE_AND_IS_NOT_REPLACED"
+  ],
+  "audit_hash": "ffce11ae46a2efa966368c21da610fac967fe5132ccc7dddea80e6caa3f9ec70"
+}

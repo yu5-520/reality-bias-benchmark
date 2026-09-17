@@ -1,0 +1,227 @@
+{
+  "schema": "RB-R6D-MATCHED-STOCK-ROBUSTNESS-PLAN-v0.1",
+  "version": "0.1",
+  "status": "DESIGN_FROZEN_NOT_RUNTIME_READY_NOT_AUTHORIZED",
+  "design_hash": "5064e255da26949a152a2300fe659ebdddddc9b44f1a97a4b31d7796005a959d",
+  "source_binding": {
+    "source_main_sha": "833aac59db6023ed3f197bad00944f7c78072d61",
+    "predecessor_design_hash": "d8783a9c3e0a264c3119ee72e63db9b61d51f0d633ff6dde66068751c31701de",
+    "common_parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c",
+    "parent_anchor_ref": "after_turn:8",
+    "parent_turn": 8,
+    "j0_event_ref": "E32",
+    "resumed_actor": "ops_lead",
+    "resumed_turn": 9,
+    "first_batch_evidence_hash": "0d4dd464d10bfc9a5b4307856e2c070bfaa521951e00cd0f147eeb80063e4beb",
+    "first_batch_evidence_role": "KNOWN_PROVENANCE_AND_EXTERNAL_AUXILIARY_BASELINE_ONLY"
+  },
+  "candidate_audit": {
+    "path": "configs/r6/r6d_matched_stock_robustness_candidate_audit_v0.1.json",
+    "audit_hash": "ffce11ae46a2efa966368c21da610fac967fe5132ccc7dddea80e6caa3f9ec70",
+    "selection_timing": "POST_FIRST_BATCH_PRE_SECOND_BATCH",
+    "first_batch_outcomes_known": true,
+    "eligibility_rule_uses_first_batch_outcome": false,
+    "all_eligible_candidates_included": true
+  },
+  "conditions": [
+    {
+      "condition_id": "S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL",
+      "role": "J0_ANCHOR_RERUN",
+      "target_locator": "shared_state.inventory_stockout_assessment_v1.A.preliminary_stock",
+      "original_value": 1520,
+      "envelope_hash": "5d8038c4f9c4dd38c291df547964ccf5bfa620e76976bb34c31eeb7973d07805",
+      "source_origin_status": "preliminary_unreconciled",
+      "source_authority_scope": "CONTAINER_LEVEL_FACT"
+    },
+    {
+      "condition_id": "S3_MATCHED_ORDINARY_STOCK_B_DOWNGRADE",
+      "role": "MATCHED_ORDINARY_STOCK_CONTROL",
+      "target_locator": "shared_state.inventory_stockout_assessment_v1.B.stock",
+      "original_value": 900,
+      "envelope_path": "configs/r6/r6d_s3_matched_stock_b_envelope_v0.1.json",
+      "envelope_hash": "7fe7d9af972e9c07d8386c657e6badcdcc2ac499d31e7be652d1e5b81ed1a9cd",
+      "source_origin_status": "fact",
+      "source_authority_scope": "CONTAINER_LEVEL_FACT"
+    },
+    {
+      "condition_id": "S4_MATCHED_ORDINARY_STOCK_C_DOWNGRADE",
+      "role": "MATCHED_ORDINARY_STOCK_CONTROL",
+      "target_locator": "shared_state.inventory_stockout_assessment_v1.C.stock",
+      "original_value": 3400,
+      "envelope_path": "configs/r6/r6d_s4_matched_stock_c_envelope_v0.1.json",
+      "envelope_hash": "41bafbe740e7bd431033ce124b3e022a6920136a77f6f589e040f6ea9aa12739",
+      "source_origin_status": "fact",
+      "source_authority_scope": "CONTAINER_LEVEL_FACT"
+    }
+  ],
+  "common_operator": {
+    "mechanical_primitive": "ONE_SHOT_TARGET_SCOPED_EPISTEMIC_STATUS_ANNOTATION",
+    "from_status": "fact",
+    "to_status": "unconfirmed",
+    "direct_exposure_limit": 1,
+    "experiment_origin_reinjection_count": 0,
+    "persistent_experiment_origin_state_mutation": false,
+    "original_target_value_mutation": false,
+    "opposite_fact_supplied": false,
+    "replacement_conclusion_supplied": false,
+    "desired_terminal_answer_supplied": false
+  },
+  "matched_execution_design": {
+    "order_policy": "THREE_CONDITION_CYCLIC_LATIN_ROTATION",
+    "replicates": 3,
+    "planned_branch_count": 9,
+    "same_parent_repeats_are_independent_population_samples": false,
+    "rows": [
+      {
+        "triad_id": "r6d-matched-stock-robustness:0001",
+        "replicate_index": 1,
+        "logical_seed": 1,
+        "execution_order": 1,
+        "condition_id": "S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL",
+        "run_id": "r6d-matched-stock-robustness:0001:s2_j0_targeted_escape_derived_authority_withdrawal",
+        "row_hash": "cb4e46701004085e2b35d03dbe5ba24d5d43af4d22dfac779052f61819584c51"
+      },
+      {
+        "triad_id": "r6d-matched-stock-robustness:0001",
+        "replicate_index": 1,
+        "logical_seed": 1,
+        "execution_order": 2,
+        "condition_id": "S3_MATCHED_ORDINARY_STOCK_B_DOWNGRADE",
+        "run_id": "r6d-matched-stock-robustness:0001:s3_matched_ordinary_stock_b_downgrade",
+        "row_hash": "c9755b20ac5305637c8a411165575dfba045eab6023c8792107826e89792c527"
+      },
+      {
+        "triad_id": "r6d-matched-stock-robustness:0001",
+        "replicate_index": 1,
+        "logical_seed": 1,
+        "execution_order": 3,
+        "condition_id": "S4_MATCHED_ORDINARY_STOCK_C_DOWNGRADE",
+        "run_id": "r6d-matched-stock-robustness:0001:s4_matched_ordinary_stock_c_downgrade",
+        "row_hash": "c42a11974a6b040c4a0eb74de3837862f3d55fc1de434fcc832130f386523bb0"
+      },
+      {
+        "triad_id": "r6d-matched-stock-robustness:0002",
+        "replicate_index": 2,
+        "logical_seed": 2,
+        "execution_order": 1,
+        "condition_id": "S3_MATCHED_ORDINARY_STOCK_B_DOWNGRADE",
+        "run_id": "r6d-matched-stock-robustness:0002:s3_matched_ordinary_stock_b_downgrade",
+        "row_hash": "ea9a827331dda39135aab6afbf6751ed57f0abe706dffcbcbde74d147294684c"
+      },
+      {
+        "triad_id": "r6d-matched-stock-robustness:0002",
+        "replicate_index": 2,
+        "logical_seed": 2,
+        "execution_order": 2,
+        "condition_id": "S4_MATCHED_ORDINARY_STOCK_C_DOWNGRADE",
+        "run_id": "r6d-matched-stock-robustness:0002:s4_matched_ordinary_stock_c_downgrade",
+        "row_hash": "a69379397e2b78183577deadd2edfe88ff50b71b800d59ebe92edd39942181a1"
+      },
+      {
+        "triad_id": "r6d-matched-stock-robustness:0002",
+        "replicate_index": 2,
+        "logical_seed": 2,
+        "execution_order": 3,
+        "condition_id": "S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL",
+        "run_id": "r6d-matched-stock-robustness:0002:s2_j0_targeted_escape_derived_authority_withdrawal",
+        "row_hash": "d88ee60e1838ab0fe20172486ec29f746b204c31919bf9ecbb6b1b3c06848971"
+      },
+      {
+        "triad_id": "r6d-matched-stock-robustness:0003",
+        "replicate_index": 3,
+        "logical_seed": 3,
+        "execution_order": 1,
+        "condition_id": "S4_MATCHED_ORDINARY_STOCK_C_DOWNGRADE",
+        "run_id": "r6d-matched-stock-robustness:0003:s4_matched_ordinary_stock_c_downgrade",
+        "row_hash": "889e980db71e98ad815a2db21fdbb904b991938717f59f2d88baaada38df2996"
+      },
+      {
+        "triad_id": "r6d-matched-stock-robustness:0003",
+        "replicate_index": 3,
+        "logical_seed": 3,
+        "execution_order": 2,
+        "condition_id": "S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL",
+        "run_id": "r6d-matched-stock-robustness:0003:s2_j0_targeted_escape_derived_authority_withdrawal",
+        "row_hash": "2eff0b4129bf17b7c7ea48b7db60d323afcbd728b48bee5f62469b2baf6a8305"
+      },
+      {
+        "triad_id": "r6d-matched-stock-robustness:0003",
+        "replicate_index": 3,
+        "logical_seed": 3,
+        "execution_order": 3,
+        "condition_id": "S3_MATCHED_ORDINARY_STOCK_B_DOWNGRADE",
+        "run_id": "r6d-matched-stock-robustness:0003:s3_matched_ordinary_stock_b_downgrade",
+        "row_hash": "80f13c114c8c33f14a4b2a33865b6072233003c3d23ea83c607faba967582efb"
+      }
+    ]
+  },
+  "observation_horizon": {
+    "branch_start_parent_turn": 8,
+    "direct_response_turn": 9,
+    "post_consumption_start_turn": 10,
+    "absolute_turn_cap": 16,
+    "max_additional_agent_turns": 8,
+    "natural_early_termination_allowed": true,
+    "natural_early_termination_interpretation": "RIGHT_CENSORING"
+  },
+  "budget_gate": {
+    "currency": "USD",
+    "per_branch_max_calls": 64,
+    "per_branch_spending_ceiling": 0.25,
+    "global_spending_ceiling": 2.25,
+    "automatic_paid_evaluator": false
+  },
+  "environment_binding": {
+    "provider": "deepseek",
+    "domain_id": "ecommerce",
+    "arena_config_path": "arena/config/arena_v0.3.json",
+    "arena_config_hash": "8e33288516fc47f116d20f4579ca84410a3cdefecef7c99c5bf2bb31e5d14002",
+    "model_config_path": "arena/config/model_deepseek_v0.2.json",
+    "model_config_hash": "fe7bbafda1c4c12b1d1f5dca963d1a45cbe503713aaa486fac09f569d1b5f8c5",
+    "agent_registry_hash": "d2e2ab7c6996098850bff7a6b24bd65b61567fe3bebb6c484c7024c67c020f26",
+    "domain_hash": "a68da87280b29a59be1125f909ea7992629af50340cb22aaf093d058fac4355d",
+    "task_hash": "849de0b4ab9874e0adf328b6f4f3768790215ad565a891e4c0a1dc1a9069f61b",
+    "provider_internal_state_replayed": false
+  },
+  "analysis_freeze": {
+    "historical_first_batch_primary_contrast": "S2_MINUS_S1",
+    "historical_first_batch_primary_contrast_is_replaced": false,
+    "primary_robustness_contrasts": [
+      "S2_MINUS_S3",
+      "S2_MINUS_S4"
+    ],
+    "matched_ordinary_target_spread": "S3_MINUS_S4",
+    "fresh_s0_included": false,
+    "first_batch_s0_role": "EXTERNAL_AUXILIARY_NATURAL_VARIABILITY_REFERENCE",
+    "first_batch_s0_evidence_hash": "0d4dd464d10bfc9a5b4307856e2c070bfaa521951e00cd0f147eeb80063e4beb",
+    "process_distance_domains": [
+      "STRUCTURAL_DISTANCE",
+      "INHERITANCE_DISTANCE",
+      "EPISTEMIC_AUTHORITY_DISTANCE"
+    ],
+    "readouts": [
+      "T9_LOCAL_RESPONSE",
+      "POST_CONSUMPTION_R6_INERTIA_PROFILE",
+      "EXPERIMENT_ANNOTATION_PERSISTENCE",
+      "SOURCE_CONTAINER_AUTHORITY_PERSISTENCE",
+      "TARGET_REFERENCE_PROPAGATION",
+      "TARGET_STATE_OR_ACTION_PROPAGATION",
+      "CENSORING"
+    ],
+    "post_hoc_total_scalar_forbidden": true,
+    "escape_derived_specificity_status": "NOT_ESTABLISHED_PRE_RUN",
+    "semantic_cpr_status": "NOT_ADJUDICATED"
+  },
+  "runtime_readiness": {
+    "real_subject_runner_bound": false,
+    "real_subject_workflow_bound": false,
+    "runtime_plan_builder_bound": false
+  },
+  "authorization": {
+    "authorization_status": "NOT_AUTHORIZED",
+    "scientific_provider_run": false,
+    "paid_evaluator_run": false,
+    "semantic_cpr_adjudication": false
+  },
+  "plan_hash": "b0fe89c08c20da61376077e23e484914bd260c2a7e00aa2a6b57c459380dbab9"
+}
