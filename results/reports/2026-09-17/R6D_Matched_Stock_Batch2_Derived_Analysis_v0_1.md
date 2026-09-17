@@ -68,7 +68,7 @@ A remaining non-exchangeability is now visible: A=1520 was already encoded as `p
 - **R6-B carrier:** strengthened. Persistent old source-container authority is directly localized.
 - **R6-C intervention-related inertia beyond natural variability:** not established.
 - **R6-D Escape/J0 specificity:** **NOT ESTABLISHED**; Batch 2 does not support upgrading the first-batch frozen target-response contrast.
-- **CPR:** `NOT_ADJUDICATED`.
+- CPR: `NOT_ADJUDICATED`.
 
 ## Methodological consequence
 
