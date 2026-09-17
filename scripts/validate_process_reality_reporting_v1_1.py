@@ -64,7 +64,7 @@ def main() -> None:
         "R5-R6 Specificity Validation Report",
         "S2 - S1",
         "Matched Factual Field",
-        "Immediate perturbation response",
+        "immediate/local perturbation response",
     ):
         require(phrase in text, f"report_standard_phrase_missing:{phrase}")
 
