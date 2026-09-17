@@ -1,0 +1,56 @@
+{
+  "schema": "RB-R6D-MATCHED-STOCK-ROBUSTNESS-FORMAL-SUBJECT-GATE-v0.2",
+  "version": "0.2",
+  "status": "RUNTIME_BOUND_GATE_CLOSED_NOT_AUTHORIZATION",
+  "design_freeze": {
+    "design_hash": "5064e255da26949a152a2300fe659ebdddddc9b44f1a97a4b31d7796005a959d",
+    "predecessor_design_hash": "d8783a9c3e0a264c3119ee72e63db9b61d51f0d633ff6dde66068751c31701de",
+    "candidate_audit_hash": "ffce11ae46a2efa966368c21da610fac967fe5132ccc7dddea80e6caa3f9ec70",
+    "plan_hash": "b0fe89c08c20da61376077e23e484914bd260c2a7e00aa2a6b57c459380dbab9",
+    "formal_gate_v0_1_hash": "af62079cf9d0727813095648cb85268895b960f7d14fb5644e3151f6711bbcf9"
+  },
+  "runtime_binding": {
+    "runtime_plan_builder_bound": true,
+    "runtime_plan_builder_path": "arena/prepare_r6d_matched_stock_plan.py",
+    "offline_smoke_bound": true,
+    "offline_smoke_path": "arena/r6d_matched_stock_runtime_smoke.py",
+    "real_subject_runner_bound": true,
+    "real_subject_runner_path": "arena/run_r6d_matched_stock_real.py",
+    "raw_evidence_freezer_bound": true,
+    "raw_evidence_freezer_path": "arena/freeze_r6d_matched_stock_raw_evidence.py",
+    "real_subject_workflow_bound": true,
+    "real_subject_workflow_path": ".github/workflows/r6d-matched-stock-subject-real.yml",
+    "runtime_readiness_workflow_path": ".github/workflows/r6d-matched-stock-runtime-readiness-v0-1.yml"
+  },
+  "exact_execution_gate": {
+    "authorization_phrase": "CALL_REAL_R6D_MATCHED_STOCK_API",
+    "confirm_design_hash_required": "5064e255da26949a152a2300fe659ebdddddc9b44f1a97a4b31d7796005a959d",
+    "manual_workflow_dispatch_only": true,
+    "preflight_required_before_provider_call": true,
+    "raw_evidence_freeze_before_derivation_required": true,
+    "raw_artifact_upload_before_derivation_required": true,
+    "automatic_retry_or_replacement_authorized": false
+  },
+  "budget_gate": {
+    "planned_branch_count": 9,
+    "per_branch_max_calls": 64,
+    "per_branch_spending_ceiling": 0.25,
+    "global_spending_ceiling": 2.25,
+    "currency": "USD",
+    "automatic_paid_evaluator": false
+  },
+  "analysis_guards": {
+    "historical_s2_minus_s1_replaced": false,
+    "primary_robustness_contrasts": ["S2_MINUS_S3", "S2_MINUS_S4"],
+    "matched_ordinary_target_spread": "S3_MINUS_S4",
+    "fresh_s0_included": false,
+    "escape_derived_specificity_pre_run": "NOT_ESTABLISHED",
+    "semantic_cpr_status": "NOT_ADJUDICATED",
+    "same_parent_repeats_are_independent_population_samples": false,
+    "terminal_outcome_is_primary": false
+  },
+  "authorization_status": "NOT_AUTHORIZED",
+  "scientific_provider_run_authorized": false,
+  "paid_evaluator_run_authorized": false,
+  "semantic_cpr_adjudication_authorized": false
+}
