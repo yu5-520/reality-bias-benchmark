@@ -15,6 +15,7 @@
     "structural_facts_used",
     "interpretation",
     "claim_status",
+    "causal_design_support",
     "boundary"
   ],
   "properties": {
@@ -124,14 +125,18 @@
     "claim_status": {
       "enum": ["SUPPORTED", "SUPPORTED_CANDIDATE", "NOT_ESTABLISHED", "CONTRADICTED"]
     },
-    "causal_design_support": {"type": "boolean", "default": false},
+    "causal_design_support": {"type": "boolean"},
     "boundary": {"type": "string", "minLength": 1},
     "reviewer_notes": {"type": "string"}
   },
   "allOf": [
     {
       "if": {
-        "properties": {"relation_type": {"const": "CAUSES"}}
+        "properties": {
+          "relation_type": {"const": "CAUSES"},
+          "causal_design_support": {"const": false}
+        },
+        "required": ["relation_type", "causal_design_support"]
       },
       "then": {
         "properties": {
