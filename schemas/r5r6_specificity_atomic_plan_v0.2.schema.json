@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-R5R6-SPECIFICITY-ATOMIC-PLAN-v0.2",
+  "title": "R6-D Atomic Specificity Plan v0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "scientific_status",
+    "source_binding_schema",
+    "selection_record_hash",
+    "conditions",
+    "s1_envelope_hash",
+    "s2_envelope_hash",
+    "primary_contrast",
+    "auxiliary_contrasts",
+    "primary_readout",
+    "historical_r5_operator_replayed_exactly",
+    "prospective_s2_role",
+    "provider_internal_state_replayed",
+    "semantic_cpr_status",
+    "authorization_status",
+    "paid_provider_authorized",
+    "paid_evaluator_authorized",
+    "plan_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-R5R6-SPECIFICITY-ATOMIC-PLAN-v0.2"},
+    "version": {"const": "0.2"},
+    "scientific_status": {"const": "PREPARED_ONLY_NO_SCIENTIFIC_SUBJECT_OUTCOMES"},
+    "source_binding_schema": {"const": "RB-R5R6-SPECIFICITY-EXACT-SOURCE-BINDING-v0.2"},
+    "selection_record_hash": {"type": "string", "minLength": 16},
+    "conditions": {
+      "const": [
+        "S0_NATURAL_REFERENCE",
+        "S1_MATCHED_OR_ORDINARY_FACTUAL_INFORMATION_DOWNGRADE",
+        "S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL"
+      ]
+    },
+    "s1_envelope_hash": {"type": "string", "minLength": 16},
+    "s2_envelope_hash": {"type": "string", "minLength": 16},
+    "primary_contrast": {"const": "S2_MINUS_S1"},
+    "auxiliary_contrasts": {"const": ["S1_MINUS_S0", "S2_MINUS_S0"]},
+    "primary_readout": {"const": "POST_CONSUMPTION_R6_INERTIA_PROFILE"},
+    "historical_r5_operator_replayed_exactly": {"const": false},
+    "prospective_s2_role": {"const": "ATOMIC_TARGET_SPECIFICITY_FOLLOW_UP"},
+    "provider_internal_state_replayed": {"const": false},
+    "semantic_cpr_status": {"const": "NOT_ADJUDICATED"},
+    "authorization_status": {"const": "NOT_AUTHORIZED"},
+    "paid_provider_authorized": {"const": false},
+    "paid_evaluator_authorized": {"const": false},
+    "plan_hash": {"type": "string", "minLength": 16}
+  }
+}
