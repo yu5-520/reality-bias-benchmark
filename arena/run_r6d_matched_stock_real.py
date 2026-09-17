@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import copy
-import json
 from pathlib import Path
 
 from .core import stable_hash
@@ -11,9 +10,9 @@ from .cost_budget import BudgetedProvider
 from .engine import run_arena_once
 from .io_utils import load_json, load_jsonl
 from .journal import Journal
-from .prepare_r6d_matched_stock_plan import CONDITIONS, load_runtime_plan
+from .prepare_r6d_matched_stock_plan import load_runtime_plan
 from .providers import provider_from_config
-from .r5r6_specificity_atomic_v0_2 import AtomicEpistemicAnnotationTransform
+from .r6d_matched_stock_atomic import CONDITIONS, MatchedStockAtomicEpistemicAnnotationTransform
 from .run_r6d_specificity_real import (
     _append_jsonl,
     _credential_check,
@@ -32,7 +31,7 @@ def _transform_for(row: dict, bundle: dict):
     condition = row["condition_id"]
     if condition not in CONDITIONS:
         raise ValueError("unknown_matched_stock_condition")
-    return AtomicEpistemicAnnotationTransform(bundle["condition_envelopes"][condition])
+    return MatchedStockAtomicEpistemicAnnotationTransform(bundle["condition_envelopes"][condition])
 
 
 def main() -> None:
