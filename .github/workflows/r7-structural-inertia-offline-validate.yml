@@ -9,10 +9,12 @@ on:
       - "scripts/validate_r7_protocol.py"
       - "docs/plans/R7_Structural_Inertia_Control_Plan.md"
       - "docs/experiments/R7_STRUCTURAL_INERTIA_CONTROL.md"
+      - "arena/engine.py"
       - "arena/persistent_field_intervention.py"
       - "arena/alr_recovery.py"
       - "arena/r7_structural_control_preflight.py"
       - "arena/prepare_r7_three_arm_plan.py"
+      - "arena/r7_runtime_smoke.py"
       - "arena/tests/test_r7_structural_control_preflight.py"
       - ".github/workflows/r7-orchestration-paired-real.yml"
       - ".github/workflows/r7-structural-inertia-offline-validate.yml"
@@ -164,6 +166,28 @@ jobs:
           print('PASS: R7 exact parent + pre-J0 ALR checkpoint binding verified')
           PY
 
+      - name: Exercise C1/C2/C3 in the real Arena loop with an offline deterministic provider
+        run: |
+          set -euo pipefail
+          python -m arena.r7_runtime_smoke \
+            --plan-dir /tmp/r7_real_parent_bound_plan \
+            --domain arena/domains/ecommerce.json \
+            --outdir /tmp/r7_runtime_smoke
+          python - <<'PY'
+          import json
+          s=json.load(open('/tmp/r7_runtime_smoke/summary.json'))
+          assert s['scientific_status']=='ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE'
+          assert s['c1_direct_exposures']==1
+          assert s['c2_direct_exposures']>=2
+          assert s['c2_reinjections']>=1
+          assert s['c3_authority_transform_count']==1
+          assert s['source_snapshots_immutable'] is True
+          assert s['provider_calls_are_real'] is False
+          assert s['paid_api_called'] is False
+          assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('PASS: R7 engine integration smoke exercised all three mechanisms')
+          PY
+
       - name: Assert obsolete R7 paid paired route is removed
         run: |
           set -euo pipefail
@@ -182,10 +206,12 @@ jobs:
             scripts/validate_r7_protocol.py \
             configs/r7/r7_three_arm_fixture.example.json \
             schemas/r7_structural_inertia_control_v1.json \
+            arena/engine.py \
             arena/persistent_field_intervention.py \
             arena/alr_recovery.py \
             arena/r7_structural_control_preflight.py \
-            arena/prepare_r7_three_arm_plan.py; then
+            arena/prepare_r7_three_arm_plan.py \
+            arena/r7_runtime_smoke.py; then
             echo "R7 offline validator/preflight must not depend on provider credentials." >&2
             exit 2
           fi
