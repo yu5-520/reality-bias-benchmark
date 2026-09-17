@@ -112,7 +112,7 @@ R6 instead measures source-backed continuation, extinction, transformation, tran
 
 A Jump phenotype can disappear while structural inertia remains in later routing, lineage, state or participation structure.
 
-The current frozen-source readout is available at **[R6 System Inertia Factual Report v2](docs/reports/2026-09-17/R6_System_Inertia_Factual_Report_v2.md)**. It creates no new subject evidence; it reorganizes the frozen R5-MID process evidence under the R6 post-consumption inertia question.
+The current frozen-source readout is available at **[R6 System Inertia Factual Report v2](docs/reports/2026-09-17/R6_System_Inertia_Factual_Report_v2.md)** with its machine-readable binding in **[R6 factual report v2 manifest](manifests/r6_system_inertia_factual_report_2026-09-17_v2.json)**. It creates no new subject evidence; it reorganizes the frozen R5-MID process evidence under the R6 post-consumption inertia question.
 
 ## R5-R6 — target-specificity triad
 
