@@ -1,12 +1,16 @@
 # R5-R6 Specificity Exact-Source Audit — 2026-09-17
 
-Status: **OFFLINE SOURCE AUDIT / NO SUBJECT RUN AUTHORIZED**
+Status: **R6-D OFFLINE SOURCE AUDIT + ATOMIC OPERATOR READY / NO SUBJECT RUN AUTHORIZED**
 
-## 1. Purpose
+## 1. Role under Process Reality v4.5
 
-This audit checks whether the frozen R5-MID parent can support the prospective S0/S1/S2 specificity design **without inventing a control field after seeing future outcomes**.
+This audit is the exact-source preparation layer for **R6-D Target Specificity**. It is not a new R stage.
 
-The scientific question is not whether any uncertainty marker changes behavior. The question is whether the selected J0's factual authority is associated with a distinguishable **post-consumption system-inertia** response relative to a normal factual information item subjected to the same one-shot epistemic-status annotation.
+The scientific question is:
+
+> Is the J0-targeted post-consumption system-inertia response structurally distinguishable from the generic response to making an ordinary factual information item uncertain once?
+
+The primary future contrast remains `S2 - S1`. The primary readout remains the **post-consumption R6 system-inertia profile**, not immediate activity volume.
 
 ## 2. Frozen source binding
 
@@ -23,149 +27,180 @@ The audit uses the frozen R5-MID raw artifact from workflow `35132777581`.
 | Control T9 runtime snapshot hash | `776892d1214693dae2880fe197068da6dcc727974529e87e7960251f16fb67bf` |
 | J0 event | `E32` |
 | J0 state key | `inventory_stockout_assessment_v1` |
-| J0 status at parent | `fact` |
+| J0 acquired container status | `fact` |
 
-## 3. Critical exact-source finding
+## 3. Exact-source finding
 
 At the frozen `after_turn:8` parent, `shared_state_metadata` contains only one non-initial entry with status `fact`:
 
 `inventory_stockout_assessment_v1.status = fact`
 
-The other material shared-state entries are `recommendation`, `unspecified`, or `initial`.
+Other material shared-state entries are `recommendation`, `unspecified`, or `initial`.
 
-Therefore the v0.1 control selector cannot honestly produce a second non-J0 `shared_state_metadata` field satisfying:
+Therefore an honest S1 control cannot be produced by pretending that a second non-J0 top-level shared-state field already had equivalent `fact` status.
 
-`pre_status = fact`
+The prospective specificity unit was therefore changed **before any scientific S-arm outputs existed** from top-level state-key matching to **atomic prompt-visible factual information**.
 
-while preserving the current top-level-state-key intervention interface.
+## 4. R6-D condition namespace
 
-This is not an experimental failure. It is a **pre-execution design discovery**.
+Canonical forward condition IDs are:
 
-The correct response is to change the prospective specificity interface before any S-arm subject run, not to relabel a recommendation as a fact or hand-pick a field expected to have little effect.
+- `S0_NATURAL_REFERENCE`
+- `S1_MATCHED_OR_ORDINARY_FACTUAL_INFORMATION_DOWNGRADE`
+- `S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL`
 
-## 4. Why the control must move to atomic factual information
+The `S` namespace is reserved for R6-D target specificity.
 
-The T9 prompt contains many ordinary source-backed factual items that are visible to the same Operations Lead at the same resumed decision point, including task-input product facts such as price, gross margin and ROAS.
+R7 continues to use the separate `C1/C2/C3` structural-handling namespace. S/C aliasing is forbidden.
 
-These are better candidates for the user's proposed falsification control:
+## 5. S1 eligible pool and outcome-blind selection
 
-> mark one normal factual information item as `unconfirmed`, once, then observe whether downstream system inertia changes in the same way as when the J0-derived factual authority is withdrawn.
+The first control pool uses ordinary atomic task facts that are:
 
-The comparison should therefore target **prompt-visible factual information identity**, not require every candidate to already exist as a top-level `shared_state_metadata` record.
-
-## 5. Prospective v0.2 operator requirement
-
-For the scientific specificity test, S1 and S2 should use a common target-scoped prompt-visible annotation primitive:
-
-`fact -> unconfirmed`
-
-with exactly the same envelope fields and temporal rules.
-
-The operator must:
-
-- identify a frozen target locator;
-- preserve the original value/content;
-- attach exactly one experiment-origin epistemic-status annotation;
-- provide no contrary factual claim;
-- provide no replacement conclusion;
-- provide no desired terminal answer;
-- mutate no persistent Arena state;
-- reinject nothing after the first exposure;
-- allow free downstream continuation after consumption.
-
-The only intended S1/S2 difference is the frozen target locator.
-
-This v0.2 prospective operator is a **specificity-extension implementation** of the same authority-withdrawal idea. It does not rewrite or relabel the historical R5-MID A/B operator.
-
-## 6. S1 eligible-pool rule
-
-The first exact-source pool should use ordinary atomic task facts that are:
-
-- already visible in the frozen T9 prompt;
+- already visible to the resumed Operations Lead;
 - source-backed by task public context;
 - factual rather than recommendation/provisional text;
 - non-J0 targets;
 - outside the direct inventory/stockout semantic family for the first generic-uncertainty control;
 - scalar and addressable by a stable locator;
-- eligible before any S-arm outcomes exist.
+- selected before any scientific S-arm outcomes exist.
 
-The exclusion of direct inventory/stockout fields is structural and frozen **before** S-arm outcomes. It prevents the first generic-uncertainty control from accidentally becoming a second stockout intervention.
+Frozen pool rule:
 
-A stricter same-family control may be added later as a separate robustness layer; it must not replace the first selected S1 after outcomes are observed.
+`PUBLIC_CONTEXT_PRODUCT_SCALAR_NON_INVENTORY_FAMILY_v1`
 
-## 7. Frozen candidate pool
-
-Using rule `PUBLIC_CONTEXT_PRODUCT_SCALAR_NON_INVENTORY_FAMILY_v1`, the eligible pool is:
-
-- `public_context.products.A.ad_roas = 4.1`
-- `public_context.products.A.gross_margin_pct = 42`
-- `public_context.products.A.price = 299`
-- `public_context.products.B.ad_roas = 3.0`
-- `public_context.products.B.gross_margin_pct = 48`
-- `public_context.products.B.price = 459`
-- `public_context.products.C.ad_roas = 3.5`
-- `public_context.products.C.gross_margin_pct = 35`
-- `public_context.products.C.price = 199`
-
-Pool size: `9`.
-
-Selection is not based on expected experimental effect.
-
-## 8. Outcome-blind deterministic selection
+Eligible pool size: `9`.
 
 Selection rule:
 
-1. sort eligible locators lexicographically;
-2. compute `SHA256(parent_state_hash | selection_contract_id)`;
-3. interpret the digest as an integer;
-4. select `integer mod pool_size`.
+`PARENT_HASH_SEEDED_LEXICOGRAPHIC_INDEX_v1`
 
 Frozen seed hash:
 
 `7347944910449db5d12de365c29131dc86b094dee8c34cf0da53de3ed09ccbc3`
 
-Selected index: `7` of `9` zero-indexed.
+Selected index: `7` zero-indexed.
 
-Selected S1 target:
+Frozen S1 target:
 
 `public_context.products.C.gross_margin_pct = 35`
 
-This target was selected before any scientific S0/S1/S2 subject output exists.
+This selection is outcome-blind and may not be replaced after S-arm outcomes are observed.
 
-## 9. What this audit changes
+## 6. S2 exact target
 
-The audit changes **prospective implementation readiness**, not historical evidence.
+Frozen S2 target:
 
-It means:
+`shared_state.inventory_stockout_assessment_v1.A.preliminary_stock = 1520`
 
-- R5-MID A/B remains frozen and valid;
-- R6 factual report v2 remains valid;
-- S0/S1/S2 theory remains valid;
-- v0.1 top-level-state-key selector is insufficient for this exact parent;
-- a v0.2 atomic target annotation interface is required before scientific specificity execution;
-- the exact S1 pool and selected target can now be frozen prospectively.
+The exact source signal originated as:
 
-## 10. Scientific status
+`preliminary_unreconciled`
 
-The current evidence has therefore passed the **conceptual qualification** for a specificity experiment but not yet the **runtime-operator qualification** for a real subject run.
+and later entered `inventory_stockout_assessment_v1` when that containing state acquired status:
 
-Next engineering step:
+`fact`
 
-`exact-source atomic target overlay -> deterministic offline preflight -> freeze exact S0/S1/S2 plan -> paid-call gate remains closed`
+The prospective S2 intervention withdraws the acquired factual authority of this exact atomic signal. It does not replace the numerical value.
 
-## 11. Authorization boundary
+## 7. Common atomic operator
 
-This audit authorizes:
+S1 and S2 use the same prospective primitive:
 
-- offline source parsing;
-- candidate-pool freezing;
-- operator implementation;
-- deterministic tests;
-- readiness validation.
+`ONE_SHOT_TARGET_SCOPED_EPISTEMIC_STATUS_ANNOTATION`
+
+Prompt-visible delta:
+
+```json
+{
+  "target_locator": "<frozen locator>",
+  "epistemic_status": "unconfirmed"
+}
+```
+
+Frozen invariants:
+
+- original target value preserved;
+- from-status class `fact`;
+- to-status `unconfirmed`;
+- exactly one experiment-origin direct exposure;
+- zero experiment-origin reinjection;
+- zero persistent experiment-origin state mutation;
+- no opposite factual claim;
+- no replacement conclusion;
+- no desired terminal answer;
+- free continuation after consumption.
+
+Only target identity/provenance differs between S1 and S2.
+
+## 8. Historical boundary
+
+The atomic v0.2 specificity operator is prospective.
+
+It is **not** represented as an exact replay of the historical R5-MID operator:
+
+`shared_state_metadata.inventory_stockout_assessment_v1.status: fact -> unconfirmed`
+
+Historical R5-MID A/B evidence remains frozen and is not retroactively relabelled S0/S2.
+
+## 9. Offline implementation status
+
+Implemented:
+
+- exact-source binding;
+- outcome-blind S1 pool and selection record;
+- common atomic one-shot operator;
+- conditional prompt support;
+- copied-runtime-view transformation;
+- one-shot consumption and no-reinjection evidence;
+- source-runtime immutability check;
+- original-value preservation check;
+- deterministic exact-source preflight;
+- unit tests;
+- cross-contract validator;
+- offline CI;
+- atomic plan and preflight schemas.
+
+These are **engineering readiness evidence only**.
+
+They do not create scientific S0/S1/S2 subject outcomes.
+
+## 10. Next freeze boundary
+
+Before any scientific S-arm execution, the repository should bind a branch-head exact prepared plan containing at minimum:
+
+- source parent/evidence hashes;
+- S1 selection record hash;
+- S1/S2 envelope hashes;
+- canonical R6-D condition IDs;
+- natural-baseline/process-distance contract;
+- observation horizon/censoring rule;
+- plan hash;
+- code SHA;
+- `NOT_AUTHORIZED` run gate.
+
+Only after that freeze and explicit user authorization may a real provider subject run be considered.
+
+## 11. Scientific status
+
+Current status:
+
+- exact source audited: **YES**;
+- S1 selected outcome-blind: **YES**;
+- atomic S1/S2 operator implemented: **YES**;
+- deterministic offline preflight available: **YES**;
+- scientific S-arm outcomes: **NO**;
+- target specificity established: **NO**;
+- CPR adjudicated: **NO**;
+- paid provider authorization: **NO**.
+
+## 12. Authorization boundary
+
+This audit authorizes offline parsing, selection, implementation, testing, schema validation and exact-plan freezing only.
 
 It does **not** authorize:
 
-- any new provider subject call;
-- any paid evaluator call;
-- semantic CPR adjudication;
+- a scientific provider subject call;
+- a paid evaluator call;
+- CPR semantic adjudication;
 - mutation of historical frozen evidence.
