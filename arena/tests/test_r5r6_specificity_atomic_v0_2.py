@@ -23,7 +23,8 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class AtomicSpecificityV02Tests(unittest.TestCase):
     def _domain(self):
-        return json.load(open(ROOT / "arena/domains/ecommerce.json", encoding="utf-8"))
+        with (ROOT / "arena/domains/ecommerce.json").open("r", encoding="utf-8") as f:
+            return json.load(f)
 
     def _runtime(self):
         return {
