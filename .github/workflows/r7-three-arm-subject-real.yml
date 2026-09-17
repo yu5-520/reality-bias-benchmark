@@ -1,0 +1,341 @@
+name: R7 Three-Arm Formal Subject Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      replicates:
+        description: 'Matched triads; fixed before outcomes are visible'
+        required: true
+        default: '2'
+        type: string
+      per_branch_spending_ceiling_usd:
+        description: 'Hard per-branch engineering ceiling in USD'
+        required: true
+        default: '0.25'
+        type: string
+      total_spending_ceiling_usd:
+        description: 'Hard total engineering ceiling in USD; must cover all branch ceilings'
+        required: true
+        default: '1.50'
+        type: string
+      per_branch_max_calls:
+        description: 'Hard subject-call cap for each branch'
+        required: true
+        default: '64'
+        type: string
+      confirm:
+        description: 'Type CALL_REAL_R7_THREE_ARM_API to authorize subject calls; PREPARE_ONLY makes zero provider calls'
+        required: true
+        default: 'PREPARE_ONLY'
+        type: string
+
+concurrency:
+  group: r7-three-arm-formal-subject
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  R7_MODEL_CONFIG: arena/config/model_deepseek_v0.2.json
+  R7_PROVIDER: deepseek
+  R7_CURRENCY: USD
+  R7_REPLICATES: ${{ inputs.replicates }}
+  R7_PER_BRANCH_CEILING: ${{ inputs.per_branch_spending_ceiling_usd }}
+  R7_TOTAL_CEILING: ${{ inputs.total_spending_ceiling_usd }}
+  R7_PER_BRANCH_MAX_CALLS: ${{ inputs.per_branch_max_calls }}
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout exact workflow commit
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate protocol before source access
+        run: |
+          set -euo pipefail
+          python scripts/validate_r7_protocol.py configs/r7/r7_three_arm_fixture.example.json
+          python -m arena.r7_structural_control_preflight --outdir "$RUNNER_TEMP/r7_contract_preflight"
+
+      - name: Resolve and verify exact frozen source artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY' > "$RUNNER_TEMP/r7_source.env"
+          import json
+          p=json.load(open('configs/r7/r7_three_arm_fixture.example.json'))['frozen_parent']
+          print('PREP_RUN_ID='+str(p['prepared_workflow_run_id']))
+          print('PREP_ARTIFACT_ID='+str(p['prepared_artifact_id']))
+          print('PREP_ARTIFACT_NAME='+p['prepared_artifact_name'])
+          print('PREP_ARTIFACT_DIGEST='+p['prepared_artifact_digest'])
+          print('PREP_INNER_SHA='+p['prepared_inner_tar_sha256'])
+          print('RAW_RUN_ID='+str(p['source_raw_workflow_run_id']))
+          print('RAW_ARTIFACT_ID='+str(p['source_raw_artifact_id']))
+          print('RAW_ARTIFACT_NAME='+p['source_raw_artifact_name'])
+          print('RAW_ARTIFACT_DIGEST='+p['source_raw_artifact_digest'])
+          print('RAW_INNER_SHA='+p['source_raw_inner_tar_sha256'])
+          PY
+          source "$RUNNER_TEMP/r7_source.env"
+          python - <<'PY'
+          import json, subprocess
+          p=json.load(open('configs/r7/r7_three_arm_fixture.example.json'))['frozen_parent']
+          checks=[
+              (p['prepared_workflow_run_id'],p['prepared_artifact_id'],p['prepared_artifact_name'],p['prepared_artifact_digest']),
+              (p['source_raw_workflow_run_id'],p['source_raw_artifact_id'],p['source_raw_artifact_name'],p['source_raw_artifact_digest']),
+          ]
+          for run_id,artifact_id,name,digest in checks:
+              payload=json.loads(subprocess.check_output(['gh','api',f"repos/${{ github.repository }}/actions/runs/{run_id}/artifacts"], text=True))
+              rows=[x for x in payload['artifacts'] if x['id']==artifact_id and x['name']==name]
+              assert len(rows)==1
+              assert rows[0].get('digest')==digest
+              assert not rows[0].get('expired')
+          print('R7_FORMAL_SOURCE_ARTIFACTS=EXACT_MATCH')
+          PY
+
+      - name: Download frozen parent plan and natural snapshots
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          source "$RUNNER_TEMP/r7_source.env"
+          mkdir -p "$RUNNER_TEMP/r7_r5_artifact" "$RUNNER_TEMP/r7_r5_prepared" "$RUNNER_TEMP/r7_raw_artifact" "$RUNNER_TEMP/r7_raw_source"
+          gh run download "$PREP_RUN_ID" --repo '${{ github.repository }}' --name "$PREP_ARTIFACT_NAME" --dir "$RUNNER_TEMP/r7_r5_artifact"
+          cd "$RUNNER_TEMP/r7_r5_artifact"
+          sha256sum -c r5mid_prospective_one_shot_prepared_v0_3.tar.gz.sha256
+          test "$(sha256sum r5mid_prospective_one_shot_prepared_v0_3.tar.gz | awk '{print $1}')" = "$PREP_INNER_SHA"
+          tar -xzf r5mid_prospective_one_shot_prepared_v0_3.tar.gz -C "$RUNNER_TEMP/r7_r5_prepared"
+
+          gh run download "$RAW_RUN_ID" --repo '${{ github.repository }}' --name "$RAW_ARTIFACT_NAME" --dir "$RUNNER_TEMP/r7_raw_artifact"
+          cd "$RUNNER_TEMP/r7_raw_artifact"
+          sha256sum -c prospective_natural_raw_bundle.tar.gz.sha256
+          test "$(sha256sum prospective_natural_raw_bundle.tar.gz | awk '{print $1}')" = "$RAW_INNER_SHA"
+          tar -xzf prospective_natural_raw_bundle.tar.gz -C "$RUNNER_TEMP/r7_raw_source"
+          cd "$GITHUB_WORKSPACE"
+
+      - name: Build exact formal R7 plan before any provider call
+        run: |
+          set -euo pipefail
+          python -m arena.prepare_r7_three_arm_plan \
+            --protocol configs/r7/r7_three_arm_fixture.example.json \
+            --r5-plan-dir "$RUNNER_TEMP/r7_r5_prepared/results/r5mid_prospective_one_shot_plan_v0_3" \
+            --source-snapshots "$RUNNER_TEMP/r7_raw_source/results/prospective_natural_raw/snapshots/prospective-ecommerce-natural-0001.jsonl" \
+            --replicates "$R7_REPLICATES" \
+            --plan-code-sha '${{ github.sha }}' \
+            --outdir results/r7_formal_plan
+
+      - name: Guarded real-run preflight — still zero provider calls
+        run: |
+          set -euo pipefail
+          python -m arena.run_r7_three_arm_real \
+            --plan-dir results/r7_formal_plan \
+            --source-r5-plan-dir "$RUNNER_TEMP/r7_r5_prepared/results/r5mid_prospective_one_shot_plan_v0_3" \
+            --model-config "$R7_MODEL_CONFIG" \
+            --provider "$R7_PROVIDER" \
+            --execution-code-sha '${{ github.sha }}' \
+            --per-branch-max-calls "$R7_PER_BRANCH_MAX_CALLS" \
+            --per-branch-spending-ceiling "$R7_PER_BRANCH_CEILING" \
+            --global-spending-ceiling "$R7_TOTAL_CEILING" \
+            --currency "$R7_CURRENCY" \
+            --preflight-only
+
+      - name: Freeze dispatch request separately from execution authorization
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, pathlib
+          plan=json.load(open('results/r7_formal_plan/r7_plan.json'))
+          record={
+              'schema':'RB-R7-FORMAL-DISPATCH-AUTHORIZATION-v0.1',
+              'workflow_run_id':'${{ github.run_id }}',
+              'workflow_sha':'${{ github.sha }}',
+              'workflow_ref':'${{ github.ref }}',
+              'confirm_input':'${{ inputs.confirm }}',
+              'authorization_phrase_required':'CALL_REAL_R7_THREE_ARM_API',
+              'authorization_granted_by_dispatch_input':'${{ inputs.confirm }}' == 'CALL_REAL_R7_THREE_ARM_API',
+              'replicates':int(os.environ['R7_REPLICATES']),
+              'planned_branch_count':plan['branch_row_count'],
+              'plan_hash':plan['plan_hash'],
+              'common_reference_parent_state_hash':plan['source_binding']['source_parent_state_hash'],
+              'c3_recovery_checkpoint_state_hash':plan['source_binding']['source_recovery_checkpoint_hash'],
+              'per_branch_spending_ceiling_usd':float(os.environ['R7_PER_BRANCH_CEILING']),
+              'total_spending_ceiling_usd':float(os.environ['R7_TOTAL_CEILING']),
+              'per_branch_max_calls':int(os.environ['R7_PER_BRANCH_MAX_CALLS']),
+              'provider':'deepseek',
+              'model_config':'arena/config/model_deepseek_v0.2.json',
+              'automatic_paid_evaluator':False,
+              'semantic_cpr_status':'NOT_ADJUDICATED',
+              'note':'This record freezes the manual dispatch inputs. Provider calls occur only in the separately gated subject job.'
+          }
+          pathlib.Path('results/r7_dispatch_authorization.json').write_text(json.dumps(record,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          PY
+
+      - name: Archive exact prepared plan and dispatch record
+        run: |
+          set -euo pipefail
+          mkdir -p prepared_bundle
+          cp -r results/r7_formal_plan prepared_bundle/plan
+          cp results/r7_dispatch_authorization.json prepared_bundle/authorization.json
+          tar -czf r7_formal_prepared_bundle.tar.gz prepared_bundle
+          sha256sum r7_formal_prepared_bundle.tar.gz > r7_formal_prepared_bundle.tar.gz.sha256
+
+      - name: Upload exact prepared formal bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-formal-prepared-${{ github.run_id }}
+          path: |
+            r7_formal_prepared_bundle.tar.gz
+            r7_formal_prepared_bundle.tar.gz.sha256
+          retention-days: 90
+
+  subject:
+    needs: prepare
+    if: ${{ inputs.confirm == 'CALL_REAL_R7_THREE_ARM_API' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Checkout exact workflow commit
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Download exact plan prepared in this workflow run
+        uses: actions/download-artifact@v4
+        with:
+          name: r7-formal-prepared-${{ github.run_id }}
+          path: prepared_artifact
+
+      - name: Verify and unpack exact prepared bundle
+        run: |
+          set -euo pipefail
+          cd prepared_artifact
+          sha256sum -c r7_formal_prepared_bundle.tar.gz.sha256
+          mkdir -p "$RUNNER_TEMP/r7_prepared"
+          tar -xzf r7_formal_prepared_bundle.tar.gz -C "$RUNNER_TEMP/r7_prepared"
+          cd "$GITHUB_WORKSPACE"
+          python - <<'PY'
+          import json, os
+          a=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'r7_prepared/prepared_bundle/authorization.json')))
+          p=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'r7_prepared/prepared_bundle/plan/r7_plan.json')))
+          assert a['authorization_granted_by_dispatch_input'] is True
+          assert a['confirm_input']=='CALL_REAL_R7_THREE_ARM_API'
+          assert a['workflow_sha']=='${{ github.sha }}'
+          assert a['plan_hash']==p['plan_hash']
+          assert a['automatic_paid_evaluator'] is False
+          assert a['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('R7_EXACT_PREPARED_AUTHORIZATION=VERIFIED')
+          PY
+
+      - name: Download exact frozen source R5 plan for runner binding
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY' > "$RUNNER_TEMP/r7_source.env"
+          import json
+          p=json.load(open('configs/r7/r7_three_arm_fixture.example.json'))['frozen_parent']
+          print('PREP_RUN_ID='+str(p['prepared_workflow_run_id']))
+          print('PREP_ARTIFACT_NAME='+p['prepared_artifact_name'])
+          print('PREP_INNER_SHA='+p['prepared_inner_tar_sha256'])
+          PY
+          source "$RUNNER_TEMP/r7_source.env"
+          mkdir -p "$RUNNER_TEMP/r7_r5_artifact" "$RUNNER_TEMP/r7_r5_prepared"
+          gh run download "$PREP_RUN_ID" --repo '${{ github.repository }}' --name "$PREP_ARTIFACT_NAME" --dir "$RUNNER_TEMP/r7_r5_artifact"
+          cd "$RUNNER_TEMP/r7_r5_artifact"
+          sha256sum -c r5mid_prospective_one_shot_prepared_v0_3.tar.gz.sha256
+          test "$(sha256sum r5mid_prospective_one_shot_prepared_v0_3.tar.gz | awk '{print $1}')" = "$PREP_INNER_SHA"
+          tar -xzf r5mid_prospective_one_shot_prepared_v0_3.tar.gz -C "$RUNNER_TEMP/r7_r5_prepared"
+
+      - name: Execute guarded real R7 subject batch
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          python -m arena.run_r7_three_arm_real \
+            --plan-dir "$RUNNER_TEMP/r7_prepared/prepared_bundle/plan" \
+            --source-r5-plan-dir "$RUNNER_TEMP/r7_r5_prepared/results/r5mid_prospective_one_shot_plan_v0_3" \
+            --outdir results/r7_subject_raw \
+            --model-config "$R7_MODEL_CONFIG" \
+            --provider "$R7_PROVIDER" \
+            --execution-code-sha '${{ github.sha }}' \
+            --per-branch-max-calls "$R7_PER_BRANCH_MAX_CALLS" \
+            --per-branch-spending-ceiling "$R7_PER_BRANCH_CEILING" \
+            --global-spending-ceiling "$R7_TOTAL_CEILING" \
+            --currency "$R7_CURRENCY" \
+            --authorization-phrase CALL_REAL_R7_THREE_ARM_API \
+            --execute-real-api
+
+      - name: Freeze raw R7 evidence before any derivation
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -s results/r7_subject_raw/traces.jsonl ]; then
+            python -m arena.freeze_r7_evidence \
+              --raw-dir results/r7_subject_raw \
+              --plan-dir "$RUNNER_TEMP/r7_prepared/prepared_bundle/plan" \
+              --authorization-record "$RUNNER_TEMP/r7_prepared/prepared_bundle/authorization.json" \
+              --out results/r7_subject_raw/evidence_batch.json
+          else
+            echo 'No R7 subject trace produced; preserving execution outputs without fabricating an evidence batch.'
+          fi
+
+      - name: Archive raw evidence before structural derivation
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p frozen_binding
+          cp -r "$RUNNER_TEMP/r7_prepared/prepared_bundle/plan" frozen_binding/plan
+          cp "$RUNNER_TEMP/r7_prepared/prepared_bundle/authorization.json" frozen_binding/authorization.json
+          tar -czf r7_subject_raw_bundle.tar.gz results/r7_subject_raw frozen_binding
+          sha256sum r7_subject_raw_bundle.tar.gz > r7_subject_raw_bundle.tar.gz.sha256
+
+      - name: Upload immutable raw R7 evidence first
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-formal-raw-${{ github.run_id }}
+          path: |
+            r7_subject_raw_bundle.tar.gz
+            r7_subject_raw_bundle.tar.gz.sha256
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Derive structural R7 measurements only from frozen evidence
+        if: success()
+        run: |
+          set -euo pipefail
+          test -s results/r7_subject_raw/evidence_batch.json
+          python -m arena.derive_r7_process_measurements \
+            --plan-dir "$RUNNER_TEMP/r7_prepared/prepared_bundle/plan" \
+            --traces results/r7_subject_raw/traces.jsonl \
+            --evidence-batch results/r7_subject_raw/evidence_batch.json \
+            --outdir results/r7_subject_derived
+
+      - name: Archive derived structural evidence separately
+        if: success()
+        run: |
+          set -euo pipefail
+          tar -czf r7_subject_derived_bundle.tar.gz results/r7_subject_derived
+          sha256sum r7_subject_derived_bundle.tar.gz > r7_subject_derived_bundle.tar.gz.sha256
+
+      - name: Upload derived R7 structural evidence — no semantic reviewer
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-formal-derived-${{ github.run_id }}
+          path: |
+            r7_subject_derived_bundle.tar.gz
+            r7_subject_derived_bundle.tar.gz.sha256
+          retention-days: 90

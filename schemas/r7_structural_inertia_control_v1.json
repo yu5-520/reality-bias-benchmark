@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-R7-STRUCTURAL-INERTIA-CONTROL-v1.2",
+  "title": "R7 Structural Inertia Control Protocol",
+  "type": "object",
+  "required": [
+    "protocol_id",
+    "frozen_parent",
+    "jump",
+    "recovery_checkpoint",
+    "semantic_payload",
+    "matched_horizon",
+    "arms",
+    "measurement_schema",
+    "integrity"
+  ],
+  "properties": {
+    "protocol_id": {"const": "RB-R7-STRUCTURAL-INERTIA-CONTROL-v1.2"},
+    "frozen_parent": {
+      "type": "object",
+      "required": [
+        "parent_state_hash",
+        "source_run_id",
+        "source_plan_hash",
+        "prepared_workflow_run_id",
+        "prepared_artifact_id",
+        "prepared_artifact_name",
+        "prepared_artifact_digest",
+        "prepared_inner_tar_sha256",
+        "source_raw_workflow_run_id",
+        "source_raw_artifact_id",
+        "source_raw_artifact_name",
+        "source_raw_artifact_digest",
+        "source_raw_inner_tar_sha256"
+      ],
+      "properties": {
+        "parent_state_hash": {"type": "string", "minLength": 16},
+        "source_run_id": {"type": ["string", "integer"]},
+        "code_sha": {"type": "string"},
+        "source_plan_hash": {"type": "string", "minLength": 16},
+        "prepared_workflow_run_id": {"type": "integer", "minimum": 1},
+        "prepared_artifact_id": {"type": "integer", "minimum": 1},
+        "prepared_artifact_name": {"type": "string", "minLength": 1},
+        "prepared_artifact_digest": {"type": "string", "minLength": 1},
+        "prepared_inner_tar_sha256": {"type": "string", "minLength": 16},
+        "source_raw_workflow_run_id": {"type": "integer", "minimum": 1},
+        "source_raw_artifact_id": {"type": "integer", "minimum": 1},
+        "source_raw_artifact_name": {"type": "string", "minLength": 1},
+        "source_raw_artifact_digest": {"type": "string", "minLength": 1},
+        "source_raw_inner_tar_sha256": {"type": "string", "minLength": 16}
+      },
+      "additionalProperties": true
+    },
+    "jump": {
+      "type": "object",
+      "required": ["jump_id", "source_event", "source_event_index", "actor", "state_key", "target_path"],
+      "properties": {
+        "jump_id": {"type": "string"},
+        "source_event": {"type": "string"},
+        "source_event_index": {"type": "integer", "minimum": 0},
+        "actor": {"type": "string"},
+        "state_key": {"type": "string", "minLength": 1},
+        "target_path": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "recovery_checkpoint": {
+      "type": "object",
+      "required": [
+        "anchor_ref",
+        "state_hash",
+        "turns",
+        "event_count",
+        "queue_head",
+        "relation_to_jump",
+        "common_reference_parent_remains"
+      ],
+      "properties": {
+        "anchor_ref": {"type": "string", "minLength": 1},
+        "state_hash": {"type": "string", "minLength": 16},
+        "turns": {"type": "integer", "minimum": 0},
+        "event_count": {"type": "integer", "minimum": 0},
+        "queue_head": {"type": "string", "minLength": 1},
+        "relation_to_jump": {"const": "immediate_pre_authority_ancestor_turn_checkpoint"},
+        "common_reference_parent_remains": {"const": "after_turn:8"}
+      },
+      "additionalProperties": false
+    },
+    "semantic_payload": {
+      "type": "object",
+      "required": ["payload_id", "target_path", "operation", "from", "to"],
+      "properties": {
+        "payload_id": {"type": "string"},
+        "target_path": {"type": "string"},
+        "operation": {"const": "replace_prompt_visible_value_or_authority_commit_status"},
+        "from": {},
+        "to": {}
+      },
+      "additionalProperties": true
+    },
+    "matched_horizon": {
+      "type": "object",
+      "required": [
+        "horizon_id",
+        "distance_basis",
+        "post_jump_turn_cap",
+        "termination_policy",
+        "early_termination_policy",
+        "comparison_policy"
+      ],
+      "properties": {
+        "horizon_id": {"type": "string", "minLength": 1},
+        "distance_basis": {"const": "post_jump_agent_turn"},
+        "post_jump_turn_cap": {"type": "integer", "minimum": 1},
+        "termination_policy": {"const": "natural_termination_or_common_cap"},
+        "early_termination_policy": {"const": "record_as_censored_not_extended"},
+        "comparison_policy": {"const": "compare_only_observed_matched_distances_and_preserve_censoring"}
+      },
+      "additionalProperties": false
+    },
+    "arms": {
+      "type": "object",
+      "required": ["C1_ONE_SHOT", "C2_PERSISTENT_FIELD", "C3_ALR"],
+      "properties": {
+        "C1_ONE_SHOT": {"$ref": "#/$defs/promptArm"},
+        "C2_PERSISTENT_FIELD": {"$ref": "#/$defs/promptArm"},
+        "C3_ALR": {"$ref": "#/$defs/alrArm"}
+      },
+      "additionalProperties": false
+    },
+    "measurement_schema": {"type": "string", "minLength": 1},
+    "integrity": {
+      "type": "object",
+      "required": [
+        "semantic_payload_equal_across_arms",
+        "same_reference_parent",
+        "same_jump",
+        "same_horizon",
+        "c3_rollback_checkpoint_explicit",
+        "early_termination_preserved_as_censoring",
+        "provider_hidden_state_replay_forbidden",
+        "fail_closed"
+      ],
+      "properties": {
+        "semantic_payload_equal_across_arms": {"const": true},
+        "same_reference_parent": {"const": true},
+        "same_jump": {"const": true},
+        "same_horizon": {"const": true},
+        "c3_rollback_checkpoint_explicit": {"const": true},
+        "early_termination_preserved_as_censoring": {"const": true},
+        "provider_hidden_state_replay_forbidden": {"const": true},
+        "fail_closed": {"const": true}
+      },
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "promptArm": {
+      "type": "object",
+      "required": ["mode", "propagation_policy", "max_exposures", "observation_horizon_id", "persistent_parent_mutation"],
+      "properties": {
+        "mode": {"type": "string"},
+        "propagation_policy": {"type": "string"},
+        "max_exposures": {"type": "integer", "minimum": 1},
+        "observation_horizon_id": {"type": "string", "minLength": 1},
+        "persistent_parent_mutation": {"const": false}
+      },
+      "additionalProperties": true
+    },
+    "alrArm": {
+      "type": "object",
+      "required": [
+        "mode",
+        "propagation_policy",
+        "authority_anchor_policy",
+        "closure_policy",
+        "preserve_unaffected",
+        "revision_required",
+        "observation_horizon_id",
+        "common_reference_parent_mutation",
+        "provider_internal_state_replayed"
+      ],
+      "properties": {
+        "mode": {"const": "authority_localized_recovery"},
+        "propagation_policy": {"const": "rollback_to_pre_authority_checkpoint_reexecute_and_transform_target_authority_commit_once"},
+        "authority_anchor_policy": {"const": "earliest_authority_violating_ancestor"},
+        "closure_policy": {"const": "rollback_reexecutes_authority_ancestor_turn_then_observes_new_descendant_lineage"},
+        "preserve_unaffected": {"const": true},
+        "revision_required": {"const": true},
+        "observation_horizon_id": {"type": "string", "minLength": 1},
+        "common_reference_parent_mutation": {"const": false},
+        "provider_internal_state_replayed": {"const": false}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

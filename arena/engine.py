@@ -1,3 +1,4 @@
+import copy
 import json
 from datetime import datetime, timezone
 from collections import defaultdict
@@ -76,13 +77,20 @@ def run_arena_once(
     branch_manifest=None,
     state_snapshot_callback=None,
     runtime_view_transform=None,
+    action_envelope_transform=None,
 ):
     """Run one Arena continuation.
 
     runtime_view_transform is an optional experimental instrumentation hook. It may
     transform only the copied runtime view passed to prompt construction and return
     either a view or (view, evidence_record). It must not mutate Arena persistent
-    state. Historical runs are unchanged when the hook is omitted.
+    state.
+
+    action_envelope_transform is an optional post-parse/pre-realization hook. It
+    receives a deep copy of the parsed agent envelope and may return either an
+    envelope or (envelope, evidence_record). The raw provider response and original
+    parsed envelope remain preserved in the trace. Historical runs are unchanged
+    when both hooks are omitted.
     """
     loop_settings = validate_loop_budget_config(config)
     if initial_state_snapshot is None:
@@ -100,6 +108,7 @@ def run_arena_once(
     amap = {a['id']: a for a in domain['agents']}
     model_calls = []
     runtime_transform_records = []
+    action_transform_records = []
     branch_parent_state_hash = branch_manifest.get('parent_state_hash') if branch_manifest is not None else (initial_state_snapshot.get('state_hash') if initial_state_snapshot else None)
     branch_start_state_hash = initial_state_snapshot.get('state_hash') if initial_state_snapshot else None
 
@@ -158,11 +167,33 @@ def run_arena_once(
                 'transport_latency_ms': response.get('transport_latency_ms'),
                 'raw_content': response.get('content'),
             })
-            envelope = parse_envelope(response['content'])
+            raw_envelope = parse_envelope(response['content'])
             if recorder:
                 recorder({'record_type': 'provider_response', 'record': call})
-            call['parsed_envelope'] = envelope
-            call['decision_summary'] = envelope.get('decision_summary', '')
+
+            envelope = raw_envelope
+            if action_envelope_transform is not None:
+                transformed = action_envelope_transform(
+                    actor=actor,
+                    turn=state.turns,
+                    envelope=copy.deepcopy(raw_envelope),
+                )
+                action_record = None
+                if isinstance(transformed, tuple) and len(transformed) == 2:
+                    envelope, action_record = transformed
+                else:
+                    envelope = transformed
+                if not isinstance(envelope, dict):
+                    raise ValueError('action_envelope_transform_must_return_envelope_dict')
+                if action_record is not None:
+                    action_transform_records.append(action_record)
+                    if recorder:
+                        recorder({'record_type': 'action_envelope_transformed', 'record': action_record})
+
+            call['parsed_envelope'] = raw_envelope
+            if action_envelope_transform is not None:
+                call['applied_envelope'] = envelope
+            call['decision_summary'] = raw_envelope.get('decision_summary', '')
             call['status'] = 'completed'
             state.apply_actions(actor, envelope)
             state.mark_execution(actor, state.turns, True)
@@ -267,6 +298,7 @@ def run_arena_once(
         'events': state.events,
         'model_calls': model_calls,
         'runtime_transform_records': runtime_transform_records,
+        'action_transform_records': action_transform_records,
     }
     if branch_manifest is not None:
         trace['experimental_branch'] = {
