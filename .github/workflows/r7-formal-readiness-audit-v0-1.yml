@@ -1,0 +1,297 @@
+name: R7 Formal Readiness Audit v0.1
+
+on:
+  push:
+    paths:
+      - 'manifests/r7_formal_readiness_audit_v0_1_2026-09-17.json'
+      - '.github/workflows/r7-formal-readiness-audit-v0-1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: r7-formal-readiness-audit-v01
+  cancel-in-progress: false
+
+env:
+  AUDIT_REQUEST: manifests/r7_formal_readiness_audit_v0_1_2026-09-17.json
+  R7_PROTOCOL: configs/r7/r7_three_arm_fixture.example.json
+  R7_MODEL_CONFIG: arena/config/model_deepseek_v0.2.json
+  R7_PROVIDER: deepseek
+
+jobs:
+  readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout exact audit commit
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify offline-only audit authorization boundary
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          m=json.load(open('manifests/r7_formal_readiness_audit_v0_1_2026-09-17.json'))
+          assert m['schema']=='RB-R7-FORMAL-READINESS-AUDIT-REQUEST-v0.1'
+          assert m['scope']=='OFFLINE_EXACT_SOURCE_R7_FORMAL_READINESS_AUDIT_ONLY'
+          assert m['protocol_id']=='RB-R7-STRUCTURAL-INERTIA-CONTROL-v1.2'
+          assert m['measurement_schema']=='RB-PROCESS-REALITY-MECHANISM-MEASUREMENT-v0.4'
+          assert m['audit_plan']['replicates']==2
+          assert m['audit_plan']['planned_branch_count']==6
+          assert m['paid_subject_authorized'] is False
+          assert m['paid_evaluator_authorized'] is False
+          assert m['new_subject_provider_call'] is False
+          assert m['semantic_cpr_status']=='NOT_ADJUDICATED'
+          assert m['terminal_outcome_is_primary'] is False
+          assert m['same_parent_repeats_are_independent_samples'] is False
+          print('R7_READINESS_AUDIT_SCOPE=OFFLINE_ONLY')
+          print('PAID_SUBJECT_AUTHORIZED=NO')
+          PY
+
+      - name: Validate protocol and full offline test suite
+        run: |
+          set -euo pipefail
+          python scripts/validate_r7_protocol.py "$R7_PROTOCOL"
+          python arena/validate_environment.py
+          python -m unittest discover -s arena/tests -v
+          python -m arena.r7_structural_control_preflight --outdir results/r7_contract_preflight
+
+      - name: Resolve exact frozen source artifact bindings
+        run: |
+          set -euo pipefail
+          python - <<'PY' > "$RUNNER_TEMP/r7_source.env"
+          import json
+          p=json.load(open('configs/r7/r7_three_arm_fixture.example.json'))['frozen_parent']
+          print('PREP_RUN_ID='+str(p['prepared_workflow_run_id']))
+          print('PREP_ARTIFACT_ID='+str(p['prepared_artifact_id']))
+          print('PREP_ARTIFACT_NAME='+p['prepared_artifact_name'])
+          print('PREP_ARTIFACT_DIGEST='+p['prepared_artifact_digest'])
+          print('PREP_INNER_SHA='+p['prepared_inner_tar_sha256'])
+          print('RAW_RUN_ID='+str(p['source_raw_workflow_run_id']))
+          print('RAW_ARTIFACT_ID='+str(p['source_raw_artifact_id']))
+          print('RAW_ARTIFACT_NAME='+p['source_raw_artifact_name'])
+          print('RAW_ARTIFACT_DIGEST='+p['source_raw_artifact_digest'])
+          print('RAW_INNER_SHA='+p['source_raw_inner_tar_sha256'])
+          PY
+
+      - name: Verify and download exact frozen source artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          source "$RUNNER_TEMP/r7_source.env"
+          python - <<'PY'
+          import json, subprocess
+          p=json.load(open('configs/r7/r7_three_arm_fixture.example.json'))['frozen_parent']
+          checks=[
+            (p['prepared_workflow_run_id'],p['prepared_artifact_id'],p['prepared_artifact_name'],p['prepared_artifact_digest']),
+            (p['source_raw_workflow_run_id'],p['source_raw_artifact_id'],p['source_raw_artifact_name'],p['source_raw_artifact_digest']),
+          ]
+          for run_id,aid,name,digest in checks:
+              payload=json.loads(subprocess.check_output(['gh','api',f"repos/${{ github.repository }}/actions/runs/{run_id}/artifacts"], text=True))
+              rows=[x for x in payload['artifacts'] if x['id']==aid and x['name']==name]
+              assert len(rows)==1
+              assert rows[0].get('digest')==digest
+              assert not rows[0].get('expired')
+          print('R7_READINESS_SOURCE_ARTIFACTS=EXACT_MATCH')
+          PY
+          mkdir -p "$RUNNER_TEMP/r7_r5_artifact" "$RUNNER_TEMP/r7_r5_prepared" "$RUNNER_TEMP/r7_raw_artifact" "$RUNNER_TEMP/r7_raw_source"
+          gh run download "$PREP_RUN_ID" --repo '${{ github.repository }}' --name "$PREP_ARTIFACT_NAME" --dir "$RUNNER_TEMP/r7_r5_artifact"
+          cd "$RUNNER_TEMP/r7_r5_artifact"
+          sha256sum -c r5mid_prospective_one_shot_prepared_v0_3.tar.gz.sha256
+          test "$(sha256sum r5mid_prospective_one_shot_prepared_v0_3.tar.gz | awk '{print $1}')" = "$PREP_INNER_SHA"
+          tar -xzf r5mid_prospective_one_shot_prepared_v0_3.tar.gz -C "$RUNNER_TEMP/r7_r5_prepared"
+          gh run download "$RAW_RUN_ID" --repo '${{ github.repository }}' --name "$RAW_ARTIFACT_NAME" --dir "$RUNNER_TEMP/r7_raw_artifact"
+          cd "$RUNNER_TEMP/r7_raw_artifact"
+          sha256sum -c prospective_natural_raw_bundle.tar.gz.sha256
+          test "$(sha256sum prospective_natural_raw_bundle.tar.gz | awk '{print $1}')" = "$RAW_INNER_SHA"
+          tar -xzf prospective_natural_raw_bundle.tar.gz -C "$RUNNER_TEMP/r7_raw_source"
+          cd "$GITHUB_WORKSPACE"
+
+      - name: Build exact six-branch R7 formal plan offline
+        run: |
+          set -euo pipefail
+          python -m arena.prepare_r7_three_arm_plan \
+            --protocol "$R7_PROTOCOL" \
+            --r5-plan-dir "$RUNNER_TEMP/r7_r5_prepared/results/r5mid_prospective_one_shot_plan_v0_3" \
+            --source-snapshots "$RUNNER_TEMP/r7_raw_source/results/prospective_natural_raw/snapshots/prospective-ecommerce-natural-0001.jsonl" \
+            --replicates 2 \
+            --plan-code-sha '${{ github.sha }}' \
+            --outdir results/r7_readiness_plan
+          python - <<'PY'
+          import json
+          p=json.load(open('results/r7_readiness_plan/r7_plan.json'))
+          assert p['protocol_id']=='RB-R7-STRUCTURAL-INERTIA-CONTROL-v1.2'
+          assert p['branch_row_count']==6
+          assert p['replicates']==2
+          assert p['source_binding']['source_parent_state_hash']=='aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c'
+          assert p['source_binding']['source_recovery_checkpoint_hash']=='99731abb4ffd1caa2e568a6c2d90987700b3d0b7a66a1c777f811b666912a349'
+          assert p['real_three_arm_runtime_mechanisms_ready'] is True
+          assert p['real_subject_execution_authorized'] is False
+          assert p['paid_subject_authorization_status']=='NOT_AUTHORIZED'
+          assert p['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('R7_EXACT_SIX_BRANCH_PLAN=READY_OFFLINE')
+          PY
+
+      - name: Exercise all three mechanisms inside deterministic Arena
+        run: |
+          set -euo pipefail
+          python -m arena.r7_runtime_smoke \
+            --plan-dir results/r7_readiness_plan \
+            --domain arena/domains/ecommerce.json \
+            --outdir results/r7_readiness_smoke
+          python - <<'PY'
+          import json
+          s=json.load(open('results/r7_readiness_smoke/summary.json'))
+          assert s['scientific_status']=='ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE'
+          assert s['c1_direct_exposures']==1
+          assert s['c2_direct_exposures']>=2
+          assert s['c2_reinjections']>=1
+          assert s['c3_authority_transform_count']==1
+          assert s['source_snapshots_immutable'] is True
+          assert s['paid_api_called'] is False
+          assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('R7_THREE_ARM_ENGINE_INTEGRATION=PASS')
+          PY
+
+      - name: Freeze engineering evidence before derivation
+        run: |
+          set -euo pipefail
+          python -m arena.freeze_r7_evidence \
+            --raw-dir results/r7_readiness_smoke \
+            --plan-dir results/r7_readiness_plan \
+            --out results/r7_readiness_smoke/evidence_batch.json
+          python - <<'PY'
+          import json
+          e=json.load(open('results/r7_readiness_smoke/evidence_batch.json'))
+          assert e['evidence_role']=='ENGINEERING_VALIDATION_EVIDENCE'
+          assert e['raw_evidence_frozen_before_derived_analysis'] is True
+          assert e['paid_evaluator_called'] is False
+          assert e['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('R7_ENGINEERING_EVIDENCE_FREEZE=PASS')
+          PY
+
+      - name: Verify frozen-evidence structural derivation path
+        run: |
+          set -euo pipefail
+          python -m arena.derive_r7_process_measurements \
+            --plan-dir results/r7_readiness_plan \
+            --traces results/r7_readiness_smoke/traces.jsonl \
+            --evidence-batch results/r7_readiness_smoke/evidence_batch.json \
+            --outdir results/r7_readiness_derived \
+            --allow-engineering-validation
+          python - <<'PY'
+          import json
+          s=json.load(open('results/r7_readiness_derived/summary.json'))
+          assert s['source_evidence_role']=='ENGINEERING_VALIDATION_EVIDENCE'
+          assert s['scientific_status']=='ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE'
+          assert s['measurement_count']==3
+          assert s['r7a_comparison_count']==1
+          assert s['r7b_comparison_count']==1
+          assert s['integrity_failure_count']==0
+          assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('R7_FREEZE_BEFORE_DERIVE_CHAIN=PASS')
+          PY
+
+      - name: Preflight guarded real runner with exact formal ceilings
+        run: |
+          set -euo pipefail
+          python -m arena.run_r7_three_arm_real \
+            --plan-dir results/r7_readiness_plan \
+            --source-r5-plan-dir "$RUNNER_TEMP/r7_r5_prepared/results/r5mid_prospective_one_shot_plan_v0_3" \
+            --model-config "$R7_MODEL_CONFIG" \
+            --provider "$R7_PROVIDER" \
+            --execution-code-sha '${{ github.sha }}' \
+            --per-branch-max-calls 64 \
+            --per-branch-spending-ceiling 0.25 \
+            --global-spending-ceiling 1.50 \
+            --currency USD \
+            --preflight-only
+
+      - name: Assert readiness audit has no provider-secret dependency
+        run: |
+          set -euo pipefail
+          if grep -nE 'DEEPSEEK_API_KEY|BAI|DASHSCOPE_API_KEY|CALL_REAL_R7_THREE_ARM_API' .github/workflows/r7-formal-readiness-audit-v0-1.yml; then
+            echo 'Readiness audit must not contain provider credentials or a real-call authorization token.' >&2
+            exit 2
+          fi
+          echo 'PASS: readiness audit is provider-secret free and cannot authorize subject calls'
+
+      - name: Write immutable readiness report
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, pathlib
+          req=json.load(open('manifests/r7_formal_readiness_audit_v0_1_2026-09-17.json'))
+          plan=json.load(open('results/r7_readiness_plan/r7_plan.json'))
+          smoke=json.load(open('results/r7_readiness_smoke/summary.json'))
+          evidence=json.load(open('results/r7_readiness_smoke/evidence_batch.json'))
+          derived=json.load(open('results/r7_readiness_derived/summary.json'))
+          report={
+            'schema':'RB-R7-FORMAL-READINESS-AUDIT-RESULT-v0.1',
+            'date':'2026-09-17',
+            'status':'FORMAL_R7_RUNTIME_AND_EVIDENCE_PIPELINE_READY_OFFLINE',
+            'audited_code_sha':'${{ github.sha }}',
+            'request_schema':req['schema'],
+            'protocol_id':plan['protocol_id'],
+            'plan_hash':plan['plan_hash'],
+            'planned_branch_count':plan['branch_row_count'],
+            'replicates':plan['replicates'],
+            'common_reference_parent_state_hash':plan['source_binding']['source_parent_state_hash'],
+            'c3_recovery_checkpoint_state_hash':plan['source_binding']['source_recovery_checkpoint_hash'],
+            'measurement_schema':plan['measurement_schema'],
+            'c1_runtime_ready':True,
+            'c2_runtime_ready':True,
+            'c3_runtime_ready':True,
+            'deterministic_smoke_summary_hash':smoke['summary_hash'],
+            'engineering_evidence_batch_hash':evidence['evidence_batch_hash'],
+            'engineering_derivation_summary_hash':derived['summary_hash'],
+            'engineering_r7a_comparison_count':derived['r7a_comparison_count'],
+            'engineering_r7b_comparison_count':derived['r7b_comparison_count'],
+            'engineering_integrity_failure_count':derived['integrity_failure_count'],
+            'real_runner_preflight_passed':True,
+            'paid_subject_authorized':False,
+            'paid_api_called':False,
+            'paid_evaluator_called':False,
+            'semantic_cpr_status':'NOT_ADJUDICATED',
+            'scientific_evidence_created':False,
+            'next_gate':'EXPLICIT_MANUAL_DISPATCH_WITH_CALL_REAL_R7_THREE_ARM_API',
+            'interpretation_boundary':'This audit proves exact-source runtime/evidence readiness only. The synthetic smoke and its derived comparisons are engineering validation, not scientific evidence of inertia steering or ALR recovery.'
+          }
+          material=json.dumps(report,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()
+          report['readiness_report_hash']=hashlib.sha256(material).hexdigest()
+          pathlib.Path('results/r7_readiness_report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+          print('R7_FORMAL_READINESS_AUDIT=PASS')
+          print('READINESS_REPORT_HASH='+report['readiness_report_hash'])
+          print('PAID_API_CALLED=NO')
+          PY
+
+      - name: Archive readiness evidence
+        run: |
+          set -euo pipefail
+          mkdir -p r7_readiness_bundle
+          cp "$AUDIT_REQUEST" r7_readiness_bundle/audit_request.json
+          cp results/r7_readiness_report.json r7_readiness_bundle/readiness_report.json
+          cp -r results/r7_readiness_plan r7_readiness_bundle/plan
+          cp -r results/r7_readiness_smoke r7_readiness_bundle/engineering_smoke
+          cp -r results/r7_readiness_derived r7_readiness_bundle/engineering_derivation
+          tar -czf r7_formal_readiness_audit_v0_1.tar.gz r7_readiness_bundle
+          sha256sum r7_formal_readiness_audit_v0_1.tar.gz > r7_formal_readiness_audit_v0_1.tar.gz.sha256
+          cat results/r7_readiness_report.json >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload R7 formal readiness artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r7-formal-readiness-v0-1-${{ github.run_id }}
+          path: |
+            r7_formal_readiness_audit_v0_1.tar.gz
+            r7_formal_readiness_audit_v0_1.tar.gz.sha256
+          retention-days: 90
