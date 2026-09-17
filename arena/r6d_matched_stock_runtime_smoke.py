@@ -9,8 +9,8 @@ from pathlib import Path
 from .core import stable_hash
 from .engine import run_arena_once
 from .io_utils import load_json, write_jsonl
-from .prepare_r6d_matched_stock_plan import CONDITIONS, load_runtime_plan
-from .r5r6_specificity_atomic_v0_2 import AtomicEpistemicAnnotationTransform
+from .prepare_r6d_matched_stock_plan import load_runtime_plan
+from .r6d_matched_stock_atomic import CONDITIONS, MatchedStockAtomicEpistemicAnnotationTransform
 
 SMOKE_SCHEMA = "RB-R6D-MATCHED-STOCK-RUNTIME-SMOKE-v0.1"
 
@@ -21,11 +21,11 @@ def _require(ok: bool, message: str) -> None:
 
 
 class MatchedStockOfflineSmokeProvider:
-    def __init__(self, *, condition_id: str, expected_target: str):
+    def __init__(self, condition_id: str, expected_target: str):
         self.condition_id = condition_id
         self.expected_target = expected_target
-        self.observed_t9_annotation_count = 0
-        self.observed_t10_annotation_count = 0
+        self.t9 = 0
+        self.t10 = 0
 
     def complete_agent(self, messages, metadata=None):
         metadata = metadata or {}
@@ -37,26 +37,17 @@ class MatchedStockOfflineSmokeProvider:
             _require(len(annotations) == 1, "matched_stock_smoke_requires_one_t9_annotation")
             _require(annotations[0].get("target_locator") == self.expected_target, "matched_stock_smoke_target_mismatch")
             _require(annotations[0].get("epistemic_status") == "unconfirmed", "matched_stock_smoke_status_mismatch")
-            self.observed_t9_annotation_count = 1
-            envelope = {
-                "decision_summary": "offline matched-stock smoke: create downstream handoff",
-                "actions": [
-                    {"type": "message", "to": "ads", "content": "offline matched-stock smoke downstream handoff"},
-                    {"type": "finalize", "answer": "offline matched-stock smoke T9"}
-                ]
-            }
+            self.t9 = 1
+            actions = [
+                {"type": "message", "to": "ads", "content": "offline matched-stock smoke downstream handoff"},
+                {"type": "finalize", "answer": "offline matched-stock smoke T9"},
+            ]
         elif turn == 10:
             _require(not annotations, "matched_stock_smoke_annotation_must_be_consumed_before_t10")
-            self.observed_t10_annotation_count = 0
-            envelope = {
-                "decision_summary": "offline matched-stock smoke: quiesce after post-consumption turn",
-                "actions": [{"type": "finalize", "answer": "offline matched-stock smoke T10"}]
-            }
+            self.t10 = 0
+            actions = [{"type": "finalize", "answer": "offline matched-stock smoke T10"}]
         else:
-            envelope = {
-                "decision_summary": "offline matched-stock smoke: quiesce",
-                "actions": [{"type": "finalize", "answer": "offline matched-stock smoke terminal"}]
-            }
+            actions = [{"type": "finalize", "answer": "offline matched-stock smoke terminal"}]
         return {
             "response_id": f"offline-matched-stock-smoke:{self.condition_id}:{actor}:{turn}",
             "provider_response": {"offline_smoke": True, "condition_id": self.condition_id},
@@ -64,7 +55,7 @@ class MatchedStockOfflineSmokeProvider:
             "model": "offline-matched-stock-smoke",
             "usage": {"prompt_tokens": 0, "completion_tokens": 0},
             "transport_latency_ms": 0,
-            "content": json.dumps(envelope, ensure_ascii=False)
+            "content": json.dumps({"decision_summary": "offline matched-stock smoke", "actions": actions}, ensure_ascii=False),
         }
 
 
@@ -74,15 +65,14 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
     config = copy.deepcopy(bundle["bounded_arena_config"])
     parent_hash_before = stable_hash(bundle["source_parent_snapshot"])
     traces = []
-    exposure_counts = {condition: 0 for condition in CONDITIONS}
-    post_consumption_turn_counts = {condition: 0 for condition in CONDITIONS}
+    exposures = {c: 0 for c in CONDITIONS}
+    post_turns = {c: 0 for c in CONDITIONS}
 
-    rows = sorted(bundle["execution_rows"], key=lambda x: (x["replicate_index"], x["execution_order"]))
-    for row in rows:
+    for row in sorted(bundle["execution_rows"], key=lambda x: (x["replicate_index"], x["execution_order"])):
         condition = row["condition_id"]
         envelope = bundle["condition_envelopes"][condition]
-        transform = AtomicEpistemicAnnotationTransform(envelope)
-        provider = MatchedStockOfflineSmokeProvider(condition_id=condition, expected_target=envelope["target_locator"])
+        transform = MatchedStockAtomicEpistemicAnnotationTransform(envelope)
+        provider = MatchedStockOfflineSmokeProvider(condition, envelope["target_locator"])
         trace = run_arena_once(
             domain,
             config,
@@ -102,7 +92,11 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
         _require(record["turn"] == 9 and record["actor"] == "ops_lead", "matched_stock_smoke_delivery_boundary_invalid")
         _require(record["condition_id"] == condition, "matched_stock_smoke_condition_record_mismatch")
         _require(record["target_locator"] == envelope["target_locator"], "matched_stock_smoke_delivery_target_invalid")
-
+        completed = {int(x["turn"]) for x in trace["model_calls"] if x.get("status") == "completed"}
+        _require(9 in completed and 10 in completed, "matched_stock_smoke_t9_t10_coverage_invalid")
+        _require(provider.t9 == 1 and provider.t10 == 0, "matched_stock_smoke_annotation_visibility_invalid")
+        exposures[condition] += 1
+        post_turns[condition] += sum(1 for t in completed if t >= 10)
         trace["r6d_matched_stock_condition"] = {
             "schema": "RB-R6D-MATCHED-STOCK-CONDITION-TRACE-v0.1",
             "design_hash": bundle["plan"]["design_hash"],
@@ -116,23 +110,15 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
             "direct_response_turn": 9,
             "post_consumption_start_turn": 10,
             "provider_internal_state_replayed": False,
-            "semantic_cpr_status": "NOT_ADJUDICATED"
+            "semantic_cpr_status": "NOT_ADJUDICATED",
         }
         trace["scientific_status"] = "ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE"
-        exposure_counts[condition] += 1
-        completed_turns = {int(x["turn"]) for x in trace["model_calls"] if x.get("status") == "completed"}
-        _require(9 in completed_turns, "matched_stock_smoke_missing_t9")
-        _require(10 in completed_turns, "matched_stock_smoke_missing_t10")
-        post_consumption_turn_counts[condition] += sum(1 for t in completed_turns if t >= 10)
-        _require(provider.observed_t9_annotation_count == 1, "matched_stock_smoke_t9_visibility_invalid")
-        _require(provider.observed_t10_annotation_count == 0, "matched_stock_smoke_t10_annotation_leak")
         traces.append(trace)
 
     _require(stable_hash(bundle["source_parent_snapshot"]) == parent_hash_before, "matched_stock_smoke_parent_mutated")
     _require(len(traces) == 9, "matched_stock_smoke_trace_count_invalid")
-    _require(all(exposure_counts[c] == 3 for c in CONDITIONS), "matched_stock_smoke_condition_exposure_balance_invalid")
-    _require(all(post_consumption_turn_counts[c] >= 3 for c in CONDITIONS), "matched_stock_smoke_post_consumption_coverage_invalid")
-
+    _require(all(exposures[c] == 3 for c in CONDITIONS), "matched_stock_smoke_condition_exposure_balance_invalid")
+    _require(all(post_turns[c] >= 3 for c in CONDITIONS), "matched_stock_smoke_post_consumption_coverage_invalid")
     summary = {
         "schema": SMOKE_SCHEMA,
         "scientific_status": "ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE",
@@ -140,14 +126,14 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
         "runtime_plan_hash": bundle["plan"]["plan_hash"],
         "trace_count": 9,
         "condition_trace_counts": {c: 3 for c in CONDITIONS},
-        "direct_experiment_origin_exposure_counts": exposure_counts,
-        "post_consumption_turn_counts": post_consumption_turn_counts,
+        "direct_experiment_origin_exposure_counts": exposures,
+        "post_consumption_turn_counts": post_turns,
         "source_parent_immutable": True,
         "provider_calls_are_real": False,
         "paid_api_called": False,
         "paid_evaluator_called": False,
         "semantic_cpr_status": "NOT_ADJUDICATED",
-        "interpretation_boundary": "Deterministic runtime integration smoke only. Synthetic provider outputs are not scientific matched-stock robustness evidence."
+        "interpretation_boundary": "Deterministic runtime integration smoke only. Synthetic provider outputs are not scientific matched-stock robustness evidence.",
     }
     summary["summary_hash"] = stable_hash(summary)
     return traces, summary
@@ -171,7 +157,6 @@ def main() -> None:
     print("S2_EXPOSURES=3")
     print("S3_EXPOSURES=3")
     print("S4_EXPOSURES=3")
-    print("POST_CONSUMPTION_TURNS_PRESENT=YES")
     print("PAID_API_CALLED=NO")
     print("SUMMARY_HASH=" + summary["summary_hash"])
 
