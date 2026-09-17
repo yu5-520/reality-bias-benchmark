@@ -1,0 +1,69 @@
+{
+  "schema": "RB-R6D-MATCHED-STOCK-ROBUSTNESS-FORMAL-SUBJECT-GATE-v0.1",
+  "version": "0.1",
+  "status": "GATE_CONTRACT_ONLY_NOT_AUTHORIZATION",
+  "design_freeze": {
+    "design_manifest_path": "manifests/r6d_matched_stock_robustness_design_freeze_2026-09-17_v0_1.json",
+    "design_hash": "5064e255da26949a152a2300fe659ebdddddc9b44f1a97a4b31d7796005a959d",
+    "predecessor_design_hash": "d8783a9c3e0a264c3119ee72e63db9b61d51f0d633ff6dde66068751c31701de",
+    "candidate_audit_hash": "ffce11ae46a2efa966368c21da610fac967fe5132ccc7dddea80e6caa3f9ec70",
+    "plan_hash": "b0fe89c08c20da61376077e23e484914bd260c2a7e00aa2a6b57c459380dbab9",
+    "first_batch_evidence_hash": "0d4dd464d10bfc9a5b4307856e2c070bfaa521951e00cd0f147eeb80063e4beb"
+  },
+  "default_plan": {
+    "conditions": [
+      "S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL",
+      "S3_MATCHED_ORDINARY_STOCK_B_DOWNGRADE",
+      "S4_MATCHED_ORDINARY_STOCK_C_DOWNGRADE"
+    ],
+    "replicates": 3,
+    "planned_branch_count": 9,
+    "order_policy": "THREE_CONDITION_CYCLIC_LATIN_ROTATION",
+    "parent_anchor_ref": "after_turn:8",
+    "direct_response_turn": 9,
+    "post_consumption_start_turn": 10,
+    "absolute_turn_cap": 16,
+    "per_branch_max_calls": 64,
+    "per_branch_spending_ceiling": 0.25,
+    "total_spending_ceiling": 2.25,
+    "automatic_paid_evaluator": false
+  },
+  "environment_binding": {
+    "provider": "deepseek",
+    "domain_id": "ecommerce",
+    "arena_config_hash": "8e33288516fc47f116d20f4579ca84410a3cdefecef7c99c5bf2bb31e5d14002",
+    "model_config_hash": "fe7bbafda1c4c12b1d1f5dca963d1a45cbe503713aaa486fac09f569d1b5f8c5",
+    "agent_registry_hash": "d2e2ab7c6996098850bff7a6b24bd65b61567fe3bebb6c484c7024c67c020f26",
+    "domain_hash": "a68da87280b29a59be1125f909ea7992629af50340cb22aaf093d058fac4355d",
+    "task_hash": "849de0b4ab9874e0adf328b6f4f3768790215ad565a891e4c0a1dc1a9069f61b"
+  },
+  "planned_runtime_binding": {
+    "runtime_plan_builder_bound": false,
+    "runner_bound": false,
+    "workflow_bound": false,
+    "raw_evidence_freezer_bound": false,
+    "runtime_readiness_status": "NOT_BOUND_AT_DESIGN_FREEZE"
+  },
+  "execution_requirements": [
+    "EXACT_FROZEN_DESIGN_HASH_MATCH",
+    "EXACT_TARGET_AND_ENVELOPE_MATCH",
+    "EXACT_CYCLIC_ORDER_MATCH",
+    "RAW_EVIDENCE_FREEZE_BEFORE_DERIVATION",
+    "RAW_ARTIFACT_UPLOAD_BEFORE_DERIVATION",
+    "EXPLICIT_SEPARATE_HUMAN_AUTHORIZATION_AFTER_RUNTIME_READINESS"
+  ],
+  "analysis_guards": {
+    "first_batch_outcomes_known": true,
+    "eligibility_rule_uses_first_batch_outcome": false,
+    "all_eligible_candidates_included": true,
+    "historical_s2_minus_s1_replaced": false,
+    "fresh_s0_included": false,
+    "escape_derived_specificity_pre_run": "NOT_ESTABLISHED",
+    "semantic_cpr_status": "NOT_ADJUDICATED"
+  },
+  "authorization_status": "NOT_AUTHORIZED",
+  "scientific_provider_run": false,
+  "paid_evaluator_run": false,
+  "semantic_cpr_adjudication": false,
+  "gate_hash": "af62079cf9d0727813095648cb85268895b960f7d14fb5644e3151f6711bbcf9"
+}
