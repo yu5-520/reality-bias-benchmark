@@ -1,0 +1,49 @@
+name: semantic-audit-contract-v0.1-validate
+
+on:
+  pull_request:
+    paths:
+      - "docs/semantic_audit_and_reporting_contract_v0.1.md"
+      - "schemas/semantic_audit_record_v0.1.schema.json"
+      - "schemas/first_paper_analysis_contract_v0.1.schema.json"
+      - "scripts/validate_semantic_audit_contract_v0_1.py"
+      - ".github/workflows/semantic-audit-contract-v0-1-validate.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/semantic_audit_and_reporting_contract_v0.1.md"
+      - "schemas/semantic_audit_record_v0.1.schema.json"
+      - "schemas/first_paper_analysis_contract_v0.1.schema.json"
+      - "scripts/validate_semantic_audit_contract_v0_1.py"
+      - ".github/workflows/semantic-audit-contract-v0-1-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile validator
+        run: python -m py_compile scripts/validate_semantic_audit_contract_v0_1.py
+      - name: Validate audit responsibility and reporting contract
+        run: python scripts/validate_semantic_audit_contract_v0_1.py
+      - name: Assert provider-secret-free methodology validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -RniE 'DEEPSEEK_API_KEY|OPENAI_API_KEY|ANTHROPIC_API_KEY|GOOGLE_API_KEY|DASHSCOPE_API_KEY' \
+            docs/semantic_audit_and_reporting_contract_v0.1.md \
+            schemas/semantic_audit_record_v0.1.schema.json \
+            scripts/validate_semantic_audit_contract_v0_1.py; then
+            echo 'FAIL: provider secret name found in methodology-only contract files'
+            exit 1
+          fi
+          echo 'PASS: methodology validator cannot execute paid subject/evaluator calls'
