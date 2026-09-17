@@ -1,0 +1,75 @@
+{
+  "authorization_boundary": {
+    "cpr_semantic_adjudication_authorized": false,
+    "new_provider_call_authorized": false,
+    "paid_evaluator_authorized": false,
+    "r7_recovery_subject_authorized": false
+  },
+  "derivation": {
+    "carrier_identification": "STRENGTHENED",
+    "escape_derived_specificity": "NOT_ESTABLISHED",
+    "first_batch_s2_minus_s1_status": "PRESERVED_AS_FROZEN_TARGET_RESPONSE_CONTRAST_NOT_UPGRADED",
+    "no_post_hoc_total_scalar": true,
+    "ordinary_target_spread": "S3_MINUS_S4",
+    "outputs": {
+      "report": "results/reports/2026-09-17/R6D_Matched_Stock_Batch2_Derived_Analysis_v0_1.md",
+      "run_metrics": "results/r6d_matched_stock_batch2_v0_1/run_metrics.jsonl",
+      "summary": "results/r6d_matched_stock_batch2_v0_1/derived_summary.json",
+      "triad_contrasts": "results/r6d_matched_stock_batch2_v0_1/triad_contrasts.json"
+    },
+    "primary_robustness_contrasts": [
+      "S2_MINUS_S3",
+      "S2_MINUS_S4"
+    ],
+    "report_standard": "RB-PROCESS-REALITY-REPORT-STANDARD-v1.3",
+    "same_parent_repeats_are_independent_population_samples": false,
+    "script": "arena/analyze_r6d_matched_stock_batch2.py",
+    "value_status_decoupling": "OBSERVED"
+  },
+  "first_batch_binding": {
+    "evidence_batch_hash": "0d4dd464d10bfc9a5b4307856e2c070bfaa521951e00cd0f147eeb80063e4beb",
+    "interpretation": "First-batch S2-S1 remains historical frozen target-response contrast. Batch 2 prevents upgrading that contrast to Escape/J0 specificity.",
+    "manifest": "manifests/r6d_first_real_subject_2026-09-17_v0_1.json"
+  },
+  "forward_interpretation": {
+    "cpr": "NOT_ADJUDICATED",
+    "inheritance_specificity": "NOT_ESTABLISHED",
+    "intervention_related_inertia_beyond_natural_variability": "NOT_ESTABLISHED",
+    "local_withdrawal_status_inherited": "NO_OBSERVABLE_EVIDENCE",
+    "persistent_carrier": "UNCHANGED_SOURCE_CONTAINER_VALUE_PLUS_CONTAINER_FACT_METADATA",
+    "remaining_nonexchangeability": [
+      "PRIOR_EPISTEMIC_STATE",
+      "DOWNGRADE_NOVELTY",
+      "DECISION_OR_CAUSAL_ROLE"
+    ],
+    "structural_specificity": "NOT_ESTABLISHED"
+  },
+  "packaging_note": {
+    "integrity_result": "The recorded digest value and independently computed downloaded inner-tar digest are identical: be314b8cff3aef2e4283874bbe82244fda6b56175ac8a9657f6642269207f164.",
+    "issue": "The inner .sha256 file records the GitHub Actions runner absolute /tmp/r6d-matched-stock-raw-subject.tar.gz path, so sha256sum -c is not portable after download.",
+    "scientific_evidence_impact": "NONE; packaging-path portability only. Raw evidence bytes and digest match.",
+    "scope": "ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE"
+  },
+  "schema": "RB-R6D-MATCHED-STOCK-BATCH2-EVIDENCE-BINDING-v0.1",
+  "scientific_subject": {
+    "artifact_digest": "sha256:1db98dc6f1ea618d4ed6d85f3430f44b4083d4575beba9b34f94a376b0a98e92",
+    "artifact_id": 10506870185,
+    "artifact_name": "r6d-matched-stock-raw-subject-35242903322",
+    "artifact_zip_sha256": "1db98dc6f1ea618d4ed6d85f3430f44b4083d4575beba9b34f94a376b0a98e92",
+    "derived_analysis_executed_before_freeze": false,
+    "design_hash": "5064e255da26949a152a2300fe659ebdddddc9b44f1a97a4b31d7796005a959d",
+    "evidence_batch_hash": "a550543edf53339c44cd6d72a0a2bde2151fff56d98117043edab28980033a45",
+    "execution_code_sha": "be0cfeebcbd20f7c6b304f2b91c95fa563eceb03",
+    "inner_tar_sha256": "be314b8cff3aef2e4283874bbe82244fda6b56175ac8a9657f6642269207f164",
+    "paid_evaluator_called": false,
+    "planned_branch_count": 9,
+    "preserved_trace_count": 9,
+    "provider_calls_are_real": true,
+    "raw_evidence_frozen_before_derivation": true,
+    "runner_error_count": 0,
+    "runtime_plan_hash": "c988ccd7ac58a129b33e3b3e7160b8ee2a3999acf43ee15cb30da7d6544f708d",
+    "semantic_cpr_status": "NOT_ADJUDICATED",
+    "workflow_run_id": 35242903322
+  },
+  "status": "DERIVED_ANALYSIS_BOUND_TO_IMMUTABLE_RAW_ARTIFACT"
+}
