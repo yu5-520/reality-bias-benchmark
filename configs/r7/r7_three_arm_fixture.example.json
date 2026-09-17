@@ -1,14 +1,22 @@
 {
-  "protocol_id": "RB-R7-STRUCTURAL-INERTIA-CONTROL-v1.0",
+  "protocol_id": "RB-R7-STRUCTURAL-INERTIA-CONTROL-v1.1",
   "frozen_parent": {
     "parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c",
     "source_run_id": "35132777581",
-    "code_sha": "8a33444741c9f9e016ffbd72aa5955a6da81187d"
+    "code_sha": "8a33444741c9f9e016ffbd72aa5955a6da81187d",
+    "source_plan_hash": "a24c98901422bbccfc9a040a6bc14575b1c710edd518c0d9c2facf7a57926351",
+    "prepared_workflow_run_id": 35129957603,
+    "prepared_artifact_id": 10460981306,
+    "prepared_artifact_name": "r5mid-prospective-one-shot-prepared-v0-3-35129957603",
+    "prepared_artifact_digest": "sha256:f861db077ebac88f67badd7605c0547c602d067b9d0f3af72b4c9a44ba8503c8",
+    "prepared_inner_tar_sha256": "3f780b2c0cc88c59fa5c149e6c3b987ba73e8a97aefb0970c89ce5e32f6b1988"
   },
   "jump": {
     "jump_id": "J0",
     "source_event": "E32",
+    "source_event_index": 32,
     "actor": "inventory",
+    "state_key": "inventory_stockout_assessment_v1",
     "target_path": "shared_state_metadata.inventory_stockout_assessment_v1.status"
   },
   "semantic_payload": {
@@ -18,17 +26,27 @@
     "from": "fact",
     "to": "unconfirmed"
   },
+  "matched_horizon": {
+    "horizon_id": "R7-H1-POST-JUMP-TURN-CAP-8",
+    "distance_basis": "post_jump_agent_turn",
+    "post_jump_turn_cap": 8,
+    "termination_policy": "natural_termination_or_common_cap",
+    "early_termination_policy": "record_as_censored_not_extended",
+    "comparison_policy": "compare_only_observed_matched_distances_and_preserve_censoring"
+  },
   "arms": {
     "C1_ONE_SHOT": {
       "mode": "one_shot_free_continuation",
       "propagation_policy": "first_post_jump_agent_turn_only",
       "max_exposures": 1,
+      "observation_horizon_id": "R7-H1-POST-JUMP-TURN-CAP-8",
       "persistent_parent_mutation": false
     },
     "C2_PERSISTENT_FIELD": {
       "mode": "persistent_field_propagation",
-      "propagation_policy": "inject_same_payload_into_each_eligible_post_jump_turn",
-      "max_exposures": null,
+      "propagation_policy": "inject_same_payload_into_each_eligible_post_jump_turn_within_common_horizon",
+      "max_exposures": 8,
+      "observation_horizon_id": "R7-H1-POST-JUMP-TURN-CAP-8",
       "persistent_parent_mutation": false
     },
     "C3_ALR": {
@@ -38,6 +56,7 @@
       "closure_policy": "registered_dependency_closure",
       "preserve_unaffected": true,
       "revision_required": true,
+      "observation_horizon_id": "R7-H1-POST-JUMP-TURN-CAP-8",
       "persistent_parent_mutation": false
     }
   },
@@ -47,6 +66,7 @@
     "same_parent": true,
     "same_jump": true,
     "same_horizon": true,
+    "early_termination_preserved_as_censoring": true,
     "fail_closed": true
   }
 }
