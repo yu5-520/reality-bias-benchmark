@@ -12,11 +12,13 @@ on:
       - "arena/persistent_field_intervention.py"
       - "arena/alr_recovery.py"
       - "arena/r7_structural_control_preflight.py"
+      - "arena/prepare_r7_three_arm_plan.py"
       - "arena/tests/test_r7_structural_control_preflight.py"
       - ".github/workflows/r7-structural-inertia-offline-validate.yml"
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   offline-contract:
@@ -67,6 +69,67 @@ jobs:
           print("PASS: R7 three-condition implementation contract isolated")
           PY
 
+      - name: Verify and download exact frozen R5 prepared parent
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY' > /tmp/r7_source.env
+          import json
+          p=json.load(open('configs/r7/r7_three_arm_fixture.example.json'))['frozen_parent']
+          print('RUN_ID='+str(p['prepared_workflow_run_id']))
+          print('ARTIFACT_ID='+str(p['prepared_artifact_id']))
+          print('ARTIFACT_NAME='+p['prepared_artifact_name'])
+          print('ARTIFACT_DIGEST='+p['prepared_artifact_digest'])
+          print('INNER_SHA='+p['prepared_inner_tar_sha256'])
+          PY
+          source /tmp/r7_source.env
+          python - <<'PY'
+          import json, subprocess
+          p=json.load(open('configs/r7/r7_three_arm_fixture.example.json'))['frozen_parent']
+          payload=json.loads(subprocess.check_output(['gh','api',f"repos/${{ github.repository }}/actions/runs/{p['prepared_workflow_run_id']}/artifacts"], text=True))
+          rows=[x for x in payload['artifacts'] if x['id']==p['prepared_artifact_id'] and x['name']==p['prepared_artifact_name']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==p['prepared_artifact_digest']
+          assert not rows[0].get('expired')
+          print('R7_SOURCE_R5_PREPARED_ARTIFACT=EXACT_MATCH')
+          PY
+          mkdir -p /tmp/r7_r5_artifact /tmp/r7_r5_prepared
+          gh run download "$RUN_ID" --repo '${{ github.repository }}' --name "$ARTIFACT_NAME" --dir /tmp/r7_r5_artifact
+          cd /tmp/r7_r5_artifact
+          sha256sum -c r5mid_prospective_one_shot_prepared_v0_3.tar.gz.sha256
+          test "$(sha256sum r5mid_prospective_one_shot_prepared_v0_3.tar.gz | awk '{print $1}')" = "$INNER_SHA"
+          tar -xzf r5mid_prospective_one_shot_prepared_v0_3.tar.gz -C /tmp/r7_r5_prepared
+          cd "$GITHUB_WORKSPACE"
+
+      - name: Bind R7 Phase-1 plan to the exact frozen R5 parent
+        run: |
+          set -euo pipefail
+          R5_PLAN_DIR=/tmp/r7_r5_prepared/results/r5mid_prospective_one_shot_plan_v0_3
+          python -m arena.prepare_r7_three_arm_plan \
+            --protocol configs/r7/r7_three_arm_fixture.example.json \
+            --r5-plan-dir "$R5_PLAN_DIR" \
+            --replicates 1 \
+            --plan-code-sha '${{ github.sha }}' \
+            --outdir /tmp/r7_real_parent_bound_plan
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/r7_real_parent_bound_plan/r7_plan.json'))
+          assert p['source_binding']['source_parent_state_hash']=='aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c'
+          assert p['source_binding']['source_r5_plan_hash']=='a24c98901422bbccfc9a040a6bc14575b1c710edd518c0d9c2facf7a57926351'
+          assert p['matched_horizon']['post_jump_turn_cap']==8
+          assert p['paid_subject_authorization_status']=='NOT_AUTHORIZED'
+          assert p['real_three_arm_execution_ready'] is False
+          assert p['blocking_reason']=='C3_ACTIVE_ALR_LOCALIZED_REEXECUTION_NOT_IMPLEMENTED'
+          rows=[json.loads(x) for x in open('/tmp/r7_real_parent_bound_plan/arm_manifests.jsonl')]
+          assert len(rows)==3
+          assert len({x['parent_state_hash'] for x in rows})==1
+          assert len({x['semantic_payload_hash'] for x in rows})==1
+          assert len({x['observation_horizon_id'] for x in rows})==1
+          assert [x for x in rows if x['arm_id']=='C3_ALR'][0]['execution_readiness']=='BLOCKED_PENDING_ACTIVE_ALR_EXECUTOR'
+          print('PASS: R7 Phase-1 exact frozen-parent binding verified fail closed')
+          PY
+
       - name: Confirm no paid-run dependency
         shell: bash
         run: |
@@ -77,7 +140,8 @@ jobs:
             schemas/r7_structural_inertia_control_v1.json \
             arena/persistent_field_intervention.py \
             arena/alr_recovery.py \
-            arena/r7_structural_control_preflight.py; then
+            arena/r7_structural_control_preflight.py \
+            arena/prepare_r7_three_arm_plan.py; then
             echo "R7 offline validator/preflight must not depend on provider credentials." >&2
             exit 2
           fi
