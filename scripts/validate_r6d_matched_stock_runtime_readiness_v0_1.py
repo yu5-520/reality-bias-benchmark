@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 import copy
 import json
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from arena.core import stable_hash
 
-ROOT = Path(__file__).resolve().parents[1]
 DESIGN_HASH = "5064e255da26949a152a2300fe659ebdddddc9b44f1a97a4b31d7796005a959d"
 FORMAL_GATE_V01_HASH = "af62079cf9d0727813095648cb85268895b960f7d14fb5644e3151f6711bbcf9"
 RUNTIME_GATE_HASH = "97650361491e310490e18c9598540a5df9c6e3d3ca9ba62a1e6ae7f8cd8ffa90"
