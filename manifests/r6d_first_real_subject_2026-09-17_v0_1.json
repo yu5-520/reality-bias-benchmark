@@ -1,0 +1,50 @@
+{
+  "authorization_boundary": {
+    "cpr_semantic_adjudication_authorized": false,
+    "new_provider_call_authorized": false,
+    "paid_evaluator_authorized": false,
+    "r7_recovery_subject_authorized": false
+  },
+  "derivation": {
+    "escape_derived_specificity": "NOT_ESTABLISHED",
+    "no_post_hoc_total_scalar": true,
+    "outputs": {
+      "report": "results/reports/2026-09-17/R6D_First_Real_Subject_Derived_Analysis_v0_1.md",
+      "run_metrics": "results/r6d_first_real_subject_v0_1/run_metrics.jsonl",
+      "summary": "results/r6d_first_real_subject_v0_1/derived_summary.json",
+      "triad_contrasts": "results/r6d_first_real_subject_v0_1/triad_contrasts.json"
+    },
+    "primary_contrast": "S2_MINUS_S1",
+    "primary_label": "FROZEN_TARGET_RESPONSE_CONTRAST",
+    "report_standard": "RB-PROCESS-REALITY-REPORT-STANDARD-v1.3",
+    "same_parent_repeats_are_independent_population_samples": false,
+    "script": "arena/analyze_r6d_first_real_subject.py"
+  },
+  "packaging_note": {
+    "integrity_result": "The recorded digest and independently computed downloaded inner-tar digest are identical: e7ffd2948d1c49f95515c0f65fad1f0be35ae7f0f8992459074a96cbdef7309f.",
+    "issue": "The inner .sha256 file records the GitHub Actions runner absolute path /tmp/r6d-specificity-raw-subject.tar.gz, so sha256sum -c is not portable after download.",
+    "scientific_evidence_impact": "NONE; packaging-path portability only. Raw evidence bytes and digest match.",
+    "scope": "ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE"
+  },
+  "schema": "RB-R6D-FIRST-REAL-SUBJECT-EVIDENCE-BINDING-v0.1",
+  "scientific_subject": {
+    "artifact_digest": "sha256:da14f406fdc574178901a6e5129b6257496cbfb584b852da812923573f0cd927",
+    "artifact_id": 10501887185,
+    "artifact_name": "r6d-specificity-raw-subject-35232218556",
+    "artifact_zip_sha256": "da14f406fdc574178901a6e5129b6257496cbfb584b852da812923573f0cd927",
+    "design_hash": "d8783a9c3e0a264c3119ee72e63db9b61d51f0d633ff6dde66068751c31701de",
+    "evidence_batch_hash": "0d4dd464d10bfc9a5b4307856e2c070bfaa521951e00cd0f147eeb80063e4beb",
+    "execution_code_sha": "11271a20abe67ad21e0e9f6cdac92d8330930f5a",
+    "inner_tar_sha256": "e7ffd2948d1c49f95515c0f65fad1f0be35ae7f0f8992459074a96cbdef7309f",
+    "paid_evaluator_called": false,
+    "planned_branch_count": 9,
+    "preserved_trace_count": 9,
+    "provider_calls_are_real": true,
+    "raw_evidence_frozen_before_derivation": true,
+    "runner_error_count": 0,
+    "runtime_plan_hash": "50d878b4835065e9c59d6e69ad372c3c9c5438017deb1ffae9a47462f0e68850",
+    "semantic_cpr_status": "NOT_ADJUDICATED",
+    "workflow_run_id": 35232218556
+  },
+  "status": "DERIVED_ANALYSIS_BOUND_TO_IMMUTABLE_RAW_ARTIFACT"
+}

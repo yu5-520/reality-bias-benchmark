@@ -1,0 +1,39 @@
+name: R6-D First Real Derived Analysis v0.1 Validate
+
+on:
+  pull_request:
+    paths:
+      - 'arena/analyze_r6d_first_real_subject.py'
+      - 'scripts/validate_r6d_first_real_derived_v0_1.py'
+      - 'manifests/r6d_first_real_subject_2026-09-17_v0_1.json'
+      - 'results/r6d_first_real_subject_v0_1/**'
+      - 'results/reports/2026-09-17/R6D_First_Real_Subject_Derived_Analysis_v0_1.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-derived-evidence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile derivation code
+        run: |
+          python -m py_compile arena/analyze_r6d_first_real_subject.py
+          python -m py_compile scripts/validate_r6d_first_real_derived_v0_1.py
+      - name: Validate frozen derived snapshot and interpretation boundaries
+        run: python scripts/validate_r6d_first_real_derived_v0_1.py
+      - name: Re-check frozen R6-D design and v4.5.1 method contracts
+        run: |
+          python scripts/validate_r6d_specificity_exact_plan_v0_1.py
+          python scripts/validate_process_reality_v4_5_1.py
+      - name: Provider-secret-free assertion
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -z "${DEEPSEEK_API_KEY:-}"
+          echo 'PASS: derived-analysis validation performs no provider/evaluator call'
