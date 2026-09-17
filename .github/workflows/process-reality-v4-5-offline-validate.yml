@@ -1,0 +1,105 @@
+name: Process Reality v4.5 Offline Validate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "docs/R_Plan_v4.5.md"
+      - "theory/theory_contract_v0.9.md"
+      - "docs/system_behavior_measurement_plan_v4.5.md"
+      - "docs/R6_inertia_identification_protocol_v0.3.md"
+      - "docs/R5_R6_specificity_protocol_v0.3.md"
+      - "docs/R7_structural_inertia_control_protocol_v0.4.md"
+      - "docs/ALR_authority_localized_recovery_contract_v0.3.md"
+      - "docs/R7_process_integrity_engineering_profile_v0.1.md"
+      - "docs/first_paper_v4.5_scope.md"
+      - "docs/evidence_status_addendum_v0.1.md"
+      - "configs/first_paper_mechanism_contract_v0.7.json"
+      - "configs/first_paper_analysis_contract_v0.6.json"
+      - "configs/process_reality_measurement_contract_v0.8.json"
+      - "configs/experimental_variable_registry_v0.6.json"
+      - "configs/r7_process_integrity_engineering_contract_v0.1.json"
+      - "schemas/process_integrity_event_v0.1.schema.json"
+      - "schemas/process_integrity_lineage_record_v0.1.schema.json"
+      - "docs/reporting/process_reality_report_standard_v1_2.md"
+      - "schemas/process_reality_report_template_v1_2.json"
+      - "scripts/validate_process_reality_v4_5.py"
+      - ".github/workflows/process-reality-v4-5-offline-validate.yml"
+      - "README.md"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-v4-5:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate Process Reality v4.5 contracts
+        run: python scripts/validate_process_reality_v4_5.py
+
+      - name: Validate exact-source specificity v0.2
+        run: python scripts/validate_r5r6_specificity_source_audit_v0_2.py
+
+      - name: Run atomic specificity tests
+        run: python -m unittest arena.tests.test_r5r6_specificity_atomic_v0_2 -v
+
+      - name: Run full Arena offline tests
+        run: python -m unittest discover arena/tests -v
+
+      - name: Run deterministic atomic specificity preflight
+        run: |
+          set -euo pipefail
+          python -m arena.r5r6_specificity_atomic_preflight_v0_2 --outdir /tmp/r5r6_atomic_specificity_preflight_v4_5
+          test -s /tmp/r5r6_atomic_specificity_preflight_v4_5/summary.json
+          test -s /tmp/r5r6_atomic_specificity_preflight_v4_5/plan.json
+
+      - name: Assert no real-provider capability in v4.5 planning path
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          files = [
+              'scripts/validate_process_reality_v4_5.py',
+              'docs/R_Plan_v4.5.md',
+              'theory/theory_contract_v0.9.md',
+              'docs/R6_inertia_identification_protocol_v0.3.md',
+              'docs/R7_structural_inertia_control_protocol_v0.4.md',
+              'docs/R7_process_integrity_engineering_profile_v0.1.md',
+              'configs/r7_process_integrity_engineering_contract_v0.1.json',
+              '.github/workflows/process-reality-v4-5-offline-validate.yml',
+          ]
+          forbidden = [
+              'OPENAI' + '_API_KEY',
+              'DASHSCOPE' + '_API_KEY',
+              'DEEPSEEK' + '_API_KEY',
+              'CALL_' + 'REAL_',
+              '--execute-' + 'real',
+              'provider_' + 'secret',
+          ]
+          failures=[]
+          for path in files:
+              text=Path(path).read_text(encoding='utf-8')
+              for token in forbidden:
+                  if token in text:
+                      failures.append((path, token))
+          if failures:
+              raise SystemExit('forbidden real-provider capability in v4.5 offline path: ' + repr(failures))
+          print('PASS: no provider credential or real-run authorization in v4.5 planning path')
+          PY
+
+      - name: Upload engineering-only v4.5 preflight artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: process-reality-v4-5-offline-preflight
+          path: /tmp/r5r6_atomic_specificity_preflight_v4_5
+          if-no-files-found: error
+          retention-days: 90
