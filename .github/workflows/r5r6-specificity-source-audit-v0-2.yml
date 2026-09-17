@@ -71,14 +71,16 @@ jobs:
           assert s['paid_evaluator_called'] is False
           assert p['conditions']==[
               'S0_NATURAL_REFERENCE',
-              'S1_MATCHED_FACTUAL_FIELD_DOWNGRADE',
-              'S2_J0_TARGETED_AUTHORITY_WITHDRAWAL',
+              'S1_MATCHED_OR_ORDINARY_FACTUAL_INFORMATION_DOWNGRADE',
+              'S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL',
           ]
           assert p['primary_contrast']=='S2_MINUS_S1'
           assert p['primary_readout']=='POST_CONSUMPTION_R6_INERTIA_PROFILE'
           assert p['historical_r5_operator_replayed_exactly'] is False
           assert p['authorization_status']=='NOT_AUTHORIZED'
           assert p['semantic_cpr_status']=='NOT_ADJUDICATED'
+          assert e1['condition_id']=='S1_MATCHED_OR_ORDINARY_FACTUAL_INFORMATION_DOWNGRADE'
+          assert e2['condition_id']=='S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL'
           for e in (e1,e2):
               assert e['mechanical_primitive']=='ONE_SHOT_TARGET_SCOPED_EPISTEMIC_STATUS_ANNOTATION'
               assert e['from_status']=='fact' and e['to_status']=='unconfirmed'
