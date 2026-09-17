@@ -159,12 +159,12 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           text=Path('.github/workflows/r6d-specificity-runtime-readiness-v0-1.yml').read_text(encoding='utf-8')
-          # Check executable YAML patterns, not quoted strings used to audit the real workflow.
+          expression_prefix='$'+'{{ secrets.'
           forbidden_patterns=[
-              'DEEPSEEK_API_KEY: ${{ secrets.',
-              'DASHSCOPE_API_KEY: ${{ secrets.',
-              'OPENAI_API_KEY: ${{ secrets.',
-              '\n            --execute-real-api',
+              'DEEPSEEK_API_KEY: '+expression_prefix,
+              'DASHSCOPE_API_KEY: '+expression_prefix,
+              'OPENAI_API_KEY: '+expression_prefix,
+              '\n            --execute-'+'real-api',
           ]
           found=[x for x in forbidden_patterns if x in text]
           assert not found, 'readiness workflow contains executable real-provider capability: '+repr(found)
