@@ -1,26 +1,42 @@
 # Formal Process Reality Report Bundle — 2026-09-17
 
-This directory contains the first report set finalized under `RB-PROCESS-REALITY-REPORT-STANDARD-v1.0`.
+This directory contains the first finalized Process Reality report set plus the forward R6 factual readout.
 
-## Repo-native reports
+## Finalized historical reports — Standard v1.0
+
+The following reports remain frozen under `RB-PROCESS-REALITY-REPORT-STANDARD-v1.0`:
 
 - `R5MID_Control_Process_Evidence_Report_v3.md`
 - `R5MID_OneShot_Process_Evidence_Report_v3.md`
 - `R5MID_Matched_AB_Mechanism_Validation_Report_v3.md`
 
-The repository keeps the reports as versionable Markdown evidence/report sources. The finalized publication-layout DOCX exports are bound by SHA256 in `manifests/r5mid_report_bundle_2026-09-17_v1.json`.
+The finalized publication-layout DOCX exports for that three-report set are bound by SHA256 in `manifests/r5mid_report_bundle_2026-09-17_v1.json`.
 
-## Reporting roles
+### Historical reporting roles
 
-The Control report documents the natural continuation and within-control process variability.
+The Control report documents natural continuation and within-control process variability.
 
-The One-Shot report documents the bounded single-exposure intervention and the realized downstream continuation.
+The One-Shot report documents the bounded single-exposure intervention and realized downstream continuation.
 
-The Matched A/B report is the central mechanism-validation report. It is responsible for time-causal contrast, first-divergence analysis, structural-change filtering, cross-pair invariant extraction, process/terminal decoupling and theory-proposition mapping.
+The Matched A/B report is the original mechanism-validation report for time-causal contrast, first-divergence analysis, structural-change filtering, cross-pair invariant extraction, process/terminal decoupling and theory-proposition mapping.
 
-## Evidence binding
+## Forward R6 factual report — Standard v1.1
 
-All three reports are derived from the frozen formal prospective one-shot evidence state associated with workflow run `35132777581`.
+- `R6_System_Inertia_Factual_Report_v2.md`
+
+This report is a frozen-source factual projection under `RB-PROCESS-REALITY-REPORT-STANDARD-v1.1`.
+
+Its purpose is narrower than a new subject experiment: it reorganizes the already-frozen R5-MID structural evidence under the R6 **post-consumption system inertia** question and records whether the evidence is sufficient to justify a prospective R5-R6 target-specificity test.
+
+The report explicitly separates:
+
+`local perturbation response -> post-consumption inertia -> future target specificity -> terminal outcome`
+
+It does not create new R6 subject evidence, semantic CPR adjudication or a paid provider/evaluator call.
+
+## Shared frozen evidence binding
+
+The v1.0 reports and R6 factual v2 report derive from the same frozen formal prospective one-shot evidence state associated with workflow run `35132777581`.
 
 Primary frozen provenance:
 
@@ -32,13 +48,18 @@ Primary frozen provenance:
 - source measurement hash: `5ec7953b473e4d7b29612de18aac9992238e722e1b12ea7c6999929958b24191`
 - measurement schema: `RB-PROCESS-REALITY-MECHANISM-MEASUREMENT-v0.4`
 
-These reports do not authorize a rerun, a new paid call, new pair expansion, semantic CPR adjudication or mutation of the frozen evidence. They are human-readable projections of the already frozen evidence and structural measurements.
+No report in this directory authorizes a rerun, paid call, semantic promotion or mutation of the frozen evidence.
 
-## Canonical reporting specification
+## Reporting specifications
 
-See:
+Historical finalized R5-MID v3 reports:
 
 - `docs/reporting/process_reality_report_standard_v1.md`
 - `schemas/process_reality_report_template_v1.json`
 
-Future Process Reality reports should follow the same notation, evidence provenance requirements, time-causal figure grammar and report profiles unless the reporting standard is explicitly versioned.
+Forward R6 and future R5-R6 specificity reports:
+
+- `docs/reporting/process_reality_report_standard_v1_1.md`
+- `schemas/process_reality_report_template_v1_1.json`
+
+The forward standard preserves the v1.0 evidence/visual grammar and adds dedicated profiles for **R6 System Inertia Factual Report** and **R5-R6 Specificity Validation Report**.
