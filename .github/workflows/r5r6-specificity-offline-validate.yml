@@ -1,0 +1,122 @@
+name: R5-R6 Specificity Offline Validate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "docs/R_Plan_v4.4.md"
+      - "docs/system_behavior_measurement_plan_v4.4.md"
+      - "docs/R6_inertia_transition_protocol_v0.2.md"
+      - "docs/R5_R6_specificity_protocol_v0.1.md"
+      - "docs/first_paper_v4.4_scope.md"
+      - "theory/theory_contract_v0.8.md"
+      - "configs/first_paper_mechanism_contract_v0.6.json"
+      - "configs/first_paper_analysis_contract_v0.5.json"
+      - "configs/process_reality_measurement_contract_v0.7.json"
+      - "configs/experimental_variable_registry_v0.5.json"
+      - "configs/r5r6_specificity_field_selection_contract_v0.1.json"
+      - "schemas/r5r6_specificity_plan_v0.1.schema.json"
+      - "schemas/r5r6_specificity_comparison_v0.1.schema.json"
+      - "arena/r5r6_specificity.py"
+      - "arena/r5r6_specificity_preflight.py"
+      - "arena/tests/test_r5r6_specificity.py"
+      - "scripts/validate_r5r6_specificity_protocol.py"
+      - ".github/workflows/r5r6-specificity-offline-validate.yml"
+      - "README.md"
+
+permissions:
+  contents: read
+
+jobs:
+  offline-specificity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate forward contracts
+        run: python scripts/validate_r5r6_specificity_protocol.py
+
+      - name: Run specificity unit tests
+        run: python -m unittest arena.tests.test_r5r6_specificity -v
+
+      - name: Run full Arena offline test suite
+        run: python -m unittest discover arena/tests -v
+
+      - name: Execute deterministic specificity preflight
+        run: |
+          set -euo pipefail
+          python -m arena.r5r6_specificity_preflight --outdir /tmp/r5r6_specificity_preflight
+          test -s /tmp/r5r6_specificity_preflight/summary.json
+          test -s /tmp/r5r6_specificity_preflight/selection_record.json
+          test -s /tmp/r5r6_specificity_preflight/specificity_plan.json
+
+      - name: Assert specificity isolation and authorization boundary
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          s=json.load(open('/tmp/r5r6_specificity_preflight/summary.json'))
+          p=json.load(open('/tmp/r5r6_specificity_preflight/specificity_plan.json'))
+          selection=json.load(open('/tmp/r5r6_specificity_preflight/selection_record.json'))
+          assert s['scientific_status']=='ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE'
+          assert s['source_parent_immutable'] is True
+          assert s['outcome_blind_selection'] is True
+          assert s['s1_s2_targets_distinct'] is True
+          assert s['s1_s2_mechanical_primitive_equal'] is True
+          assert s['s1_s2_to_status_equal'] is True
+          assert s['s1_s2_delivery_policy_equal'] is True
+          assert s['s1_direct_exposures']==1
+          assert s['s2_direct_exposures']==1
+          assert s['s1_reinjections']==0
+          assert s['s2_reinjections']==0
+          assert s['paid_api_called'] is False
+          assert s['paid_evaluator_called'] is False
+          assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
+          assert p['conditions']==[
+              'S0_NATURAL_REFERENCE',
+              'S1_MATCHED_FACTUAL_FIELD_DOWNGRADE',
+              'S2_J0_TARGETED_AUTHORITY_WITHDRAWAL',
+          ]
+          assert p['contrasts']['primary_target_specificity']=='S2_MINUS_S1'
+          assert p['measurement_contract']=='RB-PROCESS-REALITY-MEASUREMENT-CONTRACT-v0.7'
+          assert p['namespace_guard']=={'specificity_namespace':'S','r7_namespace':'C','aliasing_forbidden':True}
+          assert p['authorization_status']=='NOT_AUTHORIZED'
+          assert p['paid_evaluator_authorized'] is False
+          assert p['semantic_cpr_status']=='NOT_ADJUDICATED'
+          assert selection['selector_outcome_blind_attestation'] is True
+          assert selection['future_s_arm_outputs_available_to_selector'] is False
+          assert selection['selected_s1_state_key'] != selection['selected_j0_state_key']
+          print('PASS: R5-R6 specificity offline contract isolated')
+          PY
+
+      - name: Confirm no provider credential or real-run route in specificity validation path
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=(
+            scripts/validate_r5r6_specificity_protocol.py
+            arena/r5r6_specificity.py
+            arena/r5r6_specificity_preflight.py
+            arena/tests/test_r5r6_specificity.py
+            configs/r5r6_specificity_field_selection_contract_v0.1.json
+            .github/workflows/r5r6-specificity-offline-validate.yml
+          )
+          if grep -RniE 'OPENAI_API_KEY|DASHSCOPE_API_KEY|DEEPSEEK_API_KEY|CALL_REAL_|--execute-real|provider_secret' "${files[@]}"; then
+            echo 'Specificity offline validation path must not contain provider credentials or real-run authorization.' >&2
+            exit 2
+          fi
+          echo 'PASS: no provider credential or real-run authorization in specificity offline path'
+
+      - name: Upload offline preflight artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5r6-specificity-offline-preflight-v0-1
+          path: /tmp/r5r6_specificity_preflight
+          if-no-files-found: error
+          retention-days: 90
