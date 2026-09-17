@@ -1,0 +1,64 @@
+name: R6-D Matched Stock Batch2 Derived v0.1 Validate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "arena/analyze_r6d_matched_stock_batch2.py"
+      - "manifests/r6d_matched_stock_batch2_subject_2026-09-17_v0_1.json"
+      - "results/r6d_matched_stock_batch2_v0_1/**"
+      - "results/reports/2026-09-17/R6D_Matched_Stock_Batch2_Derived_Analysis_v0_1.md"
+      - "scripts/validate_r6d_matched_stock_batch2_derived_v0_1.py"
+      - ".github/workflows/r6d-matched-stock-batch2-derived-v0-1-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-derived-snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile derivation and validator
+        run: |
+          python -m py_compile arena/analyze_r6d_matched_stock_batch2.py
+          python -m py_compile scripts/validate_r6d_matched_stock_batch2_derived_v0_1.py
+
+      - name: Validate committed derived snapshot and interpretation boundaries
+        run: python scripts/validate_r6d_matched_stock_batch2_derived_v0_1.py
+
+      - name: Re-check matched-stock frozen design and methodological gates
+        run: |
+          python scripts/validate_r6d_matched_stock_robustness_v0_1.py
+          python scripts/validate_r6d_matched_stock_formal_gate_v0_1.py
+          python scripts/validate_process_reality_v4_5_1.py
+
+      - name: Re-check first-batch forward carrier correction
+        run: python scripts/validate_r6d_first_real_carrier_audit_v0_2.py
+
+      - name: Assert derived CI has no provider credential or real-run capability
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          text=Path('.github/workflows/r6d-matched-stock-batch2-derived-v0-1-validate.yml').read_text(encoding='utf-8')
+          forbidden=[
+              'DEEPSEEK_'+'API_KEY',
+              'DASHSCOPE_'+'API_KEY',
+              'OPENAI_'+'API_KEY',
+              '--execute-'+'real-api',
+              'CALL_'+'REAL_',
+          ]
+          found=[x for x in forbidden if x in text]
+          assert not found, 'forbidden real-call capability in derived CI: '+repr(found)
+          print('PASS: derived validation is provider-secret free and cannot execute a scientific subject')
+          PY
