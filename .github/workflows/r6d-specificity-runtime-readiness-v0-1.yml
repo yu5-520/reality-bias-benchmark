@@ -1,0 +1,212 @@
+name: R6-D Specificity Runtime Readiness v0.1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "arena/prepare_r6d_specificity_plan.py"
+      - "arena/r6d_specificity_runtime_smoke.py"
+      - "arena/run_r6d_specificity_real.py"
+      - "arena/freeze_r6d_raw_evidence.py"
+      - "configs/r6/r6d_specificity_formal_subject_gate_v0.2.json"
+      - "configs/r6/r6d_methodological_interpretation_gate_v0.1.json"
+      - "scripts/validate_process_reality_v4_5_1.py"
+      - ".github/workflows/r6d-specificity-subject-real.yml"
+      - ".github/workflows/r6d-specificity-runtime-readiness-v0-1.yml"
+      - "docs/R6D_specificity_runtime_readiness_v0.1.md"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  runtime-readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      SOURCE_RUN_ID: "35129957603"
+      SOURCE_ARTIFACT_NAME: r5mid-prospective-one-shot-prepared-v0-3-35129957603
+      SOURCE_INNER_TAR_SHA256: 3f780b2c0cc88c59fa5c149e6c3b987ba73e8a97aefb0970c89ce5e32f6b1988
+      PLAN_DIR: /tmp/r6d_runtime_readiness_plan
+      SMOKE_DIR: /tmp/r6d_runtime_readiness_smoke
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate frozen R6-D design
+        run: python scripts/validate_r6d_specificity_exact_plan_v0_1.py
+
+      - name: Validate Process Reality v4.5 stack
+        run: python scripts/validate_process_reality_v4_5.py
+
+      - name: Validate Process Reality v4.5.1 methodological closure
+        run: python scripts/validate_process_reality_v4_5_1.py
+
+      - name: Validate atomic specificity synchronization
+        run: python scripts/validate_r6d_atomic_sync_v0_1.py
+
+      - name: Download exact prepared parent artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/r6d_ready_source /tmp/r6d_ready_extracted
+          mkdir -p /tmp/r6d_ready_source /tmp/r6d_ready_extracted
+          gh run download "$SOURCE_RUN_ID" -n "$SOURCE_ARTIFACT_NAME" -D /tmp/r6d_ready_source
+          test -f /tmp/r6d_ready_source/r5mid_prospective_one_shot_prepared_v0_3.tar.gz
+          echo "$SOURCE_INNER_TAR_SHA256  /tmp/r6d_ready_source/r5mid_prospective_one_shot_prepared_v0_3.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/r6d_ready_source/r5mid_prospective_one_shot_prepared_v0_3.tar.gz -C /tmp/r6d_ready_extracted
+          test -f /tmp/r6d_ready_extracted/results/r5mid_prospective_one_shot_plan_v0_3/parent_snapshot.json
+
+      - name: Build exact nine-branch runtime plan
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$PLAN_DIR"
+          python -m arena.prepare_r6d_specificity_plan \
+            --source-r5-plan-dir /tmp/r6d_ready_extracted/results/r5mid_prospective_one_shot_plan_v0_3 \
+            --plan-code-sha "$GITHUB_SHA" \
+            --outdir "$PLAN_DIR"
+
+      - name: Run deterministic nine-branch runtime smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$SMOKE_DIR"
+          python -m arena.r6d_specificity_runtime_smoke \
+            --plan-dir "$PLAN_DIR" \
+            --outdir "$SMOKE_DIR"
+          test -s "$SMOKE_DIR/summary.json"
+          python - <<'PY'
+          import json
+          s=json.load(open('/tmp/r6d_runtime_readiness_smoke/summary.json'))
+          assert s['scientific_status']=='ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE'
+          assert s['trace_count']==9
+          assert s['direct_experiment_origin_exposure_counts']['S0_NATURAL_REFERENCE']==0
+          assert s['direct_experiment_origin_exposure_counts']['S1_MATCHED_OR_ORDINARY_FACTUAL_INFORMATION_DOWNGRADE']==3
+          assert s['direct_experiment_origin_exposure_counts']['S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL']==3
+          assert s['source_parent_immutable'] is True
+          assert s['paid_api_called'] is False
+          assert s['paid_evaluator_called'] is False
+          assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('PASS: R6-D nine-branch runtime smoke invariants')
+          PY
+
+      - name: Run formal runner in preflight-only mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m arena.run_r6d_specificity_real \
+            --plan-dir "$PLAN_DIR" \
+            --model-config arena/config/model_deepseek_v0.2.json \
+            --provider deepseek \
+            --execution-code-sha "$GITHUB_SHA" \
+            --per-branch-max-calls 64 \
+            --per-branch-spending-ceiling 0.25 \
+            --global-spending-ceiling 2.25 \
+            --currency USD \
+            --preflight-only
+
+      - name: Run atomic and full Arena offline tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest arena.tests.test_r5r6_specificity_atomic_v0_2 -v
+          python -m unittest discover arena/tests -v
+
+      - name: Audit real workflow fail-closed structure without executing it
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          wf=Path('.github/workflows/r6d-specificity-subject-real.yml').read_text(encoding='utf-8')
+          gate=json.loads(Path('configs/r6/r6d_specificity_formal_subject_gate_v0.2.json').read_text(encoding='utf-8'))
+          method_gate=json.loads(Path('configs/r6/r6d_methodological_interpretation_gate_v0.1.json').read_text(encoding='utf-8'))
+          assert 'workflow_dispatch:' in wf
+          assert '\n  push:' not in wf
+          assert '\n  pull_request:' not in wf
+          assert 'CALL_REAL_R6D_SPECIFICITY_API' in wf
+          assert 'confirm_design_hash' in wf
+          assert '--preflight-only' in wf
+          assert '--execute-real-api' in wf
+          assert 'secrets.DEEPSEEK_API_KEY' in wf
+          assert 'freeze_r6d_raw_evidence' in wf
+          assert 'validate_process_reality_v4_5_1.py' in wf
+          assert 'Upload raw scientific subject artifact before derivation' in wf
+          assert gate['status']=='RUNTIME_BOUND_GATE_CLOSED_NOT_AUTHORIZATION'
+          assert gate['authorization_status']=='NOT_AUTHORIZED'
+          assert gate['scientific_provider_run_authorized'] is False
+          assert gate['paid_evaluator_run_authorized'] is False
+          assert gate['semantic_cpr_adjudication_authorized'] is False
+          assert method_gate['status']=='REQUIRED_BEFORE_SCIENTIFIC_EXECUTION_NOT_AUTHORIZATION'
+          assert method_gate['authorization_status']=='NOT_AUTHORIZED'
+          print('PASS: real workflow exists but remains manual, exact-gated, method-gated and closed')
+          PY
+
+      - name: Assert readiness job itself has no provider credential or real execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          text=Path('.github/workflows/r6d-specificity-runtime-readiness-v0-1.yml').read_text(encoding='utf-8')
+          expression_prefix='$'+'{{ secrets.'
+          forbidden_patterns=[
+              'DEEPSEEK_API_KEY: '+expression_prefix,
+              'DASHSCOPE_API_KEY: '+expression_prefix,
+              'OPENAI_API_KEY: '+expression_prefix,
+              '\n            --execute-'+'real-api',
+          ]
+          found=[x for x in forbidden_patterns if x in text]
+          assert not found, 'readiness workflow contains executable real-provider capability: '+repr(found)
+          print('PASS: readiness workflow is offline only')
+          PY
+
+      - name: Write readiness summary
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, pathlib
+          plan=json.load(open('/tmp/r6d_runtime_readiness_plan/r6d_plan.json'))
+          smoke=json.load(open('/tmp/r6d_runtime_readiness_smoke/summary.json'))
+          row={
+              'schema':'RB-R6D-SPECIFICITY-RUNTIME-READINESS-RESULT-v0.1',
+              'scientific_status':'ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE',
+              'code_sha':'${{ github.sha }}',
+              'design_hash':plan['design_hash'],
+              'runtime_plan_hash':plan['plan_hash'],
+              'planned_branch_count':plan['branch_row_count'],
+              'smoke_summary_hash':smoke['summary_hash'],
+              'source_parent_immutable':smoke['source_parent_immutable'],
+              'runner_preflight_passed':True,
+              'methodological_gate_passed':True,
+              'real_workflow_bound':True,
+              'real_workflow_manual_only':True,
+              'scientific_provider_run_authorized':False,
+              'paid_api_called':False,
+              'paid_evaluator_called':False,
+              'semantic_cpr_status':'NOT_ADJUDICATED',
+          }
+          pathlib.Path('/tmp/r6d_runtime_readiness_result.json').write_text(json.dumps(row,indent=2,sort_keys=True)+'\n')
+          PY
+
+      - name: Upload engineering-only runtime readiness artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r6d-specificity-runtime-readiness-v0-1
+          path: |
+            /tmp/r6d_runtime_readiness_plan
+            /tmp/r6d_runtime_readiness_smoke
+            /tmp/r6d_runtime_readiness_result.json
+          if-no-files-found: error
+          retention-days: 90
