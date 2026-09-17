@@ -2,45 +2,63 @@
 
 ## Research question
 
-R7 asks whether inherited system inertia can be directionally shaped by a structural framework and whether the same framework can make the resulting process observable, traceable, locally controllable, and selectively reversible.
+R7 asks whether inherited system inertia can be directionally shaped by a structural framework and whether the same framework can make the resulting process observable, traceable, locally steerable, and selectively recoverable without prescribing the terminal answer.
 
-R7 follows the first-paper mechanism chain:
+Mechanism chain:
 
-`Natural Jump → Inherited Inertia → One-shot Path Perturbation → Path Reorganization → Inertia Transition → Structural Control / Steering → Localized Recovery`
+`Natural Jump → Inherited Inertia → One-shot Path Perturbation → Path Reorganization → Inertia Transition → Structural Steering → Localized Recovery`
 
-R5 establishes whether a bounded local perturbation can reorganize the downstream process path. R6 studies how the resulting inertia differs from the original natural inertia. R7 tests whether a structural framework can actively localize, redirect, or recover that inertia without prescribing the terminal answer.
+R5 establishes local path reorganization. R6 studies post-reorganization inertia. R7 tests whether a structural representation that first observed that process can later support localized intervention and recovery.
 
-## Three matched conditions
+## Three matched mechanisms
 
-All three conditions must begin from the same frozen parent and the same natural Jump anchor J0. Task, model/provider binding, agent registry, prompt policy, semantic correction payload, and observation horizon should be held fixed wherever the mechanism permits.
+The experiment is bound to one frozen natural J0, one common post-J0 reference parent, one semantic correction, one task/model/agent configuration, and one downstream observation horizon. The arms differ in **how** the correction enters the process.
 
 ### C1 — One-Shot Free Continuation
 
-The J0 perturbation is exposed exactly once and then removed from experiment-origin input.
+`J0 → one prompt-visible exposure → free evolution`
 
-`J0 → one-shot exposure → free evolution`
+The correction is shown exactly once on the first resumed post-Jump turn and is then removed from experiment-origin input.
 
-Purpose: estimate endogenous inherited inertia after the experiment stops injecting the variable.
+Purpose: observe endogenous inherited inertia after experiment-origin input stops.
 
 ### C2 — Persistent Field Propagation
 
-The same correction/status field is kept visible to downstream nodes across the matched continuation horizon.
+`J0 → same field visible → next eligible turn → same field visible → ...`
 
-`J0 → field persists → downstream node → same field persists → ...`
+The same correction is repeatedly made visible in the copied runtime view for each eligible downstream turn within the common horizon.
 
-Purpose: distinguish endogenous inertia from experiment-maintained persistence. Persistence in this arm must not be interpreted as endogenous inertia because the experiment continues to supply the signal.
+Purpose: observe experiment-maintained persistence and distinguish it from endogenous inherited inertia.
 
 ### C3 — ALR Structural Recovery
 
-The same J0 and matched semantic correction payload are used, but the correction is applied through Authority-Localized Recovery rather than repeated field exposure. ALR identifies the earliest relevant authority-violating ancestor, computes the affected dependency closure, preserves unaffected successful nodes, changes the breached authority/provenance condition, records a new revision lineage, and reopens or re-executes only the affected subgraph.
+`pre-J0 checkpoint → re-execute authority ancestor turn → local authority transform → new descendants`
 
-Purpose: test whether lineage-aware structural recovery can localize, redirect, and selectively reverse inherited inertia more precisely than simple persistent signal transmission.
+C3 does not repeatedly carry the correction through prompt-visible state. It rolls back to the exact source checkpoint immediately before the natural J0-producing turn, re-executes that turn, preserves the raw provider output, and—only if the same target authority-bearing write naturally appears—changes the realized status of that one write from `fact` to `unconfirmed` before Arena state realization.
+
+Purpose: test whether a localized structural recovery operation produces a different inertia/path response from persistent semantic transmission.
+
+## Exact source binding
+
+The first formal R7 configuration is tied to the frozen R5 source:
+
+- common reference parent: `after_turn:8`, state hash `aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c`;
+- exact recovery checkpoint: `before_turn:8`, state hash `99731abb4ffd1caa2e568a6c2d90987700b3d0b7a66a1c777f811b666912a349`;
+- natural J0: `E32`, actor `inventory`;
+- target: `inventory_stockout_assessment_v1.status`;
+- matched semantic correction: `fact → unconfirmed`;
+- common post-Jump horizon: 8 agent turns;
+- measurement ontology: `RB-PROCESS-REALITY-MECHANISM-MEASUREMENT-v0.4`.
+
+C1 and C2 start directly from the common post-J0 reference parent. C3 starts one natural source turn earlier because the recovery operation must act on the transition that created J0. Therefore `same parent` in R7 means the same frozen **reference parent/J0 comparison object**, not an assertion that all mechanisms literally begin from the same runtime snapshot.
+
+This distinction is methodological rather than cosmetic. Treating C3 as if it could repair an already committed J0 without reopening its causal transition would collapse structural recovery back into downstream field injection.
 
 ## Nested tests
 
 ### R7-A — One-Shot vs Persistent Propagation
 
-Question: does the observed downstream structure after a one-shot perturbation differ from a continuation in which the same field is continuously reintroduced?
+Question: does downstream structure after a one-shot perturbation differ from structure observed when the same signal is continuously reintroduced?
 
 Interpretation boundary:
 
@@ -48,114 +66,156 @@ Interpretation boundary:
 
 ### R7-B — Persistent Propagation vs ALR Recovery
 
-Question: with the semantic correction payload held as equivalent as possible, does lineage-aware structural recovery produce a different downstream process structure than simple continuous field propagation?
+Question: with semantic correction meaning matched, does localized authority recovery produce a different downstream structural response from repeated prompt-visible propagation?
 
-This is the direct mechanism comparison for structural controllability.
+C2 changes downstream visibility. C3 changes a localized realized authority transition and then allows the new process to evolve.
+
+## Why raw and applied envelopes are separated
+
+C3 uses a post-parse/pre-realization action transform. The model's raw output is not overwritten in evidence.
+
+For the target turn the trace preserves:
+
+- raw provider content;
+- raw parsed envelope;
+- applied envelope after the structural transform;
+- exact transformed action index and delta path;
+- raw/applied action hashes;
+- raw/applied envelope hashes;
+- subsequent realized Arena event/state.
+
+This separation prevents the recovery framework from laundering its own intervention into apparent model behavior.
+
+## C3 non-reproduction is data, not a failure to retry
+
+Provider hidden state cannot be replayed. Re-executing the same visible source checkpoint may not recreate the natural J0-shaped action.
+
+If exactly one matching `inventory_stockout_assessment_v1` write with status `fact` does not naturally recur on the targeted C3 turn, the system records:
+
+`C3_J0_REPRODUCTION_NOT_OBSERVED`
+
+It must not retry until the desired action appears, force a replacement action, or discard the run. Such a trace is a censored/non-realized intervention observation and is scientifically informative about the recoverability boundary.
 
 ## Passive and active ALR
 
-R2–R6 use an ALR-compatible structural observability substrate in passive mode. The substrate records naturally realized messages, state transitions, invocations, agent participation, final-state revisions, and lineage evidence; it does not prescribe the natural topology.
+R2–R6 use an ALR-compatible observability substrate passively. It records realized messages, state changes, invocations, execution, final-state revisions, and source-backed lineage without prescribing the natural routing topology.
 
-R7 activates the same structural representation as a recovery/control operator.
+R7 activates that structural representation as a recovery operator.
 
-A defensible methodological statement is:
+> ALR does not create the observed process structure; it makes naturally realized process structure observable. R7 then tests whether that observed structure is sufficiently real to support localized recovery and steering.
 
-> ALR does not create the observed process structure; it makes naturally realized process structure observable. R7 then tests whether that observed structure is sufficiently real to support localized control and recovery.
-
-The natural Arena remains free-routing rather than structurally steered toward the observed topology. Common runtime constraints such as role identity, action protocol, safety/budget limits, and serialization are not equivalent to prescribing path topology, node order, lineage, or desired terminal answer.
+The current first formal C3 is intentionally **turn-localized** because the frozen source provides a stable checkpoint immediately before the authority-ancestor turn. This experiment must not be described as arbitrary sub-event graph surgery.
 
 ## Raw evidence versus derived structure
 
-To avoid measurement circularity, R7 must preserve the distinction between raw observable facts and derived structural interpretation.
+Raw facts include:
 
-Raw evidence includes:
-
+- model input/messages;
+- raw provider output;
+- raw parsed actions;
+- applied actions when a structural transform occurs;
 - message send/delivery/read events;
-- agent invocation and execution events;
+- invocation/execution events;
 - shared-state writes and metadata changes;
 - final-state revisions;
-- actual model input/output and parsed actions;
-- queue, inbox, invocation, execution, and termination state.
+- queues, ledgers, failures, termination and usage;
+- C1/C2 exposure records;
+- C3 authority-transform and revision-lineage records.
 
-Derived structure includes:
+Derived interpretation includes:
 
 - J0 and descendant Re-Jumps;
-- dependency closure;
 - inherited-inertia lineage;
-- affected versus unaffected subgraph;
+- affected descendants;
 - path-family reconstruction;
-- recovery/re-entry relations.
+- branch/merge/re-entry topology;
+- recovery distance and residual old-inertia markers;
+- structural steering coordinates.
 
-Claims about structural control must be traceable from the derived graph back to immutable raw evidence.
+Raw evidence is frozen before any derived analysis. Semantic CPR review remains a later append-only layer.
 
 ## Structural outcome variables
 
-Primary R7 evidence is process-structural, not terminal-answer accuracy. Reuse the existing Process Reality measurement ontology wherever possible:
+Primary outcomes remain process-structural:
 
 - Jump and descendant Re-Jump lineage;
 - root-reachable event count and reach depth;
-- path-family count and transition pattern;
+- actor-transition sequence and edge distribution;
+- path-family count/transition;
 - branch/merge/re-entry structure;
 - cross-agent relations and agent participation;
-- state-inheritance lineage;
-- affected descendant localization;
-- unaffected-node preservation;
-- old-path residual markers and recurrence;
+- state/provenance inheritance;
+- preserved prefix and affected descendant localization;
+- residual old-path markers and recurrence;
 - new/secondary Jump formation;
-- reconvergence distance;
-- recovery distance;
+- reconvergence/recovery distance;
 - structural steering direction;
 - terminal/process decoupling.
 
-Secondary engineering metrics may include reopened node count, preserved node ratio, provider calls, tokens, latency, and cost, but they do not define the scientific result.
+Provider calls, tokens, latency, reopened-event count, and preservation ratio are secondary engineering measures.
 
-## Operational definition of direction
+## Operational meaning of direction
 
-R7 must not use the word `direction` as an intuitive metaphor only. A steering-direction result must be represented by one or more predeclared structural coordinates, for example:
+A steering claim must be tied to predeclared structural coordinates such as:
 
 - actor-transition sequence or edge distribution;
-- destination of state/provenance lineage;
-- location of descendant Re-Jumps;
+- state/provenance-lineage destination;
+- descendant Re-Jump location;
 - re-entry topology;
-- stage progression;
 - path-family transition;
 - downstream reach/depth profile.
 
-No condition may be labeled successful merely because the final answer is preferred.
+A preferred final answer is not evidence of steering.
 
-## Control rules
+## Common horizon and censoring
 
-1. Freeze the parent state and J0 before any R7 continuation outcome is visible.
-2. Bind all conditions to the same parent hash, task hash, agent-registry hash, model-config hash, and code identity.
-3. C1 receives exactly one experiment-origin exposure and no reinjection.
-4. C2 receives repeated exposure of only the predeclared field/payload according to a fixed delivery rule. Repeated exposure must be recorded explicitly.
-5. C3 must not receive richer semantic correction content than C2. The independent variable is structural handling/recovery, not semantic assistance.
-6. ALR may reopen only the precomputed affected dependency closure; unaffected successful nodes are preserved unless an explicit structural dependency requires reopening them.
-7. Provider-internal hidden state is never claimed to be replayed.
-8. Semantic CPR adjudication remains separable from runtime execution and structural measurement.
-9. Terminal answer remains a secondary endpoint.
+All arms use `R7-H1-POST-JUMP-TURN-CAP-8`.
+
+- maximum downstream distance: 8 post-Jump agent turns;
+- natural termination is retained;
+- shorter arms are not artificially extended;
+- early termination is marked as censoring;
+- C2 exposure count is therefore bounded by eight but may be lower in naturally shorter trajectories.
 
 ## Interpretation ladder
 
-R7 can support increasingly strong claims only when the corresponding evidence exists:
+Evidence strength is cumulative:
 
-1. **Observable** — natural process structure can be reconstructed from raw evidence.
-2. **Traceable** — downstream affected events can be linked back to J0 through recorded lineage.
-3. **Localizable** — the affected closure can be identified without reopening unrelated structure.
-4. **Steerable** — changing structural transition/recovery rules changes downstream structural coordinates while semantic payload is matched.
-5. **Selectively reversible** — affected structure can be recovered/reopened while preserving unaffected structure, with residual/recurrence explicitly measured.
+1. **Observable** — process structure can be reconstructed from raw evidence.
+2. **Traceable** — downstream events can be linked to the natural J0/source lineage.
+3. **Localizable** — a recovery operation can be restricted to the smallest supported source checkpoint/transition rather than restarting the entire run.
+4. **Steerable** — matched structural handling changes downstream structural coordinates.
+5. **Selectively recoverable** — affected structure can be re-executed while preserving the unaffected prefix, with residual/re-entry/recurrence explicitly measured.
 
-Do not use the stronger word `controllable` as a conclusion unless repeated evidence demonstrates reliable steering rather than a single structural difference.
+Do not conclude `controllable` from a single matched batch. Reliable control requires repeated evidence that steering is reproducible rather than merely different.
 
-## Engineering deliverables
+## Engineering status versus scientific evidence
 
-R7 implementation should provide:
+The repository now contains:
 
-- a persistent-field runtime-view transform with explicit per-turn exposure records;
-- an ALR recovery plan that binds authority ancestor, dependency closure, preserved nodes, reopened nodes, and revision lineage;
-- three-condition manifests sharing one frozen parent identity;
-- a preflight that verifies semantic-payload equivalence and condition isolation before any paid provider call;
-- a structural comparison artifact for C1/C2/C3;
-- an immutable evidence bundle with raw traces, manifests, measurements, hashes, and interpretation boundaries.
+- executable C1 and C2 runtime-view transforms;
+- an executable C3 authority-localized action transform;
+- exact source-parent and pre-J0 checkpoint binding;
+- raw-vs-applied envelope preservation in the Arena engine;
+- revision-lineage plumbing;
+- deterministic three-arm Arena smoke execution;
+- a guarded real three-arm subject runner;
+- zero-call real-run preflight and symmetric budget guards.
 
-The first implementation stage is engineering-only and must not be labeled scientific evidence until it is executed prospectively with the real-model protocol and frozen before analysis.
+The deterministic smoke uses synthetic provider envelopes and is **engineering-only**. It demonstrates that the experimental machinery functions; it does not demonstrate that system inertia is steerable.
+
+Real provider execution is separately gated and currently unauthorized. The exact external authorization phrase expected by the runner is `CALL_REAL_R7_THREE_ARM_API`.
+
+## Claim boundaries
+
+A first formal R7 batch may support descriptive claims about observed localization, redirection, recurrence, reconstruction, recovery distance, or non-reproduction of the target transition.
+
+It must not by itself establish:
+
+- universal superiority of ALR;
+- equivalence between C2 persistence and endogenous inertia;
+- reliable system control;
+- provider-hidden-state replay;
+- independence of same-parent repeated branches;
+- semantic CPR status unless separately adjudicated;
+- cross-model or cross-domain generality.
