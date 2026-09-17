@@ -1,249 +1,287 @@
 # reality-bias-benchmark
 
-Research repository for the Reality Bias research program and first-paper Process Reality mechanism study.
+Research repository for the Reality Bias research program and first-paper **Process Reality** mechanism study.
 
-## Current forward research layer
+Historical plans, frozen traces, reports, reviewer outputs and manifests remain append-only. Forward documents are versioned rather than silently rewriting prior evidence.
 
-The forward layer is **Process Reality / mechanism first**. Historical plans, contracts, runtime evidence, frozen reports, reviewer outputs and manifests remain append-only and are not rewritten.
+## Current forward stack
 
-Current forward stack:
+- **[R Plan v4.5](docs/R_Plan_v4.5.md)** — R5 as the bounded local probe; R6 as full System Inertia Identification; R7 as localized structural risk control/recovery.
+- **[Theory Contract v0.9](theory/theory_contract_v0.9.md)** — Reality Authority, carriers, inherited system inertia, natural variability, specificity and localized recovery.
+- **[Measurement Plan v4.5](docs/system_behavior_measurement_plan_v4.5.md)** — separates local response, carrier evidence, natural baseline, intervention-related inertia and target specificity.
+- **[R6 Identification Protocol v0.3](docs/R6_inertia_identification_protocol_v0.3.md)** — R6-A natural baseline, R6-B carrier identification, R6-C intervention-related inertia, R6-D target specificity.
+- **[Specificity Protocol v0.3](docs/R5_R6_specificity_protocol_v0.3.md)** — S0/S1/S2 as the R6-D specificity design.
+- **[R7 Control Protocol v0.4](docs/R7_structural_inertia_control_protocol_v0.4.md)** — C1 free continuation, C2 persistent field, C3 ALR localized recovery.
+- **[ALR Contract v0.3](docs/ALR_authority_localized_recovery_contract_v0.3.md)** — Authority-Localized Recovery with affected-closure and revision-lineage requirements.
+- **[Process Integrity Engineering Profile v0.1](docs/R7_process_integrity_engineering_profile_v0.1.md)** — lightweight, pluggable, real-time, content-addressed runtime integrity layer.
+- **[Evidence Status Addendum v0.1](docs/evidence_status_addendum_v0.1.md)** — explicit current support/unresolved boundaries for local response, inertia, specificity, CPR and R7.
+- **[First-Paper Scope v4.5](docs/first_paper_v4.5_scope.md)** — phenomenon -> mechanism -> identification -> localized solution -> semantic closure.
+- **[Report Standard v1.2](docs/reporting/process_reality_report_standard_v1_2.md)** and **[Template v1.2](schemas/process_reality_report_template_v1_2.json)** — reporting grammar for R6 identification and R7 localized recovery.
 
-- **[R Plan v4.4](docs/R_Plan_v4.4.md)** — R5 as the bounded probe, R6 as the principal inertia-level readout, plus the new R5-R6 target-specificity layer;
-- **[Theory Contract v0.8](theory/theory_contract_v0.8.md)** — Process Reality Fidelity, Reality Authority, Jump, inherited inertia, falsification-oriented local counterfactual perturbation and target specificity;
-- **[System Behavior Measurement v4.4](docs/system_behavior_measurement_plan_v4.4.md)** — separates local perturbation response, post-consumption inertia and target-specificity contrasts;
-- **[R6 Inertia Transition Protocol v0.2](docs/R6_inertia_transition_protocol_v0.2.md)** — system inertia after the experiment-origin one-shot signal exits active context;
-- **[R5-R6 Specificity Protocol v0.1](docs/R5_R6_specificity_protocol_v0.1.md)** — S0 natural reference vs S1 matched factual-field downgrade vs S2 J0-targeted authority withdrawal;
-- **[Matched Field Selection Contract v0.1](configs/r5r6_specificity_field_selection_contract_v0.1.json)** — outcome-blind preregistration for the S1 target;
-- **[ALR Authority-Localized Recovery Contract v0.2](docs/ALR_authority_localized_recovery_contract_v0.2.md)** — ALR as a causally localized recovery operator;
-- **[R7 Structural Inertia Control Protocol v0.3](docs/R7_structural_inertia_control_protocol_v0.3.md)** — C1 one-shot free vs C2 persistent field vs C3 ALR localized recovery;
-- **[R8 CPR Semantic Closure Protocol v0.1](docs/R8_CPR_semantic_closure_protocol_v0.1.md)** — append-only semantic adjudication after structural evidence freeze;
-- **[First-Paper Scope v4.4](docs/first_paper_v4.4_scope.md)** — publication-scope claim boundaries under the refined mechanism chain.
-
-Repository updates do not authorize paid provider or evaluator calls.
+Repository updates do **not** authorize paid provider calls, paid evaluator calls or CPR adjudication.
 
 ## Core research position
 
-The first paper is about **process phenomena and underlying system mechanism**, not final-task accuracy as the primary unit and not an architecture leaderboard.
-
-```text
-Natural trajectory
-  -> observable local Jump J0
-  -> inherited system inertia
-  -> one-shot withdrawal of J0's acquired factual authority
-  -> path reorganization
-  -> experiment-origin signal exits
-  -> post-consumption inertia transition
-  -> target-specificity test
-  -> structural inertia risk control / localized recovery
-  -> CPR semantic closure
-```
-
-The central distinction is:
+The primary object is the realized multi-Agent process rather than terminal correctness alone.
 
 > **Outcome Validity != Process Reality Fidelity**
 
-A task may end with a correct answer while its process contains unsupported promotion, scope expansion, inherited deviation or retrospective regeneration. Final outcome is therefore a terminal observation, not the definition of Reality Bias.
+A run may end at a similar terminal decision while its process history, authority transitions, carrier lineage and inherited structure differ materially.
 
-## CPR position
+## Forward research geometry
 
-CPR is a **process-dynamics taxonomy derived from repeated trajectory phenomena**, not a template every run must satisfy.
+```text
+Natural multi-Agent process
+  -> R2: natural Jump emergence
+  -> R3: inheritance / propagation structure
+  -> R4: retrospective / challenge / return dynamics
+  -> R5: one bounded local authority-withdrawal probe
+  -> R6: System Inertia Identification
+       |- R6-A natural inertia baseline
+       |- R6-B carrier / inheritance identification
+       |- R6-C intervention-related post-consumption inertia
+       `- R6-D target specificity (S0/S1/S2)
+  -> R7: localized structural risk control / recovery
+  -> R8: CPR semantic adjudication and evidence freeze
+  -> R9: external robustness / replication
+```
 
-- **C** — unsupported or weakly supported epistemic state becomes stronger, inheritable reality;
-- **P** — goal/scope/focus/information/Agent surface expands beyond supported process closure and materially changes the path;
-- **R** — prior C/P-derived state persists, regenerates, amplifies, launders or normalizes after a retrospective/challenge/reopen/correction opportunity.
+The compact logic is:
 
-Recovery is not R-positive evidence.
+> **R5 perturbs. R6 identifies. R7 localizes and repairs. R8 adjudicates semantics.**
 
-A Jump is an observable event; inherited inertia is a mechanism; CPR is a semantic process-dynamics classification; task outcome is a terminal state. These levels must not be collapsed.
+## R5 — bounded local probe
 
-## R2-R9 forward research roles
-
-R numbers describe research roles/views; they do not require nine sequential subject experiments.
-
-- **R2 — Emergence:** where and how a natural Jump appears;
-- **R3 — Inheritance / Propagation:** how Jump-derived state enters downstream context, messages, state, invocations and paths;
-- **R4 — Retrospective Dynamics:** persistence, regeneration, amplification, normalization, correction and return;
-- **R5 — One-Shot Authority Withdrawal / Path Reorganization:** one bounded local factual-authority withdrawal at J0, then free continuation;
-- **R6 — Post-Consumption System Inertia:** what inherited tendency remains, disappears, transfers, transforms, returns, reconstructs or reconverges after the direct experiment-origin signal is gone;
-- **R5-R6 Specificity — S0/S1/S2:** distinguish J0-targeted inertia response from the generic response to a matched factual-status downgrade;
-- **R7 — Structural Inertia Risk Control / Localized Recovery:** whether risk-bearing inherited inertia can be localized or recovered while preserving unrelated process freedom;
-- **R8 — CPR Semantic Closure / Evidence Freeze:** semantic adjudication only after structural evidence is frozen;
-- **R9 — External Robustness / Replication:** additional reviewers, models, domains and independent implementations/laboratories.
-
-## R5 — one-shot authority withdrawal
-
-The canonical R5 probe is not a corrective prompt that supplies a new answer. It withdraws only the selected field's acquired factual authority, for example:
+The canonical family withdraws acquired factual authority once, e.g.:
 
 ```text
 fact -> unconfirmed
 ```
 
-The invariant is:
+R5 must not provide an opposite fact, replacement conclusion, desired action, desired terminal answer, Agent identity change, topology prescription, persistent experiment-origin mutation or reinjection.
+
+R5 primarily establishes **local perturbability/direct path response** where supported. It does not alone prove long-range inertia change, condition effect, target specificity, CPR identity or successful recovery.
+
+## R6 — System Inertia Identification
+
+R6 is now the main mechanism-identification layer.
+
+### R6-A — Natural Inertia Baseline
+
+Repeated natural continuations estimate how much the system already varies without a new perturbation.
+
+Large natural variation is a measurement object, not merely a limitation.
+
+### R6-B — Carrier / Inheritance Identification
+
+A claimed inertia chain should identify what carried prior state forward.
+
+Carrier evidence levels:
 
 ```text
-same frozen natural parent
-+ selected natural J0
-+ one branch-visible factual-status downgrade
-+ exactly one experiment-origin exposure
-+ no opposite factual claim
-+ no replacement conclusion
-+ no desired terminal answer
-+ no Agent/topology modification
-+ zero persistent experiment-origin shared-state mutation
-+ zero experiment-origin reinjection after consumption
--> free multi-Agent continuation
+REACHABLE
+  -> DELIVERED / READ
+  -> ADOPTED
+  -> INHERITED
+  -> PROPAGATED
 ```
 
-R5 establishes perturbability/path reorganization where supported. It does **not** by itself establish target specificity or structural control.
+Graph reachability alone is not semantic adoption.
 
-The formal R5-MID batch and finalized v3 reports remain frozen and historically `NOT_ADJUDICATED` where the freeze contract says so.
+### R6-C — Intervention-Related Inertia Transition
 
-## R6 — post-consumption system inertia
+The direct response window is separated from the post-consumption window.
 
-R6 is the principal inertia-level readout after the direct R5 experimental mark exits active context.
+A single A/B trajectory difference is insufficient when natural A/A continuations already diverge strongly. Intervention-related inertia must be interpreted against a frozen natural-variability/process-distance reference.
 
-The core distinction is:
+Natural early termination is **right-censoring**, not proof of zero inertia or permanent extinction.
 
-> **Immediate perturbation response != inertia transition**
+### R6-D — Target Specificity
 
-One extra check, message, write or local reroute may be a real local response but is not enough to establish downstream system inertia.
+The S triad is an internal R6 design:
 
-R6 instead measures source-backed continuation, extinction, transformation, transfer, delayed re-emergence, retrospective return, post-return inheritance, branch/merge/re-entry, cross-Agent spread, replacement/reconstruction and reconvergence.
-
-A Jump phenotype can disappear while structural inertia remains in later routing, lineage, state or participation structure.
-
-The current frozen-source readout is available at **[R6 System Inertia Factual Report v2](docs/reports/2026-09-17/R6_System_Inertia_Factual_Report_v2.md)** with its machine-readable binding in **[R6 factual report v2 manifest](manifests/r6_system_inertia_factual_report_2026-09-17_v2.json)**. It creates no new subject evidence; it reorganizes the frozen R5-MID process evidence under the R6 post-consumption inertia question.
-
-## R5-R6 — target-specificity triad
-
-The forward specificity family uses an independent **S namespace**:
-
-```text
-                         frozen J0 context
-                               |
-                 +-------------+-------------+
-                 |             |             |
-                S0            S1            S2
-             natural       matched       J0-targeted
-            reference     factual field    authority
-                           downgrade       withdrawal
-                 |             |             |
-                 +------ R6 post-consumption inertia ------+
-```
-
-- **S0 — Natural Reference:** no new experiment-origin downgrade;
-- **S1 — Matched Factual-Field Downgrade:** the same one-shot mechanical transform is applied to a preregistered matched non-J0 factual field;
-- **S2 — J0-Targeted Authority Withdrawal:** the same one-shot transform is applied to J0.
+- `S0_NATURAL_REFERENCE`
+- `S1_MATCHED_OR_ORDINARY_FACTUAL_INFORMATION_DOWNGRADE`
+- `S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL`
 
 Contrasts:
 
-- `S1 - S0` — generic epistemic uncertainty response;
-- `S2 - S0` — total J0-targeted perturbation response;
+- `S1 - S0` — generic uncertainty response;
+- `S2 - S0` — total J0-targeted response;
 - `S2 - S1` — **primary target-specificity contrast**.
 
-S1 is not expected to be inert. A normal factual field becoming `unconfirmed` may legitimately induce checking or rerouting. The scientific question is whether the **post-consumption inertia profile** for J0 is structurally distinguishable from that generic response under matched mechanics.
+S1 is not required to have zero effect.
 
-The S1 target must be selected outcome-blind from a frozen eligible pool. Choosing a control field because it is expected to have little effect is forbidden.
+## Exact-source atomic specificity
 
-## Falsification-oriented interpretation
+The frozen `after_turn:8` parent contains only one non-initial top-level `shared_state_metadata` item with status `fact`: `inventory_stockout_assessment_v1`.
 
-The R5-R6 design is treated as a **local counterfactual falsification test**, not mathematical proof by contradiction.
+Therefore the prospective specificity design uses atomic prompt-visible facts rather than inventing a second top-level fact field.
 
-Candidate null interpretation:
+Frozen prospective targets:
 
-> J0 is only a local information event; its acquired factual authority is not structurally embedded in downstream system inertia.
+- **S1:** `public_context.products.C.gross_margin_pct = 35`
+- **S2:** `shared_state.inventory_stockout_assessment_v1.A.preliminary_stock = 1520`
 
-The test withdraws only that authority once, consumes the experiment-origin signal, permits free continuation and then observes R6 inertia. If the post-consumption trajectory reorganizes, the null is challenged under the matched local intervention.
+The S2 signal originated as `preliminary_unreconciled` and later entered a state container carrying `fact` authority at J0.
 
-The S1 control addresses the weaker alternative that **any** comparable factual-status downgrade would produce the same effect.
+S1/S2 use the same minimal operator:
 
-## R7 — structural inertia risk control
+`ONE_SHOT_TARGET_SCOPED_EPISTEMIC_STATUS_ANNOTATION`
 
-R7 retains the independent **C namespace**:
+The original values remain unchanged; only the target locator differs.
+
+Relevant artifacts:
+
+- `docs/R5_R6_specificity_source_audit_2026-09-17.md`
+- `configs/r5r6_specificity_field_selection_contract_v0.2.json`
+- `configs/r5r6_specificity_exact_source_binding_v0.2.json`
+- `manifests/r5r6_specificity_s1_selection_2026-09-17_v0_2.json`
+- `arena/r5r6_specificity_atomic_v0_2.py`
+- `arena/r5r6_specificity_atomic_preflight_v0_2.py`
+
+## CPR remains separate
+
+Structural change does not automatically establish Process Reality bias.
+
+- `fact` label alone != C;
+- one extra Agent/tool call alone != P;
+- same-key recurrence alone != R.
+
+CPR remains an R8 append-only semantic adjudication layer after structural evidence is frozen.
+
+## R7 — localized structural risk control
+
+R7 uses the independent `C` namespace:
+
+- **C1** — One-Shot Free Continuation;
+- **C2** — Persistent Field Propagation;
+- **C3** — ALR Authority-Localized Recovery.
+
+R7 should preferably consume an **R6-identified risk-bearing carrier or affected closure**, rather than treating every path difference as a repair target.
+
+Success requires both:
+
+1. risk-bearing inertia reduction/localization; and
+2. preservation of unaffected nodes, fields, branches, Agent participation and unrelated path diversity.
+
+Whole-system suppression is not equivalent to localized recovery.
+
+## R7 engineering implication — Process Integrity Protocol
+
+The scientific mechanism motivates a runtime engineering layer with three practical capabilities:
+
+> **Monitor -> Scout/Localize -> Point Repair**
+
+Desired properties:
+
+- lightweight;
+- pluggable;
+- non-invasive/passive by default;
+- protocol-agnostic;
+- real-time;
+- content-addressed;
+- lineage-aware;
+- localized in repair scope;
+- auditable/reversible.
+
+It should integrate beside existing Agent/MCP/A2A/workflow systems rather than replace them.
+
+Minimal event surface:
+
+- `MessageEvent`
+- `StateEvent`
+- `InvocationEvent`
+- `EvidenceSourceEvent`
+- `RevisionEvent`
+
+Recommended runtime identities:
+
+- `EventHash`
+- `MessageHash`
+- `StateHash`
+- `FieldHash`
+- `SourceHash`
+- `InvocationHash`
+- `RevisionHash`
+- `ClosureHash`
+
+The practical lifecycle is:
 
 ```text
-                 frozen J0 / risk-bearing condition
-                              |
-              +---------------+---------------+
-              |               |               |
-             C1              C2              C3
-         one-shot free    persistent field     ALR
-          continuation       propagation      recovery
-              |               |               |
-              v               v               v
-         endogenous       maintained        localized
-           inertia         persistence      recovery /
-                                           risk control
+Observe
+  -> content-address
+  -> reconstruct lineage
+  -> detect / localize carrier
+  -> compute affected closure
+  -> point repair if explicitly authorized
+  -> resume free execution
+  -> verify old/new lineage and re-entry
 ```
 
-- **C1 — One-Shot Free Continuation:** observe endogenous inherited inertia after the signal is consumed;
-- **C2 — Persistent Field Propagation:** observe experiment-maintained persistence;
-- **C3 — ALR Authority-Localized Recovery:** locate the earliest source-backed authority/provenance breach, compute affected dependency closure, preserve unaffected structure, repair that condition, create revision lineage and reopen only the affected subgraph.
+Passive observation must not become a new supervisor that prescribes the topology it claims to observe.
 
-The S and C families are orthogonal:
+Machine-readable engineering interfaces:
 
-- `S` asks **what target was perturbed**;
-- `C` asks **how a risk-bearing condition is structurally handled**.
+- `configs/r7_process_integrity_engineering_contract_v0.1.json`
+- `schemas/process_integrity_event_v0.1.schema.json`
+- `schemas/process_integrity_lineage_record_v0.1.schema.json`
 
-They must never be aliased simply because both S2 and C1 may reuse a one-shot status-downgrade primitive.
+## Current evidence status
 
-R7 success requires both risk reduction/localization and preservation of unrelated process freedom. Whole-system suppression or canonical-path forcing is not equivalent to useful localized recovery.
+Current frozen R5-MID evidence supports or exposes:
 
-## Evidence and review lifecycle
+- natural J0;
+- one-shot intervention integrity;
+- direct/local structural response;
+- natural downstream inertia candidates, especially A2;
+- large natural variability across repeated natural continuations;
+- matched downstream structural differences;
+- similar core terminal decisions despite process differences.
+
+Still unresolved/prospective:
+
+- intervention-related long-range inertia effect beyond natural variability;
+- repeatable carrier-mediated condition difference;
+- S2 vs S1 target specificity;
+- semantic C/P/R identity;
+- R7 scientific localized-recovery efficacy.
+
+See **[Evidence Status Addendum v0.1](docs/evidence_status_addendum_v0.1.md)** for the claim matrix.
+
+## Evidence lifecycle
 
 ```text
-prepare/freeze protocol
--> subject run only when explicitly authorized
+prepare / freeze protocol
+-> scientific subject run only with explicit authorization
 -> freeze raw evidence
 -> integrity validation
 -> deterministic structural derivation
--> export bounded semantic-review packets
--> append independent semantic reviews later
--> freeze paper-level evidence object
+-> R6 identification
+-> optional R7 structural-control experiment
+-> bounded semantic review packets
+-> append-only R8 adjudication
+-> paper-level evidence freeze
 ```
 
-A subject run does not automatically call a paid evaluator.
-
-The preferred architecture is:
+Preferred architecture:
 
 > **immutable evidence core + append-only interpretation layers**
 
-## Specificity offline implementation
+## Reporting
 
-The repository contains an offline-only specificity implementation:
+Forward publication reports use:
 
-- `arena/r5r6_specificity.py` — matched-field selection, S1/S2 one-shot envelopes, copied-runtime-view transform and S0/S1/S2 plan builder;
-- `arena/r5r6_specificity_preflight.py` — deterministic engineering-only preflight;
-- `arena/tests/test_r5r6_specificity.py` — selection, namespace, mechanical-equivalence and no-mutation tests;
-- `scripts/validate_r5r6_specificity_protocol.py` — cross-contract validator;
-- `.github/workflows/r5r6-specificity-offline-validate.yml` — no-credential/no-real-run validation path;
-- `schemas/r5r6_specificity_plan_v0.1.schema.json` and `schemas/r5r6_specificity_comparison_v0.1.schema.json` — machine-readable plan/comparison interfaces.
+- **[Process Reality Report Standard v1.2](docs/reporting/process_reality_report_standard_v1_2.md)**
+- **[Process Reality Report Template v1.2](schemas/process_reality_report_template_v1_2.json)**
 
-This path creates **engineering validation evidence only**. It does not create scientific S0/S1/S2 subject evidence and does not authorize a provider call.
+Historical standards remain valid for their frozen reports:
 
-## Historical evidence boundary
+- v1.1: R6 factual/specifity-forward reporting layer;
+- v1.0: finalized R5-MID v3 report bundle.
 
-Historical subject/reviewer evidence, old contracts, old prepared bundles, exploratory persistent-exposure pilots, structured-orchestration pilots and frozen formal batches remain immutable provenance. They are not silently relabeled to match the current theory.
+The reporting chain remains:
 
-In particular:
+`frozen raw trace -> source-backed derivation -> bounded report projection`
 
-- formal R5-MID `A/B` labels are not retroactively converted into `S0/S2`;
-- existing R7 `C1/C2/C3` identities are preserved;
-- existing R7 readiness evidence is not promoted into R5-R6 specificity evidence;
-- historical `NOT_ADJUDICATED` evidence remains unchanged unless a future append-only review is explicitly permitted by its freeze contract.
-
-## Reporting standard
-
-Publication-facing Process Reality reports follow versioned reporting contracts rather than ad-hoc summary formatting:
-
-- **[Process Reality Report Standard v1.1](docs/reporting/process_reality_report_standard_v1_1.md)** — forward standard extending v1.0 with R6 System Inertia Factual and R5-R6 Specificity Validation profiles;
-- **[Process Reality Report Template v1.1](schemas/process_reality_report_template_v1_1.json)** — machine-readable forward report contract;
-- **[Process Reality Report Standard v1.0](docs/reporting/process_reality_report_standard_v1.md)** and **[Template v1.0](schemas/process_reality_report_template_v1.json)** — preserved historical standard for finalized R5-MID v3 reports;
-- **[Formal R5-MID report bundle — 2026-09-17](docs/reports/2026-09-17/README.md)** — finalized historical reports plus the indexed R6 factual v2 readout;
-- **[Report bundle manifest](manifests/r5mid_report_bundle_2026-09-17_v1.json)** — binds the historical v1.0 report set and finalized DOCX export hashes to frozen evidence.
-
-The reporting chain is:
-
-`frozen raw trace -> frozen structural derivation -> report figure/table`.
-
-A report is a human-readable evidence projection and does not authorize reruns, semantic promotion or mutation of frozen evidence.
+A report does not authorize reruns, provider calls, semantic promotion or active recovery.
