@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-PROCESS-INTEGRITY-LINEAGE-RECORD-v0.1",
+  "title": "Process Integrity Lineage Record v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "record_id",
+    "record_type",
+    "root_ref",
+    "descendant_refs",
+    "carrier_refs",
+    "affected_closure",
+    "preserved_refs",
+    "scientific_status"
+  ],
+  "properties": {
+    "schema": {"const": "RB-PROCESS-INTEGRITY-LINEAGE-RECORD-v0.1"},
+    "record_id": {"type": "string", "minLength": 1},
+    "record_type": {
+      "enum": [
+        "PASSIVE_LINEAGE",
+        "R6_CARRIER_CHAIN",
+        "R7_AFFECTED_CLOSURE",
+        "R7_RECOVERY_REVISION"
+      ]
+    },
+    "root_ref": {"type": "string", "minLength": 1},
+    "descendant_refs": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "carrier_refs": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "carrier_evidence_level": {
+      "enum": [
+        "REACHABLE_CARRIER",
+        "DELIVERED_OR_READ_CARRIER",
+        "ADOPTED_CARRIER",
+        "INHERITED_CARRIER",
+        "PROPAGATED_CARRIER",
+        "UNRESOLVED"
+      ]
+    },
+    "affected_closure": {
+      "type": "object",
+      "required": ["refs", "closure_hash"],
+      "additionalProperties": false,
+      "properties": {
+        "refs": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        },
+        "closure_hash": {"type": ["string", "null"]}
+      }
+    },
+    "preserved_refs": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "authority_condition_id": {"type": ["string", "null"]},
+    "prior_revision_hash": {"type": ["string", "null"]},
+    "repaired_revision_hash": {"type": ["string", "null"]},
+    "parent_revision_ref": {"type": ["string", "null"]},
+    "reopen_plan_hash": {"type": ["string", "null"]},
+    "reopened_refs": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true,
+      "default": []
+    },
+    "old_lineage_reentry_refs": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true,
+      "default": []
+    },
+    "censoring_status": {
+      "enum": [
+        "UNCENSORED",
+        "EARLY_NATURAL_TERMINATION",
+        "HORIZON_LIMIT",
+        "MISSING_SOURCE_EVIDENCE",
+        "OTHER_UNRESOLVED"
+      ]
+    },
+    "scientific_status": {
+      "enum": [
+        "RAW_OR_STRUCTURAL_EVIDENCE",
+        "ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE",
+        "NOT_ADJUDICATED",
+        "ADJUDICATED_APPEND_ONLY"
+      ]
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "schema": "RB-CPR-ADJUDICATION-CONTRACT-v0.2",
+  "version": "0.2",
+  "date": "2026-09-17",
+  "status": "FORWARD_APPEND_ONLY_REVIEW_CONTRACT_NOT_AUTHORIZED_FOR_CURRENT_FROZEN_R5MID",
+  "definition_contract": "RB-CPR-DEFINITION-CONTRACT-v0.2",
+  "review_principle": "STRUCTURE_FROZEN_FIRST_SEMANTICS_SECOND",
+  "candidate_eligibility": {
+    "requires_frozen_structural_candidate": true,
+    "requires_source_refs": true,
+    "requires_candidate_window": true,
+    "requires_freeze_contract_to_allow_append_only_review": true,
+    "historical_r5mid_not_adjudicated_freeze_bypass_forbidden": true
+  },
+  "review_packet": {
+    "common_fields": [
+      "candidate_id",
+      "candidate_label_family",
+      "event_or_window_refs",
+      "pre_state_refs",
+      "post_state_refs",
+      "source_evidence_refs",
+      "carrier_or_lineage_refs_if_relevant",
+      "authority_or_scope_context",
+      "terminal_outcome_separate"
+    ],
+    "C_required_fields": [
+      "proposition_identity",
+      "proposition_content",
+      "source_status_at_time",
+      "container_or_state_status",
+      "promotion_transition",
+      "downstream_read_or_adoption_evidence",
+      "downstream_inheritance_evidence_if_available",
+      "independent_confirmation_available_before_use"
+    ],
+    "P_required_fields": [
+      "authorized_or_supported_boundary",
+      "expansion_event",
+      "expanded_surface",
+      "authorization_evidence",
+      "material_downstream_effect",
+      "legitimate_decomposition_alternative"
+    ],
+    "R_required_fields": [
+      "prior_semantic_ancestor",
+      "prior_deviation_lineage",
+      "challenge_reopen_or_correction_boundary",
+      "post_boundary_state_or_action",
+      "persistence_or_regeneration_evidence",
+      "new_independent_evidence_if_any"
+    ]
+  },
+  "allowed_labels": [
+    "ADJUDICATED_C",
+    "ADJUDICATED_P",
+    "ADJUDICATED_R",
+    "ADJUDICATED_MULTI_LABEL",
+    "ADJUDICATED_NON_CPR",
+    "UNRESOLVED"
+  ],
+  "reviewer_output_requirements": [
+    "label",
+    "supported_relation_checks",
+    "failed_or_missing_relation_checks",
+    "evidence_refs",
+    "counter_explanation_considered",
+    "confidence_or_uncertainty",
+    "reviewer_identity_and_model_or_human_metadata"
+  ],
+  "aggregation": {
+    "default_mode": "NO_AUTOMATIC_MAJORITY_PROMOTION",
+    "disagreement_status": "REVIEW_DISAGREEMENT",
+    "aggregate_label_requires_explicit_frozen_rule": true,
+    "unresolved_allowed": true,
+    "non_cpr_allowed": true
+  },
+  "independence": {
+    "reviewer_must_not_edit_structural_evidence": true,
+    "reviewer_must_not_create_missing_lineage": true,
+    "new_reviews_append_only": true,
+    "prior_reviewer_outputs_immutable": true
+  },
+  "current_j0": {
+    "status": "STRUCTURAL_CANDIDATE_ONLY_NOT_ADJUDICATED",
+    "candidate_reason": "preliminary_unreconciled inventory signal later entered fact-status container",
+    "semantic_c_established": false,
+    "required_unresolved_questions": [
+      "WHAT_EXACT_PROPOSITION_DID_FACT_STATUS_APPLY_TO",
+      "WAS_THERE_INDEPENDENT_CONFIRMATION_BEFORE_DOWNSTREAM_USE",
+      "DID_UNCERTAINTY_QUALIFIERS_REMAIN_VISIBLE",
+      "HOW_DID_DOWNSTREAM_AGENTS_INTERPRET_OR_USE_THE_PROPOSITION"
+    ]
+  },
+  "authorization": {
+    "semantic_adjudication": false,
+    "paid_evaluator_run": false,
+    "provider_subject_run": false
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "schema": "RB-R5R6-SPECIFICITY-EXACT-SOURCE-BINDING-v0.2",
+  "version": "0.2",
+  "date": "2026-09-17",
+  "status": "OFFLINE_EXACT_SOURCE_BINDING_NO_RUN_AUTHORIZATION",
+  "source": {
+    "workflow_run_id": 35132777581,
+    "raw_artifact_id": 10461759345,
+    "raw_artifact_digest": "sha256:7bc6e346ded2fc61bac04f9b62c54277b00b45d4493b0d5c3f3c60cfdcd850a4",
+    "raw_traces_sha256": "102089199c7e1292e80444e339b84b00d2124e298f9ab849844dda0116473ef7",
+    "evidence_batch_hash": "244d10dfd7655eef7ac99db4731e85daab62fe9a2546b89e7d27720fbb8c20f7",
+    "common_parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c",
+    "source_plan_hash": "a24c98901422bbccfc9a040a6bc14575b1c710edd518c0d9c2facf7a57926351",
+    "source_measurement_hash": "5ec7953b473e4d7b29612de18aac9992238e722e1b12ea7c6999929958b24191",
+    "control_t9_prompt_hash": "3152c87e0238f6cf033badd6e8ecfc01ff2e713d1d64dee2108c300f28e65225",
+    "control_t9_runtime_snapshot_hash": "776892d1214693dae2880fe197068da6dcc727974529e87e7960251f16fb67bf",
+    "resumed_actor": "ops_lead",
+    "resumed_turn": 9
+  },
+  "j0": {
+    "event_ref": "E32",
+    "event_index_zero_based": 32,
+    "turn": 8,
+    "actor": "inventory",
+    "container_state_key": "inventory_stockout_assessment_v1",
+    "container_acquired_status": "fact",
+    "container_basis": "Public stock/daily_units plus private supplier_lead_days and transfer_capacity_units; A stock preliminary_unreconciled 1520 vs 2100"
+  },
+  "s1": {
+    "condition": "S1_MATCHED_OR_ORDINARY_FACTUAL_INFORMATION_DOWNGRADE",
+    "target_class": "ORDINARY_ATOMIC_FACT",
+    "target_locator": "public_context.products.C.gross_margin_pct",
+    "original_value": 35,
+    "source_refs": ["arena/domains/ecommerce.json:task.public_context.products.C.gross_margin_pct"],
+    "source_origin_status": "fact",
+    "acquired_status_at_intervention": "fact",
+    "selected_by": "RB-R5R6-SPECIFICITY-S1-SELECTION-RECORD-v0.2"
+  },
+  "s2": {
+    "condition": "S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL",
+    "target_class": "J0_ESCAPE_DERIVED_ATOMIC_FACT",
+    "target_locator": "shared_state.inventory_stockout_assessment_v1.A.preliminary_stock",
+    "original_value": 1520,
+    "source_refs": ["ecom-late-1", "M00005", "E32"],
+    "source_origin_status": "preliminary_unreconciled",
+    "acquired_status_at_intervention": "fact",
+    "escape_interpretation": "The late signal Product A stock=1520 entered as preliminary/unreconciled and was later carried inside inventory_stockout_assessment_v1 when that container was written with status fact at E32. The prospective S2 atomic target withdraws the acquired factual authority of this exact signal, not the numerical value itself."
+  },
+  "common_operator": {
+    "schema": "RB-R5R6-ATOMIC-EPISTEMIC-ANNOTATION-v0.2",
+    "mechanical_primitive": "ONE_SHOT_TARGET_SCOPED_EPISTEMIC_STATUS_ANNOTATION",
+    "from_status": "fact",
+    "to_status": "unconfirmed",
+    "prompt_visible_field": "epistemic_annotations",
+    "direct_exposure_limit": 1,
+    "persistent_state_mutation": false,
+    "experiment_origin_reinjection_count": 0,
+    "original_target_value_mutation": false,
+    "opposite_fact_supplied": false,
+    "replacement_conclusion_supplied": false,
+    "desired_terminal_answer_supplied": false
+  },
+  "historical_boundary": {
+    "historical_r5mid_target": "shared_state_metadata.inventory_stockout_assessment_v1.status",
+    "historical_r5mid_transform": "fact -> unconfirmed",
+    "prospective_s2_is_exact_historical_operator_replay": false,
+    "prospective_s2_role": "ATOMIC_TARGET_SPECIFICITY_FOLLOW_UP",
+    "historical_ab_evidence_remains_unchanged": true
+  },
+  "authorization": {
+    "offline_operator_implementation": true,
+    "offline_preflight": true,
+    "scientific_subject_provider_call": false,
+    "paid_evaluator_call": false,
+    "semantic_cpr_adjudication": false
+  }
+}

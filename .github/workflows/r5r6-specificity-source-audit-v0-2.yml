@@ -1,0 +1,138 @@
+name: R5-R6 Specificity Source Audit v0.2
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "docs/R5_R6_specificity_source_audit_2026-09-17.md"
+      - "configs/r5r6_specificity_field_selection_contract_v0.2.json"
+      - "configs/r5r6_specificity_exact_source_binding_v0.2.json"
+      - "manifests/r5r6_specificity_s1_selection_2026-09-17_v0_2.json"
+      - "manifests/r5r6_specificity_source_slice_2026-09-17_v0_2.json"
+      - "arena/prompts.py"
+      - "arena/r5r6_specificity_atomic_v0_2.py"
+      - "arena/r5r6_specificity_atomic_preflight_v0_2.py"
+      - "arena/tests/test_r5r6_specificity_atomic_v0_2.py"
+      - "scripts/validate_r5r6_specificity_source_audit_v0_2.py"
+      - ".github/workflows/r5r6-specificity-source-audit-v0-2.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  offline-source-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate exact-source selection and binding
+        run: python scripts/validate_r5r6_specificity_source_audit_v0_2.py
+
+      - name: Run atomic specificity unit tests
+        run: python -m unittest arena.tests.test_r5r6_specificity_atomic_v0_2 -v
+
+      - name: Run full Arena offline test suite
+        run: python -m unittest discover arena/tests -v
+
+      - name: Execute deterministic atomic specificity preflight
+        run: |
+          set -euo pipefail
+          python -m arena.r5r6_specificity_atomic_preflight_v0_2 --outdir /tmp/r5r6_atomic_specificity_preflight
+          test -s /tmp/r5r6_atomic_specificity_preflight/summary.json
+          test -s /tmp/r5r6_atomic_specificity_preflight/plan.json
+          test -s /tmp/r5r6_atomic_specificity_preflight/s1_envelope.json
+          test -s /tmp/r5r6_atomic_specificity_preflight/s2_envelope.json
+
+      - name: Assert atomic specificity invariants
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          s=json.load(open('/tmp/r5r6_atomic_specificity_preflight/summary.json'))
+          p=json.load(open('/tmp/r5r6_atomic_specificity_preflight/plan.json'))
+          e1=json.load(open('/tmp/r5r6_atomic_specificity_preflight/s1_envelope.json'))
+          e2=json.load(open('/tmp/r5r6_atomic_specificity_preflight/s2_envelope.json'))
+          assert s['scientific_status']=='ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE'
+          assert s['exact_source_top_level_fact_keys']==['inventory_stockout_assessment_v1']
+          assert s['v0_1_second_top_level_fact_available'] is False
+          assert s['s1_s2_mechanically_equivalent'] is True
+          assert s['s1_direct_exposures']==1 and s['s2_direct_exposures']==1
+          assert s['s1_reinjections']==0 and s['s2_reinjections']==0
+          assert s['source_runtime_immutable'] is True
+          assert s['original_target_values_preserved'] is True
+          assert s['control_prompt_has_annotation'] is False
+          assert s['paid_provider_called'] is False
+          assert s['paid_evaluator_called'] is False
+          assert p['conditions']==[
+              'S0_NATURAL_REFERENCE',
+              'S1_MATCHED_OR_ORDINARY_FACTUAL_INFORMATION_DOWNGRADE',
+              'S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL',
+          ]
+          assert p['primary_contrast']=='S2_MINUS_S1'
+          assert p['primary_readout']=='POST_CONSUMPTION_R6_INERTIA_PROFILE'
+          assert p['historical_r5_operator_replayed_exactly'] is False
+          assert p['authorization_status']=='NOT_AUTHORIZED'
+          assert p['semantic_cpr_status']=='NOT_ADJUDICATED'
+          assert e1['condition_id']=='S1_MATCHED_OR_ORDINARY_FACTUAL_INFORMATION_DOWNGRADE'
+          assert e2['condition_id']=='S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL'
+          for e in (e1,e2):
+              assert e['mechanical_primitive']=='ONE_SHOT_TARGET_SCOPED_EPISTEMIC_STATUS_ANNOTATION'
+              assert e['from_status']=='fact' and e['to_status']=='unconfirmed'
+              assert e['direct_exposure_limit']==1
+              assert e['persistent_state_mutation'] is False
+              assert e['experiment_origin_reinjection_forbidden'] is True
+              assert e['original_target_value_mutation'] is False
+              assert e['opposite_fact_supplied'] is False
+              assert e['replacement_conclusion_supplied'] is False
+              assert e['desired_terminal_answer_supplied'] is False
+          assert e1['target_locator'] != e2['target_locator']
+          print('PASS: exact-source atomic specificity v0.2 invariants')
+          PY
+
+      - name: Confirm no provider credential or real-run route
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          files=[
+              'scripts/validate_r5r6_specificity_source_audit_v0_2.py',
+              'arena/r5r6_specificity_atomic_v0_2.py',
+              'arena/r5r6_specificity_atomic_preflight_v0_2.py',
+              'arena/tests/test_r5r6_specificity_atomic_v0_2.py',
+              'configs/r5r6_specificity_field_selection_contract_v0.2.json',
+              'configs/r5r6_specificity_exact_source_binding_v0.2.json',
+              '.github/workflows/r5r6-specificity-source-audit-v0-2.yml',
+          ]
+          forbidden=[
+              'OPENAI' + '_API_KEY',
+              'DASHSCOPE' + '_API_KEY',
+              'DEEPSEEK' + '_API_KEY',
+              'CALL_' + 'REAL_',
+              '--execute-' + 'real',
+              'provider_' + 'secret',
+          ]
+          failures=[]
+          for path in files:
+              text=Path(path).read_text(encoding='utf-8')
+              for token in forbidden:
+                  if token in text:
+                      failures.append((path,token))
+          if failures:
+              raise SystemExit('forbidden real-provider capability in offline source-audit path: '+repr(failures))
+          print('PASS: no provider credential or real-run authorization in source-audit path')
+          PY
+
+      - name: Upload engineering-only preflight artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5r6-specificity-atomic-preflight-v0-2
+          path: /tmp/r5r6_atomic_specificity_preflight
+          if-no-files-found: error
+          retention-days: 90

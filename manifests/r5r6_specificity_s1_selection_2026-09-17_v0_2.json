@@ -1,0 +1,83 @@
+{
+  "schema": "RB-R5R6-SPECIFICITY-S1-SELECTION-RECORD-v0.2",
+  "date": "2026-09-17",
+  "status": "FROZEN_BEFORE_SCIENTIFIC_S_ARM_OUTCOMES",
+  "scientific_s_arm_outputs_available_at_selection_time": false,
+  "selection_contract": "RB-R5R6-SPECIFICITY-FIELD-SELECTION-CONTRACT-v0.2",
+  "source_binding": {
+    "workflow_run_id": 35132777581,
+    "raw_artifact_id": 10461759345,
+    "raw_artifact_digest": "sha256:7bc6e346ded2fc61bac04f9b62c54277b00b45d4493b0d5c3f3c60cfdcd850a4",
+    "raw_traces_sha256": "102089199c7e1292e80444e339b84b00d2124e298f9ab849844dda0116473ef7",
+    "evidence_batch_hash": "244d10dfd7655eef7ac99db4731e85daab62fe9a2546b89e7d27720fbb8c20f7",
+    "common_parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c",
+    "source_plan_hash": "a24c98901422bbccfc9a040a6bc14575b1c710edd518c0d9c2facf7a57926351",
+    "source_measurement_hash": "5ec7953b473e4d7b29612de18aac9992238e722e1b12ea7c6999929958b24191",
+    "control_t9_run_id": "prospective-ecommerce-natural-0001:oneshot-pair:0001:control_continuation",
+    "control_t9_trace_hash": "d08607bafbf29a69a3eacedddfce0804556ce12ff7973420c507a64842387f1b",
+    "control_t9_prompt_hash": "3152c87e0238f6cf033badd6e8ecfc01ff2e713d1d64dee2108c300f28e65225",
+    "control_t9_runtime_snapshot_hash": "776892d1214693dae2880fe197068da6dcc727974529e87e7960251f16fb67bf",
+    "resumed_actor": "ops_lead",
+    "resumed_turn": 9
+  },
+  "j0_binding": {
+    "event_ref": "E32",
+    "turn": 8,
+    "actor": "inventory",
+    "state_key": "inventory_stockout_assessment_v1",
+    "pre_status": "fact",
+    "historical_r5_operator": "shared_state_metadata.inventory_stockout_assessment_v1.status: fact -> unconfirmed"
+  },
+  "exact_source_audit": {
+    "alternative_top_level_non_j0_shared_state_fact_exists": false,
+    "v0_1_top_level_state_key_selector_scientifically_executable_on_exact_parent": false,
+    "reason": "At after_turn:8, inventory_stockout_assessment_v1 is the only non-initial shared_state_metadata entry with status fact.",
+    "required_forward_change": "Use a common one-shot target-scoped epistemic annotation over atomic prompt-visible facts for S1 and S2."
+  },
+  "eligible_pool": {
+    "schema": "RB-R5R6-SPECIFICITY-ATOMIC-FACT-POOL-v0.1",
+    "rule_id": "PUBLIC_CONTEXT_PRODUCT_SCALAR_NON_INVENTORY_FAMILY_v1",
+    "ordering": "LEXICOGRAPHIC_TARGET_LOCATOR",
+    "candidate_count": 9,
+    "candidates": [
+      {"locator": "public_context.products.A.ad_roas", "value": 4.1, "source_class": "TASK_PUBLIC_CONTEXT", "epistemic_status_class": "fact", "visibility": "OPS_LEAD_T9_PROMPT", "value_type": "number"},
+      {"locator": "public_context.products.A.gross_margin_pct", "value": 42, "source_class": "TASK_PUBLIC_CONTEXT", "epistemic_status_class": "fact", "visibility": "OPS_LEAD_T9_PROMPT", "value_type": "number"},
+      {"locator": "public_context.products.A.price", "value": 299, "source_class": "TASK_PUBLIC_CONTEXT", "epistemic_status_class": "fact", "visibility": "OPS_LEAD_T9_PROMPT", "value_type": "number"},
+      {"locator": "public_context.products.B.ad_roas", "value": 3.0, "source_class": "TASK_PUBLIC_CONTEXT", "epistemic_status_class": "fact", "visibility": "OPS_LEAD_T9_PROMPT", "value_type": "number"},
+      {"locator": "public_context.products.B.gross_margin_pct", "value": 48, "source_class": "TASK_PUBLIC_CONTEXT", "epistemic_status_class": "fact", "visibility": "OPS_LEAD_T9_PROMPT", "value_type": "number"},
+      {"locator": "public_context.products.B.price", "value": 459, "source_class": "TASK_PUBLIC_CONTEXT", "epistemic_status_class": "fact", "visibility": "OPS_LEAD_T9_PROMPT", "value_type": "number"},
+      {"locator": "public_context.products.C.ad_roas", "value": 3.5, "source_class": "TASK_PUBLIC_CONTEXT", "epistemic_status_class": "fact", "visibility": "OPS_LEAD_T9_PROMPT", "value_type": "number"},
+      {"locator": "public_context.products.C.gross_margin_pct", "value": 35, "source_class": "TASK_PUBLIC_CONTEXT", "epistemic_status_class": "fact", "visibility": "OPS_LEAD_T9_PROMPT", "value_type": "number"},
+      {"locator": "public_context.products.C.price", "value": 199, "source_class": "TASK_PUBLIC_CONTEXT", "epistemic_status_class": "fact", "visibility": "OPS_LEAD_T9_PROMPT", "value_type": "number"}
+    ],
+    "pool_hash": "774a640e1649ab936304586438fb4b9acfd316297220bd403362ba565aaa3bd9"
+  },
+  "selection_rule": {
+    "id": "PARENT_HASH_SEEDED_LEXICOGRAPHIC_INDEX_v1",
+    "seed_material": "SHA256(common_parent_state_hash + '|' + selection_contract_schema)",
+    "seed_hash": "7347944910449db5d12de365c29131dc86b094dee8c34cf0da53de3ed09ccbc3",
+    "pool_size": 9,
+    "selected_index_zero_based": 7,
+    "selection_rule_hash": "4114b7b387b052ec89982ffffce15c4234c7543128db7f4ce8132e9fb4161cb5",
+    "manual_override_forbidden": true,
+    "future_outcome_dependent_reselection_forbidden": true
+  },
+  "selected_s1_target": {
+    "locator": "public_context.products.C.gross_margin_pct",
+    "value": 35,
+    "source_class": "TASK_PUBLIC_CONTEXT",
+    "epistemic_status_class": "fact",
+    "visibility": "OPS_LEAD_T9_PROMPT",
+    "value_type": "number",
+    "selected_target_hash": "5e8b2231136754b1d490863dbcbc1d109228b914b6b7b1b3d5e298ff272b5ce7"
+  },
+  "selection_record_hash": "534a402c988ec975f1f0bc82fa71684e72d3e6539c938ebe193aaefe56333e0a",
+  "selector_outcome_blind_attestation": true,
+  "authorization": {
+    "offline_operator_implementation": true,
+    "offline_preflight": true,
+    "scientific_subject_provider_call": false,
+    "paid_evaluator_call": false,
+    "semantic_cpr_adjudication": false
+  }
+}

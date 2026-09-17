@@ -49,6 +49,9 @@ def build_agent_messages(domain, agent, runtime_view):
             'You may return multiple actions. A finalize action ends this response; place it last. The environment may deliver new information on a subsequent turn.'
         )
     }
+    annotations = runtime_view.get('epistemic_annotations')
+    if annotations:
+        payload['epistemic_annotations'] = annotations
     return [
         {'role': 'system', 'content': system},
         {'role': 'user', 'content': json.dumps(payload, ensure_ascii=False)}
