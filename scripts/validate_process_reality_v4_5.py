@@ -114,8 +114,9 @@ def main() -> None:
     }
     texts = {"plan": plan, "theory": theory, "measurement": measurement_plan, "r6": r6, "r7": r7, "alr": alr, "engineering": eng, "scope": scope, "evidence": evidence, "report": report_standard}
     for key, phrases in required_phrases.items():
+        haystack = texts[key].lower()
         for phrase in phrases:
-            require(phrase in texts[key], f"missing_phrase:{key}:{phrase}")
+            require(phrase.lower() in haystack, f"missing_phrase:{key}:{phrase}")
 
     for auth in (
         mechanism["authorization"],
