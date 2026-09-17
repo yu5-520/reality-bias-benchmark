@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       replicates:
-        description: 'Matched same-parent triads to prepare; same-parent repeats are not independent samples'
+        description: 'Matched triads to prepare; same-parent repeats are not independent samples'
         required: true
         default: '1'
         type: string
@@ -20,7 +20,7 @@ permissions:
 jobs:
   prepare:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - name: Checkout current R7 branch
         uses: actions/checkout@v4
@@ -36,7 +36,7 @@ jobs:
           python scripts/validate_r7_protocol.py configs/r7/r7_three_arm_fixture.example.json
           python -m arena.r7_structural_control_preflight --outdir /tmp/r7_structural_control_preflight
 
-      - name: Verify exact frozen R5 prepared source artifact
+      - name: Load and verify exact frozen source bindings
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -44,73 +44,103 @@ jobs:
           python - <<'PY' > "$RUNNER_TEMP/r7_source.env"
           import json
           p=json.load(open('configs/r7/r7_three_arm_fixture.example.json'))['frozen_parent']
-          print('SOURCE_RUN_ID='+str(p['prepared_workflow_run_id']))
-          print('SOURCE_ARTIFACT_ID='+str(p['prepared_artifact_id']))
-          print('SOURCE_ARTIFACT_NAME='+p['prepared_artifact_name'])
-          print('SOURCE_ARTIFACT_DIGEST='+p['prepared_artifact_digest'])
-          print('SOURCE_INNER_SHA='+p['prepared_inner_tar_sha256'])
+          print('PREP_RUN_ID='+str(p['prepared_workflow_run_id']))
+          print('PREP_ARTIFACT_ID='+str(p['prepared_artifact_id']))
+          print('PREP_ARTIFACT_NAME='+p['prepared_artifact_name'])
+          print('PREP_ARTIFACT_DIGEST='+p['prepared_artifact_digest'])
+          print('PREP_INNER_SHA='+p['prepared_inner_tar_sha256'])
+          print('RAW_RUN_ID='+str(p['source_raw_workflow_run_id']))
+          print('RAW_ARTIFACT_ID='+str(p['source_raw_artifact_id']))
+          print('RAW_ARTIFACT_NAME='+p['source_raw_artifact_name'])
+          print('RAW_ARTIFACT_DIGEST='+p['source_raw_artifact_digest'])
+          print('RAW_INNER_SHA='+p['source_raw_inner_tar_sha256'])
           PY
           source "$RUNNER_TEMP/r7_source.env"
           python - <<'PY'
           import json, subprocess
           p=json.load(open('configs/r7/r7_three_arm_fixture.example.json'))['frozen_parent']
-          payload=json.loads(subprocess.check_output(['gh','api',f"repos/${{ github.repository }}/actions/runs/{p['prepared_workflow_run_id']}/artifacts"], text=True))
-          rows=[x for x in payload['artifacts'] if x['id']==p['prepared_artifact_id'] and x['name']==p['prepared_artifact_name']]
-          assert len(rows)==1
-          assert rows[0].get('digest')==p['prepared_artifact_digest']
-          assert not rows[0].get('expired')
-          print('R7_SOURCE_R5_PREPARED_ARTIFACT=EXACT_MATCH')
+          checks=[
+              (p['prepared_workflow_run_id'],p['prepared_artifact_id'],p['prepared_artifact_name'],p['prepared_artifact_digest']),
+              (p['source_raw_workflow_run_id'],p['source_raw_artifact_id'],p['source_raw_artifact_name'],p['source_raw_artifact_digest']),
+          ]
+          for run_id,artifact_id,name,digest in checks:
+              payload=json.loads(subprocess.check_output(['gh','api',f"repos/${{ github.repository }}/actions/runs/{run_id}/artifacts"], text=True))
+              rows=[x for x in payload['artifacts'] if x['id']==artifact_id and x['name']==name]
+              assert len(rows)==1 and rows[0].get('digest')==digest and not rows[0].get('expired')
+          print('R7_SOURCE_ARTIFACTS=EXACT_MATCH')
           PY
 
-      - name: Download and verify frozen R5 parent plan
+      - name: Download exact prepared parent and raw snapshots
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           source "$RUNNER_TEMP/r7_source.env"
-          mkdir -p "$RUNNER_TEMP/r7_r5_artifact" "$RUNNER_TEMP/r7_r5_prepared"
-          gh run download "$SOURCE_RUN_ID" \
+          mkdir -p "$RUNNER_TEMP/r7_r5_artifact" "$RUNNER_TEMP/r7_r5_prepared" "$RUNNER_TEMP/r7_raw_artifact" "$RUNNER_TEMP/r7_raw_source"
+
+          gh run download "$PREP_RUN_ID" \
             --repo '${{ github.repository }}' \
-            --name "$SOURCE_ARTIFACT_NAME" \
+            --name "$PREP_ARTIFACT_NAME" \
             --dir "$RUNNER_TEMP/r7_r5_artifact"
           cd "$RUNNER_TEMP/r7_r5_artifact"
           sha256sum -c r5mid_prospective_one_shot_prepared_v0_3.tar.gz.sha256
-          test "$(sha256sum r5mid_prospective_one_shot_prepared_v0_3.tar.gz | awk '{print $1}')" = "$SOURCE_INNER_SHA"
+          test "$(sha256sum r5mid_prospective_one_shot_prepared_v0_3.tar.gz | awk '{print $1}')" = "$PREP_INNER_SHA"
           tar -xzf r5mid_prospective_one_shot_prepared_v0_3.tar.gz -C "$RUNNER_TEMP/r7_r5_prepared"
 
-      - name: Build exact R7 Phase-1 parent-bound plan — zero provider calls
+          gh run download "$RAW_RUN_ID" \
+            --repo '${{ github.repository }}' \
+            --name "$RAW_ARTIFACT_NAME" \
+            --dir "$RUNNER_TEMP/r7_raw_artifact"
+          cd "$RUNNER_TEMP/r7_raw_artifact"
+          sha256sum -c prospective_natural_raw_bundle.tar.gz.sha256
+          test "$(sha256sum prospective_natural_raw_bundle.tar.gz | awk '{print $1}')" = "$RAW_INNER_SHA"
+          tar -xzf prospective_natural_raw_bundle.tar.gz -C "$RUNNER_TEMP/r7_raw_source"
+
+      - name: Build exact R7 source-bound three-arm plan — zero provider calls
         run: |
           set -euo pipefail
           cd "$GITHUB_WORKSPACE"
           python -m arena.prepare_r7_three_arm_plan \
             --protocol configs/r7/r7_three_arm_fixture.example.json \
             --r5-plan-dir "$RUNNER_TEMP/r7_r5_prepared/results/r5mid_prospective_one_shot_plan_v0_3" \
+            --source-snapshots "$RUNNER_TEMP/r7_raw_source/results/prospective_natural_raw/snapshots/prospective-ecommerce-natural-0001.jsonl" \
             --replicates '${{ inputs.replicates }}' \
             --plan-code-sha '${{ github.sha }}' \
             --outdir results/r7_three_arm_parent_bound_plan
 
-      - name: Fail closed on current C3 execution boundary
+      - name: Verify runtime mechanisms ready while subject execution stays unauthorized
         run: |
           set -euo pipefail
           python - <<'PY'
           import json
           p=json.load(open('results/r7_three_arm_parent_bound_plan/r7_plan.json'))
           rows=[json.loads(x) for x in open('results/r7_three_arm_parent_bound_plan/arm_manifests.jsonl')]
-          assert p['phase']=='R7_PHASE1_REAL_PARENT_BINDING_PREPARED_ONLY'
+          checkpoint=json.load(open('results/r7_three_arm_parent_bound_plan/c3_recovery_checkpoint.json'))
+          alr=json.load(open('results/r7_three_arm_parent_bound_plan/c3_alr_binding.json'))
+          assert p['phase']=='R7_EXACT_SOURCE_BOUND_THREE_ARM_PREPARED_ONLY'
           assert p['source_binding']['source_parent_state_hash']=='aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c'
+          assert p['source_binding']['source_recovery_checkpoint_hash']=='99731abb4ffd1caa2e568a6c2d90987700b3d0b7a66a1c777f811b666912a349'
+          assert checkpoint['anchor_ref']=='before_turn:8'
+          assert checkpoint['turns']==7 and len(checkpoint['events'])==32 and checkpoint['queue'][0]=='inventory'
+          assert alr['target_reexecution_turn']==8
+          assert alr['target_actor']=='inventory'
+          assert alr['state_key']=='inventory_stockout_assessment_v1'
+          assert alr['from_status']=='fact' and alr['to_status']=='unconfirmed'
+          assert alr['active_recovery_transform_status']=='READY'
           assert p['matched_horizon']['post_jump_turn_cap']==8
           assert p['paid_subject_authorization_status']=='NOT_AUTHORIZED'
           assert p['automatic_paid_evaluator'] is False
-          assert p['real_three_arm_execution_ready'] is False
-          assert p['blocking_reason']=='C3_ACTIVE_ALR_LOCALIZED_REEXECUTION_NOT_IMPLEMENTED'
-          assert all(x['execution_readiness']=='RUNTIME_TRANSFORM_READY' for x in rows if x['arm_id'] in ('C1_ONE_SHOT','C2_PERSISTENT_FIELD'))
-          assert all(x['execution_readiness']=='BLOCKED_PENDING_ACTIVE_ALR_EXECUTOR' for x in rows if x['arm_id']=='C3_ALR')
-          print('R7_PARENT_BOUND_PREPARE=PASS')
+          assert p['real_three_arm_runtime_mechanisms_ready'] is True
+          assert p['real_subject_execution_authorized'] is False
+          assert all(x['execution_readiness']=='RUNTIME_MECHANISM_READY' for x in rows)
+          print('R7_SOURCE_BOUND_PREPARE=PASS')
+          print('C1_RUNTIME=READY')
+          print('C2_RUNTIME=READY')
+          print('C3_RUNTIME=READY')
           print('PAID_SUBJECT_CALLS=DISABLED')
-          print('C3_REAL_EXECUTION=FAIL_CLOSED')
           PY
 
-      - name: Archive R7 parent-bound plan
+      - name: Archive R7 source-bound plan
         run: |
           set -euo pipefail
           tar -czf r7_three_arm_parent_bound_plan.tar.gz results/r7_three_arm_parent_bound_plan
