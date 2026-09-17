@@ -179,6 +179,8 @@ S1/S2 use the same minimal one-shot target-scoped epistemic annotation and prese
 
 ## 11. Censoring
 
+Natural termination before an equivalent downstream opportunity is observed is treated as **right-censoring**, not as negative evidence for future recurrence.
+
 Use explicit censoring states:
 
 - `UNCENSORED`;
