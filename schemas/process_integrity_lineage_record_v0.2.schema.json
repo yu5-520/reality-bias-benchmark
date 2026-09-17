@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-PROCESS-INTEGRITY-LINEAGE-RECORD-v0.2",
+  "title": "Process Integrity Lineage Record v0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "record_id",
+    "record_type",
+    "root_ref",
+    "descendant_refs",
+    "carrier_refs",
+    "relation_evidence_refs",
+    "potentially_affected_closure",
+    "evidence_supported_affected_closure",
+    "repair_closure",
+    "preserved_refs",
+    "scientific_status"
+  ],
+  "properties": {
+    "schema": {"const": "RB-PROCESS-INTEGRITY-LINEAGE-RECORD-v0.2"},
+    "record_id": {"type": "string", "minLength": 1},
+    "record_type": {
+      "enum": [
+        "PASSIVE_LINEAGE",
+        "R6_CARRIER_CHAIN",
+        "R7_AFFECTED_CLOSURE",
+        "R7_RECOVERY_REVISION"
+      ]
+    },
+    "root_ref": {"type": "string", "minLength": 1},
+    "descendant_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "carrier_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "relation_evidence_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "potentially_affected_closure": {"$ref": "#/$defs/closure"},
+    "evidence_supported_affected_closure": {"$ref": "#/$defs/closure"},
+    "mechanically_required_replay_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true, "default": []},
+    "repair_closure": {"$ref": "#/$defs/closure"},
+    "preserved_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "authority_condition_id": {"type": ["string", "null"]},
+    "prior_revision_hash": {"type": ["string", "null"]},
+    "repaired_revision_hash": {"type": ["string", "null"]},
+    "parent_revision_ref": {"type": ["string", "null"]},
+    "reopen_plan_hash": {"type": ["string", "null"]},
+    "old_lineage_reentry_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true, "default": []},
+    "censoring_status": {
+      "enum": [
+        "UNCENSORED",
+        "EARLY_NATURAL_TERMINATION",
+        "HORIZON_LIMIT",
+        "MISSING_SOURCE_EVIDENCE",
+        "OTHER_UNRESOLVED"
+      ]
+    },
+    "scientific_status": {
+      "enum": [
+        "RAW_OR_STRUCTURAL_EVIDENCE",
+        "ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE",
+        "NOT_ADJUDICATED",
+        "ADJUDICATED_APPEND_ONLY"
+      ]
+    }
+  },
+  "$defs": {
+    "closure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["refs", "closure_hash"],
+      "properties": {
+        "refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "closure_hash": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

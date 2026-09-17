@@ -48,6 +48,13 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Enforce v4.5.1 methodological interpretation gate before any provider call
+        run: |
+          set -euo pipefail
+          python scripts/validate_process_reality_v4_5_1.py
+          python scripts/validate_r6d_specificity_exact_plan_v0_1.py
+          echo "R6D_METHOD_INTERPRETATION_GATE=PASS"
+
       - name: Download exact frozen source preparation artifact
         shell: bash
         env:

@@ -1,0 +1,71 @@
+{
+  "schema": "RB-PROCESS-REALITY-MEASUREMENT-CONTRACT-v0.9",
+  "version": "0.9",
+  "date": "2026-09-17",
+  "status": "FORWARD_METHOD_CLOSURE",
+  "comparison_domains": {
+    "STRUCTURAL_DISTANCE": [
+      "EVENT_SET",
+      "EDGE_SET",
+      "ACTOR_SET_OR_SEQUENCE",
+      "ROOT_REACH",
+      "REACH_DEPTH",
+      "BRANCH_MERGE_REENTRY",
+      "PATH_FAMILY",
+      "RECONVERGENCE"
+    ],
+    "INHERITANCE_DISTANCE": [
+      "DELIVERY_OR_READ",
+      "EXPLICIT_REFERENCE",
+      "ADOPTION",
+      "REJECTION_OR_ABANDONMENT",
+      "INHERITED_STATE_OR_ACTION",
+      "PROPAGATION_OR_REENTRY",
+      "SOURCE_REPLACEMENT"
+    ],
+    "EPISTEMIC_AUTHORITY_DISTANCE": [
+      "DOWNSTREAM_AUTHORITY_USE",
+      "DOWNGRADE_ACCEPTANCE_OR_REJECTION",
+      "UNSUPPORTED_RECONFIRMATION",
+      "AUTHORITY_TRANSFER_OR_RECONSTRUCTION",
+      "INDEPENDENT_NEW_EVIDENCE"
+    ]
+  },
+  "inertia": {
+    "ordinary_inheritance_sufficient": false,
+    "requires_later_process_constraint_or_transition_effect": true,
+    "challenge_persistence_field": "post_challenge_persistence_status"
+  },
+  "relation_evidence": {
+    "schema": "RB-PROCESS-INTEGRITY-RELATION-EVIDENCE-v0.1",
+    "hash_or_reachability_alone_is_adoption": false
+  },
+  "specificity": {
+    "primary_contrast": "S2_MINUS_S1",
+    "first_level_label": "FROZEN_TARGET_RESPONSE_CONTRAST",
+    "target_descriptor_fields": [
+      "provenance_class",
+      "structural_location",
+      "task_relevance_category",
+      "downstream_opportunity_class",
+      "decision_role_category",
+      "value_type"
+    ]
+  },
+  "conditionality": {
+    "conditional_identification": true,
+    "historical_prefix_hash_required": true,
+    "independent_population_sample": false
+  },
+  "operator_semantics": {
+    "experiment_origin_persistent_state_mutation": false,
+    "endogenous_agent_state_mutation_allowed": true
+  },
+  "r7_closure_fields": [
+    "potentially_affected_refs",
+    "evidence_supported_affected_refs",
+    "mechanically_required_replay_refs",
+    "repair_closure_refs",
+    "preserved_refs"
+  ]
+}
