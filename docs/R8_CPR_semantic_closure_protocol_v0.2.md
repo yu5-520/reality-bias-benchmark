@@ -34,6 +34,8 @@ Therefore:
 - extra Agent/tool/stage call alone != P;
 - repeated key/value alone != R.
 
+Machine-verifiable semantic guards: fact label alone != C; extra Agent/tool/stage call alone != P; same-key recurrence alone != R.
+
 ## 3. C — Epistemic Reality Promotion
 
 A C-positive finding requires all materially relevant parts of the following relation:
