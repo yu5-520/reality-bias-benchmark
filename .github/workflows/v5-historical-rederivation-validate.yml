@@ -1,0 +1,28 @@
+name: V5 historical re-derivation validate
+
+on:
+  pull_request:
+    paths:
+      - "configs/v5_historical_rederivation_*"
+      - "schemas/v5_historical_rederivation_bundle_v0.1.schema.json"
+      - "scripts/derive_v5_historical_rederivation.py"
+      - "results/v5_historical_rederivation/**"
+      - "docs/reports/2026-09-18/R2-R6_V5_Historical_Rederivation_Result_v1.md"
+      - ".github/workflows/v5-historical-rederivation-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate deterministic frozen-source re-derivation
+        run: python scripts/derive_v5_historical_rederivation.py --check results/v5_historical_rederivation/rederivation_bundle_v0_1.json
+      - name: Validate v5 method layer
+        run: python scripts/validate_process_reality_v5.py

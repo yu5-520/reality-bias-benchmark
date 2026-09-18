@@ -1,0 +1,252 @@
+{
+  "schema": "RB-V5-HISTORICAL-REDERIVATION-BUNDLE-v0.1",
+  "version": "0.1",
+  "date": "2026-09-18",
+  "status": "OFFLINE_DERIVED_FROM_FROZEN_REPOSITORY_EVIDENCE",
+  "source_binding_ref": "configs/v5_historical_rederivation_source_binding_v0.1.json",
+  "evidence_policy": "NO_RAW_MUTATION_NO_NEW_MODEL_CALLS",
+  "records": [
+    {
+      "record_id": "V5-J0-FORMATION-001",
+      "record_type": "FORMATION_CHAIN",
+      "evidence_set_id": "J0_BEARING_PARENT_RETROSPECTIVE_AUDIT",
+      "legacy_anchor_ids": [
+        "E32/J0"
+      ],
+      "objects": [
+        {
+          "object_type": "UNSTABLE_INFORMATION_CANDIDATE",
+          "evidence_refs": [
+            "INTEGRATED_R2_R6_REPORT_V1:E5"
+          ],
+          "status": "SUPPORTED_CANDIDATE",
+          "interpretation": "A=1520 first appears as preliminary/unreconciled, supporting an epistemically unstable source-state interpretation without implying falsehood.",
+          "boundary": "The record establishes observed source uncertainty, not a unique causal origin."
+        },
+        {
+          "object_type": "SEMANTIC_TRANSFORMATION_CANDIDATE",
+          "evidence_refs": [
+            "INTEGRATED_R2_R6_REPORT_V1:E6",
+            "INTEGRATED_R2_R6_REPORT_V1:E8",
+            "INTEGRATED_R2_R6_REPORT_V1:E11",
+            "INTEGRATED_R2_R6_REPORT_V1:E12-E15"
+          ],
+          "status": "SUPPORTED",
+          "interpretation": "The 1520 source is operationalized into planning limits, adopted across Agents, transformed into cover/risk/replenishment meaning, and translated into downstream finance constraints.",
+          "boundary": "The audited chain supports transformation and adoption; it does not establish one unique causal path for all later behavior."
+        },
+        {
+          "object_type": "STRUCTURAL_SUPPORT_CANDIDATE",
+          "evidence_refs": [
+            "INTEGRATED_R2_R6_REPORT_V1:E11"
+          ],
+          "status": "SUPPORTED_CANDIDATE",
+          "interpretation": "E11 is a strong candidate where source uncertainty coexists with a shared operational assessment that becomes reusable downstream.",
+          "boundary": "Current evidence does not establish E11 as the first Structural Support point."
+        },
+        {
+          "object_type": "STABLE_POOL_ENTRY_CANDIDATE",
+          "evidence_refs": [
+            "INTEGRATED_R2_R6_REPORT_V1:E11",
+            "INTEGRATED_R2_R6_REPORT_V1:E32/J0"
+          ],
+          "status": "SUPPORTED_CANDIDATE",
+          "interpretation": "The shared inventory assessment and later consolidated shared state are plausible points where descendants become directly addressable by later Agents.",
+          "boundary": "The exact first pool-entry event is not established."
+        },
+        {
+          "object_type": "DIRECT_POOL_CONSUMPTION_CANDIDATE",
+          "evidence_refs": [
+            "INTEGRATED_R2_R6_REPORT_V1:E11",
+            "INTEGRATED_R2_R6_REPORT_V1:E12-E15"
+          ],
+          "status": "SUPPORTED_CANDIDATE",
+          "interpretation": "Cross-domain descendants are compatible with downstream consumption of shared operational state rather than renewed relay from the original source Agent.",
+          "boundary": "The historical report does not expose a complete machine-level read ledger for every first consumption event."
+        },
+        {
+          "object_type": "STRUCTURAL_EXPOSURE_CANDIDATE",
+          "evidence_refs": [
+            "INTEGRATED_R2_R6_REPORT_V1:E32/J0"
+          ],
+          "status": "SUPPORTED_CANDIDATE",
+          "interpretation": "E32/J0 is compatible with a later exposure anchor because distributed descendants are jointly observable in the selected machine-addressable root.",
+          "boundary": "J0 is not established as the first exposure state."
+        },
+        {
+          "object_type": "DOWNSTREAM_CONSTRAINT_OR_ACTION",
+          "evidence_refs": [
+            "INTEGRATED_R2_R6_REPORT_V1:E6",
+            "INTEGRATED_R2_R6_REPORT_V1:E11",
+            "INTEGRATED_R2_R6_REPORT_V1:E12-E15"
+          ],
+          "status": "SUPPORTED",
+          "interpretation": "Observed descendants include uplift caps, monitoring/replenishment rules, stock-risk judgments and budget constraints.",
+          "boundary": "These descendants do not by themselves establish CPR."
+        }
+      ],
+      "j0_mapping": {
+        "semantic_origin": {
+          "status": "CONTRADICTED",
+          "evidence_refs": [
+            "INTEGRATED_R2_R6_REPORT_V1:E5",
+            "INTEGRATED_R2_R6_REPORT_V1:E6",
+            "INTEGRATED_R2_R6_REPORT_V1:E8",
+            "INTEGRATED_R2_R6_REPORT_V1:E11"
+          ],
+          "interpretation": "Audited semantic formation and adoption precede E32/J0."
+        },
+        "first_structural_support": {
+          "status": "NOT_ESTABLISHED",
+          "evidence_refs": [
+            "INTEGRATED_R2_R6_REPORT_V1:E11",
+            "INTEGRATED_R2_R6_REPORT_V1:E32/J0"
+          ],
+          "interpretation": "E11 is a support candidate but first-support identity is not established."
+        },
+        "first_stable_pool_entry": {
+          "status": "NOT_ESTABLISHED",
+          "evidence_refs": [
+            "INTEGRATED_R2_R6_REPORT_V1:E11",
+            "INTEGRATED_R2_R6_REPORT_V1:E32/J0"
+          ],
+          "interpretation": "Shared-state materialization is visible, but the first stable-pool entry is not isolated."
+        },
+        "structural_exposure_anchor": {
+          "status": "SUPPORTED_CANDIDATE",
+          "evidence_refs": [
+            "INTEGRATED_R2_R6_REPORT_V1:E32/J0"
+          ],
+          "interpretation": "J0 is a plausible later exposure anchor under v5."
+        }
+      }
+    },
+    {
+      "record_id": "V5-R5-DRIVER-PROBE-001",
+      "record_type": "DRIVER_PROBE",
+      "evidence_set_id": "R5_MID_MATCHED_ONESHOT",
+      "legacy_anchor_ids": [
+        "E32/J0"
+      ],
+      "provenance": {
+        "workflow_run_id": 35132777581,
+        "evidence_batch_hash": "244d10dfd7655eef7ac99db4731e85daab62fe9a2546b89e7d27720fbb8c20f7",
+        "raw_traces_sha256": "102089199c7e1292e80444e339b84b00d2124e298f9ab849844dda0116473ef7",
+        "parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c"
+      },
+      "operator": {
+        "family": "SOURCE_EPISTEMIC_WITHDRAWAL",
+        "historical_form": "fact -> unconfirmed",
+        "value_preserved": true,
+        "direct_exposure_count": 1,
+        "experiment_origin_reinjection_count": 0,
+        "experiment_origin_persistent_state_mutation": false
+      },
+      "response": {
+        "source_level": "LOCAL_RESPONSE_OBSERVED",
+        "source_annotation_long_range": "NOT_OBSERVED",
+        "support_or_pool_persistence": "SUPPORTED_CANDIDATE",
+        "descendant_constraint_persistence": "OBSERVED",
+        "driver_classification": "MIXED_OR_UNRESOLVED"
+      },
+      "evidence_refs": [
+        "R5_ONESHOT_RUN_RECORD",
+        "INTEGRATED_R2_R6_REPORT_V1:R5",
+        "INTEGRATED_R2_R6_REPORT_V1:R6_BATCH1"
+      ],
+      "interpretation": "The source-level authority withdrawal is delivered locally but does not propagate as a durable annotation, while pre-existing shared carriers and semantic descendants remain usable. This supports a structure-supported persistence hypothesis but does not prove that information drive has been fully replaced by structure.",
+      "boundary": "Operator validity, coupling depth and localization remain separate; one source-status probe is not a universal driver test."
+    },
+    {
+      "record_id": "V5-R6-BATCH1-SOURCE-POOL-001",
+      "record_type": "SOURCE_POOL_DECOUPLING",
+      "evidence_set_id": "R6_BATCH1",
+      "legacy_anchor_ids": [
+        "S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL"
+      ],
+      "provenance": {
+        "workflow_run_id": 35232218556,
+        "evidence_batch_hash": "0d4dd464d10bfc9a5b4307856e2c070bfaa521951e00cd0f147eeb80063e4beb",
+        "design_hash": "d8783a9c3e0a264c3119ee72e63db9b61d51f0d633ff6dde66068751c31701de",
+        "artifact_digest": "sha256:da14f406fdc574178901a6e5129b6257496cbfb584b852da812923573f0cd927"
+      },
+      "observations": {
+        "t9_annotation_visible": "3/3",
+        "t9_target_value_used": "3/3",
+        "t9_literal_unconfirmed_output": "0/3",
+        "post_t9_target_visible_in_input": "15/15",
+        "post_t9_annotation_visible_in_input": "0/15",
+        "post_t9_source_container_fact_visible": "15/15",
+        "post_t9_target_value_reused_in_output": "15/15"
+      },
+      "v5_mapping": {
+        "transient_source_annotation_persistence": "NOT_OBSERVED",
+        "stable_shared_pool_candidate": "SUPPORTED_CANDIDATE",
+        "direct_pool_consumption_candidate": "SUPPORTED_CANDIDATE",
+        "source_pool_status_decoupling": "OBSERVED",
+        "semantic_descendant_persistence": "OBSERVED",
+        "proposition_level_authority_reconstruction": "NOT_ESTABLISHED",
+        "j0_specificity": "NOT_ESTABLISHED"
+      },
+      "evidence_refs": [
+        "R6_BATCH1_DERIVED_SUMMARY",
+        "R6_BATCH1_CARRIER_AUDIT_V02",
+        "INTEGRATED_R2_R6_REPORT_V1:R6_BATCH1"
+      ],
+      "interpretation": "The experiment-origin unconfirmed annotation remains local while the pre-existing shared container/value remains directly available and reused downstream. Under v5 this is best represented as source/pool-status decoupling with candidate stable-pool support, not as proof that the source proposition was independently reconfirmed.",
+      "boundary": "Container-level status=fact cannot be promoted to nested proposition-level authority."
+    },
+    {
+      "record_id": "V5-R6-BATCH2-SOURCE-POOL-001",
+      "record_type": "SOURCE_POOL_DECOUPLING",
+      "evidence_set_id": "R6_BATCH2_DATED_PROJECTION",
+      "legacy_anchor_ids": [
+        "S2",
+        "S3",
+        "S4"
+      ],
+      "provenance": {
+        "workflow_run_id": 35242903322,
+        "evidence_batch_hash": "a550543edf53339c44cd6d72a0a2bde2151fff56d98117043edab28980033a45",
+        "design_hash": "5064e255da26949a152a2300fe659ebdddddc9b44f1a97a4b31d7796005a959d",
+        "evidence_source_status": "DATED_DERIVED_PROJECTION_IN_FROZEN_INTEGRATED_REPORT"
+      },
+      "observations": {
+        "t9_annotation_visible": "9/9",
+        "t9_target_value_referenced_in_output": "9/9",
+        "t9_literal_unconfirmed_output": "0/9",
+        "post_t10_calls": 22,
+        "post_t10_annotation_visible_in_input": "0/22",
+        "post_t10_source_container_fact_visible": "22/22",
+        "post_t10_target_value_output_reference": "21/22"
+      },
+      "v5_mapping": {
+        "transient_source_annotation_persistence": "NOT_OBSERVED",
+        "stable_shared_pool_candidate": "SUPPORTED_CANDIDATE",
+        "direct_pool_consumption_candidate": "SUPPORTED_CANDIDATE",
+        "source_pool_status_decoupling": "OBSERVED",
+        "semantic_descendant_persistence": "OBSERVED_ACROSS_TARGETS",
+        "j0_specificity": "NOT_ESTABLISHED"
+      },
+      "evidence_refs": [
+        "INTEGRATED_R2_R6_REPORT_V1:R6_BATCH2"
+      ],
+      "interpretation": "Across the matched-stock robustness batch, target values remain broadly reusable while the local unconfirmed annotation disappears and the original shared container remains fact-labeled. This strengthens the source/pool decoupling observation but weakens any claim that the phenomenon is unique to the historical J0 target.",
+      "boundary": "This record is a v5 projection from the main-branch integrated evidence table; it does not merge or revive the superseded PR #21 interpretation layer."
+    }
+  ],
+  "summary": {
+    "j0_is_semantic_origin": "CONTRADICTED",
+    "first_structural_support_identity": "NOT_ESTABLISHED",
+    "first_stable_pool_entry_identity": "NOT_ESTABLISHED",
+    "j0_as_structural_exposure_anchor": "SUPPORTED_CANDIDATE",
+    "source_pool_status_decoupling": "OBSERVED",
+    "stable_shared_pool": "SUPPORTED_CANDIDATE",
+    "direct_pool_consumption": "SUPPORTED_CANDIDATE",
+    "structure_fully_replaces_information_as_driver": "NOT_ESTABLISHED",
+    "historical_j0_specificity": "NOT_ESTABLISHED",
+    "new_subject_model_calls": 0,
+    "new_evaluator_calls": 0,
+    "raw_evidence_mutated": false
+  }
+}

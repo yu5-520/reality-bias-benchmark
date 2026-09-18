@@ -81,3 +81,25 @@ Before a fresh v5 subject run:
 4. separately authorize provider execution.
 
 The next paid run should collect a reusable full-process dataset rather than recreate the old mandatory specificity stack by default.
+
+
+## Historical re-derivation execution update
+
+The offline v5 historical re-derivation is now implemented as a deterministic frozen-source projection:
+
+- source binding: `configs/v5_historical_rederivation_source_binding_v0.1.json`
+- projection spec: `configs/v5_historical_rederivation_spec_v0.1.json`
+- derivation script: `scripts/derive_v5_historical_rederivation.py`
+- checked-in bundle: `results/v5_historical_rederivation/rederivation_bundle_v0_1.json`
+- result report: `docs/reports/2026-09-18/R2-R6_V5_Historical_Rederivation_Result_v1.md`
+
+The derivation validates exact Git blob identities for its repository sources before emitting the bundle. It creates no subject/evaluator calls and mutates no historical raw evidence.
+
+Current re-derived boundaries:
+
+- J0 semantic origin: CONTRADICTED;
+- first Structural Support identity: NOT_ESTABLISHED;
+- first Stable Shared Pool entry: NOT_ESTABLISHED;
+- J0 as Structural Exposure anchor: SUPPORTED_CANDIDATE;
+- source/pool status decoupling: OBSERVED;
+- structure fully replacing information as driver: NOT_ESTABLISHED.

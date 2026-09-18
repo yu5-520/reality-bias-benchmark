@@ -1,0 +1,96 @@
+{
+  "schema": "RB-V5-HISTORICAL-REDERIVATION-SOURCE-BINDING-v0.1",
+  "version": "0.1",
+  "date": "2026-09-18",
+  "status": "FROZEN_REPOSITORY_SOURCE_BINDING",
+  "sources": [
+    {
+      "source_id": "INTEGRATED_R2_R6_REPORT_V1",
+      "path": "docs/reports/2026-09-18/R2-R6_Integrated_Experiment_Evidence_Report_v1.md",
+      "git_blob_sha": "23ea9f877de485618bb9dd4da790f96b0e760b0e",
+      "role": [
+        "FORMATION_AUDIT",
+        "R6_BATCH1_EVIDENCE_TABLE",
+        "R6_BATCH2_DATED_PROJECTION"
+      ],
+      "required_tokens": [
+        "E5 | source | preliminary / unreconciled",
+        "E6 | ops_lead | unresolved",
+        "E8 | ads | unresolved",
+        "E11 | inventory | source unresolved",
+        "E32 / J0",
+        "T9 annotation visible | 3/3",
+        "Post-T9 input retains experiment annotation | 0/15",
+        "Post-T9 J0 container `status=fact` | 15/15",
+        "T9 one-shot annotation visible | 9/9",
+        "T10+ experiment annotation in input | 0/22",
+        "T10+ original source-container `status=fact` | 22/22",
+        "T10+ target-value output references | 21/22"
+      ]
+    },
+    {
+      "source_id": "R5_ONESHOT_RUN_RECORD",
+      "path": "manifests/r5mid_prospective_one_shot_run_35132777581_record.json",
+      "git_blob_sha": "49ce8fa5e3db7adfee78b3faf4a7a88c9e6b7bac",
+      "role": [
+        "R5_OPERATOR_INTEGRITY"
+      ],
+      "expected_json": {
+        "workflow_run_id": 35132777581,
+        "plan_hash": "a24c98901422bbccfc9a040a6bc14575b1c710edd518c0d9c2facf7a57926351",
+        "source_parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c",
+        "source_measurement_hash": "5ec7953b473e4d7b29612de18aac9992238e722e1b12ea7c6999929958b24191",
+        "evidence_batch_hash": "244d10dfd7655eef7ac99db4731e85daab62fe9a2546b89e7d27720fbb8c20f7",
+        "traces_sha256": "102089199c7e1292e80444e339b84b00d2124e298f9ab849844dda0116473ef7"
+      },
+      "required_tokens": [
+        "\"to_status\": \"unconfirmed\"",
+        "\"experiment_origin_reinjection_count\": 0"
+      ]
+    },
+    {
+      "source_id": "R6_BATCH1_DERIVED_SUMMARY",
+      "path": "results/r6d_first_real_subject_v0_1/derived_summary.json",
+      "git_blob_sha": "1d6e99899e76036e8b3817d898e358637c52a501",
+      "role": [
+        "R6_BATCH1_STRUCTURAL_DERIVATION"
+      ],
+      "expected_json": {
+        "evidence_batch_hash": "0d4dd464d10bfc9a5b4307856e2c070bfaa521951e00cd0f147eeb80063e4beb",
+        "design_hash": "d8783a9c3e0a264c3119ee72e63db9b61d51f0d633ff6dde66068751c31701de",
+        "workflow_run_id": 35232218556
+      }
+    },
+    {
+      "source_id": "R6_BATCH1_CARRIER_AUDIT_V02",
+      "path": "results/reports/2026-09-17/R6D_First_Real_Carrier_Mechanism_Audit_v0_2.md",
+      "git_blob_sha": "7dfd7e15f864692cee0851ce4ad351756617eb5b",
+      "role": [
+        "R6_BATCH1_CARRIER_AUTHORITY_BOUNDARY"
+      ],
+      "required_tokens": [
+        "withdrawal-status carrier: not observed downstream",
+        "target-value carrier: observed",
+        "source-container authority carrier: observed",
+        "container authority and nested-proposition authority cannot be treated as equivalent"
+      ]
+    },
+    {
+      "source_id": "R6_BATCH1_SUBJECT_MANIFEST",
+      "path": "manifests/r6d_first_real_subject_2026-09-17_v0_1.json",
+      "git_blob_sha": "62016a0596b1c7b22509f36c514ab42525533c83",
+      "role": [
+        "R6_BATCH1_PROVENANCE"
+      ],
+      "expected_json": {
+        "artifact_digest": "sha256:da14f406fdc574178901a6e5129b6257496cbfb584b852da812923573f0cd927",
+        "evidence_batch_hash": "0d4dd464d10bfc9a5b4307856e2c070bfaa521951e00cd0f147eeb80063e4beb",
+        "design_hash": "d8783a9c3e0a264c3119ee72e63db9b61d51f0d633ff6dde66068751c31701de",
+        "workflow_run_id": 35232218556
+      }
+    }
+  ],
+  "source_policy": "REPOSITORY_FROZEN_FACTS_AND_EVIDENCE_BOUND_REPORT_TABLES_ONLY",
+  "external_network_required": false,
+  "provider_or_evaluator_call_required": false
+}
