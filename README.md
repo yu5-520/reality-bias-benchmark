@@ -93,6 +93,13 @@ R2/R3/R4 are simultaneous views of each frozen natural trajectory. R5/R6/R7 are 
 
 Repository preparation authorizes no provider, probe, repair or paid evaluator call.
 
+Owner-triggered real execution is fail-closed through:
+
+- `.github/workflows/v5-cross-domain-chat-authorization-bridge.yml`;
+- `.github/workflows/v5-cross-domain-first-round-subject-real.yml`.
+
+The bridge pins one exact default-branch SHA to a one-time authorization tag before dispatching the six-wave subject workflow.
+
 ## v5 theory chain
 
 \`\`\`text
