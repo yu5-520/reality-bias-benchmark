@@ -77,8 +77,15 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         runtime_records = [row for row in trace.get("runtime_transform_records") or [] if row.get("experiment_origin") is True]
         action_records = [row for row in trace.get("action_transform_records") or [] if row.get("experiment_origin") is True]
         revision = trace.get("r7_revision_lineage")
+        repair_application = trace.get("r7_repair_application")
         repair_verification = trace.get("r7_semantic_repair_verification")
-        if arm_id == "C3_ALR" and condition.get("condition_status") == "OBSERVED":
+        if arm_id == "C3_ALR":
+            if condition.get("condition_status") != "OBSERVED":
+                raise ValueError("r7_c3_direct_repair_condition_must_be_observed")
+            if not isinstance(repair_application, dict):
+                raise ValueError("r7_c3_repair_application_missing")
+            if repair_application.get("repair_application_hash") != bundle["c3_repair_application"].get("repair_application_hash"):
+                raise ValueError("r7_c3_repair_application_hash_mismatch")
             if not isinstance(repair_verification, dict):
                 raise ValueError("r7_c3_observed_missing_semantic_repair_verification")
             if repair_verification.get("target_integrity_repair_executed") is not True:
@@ -94,6 +101,7 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
             "runtime_transform_count": len(runtime_records),
             "action_transform_count": len(action_records),
             "revision_hash": revision.get("revision_hash") if isinstance(revision, dict) else None,
+            "repair_application_hash": repair_application.get("repair_application_hash") if isinstance(repair_application, dict) else None,
             "semantic_repair_verification_hash": repair_verification.get("verification_hash") if isinstance(repair_verification, dict) else None,
             "old_lineage_reentry_detected": repair_verification.get("old_lineage_reentry_detected") if isinstance(repair_verification, dict) else None,
             "preserved_unrelated_structure": repair_verification.get("preserved_unrelated_structure") if isinstance(repair_verification, dict) else None,
@@ -108,6 +116,9 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         "c1_one_shot_envelope.json",
         "c2_persistent_field_envelope.json",
         "c3_alr_binding.json",
+        "semantic_repair_runtime_plan.json",
+        "c3_repaired_parent_snapshot.json",
+        "c3_repair_application.json",
         "semantic_repair_packet.json",
         "lineage_completeness_gate.json",
         "r7_bounded_arena_config.json",
@@ -127,6 +138,8 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         "protocol_id": bundle["plan"]["protocol_id"],
         "common_reference_parent_state_hash": bundle["source_parent_snapshot"]["state_hash"],
         "c3_recovery_checkpoint_state_hash": bundle["c3_recovery_checkpoint"]["state_hash"],
+        "c3_repaired_parent_state_hash": bundle["c3_repaired_parent_snapshot"]["state_hash"],
+        "c3_repair_application_hash": bundle["c3_repair_application"]["repair_application_hash"],
         "semantic_payload_hash": bundle["plan"]["semantic_payload_hash"],
         "observation_horizon_id": bundle["plan"]["matched_horizon"]["horizon_id"],
         "measurement_schema": bundle["plan"]["measurement_schema"],
