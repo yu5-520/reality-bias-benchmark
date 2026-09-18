@@ -1,0 +1,75 @@
+name: V5 Cross-Domain First-Round Offline Validate
+
+on:
+  pull_request:
+    paths:
+      - "docs/cross_domain_first_round_experiment_plan_v0.1.md"
+      - "configs/v5_cross_domain_first_round_v0.1.json"
+      - "schemas/v5_cross_domain_*"
+      - "arena/build_v5_cross_domain_manifest.py"
+      - "arena/v5_cross_domain_preflight.py"
+      - "arena/run_v5_cross_domain_real.py"
+      - "arena/freeze_v5_cross_domain_evidence.py"
+      - "arena/build_v5_cross_domain_case_ledger.py"
+      - "arena/derive_v5_whole_process_structural.py"
+      - "arena/tests/test_v5_cross_domain*.py"
+      - ".github/workflows/v5-cross-domain-first-round-*.yml"
+      - "README.md"
+      - "arena/README.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile cross-domain modules
+        run: |
+          python -m py_compile arena/build_v5_cross_domain_manifest.py arena/v5_cross_domain_preflight.py
+          python -m py_compile arena/run_v5_cross_domain_real.py arena/freeze_v5_cross_domain_evidence.py
+          python -m py_compile arena/build_v5_cross_domain_case_ledger.py arena/derive_v5_whole_process_structural.py
+
+      - name: Run cross-domain tests
+        run: |
+          python -m unittest arena.tests.test_v5_cross_domain arena.tests.test_v5_cross_domain_runtime_guard -v
+
+      - name: Run four-domain offline preflight
+        run: |
+          python -m arena.v5_cross_domain_preflight --outdir results/v5_cross_domain_preflight --code-sha "$GITHUB_SHA"
+
+      - name: Assert fixed first-round manifest geometry
+        run: |
+          test "$(wc -l < results/v5_cross_domain_preflight/manifest_candidate.jsonl)" -eq 120
+          python - <<'PY'
+          import json
+          from collections import Counter
+          rows=[json.loads(x) for x in open('results/v5_cross_domain_preflight/manifest_candidate.jsonl',encoding='utf-8') if x.strip()]
+          assert Counter(r['domain_id'] for r in rows)=={
+              'ecommerce':30,'finance':30,'supply_chain':30,'software_engineering':30
+          }
+          assert Counter(r['wave_id'] for r in rows)=={1:20,2:20,3:20,4:20,5:20,6:20}
+          assert all(r['automatic_paid_evaluator'] is False for r in rows)
+          assert all(r['no_outcome_aware_rerun'] is True for r in rows)
+          print('PASS: fixed 4-domain x 30, 6-wave manifest')
+          PY
+
+      - name: Revalidate Process Reality method layer
+        run: python scripts/validate_process_reality_v5.py
+
+      - name: Assert offline path has no provider authorization
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('configs/v5_cross_domain_first_round_v0.1.json'))
+          assert p['paid_subject_execution_authorized'] is False
+          assert p['active_probe_authorized'] is False
+          assert p['active_repair_authorized'] is False
+          print('PASS: offline update authorizes no provider/probe/repair calls')
+          PY
