@@ -8,6 +8,8 @@ on:
       - "configs/**"
       - "schemas/**"
       - "scripts/validate_process_reality_v5.py"
+      - "arena/r5r6_engineering_package.py"
+      - "arena/tests/test_r5r6_engineering_package.py"
       - ".github/workflows/process-reality-v5-offline-validate.yml"
       - "README.md"
   workflow_dispatch:
@@ -23,5 +25,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
       - name: Validate Process Reality v5 method layer
         run: python scripts/validate_process_reality_v5.py
+
+      - name: Build R5-R6 engineering entry package from frozen evidence
+        run: |
+          set -euo pipefail
+          python -m arena.r5r6_engineering_package --outdir results/r5r6_engineering_gate
+          python -m unittest discover -s arena/tests -p 'test_r5r6_engineering_package.py' -v
+          python - <<'PY'
+          import json
+          s=json.load(open('results/r5r6_engineering_gate/summary.json'))
+          assert s['status']=='READY_FOR_R7_SEPARATE_AUTHORIZATION'
+          assert s['lineage_completeness_status']=='COMPLETE_FOR_AUTHORIZED_REPAIR'
+          assert s['active_repair_authorized'] is False
+          assert s['new_subject_provider_calls']==0
+          assert s['new_paid_evaluator_calls']==0
+          assert s['raw_evidence_mutated'] is False
+          assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('R5R6_ENGINEERING_ENTRY_GATE=PASS')
+          PY
