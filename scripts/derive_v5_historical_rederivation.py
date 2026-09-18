@@ -13,7 +13,7 @@ def load_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 def git_blob_sha(data: bytes) -> str:
-    header = f"blob {len(data)}\\0".encode("utf-8")
+    header = f"blob {len(data)}".encode("ascii") + b"\\x00"
     return hashlib.sha1(header + data).hexdigest()
 
 def require(ok: bool, message: str):
