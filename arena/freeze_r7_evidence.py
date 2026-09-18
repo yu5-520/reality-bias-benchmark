@@ -79,6 +79,10 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         revision = trace.get("r7_revision_lineage")
         repair_verification = trace.get("r7_semantic_repair_verification")
         if arm_id == "C3_ALR" and condition.get("condition_status") == "OBSERVED":
+            if condition.get("branch_start_state_hash") != bundle["c3_repaired_parent_snapshot"]["state_hash"]:
+                raise ValueError("r7_c3_branch_start_not_repaired_parent")
+            if action_records:
+                raise ValueError("r7_c3_direct_anchor_revision_forbids_action_transform")
             if not isinstance(repair_verification, dict):
                 raise ValueError("r7_c3_observed_missing_semantic_repair_verification")
             if repair_verification.get("target_integrity_repair_executed") is not True:
@@ -105,6 +109,8 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         "r7_plan.json",
         "source_parent_snapshot.json",
         "c3_recovery_checkpoint.json",
+        "c3_repaired_parent_snapshot.json",
+        "c3_direct_anchor_revision.json",
         "c1_one_shot_envelope.json",
         "c2_persistent_field_envelope.json",
         "c3_alr_binding.json",
@@ -127,6 +133,8 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         "protocol_id": bundle["plan"]["protocol_id"],
         "common_reference_parent_state_hash": bundle["source_parent_snapshot"]["state_hash"],
         "c3_recovery_checkpoint_state_hash": bundle["c3_recovery_checkpoint"]["state_hash"],
+        "c3_repaired_parent_state_hash": bundle["c3_repaired_parent_snapshot"]["state_hash"],
+        "c3_direct_anchor_revision_hash": bundle["c3_direct_anchor_revision"]["revision_hash"],
         "semantic_payload_hash": bundle["plan"]["semantic_payload_hash"],
         "observation_horizon_id": bundle["plan"]["matched_horizon"]["horizon_id"],
         "measurement_schema": bundle["plan"]["measurement_schema"],
