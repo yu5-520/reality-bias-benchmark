@@ -1,4 +1,4 @@
-# Process Reality v5 Status — 2026-09-18
+# Process Reality v5.1 Status — 2026-09-18
 
 Status: **METHOD LAYER IMPLEMENTED ON UPDATE BRANCH / NO NEW SCIENTIFIC SUBJECT RUN**
 
@@ -170,3 +170,73 @@ Key refinement:
 - structure-only driver: **NOT_ESTABLISHED**
 
 This audit is non-blind, theory-aware, append-only, and uses no new subject/provider or paid evaluator calls. CPR remains `NOT_ADJUDICATED`.
+
+
+## v5.1 semantic-lineage scoped repair update
+
+The forward layer now separates:
+
+- theory/phenomenon experiments;
+- engineering/control experiments;
+- future-development discussion.
+
+New forward contracts:
+
+- `theory/theory_contract_v0.12.md`
+- `docs/R_Plan_v5.1.md`
+- `docs/first_paper_v5_1_scope.md`
+- `docs/R6_semantic_lineage_repair_anchor_protocol_v1.1.md`
+- `docs/R7_semantic_lineage_scoped_recovery_protocol_v1.1.md`
+- `docs/semantic_lineage_repair_contract_v0.1.md`
+
+Engineering locality is now defined as:
+
+`LOCAL_BY_SEMANTIC_SCOPE`.
+
+The system should retrieve the complete relevant semantic history of the target object while excluding unrelated semantic branches.
+
+New machine interfaces:
+
+- `SemanticLineageClosure`;
+- `LineageCompletenessGate`;
+- `SemanticRepairPacket`;
+- Process Integrity Lineage v0.4;
+- Relation Evidence v0.2.
+
+`LINEAGE_GAP` blocks automatic Repair Agent execution.
+
+## Reporting split
+
+Forward report standard: `process_reality_report_standard_v1_6.md`.
+
+Separate report families:
+
+- Theory Experiment Report;
+- Engineering Experiment Report.
+
+Future discussion is not treated as experimental evidence.
+
+## Fresh Batch001 v0.2
+
+The natural-batch geometry remains three ecommerce runs with the same Arena runtime and no automatic evaluator.
+
+The engineering core now records:
+
+- Structural Repair Anchor candidates;
+- content addresses;
+- pool visibility ledger;
+- provenance;
+- semantic-lineage recoverability;
+- downstream structural closure candidates.
+
+First support / first pool / first exposure remain available as optional mechanism observables and are no longer engineering prerequisites.
+
+Forward design:
+
+- `configs/v5_whole_process_ecommerce_batch001_v0.2.json`
+- `docs/v5_fresh_whole_process_design_v0.2.md`
+- `configs/v5_whole_process_subject_gate_v0.2.json`
+
+Provider execution: **NOT AUTHORIZED**.  
+Active recovery: **NOT AUTHORIZED**.  
+CPR: **NOT_ADJUDICATED**.
