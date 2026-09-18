@@ -78,6 +78,13 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         action_records = [row for row in trace.get("action_transform_records") or [] if row.get("experiment_origin") is True]
         revision = trace.get("r7_revision_lineage")
         repair_verification = trace.get("r7_semantic_repair_verification")
+        if arm_id == "C3_ALR" and condition.get("condition_status") == "OBSERVED":
+            if not isinstance(repair_verification, dict):
+                raise ValueError("r7_c3_observed_missing_semantic_repair_verification")
+            if repair_verification.get("target_integrity_repair_executed") is not True:
+                raise ValueError("r7_c3_repair_verification_target_not_executed")
+            if repair_verification.get("packet_hash") != bundle["semantic_repair_packet"].get("packet_hash"):
+                raise ValueError("r7_c3_repair_packet_hash_mismatch")
         condition_rows.append({
             "run_id": trace.get("run_id"),
             "arm_id": arm_id,
