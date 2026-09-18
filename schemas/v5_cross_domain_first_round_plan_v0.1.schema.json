@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-V5-CROSS-DOMAIN-FIRST-ROUND-PLAN-v0.1",
+  "title": "Process Reality v5 Cross-Domain First-Round Plan v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema","version","date","status","first_round_id","experiment_family",
+    "method_development_domain","domains","planned_repeats_per_domain",
+    "wave_size_per_domain","wave_count","subject_condition","arena_config_path",
+    "model_config_path","theory_contract_path","measurement_contract_path",
+    "scout_config_path","experiment_profile_path","report_standard_path",
+    "engineering_report_standard_path","protocol_lock","execution_stages",
+    "r5_contract","r6_contract","r7_contract","technical_failure_policy",
+    "paid_subject_execution_authorized","active_probe_authorized","active_repair_authorized"
+  ],
+  "properties": {
+    "schema": {"const": "RB-V5-CROSS-DOMAIN-FIRST-ROUND-PLAN-v0.1"},
+    "version": {"const": "0.1"},
+    "date": {"type":"string"},
+    "status": {"const":"FROZEN_PROTOCOL_CANDIDATE_NOT_PROVIDER_AUTHORIZED"},
+    "first_round_id": {"type":"string","minLength":1},
+    "experiment_family": {"const":"PROCESS_REALITY_V5_CROSS_DOMAIN_FIRST_ROUND"},
+    "method_development_domain": {"type":"string","minLength":1},
+    "domains": {
+      "type":"array","minItems":4,"maxItems":4,
+      "items":{
+        "type":"object","additionalProperties":false,
+        "required":["domain_id","cohort_role"],
+        "properties":{
+          "domain_id":{"type":"string","minLength":1},
+          "cohort_role":{"enum":["METHOD_DEVELOPMENT_REFERENCE_FRESH_REPLICATION","FROZEN_PROTOCOL_REPLICATION"]}
+        }
+      }
+    },
+    "planned_repeats_per_domain":{"type":"integer","minimum":1},
+    "wave_size_per_domain":{"type":"integer","minimum":1},
+    "wave_count":{"type":"integer","minimum":1},
+    "subject_condition":{"const":"NATURAL_UNMANIPULATED"},
+    "arena_config_path":{"type":"string"},
+    "model_config_path":{"type":"string"},
+    "theory_contract_path":{"type":"string"},
+    "measurement_contract_path":{"type":"string"},
+    "scout_config_path":{"type":"string"},
+    "experiment_profile_path":{"type":"string"},
+    "report_standard_path":{"type":"string"},
+    "engineering_report_standard_path":{"type":"string"},
+    "protocol_lock":{"type":"object"},
+    "execution_stages":{"type":"array","minItems":1},
+    "r5_contract":{"type":"object"},
+    "r6_contract":{"type":"object"},
+    "r7_contract":{"type":"object"},
+    "technical_failure_policy":{"type":"object"},
+    "paid_subject_execution_authorized":{"const":false},
+    "active_probe_authorized":{"const":false},
+    "active_repair_authorized":{"const":false}
+  }
+}
