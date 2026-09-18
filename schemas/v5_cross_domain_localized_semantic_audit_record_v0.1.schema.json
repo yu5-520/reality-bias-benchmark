@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-V5-CROSS-DOMAIN-LOCALIZED-SEMANTIC-AUDIT-RECORD-v0.1",
+  "title": "Cross-Domain Localized Semantic Audit Record v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema","audit_id","source_case_hash","source_run_id","domain_id","wave_id",
+    "candidate_ref","content_address","auditor","source","evidence_pointers",
+    "semantic_adoption","decision_action_dependence","authority_handling",
+    "authority_escalation","r5_scientific_eligibility",
+    "r5_existing_operator_compatibility","r5_probe_authorized",
+    "r7_repair_authorized","claim_boundary","audit_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-V5-CROSS-DOMAIN-LOCALIZED-SEMANTIC-AUDIT-RECORD-v0.1"},
+    "audit_id": {"type":"string","minLength":1},
+    "source_case_hash": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "source_run_id": {"type":"string","minLength":1},
+    "domain_id": {"enum":["finance","supply_chain","software_engineering"]},
+    "wave_id": {"type":"integer","minimum":1,"maximum":6},
+    "candidate_ref": {"type":"string","minLength":1},
+    "content_address": {"type":"string","minLength":1},
+    "auditor": {"type":"object"},
+    "source": {"type":"object"},
+    "evidence_pointers": {"type":"array","minItems":2,"items":{"type":"object"}},
+    "semantic_adoption": {"const":"SUPPORTED_CANDIDATE"},
+    "decision_action_dependence": {"const":"SUPPORTED_CANDIDATE"},
+    "authority_handling": {"const":"UNCERTAINTY_PRESERVED_SUPPORTED_CANDIDATE"},
+    "authority_escalation": {"const":"NOT_ESTABLISHED"},
+    "r5_scientific_eligibility": {"const":"ELIGIBLE_R5_ATOMIC_PROBE"},
+    "r5_existing_operator_compatibility": {"const":"FACT_TO_UNCONFIRMED_COMPATIBLE"},
+    "r5_probe_authorized": {"const":false},
+    "r7_repair_authorized": {"const":false},
+    "claim_boundary": {"type":"string","minLength":1},
+    "audit_hash": {"type":"string","pattern":"^[0-9a-f]{64}$"}
+  }
+}

@@ -6,6 +6,8 @@ on:
       - "docs/cross_domain_first_round_experiment_plan_v0.2.md"
       - "docs/cross_domain_case_progression_contract_v0.1.md"
       - "docs/cross_domain_semantic_triage_protocol_v0.1.md"
+      - "docs/cross_domain_localized_semantic_audit_protocol_v0.1.md"
+      - "manifests/v5_cross_domain_localized_semantic_audit_review_2026-09-19_v0_1.json"
       - "configs/v5_cross_domain_first_round_v0.2.json"
       - "configs/v5_cross_domain_subject_gate_v0.2.json"
       - "configs/v5_cross_domain_semantic_triage_v0.1.json"
@@ -17,6 +19,7 @@ on:
       - "arena/build_v5_cross_domain_case_ledger.py"
       - "arena/build_v5_cross_domain_first_round_registry.py"
       - "arena/build_v5_cross_domain_semantic_triage.py"
+      - "arena/build_v5_cross_domain_localized_semantic_audit.py"
       - "arena/derive_v5_whole_process_structural.py"
       - "arena/tests/test_v5_cross_domain*.py"
       - ".github/workflows/v5-cross-domain-first-round-*.yml"
@@ -43,11 +46,12 @@ jobs:
           python -m py_compile arena/run_v5_cross_domain_real.py arena/freeze_v5_cross_domain_evidence.py
           python -m py_compile arena/build_v5_cross_domain_case_ledger.py arena/build_v5_cross_domain_first_round_registry.py
           python -m py_compile arena/build_v5_cross_domain_semantic_triage.py
+          python -m py_compile arena/build_v5_cross_domain_localized_semantic_audit.py
           python -m py_compile arena/derive_v5_whole_process_structural.py
 
       - name: Run cross-domain tests
         run: |
-          python -m unittest arena.tests.test_v5_cross_domain arena.tests.test_v5_cross_domain_runtime_guard arena.tests.test_v5_cross_domain_semantic_triage -v
+          python -m unittest arena.tests.test_v5_cross_domain arena.tests.test_v5_cross_domain_runtime_guard arena.tests.test_v5_cross_domain_semantic_triage arena.tests.test_v5_cross_domain_localized_semantic_audit -v
 
       - name: Run held-out cross-domain offline preflight
         run: |
@@ -89,6 +93,23 @@ jobs:
           assert p['authorization']['r7_repair'] is False
           assert p['authorization']['r8_cpr_adjudication'] is False
           print('PASS: semantic triage is deterministic and authorizes no active scientific stage')
+          PY
+
+      - name: Validate localized semantic-audit pass-1 contract
+        run: |
+          python -m json.tool manifests/v5_cross_domain_localized_semantic_audit_review_2026-09-19_v0_1.json >/dev/null
+          python -m json.tool schemas/v5_cross_domain_localized_semantic_audit_record_v0.1.schema.json >/dev/null
+          python - <<'PY'
+          import json
+          p=json.load(open('manifests/v5_cross_domain_localized_semantic_audit_review_2026-09-19_v0_1.json'))
+          assert p['status']=='MODEL_REVIEW_PASS1_APPEND_ONLY'
+          assert p['selection_rule']['reviewed_case_count']==29
+          assert p['domain_counts']=={'finance':5,'software_engineering':8,'supply_chain':16}
+          assert len(p['reviewed_case_hashes'])==29
+          assert len(set(p['reviewed_case_hashes']))==29
+          assert p['uniform_review_decision']['r5_probe_authorized'] is False
+          assert p['uniform_review_decision']['r7_repair_authorized'] is False
+          print('PASS: localized semantic audit pass 1 freezes review decisions but authorizes no active stage')
           PY
 
       - name: Revalidate Process Reality method layer

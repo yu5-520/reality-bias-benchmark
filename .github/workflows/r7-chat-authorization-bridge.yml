@@ -428,3 +428,178 @@ jobs:
           body="Frozen-evidence cross-domain semantic triage completed.\n\nSource subject run: ${SOURCE_RUN_ID}\nTriage workflow run: $GITHUB_RUN_ID\nSelected unique localized-audit cases: ${CASE_COUNT}\nAuthority-review trajectory counts: ${AUTHORITY_COUNTS}\nSummary hash: ${SUMMARY_HASH}\n\nProvider calls: 0. Paid evaluator calls: 0. R5/R7 calls: 0. CPR remains NOT_ADJUDICATED."
           gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
           gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
+
+
+  materialize-cross-domain-localized-semantic-audit-pass1:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5 CROSS-DOMAIN LOCALIZED SEMANTIC AUDIT'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      EXPECTED_EXECUTION_PHRASE: MATERIALIZE_FROZEN_V5_CROSS_DOMAIN_SEMANTIC_AUDIT_PASS1
+      REVIEW_MANIFEST: manifests/v5_cross_domain_localized_semantic_audit_review_2026-09-19_v0_1.json
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact audit materialization request
+        id: auth
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, re
+          rows={}
+          for raw in os.environ['AUTH_BODY'].splitlines():
+              line=raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit(f'invalid audit request line: {line!r}')
+              key,value=line.split('=',1)
+              if key in rows:
+                  raise SystemExit(f'duplicate audit request key: {key}')
+              rows[key]=value
+          required={
+              'execution_phrase',
+              'source_triage_run_id',
+              'expected_triage_summary_hash',
+              'authorization_id',
+              'control_plane',
+          }
+          if set(rows)!=required:
+              raise SystemExit(f'audit request keys mismatch: {sorted(rows)}')
+          if rows['execution_phrase']!=os.environ['EXPECTED_EXECUTION_PHRASE']:
+              raise SystemExit('audit execution phrase mismatch')
+          if rows['control_plane']!='CHAT_EXECUTION_BRIDGE_V5_CROSS_DOMAIN_SEMANTIC_AUDIT_v0.1':
+              raise SystemExit('audit control-plane identifier mismatch')
+          if not re.fullmatch(r'\d{6,20}', rows['source_triage_run_id']):
+              raise SystemExit('invalid source_triage_run_id')
+          if not re.fullmatch(r'[0-9a-f]{64}', rows['expected_triage_summary_hash']):
+              raise SystemExit('invalid expected_triage_summary_hash')
+          if not re.fullmatch(r'[A-Za-z0-9._-]{8,80}', rows['authorization_id']):
+              raise SystemExit('invalid authorization_id')
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as fh:
+              fh.write('source_triage_run_id='+rows['source_triage_run_id']+'\n')
+              fh.write('expected_triage_summary_hash='+rows['expected_triage_summary_hash']+'\n')
+          print('PASS: exact localized semantic-audit materialization request validated')
+          PY
+
+      - name: Verify frozen review manifest
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          p=json.load(open(os.environ['REVIEW_MANIFEST']))
+          assert p['status']=='MODEL_REVIEW_PASS1_APPEND_ONLY'
+          assert p['auditor']['auditor_id']=='GPT-5.6-Sol'
+          assert p['selection_rule']['reviewed_case_count']==29
+          assert p['domain_counts']=={'finance':5,'software_engineering':8,'supply_chain':16}
+          assert len(p['reviewed_case_hashes'])==29
+          assert len(set(p['reviewed_case_hashes']))==29
+          assert p['uniform_review_decision']['r5_probe_authorized'] is False
+          assert p['uniform_review_decision']['r7_repair_authorized'] is False
+          print('PASS: frozen model-review decisions are internally consistent')
+          PY
+
+      - name: Verify completed triage source workflow and artifact digest
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_TRIAGE_RUN_ID: ${{ steps.auth.outputs.source_triage_run_id }}
+          EXPECTED_TRIAGE_SUMMARY_HASH: ${{ steps.auth.outputs.expected_triage_summary_hash }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_TRIAGE_RUN_ID" > "$RUNNER_TEMP/triage_run.json"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_TRIAGE_RUN_ID/artifacts" > "$RUNNER_TEMP/triage_artifacts.json"
+          python - <<'PY'
+          import json, os
+          review=json.load(open(os.environ['REVIEW_MANIFEST']))
+          run=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'triage_run.json')))
+          arts=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'triage_artifacts.json')))['artifacts']
+          assert run['status']=='completed' and run['conclusion']=='success'
+          assert int(run['id'])==int(os.environ['SOURCE_TRIAGE_RUN_ID'])
+          assert review['source_triage']['workflow_run_id']==int(run['id'])
+          matches=[a for a in arts if a['id']==review['source_triage']['artifact_id']]
+          assert len(matches)==1
+          assert matches[0].get('digest')==review['source_triage']['artifact_digest']
+          assert review['source_triage']['summary_hash']==os.environ['EXPECTED_TRIAGE_SUMMARY_HASH']
+          print('PASS: exact frozen triage artifact identity verified')
+          PY
+
+      - name: Download exact triage artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_TRIAGE_RUN_ID: ${{ steps.auth.outputs.source_triage_run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p results/v5_cross_domain_semantic_triage_source
+          gh run download "$SOURCE_TRIAGE_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern "v5-cross-domain-semantic-triage-*-$SOURCE_TRIAGE_RUN_ID" \
+            --dir results/v5_cross_domain_semantic_triage_source
+          test "$(find results/v5_cross_domain_semantic_triage_source -name semantic_triage_cases.jsonl -type f | wc -l)" -eq 1
+          test "$(find results/v5_cross_domain_semantic_triage_source -name summary.json -type f | wc -l)" -eq 1
+
+      - name: Verify triage summary hash and materialize reviewed audit records
+        id: materialize
+        env:
+          EXPECTED_TRIAGE_SUMMARY_HASH: ${{ steps.auth.outputs.expected_triage_summary_hash }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TRIAGE_CASES="$(find results/v5_cross_domain_semantic_triage_source -name semantic_triage_cases.jsonl -type f)"
+          TRIAGE_SUMMARY="$(find results/v5_cross_domain_semantic_triage_source -name summary.json -type f)"
+          export TRIAGE_SUMMARY
+          python - <<'PY'
+          import json, os
+          from arena.core import stable_hash
+          p=json.load(open(os.environ['TRIAGE_SUMMARY']))
+          expected=os.environ['EXPECTED_TRIAGE_SUMMARY_HASH']
+          assert p['summary_hash']==expected
+          assert stable_hash({k:v for k,v in p.items() if k!='summary_hash'})==expected
+          print('PASS: triage summary content hash verified')
+          PY
+          python -m arena.build_v5_cross_domain_localized_semantic_audit \
+            --triage-cases "$TRIAGE_CASES" \
+            --decisions "$REVIEW_MANIFEST" \
+            --outdir results/v5_cross_domain_localized_semantic_audit
+          python - <<'PY'
+          import json, os
+          p=json.load(open('results/v5_cross_domain_localized_semantic_audit/summary.json'))
+          assert p['reviewed_case_count']==29
+          assert p['domain_counts']=={'finance':5,'software_engineering':8,'supply_chain':16}
+          assert p['r5_scientifically_eligible_count']==29
+          assert p['r5_existing_fact_to_unconfirmed_compatible_count']==29
+          assert p['deferred_authority_case_count']==56
+          assert p['provider_calls']==0 and p['paid_evaluator_calls']==0
+          assert p['r5_probe_calls']==0 and p['r7_repair_calls']==0
+          assert p['r8_cpr_adjudication'] is False
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as fh:
+              fh.write('summary_hash='+p['summary_hash']+'\n')
+          print('PASS: localized semantic audit pass 1 materialized without active experiment calls')
+          PY
+
+      - name: Upload append-only localized semantic-audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-cross-domain-localized-semantic-audit-pass1-${{ steps.auth.outputs.source_triage_run_id }}-${{ github.run_id }}
+          path: results/v5_cross_domain_localized_semantic_audit
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Record completed semantic audit pass 1
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SUMMARY_HASH: ${{ steps.materialize.outputs.summary_hash }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="Cross-domain localized semantic audit pass 1 materialized and frozen.\n\nReviewed cases: 29 fact-status authority-review anchors (finance 5 / software_engineering 8 / supply_chain 16).\nSemantic adoption: 29 SUPPORTED_CANDIDATE.\nDecision/action dependence: 29 SUPPORTED_CANDIDATE.\nUncertainty preservation: 29 SUPPORTED_CANDIDATE.\nAuthority escalation: 0 established.\nR5 scientific eligibility: 29; existing fact->unconfirmed operator compatible: 29.\nDeferred authority-review cases: 56 provisional/unspecified sources.\nSummary hash: ${SUMMARY_HASH}.\n\nProvider/evaluator/R5/R7 calls: 0. CPR remains NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed

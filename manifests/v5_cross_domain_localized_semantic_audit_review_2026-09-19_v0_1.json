@@ -1,0 +1,82 @@
+{
+  "schema": "RB-V5-CROSS-DOMAIN-LOCALIZED-SEMANTIC-AUDIT-DECISIONS-v0.1",
+  "date": "2026-09-19",
+  "status": "MODEL_REVIEW_PASS1_APPEND_ONLY",
+  "source_triage": {
+    "workflow_run_id": 35377246079,
+    "artifact_id": 10560253559,
+    "artifact_digest": "sha256:b0e8b264cd6ee5b8970f3dbe186a49b3e23a5ae33eb67c01076afc7d8baf0550",
+    "summary_hash": "0cb90df320499618d3684b21071783f31995d2427efc3e94cdd49d776b0fabfa",
+    "selected_unique_case_count": 167
+  },
+  "auditor": {
+    "auditor_kind": "MODEL",
+    "auditor_id": "GPT-5.6-Sol",
+    "blind_to_prior_semantic_labels": false,
+    "notes": "Pass 1 reviews only fact-status authority-review anchors carrying an explicit uncertainty marker. Structural evidence is immutable."
+  },
+  "selection_rule": {
+    "triage_role_required": "AUTHORITY_REVIEW_ANCHOR",
+    "source_status_required": "fact",
+    "explicit_uncertainty_marker_required": true,
+    "reviewed_case_count": 29
+  },
+  "uniform_review_decision": {
+    "semantic_adoption": "SUPPORTED_CANDIDATE",
+    "decision_action_dependence": "SUPPORTED_CANDIDATE",
+    "authority_handling": "UNCERTAINTY_PRESERVED_SUPPORTED_CANDIDATE",
+    "authority_escalation": "NOT_ESTABLISHED",
+    "r5_scientific_eligibility": "ELIGIBLE_R5_ATOMIC_PROBE",
+    "r5_existing_operator_compatibility": "FACT_TO_UNCONFIRMED_COMPATIBLE",
+    "r5_probe_authorized": false,
+    "r7_repair_authorized": false,
+    "claim_boundary": "Observed downstream reasoning reuses the reviewed source while preserving uncertainty. This does not establish causal dependence, System Inertia, CPR, or authority error; R5 is required to test source-status dependence."
+  },
+  "domain_counts": {
+    "finance": 5,
+    "software_engineering": 8,
+    "supply_chain": 16
+  },
+  "reviewed_case_hashes": [
+    "7ed0c65065a0ad615ae4c06e8f9bf4a8a80e58016232d12f5abe115692a03488",
+    "92211309fb1b9983fc9649ac78c81cdb1b83aaafc8aa1ef6830d32e1b648ec6b",
+    "bb8524ad125b6c07194c337f27e32c241d3e0b71bb7a9c6061a7526119c592d4",
+    "9d1ad55823f89b06d211a3f8aa3807368778a25b3132f79247b2b06ecd53107c",
+    "3e4a064e689e5f46fb4058ac8ea2465f8b3657cd97a113dacb8c919665f1233e",
+    "8c668b56a8c2e9ed70a89ab46f3d571e4654fdf42df275cc95f0067b0c7b4dee",
+    "9684a9c95d382dfe231ea1d3a4226c38906291885cc79c280b26106036817d31",
+    "0aa6e0fc2696017ff562311e79d8aad914dc06294ae8d5c4069978ea38b57e94",
+    "31e80d6171638c481c6f6dea44d9082c58621377df8bfd4100bc8a32760bc69c",
+    "83476eeee96e111d9e0d3b66483ee9bf3bde7375cf268382a8aa4d08f60c3f85",
+    "7c7e526e4d911cf24416eae067967e9b9504b1846b8a4f1fe8f6057becada4c0",
+    "6c9e60abebc3e2368c17dbc9d3b719d73e155d6ca770948755bf8151a33bc4e8",
+    "8920c4c55c7fcccdf2c031dadcfba8fa9b69e756ec895d7a6c34e83c2585ffd6",
+    "a4d9503019bb28b5f82a3a62589c859b72883c81bab2005fa85e6d01730562f2",
+    "6c3de6b872ba4d9cb3330c12ad113453b441fc729375f07781a271a602859aa5",
+    "99e0d6a53a767422b08bd4aec03b9d10b9f2f8c78784024645f176cf21d19ad0",
+    "907d3ff32f501361c3b613974cd1bd81b8807553dbe79c90a7da64338b60d679",
+    "0d2e0d7c1a8d07aa87b9201677ad7be22062108167bd9b4288dc8f31289075b9",
+    "cac2cde91b7ad076202143188348e5c74a8200844e9d70fd706165b60404385b",
+    "56ee79f97f54dc9968b537cd06b8a273210a9ded06637dfce45e88f652db1b2f",
+    "0482e485fba4da84e66aa21902a42286f7712aec1cda187c68ba25d2b4403de6",
+    "d8274348bfc32ba49b20606fb3b487c815b3da8f3de2fed2b3fed01c289f047c",
+    "e6c00ccc4f9803350890d9cf4ad6679ea06f1b7be4fde8c96ebcc814b6182abb",
+    "cf726639de1dc285c89b2f8037eadd6ea969e553a2bc963483f1c9035bff217a",
+    "8b1731b57396dadfb25e0d975c4849ef83d55b6a68a5920a209c9ed84079b5d6",
+    "57aab6cf5a3ed7d8ab997c3d9a03795eb4e2ab061da91bf1f98b4755e43b5951",
+    "31c8e9e27e036e985a255643ee0c1b7b704e376d031a8a625577fd2788b48939",
+    "d6e6f180b5849c74fc5bb735599d7e172f38d600e99f600f885c5f13181518d9",
+    "74a1a8e0fb7ea2f94083243369796bed438e4cd5ef08523fdac8c133eec37415"
+  ],
+  "deferred_authority_cases": {
+    "count": 56,
+    "reason": "provisional/unspecified sources require a separately frozen source-status-withdrawal operator before active R5 probing"
+  },
+  "non_claims": [
+    "UNCERTAINTY_PRESERVATION_DOES_NOT_PROVE_NO_RISK",
+    "R5_ELIGIBILITY_DOES_NOT_AUTHORIZE_R5_EXECUTION",
+    "NO_CPR_ADJUDICATION",
+    "NO_SYSTEM_INERTIA_CONCLUSION",
+    "NO_CAUSAL_DEPENDENCE_CONCLUSION"
+  ]
+}
