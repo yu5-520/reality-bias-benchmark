@@ -5,8 +5,10 @@ on:
     paths:
       - "docs/cross_domain_first_round_experiment_plan_v0.2.md"
       - "docs/cross_domain_case_progression_contract_v0.1.md"
+      - "docs/cross_domain_semantic_triage_protocol_v0.1.md"
       - "configs/v5_cross_domain_first_round_v0.2.json"
       - "configs/v5_cross_domain_subject_gate_v0.2.json"
+      - "configs/v5_cross_domain_semantic_triage_v0.1.json"
       - "schemas/v5_cross_domain_*"
       - "arena/build_v5_cross_domain_manifest.py"
       - "arena/v5_cross_domain_preflight.py"
@@ -14,9 +16,11 @@ on:
       - "arena/freeze_v5_cross_domain_evidence.py"
       - "arena/build_v5_cross_domain_case_ledger.py"
       - "arena/build_v5_cross_domain_first_round_registry.py"
+      - "arena/build_v5_cross_domain_semantic_triage.py"
       - "arena/derive_v5_whole_process_structural.py"
       - "arena/tests/test_v5_cross_domain*.py"
       - ".github/workflows/v5-cross-domain-first-round-*.yml"
+      - ".github/workflows/r7-chat-authorization-bridge.yml"
       - "README.md"
       - "arena/README.md"
   workflow_dispatch:
@@ -38,11 +42,12 @@ jobs:
           python -m py_compile arena/build_v5_cross_domain_manifest.py arena/v5_cross_domain_preflight.py
           python -m py_compile arena/run_v5_cross_domain_real.py arena/freeze_v5_cross_domain_evidence.py
           python -m py_compile arena/build_v5_cross_domain_case_ledger.py arena/build_v5_cross_domain_first_round_registry.py
+          python -m py_compile arena/build_v5_cross_domain_semantic_triage.py
           python -m py_compile arena/derive_v5_whole_process_structural.py
 
       - name: Run cross-domain tests
         run: |
-          python -m unittest arena.tests.test_v5_cross_domain arena.tests.test_v5_cross_domain_runtime_guard -v
+          python -m unittest arena.tests.test_v5_cross_domain arena.tests.test_v5_cross_domain_runtime_guard arena.tests.test_v5_cross_domain_semantic_triage -v
 
       - name: Run held-out cross-domain offline preflight
         run: |
@@ -68,6 +73,22 @@ jobs:
           assert all(r['automatic_paid_evaluator'] is False for r in rows)
           assert all(r['no_outcome_aware_rerun'] is True for r in rows)
           print('PASS: held-out 3 domains x 30, 2 domain-pure waves each')
+          PY
+
+      - name: Validate deterministic semantic-triage contract
+        run: |
+          python -m json.tool configs/v5_cross_domain_semantic_triage_v0.1.json >/dev/null
+          python -m json.tool schemas/v5_cross_domain_semantic_triage_case_v0.1.schema.json >/dev/null
+          python - <<'PY'
+          import json
+          p=json.load(open('configs/v5_cross_domain_semantic_triage_v0.1.json'))
+          assert p['status']=='FROZEN_DETERMINISTIC_TRIAGE_NO_SEMANTIC_ADJUDICATION'
+          assert p['authorization']['provider_calls'] is False
+          assert p['authorization']['paid_evaluator_calls'] is False
+          assert p['authorization']['r5_probe'] is False
+          assert p['authorization']['r7_repair'] is False
+          assert p['authorization']['r8_cpr_adjudication'] is False
+          print('PASS: semantic triage is deterministic and authorizes no active scientific stage')
           PY
 
       - name: Revalidate Process Reality method layer
