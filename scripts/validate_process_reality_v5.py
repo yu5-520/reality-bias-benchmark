@@ -62,6 +62,10 @@ def main() -> None:
         "arena/r5r6_engineering_package.py",
         "arena/tests/test_r5r6_engineering_package.py",
         "docs/reports/2026-09-18/R5-R6_Engineering_Experiment_Report_v1.md",
+        "configs/r5r6_r7_entry_engineering_audit_binding_v0.1.json",
+        "arena/r5r6_r7_entry_audit.py",
+        "arena/tests/test_r5r6_r7_entry_audit.py",
+        "docs/reports/2026-09-18/R5-R6_Engineering_Audit_for_R7_Entry_v1.md",
     ]
     for path in required_files:
         require((ROOT / path).exists(), f"missing required v5/v5.1 file: {path}")
@@ -159,6 +163,12 @@ def main() -> None:
         "READY_FOR_SEPARATE_AUTHORIZATION",
         "Repair Anchor != Semantic Origin",
         "R7 READY FOR SEPARATE AUTHORIZATION",
+    ])
+    require_tokens("docs/reports/2026-09-18/R5-R6_Engineering_Audit_for_R7_Entry_v1.md", [
+        "PASS_R7_ENTRY_BOUNDED_ENGINEERING_EXPERIMENT",
+        "8 / 8 entry criteria PASS",
+        "R7_RESEARCH_QUESTION_REMAINS_OPEN",
+        "R7 can now ask whether that target is actually repairable",
     ])
     require_tokens("README.md", [
         "Process Reality v5.1",
