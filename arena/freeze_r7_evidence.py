@@ -105,6 +105,7 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
             "semantic_repair_verification_hash": repair_verification.get("verification_hash") if isinstance(repair_verification, dict) else None,
             "old_lineage_reentry_detected": repair_verification.get("old_lineage_reentry_detected") if isinstance(repair_verification, dict) else None,
             "preserved_unrelated_structure": repair_verification.get("preserved_unrelated_structure") if isinstance(repair_verification, dict) else None,
+            "post_repair_watch_result_hash": repair_verification.get("post_repair_watch_result_hash") if isinstance(repair_verification, dict) else None,
             "trace_hash": stable_hash(trace),
         })
 
@@ -120,6 +121,8 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         "c3_repaired_parent_snapshot.json",
         "c3_repair_application.json",
         "semantic_repair_packet.json",
+        "semantic_lineage_package.json",
+        "post_repair_watch_contract.json",
         "lineage_completeness_gate.json",
         "r7_bounded_arena_config.json",
         "arm_manifests.jsonl",
@@ -144,6 +147,9 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         "observation_horizon_id": bundle["plan"]["matched_horizon"]["horizon_id"],
         "measurement_schema": bundle["plan"]["measurement_schema"],
         "semantic_repair_packet_hash": bundle["semantic_repair_packet"].get("packet_hash"),
+        "semantic_lineage_package_hash": bundle["semantic_lineage_package"].get("package_hash"),
+        "post_repair_watch_contract_hash": bundle["post_repair_watch_contract"].get("watch_hash"),
+        "full_lineage_observation_policy": bundle["plan"].get("full_lineage_observation_policy"),
         "lineage_completeness_gate_hash": bundle["lineage_completeness_gate"].get("gate_hash"),
         "planned_branch_count": len(bundle["execution_rows"]),
         "preserved_trace_count": len(traces),
