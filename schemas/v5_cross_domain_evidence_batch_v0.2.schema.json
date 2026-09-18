@@ -1,0 +1,42 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"RB-V5-CROSS-DOMAIN-EVIDENCE-BATCH-v0.2",
+  "title":"Cross-Domain Domain-Pure Wave Evidence Batch v0.2",
+  "type":"object",
+  "additionalProperties":false,
+  "required":[
+    "schema","first_round_id","authorization_event_id","selected_wave_id","selected_wave_key",
+    "selected_domain_id","manifest_sha256","traces_sha256","summary_sha256",
+    "authorization_record_sha256","journal_hashes","snapshot_hashes","selected_run_count",
+    "preserved_trace_count","runner_error_count","domain_trace_counts","code_commit_sha",
+    "plan_hash","raw_evidence_frozen_before_structural_derivation",
+    "automatic_paid_evaluator_called","driver_probe_called","active_recovery_called",
+    "semantic_status","evidence_batch_hash"
+  ],
+  "properties":{
+    "schema":{"const":"RB-V5-CROSS-DOMAIN-EVIDENCE-BATCH-v0.2"},
+    "first_round_id":{"type":"string"},
+    "authorization_event_id":{"type":"string"},
+    "selected_wave_id":{"type":"integer","minimum":1,"maximum":6},
+    "selected_wave_key":{"type":"string"},
+    "selected_domain_id":{"enum":["finance","supply_chain","software_engineering"]},
+    "manifest_sha256":{"type":"string"},
+    "traces_sha256":{"type":"string"},
+    "summary_sha256":{"type":"string"},
+    "authorization_record_sha256":{"type":"string"},
+    "journal_hashes":{"type":"object","additionalProperties":{"type":"string"}},
+    "snapshot_hashes":{"type":"object","additionalProperties":{"type":"string"}},
+    "selected_run_count":{"const":15},
+    "preserved_trace_count":{"type":"integer","minimum":0,"maximum":15},
+    "runner_error_count":{"type":"integer","minimum":0},
+    "domain_trace_counts":{"type":"object","additionalProperties":{"type":"integer","minimum":0}},
+    "code_commit_sha":{"type":"string"},
+    "plan_hash":{"type":"string"},
+    "raw_evidence_frozen_before_structural_derivation":{"const":true},
+    "automatic_paid_evaluator_called":{"const":false},
+    "driver_probe_called":{"const":false},
+    "active_recovery_called":{"const":false},
+    "semantic_status":{"const":"NOT_ADJUDICATED"},
+    "evidence_batch_hash":{"type":"string","minLength":1}
+  }
+}

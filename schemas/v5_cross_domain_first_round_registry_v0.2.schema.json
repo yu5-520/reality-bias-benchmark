@@ -1,0 +1,32 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"RB-V5-CROSS-DOMAIN-FIRST-ROUND-REGISTRY-v0.2",
+  "title":"Cross-Domain Held-Out Replication Evidence Registry v0.2",
+  "type":"object",
+  "additionalProperties":false,
+  "required":[
+    "schema","first_round_id","authorization_event_id","wave_count","all_waves_present",
+    "same_execution_sha","same_plan_hash","same_authorization_event","planned_selected_run_count",
+    "preserved_trace_count","runner_error_count","domain_trace_counts","wave_batches",
+    "code_commit_sha","plan_hash","semantic_status","registry_hash"
+  ],
+  "properties":{
+    "schema":{"const":"RB-V5-CROSS-DOMAIN-FIRST-ROUND-REGISTRY-v0.2"},
+    "first_round_id":{"type":"string"},
+    "authorization_event_id":{"type":"string"},
+    "wave_count":{"const":6},
+    "all_waves_present":{"const":true},
+    "same_execution_sha":{"const":true},
+    "same_plan_hash":{"const":true},
+    "same_authorization_event":{"const":true},
+    "planned_selected_run_count":{"const":90},
+    "preserved_trace_count":{"type":"integer","minimum":0,"maximum":90},
+    "runner_error_count":{"type":"integer","minimum":0},
+    "domain_trace_counts":{"type":"object","additionalProperties":{"type":"integer","minimum":0}},
+    "wave_batches":{"type":"array","minItems":6,"maxItems":6},
+    "code_commit_sha":{"type":"string"},
+    "plan_hash":{"type":"string"},
+    "semantic_status":{"const":"NOT_ADJUDICATED"},
+    "registry_hash":{"type":"string"}
+  }
+}

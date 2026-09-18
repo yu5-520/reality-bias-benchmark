@@ -41,17 +41,40 @@ def main() -> None:
     traces = load_jsonl(traces_path)
     summary = load_json(summary_path)
     auth = load_json(auth_path)
-    wave_id = auth["selected_wave_id"]
-    selected_rows = [row for row in rows if row["wave_id"] == wave_id]
+
+    wave_id = int(auth["selected_wave_id"])
+    selected_rows = [row for row in rows if int(row["wave_id"]) == wave_id]
+    if len(selected_rows) != 15:
+        raise ValueError("cross_domain_frozen_wave_must_have_15_planned_rows")
     expected_run_ids = {row["run_id"] for row in selected_rows}
     if any(trace.get("run_id") not in expected_run_ids for trace in traces):
         raise ValueError("cross_domain_trace_not_in_authorized_wave")
 
+    domains = {row["domain_id"] for row in selected_rows}
+    if len(domains) != 1:
+        raise ValueError("cross_domain_frozen_wave_must_be_domain_pure")
+    selected_domain_id = next(iter(domains))
+    wave_keys = {row["wave_key"] for row in selected_rows}
+    if len(wave_keys) != 1:
+        raise ValueError("cross_domain_wave_key_not_unique")
+    selected_wave_key = next(iter(wave_keys))
+
+    if auth.get("selected_domain_id") != selected_domain_id:
+        raise ValueError("cross_domain_authorization_domain_mismatch")
+    if auth.get("selected_wave_key") != selected_wave_key:
+        raise ValueError("cross_domain_authorization_wave_key_mismatch")
+
     domain_trace_counts = Counter(trace.get("domain_id") for trace in traces)
+    if any(domain_id != selected_domain_id for domain_id in domain_trace_counts):
+        raise ValueError("cross_domain_preserved_trace_crossed_wave_domain")
+
     record = {
-        "schema": "RB-V5-CROSS-DOMAIN-EVIDENCE-BATCH-v0.1",
+        "schema": "RB-V5-CROSS-DOMAIN-EVIDENCE-BATCH-v0.2",
         "first_round_id": rows[0]["first_round_id"],
+        "authorization_event_id": auth["authorization_event_id"],
         "selected_wave_id": wave_id,
+        "selected_wave_key": selected_wave_key,
+        "selected_domain_id": selected_domain_id,
         "manifest_sha256": sha256_file(args.manifest),
         "traces_sha256": sha256_file(traces_path),
         "summary_sha256": sha256_file(summary_path),
@@ -76,7 +99,10 @@ def main() -> None:
         encoding="utf-8",
     )
     print("V5_CROSS_DOMAIN_RAW_EVIDENCE_FROZEN=YES")
+    print("AUTHORIZATION_EVENT_ID=" + record["authorization_event_id"])
     print("WAVE_ID=" + str(wave_id))
+    print("WAVE_KEY=" + selected_wave_key)
+    print("DOMAIN_ID=" + selected_domain_id)
     print("EVIDENCE_BATCH_HASH=" + record["evidence_batch_hash"])
 
 

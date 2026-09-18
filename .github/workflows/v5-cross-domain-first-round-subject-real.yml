@@ -4,23 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       expected_execution_sha:
-        description: Exact repository SHA frozen for all six first-round waves
+        description: Exact repository SHA frozen for all six held-out waves
         required: true
         default: ""
         type: string
-      wave_id:
-        description: Fixed preregistered wave number 1-6; each wave contains 5 runs per domain
-        required: true
-        default: "1"
-        type: choice
-        options: ["1","2","3","4","5","6"]
       authorization_phrase:
-        description: Exact paid natural-subject authorization phrase
+        description: Exact authorization phrase binding one six-wave launch event
         required: true
         default: ""
         type: string
       per_run_max_calls:
-        description: Maximum provider calls per natural run
+        description: Maximum provider calls per natural trajectory
         required: true
         default: "0"
         type: string
@@ -29,8 +23,13 @@ on:
         required: true
         default: "0"
         type: string
-      global_spending_ceiling:
-        description: Global spending ceiling for this 20-run wave in USD
+      wave_spending_ceiling:
+        description: Spending ceiling for each 15-run wave in USD
+        required: true
+        default: "0"
+        type: string
+      first_round_spending_ceiling:
+        description: Spending ceiling for all six waves in USD
         required: true
         default: "0"
         type: string
@@ -39,13 +38,13 @@ permissions:
   contents: read
 
 concurrency:
-  group: v5-cross-domain-first-round-wave-${{ inputs.wave_id }}
+  group: v5-cross-domain-first-round-${{ github.run_id }}
   cancel-in-progress: false
 
 jobs:
-  subject:
+  prepare:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -58,89 +57,165 @@ jobs:
           set -euo pipefail
           test -n "${{ inputs.expected_execution_sha }}"
           test "${{ inputs.expected_execution_sha }}" = "$GITHUB_SHA"
-          echo "PASS: execution SHA matches frozen first-round SHA"
+          echo "PASS: one exact execution SHA binds the six-wave first round"
 
-      - name: Validate method and cross-domain preflight
+      - name: Validate method and held-out preflight
         run: |
           python scripts/validate_process_reality_v5.py
           python -m unittest arena.tests.test_v5_cross_domain arena.tests.test_v5_cross_domain_runtime_guard -v
-          python -m arena.v5_cross_domain_preflight --outdir results/v5_cross_domain_preflight --code-sha "$GITHUB_SHA"
+          python -m arena.v5_cross_domain_preflight             --outdir results/v5_cross_domain_preflight             --code-sha "$GITHUB_SHA"
 
-      - name: Build full preregistered 120-run manifest
+      - name: Build one frozen 90-row manifest before any provider call
         run: |
           mkdir -p results/v5_cross_domain
-          python -m arena.build_v5_cross_domain_manifest \
-            --plan configs/v5_cross_domain_first_round_v0.1.json \
-            --code-sha "$GITHUB_SHA" \
-            --out results/v5_cross_domain/subject_manifest.jsonl
-          test "$(wc -l < results/v5_cross_domain/subject_manifest.jsonl)" -eq 120
+          python -m arena.build_v5_cross_domain_manifest             --plan configs/v5_cross_domain_first_round_v0.2.json             --code-sha "$GITHUB_SHA"             --out results/v5_cross_domain/subject_manifest.jsonl
+          test "$(wc -l < results/v5_cross_domain/subject_manifest.jsonl)" -eq 90
 
-      - name: Execute exactly one fixed 20-run natural wave
+      - name: Upload common first-round manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-cross-domain-first-round-manifest-${{ github.run_id }}
+          path: results/v5_cross_domain/subject_manifest.jsonl
+          retention-days: 90
+          if-no-files-found: error
+
+  subject:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        wave_id: [1, 2, 3, 4, 5, 6]
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download common frozen manifest
+        uses: actions/download-artifact@v4
+        with:
+          name: v5-cross-domain-first-round-manifest-${{ github.run_id }}
+          path: results/v5_cross_domain
+
+      - name: Assert common manifest and execution SHA
+        run: |
+          test "${{ inputs.expected_execution_sha }}" = "$GITHUB_SHA"
+          test "$(wc -l < results/v5_cross_domain/subject_manifest.jsonl)" -eq 90
+
+      - name: Execute one domain-pure 15-run wave
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
+          mkdir -p "results/v5_cross_domain/wave-${{ matrix.wave_id }}"
           set +e
-          python -m arena.run_v5_cross_domain_real \
-            --manifest results/v5_cross_domain/subject_manifest.jsonl \
-            --wave-id "${{ inputs.wave_id }}" \
-            --expected-execution-sha "${{ inputs.expected_execution_sha }}" \
-            --outdir results/v5_cross_domain/raw \
-            --provider deepseek \
-            --per-run-max-calls "${{ inputs.per_run_max_calls }}" \
-            --per-run-spending-ceiling "${{ inputs.per_run_spending_ceiling }}" \
-            --global-spending-ceiling "${{ inputs.global_spending_ceiling }}" \
-            --currency USD \
-            --authorization-phrase "${{ inputs.authorization_phrase }}" \
-            --execute-real-api
+          python -m arena.run_v5_cross_domain_real             --manifest results/v5_cross_domain/subject_manifest.jsonl             --wave-id "${{ matrix.wave_id }}"             --authorization-event-id "${{ github.run_id }}"             --expected-execution-sha "${{ inputs.expected_execution_sha }}"             --outdir "results/v5_cross_domain/wave-${{ matrix.wave_id }}/raw"             --provider deepseek             --per-run-max-calls "${{ inputs.per_run_max_calls }}"             --per-run-spending-ceiling "${{ inputs.per_run_spending_ceiling }}"             --wave-spending-ceiling "${{ inputs.wave_spending_ceiling }}"             --first-round-spending-ceiling "${{ inputs.first_round_spending_ceiling }}"             --currency USD             --authorization-phrase "${{ inputs.authorization_phrase }}"             --execute-real-api
           rc=$?
           set -e
-          echo "$rc" > results/v5_cross_domain/runner_exit_code.txt
+          echo "$rc" > "results/v5_cross_domain/wave-${{ matrix.wave_id }}/runner_exit_code.txt"
           echo "RUNNER_EXIT_CODE=$rc"
 
-      - name: Freeze raw evidence before any derivation
+      - name: Freeze raw evidence before derivation
+        if: always()
         run: |
-          python -m arena.freeze_v5_cross_domain_evidence \
-            --raw-dir results/v5_cross_domain/raw \
-            --manifest results/v5_cross_domain/subject_manifest.jsonl \
-            --out results/v5_cross_domain/evidence_batch.json
+          python -m arena.freeze_v5_cross_domain_evidence             --raw-dir "results/v5_cross_domain/wave-${{ matrix.wave_id }}/raw"             --manifest results/v5_cross_domain/subject_manifest.jsonl             --out "results/v5_cross_domain/wave-${{ matrix.wave_id }}/evidence_batch.json"
 
-      - name: Derive structural/content-address indexes only
+      - name: Derive structural indexes
+        if: always()
         run: |
-          python -m arena.derive_v5_whole_process_structural \
-            --raw-dir results/v5_cross_domain/raw \
-            --evidence-batch results/v5_cross_domain/evidence_batch.json \
-            --outdir results/v5_cross_domain/derived
+          python -m arena.derive_v5_whole_process_structural             --raw-dir "results/v5_cross_domain/wave-${{ matrix.wave_id }}/raw"             --evidence-batch "results/v5_cross_domain/wave-${{ matrix.wave_id }}/evidence_batch.json"             --outdir "results/v5_cross_domain/wave-${{ matrix.wave_id }}/derived"
 
-      - name: Build fail-closed localized semantic-audit candidate ledger
+      - name: Build fail-closed case candidate ledger
+        if: always()
         run: |
-          python -m arena.build_v5_cross_domain_case_ledger \
-            --structural-index results/v5_cross_domain/derived/v5_structural_index.jsonl \
-            --first-round-id PR-FIRST-ROUND-CROSS-DOMAIN-001 \
-            --out results/v5_cross_domain/case_candidate_ledger.jsonl
+          python -m arena.build_v5_cross_domain_case_ledger             --structural-index "results/v5_cross_domain/wave-${{ matrix.wave_id }}/derived/v5_structural_index.jsonl"             --first-round-id PR-FIRST-ROUND-CROSS-DOMAIN-001             --out "results/v5_cross_domain/wave-${{ matrix.wave_id }}/case_candidate_ledger.jsonl"
 
-      - name: Assert no automatic R5/R7/CPR promotion
+      - name: Assert no automatic R5 or R7 promotion
+        if: always()
         run: |
           python - <<'PY'
-          import json
-          rows=[json.loads(x) for x in open('results/v5_cross_domain/case_candidate_ledger.jsonl',encoding='utf-8') if x.strip()]
+          import json, os
+          wave=os.environ["WAVE"]
+          path=f"results/v5_cross_domain/wave-{wave}/case_candidate_ledger.jsonl"
+          rows=[json.loads(x) for x in open(path,encoding='utf-8') if x.strip()]
           assert all(r['r5_probe_authorized'] is False for r in rows)
           assert all(r['r7_repair_authorized'] is False for r in rows)
           assert all(r['qualification_status'] in {'NO_QUALIFYING_NATURAL_STRUCTURE','AWAITING_LOCALIZED_SEMANTIC_AUDIT'} for r in rows)
-          print('PASS: structural scouting does not auto-authorize probe or repair')
+          print('PASS: natural wave cannot auto-enter R5/R7')
           PY
+        env:
+          WAVE: ${{ matrix.wave_id }}
 
-      - name: Fail closed after evidence preservation if subject runner failed
-        if: always()
-        run: |
-          test -f results/v5_cross_domain/runner_exit_code.txt
-          rc="$(cat results/v5_cross_domain/runner_exit_code.txt)"
-          test "$rc" -eq 0
-
-      - name: Upload frozen cross-domain wave bundle
+      - name: Upload frozen domain-pure wave bundle
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: v5-cross-domain-first-round-wave-${{ inputs.wave_id }}-${{ github.run_id }}
-          path: results/v5_cross_domain
+          name: v5-cross-domain-first-round-wave-${{ matrix.wave_id }}-${{ github.run_id }}
+          path: |
+            results/v5_cross_domain/wave-${{ matrix.wave_id }}
+            results/v5_cross_domain/subject_manifest.jsonl
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Fail closed after evidence preservation if runner failed
+        if: always()
+        run: |
+          test -f "results/v5_cross_domain/wave-${{ matrix.wave_id }}/runner_exit_code.txt"
+          rc="$(cat "results/v5_cross_domain/wave-${{ matrix.wave_id }}/runner_exit_code.txt")"
+          test "$rc" -eq 0
+
+  registry:
+    needs: [prepare, subject]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download all six wave artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: v5-cross-domain-first-round-wave-*-${{ github.run_id }}
+          path: results/v5_cross_domain/all_waves
+          merge-multiple: false
+
+      - name: Build six-wave first-round evidence registry
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t batches < <(find results/v5_cross_domain/all_waves -name evidence_batch.json -type f | sort)
+          test "${#batches[@]}" -eq 6
+          args=()
+          for b in "${batches[@]}"; do
+            args+=(--evidence-batch "$b")
+          done
+          mkdir -p results/v5_cross_domain/registry
+          python -m arena.build_v5_cross_domain_first_round_registry "${args[@]}" --out results/v5_cross_domain/registry/first_round_registry.json
+
+      - name: Assert prospective held-out first-round geometry
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('results/v5_cross_domain/registry/first_round_registry.json'))
+          assert p['planned_selected_run_count']==90
+          assert p['wave_count']==6
+          assert p['same_execution_sha'] is True
+          assert p['same_plan_hash'] is True
+          assert p['same_authorization_event'] is True
+          assert set(p['domain_trace_counts']).issubset({'finance','supply_chain','software_engineering'})
+          print('PASS: six domain-pure waves share one first-round evidence lineage')
+          PY
+
+      - name: Upload first-round evidence registry
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-cross-domain-first-round-registry-${{ github.run_id }}
+          path: results/v5_cross_domain/registry
           retention-days: 90
           if-no-files-found: error

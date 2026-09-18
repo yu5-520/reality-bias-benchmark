@@ -48,32 +48,50 @@ Current R7 engineering report:
 
 ## Cross-domain first-round experiment
 
-The next subject layer is a four-domain frozen-protocol first round:
+The next prospective subject layer is a **held-out three-domain replication cohort**.
 
-- `ecommerce` — method-development reference + fresh final-protocol replication;
-- `finance` — frozen-protocol replication;
-- `supply_chain` — frozen-protocol replication;
-- `software_engineering` — frozen-protocol replication.
+Ecommerce remains the method-development / deep-mechanism reference domain and is **not included in the new replication sample**.
+
+Held-out replication domains:
+
+- `finance`;
+- `supply_chain`;
+- `software_engineering`.
 
 The replication rule is:
 
 `replicate the frozen method, not the history of method development`.
 
-Current first-round interfaces:
+Current v0.2 interfaces:
 
-- `docs/cross_domain_first_round_experiment_plan_v0.1.md`
-- `configs/v5_cross_domain_first_round_v0.1.json`
-- `schemas/v5_cross_domain_first_round_plan_v0.1.schema.json`
+- `docs/cross_domain_first_round_experiment_plan_v0.2.md`
+- `configs/v5_cross_domain_first_round_v0.2.json`
+- `configs/v5_cross_domain_subject_gate_v0.2.json`
+- `schemas/v5_cross_domain_first_round_plan_v0.2.schema.json`
+- `schemas/v5_cross_domain_subject_manifest_v0.2.schema.json`
+- `schemas/v5_cross_domain_paid_authorization_v0.2.schema.json`
+- `schemas/v5_cross_domain_evidence_batch_v0.2.schema.json`
+- `schemas/v5_cross_domain_first_round_registry_v0.2.schema.json`
 - `arena/build_v5_cross_domain_manifest.py`
 - `arena/v5_cross_domain_preflight.py`
 - `arena/run_v5_cross_domain_real.py`
 - `arena/freeze_v5_cross_domain_evidence.py`
 - `arena/build_v5_cross_domain_case_ledger.py`
+- `arena/build_v5_cross_domain_first_round_registry.py`
 
-The preregistered natural cohort is 30 trajectories per domain (120 total), partitioned into six fixed 20-run waves. R2/R3/R4 are simultaneous views of each frozen natural trajectory. R5/R6/R7 are conditional extensions only after evidence-bound case qualification. R8 CPR adjudication is not part of this first-round execution plan.
+Prospective sample geometry:
+
+- 30 natural trajectories per held-out domain;
+- 90 new natural trajectories total;
+- 2 preregistered waves per domain;
+- 15 trajectories per wave;
+- 6 domain-pure waves total.
+
+One workflow-dispatch authorization prepares one common 90-row manifest and launches all six waves concurrently under the same execution SHA and authorization event. Each wave freezes its own evidence before structural derivation; a final registry binds all six wave evidence batches.
+
+R2/R3/R4 are simultaneous views of each frozen natural trajectory. R5/R6/R7 are conditional extensions only after evidence-bound case qualification. R8 CPR adjudication is not part of this first-round execution plan.
 
 Repository preparation authorizes no provider, probe, repair or paid evaluator call.
-
 
 ## v5 theory chain
 

@@ -1,0 +1,48 @@
+{
+  "schema": "RB-V5-CROSS-DOMAIN-SUBJECT-GATE-v0.2",
+  "version": "0.2",
+  "date": "2026-09-19",
+  "status": "PREPARED_NOT_AUTHORIZED",
+  "predecessor": "configs/v5_cross_domain_subject_gate_v0.1.json",
+  "first_round_plan_path": "configs/v5_cross_domain_first_round_v0.2.json",
+  "required_authorization_phrase": "CALL_REAL_V5_CROSS_DOMAIN_FIRST_ROUND_API",
+  "required_wave_ids": [1,2,3,4,5,6],
+  "runs_per_wave": 15,
+  "held_out_domain_count": 3,
+  "waves_per_domain": 2,
+  "planned_new_natural_trajectories": 90,
+  "single_authorization_event_for_all_six_waves": true,
+  "provider_execution_authorized": false,
+  "evaluator_execution_authorized": false,
+  "r5_probe_authorized": false,
+  "r7_repair_authorized": false,
+  "prerequisites": [
+    "PROCESS_REALITY_V5_METHOD_VALIDATION_PASS",
+    "CROSS_DOMAIN_V0_2_OFFLINE_PREFLIGHT_PASS",
+    "FULL_90_ROW_MANIFEST_FROZEN_BEFORE_PROVIDER_EXECUTION",
+    "EXACT_FIRST_ROUND_PLAN_HASH_BOUND",
+    "EXACT_HELD_OUT_DOMAIN_HASHES_BOUND",
+    "ECOMMERCE_EXCLUDED_FROM_NEW_REPLICATION_SAMPLE",
+    "EXACT_EXECUTION_SHA_BOUND_AND_SAME_ACROSS_ALL_SIX_WAVES",
+    "ONE_AUTHORIZATION_EVENT_BINDS_ALL_SIX_WAVES",
+    "POSITIVE_PER_RUN_CALL_LIMIT",
+    "POSITIVE_PER_RUN_SPENDING_CEILING",
+    "WAVE_CEILING_COVERS_15_SYMMETRIC_RUNS",
+    "FIRST_ROUND_CEILING_COVERS_6_WAVE_CEILINGS",
+    "EXACT_EXPLICIT_AUTHORIZATION"
+  ],
+  "forbidden_implicit_authorizations": [
+    "EXECUTE",
+    "CONTINUE",
+    "RUN_THE_PLAN",
+    "MERGE_THE_PR",
+    "REPOSITORY_UPDATE"
+  ],
+  "post_natural_stage_boundary": {
+    "localized_semantic_audit_required_before_r5": true,
+    "r5_case_specific_authorization_required": true,
+    "r7_completeness_gate_required": true,
+    "r7_case_specific_authorization_required": true,
+    "r8_cpr_not_part_of_first_round": true
+  }
+}

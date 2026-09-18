@@ -32,18 +32,32 @@ def _write_json(path: Path, row) -> None:
     path.write_text(json.dumps(row, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def validate_paid_gate(*, execute_real_api: bool, authorization_phrase: str,
-                       per_run_max_calls: int, per_run_spending_ceiling: float,
-                       global_spending_ceiling: float, selected_run_count: int) -> None:
+def validate_paid_gate(
+    *,
+    execute_real_api: bool,
+    authorization_phrase: str,
+    authorization_event_id: str,
+    per_run_max_calls: int,
+    per_run_spending_ceiling: float,
+    wave_spending_ceiling: float,
+    first_round_spending_ceiling: float,
+    selected_run_count: int,
+    wave_count: int,
+) -> None:
     if not execute_real_api or authorization_phrase != AUTH_PHRASE:
         raise SystemExit("Refusing provider calls: exact cross-domain first-round authorization required.")
+    if not authorization_event_id:
+        raise SystemExit("non-empty shared authorization_event_id required")
     if per_run_max_calls <= 0:
         raise SystemExit("positive per-run call cap required")
-    if per_run_spending_ceiling <= 0 or global_spending_ceiling <= 0:
+    if per_run_spending_ceiling <= 0 or wave_spending_ceiling <= 0 or first_round_spending_ceiling <= 0:
         raise SystemExit("positive spending ceilings required")
-    required_global = per_run_spending_ceiling * selected_run_count
-    if global_spending_ceiling + 1e-12 < required_global:
-        raise SystemExit("global ceiling must cover all selected symmetric per-run ceilings")
+    minimum_wave = per_run_spending_ceiling * selected_run_count
+    if wave_spending_ceiling + 1e-12 < minimum_wave:
+        raise SystemExit("wave ceiling must cover all symmetric per-run ceilings")
+    minimum_first_round = wave_spending_ceiling * wave_count
+    if first_round_spending_ceiling + 1e-12 < minimum_first_round:
+        raise SystemExit("first-round ceiling must cover all six symmetric wave ceilings")
 
 
 def _credential_check(model_config: dict) -> None:
@@ -95,12 +109,14 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--manifest", required=True)
     ap.add_argument("--wave-id", required=True, type=int)
+    ap.add_argument("--authorization-event-id", required=True)
     ap.add_argument("--expected-execution-sha", required=True)
     ap.add_argument("--outdir", required=True)
     ap.add_argument("--provider", required=True)
     ap.add_argument("--per-run-max-calls", required=True, type=int)
     ap.add_argument("--per-run-spending-ceiling", required=True, type=float)
-    ap.add_argument("--global-spending-ceiling", required=True, type=float)
+    ap.add_argument("--wave-spending-ceiling", required=True, type=float)
+    ap.add_argument("--first-round-spending-ceiling", required=True, type=float)
     ap.add_argument("--currency", default="USD")
     ap.add_argument("--authorization-phrase", required=True)
     ap.add_argument("--execute-real-api", action="store_true")
@@ -113,23 +129,29 @@ def main() -> None:
         expected_execution_sha=args.expected_execution_sha,
     )
 
-    if args.wave_id < 1 or args.wave_id > int(plan["wave_count"]):
+    wave_defs = {int(row["wave_id"]): row for row in plan["execution_waves"]}
+    if args.wave_id not in wave_defs:
         raise ValueError("cross_domain_wave_id_out_of_range")
+    wave_def = wave_defs[args.wave_id]
     rows = [row for row in all_rows if row["wave_id"] == args.wave_id]
-    expected_selected = int(plan["wave_size_per_domain"]) * len(plan["domains"])
-    if len(rows) != expected_selected:
+    if len(rows) != int(plan["wave_size"]):
         raise ValueError("cross_domain_selected_wave_run_count_mismatch")
-    selected_domain_counts = Counter(row["domain_id"] for row in rows)
-    if any(selected_domain_counts[row["domain_id"]] != int(plan["wave_size_per_domain"]) for row in plan["domains"]):
-        raise ValueError("cross_domain_selected_wave_not_balanced")
+    selected_domains = {row["domain_id"] for row in rows}
+    if selected_domains != {wave_def["domain_id"]}:
+        raise ValueError("cross_domain_selected_wave_must_be_domain_pure")
+    if {row["wave_key"] for row in rows} != {wave_def["wave_key"]}:
+        raise ValueError("cross_domain_selected_wave_key_mismatch")
 
     validate_paid_gate(
         execute_real_api=args.execute_real_api,
         authorization_phrase=args.authorization_phrase,
+        authorization_event_id=args.authorization_event_id,
         per_run_max_calls=args.per_run_max_calls,
         per_run_spending_ceiling=args.per_run_spending_ceiling,
-        global_spending_ceiling=args.global_spending_ceiling,
+        wave_spending_ceiling=args.wave_spending_ceiling,
+        first_round_spending_ceiling=args.first_round_spending_ceiling,
         selected_run_count=len(rows),
+        wave_count=int(plan["wave_count"]),
     )
     _credential_check(model_config)
 
@@ -137,18 +159,25 @@ def main() -> None:
     if out.exists():
         raise ValueError("refusing_to_overwrite_cross_domain_output")
     out.mkdir(parents=True)
+    traces_path = out / "traces.jsonl"
+    traces_path.touch()
 
     auth = {
-        "schema": "RB-V5-CROSS-DOMAIN-PAID-AUTHORIZATION-v0.1",
+        "schema": "RB-V5-CROSS-DOMAIN-PAID-AUTHORIZATION-v0.2",
         "first_round_id": plan["first_round_id"],
+        "authorization_event_id": args.authorization_event_id,
         "authorization_phrase": args.authorization_phrase,
         "provider": args.provider,
+        "authorized_wave_ids": [1,2,3,4,5,6],
         "selected_wave_id": args.wave_id,
+        "selected_wave_key": wave_def["wave_key"],
+        "selected_domain_id": wave_def["domain_id"],
         "selected_run_count": len(rows),
-        "selected_domain_counts": dict(sorted(selected_domain_counts.items())),
+        "authorized_total_run_count": int(plan["planned_new_natural_trajectories"]),
         "per_run_max_calls": args.per_run_max_calls,
         "per_run_spending_ceiling": args.per_run_spending_ceiling,
-        "global_spending_ceiling": args.global_spending_ceiling,
+        "wave_spending_ceiling": args.wave_spending_ceiling,
+        "first_round_spending_ceiling": args.first_round_spending_ceiling,
         "currency": args.currency.upper(),
         "pricing_policy": pricing_policy(model_config),
         "manifest_sha256": sha256_file(args.manifest),
@@ -163,8 +192,6 @@ def main() -> None:
     _write_json(out / "authorization_record.json", auth)
 
     upstream = provider_from_config(model_config)
-    traces_path = out / "traces.jsonl"
-    traces_path.touch()
     errors = []
     spend_by_domain: dict[str, float] = defaultdict(float)
 
@@ -200,10 +227,13 @@ def main() -> None:
             trace.update({
                 "v5_cross_domain_first_round": True,
                 "first_round_id": row["first_round_id"],
+                "authorization_event_id": args.authorization_event_id,
                 "domain_id": row["domain_id"],
                 "cohort_role": row["cohort_role"],
                 "trial": row["trial"],
                 "wave_id": row["wave_id"],
+                "wave_key": row["wave_key"],
+                "domain_wave_id": row["domain_wave_id"],
                 "subject_condition": row["subject_condition"],
                 "code_commit_sha": row["code_commit_sha"],
                 "plan_hash": row["plan_hash"],
@@ -232,29 +262,46 @@ def main() -> None:
                 "run_id": row["run_id"],
                 "domain_id": row["domain_id"],
                 "wave_id": row["wave_id"],
+                "wave_key": row["wave_key"],
                 "error": repr(err),
                 "snapshot_count_preserved": len(snapshots),
             }
             errors.append(error)
             _append_jsonl(out / "errors.jsonl", error)
 
-    preserved_traces = load_jsonl(traces_path) if traces_path.exists() else []
+    preserved_traces = load_jsonl(traces_path)
     preserved_domain_counts = Counter(trace.get("domain_id") for trace in preserved_traces)
+    estimated_total_spend = sum(spend_by_domain.values())
+    if estimated_total_spend > args.wave_spending_ceiling + 1e-12:
+        errors.append({
+            "run_id": None,
+            "domain_id": wave_def["domain_id"],
+            "wave_id": args.wave_id,
+            "wave_key": wave_def["wave_key"],
+            "error": "estimated_wave_spend_exceeded_declared_ceiling",
+            "estimated_total_spend": estimated_total_spend,
+            "wave_spending_ceiling": args.wave_spending_ceiling,
+        })
+        _append_jsonl(out / "errors.jsonl", errors[-1])
+
     summary = {
-        "schema": "RB-V5-CROSS-DOMAIN-RUN-SUMMARY-v0.1",
+        "schema": "RB-V5-CROSS-DOMAIN-RUN-SUMMARY-v0.2",
         "first_round_id": plan["first_round_id"],
+        "authorization_event_id": args.authorization_event_id,
         "selected_wave_id": args.wave_id,
+        "selected_wave_key": wave_def["wave_key"],
+        "selected_domain_id": wave_def["domain_id"],
         "planned_selected_run_count": len(rows),
-        "selected_domain_counts": dict(sorted(selected_domain_counts.items())),
         "preserved_trace_count": len(preserved_traces),
         "preserved_domain_counts": dict(sorted(preserved_domain_counts.items())),
         "runner_error_count": len(errors),
         "estimated_spend_by_domain": dict(sorted(spend_by_domain.items())),
-        "estimated_total_spend": sum(spend_by_domain.values()),
+        "estimated_total_spend": estimated_total_spend,
         "currency": args.currency.upper(),
         "per_run_max_calls": args.per_run_max_calls,
         "per_run_spending_ceiling": args.per_run_spending_ceiling,
-        "global_spending_ceiling": args.global_spending_ceiling,
+        "wave_spending_ceiling": args.wave_spending_ceiling,
+        "first_round_spending_ceiling": args.first_round_spending_ceiling,
         "automatic_paid_evaluator_called": False,
         "driver_probe_called": False,
         "active_recovery_called": False,
@@ -266,10 +313,13 @@ def main() -> None:
     _write_json(out / "errors.json", errors)
 
     if errors:
-        raise SystemExit("cross-domain wave contains runner errors; preserved all available raw evidence")
+        raise SystemExit("cross-domain wave contains errors; preserved all available raw evidence")
 
     print("V5_CROSS_DOMAIN_SUBJECT_WAVE_COMPLETE")
+    print("AUTHORIZATION_EVENT_ID=" + args.authorization_event_id)
     print("WAVE_ID=" + str(args.wave_id))
+    print("WAVE_KEY=" + wave_def["wave_key"])
+    print("DOMAIN_ID=" + wave_def["domain_id"])
     print("PRESERVED_TRACE_COUNT=" + str(len(preserved_traces)))
     print("PAID_EVALUATOR_CALLED=NO")
     print("DRIVER_PROBE_CALLED=NO")
