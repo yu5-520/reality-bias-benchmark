@@ -13,6 +13,7 @@ from .experimental_control import verify_state_snapshot
 from .io_utils import load_json, load_jsonl, write_jsonl
 from .one_shot_intervention import verify_one_shot_envelope
 from .persistent_field_intervention import build_persistent_field_envelope, verify_persistent_field_envelope
+from .r7_semantic_repair_runtime import build_repaired_parent_snapshot, build_semantic_repair_runtime_plan
 
 PLAN_SCHEMA = "RB-R7-THREE-ARM-EXECUTION-PLAN-v0.2"
 ARM_MANIFEST_SCHEMA = "RB-R7-ARM-MANIFEST-v0.2"
@@ -199,14 +200,28 @@ def build_r7_three_arm_plan(*, protocol: Mapping[str, Any], r5: Mapping[str, Any
         "to_status": one_shot["to_status"],
         "semantic_payload_hash": semantic_hash,
         "authority_class": "I",
-        "recovery_operator": "ROLLBACK_ONE_AUTHORITY_ANCESTOR_TURN_THEN_TRANSFORM_TARGET_WRITE_STATE_STATUS_ONCE",
+        "recovery_operator": "DIRECT_POST_J0_PARENT_AUTHORITY_REPAIR_THEN_RECOMPUTE_DESCENDANTS",
         "common_reference_parent_mutated": False,
         "provider_internal_state_replayed": False,
-        "active_recovery_transform_status": "READY",
+        "active_recovery_transform_status": "DIRECT_STATE_REPAIR_READY",
         "revision_lineage_required": True,
-        "note": "C3 re-executes the J0-producing turn from the exact source checkpoint. Provider hidden state is not replayed; only the targeted authority-bearing write_state.status commit is transformed fact→unconfirmed, and new descendants are observed prospectively.",
+        "note": "C3 derives a repaired branch snapshot directly from the frozen post-J0 parent. The target value is preserved while only its authority/status is changed fact→unconfirmed before any downstream continuation. Provider hidden state is not replayed.",
     }
     alr_binding["binding_hash"] = _hash_without(alr_binding, "binding_hash")
+
+    semantic_runtime_plan = build_semantic_repair_runtime_plan(
+        packet=semantic_repair_packet,
+        gate=lineage_completeness_gate,
+        bundle={
+            "c3_alr_binding": alr_binding,
+            "c3_recovery_checkpoint": checkpoint,
+            "source_parent_snapshot": parent,
+        },
+    )
+    c3_repaired_parent_snapshot, c3_repair_application = build_repaired_parent_snapshot(
+        parent_snapshot=parent,
+        plan=semantic_runtime_plan,
+    )
 
     manifests: list[dict[str, Any]] = []
     rows: list[dict[str, Any]] = []
@@ -225,9 +240,9 @@ def build_r7_three_arm_plan(*, protocol: Mapping[str, Any], r5: Mapping[str, Any
                 binding_hash = persistent["envelope_hash"]
                 mechanism = "PERSISTENT_RUNTIME_VIEW_OVERLAY"
             else:
-                start_hash = checkpoint["state_hash"]
-                binding_hash = alr_binding["binding_hash"]
-                mechanism = "ALR_ROLLBACK_REEXECUTION_AUTHORITY_TRANSFORM"
+                start_hash = c3_repaired_parent_snapshot["state_hash"]
+                binding_hash = c3_repair_application["repair_application_hash"]
+                mechanism = "SEMANTIC_REPAIR_PACKET_POST_J0_PARENT_REPAIR"
             manifest = {
                 "schema": ARM_MANIFEST_SCHEMA,
                 "version": "0.2",
@@ -283,11 +298,14 @@ def build_r7_three_arm_plan(*, protocol: Mapping[str, Any], r5: Mapping[str, Any
         "condition_isolation": {
             "C1": "same post-J0 parent; one prompt-visible status exposure then free continuation",
             "C2": "same post-J0 parent; same status re-exposed on each eligible downstream turn within common horizon",
-            "C3": "same J0/common reference parent; rollback one source turn to exact pre-J0 checkpoint, re-execute that turn, transform only the targeted authority-bearing write status once, then observe new descendants",
+            "C3": "same frozen post-J0 parent; derive a repaired branch snapshot by changing only the target authority/status fact→unconfirmed, then reopen the existing downstream queue and recompute descendants within the common horizon",
         },
         "c1_one_shot_envelope_hash": one_shot["envelope_hash"],
         "c2_persistent_field_envelope_hash": persistent["envelope_hash"],
         "c3_alr_binding_hash": alr_binding["binding_hash"],
+        "c3_repaired_parent_state_hash": c3_repaired_parent_snapshot["state_hash"],
+        "c3_repair_application_hash": c3_repair_application["repair_application_hash"],
+        "semantic_repair_runtime_plan_hash": semantic_runtime_plan["plan_hash"],
         "semantic_repair_packet_hash": semantic_repair_packet.get("packet_hash"),
         "lineage_completeness_gate_hash": lineage_completeness_gate.get("gate_hash"),
         "semantic_repair_packet_id": semantic_repair_packet.get("packet_id"),
@@ -312,6 +330,9 @@ def build_r7_three_arm_plan(*, protocol: Mapping[str, Any], r5: Mapping[str, Any
         "c1_one_shot_envelope": one_shot,
         "c2_persistent_field_envelope": persistent,
         "c3_alr_binding": alr_binding,
+        "semantic_repair_runtime_plan": semantic_runtime_plan,
+        "c3_repaired_parent_snapshot": c3_repaired_parent_snapshot,
+        "c3_repair_application": c3_repair_application,
         "semantic_repair_packet": copy.deepcopy(dict(semantic_repair_packet)),
         "lineage_completeness_gate": copy.deepcopy(dict(lineage_completeness_gate)),
         "bounded_arena_config": bounded_arena_config,
@@ -324,8 +345,12 @@ def verify_r7_three_arm_plan(bundle: Mapping[str, Any]) -> bool:
     plan = bundle["plan"]
     parent = bundle["source_parent_snapshot"]
     checkpoint = bundle["c3_recovery_checkpoint"]
+    repaired_parent = bundle["c3_repaired_parent_snapshot"]
+    repair_application = bundle["c3_repair_application"]
+    semantic_runtime_plan = bundle["semantic_repair_runtime_plan"]
     verify_state_snapshot(parent)
     verify_state_snapshot(checkpoint)
+    verify_state_snapshot(repaired_parent)
     verify_one_shot_envelope(bundle["c1_one_shot_envelope"])
     verify_persistent_field_envelope(bundle["c2_persistent_field_envelope"])
     packet = bundle["semantic_repair_packet"]
@@ -340,6 +365,11 @@ def verify_r7_three_arm_plan(bundle: Mapping[str, Any]) -> bool:
     _require(plan.get("semantic_repair_packet_hash") == packet.get("packet_hash"), "r7_plan_packet_hash_mismatch")
     _require(plan.get("lineage_completeness_gate_hash") == gate.get("gate_hash"), "r7_plan_gate_hash_mismatch")
     _require(plan.get("repair_closure_refs") == list(packet.get("repair_closure_refs") or []), "r7_plan_repair_closure_mismatch")
+    _require(plan.get("c3_repaired_parent_state_hash") == repaired_parent.get("state_hash"), "r7_plan_repaired_parent_hash_mismatch")
+    _require(plan.get("c3_repair_application_hash") == repair_application.get("repair_application_hash"), "r7_plan_repair_application_hash_mismatch")
+    _require(plan.get("semantic_repair_runtime_plan_hash") == semantic_runtime_plan.get("plan_hash"), "r7_plan_semantic_runtime_hash_mismatch")
+    _require(repair_application.get("parent_state_hash") == parent.get("state_hash"), "r7_repair_application_parent_mismatch")
+    _require(repair_application.get("repaired_parent_state_hash") == repaired_parent.get("state_hash"), "r7_repair_application_start_mismatch")
     _require(plan.get("paid_subject_authorization_status") == "NOT_AUTHORIZED", "r7_plan_must_not_self_authorize")
     _require(plan.get("automatic_paid_evaluator") is False, "r7_plan_paid_evaluator_forbidden")
     _require(plan.get("semantic_cpr_status") == "NOT_ADJUDICATED", "r7_plan_semantic_status_invalid")
@@ -353,7 +383,7 @@ def verify_r7_three_arm_plan(bundle: Mapping[str, Any]) -> bool:
     _require({m["semantic_payload_hash"] for m in manifests} == {plan["semantic_payload_hash"]}, "r7_semantic_payload_not_matched")
     _require({m["observation_horizon_id"] for m in manifests} == {plan["matched_horizon"]["horizon_id"]}, "r7_horizon_not_matched")
     c3 = [m for m in manifests if m["arm_id"] == "C3_ALR"]
-    _require(c3 and all(m["branch_start_state_hash"] == checkpoint["state_hash"] for m in c3), "r7_c3_checkpoint_start_mismatch")
+    _require(c3 and all(m["branch_start_state_hash"] == repaired_parent["state_hash"] for m in c3), "r7_c3_repaired_parent_start_mismatch")
     _require(all(m["execution_readiness"] == "RUNTIME_MECHANISM_READY" for m in manifests), "r7_runtime_readiness_mismatch")
     return True
 
@@ -396,6 +426,9 @@ def main() -> None:
     _write_json(out / "c1_one_shot_envelope.json", bundle["c1_one_shot_envelope"])
     _write_json(out / "c2_persistent_field_envelope.json", bundle["c2_persistent_field_envelope"])
     _write_json(out / "c3_alr_binding.json", bundle["c3_alr_binding"])
+    _write_json(out / "semantic_repair_runtime_plan.json", bundle["semantic_repair_runtime_plan"])
+    _write_json(out / "c3_repaired_parent_snapshot.json", bundle["c3_repaired_parent_snapshot"])
+    _write_json(out / "c3_repair_application.json", bundle["c3_repair_application"])
     _write_json(out / "semantic_repair_packet.json", bundle["semantic_repair_packet"])
     _write_json(out / "lineage_completeness_gate.json", bundle["lineage_completeness_gate"])
     _write_json(out / "r7_bounded_arena_config.json", bundle["bounded_arena_config"])
@@ -406,6 +439,8 @@ def main() -> None:
     print("PLAN_HASH=" + bundle["plan"]["plan_hash"])
     print("COMMON_REFERENCE_PARENT=" + bundle["source_parent_snapshot"]["state_hash"])
     print("C3_RECOVERY_CHECKPOINT=" + bundle["c3_recovery_checkpoint"]["state_hash"])
+    print("C3_REPAIRED_PARENT=" + bundle["c3_repaired_parent_snapshot"]["state_hash"])
+    print("C3_REPAIR_APPLICATION_HASH=" + bundle["c3_repair_application"]["repair_application_hash"])
     print("COMMON_HORIZON=" + bundle["plan"]["matched_horizon"]["horizon_id"])
     print("C1_RUNTIME_MECHANISM=READY")
     print("C2_RUNTIME_MECHANISM=READY")
