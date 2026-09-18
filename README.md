@@ -172,3 +172,23 @@ python scripts/validate_process_reality_v5.py
 \`\`\`
 
 Historical validators remain available for their own frozen layers.
+
+
+## Fresh Whole-Process Batch001 readiness
+
+The first fresh v5 subject design is prepared and has an offline preflight profile:
+
+- `docs/v5_fresh_whole_process_design_v0.1.md`
+- `configs/v5_whole_process_ecommerce_batch001_v0.1.json`
+- `configs/v5_whole_process_subject_gate_v0.1.json`
+- `arena/build_v5_whole_process_manifest.py`
+- `arena/v5_whole_process_index.py`
+- `arena/v5_whole_process_preflight.py`
+
+Batch001 is three natural ecommerce repeats. The Arena runtime and Agent prompts are unchanged.
+
+The structural index records support/pool/exposure candidates and preserves the boundary:
+
+`POOL_VISIBILITY_OBSERVED != DIRECT_POOL_CONSUMPTION`
+
+No real provider execution is authorized. The future exact authorization phrase is `CALL_REAL_V5_WHOLE_PROCESS_API`.
