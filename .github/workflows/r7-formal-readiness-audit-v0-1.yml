@@ -196,7 +196,8 @@ jobs:
           assert s['c1_direct_exposures']==1
           assert s['c2_direct_exposures']>=2
           assert s['c2_reinjections']>=1
-          assert s['c3_authority_transform_count']==1
+          assert s['c3_authority_transform_count']==0
+          assert s['c3_direct_anchor_revision_count']==1
           assert s['c3_semantic_repair_packet_consumed'] is True
           assert isinstance(s['c3_old_lineage_reentry_detected'], bool)
           assert isinstance(s['c3_preserved_unrelated_structure'], bool)
