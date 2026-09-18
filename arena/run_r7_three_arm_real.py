@@ -97,6 +97,13 @@ def validate_execution_bindings(*, bundle: dict, source_r5_plan_dir: str | Path,
     _require(stable_hash(domain.get("task")) == config_identity.get("task_hash"), "r7_task_hash_mismatch")
     _require(stable_hash(domain.get("agents")) == config_identity.get("agent_registry_hash"), "r7_agent_registry_hash_mismatch")
 
+    semantic_runtime_plan = build_semantic_repair_runtime_plan(
+        packet=bundle["semantic_repair_packet"],
+        gate=bundle["lineage_completeness_gate"],
+        bundle=bundle,
+    )
+    _require(semantic_runtime_plan.get("repair_closure_refs") == plan.get("repair_closure_refs"), "r7_runtime_repair_closure_plan_mismatch")
+
     bounded = bundle["bounded_arena_config"]
     _require(int(bounded["max_turns"]) == int(plan["source_binding"]["absolute_turn_cap"]), "r7_bounded_turn_cap_mismatch")
     _require((bounded.get("r7_observation_horizon") or {}).get("horizon_id") == plan["matched_horizon"]["horizon_id"], "r7_bounded_horizon_id_mismatch")
@@ -105,6 +112,7 @@ def validate_execution_bindings(*, bundle: dict, source_r5_plan_dir: str | Path,
         "domain": domain,
         "domain_path": str(domain_path),
         "source_r5_plan": source_r5_plan,
+        "semantic_repair_runtime_plan": semantic_runtime_plan,
     }
 
 
