@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-V5-HISTORICAL-REDERIVATION-BUNDLE-v0.1",
+  "title": "Process Reality v5 Historical Re-derivation Bundle v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "date",
+    "status",
+    "source_binding_ref",
+    "evidence_policy",
+    "records",
+    "summary"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-V5-HISTORICAL-REDERIVATION-BUNDLE-v0.1"
+    },
+    "version": {
+      "const": "0.1"
+    },
+    "date": {
+      "type": "string"
+    },
+    "status": {
+      "const": "OFFLINE_DERIVED_FROM_FROZEN_REPOSITORY_EVIDENCE"
+    },
+    "source_binding_ref": {
+      "type": "string"
+    },
+    "evidence_policy": {
+      "const": "NO_RAW_MUTATION_NO_NEW_MODEL_CALLS"
+    },
+    "records": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object"
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "j0_is_semantic_origin",
+        "first_structural_support_identity",
+        "first_stable_pool_entry_identity",
+        "j0_as_structural_exposure_anchor",
+        "source_pool_status_decoupling",
+        "structure_fully_replaces_information_as_driver",
+        "new_subject_model_calls",
+        "new_evaluator_calls",
+        "raw_evidence_mutated"
+      ],
+      "properties": {
+        "new_subject_model_calls": {
+          "const": 0
+        },
+        "new_evaluator_calls": {
+          "const": 0
+        },
+        "raw_evidence_mutated": {
+          "const": false
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}
