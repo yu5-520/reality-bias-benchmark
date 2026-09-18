@@ -7,12 +7,16 @@ from .core import stable_hash
 from .io_utils import load_jsonl, write_jsonl
 
 def prepare(*, traces_path, measurements_path):
-    traces={r["run_id"]:r for r in load_jsonl(traces_path)}
+    traces=load_jsonl(traces_path)
+    trace_index={(str((r.get("r7_condition") or {}).get("triad_id")), str((r.get("r7_condition") or {}).get("arm_id"))):r for r in traces}
     measurements=load_jsonl(measurements_path)
     rows=[]
     for m in measurements:
-        run_id=m["run_id"]
-        t=traces[run_id]
+        key=(str(m.get("triad_id")), str(m.get("arm_id")))
+        if key not in trace_index:
+            raise ValueError("r8_trace_binding_missing:"+repr(key))
+        t=trace_index[key]
+        run_id=t["run_id"]
         row={
             "schema":"RB-R8-SEMANTIC-AUDIT-CASE-v0.1",
             "run_id":run_id,
