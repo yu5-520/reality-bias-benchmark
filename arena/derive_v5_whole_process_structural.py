@@ -32,6 +32,10 @@ def main() -> None:
     for trace in traces:
         row = derive_v5_structural_index(trace)
         row["evidence_batch_hash"] = evidence["evidence_batch_hash"]
+        # Forward-compatible identity fields for cross-domain batches.
+        for key in ("domain_id", "cohort_role", "wave_id", "first_round_id"):
+            if trace.get(key) is not None:
+                row[key] = trace.get(key)
         indexes.append(row)
     write_jsonl(out / "v5_structural_index.jsonl", indexes)
 
@@ -39,6 +43,10 @@ def main() -> None:
         "schema": "RB-V5-WHOLE-PROCESS-STRUCTURAL-DERIVATION-SUMMARY-v0.2",
         "evidence_batch_hash": evidence["evidence_batch_hash"],
         "trace_count": len(traces),
+        "domain_trace_counts": {
+            domain: sum(1 for x in indexes if x.get("domain_id") == domain)
+            for domain in sorted({x.get("domain_id") for x in indexes if x.get("domain_id")})
+        },
         "repair_anchor_candidate_run_count": sum(bool((x.get("engineering_core") or {}).get("first_repair_anchor_candidate_ref")) for x in indexes),
         "content_addressable_run_count": sum(bool((x.get("engineering_core") or {}).get("content_address_count")) for x in indexes),
         "semantic_lineage_recoverability_status": "STRUCTURAL_PROVENANCE_READY_SEMANTIC_AUDIT_REQUIRED",
