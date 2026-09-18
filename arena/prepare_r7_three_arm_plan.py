@@ -140,14 +140,31 @@ def _build_bounded_arena_config(source_plan: Mapping[str, Any], parent: Mapping[
     return out
 
 
-def build_r7_three_arm_plan(*, protocol: Mapping[str, Any], r5: Mapping[str, Any], checkpoint: Mapping[str, Any], replicates: int, plan_code_sha: str) -> dict[str, Any]:
+def build_r7_three_arm_plan(*, protocol: Mapping[str, Any], r5: Mapping[str, Any], checkpoint: Mapping[str, Any], semantic_repair_packet: Mapping[str, Any], lineage_completeness_gate: Mapping[str, Any], replicates: int, plan_code_sha: str) -> dict[str, Any]:
     _require(isinstance(replicates, int) and replicates >= 1, "r7_positive_replicates_required")
+    _require(semantic_repair_packet.get("schema") == "RB-SEMANTIC-REPAIR-PACKET-v0.1", "r7_semantic_repair_packet_schema_invalid")
+    _require(lineage_completeness_gate.get("schema") == "RB-LINEAGE-COMPLETENESS-GATE-v0.1", "r7_lineage_completeness_gate_schema_invalid")
+    _require(lineage_completeness_gate.get("status") == "COMPLETE_FOR_AUTHORIZED_REPAIR", "r7_lineage_not_complete_for_repair")
+    _require(semantic_repair_packet.get("repair_authorization_status") == "READY_FOR_SEPARATE_AUTHORIZATION", "r7_semantic_repair_packet_not_ready")
     source_binding = validate_source_binding(protocol, r5, checkpoint)
     parent = copy.deepcopy(r5["parent_snapshot"])
     checkpoint = copy.deepcopy(checkpoint)
     one_shot = copy.deepcopy(r5["one_shot_envelope"])
     semantic_hash = _semantic_payload_hash(protocol)
     horizon = protocol["matched_horizon"]
+
+    _require(
+        semantic_repair_packet.get("repair_anchor_ref") == "arena_event:32:state:" + one_shot["state_key"],
+        "r7_repair_packet_anchor_mismatch",
+    )
+    _require(
+        semantic_repair_packet.get("content_address"),
+        "r7_repair_packet_content_address_missing",
+    )
+    _require(
+        semantic_repair_packet.get("lineage_completeness_gate_ref") == lineage_completeness_gate.get("gate_id"),
+        "r7_repair_packet_gate_ref_mismatch",
+    )
 
     persistent = build_persistent_field_envelope(
         target_jump_ref=one_shot["target_jump_ref"],
@@ -271,6 +288,11 @@ def build_r7_three_arm_plan(*, protocol: Mapping[str, Any], r5: Mapping[str, Any
         "c1_one_shot_envelope_hash": one_shot["envelope_hash"],
         "c2_persistent_field_envelope_hash": persistent["envelope_hash"],
         "c3_alr_binding_hash": alr_binding["binding_hash"],
+        "semantic_repair_packet_hash": semantic_repair_packet.get("packet_hash"),
+        "lineage_completeness_gate_hash": lineage_completeness_gate.get("gate_hash"),
+        "semantic_repair_packet_id": semantic_repair_packet.get("packet_id"),
+        "repair_closure_refs": copy.deepcopy(semantic_repair_packet.get("repair_closure_refs") or []),
+        "evidence_supported_affected_closure_refs": copy.deepcopy(semantic_repair_packet.get("evidence_supported_affected_closure_refs") or []),
         "code_identity": {
             "source_r5_branch_execution_commit": r5["plan"].get("code_identity", {}).get("branch_execution_commit"),
             "r7_plan_code_sha": plan_code_sha,
@@ -290,6 +312,8 @@ def build_r7_three_arm_plan(*, protocol: Mapping[str, Any], r5: Mapping[str, Any
         "c1_one_shot_envelope": one_shot,
         "c2_persistent_field_envelope": persistent,
         "c3_alr_binding": alr_binding,
+        "semantic_repair_packet": copy.deepcopy(dict(semantic_repair_packet)),
+        "lineage_completeness_gate": copy.deepcopy(dict(lineage_completeness_gate)),
         "bounded_arena_config": bounded_arena_config,
         "arm_manifests": manifests,
         "execution_rows": rows,
@@ -304,10 +328,18 @@ def verify_r7_three_arm_plan(bundle: Mapping[str, Any]) -> bool:
     verify_state_snapshot(checkpoint)
     verify_one_shot_envelope(bundle["c1_one_shot_envelope"])
     verify_persistent_field_envelope(bundle["c2_persistent_field_envelope"])
+    packet = bundle["semantic_repair_packet"]
+    gate = bundle["lineage_completeness_gate"]
+    _require(packet.get("schema") == "RB-SEMANTIC-REPAIR-PACKET-v0.1", "r7_plan_packet_schema_invalid")
+    _require(gate.get("schema") == "RB-LINEAGE-COMPLETENESS-GATE-v0.1", "r7_plan_gate_schema_invalid")
+    _require(gate.get("status") == "COMPLETE_FOR_AUTHORIZED_REPAIR", "r7_plan_gate_not_complete")
     _require(plan.get("schema") == PLAN_SCHEMA, "r7_plan_schema_invalid")
     _require(plan.get("plan_hash") == _hash_without(plan, "plan_hash"), "r7_plan_hash_mismatch")
     _require(plan.get("source_binding", {}).get("source_parent_state_hash") == parent["state_hash"], "r7_plan_parent_binding_mismatch")
     _require(plan.get("source_binding", {}).get("source_recovery_checkpoint_hash") == checkpoint["state_hash"], "r7_plan_checkpoint_binding_mismatch")
+    _require(plan.get("semantic_repair_packet_hash") == packet.get("packet_hash"), "r7_plan_packet_hash_mismatch")
+    _require(plan.get("lineage_completeness_gate_hash") == gate.get("gate_hash"), "r7_plan_gate_hash_mismatch")
+    _require(plan.get("repair_closure_refs") == list(packet.get("repair_closure_refs") or []), "r7_plan_repair_closure_mismatch")
     _require(plan.get("paid_subject_authorization_status") == "NOT_AUTHORIZED", "r7_plan_must_not_self_authorize")
     _require(plan.get("automatic_paid_evaluator") is False, "r7_plan_paid_evaluator_forbidden")
     _require(plan.get("semantic_cpr_status") == "NOT_ADJUDICATED", "r7_plan_semantic_status_invalid")
@@ -331,6 +363,8 @@ def main() -> None:
     ap.add_argument("--protocol", default="configs/r7/r7_three_arm_fixture.example.json")
     ap.add_argument("--r5-plan-dir", required=True)
     ap.add_argument("--source-snapshots", required=True)
+    ap.add_argument("--semantic-repair-packet", required=True)
+    ap.add_argument("--lineage-completeness-gate", required=True)
     ap.add_argument("--replicates", type=int, default=1)
     ap.add_argument("--plan-code-sha", default="LOCAL_OR_UNRECORDED")
     ap.add_argument("--outdir", required=True)
@@ -339,7 +373,17 @@ def main() -> None:
     protocol = load_json(args.protocol)
     r5 = load_r5_plan_bundle(args.r5_plan_dir)
     checkpoint = load_recovery_checkpoint(args.source_snapshots, protocol)
-    bundle = build_r7_three_arm_plan(protocol=protocol, r5=r5, checkpoint=checkpoint, replicates=args.replicates, plan_code_sha=args.plan_code_sha)
+    semantic_repair_packet = load_json(args.semantic_repair_packet)
+    lineage_completeness_gate = load_json(args.lineage_completeness_gate)
+    bundle = build_r7_three_arm_plan(
+        protocol=protocol,
+        r5=r5,
+        checkpoint=checkpoint,
+        semantic_repair_packet=semantic_repair_packet,
+        lineage_completeness_gate=lineage_completeness_gate,
+        replicates=args.replicates,
+        plan_code_sha=args.plan_code_sha,
+    )
     verify_r7_three_arm_plan(bundle)
 
     out = Path(args.outdir)
@@ -352,6 +396,8 @@ def main() -> None:
     _write_json(out / "c1_one_shot_envelope.json", bundle["c1_one_shot_envelope"])
     _write_json(out / "c2_persistent_field_envelope.json", bundle["c2_persistent_field_envelope"])
     _write_json(out / "c3_alr_binding.json", bundle["c3_alr_binding"])
+    _write_json(out / "semantic_repair_packet.json", bundle["semantic_repair_packet"])
+    _write_json(out / "lineage_completeness_gate.json", bundle["lineage_completeness_gate"])
     _write_json(out / "r7_bounded_arena_config.json", bundle["bounded_arena_config"])
     write_jsonl(out / "arm_manifests.jsonl", bundle["arm_manifests"])
     write_jsonl(out / "execution_rows.jsonl", bundle["execution_rows"])
@@ -364,6 +410,8 @@ def main() -> None:
     print("C1_RUNTIME_MECHANISM=READY")
     print("C2_RUNTIME_MECHANISM=READY")
     print("C3_RUNTIME_MECHANISM=READY")
+    print("SEMANTIC_REPAIR_PACKET_BOUND=YES")
+    print("REPAIR_CLOSURE_REFS=" + str(len(bundle["semantic_repair_packet"].get("repair_closure_refs") or [])))
     print("PAID_SUBJECT_AUTHORIZED=NO")
 
 
