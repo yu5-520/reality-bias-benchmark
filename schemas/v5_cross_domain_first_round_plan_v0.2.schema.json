@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-V5-CROSS-DOMAIN-FIRST-ROUND-PLAN-v0.2",
+  "title": "Process Reality v5 Cross-Domain First-Round Plan v0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema","version","date","status","predecessor","first_round_id","experiment_family",
+    "method_development_reference","replication_domains","planned_repeats_per_domain",
+    "wave_size","waves_per_domain","wave_count","planned_new_natural_trajectories",
+    "execution_waves","subject_condition","arena_config_path","model_config_path",
+    "theory_contract_path","measurement_contract_path","scout_config_path",
+    "experiment_profile_path","report_standard_path","engineering_report_standard_path",
+    "protocol_lock","execution_stages","r5_contract","r6_contract","r7_contract",
+    "technical_failure_policy","paid_subject_execution_authorized",
+    "active_probe_authorized","active_repair_authorized"
+  ],
+  "properties": {
+    "schema": {"const": "RB-V5-CROSS-DOMAIN-FIRST-ROUND-PLAN-v0.2"},
+    "version": {"const": "0.2"},
+    "date": {"type":"string"},
+    "status": {"const":"FROZEN_PROTOCOL_CANDIDATE_NOT_PROVIDER_AUTHORIZED"},
+    "predecessor": {"type":"string"},
+    "first_round_id": {"type":"string","minLength":1},
+    "experiment_family": {"const":"PROCESS_REALITY_V5_CROSS_DOMAIN_FIRST_ROUND"},
+    "method_development_reference": {
+      "type":"object","additionalProperties":false,
+      "required":["domain_id","role","included_in_new_replication_sample","historical_evidence_mutated"],
+      "properties":{
+        "domain_id":{"const":"ecommerce"},
+        "role":{"const":"METHOD_DEVELOPMENT_DEEP_REFERENCE"},
+        "included_in_new_replication_sample":{"const":false},
+        "historical_evidence_mutated":{"const":false}
+      }
+    },
+    "replication_domains": {
+      "type":"array","minItems":3,"maxItems":3,
+      "items":{
+        "type":"object","additionalProperties":false,
+        "required":["domain_id","cohort_role"],
+        "properties":{
+          "domain_id":{"enum":["finance","supply_chain","software_engineering"]},
+          "cohort_role":{"const":"FROZEN_PROTOCOL_REPLICATION"}
+        }
+      }
+    },
+    "planned_repeats_per_domain":{"const":30},
+    "wave_size":{"const":15},
+    "waves_per_domain":{"const":2},
+    "wave_count":{"const":6},
+    "planned_new_natural_trajectories":{"const":90},
+    "execution_waves":{
+      "type":"array","minItems":6,"maxItems":6,
+      "items":{
+        "type":"object","additionalProperties":false,
+        "required":["wave_id","wave_key","domain_id","domain_wave_id","trial_start","trial_end"],
+        "properties":{
+          "wave_id":{"type":"integer","minimum":1,"maximum":6},
+          "wave_key":{"type":"string","minLength":1},
+          "domain_id":{"enum":["finance","supply_chain","software_engineering"]},
+          "domain_wave_id":{"type":"integer","minimum":1,"maximum":2},
+          "trial_start":{"type":"integer","minimum":1,"maximum":30},
+          "trial_end":{"type":"integer","minimum":1,"maximum":30}
+        }
+      }
+    },
+    "subject_condition":{"const":"NATURAL_UNMANIPULATED"},
+    "arena_config_path":{"type":"string"},
+    "model_config_path":{"type":"string"},
+    "theory_contract_path":{"type":"string"},
+    "measurement_contract_path":{"type":"string"},
+    "scout_config_path":{"type":"string"},
+    "experiment_profile_path":{"type":"string"},
+    "report_standard_path":{"type":"string"},
+    "engineering_report_standard_path":{"type":"string"},
+    "protocol_lock":{"type":"object"},
+    "execution_stages":{"type":"array","minItems":1},
+    "r5_contract":{"type":"object"},
+    "r6_contract":{"type":"object"},
+    "r7_contract":{"type":"object"},
+    "technical_failure_policy":{"type":"object"},
+    "paid_subject_execution_authorized":{"const":false},
+    "active_probe_authorized":{"const":false},
+    "active_repair_authorized":{"const":false}
+  }
+}
