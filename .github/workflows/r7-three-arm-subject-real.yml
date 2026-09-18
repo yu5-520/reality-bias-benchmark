@@ -23,8 +23,16 @@ on:
         required: true
         default: '64'
         type: string
+      execution_scope:
+        description: 'Execution scope: FULL keeps all three arms; C3_ONLY executes only C3_ALR rows from the frozen plan'
+        required: true
+        default: 'FULL'
+        type: choice
+        options:
+          - FULL
+          - C3_ONLY
       confirm:
-        description: 'Type CALL_REAL_R7_THREE_ARM_API to authorize subject calls; PREPARE_ONLY makes zero provider calls'
+        description: 'FULL requires CALL_REAL_R7_THREE_ARM_API; C3_ONLY requires CALL_REAL_R7_C3_API; PREPARE_ONLY makes zero provider calls'
         required: true
         default: 'PREPARE_ONLY'
         type: string
@@ -45,6 +53,7 @@ env:
   R7_PER_BRANCH_CEILING: ${{ inputs.per_branch_spending_ceiling_usd }}
   R7_TOTAL_CEILING: ${{ inputs.total_spending_ceiling_usd }}
   R7_PER_BRANCH_MAX_CALLS: ${{ inputs.per_branch_max_calls }}
+  R7_EXECUTION_SCOPE: ${{ inputs.execution_scope }}
 
 jobs:
   prepare:
@@ -173,6 +182,10 @@ jobs:
       - name: Guarded real-run preflight — still zero provider calls
         run: |
           set -euo pipefail
+          EXTRA_ARGS=()
+          if [ "$R7_EXECUTION_SCOPE" = "C3_ONLY" ]; then
+            EXTRA_ARGS+=(--only-arm C3_ALR)
+          fi
           python -m arena.run_r7_three_arm_real \
             --plan-dir results/r7_formal_plan \
             --source-r5-plan-dir "$RUNNER_TEMP/r7_r5_prepared/results/r5mid_prospective_one_shot_plan_v0_3" \
@@ -183,6 +196,7 @@ jobs:
             --per-branch-spending-ceiling "$R7_PER_BRANCH_CEILING" \
             --global-spending-ceiling "$R7_TOTAL_CEILING" \
             --currency "$R7_CURRENCY" \
+            "${EXTRA_ARGS[@]}" \
             --preflight-only
 
       - name: Freeze dispatch request separately from execution authorization
@@ -195,16 +209,22 @@ jobs:
           packet=json.load(open('results/r5r6_engineering_gate/semantic_repair_packet.json'))
           gate=json.load(open('results/r5r6_engineering_gate/lineage_completeness_gate.json'))
           audit=json.load(open('results/r5r6_r7_entry_audit.json'))
+          scope=os.environ['R7_EXECUTION_SCOPE']
+          required_phrase='CALL_REAL_R7_C3_API' if scope=='C3_ONLY' else 'CALL_REAL_R7_THREE_ARM_API'
+          selected_branch_count=sum(1 for row in open('results/r7_formal_plan/execution_rows.jsonl',encoding='utf-8') if (scope!='C3_ONLY' or json.loads(row)['arm_id']=='C3_ALR'))
           record={
-              'schema':'RB-R7-FORMAL-DISPATCH-AUTHORIZATION-v0.1',
+              'schema':'RB-R7-FORMAL-DISPATCH-AUTHORIZATION-v0.2',
               'workflow_run_id':'${{ github.run_id }}',
               'workflow_sha':'${{ github.sha }}',
               'workflow_ref':'${{ github.ref }}',
               'confirm_input':'${{ inputs.confirm }}',
-              'authorization_phrase_required':'CALL_REAL_R7_THREE_ARM_API',
-              'authorization_granted_by_dispatch_input':'${{ inputs.confirm }}' == 'CALL_REAL_R7_THREE_ARM_API',
+              'execution_scope':scope,
+              'selected_arm':'C3_ALR' if scope=='C3_ONLY' else None,
+              'authorization_phrase_required':required_phrase,
+              'authorization_granted_by_dispatch_input':'${{ inputs.confirm }}' == required_phrase,
               'replicates':int(os.environ['R7_REPLICATES']),
               'planned_branch_count':plan['branch_row_count'],
+              'selected_branch_count':selected_branch_count,
               'plan_hash':plan['plan_hash'],
               'r5r6_engineering_summary_hash':eng['summary_hash'],
               'semantic_repair_packet_hash':packet['packet_hash'],
@@ -229,7 +249,7 @@ jobs:
               'model_config':'arena/config/model_deepseek_v0.2.json',
               'automatic_paid_evaluator':False,
               'semantic_cpr_status':'NOT_ADJUDICATED',
-              'note':'This record freezes the manual dispatch inputs. Provider calls occur only in the separately gated subject job.'
+              'note':'This record freezes the dispatch scope and authorization. C3_ONLY reuses the full frozen plan but executes only C3_ALR rows; provider calls occur only in the separately gated subject job.'
           }
           pathlib.Path('results/r7_dispatch_authorization.json').write_text(json.dumps(record,indent=2,sort_keys=True)+'\n',encoding='utf-8')
           PY
@@ -256,7 +276,7 @@ jobs:
 
   subject:
     needs: prepare
-    if: ${{ inputs.confirm == 'CALL_REAL_R7_THREE_ARM_API' }}
+    if: ${{ (inputs.execution_scope == 'FULL' && inputs.confirm == 'CALL_REAL_R7_THREE_ARM_API') || (inputs.execution_scope == 'C3_ONLY' && inputs.confirm == 'CALL_REAL_R7_C3_API') }}
     runs-on: ubuntu-latest
     timeout-minutes: 240
     steps:
@@ -291,7 +311,12 @@ jobs:
           lg=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'r7_prepared/prepared_bundle/r5r6_engineering_gate/lineage_completeness_gate.json')))
           audit=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'r7_prepared/prepared_bundle/r5r6_r7_entry_audit.json')))
           assert a['authorization_granted_by_dispatch_input'] is True
-          assert a['confirm_input']=='CALL_REAL_R7_THREE_ARM_API'
+          expected_scope='${{ inputs.execution_scope }}'
+          expected_phrase='CALL_REAL_R7_C3_API' if expected_scope=='C3_ONLY' else 'CALL_REAL_R7_THREE_ARM_API'
+          assert a['execution_scope']==expected_scope
+          assert a['confirm_input']==expected_phrase
+          assert a['authorization_phrase_required']==expected_phrase
+          assert a['selected_branch_count']==(int(a['replicates']) if expected_scope=='C3_ONLY' else int(a['replicates'])*3)
           assert a['workflow_sha']=='${{ github.sha }}'
           assert a['plan_hash']==p['plan_hash']
           assert p['semantic_repair_packet_hash']==rp['packet_hash']
@@ -346,6 +371,12 @@ jobs:
         run: |
           set -euo pipefail
           cd "$GITHUB_WORKSPACE"
+          EXTRA_ARGS=()
+          AUTH_PHRASE=CALL_REAL_R7_THREE_ARM_API
+          if [ "$R7_EXECUTION_SCOPE" = "C3_ONLY" ]; then
+            EXTRA_ARGS+=(--only-arm C3_ALR)
+            AUTH_PHRASE=CALL_REAL_R7_C3_API
+          fi
           python -m arena.run_r7_three_arm_real \
             --plan-dir "$RUNNER_TEMP/r7_prepared/prepared_bundle/plan" \
             --source-r5-plan-dir "$RUNNER_TEMP/r7_r5_prepared/results/r5mid_prospective_one_shot_plan_v0_3" \
@@ -357,7 +388,8 @@ jobs:
             --per-branch-spending-ceiling "$R7_PER_BRANCH_CEILING" \
             --global-spending-ceiling "$R7_TOTAL_CEILING" \
             --currency "$R7_CURRENCY" \
-            --authorization-phrase CALL_REAL_R7_THREE_ARM_API \
+            "${EXTRA_ARGS[@]}" \
+            --authorization-phrase "$AUTH_PHRASE" \
             --execute-real-api
 
       - name: Freeze raw R7 evidence before any derivation
