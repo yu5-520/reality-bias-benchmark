@@ -81,6 +81,9 @@ def build_repaired_parent_snapshot(
 ) -> tuple[dict, dict]:
     """Create the C3 branch start by revising the already-observed Repair Anchor.
 
+    This v0.3 operator is intentionally validated through the repository offline
+    R7 chain before any new subject dispatch.
+
     v0.2 removes the old stochastic prerequisite that the provider must reproduce
     the historical J0 write after rollback. The frozen post-J0 parent already
     contains the content-addressed target. Repair is a branch-local revision of
