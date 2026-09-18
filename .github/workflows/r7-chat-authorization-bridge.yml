@@ -275,3 +275,156 @@ jobs:
           body="V5 cross-domain authorization accepted and converted to the existing fail-closed six-wave subject workflow_dispatch.\n\nPinned execution ref: ${AUTH_TAG}\nExecution SHA: ${GITHUB_SHA}\n\nFrozen geometry: 3 held-out domains / 90 natural trajectories / 6 domain-pure waves / 15 trajectories per wave.\nHard ceilings: 64 calls per run, USD 0.25 per run, USD 3.75 per wave, USD 22.50 first round.\nNo paid evaluator, R5 probe, R7 repair, or R8 CPR adjudication is enabled by this dispatch."
           gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
           gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
+
+
+  execute-cross-domain-semantic-triage:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5 CROSS-DOMAIN SEMANTIC TRIAGE'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      EXPECTED_EXECUTION_PHRASE: RUN_FROZEN_V5_CROSS_DOMAIN_TRIAGE
+      TRIAGE_CONTRACT: configs/v5_cross_domain_semantic_triage_v0.1.json
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact frozen-evidence triage request
+        id: auth
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, re
+          rows={}
+          for raw in os.environ['AUTH_BODY'].splitlines():
+              line=raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit(f'invalid triage request line: {line!r}')
+              key,value=line.split('=',1)
+              if key in rows:
+                  raise SystemExit(f'duplicate triage request key: {key}')
+              rows[key]=value
+          required={
+              'execution_phrase',
+              'source_run_id',
+              'expected_source_sha',
+              'authorization_id',
+              'control_plane',
+          }
+          if set(rows)!=required:
+              raise SystemExit(f'triage request keys mismatch: {sorted(rows)}')
+          if rows['execution_phrase']!=os.environ['EXPECTED_EXECUTION_PHRASE']:
+              raise SystemExit('triage execution phrase mismatch')
+          if rows['control_plane']!='CHAT_EXECUTION_BRIDGE_V5_CROSS_DOMAIN_TRIAGE_v0.1':
+              raise SystemExit('triage control-plane identifier mismatch')
+          if not re.fullmatch(r'\d{6,20}', rows['source_run_id']):
+              raise SystemExit('invalid source_run_id')
+          if not re.fullmatch(r'[0-9a-f]{40}', rows['expected_source_sha']):
+              raise SystemExit('invalid expected_source_sha')
+          if not re.fullmatch(r'[A-Za-z0-9._-]{8,80}', rows['authorization_id']):
+              raise SystemExit('invalid authorization_id')
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as fh:
+              fh.write('source_run_id='+rows['source_run_id']+'\n')
+              fh.write('expected_source_sha='+rows['expected_source_sha']+'\n')
+              fh.write('authorization_id='+rows['authorization_id']+'\n')
+          print('PASS: exact cross-domain frozen-evidence triage request validated')
+          PY
+
+      - name: Verify completed six-wave source workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ steps.auth.outputs.source_run_id }}
+          EXPECTED_SOURCE_SHA: ${{ steps.auth.outputs.expected_source_sha }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID" > "$RUNNER_TEMP/source_run.json"
+          python - <<'PY'
+          import json, os
+          p=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'source_run.json')))
+          assert p['status']=='completed'
+          assert p['conclusion']=='success'
+          assert p['head_sha']==os.environ['EXPECTED_SOURCE_SHA']
+          assert p['path']=='.github/workflows/v5-cross-domain-first-round-subject-real.yml'
+          print('PASS: source run is the completed cross-domain first-round workflow')
+          PY
+
+      - name: Download six immutable wave evidence bundles
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ steps.auth.outputs.source_run_id }}
+        run: |
+          set -euo pipefail
+          mkdir -p results/v5_cross_domain_source
+          gh run download "$SOURCE_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern "v5-cross-domain-first-round-wave-*-$SOURCE_RUN_ID" \
+            --dir results/v5_cross_domain_source
+          test "$(find results/v5_cross_domain_source -name evidence_batch.json -type f | wc -l)" -eq 6
+          test "$(find results/v5_cross_domain_source -name v5_structural_index.jsonl -type f | wc -l)" -eq 6
+          test "$(find results/v5_cross_domain_source -name traces.jsonl -type f | wc -l)" -eq 6
+
+      - name: Build deterministic localized semantic-audit queue
+        run: |
+          set -euo pipefail
+          python -m arena.build_v5_cross_domain_semantic_triage \
+            --input-root results/v5_cross_domain_source \
+            --contract "$TRIAGE_CONTRACT" \
+            --outdir results/v5_cross_domain_semantic_triage
+
+      - name: Validate triage boundary and capture summary
+        id: stats
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          p=json.load(open('results/v5_cross_domain_semantic_triage/summary.json'))
+          assert p['trajectory_count']==90
+          assert p['source_wave_count']==6
+          assert p['role_assignment_counts']['FORMATION_ANCHOR']==90
+          assert p['role_assignment_counts']['PROPAGATION_ANCHOR']==90
+          assert 0 <= p['role_assignment_counts'].get('AUTHORITY_REVIEW_ANCHOR',0) <= 90
+          assert 90 <= p['selected_unique_case_count'] <= 270
+          assert p['provider_calls']==0
+          assert p['paid_evaluator_calls']==0
+          assert p['r5_probe_calls']==0
+          assert p['r7_repair_calls']==0
+          assert p['r8_cpr_adjudication'] is False
+          assert p['semantic_status']=='NOT_ADJUDICATED'
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as fh:
+              fh.write('case_count='+str(p['selected_unique_case_count'])+'\n')
+              fh.write('authority_counts='+json.dumps(p['authority_review_trajectory_counts'],sort_keys=True,separators=(',',':'))+'\n')
+              fh.write('summary_hash='+p['summary_hash']+'\n')
+          print('PASS: deterministic triage preserves semantic and active-stage boundaries')
+          PY
+
+      - name: Upload append-only semantic-triage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-cross-domain-semantic-triage-${{ steps.auth.outputs.source_run_id }}-${{ github.run_id }}
+          path: results/v5_cross_domain_semantic_triage
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Record completed triage on execution issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ steps.auth.outputs.source_run_id }}
+          CASE_COUNT: ${{ steps.stats.outputs.case_count }}
+          AUTHORITY_COUNTS: ${{ steps.stats.outputs.authority_counts }}
+          SUMMARY_HASH: ${{ steps.stats.outputs.summary_hash }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="Frozen-evidence cross-domain semantic triage completed.\n\nSource subject run: ${SOURCE_RUN_ID}\nTriage workflow run: $GITHUB_RUN_ID\nSelected unique localized-audit cases: ${CASE_COUNT}\nAuthority-review trajectory counts: ${AUTHORITY_COUNTS}\nSummary hash: ${SUMMARY_HASH}\n\nProvider calls: 0. Paid evaluator calls: 0. R5/R7 calls: 0. CPR remains NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
