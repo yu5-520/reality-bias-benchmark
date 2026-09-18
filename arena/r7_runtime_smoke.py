@@ -35,6 +35,8 @@ def load_r7_plan_bundle(plan_dir: str | Path) -> dict:
         "c3_repaired_parent_snapshot": load_json(p / "c3_repaired_parent_snapshot.json"),
         "c3_repair_application": load_json(p / "c3_repair_application.json"),
         "semantic_repair_packet": load_json(p / "semantic_repair_packet.json"),
+        "semantic_lineage_package": load_json(p / "semantic_lineage_package.json"),
+        "post_repair_watch_contract": load_json(p / "post_repair_watch_contract.json"),
         "lineage_completeness_gate": load_json(p / "lineage_completeness_gate.json"),
         "bounded_arena_config": load_json(p / "r7_bounded_arena_config.json"),
         "arm_manifests": load_jsonl(p / "arm_manifests.jsonl"),
