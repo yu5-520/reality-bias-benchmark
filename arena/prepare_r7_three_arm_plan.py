@@ -154,7 +154,7 @@ def build_r7_three_arm_plan(*, protocol: Mapping[str, Any], r5: Mapping[str, Any
     horizon = protocol["matched_horizon"]
 
     _require(
-        semantic_repair_packet.get("repair_anchor_ref") == "arena_event:32:state:" + one_shot["state_key"],
+        semantic_repair_packet.get("repair_anchor_ref") == f"arena_event:{one_shot['source_event_index']}:state:{one_shot['state_key']}",
         "r7_repair_packet_anchor_mismatch",
     )
     _require(
