@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-R7-POST-REPAIR-WATCH-CONTRACT-v0.1",
+  "title": "R7 Post-Repair Watch Contract v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "watch_id",
+    "repair_anchor_ref",
+    "target_semantic_id",
+    "target_state_key",
+    "old_authority_status",
+    "new_authority_status",
+    "repair_branch_start_event_count",
+    "monitoring_intensity",
+    "watch_triggers",
+    "semantic_cpr_status",
+    "watch_hash"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-R7-POST-REPAIR-WATCH-CONTRACT-v0.1"
+    },
+    "watch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repair_anchor_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_semantic_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_state_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "old_authority_status": {
+      "type": "string"
+    },
+    "new_authority_status": {
+      "type": "string"
+    },
+    "repair_branch_start_event_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "monitoring_intensity": {
+      "const": "HIGH_AFTER_REPAIR"
+    },
+    "watch_triggers": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "EXACT_OLD_AUTHORITY_REENTRY",
+          "TARGET_REWRITE",
+          "NEW_STATE_WRITE",
+          "AUTHORITY_ESCALATION_CANDIDATE",
+          "CLOSURE_EXPANSION_CANDIDATE"
+        ]
+      }
+    },
+    "semantic_cpr_status": {
+      "const": "NOT_ADJUDICATED"
+    },
+    "watch_hash": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
