@@ -21,10 +21,31 @@ Core forward files:
 - \`docs/R6_structural_support_trace_control_surface_protocol_v1.0.md\`
 - \`docs/R7_localized_recovery_protocol_v1.0.md\`
 - \`docs/v5_whole_process_experiment_protocol_v0.1.md\`
-- \`docs/reporting/process_reality_report_standard_v1_5.md\`
+- \`docs/reporting/process_reality_report_standard_v1_7.md\`
 - \`manifests/process_reality_v5_methodological_migration_2026-09-18.json\`
 
 The historical v4.5.1 layer remains frozen for evidence already bound to it.
+
+## Current reporting layer
+
+Forward reports now use a trajectory-semantic evidence profile:
+
+- `docs/reporting/process_reality_report_standard_v1_7.md`
+- `docs/reporting/process_reality_experiment_report_template_v3.md`
+- `docs/reporting/process_reality_theory_experiment_report_standard_v1_0.md`
+- `docs/reporting/process_reality_engineering_experiment_report_standard_v1_1.md`
+
+Core rule:
+
+`Frozen structural facts -> realized Agent path -> evidence-bound semantic interpretation -> claim boundary`
+
+Aggregate topology and hashes remain the factual substrate, but they do not replace the realized Agent path when path evidence exists.
+
+Current R7 engineering report:
+
+- `docs/reports/2026-09-18/R7_Process_Integrity_Engineering_Experiment_Report_v2.md`
+- `manifests/r7_process_integrity_engineering_report_2026-09-18_v1.json`
+
 
 ## v5 theory chain
 
