@@ -240,3 +240,39 @@ Forward design:
 Provider execution: **NOT AUTHORIZED**.  
 Active recovery: **NOT AUTHORIZED**.  
 CPR: **NOT_ADJUDICATED**.
+
+
+## R5–R6 engineering-package closure
+
+The R6→R7 engineering handoff is now implemented as a deterministic frozen-evidence package.
+
+Added:
+
+- source binding: configs/r5r6_engineering_package_source_binding_v0.1.json;
+- package builder: arena/r5r6_engineering_package.py;
+- offline test: arena/tests/test_r5r6_engineering_package.py;
+- formal report: docs/reports/2026-09-18/R5-R6_Engineering_Experiment_Report_v1.md.
+
+The builder emits:
+
+- Process Integrity Relation Evidence;
+- Semantic Lineage Closure;
+- Lineage Completeness Gate;
+- Semantic Repair Packet;
+- Process Integrity Lineage Record;
+- engineering summary.
+
+Current scoped gate result:
+
+- Repair Anchor: E32/J0 machine-addressable state surface;
+- completeness scope: FROZEN_DECLARED_R5_R6_OBSERVATION_HORIZON;
+- Lineage Completeness: COMPLETE_FOR_AUTHORIZED_REPAIR;
+- R7 entry: READY_FOR_SEPARATE_AUTHORIZATION;
+- automatic repair: false;
+- active repair: NOT AUTHORIZED;
+- new provider/evaluator calls: 0;
+- CPR: NOT_ADJUDICATED.
+
+This gate does not claim global exhaustive semantic lineage, causal primacy of J0, first support/pool identity or exclusive pool-to-judgment attribution.
+
+The formal R7 subject workflow and the offline R7 readiness audit now both rebuild and hash-bind this package before R7 planning/execution. The prepared R7 bundle carries the exact Semantic Repair Packet and completeness-gate hashes forward so the audited engineering target cannot silently change between R6 handoff and R7 execution.
