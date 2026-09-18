@@ -318,6 +318,22 @@ jobs:
             --currency USD \
             --preflight-only
 
+      - name: Preflight guarded C3-only runner without provider calls
+        run: |
+          set -euo pipefail
+          python -m arena.run_r7_three_arm_real \
+            --plan-dir /tmp/r7_real_parent_bound_plan \
+            --source-r5-plan-dir /tmp/r7_r5_prepared/results/r5mid_prospective_one_shot_plan_v0_3 \
+            --model-config arena/config/model_deepseek_v0.2.json \
+            --provider deepseek \
+            --execution-code-sha '${{ github.sha }}' \
+            --per-branch-max-calls 64 \
+            --per-branch-spending-ceiling 0.25 \
+            --global-spending-ceiling 0.25 \
+            --currency USD \
+            --only-arm C3_ALR \
+            --preflight-only
+
       - name: Assert obsolete R7 paid paired route is removed
         run: |
           set -euo pipefail
