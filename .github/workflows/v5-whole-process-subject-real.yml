@@ -1,0 +1,96 @@
+name: V5 Whole-Process subject real
+
+on:
+  workflow_dispatch:
+    inputs:
+      authorization_phrase:
+        description: Exact paid subject authorization phrase
+        required: true
+        default: ""
+        type: string
+      per_run_max_calls:
+        description: Maximum provider calls per natural run
+        required: true
+        default: "0"
+        type: string
+      per_run_spending_ceiling:
+        description: Per-run spending ceiling in USD
+        required: true
+        default: "0"
+        type: string
+      global_spending_ceiling:
+        description: Global spending ceiling in USD
+        required: true
+        default: "0"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-whole-process-subject-real
+  cancel-in-progress: false
+
+jobs:
+  subject:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate offline method and fresh-run preflight
+        run: |
+          python scripts/validate_process_reality_v5.py
+          python scripts/derive_v5_historical_rederivation.py --check results/v5_historical_rederivation/rederivation_bundle_v0_1.json
+          python -m unittest arena.tests.test_v5_whole_process arena.tests.test_v5_whole_process_runtime_guard -v
+          python -m arena.v5_whole_process_preflight --outdir results/v5_whole_process_preflight --code-sha "$GITHUB_SHA"
+
+      - name: Build exact fresh Batch001 manifest
+        run: |
+          mkdir -p results/v5_whole_process
+          python -m arena.build_v5_whole_process_manifest \
+            --design configs/v5_whole_process_ecommerce_batch001_v0.1.json \
+            --code-sha "$GITHUB_SHA" \
+            --out results/v5_whole_process/subject_manifest.jsonl
+          test "$(wc -l < results/v5_whole_process/subject_manifest.jsonl)" -eq 3
+
+      - name: Execute guarded natural subject runs
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python -m arena.run_v5_whole_process_real \
+            --manifest results/v5_whole_process/subject_manifest.jsonl \
+            --outdir results/v5_whole_process/raw \
+            --provider deepseek \
+            --per-run-max-calls "${{ inputs.per_run_max_calls }}" \
+            --per-run-spending-ceiling "${{ inputs.per_run_spending_ceiling }}" \
+            --global-spending-ceiling "${{ inputs.global_spending_ceiling }}" \
+            --currency USD \
+            --authorization-phrase "${{ inputs.authorization_phrase }}" \
+            --execute-real-api
+
+      - name: Freeze raw evidence before derivation
+        run: |
+          python -m arena.freeze_v5_whole_process_evidence \
+            --raw-dir results/v5_whole_process/raw \
+            --manifest results/v5_whole_process/subject_manifest.jsonl \
+            --out results/v5_whole_process/evidence_batch.json
+
+      - name: Derive v5 structural support/pool/exposure indexes
+        run: |
+          python -m arena.derive_v5_whole_process_structural \
+            --raw-dir results/v5_whole_process/raw \
+            --evidence-batch results/v5_whole_process/evidence_batch.json \
+            --outdir results/v5_whole_process/derived
+
+      - name: Upload frozen Whole-Process bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-whole-process-batch001-${{ github.run_id }}
+          path: results/v5_whole_process
+          retention-days: 90
+          if-no-files-found: error
