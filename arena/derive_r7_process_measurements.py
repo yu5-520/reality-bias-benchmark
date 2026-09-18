@@ -119,6 +119,7 @@ def derive_r7(*, plan_dir: str | Path, traces_path: str | Path, evidence_batch_p
         )
         condition = trace.get("r7_condition") or {}
         revision = trace.get("r7_revision_lineage") or {}
+        repair_verification = trace.get("r7_semantic_repair_verification") or {}
         measurement.update({
             "r7_protocol_id": bundle["plan"]["protocol_id"],
             "triad_id": row["triad_id"],
@@ -135,6 +136,14 @@ def derive_r7(*, plan_dir: str | Path, traces_path: str | Path, evidence_batch_p
             "runtime_transform_count": integrity["runtime_transform_count"],
             "action_transform_count": integrity["action_transform_count"],
             "revision_hash": revision.get("revision_hash"),
+            "semantic_repair_verification_hash": repair_verification.get("verification_hash"),
+            "semantic_repair_packet_hash": repair_verification.get("packet_hash"),
+            "old_lineage_reentry_detected": repair_verification.get("old_lineage_reentry_detected"),
+            "old_lineage_reentry_refs": list(repair_verification.get("old_lineage_reentry_refs") or []),
+            "preserved_unrelated_structure": repair_verification.get("preserved_unrelated_structure"),
+            "recomputed_descendant_refs": list(repair_verification.get("recomputed_descendant_refs") or []),
+            "semantic_lineage_closure_before_hash": repair_verification.get("semantic_lineage_closure_before_hash"),
+            "semantic_lineage_closure_after_hash": repair_verification.get("semantic_lineage_closure_after_hash"),
             "source_raw_evidence_batch_hash": evidence["evidence_batch_hash"],
             "source_evidence_role": role,
             "semantic_status": "NOT_ADJUDICATED",
@@ -209,6 +218,9 @@ def derive_r7(*, plan_dir: str | Path, traces_path: str | Path, evidence_batch_p
                 "right_arm_id": "C3_ALR",
                 "source_raw_evidence_batch_hash": evidence["evidence_batch_hash"],
                 "c3_revision_hash": c3.get("revision_hash"),
+                "c3_semantic_repair_verification_hash": c3.get("semantic_repair_verification_hash"),
+                "c3_old_lineage_reentry_detected": c3.get("old_lineage_reentry_detected"),
+                "c3_preserved_unrelated_structure": c3.get("preserved_unrelated_structure"),
                 "path_family_completeness": {
                     "left_overflow": _path_overflow(c2),
                     "right_overflow": _path_overflow(c3),
@@ -239,6 +251,9 @@ def derive_r7(*, plan_dir: str | Path, traces_path: str | Path, evidence_batch_p
         "comparison_count": len(comparisons),
         "r7a_comparison_count": sum(1 for row in comparisons if row.get("r7_comparison") == "R7-A_ONE_SHOT_VS_PERSISTENT_FIELD"),
         "r7b_comparison_count": sum(1 for row in comparisons if row.get("r7_comparison") == "R7-B_PERSISTENT_FIELD_VS_ALR_RECOVERY"),
+        "semantic_repair_verification_count": sum(1 for row in measurements if row.get("semantic_repair_verification_hash")),
+        "old_lineage_reentry_detected_count": sum(1 for row in measurements if row.get("old_lineage_reentry_detected") is True),
+        "preserved_unrelated_structure_pass_count": sum(1 for row in measurements if row.get("preserved_unrelated_structure") is True),
         "integrity_failure_count": len(integrity_failures),
         "semantic_cpr_status": "NOT_ADJUDICATED",
         "paid_evaluator_called": False,
@@ -278,6 +293,9 @@ def main() -> None:
     print("R7_STRUCTURAL_COMPARISONS=" + str(summary["comparison_count"]))
     print("R7A_COMPARISONS=" + str(summary["r7a_comparison_count"]))
     print("R7B_COMPARISONS=" + str(summary["r7b_comparison_count"]))
+    print("SEMANTIC_REPAIR_VERIFICATIONS=" + str(summary["semantic_repair_verification_count"]))
+    print("OLD_LINEAGE_REENTRY_DETECTED=" + str(summary["old_lineage_reentry_detected_count"]))
+    print("PRESERVED_UNRELATED_PASS=" + str(summary["preserved_unrelated_structure_pass_count"]))
     print("INTEGRITY_FAILURES=" + str(summary["integrity_failure_count"]))
     print("SEMANTIC_CPR_STATUS=NOT_ADJUDICATED")
 
