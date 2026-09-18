@@ -13,12 +13,14 @@ on:
       - "arena/persistent_field_intervention.py"
       - "arena/alr_recovery.py"
       - "arena/r7_structural_control_preflight.py"
+      - "arena/r7_semantic_repair_runtime.py"
       - "arena/prepare_r7_three_arm_plan.py"
       - "arena/r7_runtime_smoke.py"
       - "arena/run_r7_three_arm_real.py"
       - "arena/freeze_r7_evidence.py"
       - "arena/derive_r7_process_measurements.py"
       - "arena/tests/test_r7_structural_control_preflight.py"
+      - "arena/tests/test_r7_semantic_repair_runtime.py"
       - ".github/workflows/r7-orchestration-paired-real.yml"
       - ".github/workflows/r7-structural-inertia-offline-validate.yml"
 
@@ -40,6 +42,19 @@ jobs:
 
       - name: Validate R7 protocol fixture
         run: python scripts/validate_r7_protocol.py configs/r7/r7_three_arm_fixture.example.json
+
+      - name: Build R5-R6 engineering package for R7 runtime binding
+        run: |
+          set -euo pipefail
+          python -m arena.r5r6_engineering_package --outdir /tmp/r5r6_engineering_gate
+          python - <<'PY'
+          import json
+          p=json.load(open('/tmp/r5r6_engineering_gate/semantic_repair_packet.json'))
+          g=json.load(open('/tmp/r5r6_engineering_gate/lineage_completeness_gate.json'))
+          assert p['repair_authorization_status']=='READY_FOR_SEPARATE_AUTHORIZATION'
+          assert g['status']=='COMPLETE_FOR_AUTHORIZED_REPAIR'
+          print('R5R6_REPAIR_PACKET_FOR_R7_RUNTIME=READY')
+          PY
 
       - name: Run R7 implementation preflight
         run: |
@@ -140,6 +155,8 @@ jobs:
             --protocol configs/r7/r7_three_arm_fixture.example.json \
             --r5-plan-dir "$R5_PLAN_DIR" \
             --source-snapshots "$SNAPSHOTS" \
+            --semantic-repair-packet /tmp/r5r6_engineering_gate/semantic_repair_packet.json \
+            --lineage-completeness-gate /tmp/r5r6_engineering_gate/lineage_completeness_gate.json \
             --replicates 1 \
             --plan-code-sha '${{ github.sha }}' \
             --outdir /tmp/r7_real_parent_bound_plan
@@ -158,6 +175,11 @@ jobs:
           assert p['paid_subject_authorization_status']=='NOT_AUTHORIZED'
           assert p['real_three_arm_runtime_mechanisms_ready'] is True
           assert p['real_subject_execution_authorized'] is False
+          packet=json.load(open('/tmp/r5r6_engineering_gate/semantic_repair_packet.json'))
+          gate=json.load(open('/tmp/r5r6_engineering_gate/lineage_completeness_gate.json'))
+          assert p['semantic_repair_packet_hash']==packet['packet_hash']
+          assert p['lineage_completeness_gate_hash']==gate['gate_hash']
+          assert p['repair_closure_refs']==packet['repair_closure_refs']
           assert len(rows)==3
           assert len({x['common_reference_parent_state_hash'] for x in rows})==1
           assert len({x['semantic_payload_hash'] for x in rows})==1
@@ -184,6 +206,9 @@ jobs:
           assert s['c2_direct_exposures']>=2
           assert s['c2_reinjections']>=1
           assert s['c3_authority_transform_count']==1
+          assert s['c3_semantic_repair_packet_consumed'] is True
+          assert isinstance(s['c3_old_lineage_reentry_detected'], bool)
+          assert isinstance(s['c3_preserved_unrelated_structure'], bool)
           assert s['source_snapshots_immutable'] is True
           assert s['provider_calls_are_real'] is False
           assert s['paid_api_called'] is False
@@ -224,6 +249,7 @@ jobs:
           assert s['source_evidence_role']=='ENGINEERING_VALIDATION_EVIDENCE'
           assert s['scientific_status']=='ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE'
           assert s['measurement_count']==3
+          assert s['semantic_repair_verification_count']==1
           assert s['integrity_failure_count']==0
           assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
           assert s['paid_evaluator_called'] is False
@@ -267,6 +293,7 @@ jobs:
             arena/persistent_field_intervention.py \
             arena/alr_recovery.py \
             arena/r7_structural_control_preflight.py \
+            arena/r7_semantic_repair_runtime.py \
             arena/prepare_r7_three_arm_plan.py \
             arena/r7_runtime_smoke.py \
             arena/freeze_r7_evidence.py \

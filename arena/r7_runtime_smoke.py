@@ -13,6 +13,7 @@ from .io_utils import load_json, load_jsonl, write_jsonl
 from .one_shot_intervention import OneShotRuntimeViewTransform
 from .persistent_field_intervention import PersistentFieldRuntimeViewTransform
 from .prepare_r7_three_arm_plan import verify_r7_three_arm_plan
+from .r7_semantic_repair_runtime import build_semantic_repair_runtime_plan, verify_semantic_repair_trace
 
 SMOKE_SCHEMA = "RB-R7-RUNTIME-SMOKE-v0.2"
 
@@ -31,6 +32,8 @@ def load_r7_plan_bundle(plan_dir: str | Path) -> dict:
         "c1_one_shot_envelope": load_json(p / "c1_one_shot_envelope.json"),
         "c2_persistent_field_envelope": load_json(p / "c2_persistent_field_envelope.json"),
         "c3_alr_binding": load_json(p / "c3_alr_binding.json"),
+        "semantic_repair_packet": load_json(p / "semantic_repair_packet.json"),
+        "lineage_completeness_gate": load_json(p / "lineage_completeness_gate.json"),
         "bounded_arena_config": load_json(p / "r7_bounded_arena_config.json"),
         "arm_manifests": load_jsonl(p / "arm_manifests.jsonl"),
         "execution_rows": load_jsonl(p / "execution_rows.jsonl"),
@@ -116,6 +119,7 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
         manifest = _manifest_for_arm(bundle, arm_id)
         runtime_transform = None
         action_transform = None
+        semantic_repair_runtime_plan = None
         if arm_id == "C1_ONE_SHOT":
             start = bundle["source_parent_snapshot"]
             runtime_transform = OneShotRuntimeViewTransform(bundle["c1_one_shot_envelope"])
@@ -125,13 +129,18 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
         else:
             start = bundle["c3_recovery_checkpoint"]
             alr = bundle["c3_alr_binding"]
+            semantic_repair_runtime_plan = build_semantic_repair_runtime_plan(
+                packet=bundle["semantic_repair_packet"],
+                gate=bundle["lineage_completeness_gate"],
+                bundle=bundle,
+            )
             action_transform = AuthorityLocalizedEnvelopeTransform(
                 target_actor=alr["target_actor"],
                 target_turn=int(alr["target_reexecution_turn"]),
-                state_key=alr["state_key"],
-                from_status=alr["from_status"],
-                to_status=alr["to_status"],
-                jump_ref=alr["jump_ref"],
+                state_key=semantic_repair_runtime_plan["target_state_key"],
+                from_status=semantic_repair_runtime_plan["authority_from_status"],
+                to_status=semantic_repair_runtime_plan["authority_to_status"],
+                jump_ref=semantic_repair_runtime_plan["repair_anchor_ref"],
                 semantic_payload_hash=alr["semantic_payload_hash"],
             )
 
@@ -188,7 +197,21 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
             }
             revision["revision_hash"] = stable_hash(revision)
             trace["r7_revision_lineage"] = revision
-            arm_summaries[arm_id] = {**action_transform.summary(), "revision_hash": revision["revision_hash"]}
+            repair_verification = verify_semantic_repair_trace(
+                trace=trace,
+                plan=semantic_repair_runtime_plan,
+                transform_summary=action_transform.summary(),
+            )
+            trace["r7_semantic_repair_runtime_plan"] = semantic_repair_runtime_plan
+            trace["r7_semantic_repair_verification"] = repair_verification
+            arm_summaries[arm_id] = {
+                **action_transform.summary(),
+                "revision_hash": revision["revision_hash"],
+                "semantic_repair_runtime_plan_hash": semantic_repair_runtime_plan["plan_hash"],
+                "semantic_repair_verification_hash": repair_verification["verification_hash"],
+                "old_lineage_reentry_detected": repair_verification["old_lineage_reentry_detected"],
+                "preserved_unrelated_structure": repair_verification["preserved_unrelated_structure"],
+            }
 
         trace["r7_condition"] = {
             "schema": "RB-R7-CONDITION-TRACE-v0.1",
@@ -223,6 +246,9 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
         "c2_direct_exposures": arm_summaries["C2_PERSISTENT_FIELD"]["direct_experiment_origin_exposure_count"],
         "c2_reinjections": arm_summaries["C2_PERSISTENT_FIELD"]["experiment_origin_reinjection_count"],
         "c3_authority_transform_count": arm_summaries["C3_ALR"]["transform_count"],
+        "c3_semantic_repair_packet_consumed": True,
+        "c3_old_lineage_reentry_detected": arm_summaries["C3_ALR"]["old_lineage_reentry_detected"],
+        "c3_preserved_unrelated_structure": arm_summaries["C3_ALR"]["preserved_unrelated_structure"],
         "source_snapshots_immutable": True,
         "provider_calls_are_real": False,
         "paid_api_called": False,
@@ -252,6 +278,9 @@ def main() -> None:
     print("C2_DIRECT_EXPOSURES=" + str(summary["c2_direct_exposures"]))
     print("C2_REINJECTIONS=" + str(summary["c2_reinjections"]))
     print("C3_AUTHORITY_TRANSFORM_COUNT=" + str(summary["c3_authority_transform_count"]))
+    print("C3_SEMANTIC_REPAIR_PACKET_CONSUMED=YES")
+    print("C3_OLD_LINEAGE_REENTRY_DETECTED=" + ("YES" if summary["c3_old_lineage_reentry_detected"] else "NO"))
+    print("C3_PRESERVED_UNRELATED_STRUCTURE=" + ("YES" if summary["c3_preserved_unrelated_structure"] else "NO"))
     print("PAID_API_CALLED=NO")
     print("SUMMARY_HASH=" + summary["summary_hash"])
 

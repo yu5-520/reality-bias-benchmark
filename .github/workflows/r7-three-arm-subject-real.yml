@@ -84,8 +84,10 @@ jobs:
           python - <<'PY'
           import json
           a=json.load(open('results/r5r6_r7_entry_audit.json'))
-          assert a['decision']=='PASS_R7_ENTRY_BOUNDED_ENGINEERING_EXPERIMENT'
+          assert a['decision']=='PASS_R7_ENTRY_FULL_REQUIREMENT_COVERAGE'
           assert a['criteria_passed']==a['criteria_total']==8
+          assert a['framework_coverage_full'] is True
+          assert a['framework_coverage_count']==a['framework_requirement_count']
           assert a['r7_entry_supported'] is True
           assert a['active_r7_repair_authorized'] is False
           assert a['separate_manual_authorization_required'] is True
@@ -162,6 +164,8 @@ jobs:
             --protocol configs/r7/r7_three_arm_fixture.example.json \
             --r5-plan-dir "$RUNNER_TEMP/r7_r5_prepared/results/r5mid_prospective_one_shot_plan_v0_3" \
             --source-snapshots "$RUNNER_TEMP/r7_raw_source/results/prospective_natural_raw/snapshots/prospective-ecommerce-natural-0001.jsonl" \
+            --semantic-repair-packet results/r5r6_engineering_gate/semantic_repair_packet.json \
+            --lineage-completeness-gate results/r5r6_engineering_gate/lineage_completeness_gate.json \
             --replicates "$R7_REPLICATES" \
             --plan-code-sha '${{ github.sha }}' \
             --outdir results/r7_formal_plan
@@ -211,6 +215,9 @@ jobs:
               'r5r6_r7_entry_audit_hash':audit['audit_hash'],
               'r5r6_r7_entry_criteria_passed':audit['criteria_passed'],
               'r5r6_r7_entry_criteria_total':audit['criteria_total'],
+              'r5r6_r7_framework_coverage_full':audit['framework_coverage_full'],
+              'r5r6_r7_framework_coverage_count':audit['framework_coverage_count'],
+              'r5r6_r7_framework_requirement_count':audit['framework_requirement_count'],
               'common_reference_parent_state_hash':plan['source_binding']['source_parent_state_hash'],
               'c3_recovery_checkpoint_state_hash':plan['source_binding']['source_recovery_checkpoint_hash'],
               'per_branch_spending_ceiling_usd':float(os.environ['R7_PER_BRANCH_CEILING']),
@@ -285,15 +292,23 @@ jobs:
           assert a['confirm_input']=='CALL_REAL_R7_THREE_ARM_API'
           assert a['workflow_sha']=='${{ github.sha }}'
           assert a['plan_hash']==p['plan_hash']
+          assert p['semantic_repair_packet_hash']==rp['packet_hash']
+          assert p['lineage_completeness_gate_hash']==lg['gate_hash']
+          assert p['repair_closure_refs']==rp['repair_closure_refs']
           assert a['r5r6_engineering_summary_hash']==e['summary_hash']
           assert a['semantic_repair_packet_hash']==rp['packet_hash']
           assert a['lineage_completeness_gate_hash']==lg['gate_hash']
           assert a['lineage_completeness_status']=='COMPLETE_FOR_AUTHORIZED_REPAIR'
           assert a['r7_entry_status']=='READY_FOR_R7_SEPARATE_AUTHORIZATION'
-          assert a['r5r6_r7_entry_audit_decision']=='PASS_R7_ENTRY_BOUNDED_ENGINEERING_EXPERIMENT'
+          assert a['r5r6_r7_entry_audit_decision']=='PASS_R7_ENTRY_FULL_REQUIREMENT_COVERAGE'
           assert a['r5r6_r7_entry_audit_hash']==audit['audit_hash']
           assert a['r5r6_r7_entry_criteria_passed']==audit['criteria_passed']==8
           assert a['r5r6_r7_entry_criteria_total']==audit['criteria_total']==8
+          assert a['r5r6_r7_framework_coverage_full'] is True
+          assert a['r5r6_r7_framework_coverage_count']==audit['framework_coverage_count']
+          assert a['r5r6_r7_framework_requirement_count']==audit['framework_requirement_count']
+          assert audit['framework_coverage_full'] is True
+          assert audit['framework_coverage_count']==audit['framework_requirement_count']
           assert audit['r7_entry_supported'] is True
           assert rp['repair_authorization_status']=='READY_FOR_SEPARATE_AUTHORIZATION'
           assert a['automatic_paid_evaluator'] is False

@@ -205,6 +205,102 @@ def build_audit(binding_path: str = DEFAULT_BINDING) -> dict:
         else "HOLD_R7_ENTRY_INSUFFICIENT_EVIDENCE"
     )
 
+    _require_tokens(
+        "arena/r7_semantic_repair_runtime.py",
+        [
+            '"AUTHORITY_DOWNGRADE": "ACTION_ENVELOPE_TRANSFORM_ON_REEXECUTED_AUTHORITY_COMMIT"',
+            '"POOL_INVALIDATION": "CHECKPOINT_EXCLUSION_OF_POST_ANCHOR_POOL_REALIZATIONS"',
+            '"DESCENDANT_INVALIDATION": "CHECKPOINT_EXCLUSION_OF_POST_ANCHOR_DESCENDANTS"',
+            '"DEPENDENT_DECISION_REOPEN": "REEXECUTE_FROM_AUTHORITY_ANCESTOR_CHECKPOINT"',
+            '"SELECTIVE_RECOMPUTE": "RECOMPUTE_REOPENED_POST_ANCHOR_CONTINUATION_WITHIN_BOUND_HORIZON"',
+            '"old_lineage_reentry_detected"',
+            '"preserved_unrelated_structure"',
+        ],
+    )
+    _require_tokens(
+        "arena/run_r7_three_arm_real.py",
+        [
+            "build_semantic_repair_runtime_plan",
+            "verify_semantic_repair_trace",
+            'trace["r7_semantic_repair_verification"]',
+        ],
+    )
+    _require_tokens(
+        "arena/prepare_r7_three_arm_plan.py",
+        [
+            '"semantic_repair_packet_hash"',
+            '"lineage_completeness_gate_hash"',
+            '"repair_closure_refs"',
+        ],
+    )
+    _require_tokens(
+        "arena/derive_r7_process_measurements.py",
+        [
+            '"old_lineage_reentry_refs"',
+            '"preserved_unrelated_structure"',
+            '"semantic_lineage_closure_before_hash"',
+            '"semantic_lineage_closure_after_hash"',
+        ],
+    )
+
+    coverage = [
+        {
+            "requirement": "TARGET_AND_AUTHORITY_LOCALIZATION",
+            "status": "FULL",
+            "r5r6_basis": "R5 one-shot authority withdrawal requires exact target/status localization.",
+            "r7_implementation": "Repair Anchor + Content Address + packet-bound AuthorityLocalizedEnvelopeTransform.",
+        },
+        {
+            "requirement": "SEMANTIC_LINEAGE_AND_COMPLETENESS",
+            "status": "FULL",
+            "r5r6_basis": "R6 carrier/descendant persistence requires relevant-lineage reconstruction before repair.",
+            "r7_implementation": "SemanticLineageClosure + LineageCompletenessGate; LINEAGE_GAP/UNRESOLVED block execution.",
+        },
+        {
+            "requirement": "POOL_INVALIDATION",
+            "status": "FULL",
+            "r5r6_basis": "Persistent shared carrier can survive the local experiment annotation.",
+            "r7_implementation": "RepairClosure-bound checkpoint exclusion invalidates post-anchor pool realizations before replay.",
+        },
+        {
+            "requirement": "DESCENDANT_INVALIDATION",
+            "status": "FULL",
+            "r5r6_basis": "R6 establishes downstream semantic-descendant persistence.",
+            "r7_implementation": "Post-anchor descendant branch is excluded at checkpoint and rebuilt as a new lineage.",
+        },
+        {
+            "requirement": "DEPENDENT_DECISION_REOPEN",
+            "status": "FULL",
+            "r5r6_basis": "Inertia is expressed through downstream actions/decisions rather than only the source field.",
+            "r7_implementation": "C3 reopens execution from the authority-ancestor checkpoint and reexecutes dependent continuation.",
+        },
+        {
+            "requirement": "SELECTIVE_RECOMPUTE",
+            "status": "FULL",
+            "r5r6_basis": "Affected downstream structure must be recomputed after invalidation.",
+            "r7_implementation": "Reopened post-anchor continuation is recomputed within the frozen common horizon and recorded as recomputed descendants.",
+        },
+        {
+            "requirement": "PRESERVE_UNRELATED_STRUCTURE",
+            "status": "FULL",
+            "r5r6_basis": "Localized repair must not silently become a whole-system reset.",
+            "r7_implementation": "Checkpoint-unrelated state hashes are frozen and verified after C3; drift is recorded as preservation failure rather than hidden.",
+        },
+        {
+            "requirement": "OLD_LINEAGE_REENTRY_DETECTION",
+            "status": "FULL",
+            "r5r6_basis": "System inertia may regenerate/re-enter after the initial repair surface changes.",
+            "r7_implementation": "Post-repair writes restoring the pre-repair authority on the target key are explicitly recorded as old-lineage re-entry.",
+        },
+        {
+            "requirement": "BEFORE_AFTER_REPAIR_VERIFICATION",
+            "status": "FULL",
+            "r5r6_basis": "R7 must distinguish repair execution from actual downstream process realization.",
+            "r7_implementation": "Runtime emits repair verification, closure-before/after hashes, recomputed refs, preservation and re-entry records; semantic success stays NOT_ADJUDICATED.",
+        },
+    ]
+    coverage_full = all(row["status"] == "FULL" for row in coverage)
+
     unresolved = [
         "Exact first Structural Support identity remains NOT_ESTABLISHED.",
         "Exact first Stable Shared Pool entry remains NOT_ESTABLISHED.",
@@ -215,8 +311,14 @@ def build_audit(binding_path: str = DEFAULT_BINDING) -> dict:
         "R7 repair efficacy, preservation and old-lineage re-entry remain untested.",
     ]
 
+    decision = (
+        "PASS_R7_ENTRY_FULL_REQUIREMENT_COVERAGE"
+        if passed and coverage_full
+        else "HOLD_R7_ENTRY_INCOMPLETE_REQUIREMENT_COVERAGE"
+    )
+
     out = {
-        "schema": "RB-R5R6-R7-ENTRY-ENGINEERING-AUDIT-v0.1",
+        "schema": "RB-R5R6-R7-ENTRY-ENGINEERING-AUDIT-v0.2",
         "date": "2026-09-18",
         "audit_question": binding["audit_question"],
         "decision": decision,
@@ -225,6 +327,10 @@ def build_audit(binding_path: str = DEFAULT_BINDING) -> dict:
         "criteria": criteria,
         "criteria_passed": sum(row["status"] == "PASS" for row in criteria),
         "criteria_total": len(criteria),
+        "framework_coverage": coverage,
+        "framework_coverage_full": coverage_full,
+        "framework_coverage_count": sum(row["status"] == "FULL" for row in coverage),
+        "framework_requirement_count": len(coverage),
         "r5r6_engineering_package": {
             "summary_hash": summary["summary_hash"],
             "semantic_lineage_closure_hash": summary["semantic_lineage_closure_hash"],
@@ -232,7 +338,7 @@ def build_audit(binding_path: str = DEFAULT_BINDING) -> dict:
             "semantic_repair_packet_hash": summary["semantic_repair_packet_hash"],
         },
         "unresolved_nonblocking_for_bounded_r7": unresolved,
-        "r7_entry_supported": passed,
+        "r7_entry_supported": passed and coverage_full,
         "active_r7_repair_authorized": False,
         "separate_manual_authorization_required": True,
         "new_subject_provider_calls": 0,
@@ -240,8 +346,8 @@ def build_audit(binding_path: str = DEFAULT_BINDING) -> dict:
         "raw_evidence_mutated": False,
         "semantic_cpr_status": "NOT_ADJUDICATED",
         "interpretation_boundary": (
-            "PASS means the frozen R5-R6 evidence is sufficient to justify and technically bind a bounded R7 localized-recovery experiment. "
-            "It does not mean localized recovery is effective, that J0 is a universal causal origin, that CPR is adjudicated, or that the result generalizes across models/domains."
+            "PASS means the frozen R5-R6 evidence is sufficient and every repair-relevant R5-R6 engineering requirement has an executable or verifiable counterpart in the current R7 framework. "
+            "R7 may exceed those requirements, but none may be missing. PASS still does not mean localized recovery is empirically effective, that J0 is a universal causal origin, or that CPR is adjudicated."
         ),
     }
     out["audit_hash"] = stable_hash(out)
@@ -261,6 +367,7 @@ def main() -> None:
 
     print("R5R6_R7_ENTRY_AUDIT=" + out["decision"])
     print("CRITERIA=" + str(out["criteria_passed"]) + "/" + str(out["criteria_total"]))
+    print("FRAMEWORK_COVERAGE=" + str(out["framework_coverage_count"]) + "/" + str(out["framework_requirement_count"]))
     print("R7_ENTRY_SUPPORTED=" + ("YES" if out["r7_entry_supported"] else "NO"))
     print("ACTIVE_R7_REPAIR_AUTHORIZED=NO")
     print("SEPARATE_MANUAL_AUTHORIZATION_REQUIRED=YES")

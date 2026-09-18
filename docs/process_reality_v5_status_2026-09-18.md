@@ -291,7 +291,7 @@ Added:
 
 The audit asks a narrower question than R7 itself:
 
-Do frozen R5–R6 experimental results provide sufficient bounded engineering evidence to justify entering an R7 localized-recovery experiment?
+Do frozen R5–R6 engineering requirements have complete executable coverage in the current R7 framework?
 
 Entry criteria:
 
@@ -306,9 +306,9 @@ Entry criteria:
 
 Expected gate decision when all frozen bindings remain intact:
 
-PASS_R7_ENTRY_BOUNDED_ENGINEERING_EXPERIMENT.
+PASS_R7_ENTRY_FULL_REQUIREMENT_COVERAGE.
 
-The decision means R5–R6 are sufficient to justify and technically bind the R7 experiment. It does not establish R7 repair efficacy.
+The decision means every repair-relevant requirement derived from R5–R6 has an executable or verifiable counterpart in R7. R7 may exceed those requirements but may not omit any of them. It does not establish empirical repair efficacy.
 
 The formal R7 readiness workflow and subject workflow now require both:
 
@@ -316,3 +316,26 @@ The formal R7 readiness workflow and subject workflow now require both:
 - R5–R6 Engineering Audit PASS.
 
 The audit hash and 8/8 criteria result are frozen into the R7 prepared/authorization chain. Active repair still requires separate manual authorization. CPR remains NOT_ADJUDICATED.
+
+
+## R7 semantic-repair runtime coverage update
+
+The v5.1 Semantic Repair Packet is now bound into the formal R7 plan and consumed by C3 runtime rather than being only a pre-run artifact.
+
+Executable/verifiable coverage now includes:
+
+- packet-bound authority downgrade;
+- checkpoint exclusion of post-anchor pool realizations;
+- checkpoint exclusion of post-anchor descendants;
+- dependent-decision reopen from the authority-ancestor checkpoint;
+- bounded post-anchor recomputation;
+- unrelated checkpoint-state preservation verification;
+- old-lineage authority re-entry detection;
+- before/after repair-closure hashes;
+- raw-evidence freeze of repair-verification records.
+
+The machine audit decision is now based on the set relation:
+
+R5-R6 repair requirements ⊆ R7 executable/verifiable capabilities.
+
+No formal R5-R6 audit report is required in the repository. Active subject execution remains separately authorized, and semantic recovery efficacy remains NOT_ADJUDICATED until R7 subject evidence exists.
