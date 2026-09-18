@@ -1,3 +1,36 @@
+# Process Reality v5 Whole-Process forward layer
+
+The current forward subject profile is **Process Reality v5 Whole-Process Batch001**.
+
+Forward v5 preparation files:
+
+- `../docs/v5_fresh_whole_process_design_v0.1.md`
+- `../configs/v5_whole_process_ecommerce_batch001_v0.1.json`
+- `build_v5_whole_process_manifest.py`
+- `v5_whole_process_index.py`
+- `v5_whole_process_preflight.py`
+- `tests/test_v5_whole_process.py`
+
+The existing Arena engine and Agent prompts are intentionally unchanged. v5 derives Structural Support / Stable Shared Pool / Structural Exposure candidates from the runtime evidence already recorded by the Arena.
+
+Important boundary:
+
+`POOL_VISIBILITY_OBSERVED != DIRECT_POOL_CONSUMPTION`
+
+Shared-state visibility is mechanically observable. Semantic adoption/direct consumption remains deferred append-only audit.
+
+Fresh Batch001 is prepared as three natural ecommerce repeats with no intervention, no recovery, no CPR adjudication and no automatic paid evaluator.
+
+Offline preflight:
+
+```bash
+python -m arena.v5_whole_process_preflight --outdir results/v5_whole_process_preflight
+```
+
+Real provider execution is not authorized by repository preparation. The future exact authorization phrase is `CALL_REAL_V5_WHOLE_PROCESS_API`.
+
+---
+
 # Free-Agent Arena
 
 A domain-general environment for natural multi-agent self-organization and Reality Bias observation.
