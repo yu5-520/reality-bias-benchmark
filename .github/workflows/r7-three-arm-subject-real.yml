@@ -162,6 +162,8 @@ jobs:
             --protocol configs/r7/r7_three_arm_fixture.example.json \
             --r5-plan-dir "$RUNNER_TEMP/r7_r5_prepared/results/r5mid_prospective_one_shot_plan_v0_3" \
             --source-snapshots "$RUNNER_TEMP/r7_raw_source/results/prospective_natural_raw/snapshots/prospective-ecommerce-natural-0001.jsonl" \
+            --semantic-repair-packet results/r5r6_engineering_gate/semantic_repair_packet.json \
+            --lineage-completeness-gate results/r5r6_engineering_gate/lineage_completeness_gate.json \
             --replicates "$R7_REPLICATES" \
             --plan-code-sha '${{ github.sha }}' \
             --outdir results/r7_formal_plan
@@ -285,6 +287,9 @@ jobs:
           assert a['confirm_input']=='CALL_REAL_R7_THREE_ARM_API'
           assert a['workflow_sha']=='${{ github.sha }}'
           assert a['plan_hash']==p['plan_hash']
+          assert p['semantic_repair_packet_hash']==rp['packet_hash']
+          assert p['lineage_completeness_gate_hash']==lg['gate_hash']
+          assert p['repair_closure_refs']==rp['repair_closure_refs']
           assert a['r5r6_engineering_summary_hash']==e['summary_hash']
           assert a['semantic_repair_packet_hash']==rp['packet_hash']
           assert a['lineage_completeness_gate_hash']==lg['gate_hash']
