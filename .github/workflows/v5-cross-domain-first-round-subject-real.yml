@@ -1,0 +1,146 @@
+name: V5 Cross-Domain First-Round Subject Real
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_execution_sha:
+        description: Exact repository SHA frozen for all six first-round waves
+        required: true
+        default: ""
+        type: string
+      wave_id:
+        description: Fixed preregistered wave number 1-6; each wave contains 5 runs per domain
+        required: true
+        default: "1"
+        type: choice
+        options: ["1","2","3","4","5","6"]
+      authorization_phrase:
+        description: Exact paid natural-subject authorization phrase
+        required: true
+        default: ""
+        type: string
+      per_run_max_calls:
+        description: Maximum provider calls per natural run
+        required: true
+        default: "0"
+        type: string
+      per_run_spending_ceiling:
+        description: Per-run spending ceiling in USD
+        required: true
+        default: "0"
+        type: string
+      global_spending_ceiling:
+        description: Global spending ceiling for this 20-run wave in USD
+        required: true
+        default: "0"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v5-cross-domain-first-round-wave-${{ inputs.wave_id }}
+  cancel-in-progress: false
+
+jobs:
+  subject:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bind exact frozen execution SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${{ inputs.expected_execution_sha }}"
+          test "${{ inputs.expected_execution_sha }}" = "$GITHUB_SHA"
+          echo "PASS: execution SHA matches frozen first-round SHA"
+
+      - name: Validate method and cross-domain preflight
+        run: |
+          python scripts/validate_process_reality_v5.py
+          python -m unittest arena.tests.test_v5_cross_domain arena.tests.test_v5_cross_domain_runtime_guard -v
+          python -m arena.v5_cross_domain_preflight --outdir results/v5_cross_domain_preflight --code-sha "$GITHUB_SHA"
+
+      - name: Build full preregistered 120-run manifest
+        run: |
+          mkdir -p results/v5_cross_domain
+          python -m arena.build_v5_cross_domain_manifest \
+            --plan configs/v5_cross_domain_first_round_v0.1.json \
+            --code-sha "$GITHUB_SHA" \
+            --out results/v5_cross_domain/subject_manifest.jsonl
+          test "$(wc -l < results/v5_cross_domain/subject_manifest.jsonl)" -eq 120
+
+      - name: Execute exactly one fixed 20-run natural wave
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          set +e
+          python -m arena.run_v5_cross_domain_real \
+            --manifest results/v5_cross_domain/subject_manifest.jsonl \
+            --wave-id "${{ inputs.wave_id }}" \
+            --expected-execution-sha "${{ inputs.expected_execution_sha }}" \
+            --outdir results/v5_cross_domain/raw \
+            --provider deepseek \
+            --per-run-max-calls "${{ inputs.per_run_max_calls }}" \
+            --per-run-spending-ceiling "${{ inputs.per_run_spending_ceiling }}" \
+            --global-spending-ceiling "${{ inputs.global_spending_ceiling }}" \
+            --currency USD \
+            --authorization-phrase "${{ inputs.authorization_phrase }}" \
+            --execute-real-api
+          rc=$?
+          set -e
+          echo "$rc" > results/v5_cross_domain/runner_exit_code.txt
+          echo "RUNNER_EXIT_CODE=$rc"
+
+      - name: Freeze raw evidence before any derivation
+        run: |
+          python -m arena.freeze_v5_cross_domain_evidence \
+            --raw-dir results/v5_cross_domain/raw \
+            --manifest results/v5_cross_domain/subject_manifest.jsonl \
+            --out results/v5_cross_domain/evidence_batch.json
+
+      - name: Derive structural/content-address indexes only
+        run: |
+          python -m arena.derive_v5_whole_process_structural \
+            --raw-dir results/v5_cross_domain/raw \
+            --evidence-batch results/v5_cross_domain/evidence_batch.json \
+            --outdir results/v5_cross_domain/derived
+
+      - name: Build fail-closed localized semantic-audit candidate ledger
+        run: |
+          python -m arena.build_v5_cross_domain_case_ledger \
+            --structural-index results/v5_cross_domain/derived/v5_structural_index.jsonl \
+            --first-round-id PR-FIRST-ROUND-CROSS-DOMAIN-001 \
+            --out results/v5_cross_domain/case_candidate_ledger.jsonl
+
+      - name: Assert no automatic R5/R7/CPR promotion
+        run: |
+          python - <<'PY'
+          import json
+          rows=[json.loads(x) for x in open('results/v5_cross_domain/case_candidate_ledger.jsonl',encoding='utf-8') if x.strip()]
+          assert all(r['r5_probe_authorized'] is False for r in rows)
+          assert all(r['r7_repair_authorized'] is False for r in rows)
+          assert all(r['qualification_status'] in {'NO_QUALIFYING_NATURAL_STRUCTURE','AWAITING_LOCALIZED_SEMANTIC_AUDIT'} for r in rows)
+          print('PASS: structural scouting does not auto-authorize probe or repair')
+          PY
+
+      - name: Fail closed after evidence preservation if subject runner failed
+        if: always()
+        run: |
+          test -f results/v5_cross_domain/runner_exit_code.txt
+          rc="$(cat results/v5_cross_domain/runner_exit_code.txt)"
+          test "$rc" -eq 0
+
+      - name: Upload frozen cross-domain wave bundle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-cross-domain-first-round-wave-${{ inputs.wave_id }}-${{ github.run_id }}
+          path: results/v5_cross_domain
+          retention-days: 90
+          if-no-files-found: error

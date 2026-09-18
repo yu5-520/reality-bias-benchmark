@@ -46,6 +46,34 @@ Current R7 engineering report:
 - `docs/reports/2026-09-18/R7_Process_Integrity_Engineering_Experiment_Report_v2.md`
 - `manifests/r7_process_integrity_engineering_report_2026-09-18_v1.json`
 
+## Cross-domain first-round experiment
+
+The next subject layer is a four-domain frozen-protocol first round:
+
+- `ecommerce` — method-development reference + fresh final-protocol replication;
+- `finance` — frozen-protocol replication;
+- `supply_chain` — frozen-protocol replication;
+- `software_engineering` — frozen-protocol replication.
+
+The replication rule is:
+
+`replicate the frozen method, not the history of method development`.
+
+Current first-round interfaces:
+
+- `docs/cross_domain_first_round_experiment_plan_v0.1.md`
+- `configs/v5_cross_domain_first_round_v0.1.json`
+- `schemas/v5_cross_domain_first_round_plan_v0.1.schema.json`
+- `arena/build_v5_cross_domain_manifest.py`
+- `arena/v5_cross_domain_preflight.py`
+- `arena/run_v5_cross_domain_real.py`
+- `arena/freeze_v5_cross_domain_evidence.py`
+- `arena/build_v5_cross_domain_case_ledger.py`
+
+The preregistered natural cohort is 30 trajectories per domain (120 total), partitioned into six fixed 20-run waves. R2/R3/R4 are simultaneous views of each frozen natural trajectory. R5/R6/R7 are conditional extensions only after evidence-bound case qualification. R8 CPR adjudication is not part of this first-round execution plan.
+
+Repository preparation authorizes no provider, probe, repair or paid evaluator call.
+
 
 ## v5 theory chain
 

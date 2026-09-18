@@ -1,0 +1,36 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"RB-V5-CROSS-DOMAIN-PAID-AUTHORIZATION-v0.1",
+  "title":"Cross-Domain First-Round Paid Authorization v0.1",
+  "type":"object",
+  "additionalProperties":false,
+  "required":[
+    "schema","first_round_id","authorization_phrase","provider","selected_wave_id",
+    "selected_run_count","selected_domain_counts","per_run_max_calls",
+    "per_run_spending_ceiling","global_spending_ceiling","currency","pricing_policy",
+    "manifest_sha256","plan_hash","code_commit_sha","automatic_paid_evaluator",
+    "driver_probe_authorized","active_recovery_authorized","no_outcome_aware_rerun","authorization_hash"
+  ],
+  "properties":{
+    "schema":{"const":"RB-V5-CROSS-DOMAIN-PAID-AUTHORIZATION-v0.1"},
+    "first_round_id":{"type":"string","minLength":1},
+    "authorization_phrase":{"const":"CALL_REAL_V5_CROSS_DOMAIN_FIRST_ROUND_API"},
+    "provider":{"type":"string","minLength":1},
+    "selected_wave_id":{"type":"integer","minimum":1},
+    "selected_run_count":{"type":"integer","minimum":1},
+    "selected_domain_counts":{"type":"object","additionalProperties":{"type":"integer","minimum":1}},
+    "per_run_max_calls":{"type":"integer","minimum":1},
+    "per_run_spending_ceiling":{"type":"number","exclusiveMinimum":0},
+    "global_spending_ceiling":{"type":"number","exclusiveMinimum":0},
+    "currency":{"type":"string","minLength":3,"maxLength":3},
+    "pricing_policy":{"type":"object"},
+    "manifest_sha256":{"type":"string","minLength":1},
+    "plan_hash":{"type":"string","minLength":1},
+    "code_commit_sha":{"type":"string","minLength":1},
+    "automatic_paid_evaluator":{"const":false},
+    "driver_probe_authorized":{"const":false},
+    "active_recovery_authorized":{"const":false},
+    "no_outcome_aware_rerun":{"const":true},
+    "authorization_hash":{"type":"string","minLength":1}
+  }
+}

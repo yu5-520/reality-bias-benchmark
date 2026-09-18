@@ -1,33 +1,59 @@
-# Process Reality v5 Whole-Process forward layer
+# Process Reality v5 Cross-Domain First-Round forward layer
 
-The current forward subject profile is **Process Reality v5 Whole-Process Batch001**.
+The current next subject profile is **PR-FIRST-ROUND-CROSS-DOMAIN-001**.
 
-Forward v5 preparation files:
+It uses the existing Free-Agent Arena without changing the Arena engine or Agent prompt protocol.
 
-- `../docs/v5_fresh_whole_process_design_v0.1.md`
-- `../configs/v5_whole_process_ecommerce_batch001_v0.1.json`
-- `build_v5_whole_process_manifest.py`
-- `v5_whole_process_index.py`
-- `v5_whole_process_preflight.py`
-- `tests/test_v5_whole_process.py`
+Domains:
 
-The existing Arena engine and Agent prompts are intentionally unchanged. v5 derives Structural Support / Stable Shared Pool / Structural Exposure candidates from the runtime evidence already recorded by the Arena.
+- `ecommerce` — method-development reference + fresh final-protocol replication;
+- `finance` — frozen-protocol replication;
+- `supply_chain` — frozen-protocol replication;
+- `software_engineering` — frozen-protocol replication.
 
-Important boundary:
+Sample geometry:
+
+- 30 preregistered natural trajectories per domain;
+- 120 total natural trajectories;
+- 6 fixed waves;
+- 5 trajectories per domain per wave;
+- 20 trajectories per wave.
+
+Core files:
+
+- `../docs/cross_domain_first_round_experiment_plan_v0.1.md`
+- `../configs/v5_cross_domain_first_round_v0.1.json`
+- `build_v5_cross_domain_manifest.py`
+- `v5_cross_domain_preflight.py`
+- `run_v5_cross_domain_real.py`
+- `freeze_v5_cross_domain_evidence.py`
+- `build_v5_cross_domain_case_ledger.py`
+
+Execution rule:
+
+`Natural -> Freeze -> Structural Derivation -> Localized Semantic Audit -> conditional R5 -> conditional R6 -> conditional R7 -> Watch`
+
+R2/R3/R4 are simultaneous analysis views, not separate subject runs.
+
+The replication domains do not replay the historical ecommerce method-development path. They use the final frozen protocol directly.
+
+Important boundaries:
 
 `POOL_VISIBILITY_OBSERVED != DIRECT_POOL_CONSUMPTION`
 
-Shared-state visibility is mechanically observable. Semantic adoption/direct consumption remains deferred append-only audit.
+`STRUCTURAL_CANDIDATE != R5_ELIGIBILITY != R7_REPAIRABILITY`
 
-Fresh Batch001 is prepared as three natural ecommerce repeats with no intervention, no recovery, no CPR adjudication and no automatic paid evaluator.
+`LINEAGE_GAP -> NO_ACTIVE_REPAIR`
 
 Offline preflight:
 
 ```bash
-python -m arena.v5_whole_process_preflight --outdir results/v5_whole_process_preflight
+python -m arena.v5_cross_domain_preflight --outdir results/v5_cross_domain_preflight
 ```
 
-Real provider execution is not authorized by repository preparation. The future exact authorization phrase is `CALL_REAL_V5_WHOLE_PROCESS_API`.
+Repository preparation authorizes no provider, R5 probe, R7 repair or paid evaluator call. Natural first-round execution requires the exact phrase `CALL_REAL_V5_CROSS_DOMAIN_FIRST_ROUND_API` plus the frozen execution SHA, fixed wave ID and positive call/spending ceilings.
+
+The preceding ecommerce-only Whole-Process Batch001 files remain historical/compatible interfaces; they are not deleted or reinterpreted as cross-domain evidence.
 
 ---
 
