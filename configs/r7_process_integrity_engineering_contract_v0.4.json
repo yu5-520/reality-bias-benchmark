@@ -1,0 +1,76 @@
+{
+  "schema": "RB-R7-PROCESS-INTEGRITY-ENGINEERING-CONTRACT-v0.4",
+  "version": "0.4",
+  "date": "2026-09-18",
+  "status": "ENGINEERING_PROTOCOL_NO_CPR_ADJUDICATION",
+  "predecessor": "RB-R7-PROCESS-INTEGRITY-ENGINEERING-CONTRACT-v0.3",
+  "design_targets": [
+    "LIGHTWEIGHT",
+    "PLUGGABLE",
+    "CONTENT_ADDRESSED",
+    "HASH_LINEAGE_AWARE",
+    "SEMANTIC_LINEAGE_PACKAGE",
+    "FULL_LINEAGE_OBSERVATION_ALL_ARMS",
+    "LINEAGE_SCOPED_RECOVERY",
+    "AUDITABLE_REVISION",
+    "POST_REPAIR_REINFORCED_MONITORING"
+  ],
+  "locality": {
+    "definition": "LINEAGE_BOUNDED_NOT_SIZE_BOUNDED",
+    "complete_relevant_history_required": true,
+    "unrelated_semantic_branches_excluded_by_default": true
+  },
+  "three_arm_contract": {
+    "observation_policy": "FULL_LINEAGE_ALL_ARMS",
+    "C1": "ONE_SHOT_RUNTIME_VIEW_EXPOSURE",
+    "C2": "PERSISTENT_RUNTIME_VIEW_EXPOSURE",
+    "C3": "STRUCTURAL_AUTHORITY_REPAIR_PLUS_BOUNDED_DESCENDANT_INVALIDATION_REOPEN_RECOMPUTE",
+    "semantic_cpr_adjudication": false
+  },
+  "repair_unit": {
+    "entry": "CONTENT_ADDRESSED_REPAIR_ANCHOR",
+    "object": "SEMANTIC_LINEAGE_PACKAGE",
+    "includes": [
+      "SOURCE_PROVENANCE",
+      "TRANSFORMATIONS",
+      "AUTHORITY_TRANSITIONS",
+      "POOL_REPRESENTATIONS",
+      "ADOPTION_RELATIONS",
+      "DEPENDENT_DECISIONS",
+      "DESCENDANT_CANDIDATES",
+      "AFFECTED_CLOSURE",
+      "REPAIR_CLOSURE"
+    ]
+  },
+  "post_repair_watch": {
+    "required": true,
+    "default_cost_mode": "HASH_LINEAGE_EVENT_MONITORING",
+    "monitor": [
+      "EXACT_OLD_AUTHORITY_REENTRY",
+      "TARGET_REWRITE",
+      "NEW_STATE_WRITE",
+      "AUTHORITY_ESCALATION_CANDIDATE",
+      "CLOSURE_EXPANSION_CANDIDATE"
+    ],
+    "semantic_recurrence_adjudication": "DEFER_TO_R8"
+  },
+  "r8_boundary": {
+    "consumes_frozen_evidence_only": true,
+    "subject_rerun_required": false,
+    "may_adjudicate": [
+      "C_EVENT",
+      "P_EVENT",
+      "R_EVENT",
+      "EVENT_OVERLAP",
+      "EVENT_TRANSITION",
+      "COLLECTIVE_COMPLETION",
+      "AUTHORITY_MIGRATION",
+      "SEMANTIC_RECURRENCE"
+    ]
+  },
+  "authorization": {
+    "paid_provider_run": false,
+    "paid_evaluator_run": false,
+    "active_recovery_on_scientific_subject": false
+  }
+}
