@@ -1,0 +1,27 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"RB-V5-CROSS-DOMAIN-CASE-QUALIFICATION-v0.1",
+  "title":"Cross-Domain Case Qualification v0.1",
+  "type":"object",
+  "additionalProperties":false,
+  "required":[
+    "schema","first_round_id","domain_id","source_run_id","candidate_ref","content_address",
+    "structural_candidate_status","semantic_audit_status","qualification_status",
+    "r5_probe_authorized","r7_repair_authorized","evidence_refs","claim_boundary"
+  ],
+  "properties":{
+    "schema":{"const":"RB-V5-CROSS-DOMAIN-CASE-QUALIFICATION-v0.1"},
+    "first_round_id":{"type":"string"},
+    "domain_id":{"type":"string"},
+    "source_run_id":{"type":"string"},
+    "candidate_ref":{"type":["string","null"]},
+    "content_address":{"type":["string","null"]},
+    "structural_candidate_status":{"enum":["NO_ADDRESSABLE_CANDIDATE","STRUCTURAL_CANDIDATE_OBSERVED"]},
+    "semantic_audit_status":{"enum":["NOT_REQUIRED_NO_CANDIDATE","PENDING_LOCALIZED_SEMANTIC_AUDIT","AUDITED_APPEND_ONLY"]},
+    "qualification_status":{"enum":["NO_QUALIFYING_NATURAL_STRUCTURE","AWAITING_LOCALIZED_SEMANTIC_AUDIT","ELIGIBLE_R5_ATOMIC_PROBE","NOT_ELIGIBLE_R5","COMPLETE_FOR_AUTHORIZED_REPAIR","LINEAGE_GAP_BLOCKS_REPAIR","R7_COMPLETED"]},
+    "r5_probe_authorized":{"const":false},
+    "r7_repair_authorized":{"const":false},
+    "evidence_refs":{"type":"array","items":{"type":"string"}},
+    "claim_boundary":{"type":"string"}
+  }
+}
