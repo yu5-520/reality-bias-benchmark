@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-V5-WHOLE-PROCESS-BATCH-DESIGN-v0.2",
+  "title": "Process Reality v5 Whole-Process Batch Design v0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "status",
+    "batch_id",
+    "experiment_family",
+    "domain_id",
+    "planned_repeats",
+    "subject_condition",
+    "arena_config_path",
+    "model_config_path",
+    "theory_contract_path",
+    "measurement_contract_path",
+    "scout_config_path",
+    "experiment_profile_path",
+    "theory_report_standard_path",
+    "engineering_report_standard_path",
+    "core_recording_requirements",
+    "engineering_core_outputs",
+    "optional_mechanism_observables",
+    "semantic_boundaries",
+    "base_optional_phases",
+    "no_outcome_aware_rerun",
+    "automatic_paid_evaluator",
+    "paid_subject_execution_authorized"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-V5-WHOLE-PROCESS-BATCH-DESIGN-v0.2"
+    },
+    "version": {
+      "const": "0.2"
+    },
+    "date": {
+      "type": "string"
+    },
+    "status": {
+      "const": "FROZEN_DESIGN_CANDIDATE_NOT_PROVIDER_AUTHORIZED"
+    },
+    "predecessor": {
+      "type": "string"
+    },
+    "batch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "experiment_family": {
+      "const": "PROCESS_REALITY_V5_WHOLE_PROCESS"
+    },
+    "domain_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "planned_repeats": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "subject_condition": {
+      "const": "NATURAL_UNMANIPULATED"
+    },
+    "arena_config_path": {
+      "type": "string"
+    },
+    "model_config_path": {
+      "type": "string"
+    },
+    "theory_contract_path": {
+      "type": "string"
+    },
+    "measurement_contract_path": {
+      "type": "string"
+    },
+    "scout_config_path": {
+      "type": "string"
+    },
+    "experiment_profile_path": {
+      "type": "string"
+    },
+    "theory_report_standard_path": {
+      "type": "string"
+    },
+    "engineering_report_standard_path": {
+      "type": "string"
+    },
+    "core_recording_requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "engineering_core_outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "optional_mechanism_observables": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "semantic_boundaries": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "base_optional_phases": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "no_outcome_aware_rerun": {
+      "const": true
+    },
+    "automatic_paid_evaluator": {
+      "const": false
+    },
+    "paid_subject_execution_authorized": {
+      "const": false
+    }
+  }
+}
