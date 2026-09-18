@@ -58,6 +58,10 @@ def main() -> None:
         "configs/v5_whole_process_ecommerce_batch001_v0.2.json",
         "configs/v5_whole_process_subject_gate_v0.2.json",
         "docs/v5_fresh_whole_process_design_v0.2.md",
+        "configs/r5r6_engineering_package_source_binding_v0.1.json",
+        "arena/r5r6_engineering_package.py",
+        "arena/tests/test_r5r6_engineering_package.py",
+        "docs/reports/2026-09-18/R5-R6_Engineering_Experiment_Report_v1.md",
     ]
     for path in required_files:
         require((ROOT / path).exists(), f"missing required v5/v5.1 file: {path}")
@@ -149,6 +153,12 @@ def main() -> None:
         "complete relevant semantic history + minimal unrelated context",
         "LINEAGE_GAP",
         "Missing semantic history must not be reconstructed as historical fact",
+    ])
+    require_tokens("docs/reports/2026-09-18/R5-R6_Engineering_Experiment_Report_v1.md", [
+        "COMPLETE_FOR_AUTHORIZED_REPAIR",
+        "READY_FOR_SEPARATE_AUTHORIZATION",
+        "Repair Anchor != Semantic Origin",
+        "R7 READY FOR SEPARATE AUTHORIZATION",
     ])
     require_tokens("README.md", [
         "Process Reality v5.1",
