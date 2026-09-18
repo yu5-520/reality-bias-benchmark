@@ -96,6 +96,28 @@ Completed first-round triage:
 - result report: `docs/reports/2026-09-19/V5_Cross_Domain_Semantic_Triage_Report_v1.md`;
 - result manifest: `manifests/v5_cross_domain_semantic_triage_2026-09-19_v0_1.json`.
 
+Localized semantic audit pass 1 is now frozen for the 29 authority-review cases that satisfy `source status = fact + explicit uncertainty marker`:
+
+- finance: 5;
+- software_engineering: 8;
+- supply_chain: 16;
+- reviewer: GPT-5.6 Sol;
+- adoption / decision-action dependence: `SUPPORTED_CANDIDATE`;
+- uncertainty preservation: `SUPPORTED_CANDIDATE`;
+- authority escalation: `NOT_ESTABLISHED`;
+- scientific R5 eligibility: 29;
+- existing `fact -> unconfirmed` operator compatible: 29;
+- R5 execution authorized: **NO**.
+
+The other 56 authority-review cases use provisional or unspecified source status and remain deferred until a separate source-status-withdrawal operator is frozen.
+
+Pass-1 interfaces:
+
+- `docs/cross_domain_localized_semantic_audit_protocol_v0.1.md`;
+- `manifests/v5_cross_domain_localized_semantic_audit_review_2026-09-19_v0_1.json`;
+- `schemas/v5_cross_domain_localized_semantic_audit_record_v0.1.schema.json`;
+- `arena/build_v5_cross_domain_localized_semantic_audit.py`.
+
 Prospective sample geometry:
 
 - 30 natural trajectories per held-out domain;
