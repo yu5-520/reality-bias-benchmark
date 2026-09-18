@@ -84,8 +84,10 @@ jobs:
           python - <<'PY'
           import json
           a=json.load(open('results/r5r6_r7_entry_audit.json'))
-          assert a['decision']=='PASS_R7_ENTRY_BOUNDED_ENGINEERING_EXPERIMENT'
+          assert a['decision']=='PASS_R7_ENTRY_FULL_REQUIREMENT_COVERAGE'
           assert a['criteria_passed']==a['criteria_total']==8
+          assert a['framework_coverage_full'] is True
+          assert a['framework_coverage_count']==a['framework_requirement_count']
           assert a['r7_entry_supported'] is True
           assert a['active_r7_repair_authorized'] is False
           assert a['separate_manual_authorization_required'] is True
@@ -295,10 +297,12 @@ jobs:
           assert a['lineage_completeness_gate_hash']==lg['gate_hash']
           assert a['lineage_completeness_status']=='COMPLETE_FOR_AUTHORIZED_REPAIR'
           assert a['r7_entry_status']=='READY_FOR_R7_SEPARATE_AUTHORIZATION'
-          assert a['r5r6_r7_entry_audit_decision']=='PASS_R7_ENTRY_BOUNDED_ENGINEERING_EXPERIMENT'
+          assert a['r5r6_r7_entry_audit_decision']=='PASS_R7_ENTRY_FULL_REQUIREMENT_COVERAGE'
           assert a['r5r6_r7_entry_audit_hash']==audit['audit_hash']
           assert a['r5r6_r7_entry_criteria_passed']==audit['criteria_passed']==8
           assert a['r5r6_r7_entry_criteria_total']==audit['criteria_total']==8
+          assert audit['framework_coverage_full'] is True
+          assert audit['framework_coverage_count']==audit['framework_requirement_count']
           assert audit['r7_entry_supported'] is True
           assert rp['repair_authorization_status']=='READY_FOR_SEPARATE_AUTHORIZATION'
           assert a['automatic_paid_evaluator'] is False
