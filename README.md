@@ -118,6 +118,18 @@ Pass-1 interfaces:
 - `schemas/v5_cross_domain_localized_semantic_audit_record_v0.1.schema.json`;
 - `arena/build_v5_cross_domain_localized_semantic_audit.py`.
 
+Completed pass-1 execution:
+
+- workflow: `35378782053`;
+- artifact: `10561246944`;
+- artifact digest: `sha256:457b4fc91d09dcec0a3dbe609068761d238df24679fb40dd7db26c06e3630e60`;
+- summary hash: `b97ae65a2ff3ab808abf7e39aa45ffda320dd6786db6b3369bf82d575057d9a3`;
+- 29 unique source-case hashes -> 29 unique audit hashes;
+- result report: `docs/reports/2026-09-19/V5_Cross_Domain_Localized_Semantic_Audit_Pass1_Report_v1.md`;
+- result manifest: `manifests/v5_cross_domain_localized_semantic_audit_pass1_2026-09-19_v0_1.json`;
+- R5 scientific eligibility: **29**;
+- R5 execution authorization: **NO**.
+
 Prospective sample geometry:
 
 - 30 natural trajectories per held-out domain;
