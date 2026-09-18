@@ -1,0 +1,67 @@
+{
+  "schema": "RB-V5-CROSS-DOMAIN-LOCALIZED-SEMANTIC-AUDIT-RESULT-MANIFEST-v0.1",
+  "date": "2026-09-19",
+  "status": "FROZEN_PASS1_RESULT_R5_ELIGIBLE_NOT_AUTHORIZED",
+  "source_subject": {
+    "workflow_run_id": 35370679448,
+    "execution_sha": "b712dabc227973470900af4aea4e13d1077f5696",
+    "preserved_trace_count": 90,
+    "runner_error_count": 0
+  },
+  "source_triage": {
+    "workflow_run_id": 35377246079,
+    "artifact_id": 10560253559,
+    "artifact_digest": "sha256:b0e8b264cd6ee5b8970f3dbe186a49b3e23a5ae33eb67c01076afc7d8baf0550",
+    "summary_hash": "0cb90df320499618d3684b21071783f31995d2427efc3e94cdd49d776b0fabfa",
+    "selected_unique_case_count": 167
+  },
+  "semantic_audit_pass1": {
+    "workflow_run_id": 35378782053,
+    "execution_sha": "6789246a689de7c2871441bf8bdef16af62e16c7",
+    "artifact_id": 10561246944,
+    "artifact_name": "v5-cross-domain-localized-semantic-audit-pass1-35377246079-35378782053",
+    "artifact_digest": "sha256:457b4fc91d09dcec0a3dbe609068761d238df24679fb40dd7db26c06e3630e60",
+    "summary_hash": "b97ae65a2ff3ab808abf7e39aa45ffda320dd6786db6b3369bf82d575057d9a3",
+    "reviewed_case_count": 29,
+    "unique_source_case_hash_count": 29,
+    "unique_audit_hash_count": 29,
+    "minimum_evidence_pointer_count": 3,
+    "maximum_evidence_pointer_count": 13
+  },
+  "auditor": {
+    "auditor_kind": "MODEL",
+    "auditor_id": "GPT-5.6-Sol",
+    "blind_to_prior_semantic_labels": false,
+    "review_role": "PASS1_BOUNDED_SEMANTIC_REVIEW"
+  },
+  "selection_rule": {
+    "triage_role": "AUTHORITY_REVIEW_ANCHOR",
+    "source_status": "fact",
+    "explicit_uncertainty_marker_required": true,
+    "selected_case_count": 29,
+    "domain_counts": {
+      "finance": 5,
+      "software_engineering": 8,
+      "supply_chain": 16
+    }
+  },
+  "semantic_results": {
+    "semantic_adoption_supported_candidate_count": 29,
+    "decision_action_dependence_supported_candidate_count": 29,
+    "uncertainty_preserved_supported_candidate_count": 29,
+    "authority_escalation_established_count": 0,
+    "r5_scientifically_eligible_count": 29,
+    "r5_existing_fact_to_unconfirmed_compatible_count": 29,
+    "deferred_authority_case_count": 56
+  },
+  "authorization_boundary": {
+    "provider_calls": 0,
+    "paid_evaluator_calls": 0,
+    "r5_probe_calls": 0,
+    "r7_repair_calls": 0,
+    "r8_cpr_adjudication": false,
+    "semantic_cpr_status": "NOT_ADJUDICATED",
+    "r5_execution_authorized": false
+  },
+  "claim_boundary": "Pass 1 establishes evidence-bound semantic candidates for a frozen 29-case subset. It does not establish causal dependence, System Inertia, CPR, authority error, R7 repairability, or population prevalence. The reviewer was not blinded to prior semantic labels."
+}
