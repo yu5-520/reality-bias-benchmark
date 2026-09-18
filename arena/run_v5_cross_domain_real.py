@@ -164,6 +164,7 @@ def main() -> None:
 
     upstream = provider_from_config(model_config)
     traces_path = out / "traces.jsonl"
+    traces_path.touch()
     errors = []
     spend_by_domain: dict[str, float] = defaultdict(float)
 
