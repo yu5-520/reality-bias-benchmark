@@ -20,7 +20,7 @@ from .one_shot_intervention import (
     verify_branch_manifest_v3,
     verify_one_shot_envelope,
 )
-from .providers import provider_from_config
+from .providers import ScriptedProvider, provider_from_config
 
 ROOT = Path(__file__).resolve().parents[1]
 AUTH_PHRASE = "CALL_REAL_V5_CROSS_DOMAIN_R5_FIRST_WAVE_API"
@@ -100,6 +100,56 @@ def _validate_limits(branch_count, per_branch_max_calls, per_branch_ceiling, glo
         raise ValueError("r5_global_ceiling_must_cover_symmetric_branch_ceilings")
 
 
+def _offline_lifecycle_preflight(*, plan_dir, cases, rows, manifests, verified):
+    case_map = {c["case_id"]: c for c in cases}
+    manifest_map = {m["branch_hash"]: m for m in manifests}
+    checked = 0
+    for row in rows:
+        case = case_map[row["case_id"]]
+        domain, arena_cfg, _, parent, envelope = verified[row["case_id"]]
+        manifest = manifest_map[row["branch_hash"]]
+        bound = None if row["condition_id"] == CONTROL_CONDITION else envelope
+        scripted = ScriptedProvider([
+            {"decision_summary": "offline R5 lifecycle preflight", "actions": []}
+            for _ in range(max(128, int(arena_cfg.get("max_turns", 64)) + 8))
+        ])
+        transform = OneShotRuntimeViewTransform(bound) if bound is not None else None
+        parent_hash_before = stable_hash(parent)
+        trace = run_arena_once(
+            domain,
+            arena_cfg,
+            scripted,
+            "offline-preflight:" + row["run_id"],
+            row["logical_seed"],
+            initial_state_snapshot=parent,
+            branch_manifest=manifest,
+            runtime_view_transform=transform,
+        )
+        if stable_hash(parent) != parent_hash_before:
+            raise ValueError("r5_offline_preflight_mutated_parent")
+        records = list(trace.get("runtime_transform_records") or [])
+        if row["condition_id"] == CONTROL_CONDITION:
+            if records:
+                raise ValueError("r5_offline_control_has_transform_record")
+        else:
+            transform.verify_finished()
+            if len(records) != 1:
+                raise ValueError("r5_offline_intervention_requires_one_transform")
+            record = records[0]
+            if record.get("actor") != parent["queue"][0]:
+                raise ValueError("r5_offline_intervention_actor_mismatch")
+            if record.get("turn") != int(parent["turns"]) + 1:
+                raise ValueError("r5_offline_intervention_turn_mismatch")
+            if record.get("from_status") != "fact" or record.get("to_status") != "unconfirmed":
+                raise ValueError("r5_offline_intervention_status_delta_invalid")
+            if record.get("persistent_state_mutation") is not False:
+                raise ValueError("r5_offline_intervention_persisted")
+        checked += 1
+    if checked != 24:
+        raise ValueError("r5_offline_lifecycle_preflight_branch_count_mismatch")
+    return checked
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--plan-dir", required=True)
@@ -137,9 +187,18 @@ def main():
         verify_branch_manifest_v3(manifest, parent_snapshot=parent, envelope=bound)
 
     if args.preflight_only:
+        checked = _offline_lifecycle_preflight(
+            plan_dir=p,
+            cases=cases,
+            rows=rows,
+            manifests=manifests,
+            verified=verified,
+        )
         print("V5_CROSS_DOMAIN_R5_FIRST_WAVE_PREFLIGHT=PASS")
         print("CASE_COUNT=6")
         print("BRANCH_COUNT=24")
+        print("OFFLINE_BRANCH_LIFECYCLE_CHECKED=" + str(checked))
+        print("SCRIPTED_PROVIDER_ONLY=YES")
         print("PAID_API_CALLED=NO")
         return
 
