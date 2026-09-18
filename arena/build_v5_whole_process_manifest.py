@@ -16,7 +16,7 @@ SCHEMA = "RB-V5-WHOLE-PROCESS-SUBJECT-MANIFEST-v0.1"
 def build_rows(*, design_path: str, code_sha: str | None = None) -> list[dict]:
     design_file = ROOT / design_path
     design = load_json(design_file)
-    if design.get("schema") != "RB-V5-WHOLE-PROCESS-BATCH-DESIGN-v0.1":
+    if design.get("schema") not in {"RB-V5-WHOLE-PROCESS-BATCH-DESIGN-v0.1", "RB-V5-WHOLE-PROCESS-BATCH-DESIGN-v0.2"}:
         raise ValueError("v5_batch_design_schema_invalid")
     if design.get("paid_subject_execution_authorized") is not False:
         raise ValueError("v5_prepare_design_must_not_authorize_paid_execution")
@@ -112,7 +112,7 @@ def verify_manifest(rows: list[dict]) -> bool:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--design", default="configs/v5_whole_process_ecommerce_batch001_v0.1.json")
+    ap.add_argument("--design", default="configs/v5_whole_process_ecommerce_batch001_v0.2.json")
     ap.add_argument("--code-sha")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()

@@ -89,16 +89,18 @@ def main() -> None:
     args = ap.parse_args()
 
     rows = build_rows(
-        design_path="configs/v5_whole_process_ecommerce_batch001_v0.1.json",
+        design_path="configs/v5_whole_process_ecommerce_batch001_v0.2.json",
         code_sha=args.code_sha,
     )
     assert verify_manifest(rows)
     assert len(rows) == 3
 
     index = derive_v5_structural_index(_fixture_trace())
-    assert index["first_support_candidate_ref"] == "arena_event:0:state:inventory_assessment"
-    assert index["first_pool_candidate_ref"] == "arena_event:0:state:inventory_assessment"
-    assert index["first_exposure_candidate_ref"] == "arena_event:0:state:inventory_assessment"
+    assert index["engineering_core"]["first_repair_anchor_candidate_ref"] == "arena_event:0:state:inventory_assessment"
+    assert index["engineering_core"]["content_address_count"] >= 1
+    assert index["engineering_core"]["pool_visibility_ledger_count"] >= 1
+    assert index["engineering_core"]["first_node_localization_required_for_repair"] is False
+    assert index["mechanism_observables"]["engineering_requirement"] is False
     assert index["direct_pool_consumption_semantic_status"] == "NOT_ADJUDICATED"
 
     out = Path(args.outdir)
@@ -121,9 +123,13 @@ def main() -> None:
         "agent_runtime_modified": False,
         "pool_visibility_mechanical": True,
         "direct_pool_consumption_semantic": "DEFERRED_APPEND_ONLY",
-        "first_support_candidate_fixture": index["first_support_candidate_ref"],
-        "first_pool_candidate_fixture": index["first_pool_candidate_ref"],
-        "first_exposure_candidate_fixture": index["first_exposure_candidate_ref"],
+        "repair_anchor_candidate_fixture": index["engineering_core"]["first_repair_anchor_candidate_ref"],
+        "content_address_count": index["engineering_core"]["content_address_count"],
+        "pool_visibility_ledger_count": index["engineering_core"]["pool_visibility_ledger_count"],
+        "first_node_localization_required_for_repair": False,
+        "optional_first_support_candidate_fixture": index["first_support_candidate_ref"],
+        "optional_first_pool_candidate_fixture": index["first_pool_candidate_ref"],
+        "optional_first_exposure_candidate_fixture": index["first_exposure_candidate_ref"],
     }
     (out / "summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
@@ -132,6 +138,8 @@ def main() -> None:
     print("V5_WHOLE_PROCESS_PREFLIGHT=PASS")
     print("PLANNED_SUBJECT_RUNS=3")
     print("PROVIDER_CALLS=0")
+    print("REPAIR_ANCHOR_DERIVATION=PASS")
+    print("FIRST_NODE_LOCALIZATION_REQUIRED_FOR_REPAIR=NO")
     print("DIRECT_POOL_CONSUMPTION_SEMANTIC=DEFERRED_APPEND_ONLY")
 
 

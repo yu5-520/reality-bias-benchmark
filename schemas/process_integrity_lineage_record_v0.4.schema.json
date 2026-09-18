@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-PROCESS-INTEGRITY-LINEAGE-RECORD-v0.4",
+  "title": "Process Integrity Lineage Record v0.4",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "record_id",
+    "record_type",
+    "repair_anchor_ref",
+    "target_semantic_id",
+    "content_address",
+    "trace_root_ref",
+    "semantic_lineage_closure_ref",
+    "lineage_completeness_status",
+    "relation_evidence_refs",
+    "potentially_affected_closure",
+    "evidence_supported_affected_closure",
+    "candidate_intervention_surface_refs",
+    "repair_closure",
+    "preserved_unrelated_refs",
+    "scientific_status"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-PROCESS-INTEGRITY-LINEAGE-RECORD-v0.4"
+    },
+    "record_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "record_type": {
+      "enum": [
+        "PASSIVE_LINEAGE",
+        "R5_SCOUTED_REGION",
+        "R6_REPAIR_ANCHOR_TRACE",
+        "R7_SEMANTIC_REPAIR_PACKET",
+        "R7_RECOVERY_REVISION"
+      ]
+    },
+    "legacy_root_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "repair_anchor_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_semantic_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content_address": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_root_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "semantic_lineage_closure_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lineage_completeness_status": {
+      "enum": [
+        "COMPLETE_FOR_AUTHORIZED_REPAIR",
+        "COMPLETE_FOR_AUDIT_ONLY",
+        "LINEAGE_GAP",
+        "UNRESOLVED"
+      ]
+    },
+    "detection_surface_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "selected_intervention_surface_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "relation_evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "structural_support_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "pool_state_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "exposure_anchor_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "potentially_affected_closure": {
+      "$ref": "#/$defs/closure"
+    },
+    "evidence_supported_affected_closure": {
+      "$ref": "#/$defs/closure"
+    },
+    "mechanically_required_replay_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "candidate_intervention_surface_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "repair_closure": {
+      "$ref": "#/$defs/closure"
+    },
+    "preserved_unrelated_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "lineage_gap_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "prior_revision_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "repaired_revision_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "old_lineage_reentry_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "scientific_status": {
+      "enum": [
+        "RAW_OR_STRUCTURAL_EVIDENCE",
+        "ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE",
+        "NOT_ADJUDICATED",
+        "ADJUDICATED_APPEND_ONLY"
+      ]
+    }
+  },
+  "$defs": {
+    "closure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "refs",
+        "closure_hash"
+      ],
+      "properties": {
+        "refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "closure_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "schema": "RB-R7-PROCESS-INTEGRITY-ENGINEERING-CONTRACT-v0.3",
+  "version": "0.3",
+  "date": "2026-09-18",
+  "status": "ENGINEERING_IMPLICATION_OFFLINE_ONLY",
+  "predecessor": "RB-R7-PROCESS-INTEGRITY-ENGINEERING-CONTRACT-v0.2",
+  "design_targets": [
+    "LIGHTWEIGHT",
+    "PLUGGABLE",
+    "CONTENT_ADDRESSED",
+    "LINEAGE_AWARE",
+    "SEMANTIC_SCOPE_LOCALIZED",
+    "COMPLETE_RELEVANT_HISTORY",
+    "UNRELATED_CONTEXT_MINIMIZED",
+    "REPAIR_ANCHOR_DRIVEN",
+    "LOCALIZED_RECOVERY",
+    "AUDITABLE_REVISION"
+  ],
+  "locality": {
+    "definition": "LOCAL_BY_SEMANTIC_SCOPE",
+    "local_by_trace_depth": false,
+    "complete_relevant_history_required": true,
+    "unrelated_semantic_branches_excluded_by_default": true
+  },
+  "repair_anchor": {
+    "selection_goal": "EARLIEST_SUFFICIENTLY_EXPOSED_ADDRESSABLE_REPAIR_EFFICIENT_ANCHOR",
+    "causal_primacy_required": false,
+    "may_equal_legacy_jump_or_j0_candidate": true,
+    "required_properties": [
+      "ADDRESSABLE",
+      "PROVENANCE_BOUND",
+      "DESCENDANT_VISIBLE",
+      "SCOUTABLE"
+    ]
+  },
+  "content_addressing": {
+    "resolves": [
+      "TARGET_SEMANTIC_ID",
+      "SOURCE_PROPOSITION",
+      "SOURCE_EPISTEMIC_STATUS",
+      "SEMANTIC_TRANSFORMATIONS",
+      "ADOPTION_RELATIONS",
+      "AUTHORITY_TRANSITIONS",
+      "POOL_STATES",
+      "RELEVANT_REVISIONS",
+      "REJECTED_OR_ABANDONED_RELEVANT_BRANCHES",
+      "AFFECTED_DESCENDANTS",
+      "RAW_EVIDENCE_POINTERS"
+    ],
+    "hash_identity_is_semantic_use": false,
+    "relation_evidence_required_for_semantic_use": true
+  },
+  "closures": {
+    "semantic_lineage": "SEMANTIC_LINEAGE_CLOSURE",
+    "potential": "POTENTIALLY_AFFECTED_CLOSURE",
+    "evidenced": "EVIDENCE_SUPPORTED_AFFECTED_CLOSURE",
+    "repair": "REPAIR_CLOSURE",
+    "semantic_lineage_may_span_entire_run": true
+  },
+  "completeness_gate": {
+    "outcomes": [
+      "COMPLETE_FOR_AUTHORIZED_REPAIR",
+      "COMPLETE_FOR_AUDIT_ONLY",
+      "LINEAGE_GAP",
+      "UNRESOLVED"
+    ],
+    "blocks_automatic_repair_on": [
+      "LINEAGE_GAP",
+      "UNRESOLVED"
+    ],
+    "repair_agent_may_invent_missing_lineage_as_fact": false
+  },
+  "optimization_objective": {
+    "minimize": "UNRELATED_CONTEXT",
+    "subject_to": "RELEVANT_SEMANTIC_LINEAGE_COMPLETENESS_AT_OR_ABOVE_THRESHOLD"
+  },
+  "authorization": {
+    "paid_provider_run": false,
+    "paid_evaluator_run": false,
+    "active_recovery_on_scientific_subject": false
+  }
+}

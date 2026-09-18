@@ -36,12 +36,17 @@ def main() -> None:
     write_jsonl(out / "v5_structural_index.jsonl", indexes)
 
     summary = {
-        "schema": "RB-V5-WHOLE-PROCESS-STRUCTURAL-DERIVATION-SUMMARY-v0.1",
+        "schema": "RB-V5-WHOLE-PROCESS-STRUCTURAL-DERIVATION-SUMMARY-v0.2",
         "evidence_batch_hash": evidence["evidence_batch_hash"],
         "trace_count": len(traces),
-        "support_candidate_run_count": sum(bool(x.get("first_support_candidate_ref")) for x in indexes),
-        "pool_candidate_run_count": sum(bool(x.get("first_pool_candidate_ref")) for x in indexes),
-        "exposure_candidate_run_count": sum(bool(x.get("first_exposure_candidate_ref")) for x in indexes),
+        "repair_anchor_candidate_run_count": sum(bool((x.get("engineering_core") or {}).get("first_repair_anchor_candidate_ref")) for x in indexes),
+        "content_addressable_run_count": sum(bool((x.get("engineering_core") or {}).get("content_address_count")) for x in indexes),
+        "semantic_lineage_recoverability_status": "STRUCTURAL_PROVENANCE_READY_SEMANTIC_AUDIT_REQUIRED",
+        "optional_mechanism_observables": {
+            "support_candidate_run_count": sum(bool(x.get("first_support_candidate_ref")) for x in indexes),
+            "pool_candidate_run_count": sum(bool(x.get("first_pool_candidate_ref")) for x in indexes),
+            "exposure_candidate_run_count": sum(bool(x.get("first_exposure_candidate_ref")) for x in indexes),
+        },
         "direct_pool_consumption_semantic_status": "NOT_ADJUDICATED",
         "new_provider_calls": 0,
         "new_evaluator_calls": 0,

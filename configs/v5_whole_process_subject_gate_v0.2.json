@@ -1,0 +1,30 @@
+{
+  "schema": "RB-V5-WHOLE-PROCESS-SUBJECT-GATE-v0.2",
+  "version": "0.2",
+  "date": "2026-09-18",
+  "status": "PREPARED_NOT_AUTHORIZED",
+  "predecessor": "configs/v5_whole_process_subject_gate_v0.1.json",
+  "batch_design_path": "configs/v5_whole_process_ecommerce_batch001_v0.2.json",
+  "required_authorization_phrase": "CALL_REAL_V5_WHOLE_PROCESS_API",
+  "provider_execution_authorized": false,
+  "evaluator_execution_authorized": false,
+  "active_recovery_authorized": false,
+  "prerequisites": [
+    "V5_1_METHOD_VALIDATION_PASS",
+    "V5_HISTORICAL_REDERIVATION_PASS",
+    "V5_SEMANTIC_MECHANISM_REAUDIT_PASS",
+    "V5_WHOLE_PROCESS_PREFLIGHT_PASS",
+    "EXACT_BATCH_MANIFEST_FROZEN",
+    "EXACT_CODE_AND_CONFIG_HASHES_BOUND",
+    "POSITIVE_CALL_LIMIT",
+    "POSITIVE_SPENDING_CEILING",
+    "EXACT_EXPLICIT_AUTHORIZATION"
+  ],
+  "forbidden_implicit_authorizations": [
+    "EXECUTE",
+    "CONTINUE",
+    "RUN_THE_PLAN",
+    "MERGE_THE_PR",
+    "REPOSITORY_UPDATE"
+  ]
+}

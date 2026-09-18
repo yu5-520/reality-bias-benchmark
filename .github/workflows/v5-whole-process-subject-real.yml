@@ -52,7 +52,7 @@ jobs:
         run: |
           mkdir -p results/v5_whole_process
           python -m arena.build_v5_whole_process_manifest \
-            --design configs/v5_whole_process_ecommerce_batch001_v0.1.json \
+            --design configs/v5_whole_process_ecommerce_batch001_v0.2.json \
             --code-sha "$GITHUB_SHA" \
             --out results/v5_whole_process/subject_manifest.jsonl
           test "$(wc -l < results/v5_whole_process/subject_manifest.jsonl)" -eq 3
@@ -79,7 +79,7 @@ jobs:
             --manifest results/v5_whole_process/subject_manifest.jsonl \
             --out results/v5_whole_process/evidence_batch.json
 
-      - name: Derive v5 structural support/pool/exposure indexes
+      - name: Derive v5 repair-anchor/content-address structural indexes
         run: |
           python -m arena.derive_v5_whole_process_structural \
             --raw-dir results/v5_whole_process/raw \
