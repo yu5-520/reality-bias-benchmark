@@ -603,3 +603,219 @@ jobs:
           body="Cross-domain localized semantic audit pass 1 materialized and frozen.\n\nReviewed cases: 29 fact-status authority-review anchors (finance 5 / software_engineering 8 / supply_chain 16).\nSemantic adoption: 29 SUPPORTED_CANDIDATE.\nDecision/action dependence: 29 SUPPORTED_CANDIDATE.\nUncertainty preservation: 29 SUPPORTED_CANDIDATE.\nAuthority escalation: 0 established.\nR5 scientific eligibility: 29; existing fact->unconfirmed operator compatible: 29.\nDeferred authority-review cases: 56 provisional/unspecified sources.\nSummary hash: ${SUMMARY_HASH}.\n\nProvider/evaluator/R5/R7 calls: 0. CPR remains NOT_ADJUDICATED."
           gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
           gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
+
+
+  execute-cross-domain-r5-first-wave:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5 CROSS-DOMAIN R5 FIRST WAVE'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      PLAN_CONFIG: configs/v5_cross_domain_r5_first_wave_v0.1.json
+      EXPECTED_AUTHORIZATION_PHRASE: CALL_REAL_V5_CROSS_DOMAIN_R5_FIRST_WAVE_API
+      PER_BRANCH_MAX_CALLS: '64'
+      PER_BRANCH_CEILING_USD: '0.25'
+      GLOBAL_CEILING_USD: '6.00'
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact R5 first-wave authorization
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, re
+          rows={}
+          for raw in os.environ['AUTH_BODY'].splitlines():
+              line=raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit(f'invalid R5 authorization line: {line!r}')
+              key,value=line.split('=',1)
+              if key in rows:
+                  raise SystemExit(f'duplicate R5 authorization key: {key}')
+              rows[key]=value
+          required={'authorization_phrase','expected_main_sha','authorization_id','control_plane'}
+          if set(rows)!=required:
+              raise SystemExit(f'R5 authorization keys mismatch: {sorted(rows)}')
+          if rows['authorization_phrase']!=os.environ['EXPECTED_AUTHORIZATION_PHRASE']:
+              raise SystemExit('R5 authorization phrase mismatch')
+          if rows['expected_main_sha']!=os.environ['GITHUB_SHA']:
+              raise SystemExit(
+                  f"R5 main SHA mismatch: authorized={rows['expected_main_sha']} event={os.environ['GITHUB_SHA']}"
+              )
+          if rows['control_plane']!='CHAT_AUTHORIZATION_BRIDGE_V5_CROSS_DOMAIN_R5_v0.1':
+              raise SystemExit('R5 control-plane identifier mismatch')
+          if not re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['authorization_id']):
+              raise SystemExit('invalid R5 authorization_id')
+          print('PASS: exact R5 first-wave authorization validated')
+          PY
+
+      - name: Verify exact frozen source artifact identities
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, subprocess
+          p=json.load(open(os.environ['PLAN_CONFIG']))
+          repo=os.environ['GITHUB_REPOSITORY']
+          def artifacts(run_id):
+              return json.loads(subprocess.check_output(
+                  ['gh','api',f'repos/{repo}/actions/runs/{run_id}/artifacts'],text=True
+              ))['artifacts']
+          subject=artifacts(p['source_subject']['workflow_run_id'])
+          audit=artifacts(p['source_semantic_audit']['workflow_run_id'])
+          expected=[p['source_subject']['manifest_artifact'],*p['source_subject']['wave_artifacts']]
+          for item in expected:
+              rows=[x for x in subject if x['id']==item['id'] and x['name']==item['name']]
+              assert len(rows)==1, item
+              assert rows[0].get('digest')==item['digest'], item['name']
+              assert not rows[0].get('expired'), item['name']
+          item=p['source_semantic_audit']
+          rows=[x for x in audit if x['id']==item['artifact_id'] and x['name']==item['artifact_name']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==item['artifact_digest']
+          assert not rows[0].get('expired')
+          print('PASS: exact natural and semantic-audit artifacts verified')
+          PY
+
+      - name: Download frozen natural manifest, six wave bundles and semantic audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/manifest source/waves source/audit
+          python - <<'PY' > "$RUNNER_TEMP/r5_source.env"
+          import json, os
+          p=json.load(open(os.environ['PLAN_CONFIG']))
+          print('SUBJECT_RUN='+str(p['source_subject']['workflow_run_id']))
+          print('MANIFEST_NAME='+p['source_subject']['manifest_artifact']['name'])
+          print('AUDIT_RUN='+str(p['source_semantic_audit']['workflow_run_id']))
+          print('AUDIT_NAME='+p['source_semantic_audit']['artifact_name'])
+          for x in p['source_subject']['wave_artifacts']:
+              print('WAVE_NAME_'+str(x['wave_id'])+'='+x['name'])
+          PY
+          source "$RUNNER_TEMP/r5_source.env"
+          gh run download "$SUBJECT_RUN" --repo "$GITHUB_REPOSITORY" --name "$MANIFEST_NAME" --dir source/manifest
+          for i in 1 2 3 4 5 6; do
+            var="WAVE_NAME_$i"
+            gh run download "$SUBJECT_RUN" --repo "$GITHUB_REPOSITORY" --name "${!var}" --dir source/waves
+          done
+          gh run download "$AUDIT_RUN" --repo "$GITHUB_REPOSITORY" --name "$AUDIT_NAME" --dir source/audit
+          test "$(find source/waves -name traces.jsonl -type f | wc -l)" -eq 6
+          test "$(find source/waves -path '*/snapshots/*.jsonl' -type f | wc -l)" -eq 90
+          test "$(find source/manifest -name subject_manifest.jsonl -type f | wc -l)" -eq 1
+          test "$(find source/audit -name localized_semantic_audit_records.jsonl -type f | wc -l)" -eq 1
+
+      - name: Prepare exact six-case frozen-parent R5 plan
+        run: |
+          set -euo pipefail
+          AUDIT_RECORDS="$(find source/audit -name localized_semantic_audit_records.jsonl -type f)"
+          SOURCE_MANIFEST="$(find source/manifest -name subject_manifest.jsonl -type f)"
+          python -m arena.prepare_v5_cross_domain_r5_first_wave \
+            --audit-records "$AUDIT_RECORDS" \
+            --source-manifest "$SOURCE_MANIFEST" \
+            --source-root source/waves \
+            --plan-config "$PLAN_CONFIG" \
+            --branch-code-sha "$GITHUB_SHA" \
+            --outdir prepared/r5_first_wave
+
+      - name: Run exact offline R5 preflight before provider access
+        run: |
+          set -euo pipefail
+          python -m arena.run_v5_cross_domain_r5_first_wave \
+            --plan-dir prepared/r5_first_wave \
+            --provider deepseek \
+            --execution-code-sha "$GITHUB_SHA" \
+            --per-branch-max-calls "$PER_BRANCH_MAX_CALLS" \
+            --per-branch-spending-ceiling "$PER_BRANCH_CEILING_USD" \
+            --global-spending-ceiling "$GLOBAL_CEILING_USD" \
+            --currency USD \
+            --preflight-only
+
+      - name: Execute 24 frozen-parent R5 branches
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          set -euo pipefail
+          python -m arena.run_v5_cross_domain_r5_first_wave \
+            --plan-dir prepared/r5_first_wave \
+            --outdir results/v5_cross_domain_r5_first_wave/raw \
+            --provider deepseek \
+            --execution-code-sha "$GITHUB_SHA" \
+            --per-branch-max-calls "$PER_BRANCH_MAX_CALLS" \
+            --per-branch-spending-ceiling "$PER_BRANCH_CEILING_USD" \
+            --global-spending-ceiling "$GLOBAL_CEILING_USD" \
+            --currency USD \
+            --authorization-phrase "$EXPECTED_AUTHORIZATION_PHRASE" \
+            --execute-real-api
+
+      - name: Freeze raw R5 evidence before any derived comparison
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -s results/v5_cross_domain_r5_first_wave/raw/traces.jsonl ]; then
+            python -m arena.freeze_v5_cross_domain_r5_first_wave \
+              --raw-dir results/v5_cross_domain_r5_first_wave/raw \
+              --plan-dir prepared/r5_first_wave \
+              --out results/v5_cross_domain_r5_first_wave/evidence_batch.json
+          else
+            echo 'No R5 traces available to freeze.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Derive structural local-response comparison only
+        if: success()
+        id: derive
+        run: |
+          set -euo pipefail
+          python -m arena.derive_v5_cross_domain_r5_local_response \
+            --traces results/v5_cross_domain_r5_first_wave/raw/traces.jsonl \
+            --evidence-batch results/v5_cross_domain_r5_first_wave/evidence_batch.json \
+            --outdir results/v5_cross_domain_r5_first_wave/local_response
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          p=json.load(open('results/v5_cross_domain_r5_first_wave/local_response/summary.json'))
+          for k in (
+              'pair_count','first_parsed_envelope_changed_pairs',
+              'first_decision_summary_changed_pairs','agent_path_changed_pairs',
+              'final_state_changed_pairs','summary_hash'
+          ):
+              print(k+'='+str(p[k]))
+          PY
+
+      - name: Upload immutable R5 first-wave evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-cross-domain-r5-first-wave-${{ github.run_id }}
+          path: |
+            configs/v5_cross_domain_r5_first_wave_v0.1.json
+            prepared/r5_first_wave/
+            results/v5_cross_domain_r5_first_wave/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Record completed R5 first wave
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PAIR_COUNT: ${{ steps.derive.outputs.pair_count }}
+          FIRST_ACTION_CHANGED: ${{ steps.derive.outputs.first_parsed_envelope_changed_pairs }}
+          FIRST_DECISION_CHANGED: ${{ steps.derive.outputs.first_decision_summary_changed_pairs }}
+          PATH_CHANGED: ${{ steps.derive.outputs.agent_path_changed_pairs }}
+          FINAL_CHANGED: ${{ steps.derive.outputs.final_state_changed_pairs }}
+          SUMMARY_HASH: ${{ steps.derive.outputs.summary_hash }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="V5 cross-domain R5 first wave completed and raw evidence was frozen before derivation.\n\nGeometry: 6 source-bound cases / 12 matched pairs / 24 branches.\nOperator: one-shot fact -> unconfirmed on the first resumed Agent view only; no persistent mutation or reinjection.\nStructural pairs: $PAIR_COUNT.\nFirst parsed action changed: $FIRST_ACTION_CHANGED.\nFirst decision summary changed: $FIRST_DECISION_CHANGED.\nAgent path changed: $PATH_CHANGED.\nFinal state changed: $FINAL_CHANGED.\nDerived summary hash: $SUMMARY_HASH.\n\nPaid evaluator: 0. R6 semantic inertia remains NOT_ADJUDICATED. R7 not authorized. CPR NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
