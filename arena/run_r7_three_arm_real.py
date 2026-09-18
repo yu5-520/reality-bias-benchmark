@@ -16,6 +16,7 @@ from .one_shot_intervention import OneShotRuntimeViewTransform
 from .persistent_field_intervention import PersistentFieldRuntimeViewTransform
 from .providers import provider_from_config
 from .r7_runtime_smoke import load_r7_plan_bundle
+from .r7_semantic_repair_runtime import build_semantic_repair_runtime_plan, verify_semantic_repair_trace
 
 AUTH_PHRASE = "CALL_REAL_R7_THREE_ARM_API"
 RUN_SCHEMA = "RB-R7-THREE-ARM-REAL-RUN-v0.1"
@@ -165,6 +166,7 @@ def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, 
         start = bundle["source_parent_snapshot"] if arm_id in ("C1_ONE_SHOT", "C2_PERSISTENT_FIELD") else bundle["c3_recovery_checkpoint"]
         runtime_transform = None
         action_transform = None
+        semantic_repair_runtime_plan = None
         if arm_id == "C1_ONE_SHOT":
             runtime_transform = OneShotRuntimeViewTransform(bundle["c1_one_shot_envelope"])
         elif arm_id == "C2_PERSISTENT_FIELD":
@@ -179,6 +181,11 @@ def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, 
                 to_status=alr["to_status"],
                 jump_ref=alr["jump_ref"],
                 semantic_payload_hash=alr["semantic_payload_hash"],
+            )
+            semantic_repair_runtime_plan = build_semantic_repair_runtime_plan(
+                packet=bundle["semantic_repair_packet"],
+                gate=bundle["lineage_completeness_gate"],
+                bundle=bundle,
             )
         else:
             raise ValueError("unknown_r7_arm:" + str(arm_id))
@@ -271,12 +278,25 @@ def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, 
             revision = _revision_lineage(bundle, trace, action_transform)
             if revision is not None:
                 trace["r7_revision_lineage"] = revision
+            if condition_status == "OBSERVED":
+                repair_verification = verify_semantic_repair_trace(
+                    trace=trace,
+                    plan=semantic_repair_runtime_plan,
+                    transform_summary=action_transform.summary(),
+                )
+                trace["r7_semantic_repair_runtime_plan"] = semantic_repair_runtime_plan
+                trace["r7_semantic_repair_verification"] = repair_verification
+                trace["r7_condition"]["semantic_repair_packet_hash"] = semantic_repair_runtime_plan["packet_hash"]
+                trace["r7_condition"]["semantic_repair_runtime_plan_hash"] = semantic_repair_runtime_plan["plan_hash"]
+                trace["r7_condition"]["semantic_repair_verification_hash"] = repair_verification["verification_hash"]
+                trace["r7_condition"]["old_lineage_reentry_detected"] = repair_verification["old_lineage_reentry_detected"]
+                trace["r7_condition"]["preserved_unrelated_structure"] = repair_verification["preserved_unrelated_structure"]
 
         budget_summary = provider.summary()
         trace["r7_budget_summary"] = budget_summary
         total_estimated_spend += float(budget_summary["estimated_spend"])
         _append_jsonl(traces_path, trace)
-        branch_summaries.append({
+        branch_summary = {
             "run_id": row["run_id"],
             "arm_id": arm_id,
             "condition_status": condition_status,
@@ -285,7 +305,17 @@ def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, 
             "estimated_spend": budget_summary["estimated_spend"],
             "calls_started": budget_summary["calls_started"],
             "calls_completed": budget_summary["calls_completed"],
-        })
+        }
+        if arm_id == "C3_ALR" and trace.get("r7_semantic_repair_verification"):
+            v = trace["r7_semantic_repair_verification"]
+            branch_summary.update({
+                "semantic_repair_packet_consumed": True,
+                "semantic_repair_verification_hash": v["verification_hash"],
+                "old_lineage_reentry_detected": v["old_lineage_reentry_detected"],
+                "preserved_unrelated_structure": v["preserved_unrelated_structure"],
+                "recomputed_descendant_count": len(v["recomputed_descendant_refs"]),
+            })
+        branch_summaries.append(branch_summary)
         if trace["run_status"] == "RUN_COMPLETE":
             completed += 1
         elif trace["run_status"] == "BUDGET_CENSORED" or condition_status != "OBSERVED":
@@ -308,6 +338,8 @@ def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, 
         "automatic_paid_evaluator": False,
         "semantic_cpr_status": "NOT_ADJUDICATED",
         "provider_internal_state_replayed": False,
+        "semantic_repair_packet_hash": bundle["semantic_repair_packet"].get("packet_hash"),
+        "lineage_completeness_gate_hash": bundle["lineage_completeness_gate"].get("gate_hash"),
         "branch_summaries": branch_summaries,
         "interpretation_boundary": "Subject traces are raw process evidence. Semantic CPR adjudication and structural causal interpretation remain deferred until raw evidence is frozen.",
     }
