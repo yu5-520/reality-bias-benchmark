@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-SEMANTIC-LINEAGE-CLOSURE-v0.1",
+  "title": "Semantic Lineage Closure v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "closure_id",
+    "target_semantic_id",
+    "repair_anchor_ref",
+    "content_address",
+    "source_refs",
+    "transformation_refs",
+    "adoption_relation_refs",
+    "authority_transition_refs",
+    "pool_state_refs",
+    "revision_refs",
+    "relevant_descendant_refs",
+    "raw_evidence_refs",
+    "excluded_unrelated_refs",
+    "completeness_status"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-SEMANTIC-LINEAGE-CLOSURE-v0.1"
+    },
+    "closure_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_semantic_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repair_anchor_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content_address": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "transformation_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "adoption_relation_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "authority_transition_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "pool_state_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "revision_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "rejected_or_abandoned_relevant_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "relevant_descendant_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "raw_evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "excluded_unrelated_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "missing_required_components": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "completeness_status": {
+      "enum": [
+        "COMPLETE_FOR_AUTHORIZED_REPAIR",
+        "COMPLETE_FOR_AUDIT_ONLY",
+        "LINEAGE_GAP",
+        "UNRESOLVED"
+      ]
+    },
+    "closure_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

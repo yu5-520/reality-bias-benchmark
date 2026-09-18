@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-SEMANTIC-REPAIR-PACKET-v0.1",
+  "title": "Semantic Repair Packet v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "packet_id",
+    "repair_anchor_ref",
+    "target_semantic_id",
+    "content_address",
+    "semantic_lineage_closure_ref",
+    "lineage_completeness_gate_ref",
+    "evidence_supported_affected_closure_refs",
+    "repair_closure_refs",
+    "preserved_unrelated_refs",
+    "raw_evidence_refs",
+    "repair_authorization_status"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-SEMANTIC-REPAIR-PACKET-v0.1"
+    },
+    "packet_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repair_anchor_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_semantic_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content_address": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_root_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "semantic_lineage_closure_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lineage_completeness_gate_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_supported_affected_closure_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "mechanically_required_replay_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "repair_closure_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "preserved_unrelated_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "raw_evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "allowed_repair_operations": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "AUTHORITY_DOWNGRADE",
+          "SOURCE_REVISION",
+          "POOL_INVALIDATION",
+          "DESCENDANT_INVALIDATION",
+          "SELECTIVE_RECOMPUTE",
+          "DEPENDENT_DECISION_REOPEN",
+          "CACHE_OR_MEMORY_INVALIDATION"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "unresolved_gaps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "repair_authorization_status": {
+      "enum": [
+        "NOT_AUTHORIZED",
+        "AUDIT_ONLY",
+        "READY_FOR_SEPARATE_AUTHORIZATION",
+        "AUTHORIZED_EXTERNALLY"
+      ]
+    },
+    "packet_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

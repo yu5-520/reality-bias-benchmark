@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-LINEAGE-COMPLETENESS-GATE-v0.1",
+  "title": "Lineage Completeness Gate v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "gate_id",
+    "semantic_lineage_closure_ref",
+    "dimensions",
+    "status",
+    "automatic_repair_allowed",
+    "boundary"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-LINEAGE-COMPLETENESS-GATE-v0.1"
+    },
+    "gate_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "semantic_lineage_closure_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_bound",
+        "transformations_bound",
+        "authority_history_bound",
+        "pool_state_bound",
+        "affected_descendants_bound",
+        "evidence_pointers_bound"
+      ],
+      "properties": {
+        "source_bound": {
+          "enum": [
+            "YES",
+            "NO",
+            "UNRESOLVED"
+          ]
+        },
+        "transformations_bound": {
+          "enum": [
+            "YES",
+            "NO",
+            "UNRESOLVED"
+          ]
+        },
+        "authority_history_bound": {
+          "enum": [
+            "YES",
+            "NO",
+            "UNRESOLVED"
+          ]
+        },
+        "pool_state_bound": {
+          "enum": [
+            "YES",
+            "NO",
+            "UNRESOLVED"
+          ]
+        },
+        "affected_descendants_bound": {
+          "enum": [
+            "YES",
+            "NO",
+            "UNRESOLVED"
+          ]
+        },
+        "evidence_pointers_bound": {
+          "enum": [
+            "YES",
+            "NO",
+            "UNRESOLVED"
+          ]
+        }
+      }
+    },
+    "missing_components": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "status": {
+      "enum": [
+        "COMPLETE_FOR_AUTHORIZED_REPAIR",
+        "COMPLETE_FOR_AUDIT_ONLY",
+        "LINEAGE_GAP",
+        "UNRESOLVED"
+      ]
+    },
+    "automatic_repair_allowed": {
+      "type": "boolean"
+    },
+    "boundary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "gate_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
