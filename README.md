@@ -6,9 +6,9 @@ Historical evidence remains append-only. Forward methods are versioned rather th
 
 ## Current forward layer
 
-The current forward methodological layer is **Process Reality v5.0**.
+The current forward methodological layer is **Process Reality v5.1**.
 
-v5.0 is a major theory/experiment-chain migration. It does **not** add a new R stage and does **not** mutate historical v4.5.1 evidence, condition IDs or frozen design hashes.
+v5.0 established the major theory/experiment-chain migration. v5.1 refines the engineering layer around semantic-lineage scoped repair. It does **not** add a new R stage and does **not** mutate historical v4.5.1 evidence, condition IDs or frozen design hashes.
 
 Core forward files:
 
@@ -192,3 +192,87 @@ The structural index records support/pool/exposure candidates and preserves the 
 `POOL_VISIBILITY_OBSERVED != DIRECT_POOL_CONSUMPTION`
 
 No real provider execution is authorized. The future exact authorization phrase is `CALL_REAL_V5_WHOLE_PROCESS_API`.
+
+
+## v5.1 semantic-lineage scoped repair
+
+v5.1 separates **scientific formation explanation** from **engineering repair control**.
+
+Scientific formation remains dynamic across runs:
+
+```text
+Unstable Information
+  -> variable Escape Structure
+  -> Semantic Transformation
+  -> Structural Support
+  -> Stable Shared Information Pool
+  -> Semantic Descendants
+```
+
+Engineering repair does not require the globally first support/pool node. It starts from a sufficiently exposed, addressable, repair-efficient **Structural Repair Anchor**:
+
+```text
+Structural Scout
+  -> Structural Repair Anchor
+  -> Content Address
+  -> Semantic Lineage Closure
+  -> Lineage Completeness Gate
+  -> Localized Semantic Audit
+  -> RepairClosure
+  -> Invalidate / Revise / Recompute
+  -> Verify
+```
+
+Key locality rule:
+
+`local = complete relevant semantic lineage + minimal unrelated context`
+
+not:
+
+`local = shallow event window`.
+
+The Repair Agent may interpret recorded lineage but may not invent missing semantic history as fact. `LINEAGE_GAP` blocks automatic repair.
+
+## Paper-layer separation
+
+The first paper now uses three explicit layers:
+
+1. **Theory Experiment Report** — formation, persistence and mechanism boundaries.
+2. **Engineering Experiment Report** — Repair Anchor, content addressing, lineage completeness, repair and recovery.
+3. **Future Discussion** — portable Process Integrity protocols, cross-runtime/domain work and semantic/epistemic integrity infrastructure.
+
+`Scientific Explanation != Engineering Control != Future Speculation`
+
+## v5.1 Process Integrity interfaces
+
+Forward engineering interfaces now include:
+
+- `schemas/process_integrity_lineage_record_v0.4.schema.json`
+- `schemas/process_integrity_relation_evidence_v0.2.schema.json`
+- `schemas/semantic_lineage_closure_v0.1.schema.json`
+- `schemas/lineage_completeness_gate_v0.1.schema.json`
+- `schemas/semantic_repair_packet_v0.1.schema.json`
+- `configs/r7_process_integrity_engineering_contract_v0.3.json`
+
+Content address establishes identity/retrieval, not semantic adoption.
+
+## Fresh Whole-Process Batch001 v0.2
+
+The forward natural-batch design is now:
+
+- `docs/v5_fresh_whole_process_design_v0.2.md`
+- `configs/v5_whole_process_ecommerce_batch001_v0.2.json`
+- `configs/v5_whole_process_subject_gate_v0.2.json`
+
+Engineering core outputs:
+
+- Repair Anchor candidates;
+- Content Address Index;
+- Pool Visibility Ledger;
+- provenance;
+- Semantic-Lineage Recoverability;
+- downstream structural closure candidates.
+
+First support / first pool / first exposure remain recorded as **optional mechanism observables**, not engineering prerequisites.
+
+Real provider execution remains **NOT AUTHORIZED**.
