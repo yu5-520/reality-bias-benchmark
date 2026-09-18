@@ -1,0 +1,57 @@
+{
+  "schema": "RB-V5-CROSS-DOMAIN-SEMANTIC-TRIAGE-MANIFEST-v0.1",
+  "date": "2026-09-19",
+  "status": "FROZEN_TRIAGE_RESULT",
+  "source_subject": {
+    "workflow_run_id": 35370679448,
+    "workflow_path": ".github/workflows/v5-cross-domain-first-round-subject-real.yml",
+    "execution_sha": "b712dabc227973470900af4aea4e13d1077f5696",
+    "registry_artifact_id": 10560021678,
+    "registry_artifact_digest": "sha256:ef68b88f94271c5e1f0459f731268ad16e14c1a14e4bd7bb270312091ae34875",
+    "preserved_trace_count": 90,
+    "runner_error_count": 0,
+    "structural_candidate_count": 2127
+  },
+  "triage_method": {
+    "contract": "configs/v5_cross_domain_semantic_triage_v0.1.json",
+    "protocol": "docs/cross_domain_semantic_triage_protocol_v0.1.md",
+    "runtime": "arena/build_v5_cross_domain_semantic_triage.py",
+    "successful_execution_sha": "435ef100f9848dee37a44f07010b3bce9135cb33",
+    "failed_attempt_workflow_run_id": 35376830512,
+    "failed_attempt_status": "FAILED_BEFORE_TRIAGE_OUTPUT_UNSUPPORTED_REVISE_FINAL_STATE_SOURCE_EXTRACTION",
+    "hotfix_pr": 61
+  },
+  "successful_triage": {
+    "workflow_run_id": 35377246079,
+    "artifact_id": 10560253559,
+    "artifact_name": "v5-cross-domain-semantic-triage-35370679448-35377246079",
+    "artifact_digest": "sha256:b0e8b264cd6ee5b8970f3dbe186a49b3e23a5ae33eb67c01076afc7d8baf0550",
+    "summary_hash": "0cb90df320499618d3684b21071783f31995d2427efc3e94cdd49d776b0fabfa",
+    "trajectory_count": 90,
+    "selected_unique_case_count": 167,
+    "role_assignment_counts": {
+      "FORMATION_ANCHOR": 90,
+      "PROPAGATION_ANCHOR": 90,
+      "AUTHORITY_REVIEW_ANCHOR": 85
+    },
+    "authority_review_trajectory_counts": {
+      "finance": 29,
+      "supply_chain": 30,
+      "software_engineering": 26
+    },
+    "domain_selected_case_counts": {
+      "finance": 50,
+      "supply_chain": 53,
+      "software_engineering": 64
+    }
+  },
+  "authorization_boundary": {
+    "provider_calls": 0,
+    "paid_evaluator_calls": 0,
+    "r5_probe_calls": 0,
+    "r7_repair_calls": 0,
+    "r8_cpr_adjudication": false,
+    "semantic_status": "NOT_ADJUDICATED"
+  },
+  "claim_boundary": "The triage result is an audit-location index, not a semantic finding. Authority-review anchors are status/lexical review targets and do not establish authority error or Reality Bias."
+}
