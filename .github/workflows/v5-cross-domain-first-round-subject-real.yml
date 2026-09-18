@@ -189,13 +189,13 @@ jobs:
         run: |
           set -euo pipefail
           mapfile -t batches < <(find results/v5_cross_domain/all_waves -name evidence_batch.json -type f | sort)
-          test "${{#batches[@]}}" -eq 6
+          test "${#batches[@]}" -eq 6
           args=()
-          for b in "${{batches[@]}"; do
+          for b in "${batches[@]}"; do
             args+=(--evidence-batch "$b")
           done
           mkdir -p results/v5_cross_domain/registry
-          python -m arena.build_v5_cross_domain_first_round_registry             "${{args[@]}"             --out results/v5_cross_domain/registry/first_round_registry.json
+          python -m arena.build_v5_cross_domain_first_round_registry "${args[@]}" --out results/v5_cross_domain/registry/first_round_registry.json
 
       - name: Assert prospective held-out first-round geometry
         run: |
