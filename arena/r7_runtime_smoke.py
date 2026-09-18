@@ -129,19 +129,19 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
         else:
             start = bundle["c3_recovery_checkpoint"]
             alr = bundle["c3_alr_binding"]
-            action_transform = AuthorityLocalizedEnvelopeTransform(
-                target_actor=alr["target_actor"],
-                target_turn=int(alr["target_reexecution_turn"]),
-                state_key=alr["state_key"],
-                from_status=alr["from_status"],
-                to_status=alr["to_status"],
-                jump_ref=alr["jump_ref"],
-                semantic_payload_hash=alr["semantic_payload_hash"],
-            )
             semantic_repair_runtime_plan = build_semantic_repair_runtime_plan(
                 packet=bundle["semantic_repair_packet"],
                 gate=bundle["lineage_completeness_gate"],
                 bundle=bundle,
+            )
+            action_transform = AuthorityLocalizedEnvelopeTransform(
+                target_actor=alr["target_actor"],
+                target_turn=int(alr["target_reexecution_turn"]),
+                state_key=semantic_repair_runtime_plan["target_state_key"],
+                from_status=semantic_repair_runtime_plan["authority_from_status"],
+                to_status=semantic_repair_runtime_plan["authority_to_status"],
+                jump_ref=semantic_repair_runtime_plan["repair_anchor_ref"],
+                semantic_payload_hash=alr["semantic_payload_hash"],
             )
 
         trace = run_arena_once(
