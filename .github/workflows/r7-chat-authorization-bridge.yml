@@ -707,7 +707,8 @@ jobs:
           gh run download "$SUBJECT_RUN" --repo "$GITHUB_REPOSITORY" --name "$MANIFEST_NAME" --dir source/manifest
           for i in 1 2 3 4 5 6; do
             var="WAVE_NAME_$i"
-            gh run download "$SUBJECT_RUN" --repo "$GITHUB_REPOSITORY" --name "${!var}" --dir source/waves
+            mkdir -p "source/waves/artifact-$i"
+            gh run download "$SUBJECT_RUN" --repo "$GITHUB_REPOSITORY" --name "${!var}" --dir "source/waves/artifact-$i"
           done
           gh run download "$AUDIT_RUN" --repo "$GITHUB_REPOSITORY" --name "$AUDIT_NAME" --dir source/audit
           test "$(find source/waves -name traces.jsonl -type f | wc -l)" -eq 6
