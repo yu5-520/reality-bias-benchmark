@@ -132,6 +132,16 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
     authorization_path = Path(authorization_record) if authorization_record else None
     if evidence_role == "SUBJECT_PROCESS_EVIDENCE" and authorization_path is None:
         raise ValueError("r7_subject_evidence_requires_authorization_record_binding")
+    authorization = json.loads(authorization_path.read_text(encoding="utf-8")) if authorization_path else None
+    authorization_scope = (authorization or {}).get("execution_scope", "FULL")
+    if authorization_scope == "C3_ONLY":
+        if any(row.get("arm_id") != "C3_ALR" for row in condition_rows):
+            raise ValueError("r7_c3_only_evidence_contains_non_c3_trace")
+        selected_branch_count = int((authorization or {}).get("selected_branch_count") or 0)
+        if selected_branch_count <= 0:
+            raise ValueError("r7_c3_only_authorization_missing_selected_branch_count")
+        if len(traces) > selected_branch_count:
+            raise ValueError("r7_c3_only_trace_count_exceeds_authorized_branch_count")
 
     record = {
         "schema": EVIDENCE_SCHEMA,
@@ -168,6 +178,9 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         "plan_file_manifest_hash": stable_hash(plan_hashes),
         "authorization_record_sha256": sha256_file(authorization_path) if authorization_path else None,
         "authorization_record_bound": authorization_path is not None,
+        "authorization_execution_scope": authorization_scope,
+        "authorization_selected_arm": (authorization or {}).get("selected_arm"),
+        "authorization_selected_branch_count": (authorization or {}).get("selected_branch_count"),
         "raw_evidence_frozen_before_derived_analysis": True,
         "semantic_cpr_status": "NOT_ADJUDICATED",
         "paid_evaluator_called": False,
