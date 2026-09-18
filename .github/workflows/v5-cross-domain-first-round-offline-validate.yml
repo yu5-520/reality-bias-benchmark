@@ -3,10 +3,10 @@ name: V5 Cross-Domain First-Round Offline Validate
 on:
   pull_request:
     paths:
-      - "docs/cross_domain_first_round_experiment_plan_v0.1.md"
+      - "docs/cross_domain_first_round_experiment_plan_v0.2.md"
       - "docs/cross_domain_case_progression_contract_v0.1.md"
-      - "configs/v5_cross_domain_first_round_v0.1.json"
-      - "configs/v5_cross_domain_subject_gate_v0.1.json"
+      - "configs/v5_cross_domain_first_round_v0.2.json"
+      - "configs/v5_cross_domain_subject_gate_v0.2.json"
       - "schemas/v5_cross_domain_*"
       - "arena/build_v5_cross_domain_manifest.py"
       - "arena/v5_cross_domain_preflight.py"
@@ -44,24 +44,30 @@ jobs:
         run: |
           python -m unittest arena.tests.test_v5_cross_domain arena.tests.test_v5_cross_domain_runtime_guard -v
 
-      - name: Run four-domain offline preflight
+      - name: Run held-out cross-domain offline preflight
         run: |
           python -m arena.v5_cross_domain_preflight --outdir results/v5_cross_domain_preflight --code-sha "$GITHUB_SHA"
 
-      - name: Assert fixed first-round manifest geometry
+      - name: Assert fixed 90-row six-wave geometry
         run: |
-          test "$(wc -l < results/v5_cross_domain_preflight/manifest_candidate.jsonl)" -eq 120
+          test "$(wc -l < results/v5_cross_domain_preflight/manifest_candidate.jsonl)" -eq 90
           python - <<'PY'
           import json
           from collections import Counter
           rows=[json.loads(x) for x in open('results/v5_cross_domain_preflight/manifest_candidate.jsonl',encoding='utf-8') if x.strip()]
           assert Counter(r['domain_id'] for r in rows)=={
-              'ecommerce':30,'finance':30,'supply_chain':30,'software_engineering':30
+              'finance':30,'supply_chain':30,'software_engineering':30
           }
-          assert Counter(r['wave_id'] for r in rows)=={1:20,2:20,3:20,4:20,5:20,6:20}
+          assert 'ecommerce' not in Counter(r['domain_id'] for r in rows)
+          assert Counter(r['wave_id'] for r in rows)=={1:15,2:15,3:15,4:15,5:15,6:15}
+          expected={1:'finance',2:'finance',3:'supply_chain',4:'supply_chain',5:'software_engineering',6:'software_engineering'}
+          for wave_id,domain_id in expected.items():
+              group=[r for r in rows if r['wave_id']==wave_id]
+              assert {r['domain_id'] for r in group}=={domain_id}
+              assert len(group)==15
           assert all(r['automatic_paid_evaluator'] is False for r in rows)
           assert all(r['no_outcome_aware_rerun'] is True for r in rows)
-          print('PASS: fixed 4-domain x 30, 6-wave manifest')
+          print('PASS: held-out 3 domains x 30, 2 domain-pure waves each')
           PY
 
       - name: Revalidate Process Reality method layer
@@ -71,9 +77,14 @@ jobs:
         run: |
           python - <<'PY'
           import json
-          p=json.load(open('configs/v5_cross_domain_first_round_v0.1.json'))
+          p=json.load(open('configs/v5_cross_domain_first_round_v0.2.json'))
+          g=json.load(open('configs/v5_cross_domain_subject_gate_v0.2.json'))
+          assert p['planned_new_natural_trajectories']==90
+          assert p['method_development_reference']['included_in_new_replication_sample'] is False
           assert p['paid_subject_execution_authorized'] is False
           assert p['active_probe_authorized'] is False
           assert p['active_repair_authorized'] is False
-          print('PASS: offline update authorizes no provider/probe/repair calls')
+          assert g['single_authorization_event_for_all_six_waves'] is True
+          assert g['provider_execution_authorized'] is False
+          print('PASS: v0.2 offline update authorizes no provider/probe/repair calls')
           PY
