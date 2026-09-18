@@ -1,0 +1,42 @@
+{
+  "schema": "RB-R5R6-ENGINEERING-PACKAGE-SOURCE-BINDING-v0.1",
+  "version": "0.1",
+  "date": "2026-09-18",
+  "status": "FROZEN_SOURCE_BOUND_OFFLINE_DERIVATION",
+  "target": {
+    "repair_anchor_ref": "arena_event:32:state:inventory_stockout_assessment_v1",
+    "trace_root_ref": "arena_event:32:state:inventory_stockout_assessment_v1",
+    "target_semantic_id": "inventory_stockout_assessment_v1::A.preliminary_stock=1520",
+    "state_key": "inventory_stockout_assessment_v1",
+    "nested_field": "A.preliminary_stock",
+    "target_value": 1520,
+    "source_event_index": 32,
+    "source_actor": "inventory",
+    "parent_state_hash": "aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c"
+  },
+  "completeness_scope": "FROZEN_DECLARED_R5_R6_OBSERVATION_HORIZON",
+  "source_files": [
+    {"path":"reviews/v5_semantic_mechanism_reaudit_2026-09-18/audit_records.jsonl","git_blob_sha":"59a4713be5e3b50488541e582931fc28b9c061e6"},
+    {"path":"results/v5_historical_rederivation/rederivation_bundle_v0_1.json","git_blob_sha":"b2adf816abead246a6bd2dda6de4cb9acb2b2d32"},
+    {"path":"docs/reports/2026-09-18/R2-R6_Integrated_Experiment_Evidence_Report_v1.md","git_blob_sha":"23ea9f877de485618bb9dd4da790f96b0e760b0e"},
+    {"path":"docs/reports/2026-09-17/R5MID_OneShot_Process_Evidence_Report_v3.md","git_blob_sha":"fe74b80758ab7124652bb6e2563647c5df3a27cf"},
+    {"path":"docs/reports/2026-09-17/R6_System_Inertia_Factual_Report_v2.md","git_blob_sha":"dbe27c38c56e4b5d52351b90ad1039c7d6df483f"}
+  ],
+  "required_audit_ids": [
+    "V5-REAUDIT-001-E5-UNSTABLE",
+    "V5-REAUDIT-002-E6-TRANSFORMATION",
+    "V5-REAUDIT-003-E8-ADOPTION",
+    "V5-REAUDIT-004-E11-SUPPORT",
+    "V5-REAUDIT-005-STABLE-POOL-EXISTENCE",
+    "V5-REAUDIT-006-DIRECT-POOL-CONSUMPTION",
+    "V5-REAUDIT-007-E32-EXPOSURE",
+    "V5-REAUDIT-008-R5-DRIVER",
+    "V5-REAUDIT-009-R6-DESCENDANT-PERSISTENCE"
+  ],
+  "authorization": {
+    "new_subject_provider_calls": false,
+    "new_paid_evaluator_calls": false,
+    "active_repair": false,
+    "semantic_cpr_adjudication": false
+  }
+}
