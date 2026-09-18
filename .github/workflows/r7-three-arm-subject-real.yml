@@ -59,6 +59,24 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Build and verify R5-R6 Semantic Repair Packet before R7 planning
+        run: |
+          set -euo pipefail
+          python -m arena.r5r6_engineering_package --outdir results/r5r6_engineering_gate
+          python - <<'PY'
+          import json
+          s=json.load(open('results/r5r6_engineering_gate/summary.json'))
+          g=json.load(open('results/r5r6_engineering_gate/lineage_completeness_gate.json'))
+          p=json.load(open('results/r5r6_engineering_gate/semantic_repair_packet.json'))
+          assert s['status']=='READY_FOR_R7_SEPARATE_AUTHORIZATION'
+          assert g['status']=='COMPLETE_FOR_AUTHORIZED_REPAIR'
+          assert g['automatic_repair_allowed'] is False
+          assert p['repair_authorization_status']=='READY_FOR_SEPARATE_AUTHORIZATION'
+          assert s['active_repair_authorized'] is False
+          assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('R7_SEMANTIC_REPAIR_ENTRY_PACKET=READY')
+          PY
+
       - name: Validate protocol before source access
         run: |
           set -euo pipefail
@@ -153,6 +171,9 @@ jobs:
           python - <<'PY'
           import json, os, pathlib
           plan=json.load(open('results/r7_formal_plan/r7_plan.json'))
+          eng=json.load(open('results/r5r6_engineering_gate/summary.json'))
+          packet=json.load(open('results/r5r6_engineering_gate/semantic_repair_packet.json'))
+          gate=json.load(open('results/r5r6_engineering_gate/lineage_completeness_gate.json'))
           record={
               'schema':'RB-R7-FORMAL-DISPATCH-AUTHORIZATION-v0.1',
               'workflow_run_id':'${{ github.run_id }}',
@@ -164,6 +185,11 @@ jobs:
               'replicates':int(os.environ['R7_REPLICATES']),
               'planned_branch_count':plan['branch_row_count'],
               'plan_hash':plan['plan_hash'],
+              'r5r6_engineering_summary_hash':eng['summary_hash'],
+              'semantic_repair_packet_hash':packet['packet_hash'],
+              'lineage_completeness_gate_hash':gate['gate_hash'],
+              'lineage_completeness_status':gate['status'],
+              'r7_entry_status':eng['status'],
               'common_reference_parent_state_hash':plan['source_binding']['source_parent_state_hash'],
               'c3_recovery_checkpoint_state_hash':plan['source_binding']['source_recovery_checkpoint_hash'],
               'per_branch_spending_ceiling_usd':float(os.environ['R7_PER_BRANCH_CEILING']),
@@ -183,6 +209,7 @@ jobs:
           set -euo pipefail
           mkdir -p prepared_bundle
           cp -r results/r7_formal_plan prepared_bundle/plan
+          cp -r results/r5r6_engineering_gate prepared_bundle/r5r6_engineering_gate
           cp results/r7_dispatch_authorization.json prepared_bundle/authorization.json
           tar -czf r7_formal_prepared_bundle.tar.gz prepared_bundle
           sha256sum r7_formal_prepared_bundle.tar.gz > r7_formal_prepared_bundle.tar.gz.sha256
@@ -228,10 +255,19 @@ jobs:
           import json, os
           a=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'r7_prepared/prepared_bundle/authorization.json')))
           p=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'r7_prepared/prepared_bundle/plan/r7_plan.json')))
+          e=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'r7_prepared/prepared_bundle/r5r6_engineering_gate/summary.json')))
+          rp=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'r7_prepared/prepared_bundle/r5r6_engineering_gate/semantic_repair_packet.json')))
+          lg=json.load(open(os.path.join(os.environ['RUNNER_TEMP'],'r7_prepared/prepared_bundle/r5r6_engineering_gate/lineage_completeness_gate.json')))
           assert a['authorization_granted_by_dispatch_input'] is True
           assert a['confirm_input']=='CALL_REAL_R7_THREE_ARM_API'
           assert a['workflow_sha']=='${{ github.sha }}'
           assert a['plan_hash']==p['plan_hash']
+          assert a['r5r6_engineering_summary_hash']==e['summary_hash']
+          assert a['semantic_repair_packet_hash']==rp['packet_hash']
+          assert a['lineage_completeness_gate_hash']==lg['gate_hash']
+          assert a['lineage_completeness_status']=='COMPLETE_FOR_AUTHORIZED_REPAIR'
+          assert a['r7_entry_status']=='READY_FOR_R7_SEPARATE_AUTHORIZATION'
+          assert rp['repair_authorization_status']=='READY_FOR_SEPARATE_AUTHORIZATION'
           assert a['automatic_paid_evaluator'] is False
           assert a['semantic_cpr_status']=='NOT_ADJUDICATED'
           print('R7_EXACT_PREPARED_AUTHORIZATION=VERIFIED')
@@ -297,6 +333,7 @@ jobs:
           set -euo pipefail
           mkdir -p frozen_binding
           cp -r "$RUNNER_TEMP/r7_prepared/prepared_bundle/plan" frozen_binding/plan
+          cp -r "$RUNNER_TEMP/r7_prepared/prepared_bundle/r5r6_engineering_gate" frozen_binding/r5r6_engineering_gate
           cp "$RUNNER_TEMP/r7_prepared/prepared_bundle/authorization.json" frozen_binding/authorization.json
           tar -czf r7_subject_raw_bundle.tar.gz results/r7_subject_raw frozen_binding
           sha256sum r7_subject_raw_bundle.tar.gz > r7_subject_raw_bundle.tar.gz.sha256
