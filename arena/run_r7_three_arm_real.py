@@ -7,7 +7,6 @@ import json
 import os
 from pathlib import Path
 
-from .alr_recovery import AuthorityLocalizedEnvelopeTransform
 from .core import stable_hash
 from .cost_budget import BudgetedProvider
 from .engine import run_arena_once
@@ -16,7 +15,7 @@ from .one_shot_intervention import OneShotRuntimeViewTransform
 from .persistent_field_intervention import PersistentFieldRuntimeViewTransform
 from .providers import provider_from_config
 from .r7_runtime_smoke import load_r7_plan_bundle
-from .r7_semantic_repair_runtime import build_semantic_repair_runtime_plan, verify_semantic_repair_trace
+from .r7_semantic_repair_runtime import verify_semantic_repair_trace
 
 AUTH_PHRASE = "CALL_REAL_R7_THREE_ARM_API"
 RUN_SCHEMA = "RB-R7-THREE-ARM-REAL-RUN-v0.1"
@@ -97,12 +96,11 @@ def validate_execution_bindings(*, bundle: dict, source_r5_plan_dir: str | Path,
     _require(stable_hash(domain.get("task")) == config_identity.get("task_hash"), "r7_task_hash_mismatch")
     _require(stable_hash(domain.get("agents")) == config_identity.get("agent_registry_hash"), "r7_agent_registry_hash_mismatch")
 
-    semantic_runtime_plan = build_semantic_repair_runtime_plan(
-        packet=bundle["semantic_repair_packet"],
-        gate=bundle["lineage_completeness_gate"],
-        bundle=bundle,
-    )
+    semantic_runtime_plan = bundle["semantic_repair_runtime_plan"]
     _require(semantic_runtime_plan.get("repair_closure_refs") == plan.get("repair_closure_refs"), "r7_runtime_repair_closure_plan_mismatch")
+    _require(semantic_runtime_plan.get("plan_hash") == plan.get("semantic_repair_runtime_plan_hash"), "r7_runtime_semantic_plan_hash_mismatch")
+    _require(bundle["c3_repair_application"].get("repair_application_hash") == plan.get("c3_repair_application_hash"), "r7_runtime_repair_application_hash_mismatch")
+    _require(bundle["c3_repaired_parent_snapshot"].get("state_hash") == plan.get("c3_repaired_parent_state_hash"), "r7_runtime_repaired_parent_hash_mismatch")
 
     bounded = bundle["bounded_arena_config"]
     _require(int(bounded["max_turns"]) == int(plan["source_binding"]["absolute_turn_cap"]), "r7_bounded_turn_cap_mismatch")
@@ -123,16 +121,15 @@ def _manifest_by_row(bundle: dict) -> dict[str, dict]:
     return manifests
 
 
-def _revision_lineage(bundle: dict, trace: dict, transform: AuthorityLocalizedEnvelopeTransform) -> dict | None:
-    if transform.transformed_count != 1:
-        return None
+def _revision_lineage(bundle: dict, trace: dict) -> dict:
     row = {
-        "schema": "RB-R7-C3-REVISION-LINEAGE-v0.1",
+        "schema": "RB-R7-C3-REVISION-LINEAGE-v0.2",
         "common_reference_parent_state_hash": bundle["source_parent_snapshot"]["state_hash"],
-        "recovery_checkpoint_state_hash": bundle["c3_recovery_checkpoint"]["state_hash"],
+        "repaired_parent_state_hash": bundle["c3_repaired_parent_snapshot"]["state_hash"],
+        "historical_recovery_checkpoint_state_hash": bundle["c3_recovery_checkpoint"]["state_hash"],
+        "repair_application_hash": bundle["c3_repair_application"]["repair_application_hash"],
+        "semantic_repair_runtime_plan_hash": bundle["semantic_repair_runtime_plan"]["plan_hash"],
         "semantic_payload_hash": bundle["c3_alr_binding"]["semantic_payload_hash"],
-        "reopened_source_event_range": bundle["c3_alr_binding"]["reopened_source_event_range"],
-        "authority_transform_hashes": transform.summary()["transform_hashes"],
         "result_trace_hash_before_revision_record": stable_hash(trace),
         "provider_internal_state_replayed": False,
     }
@@ -150,6 +147,7 @@ def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, 
     manifests = _manifest_by_row(bundle)
     parent_hash_before = stable_hash(bundle["source_parent_snapshot"])
     checkpoint_hash_before = stable_hash(bundle["c3_recovery_checkpoint"])
+    repaired_parent_hash_before = stable_hash(bundle["c3_repaired_parent_snapshot"])
     total_estimated_spend = 0.0
     completed = 0
     censored = 0
@@ -171,29 +169,18 @@ def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, 
 
         manifest = manifests[row["manifest_hash"]]
         arm_id = row["arm_id"]
-        start = bundle["source_parent_snapshot"] if arm_id in ("C1_ONE_SHOT", "C2_PERSISTENT_FIELD") else bundle["c3_recovery_checkpoint"]
+        start = bundle["source_parent_snapshot"] if arm_id in ("C1_ONE_SHOT", "C2_PERSISTENT_FIELD") else bundle["c3_repaired_parent_snapshot"]
         runtime_transform = None
-        action_transform = None
-        semantic_repair_runtime_plan = None
+        semantic_repair_runtime_plan = bundle["semantic_repair_runtime_plan"] if arm_id == "C3_ALR" else None
         if arm_id == "C1_ONE_SHOT":
             runtime_transform = OneShotRuntimeViewTransform(bundle["c1_one_shot_envelope"])
         elif arm_id == "C2_PERSISTENT_FIELD":
             runtime_transform = PersistentFieldRuntimeViewTransform(bundle["c2_persistent_field_envelope"])
         elif arm_id == "C3_ALR":
-            alr = bundle["c3_alr_binding"]
-            semantic_repair_runtime_plan = build_semantic_repair_runtime_plan(
-                packet=bundle["semantic_repair_packet"],
-                gate=bundle["lineage_completeness_gate"],
-                bundle=bundle,
-            )
-            action_transform = AuthorityLocalizedEnvelopeTransform(
-                target_actor=alr["target_actor"],
-                target_turn=int(alr["target_reexecution_turn"]),
-                state_key=semantic_repair_runtime_plan["target_state_key"],
-                from_status=semantic_repair_runtime_plan["authority_from_status"],
-                to_status=semantic_repair_runtime_plan["authority_to_status"],
-                jump_ref=semantic_repair_runtime_plan["repair_anchor_ref"],
-                semantic_payload_hash=alr["semantic_payload_hash"],
+            _require(
+                start["shared_state_metadata"][semantic_repair_runtime_plan["target_state_key"]]["status"]
+                == semantic_repair_runtime_plan["authority_to_status"],
+                "r7_c3_repaired_parent_authority_status_missing",
             )
         else:
             raise ValueError("unknown_r7_arm:" + str(arm_id))
@@ -236,13 +223,15 @@ def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, 
                 recorder=journal,
                 initial_state_snapshot=start,
                 runtime_view_transform=runtime_transform,
-                action_envelope_transform=action_transform,
+                action_envelope_transform=None,
             )
 
         if stable_hash(bundle["source_parent_snapshot"]) != parent_hash_before:
             raise ValueError("r7_common_reference_parent_mutated")
         if stable_hash(bundle["c3_recovery_checkpoint"]) != checkpoint_hash_before:
             raise ValueError("r7_recovery_checkpoint_mutated")
+        if stable_hash(bundle["c3_repaired_parent_snapshot"]) != repaired_parent_hash_before:
+            raise ValueError("r7_repaired_parent_mutated")
 
         condition_status = "OBSERVED"
         transform_summary = {}
@@ -259,14 +248,15 @@ def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, 
                 condition_status = "C2_EXPOSURE_NOT_REALIZED"
             transform_summary = runtime_transform.summary()
         else:
-            transform_summary = action_transform.summary()
-            if action_transform.transformed_count == 1:
-                action_transform.verify_finished()
-            else:
-                condition_status = "C3_J0_REPRODUCTION_NOT_OBSERVED"
+            transform_summary = {
+                "repair_application_count": 1,
+                "repair_application_hash": bundle["c3_repair_application"]["repair_application_hash"],
+                "repaired_parent_state_hash": bundle["c3_repaired_parent_snapshot"]["state_hash"],
+                "semantic_repair_runtime_plan_hash": semantic_repair_runtime_plan["plan_hash"],
+            }
 
         trace["r7_condition"] = {
-            "schema": "RB-R7-CONDITION-TRACE-v0.1",
+            "schema": "RB-R7-CONDITION-TRACE-v0.2",
             "arm_id": arm_id,
             "triad_id": row["triad_id"],
             "replicate_index": row["replicate_index"],
@@ -277,28 +267,27 @@ def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, 
             "branch_start_state_hash": start["state_hash"],
             "semantic_payload_hash": manifest["semantic_payload_hash"],
             "observation_horizon_id": manifest["observation_horizon_id"],
-            "transform_summary": transform_summary,
+            "mechanism_summary": transform_summary,
             "provider_internal_state_replayed": False,
             "semantic_cpr_status": "NOT_ADJUDICATED",
             "terminal_outcome_is_primary": False,
         }
         if arm_id == "C3_ALR":
-            revision = _revision_lineage(bundle, trace, action_transform)
-            if revision is not None:
-                trace["r7_revision_lineage"] = revision
-            if condition_status == "OBSERVED":
-                repair_verification = verify_semantic_repair_trace(
-                    trace=trace,
-                    plan=semantic_repair_runtime_plan,
-                    transform_summary=action_transform.summary(),
-                )
-                trace["r7_semantic_repair_runtime_plan"] = semantic_repair_runtime_plan
-                trace["r7_semantic_repair_verification"] = repair_verification
-                trace["r7_condition"]["semantic_repair_packet_hash"] = semantic_repair_runtime_plan["packet_hash"]
-                trace["r7_condition"]["semantic_repair_runtime_plan_hash"] = semantic_repair_runtime_plan["plan_hash"]
-                trace["r7_condition"]["semantic_repair_verification_hash"] = repair_verification["verification_hash"]
-                trace["r7_condition"]["old_lineage_reentry_detected"] = repair_verification["old_lineage_reentry_detected"]
-                trace["r7_condition"]["preserved_unrelated_structure"] = repair_verification["preserved_unrelated_structure"]
+            revision = _revision_lineage(bundle, trace)
+            trace["r7_revision_lineage"] = revision
+            repair_verification = verify_semantic_repair_trace(
+                trace=trace,
+                plan=semantic_repair_runtime_plan,
+                repair_application=bundle["c3_repair_application"],
+            )
+            trace["r7_semantic_repair_runtime_plan"] = semantic_repair_runtime_plan
+            trace["r7_repair_application"] = bundle["c3_repair_application"]
+            trace["r7_semantic_repair_verification"] = repair_verification
+            trace["r7_condition"]["semantic_repair_packet_hash"] = semantic_repair_runtime_plan["packet_hash"]
+            trace["r7_condition"]["semantic_repair_runtime_plan_hash"] = semantic_repair_runtime_plan["plan_hash"]
+            trace["r7_condition"]["semantic_repair_verification_hash"] = repair_verification["verification_hash"]
+            trace["r7_condition"]["old_lineage_reentry_detected"] = repair_verification["old_lineage_reentry_detected"]
+            trace["r7_condition"]["preserved_unrelated_structure"] = repair_verification["preserved_unrelated_structure"]
 
         budget_summary = provider.summary()
         trace["r7_budget_summary"] = budget_summary
@@ -348,6 +337,8 @@ def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, 
         "provider_internal_state_replayed": False,
         "semantic_repair_packet_hash": bundle["semantic_repair_packet"].get("packet_hash"),
         "lineage_completeness_gate_hash": bundle["lineage_completeness_gate"].get("gate_hash"),
+        "c3_repaired_parent_state_hash": bundle["c3_repaired_parent_snapshot"].get("state_hash"),
+        "c3_repair_application_hash": bundle["c3_repair_application"].get("repair_application_hash"),
         "branch_summaries": branch_summaries,
         "interpretation_boundary": "Subject traces are raw process evidence. Semantic CPR adjudication and structural causal interpretation remain deferred until raw evidence is frozen.",
     }
