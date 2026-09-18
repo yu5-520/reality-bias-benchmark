@@ -1,0 +1,66 @@
+{
+  "schema": "RB-V5-CROSS-DOMAIN-SEMANTIC-TRIAGE-CONTRACT-v0.1",
+  "version": "0.1",
+  "date": "2026-09-19",
+  "status": "FROZEN_DETERMINISTIC_TRIAGE_NO_SEMANTIC_ADJUDICATION",
+  "purpose": "Compress structural candidates into a bounded localized-semantic-audit queue without upgrading structure into semantic claims.",
+  "candidate_source": "structural_repair_anchor_candidate",
+  "control_state_keys": [
+    "status",
+    "state",
+    "decision_version",
+    "allocation_version",
+    "release_version"
+  ],
+  "control_state_key_suffixes": [
+    "_version",
+    ".version"
+  ],
+  "selection_roles": {
+    "FORMATION_ANCHOR": {
+      "rule": "Earliest non-control structural repair-anchor candidate by source_event_index; fall back to any repair-anchor candidate only if no non-control candidate exists."
+    },
+    "PROPAGATION_ANCHOR": {
+      "rule": "Non-control candidate maximizing distinct_visible_actor_count, then later_visibility_count, then activity_after_visibility_count; earliest source_event_index breaks ties."
+    },
+    "AUTHORITY_REVIEW_ANCHOR": {
+      "rule": "Earliest non-control candidate requiring authority review under the frozen lexical/status rule. Priority: fact carrying an explicit uncertainty marker, then provisional/unconfirmed, then unspecified."
+    }
+  },
+  "authority_review": {
+    "explicit_uncertainty_markers": [
+      "preliminary",
+      "unreconciled",
+      "pending",
+      "unverified",
+      "not confirmed",
+      "unconfirmed",
+      "estimate",
+      "estimated",
+      "draft",
+      "provisional",
+      "uncertain",
+      "subject to",
+      "assumption"
+    ],
+    "fact_with_marker_priority": 0,
+    "provisional_or_unconfirmed_priority": 1,
+    "unspecified_priority": 2,
+    "note": "Marker/status matching is triage only. It does not establish semantic uncertainty, authority error, adoption, inheritance, inertia, CPR, or R5 eligibility."
+  },
+  "packet": {
+    "max_downstream_call_summaries": 12,
+    "summary_sampling": "FIRST_HALF_PLUS_LAST_HALF_WHEN_TRUNCATED",
+    "include_source_value": true,
+    "include_source_basis": true,
+    "include_all_structural_visibility_rows": true
+  },
+  "authorization": {
+    "provider_calls": false,
+    "paid_evaluator_calls": false,
+    "r5_probe": false,
+    "r7_repair": false,
+    "r8_cpr_adjudication": false
+  },
+  "claim_boundary": "Triage ranks where semantic audit should look. It does not decide what any candidate means."
+}
