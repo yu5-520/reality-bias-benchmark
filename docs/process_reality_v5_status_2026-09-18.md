@@ -73,12 +73,17 @@ Implemented:
 
 ## Next scientific step
 
-Before a fresh v5 subject run:
+Historical re-derivation is complete and the first fresh Whole-Process Batch001 design is now prepared and offline-preflighted.
 
-1. execute/inspect the offline historical re-derivation against frozen evidence;
-2. confirm scout/support/pool mappings are operationally usable;
-3. freeze one fresh Whole-Process Run design;
-4. separately authorize provider execution.
+Current Batch001 design:
+
+1. ecommerce natural subject only;
+2. three fresh repeats;
+3. existing Arena v0.3.2 runtime and prompts unchanged;
+4. structural support/pool/exposure indexing after freeze;
+5. no driver probe, control-surface intervention, recovery, CPR adjudication or paid evaluator.
+
+The remaining gate before any fresh subject evidence is **separate explicit provider authorization** bound to the final batch/code/config hashes.
 
 The next paid run should collect a reusable full-process dataset rather than recreate the old mandatory specificity stack by default.
 
@@ -103,3 +108,22 @@ Current re-derived boundaries:
 - J0 as Structural Exposure anchor: SUPPORTED_CANDIDATE;
 - source/pool status decoupling: OBSERVED;
 - structure fully replacing information as driver: NOT_ESTABLISHED.
+
+
+## Fresh Whole-Process Batch001 preparation update
+
+Offline fresh-run preparation is now implemented:
+
+- design: `docs/v5_fresh_whole_process_design_v0.1.md`
+- batch config: `configs/v5_whole_process_ecommerce_batch001_v0.1.json`
+- subject gate: `configs/v5_whole_process_subject_gate_v0.1.json`
+- manifest builder: `arena/build_v5_whole_process_manifest.py`
+- structural index: `arena/v5_whole_process_index.py`
+- offline preflight: `arena/v5_whole_process_preflight.py`
+- tests: `arena/tests/test_v5_whole_process.py`
+
+Offline preflight status: **PASS**.
+
+The runtime/Agent prompts remain unchanged. The new index intentionally distinguishes mechanically observed shared-state visibility from semantic direct consumption.
+
+Real provider execution remains **NOT AUTHORIZED**.
