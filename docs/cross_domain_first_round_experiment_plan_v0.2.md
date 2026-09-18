@@ -1,6 +1,6 @@
 # Process Reality Cross-Domain First-Round Experiment Plan v0.2
 
-Date: 2026-09-18  
+Date: 2026-09-19  
 Status: **FROZEN PROTOCOL CANDIDATE / OFFLINE-READY TARGET / REAL PROVIDER NOT AUTHORIZED**  
 Predecessor: `docs/cross_domain_first_round_experiment_plan_v0.1.md`
 
