@@ -14,6 +14,7 @@ from .io_utils import load_json, load_jsonl, write_jsonl
 from .one_shot_intervention import verify_one_shot_envelope
 from .persistent_field_intervention import build_persistent_field_envelope, verify_persistent_field_envelope
 from .r7_semantic_repair_runtime import build_repaired_parent_snapshot, build_semantic_repair_runtime_plan
+from .r7_lineage_monitoring import build_semantic_lineage_package, build_post_repair_watch_contract
 
 PLAN_SCHEMA = "RB-R7-THREE-ARM-EXECUTION-PLAN-v0.2"
 ARM_MANIFEST_SCHEMA = "RB-R7-ARM-MANIFEST-v0.2"
@@ -222,6 +223,8 @@ def build_r7_three_arm_plan(*, protocol: Mapping[str, Any], r5: Mapping[str, Any
         parent_snapshot=parent,
         plan=semantic_runtime_plan,
     )
+    semantic_lineage_package = build_semantic_lineage_package(packet=semantic_repair_packet, runtime_plan=semantic_runtime_plan)
+    post_repair_watch_contract = build_post_repair_watch_contract(runtime_plan=semantic_runtime_plan, repair_application=c3_repair_application)
 
     manifests: list[dict[str, Any]] = []
     rows: list[dict[str, Any]] = []
@@ -306,6 +309,9 @@ def build_r7_three_arm_plan(*, protocol: Mapping[str, Any], r5: Mapping[str, Any
         "c3_repaired_parent_state_hash": c3_repaired_parent_snapshot["state_hash"],
         "c3_repair_application_hash": c3_repair_application["repair_application_hash"],
         "semantic_repair_runtime_plan_hash": semantic_runtime_plan["plan_hash"],
+        "semantic_lineage_package_hash": semantic_lineage_package["package_hash"],
+        "post_repair_watch_contract_hash": post_repair_watch_contract["watch_hash"],
+        "full_lineage_observation_policy": "FULL_LINEAGE_ALL_ARMS",
         "semantic_repair_packet_hash": semantic_repair_packet.get("packet_hash"),
         "lineage_completeness_gate_hash": lineage_completeness_gate.get("gate_hash"),
         "semantic_repair_packet_id": semantic_repair_packet.get("packet_id"),
@@ -334,6 +340,8 @@ def build_r7_three_arm_plan(*, protocol: Mapping[str, Any], r5: Mapping[str, Any
         "c3_repaired_parent_snapshot": c3_repaired_parent_snapshot,
         "c3_repair_application": c3_repair_application,
         "semantic_repair_packet": copy.deepcopy(dict(semantic_repair_packet)),
+        "semantic_lineage_package": semantic_lineage_package,
+        "post_repair_watch_contract": post_repair_watch_contract,
         "lineage_completeness_gate": copy.deepcopy(dict(lineage_completeness_gate)),
         "bounded_arena_config": bounded_arena_config,
         "arm_manifests": manifests,
@@ -348,6 +356,8 @@ def verify_r7_three_arm_plan(bundle: Mapping[str, Any]) -> bool:
     repaired_parent = bundle["c3_repaired_parent_snapshot"]
     repair_application = bundle["c3_repair_application"]
     semantic_runtime_plan = bundle["semantic_repair_runtime_plan"]
+    semantic_lineage_package = bundle["semantic_lineage_package"]
+    post_repair_watch_contract = bundle["post_repair_watch_contract"]
     verify_state_snapshot(parent)
     verify_state_snapshot(checkpoint)
     verify_state_snapshot(repaired_parent)
@@ -368,6 +378,9 @@ def verify_r7_three_arm_plan(bundle: Mapping[str, Any]) -> bool:
     _require(plan.get("c3_repaired_parent_state_hash") == repaired_parent.get("state_hash"), "r7_plan_repaired_parent_hash_mismatch")
     _require(plan.get("c3_repair_application_hash") == repair_application.get("repair_application_hash"), "r7_plan_repair_application_hash_mismatch")
     _require(plan.get("semantic_repair_runtime_plan_hash") == semantic_runtime_plan.get("plan_hash"), "r7_plan_semantic_runtime_hash_mismatch")
+    _require(plan.get("semantic_lineage_package_hash") == semantic_lineage_package.get("package_hash"), "r7_plan_lineage_package_hash_mismatch")
+    _require(plan.get("post_repair_watch_contract_hash") == post_repair_watch_contract.get("watch_hash"), "r7_plan_watch_contract_hash_mismatch")
+    _require(plan.get("full_lineage_observation_policy") == "FULL_LINEAGE_ALL_ARMS", "r7_plan_observation_policy_invalid")
     _require(repair_application.get("parent_state_hash") == parent.get("state_hash"), "r7_repair_application_parent_mismatch")
     _require(repair_application.get("repaired_parent_state_hash") == repaired_parent.get("state_hash"), "r7_repair_application_start_mismatch")
     _require(plan.get("paid_subject_authorization_status") == "NOT_AUTHORIZED", "r7_plan_must_not_self_authorize")
@@ -430,6 +443,8 @@ def main() -> None:
     _write_json(out / "c3_repaired_parent_snapshot.json", bundle["c3_repaired_parent_snapshot"])
     _write_json(out / "c3_repair_application.json", bundle["c3_repair_application"])
     _write_json(out / "semantic_repair_packet.json", bundle["semantic_repair_packet"])
+    _write_json(out / "semantic_lineage_package.json", bundle["semantic_lineage_package"])
+    _write_json(out / "post_repair_watch_contract.json", bundle["post_repair_watch_contract"])
     _write_json(out / "lineage_completeness_gate.json", bundle["lineage_completeness_gate"])
     _write_json(out / "r7_bounded_arena_config.json", bundle["bounded_arena_config"])
     write_jsonl(out / "arm_manifests.jsonl", bundle["arm_manifests"])
@@ -446,6 +461,9 @@ def main() -> None:
     print("C2_RUNTIME_MECHANISM=READY")
     print("C3_RUNTIME_MECHANISM=READY")
     print("SEMANTIC_REPAIR_PACKET_BOUND=YES")
+    print("SEMANTIC_LINEAGE_PACKAGE_BOUND=YES")
+    print("POST_REPAIR_WATCH_CONTRACT_BOUND=YES")
+    print("FULL_LINEAGE_OBSERVATION_POLICY=FULL_LINEAGE_ALL_ARMS")
     print("REPAIR_CLOSURE_REFS=" + str(len(bundle["semantic_repair_packet"].get("repair_closure_refs") or [])))
     print("PAID_SUBJECT_AUTHORIZED=NO")
 

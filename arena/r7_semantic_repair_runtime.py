@@ -5,11 +5,12 @@ from typing import Any, Mapping
 
 from .core import stable_hash
 from .experimental_control import verify_state_snapshot
+from .r7_lineage_monitoring import build_post_repair_watch_contract, evaluate_post_repair_watch
 
 # R7 v5.3 validation marker: repository-native offline chain must pass before subject redispatch.
 PLAN_SCHEMA = "RB-R7-SEMANTIC-REPAIR-RUNTIME-PLAN-v0.3"
 REPAIR_APPLICATION_SCHEMA = "RB-R7-SEMANTIC-REPAIR-APPLICATION-v0.2"
-VERIFY_SCHEMA = "RB-R7-SEMANTIC-REPAIR-VERIFICATION-v0.3"
+VERIFY_SCHEMA = "RB-R7-SEMANTIC-REPAIR-VERIFICATION-v0.4"
 
 REQUIRED_RUNTIME_OPERATIONS = {
     "AUTHORITY_DOWNGRADE",
@@ -358,9 +359,12 @@ def verify_semantic_repair_trace(*, trace: Mapping[str, Any], plan: Mapping[str,
         "direct_unrelated_anchor_state_preserved": True,
     }
 
+    watch_contract = build_post_repair_watch_contract(runtime_plan=plan, repair_application=repair_application)
+    watch_result = evaluate_post_repair_watch(trace=trace, contract=watch_contract)
+
     row = {
         "schema": VERIFY_SCHEMA,
-        "version": "0.3",
+        "version": "0.4",
         "runtime_plan_hash": plan["plan_hash"],
         "repair_application_hash": repair_application["repair_application_hash"],
         "packet_hash": plan["packet_hash"],
@@ -393,6 +397,10 @@ def verify_semantic_repair_trace(*, trace: Mapping[str, Any], plan: Mapping[str,
         "semantic_lineage_closure_before_hash": stable_hash(before_closure),
         "semantic_lineage_closure_after_hash": stable_hash(after_closure),
         "target_integrity_repair_executed": True,
+        "post_repair_watch_contract": watch_contract,
+        "post_repair_watch_result": watch_result,
+        "post_repair_watch_contract_hash": watch_contract["watch_hash"],
+        "post_repair_watch_result_hash": watch_result["watch_result_hash"],
         "recovery_success_semantic_status": "NOT_ADJUDICATED",
         "terminal_outcome_is_primary": False,
         "interpretation_boundary": (

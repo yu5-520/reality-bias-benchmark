@@ -15,6 +15,7 @@ from .system_behavior import content_hash
 from .system_behavior_adapter import adapt_arena_trace_v03
 from .system_behavior_dynamics_v4 import build_system_dynamics_view
 from .system_behavior_lineage_v4 import build_system_lineage_view
+from .r7_lineage_monitoring import build_full_lineage_observation
 
 DERIVATION_SUMMARY_SCHEMA = "RB-R7-PROCESS-REALITY-DERIVATION-SUMMARY-v0.1"
 TRIAD_INDEX_SCHEMA = "RB-R7-TRIAD-INDEX-v0.1"
@@ -130,6 +131,8 @@ def derive_r7(*, plan_dir: str | Path, traces_path: str | Path, evidence_batch_p
         condition = trace.get("r7_condition") or {}
         revision = trace.get("r7_revision_lineage") or {}
         repair_verification = trace.get("r7_semantic_repair_verification") or {}
+        branch_start_event_count = (int((trace.get("r7_repair_application") or {}).get("repaired_branch_start_event_count")) if arm_id == "C3_ALR" else int(bundle["source_parent_snapshot"].get("events") and len(bundle["source_parent_snapshot"]["events"]) or 0))
+        full_lineage_observation = build_full_lineage_observation(trace=trace, arm_id=arm_id, anchor_event_index=target_event_index, branch_start_event_count=branch_start_event_count, target_state_key=target_state_key)
         measurement.update({
             "r7_protocol_id": bundle["plan"]["protocol_id"],
             "triad_id": row["triad_id"],
@@ -154,6 +157,9 @@ def derive_r7(*, plan_dir: str | Path, traces_path: str | Path, evidence_batch_p
             "old_lineage_reentry_refs": list(repair_verification.get("old_lineage_reentry_refs") or []),
             "preserved_unrelated_structure": repair_verification.get("preserved_unrelated_structure"),
             "recomputed_descendant_refs": list(repair_verification.get("recomputed_descendant_refs") or []),
+            "full_lineage_observation": full_lineage_observation,
+            "full_lineage_observation_hash": full_lineage_observation["observation_hash"],
+            "post_repair_watch_result_hash": repair_verification.get("post_repair_watch_result_hash"),
             "semantic_lineage_closure_before_hash": repair_verification.get("semantic_lineage_closure_before_hash"),
             "semantic_lineage_closure_after_hash": repair_verification.get("semantic_lineage_closure_after_hash"),
             "source_raw_evidence_batch_hash": evidence["evidence_batch_hash"],
@@ -264,6 +270,8 @@ def derive_r7(*, plan_dir: str | Path, traces_path: str | Path, evidence_batch_p
         "r7a_comparison_count": sum(1 for row in comparisons if row.get("r7_comparison") == "R7-A_ONE_SHOT_VS_PERSISTENT_FIELD"),
         "r7b_comparison_count": sum(1 for row in comparisons if row.get("r7_comparison") == "R7-B_PERSISTENT_FIELD_VS_ALR_RECOVERY"),
         "semantic_repair_verification_count": sum(1 for row in measurements if row.get("semantic_repair_verification_hash")),
+        "full_lineage_observation_count": sum(1 for row in measurements if row.get("full_lineage_observation_hash")),
+        "post_repair_watch_count": sum(1 for row in measurements if row.get("post_repair_watch_result_hash")),
         "old_lineage_reentry_detected_count": sum(1 for row in measurements if row.get("old_lineage_reentry_detected") is True),
         "preserved_unrelated_structure_pass_count": sum(1 for row in measurements if row.get("preserved_unrelated_structure") is True),
         "integrity_failure_count": len(integrity_failures),
@@ -306,6 +314,8 @@ def main() -> None:
     print("R7A_COMPARISONS=" + str(summary["r7a_comparison_count"]))
     print("R7B_COMPARISONS=" + str(summary["r7b_comparison_count"]))
     print("SEMANTIC_REPAIR_VERIFICATIONS=" + str(summary["semantic_repair_verification_count"]))
+    print("FULL_LINEAGE_OBSERVATIONS=" + str(summary["full_lineage_observation_count"]))
+    print("POST_REPAIR_WATCHES=" + str(summary["post_repair_watch_count"]))
     print("OLD_LINEAGE_REENTRY_DETECTED=" + str(summary["old_lineage_reentry_detected_count"]))
     print("PRESERVED_UNRELATED_PASS=" + str(summary["preserved_unrelated_structure_pass_count"]))
     print("INTEGRITY_FAILURES=" + str(summary["integrity_failure_count"]))

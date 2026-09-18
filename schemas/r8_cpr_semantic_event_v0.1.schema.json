@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-R8-CPR-SEMANTIC-EVENT-v0.1",
+  "title": "R8 CPR Semantic Event v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "event_id",
+    "run_id",
+    "candidate_type",
+    "start_ref",
+    "end_ref",
+    "evidence_refs",
+    "root_lineage_refs",
+    "independent_evidence_refs",
+    "descendant_support_refs",
+    "preceding_event_refs",
+    "following_event_refs",
+    "overlap_event_refs",
+    "adjudication_status"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-R8-CPR-SEMANTIC-EVENT-v0.1"
+    },
+    "event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_type": {
+      "enum": [
+        "C",
+        "P",
+        "R",
+        "UNRESOLVED"
+      ]
+    },
+    "start_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "end_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "root_lineage_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "independent_evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "descendant_support_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "preceding_event_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "following_event_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "overlap_event_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "mechanism_notes": {
+      "type": "string"
+    },
+    "adjudication_status": {
+      "enum": [
+        "UNREVIEWED",
+        "SUPPORTED",
+        "SUPPORTED_CANDIDATE",
+        "NOT_ESTABLISHED",
+        "CONTRADICTED",
+        "UNRESOLVED"
+      ]
+    }
+  }
+}
