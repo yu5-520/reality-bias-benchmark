@@ -1,0 +1,139 @@
+name: R7 C3 Chat Authorization Bridge
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+
+concurrency:
+  group: r7-c3-chat-authorization-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  dispatch-authorized-c3-subject:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'R7 C3 SCIENTIFIC AUTHORIZATION'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      EXPECTED_AUTHORIZATION_PHRASE: CALL_REAL_R7_C3_API
+      SCIENTIFIC_WORKFLOW: r7-three-arm-subject-real.yml
+      AUTH_BODY: ${{ github.event.issue.body }}
+      R7_REPLICATES: '2'
+      R7_PER_BRANCH_CEILING_USD: '0.25'
+      R7_TOTAL_CEILING_USD: '0.50'
+      R7_PER_BRANCH_MAX_CALLS: '64'
+
+    steps:
+      - name: Validate exact C3-only authorization record
+        id: auth
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, re
+          rows = {}
+          for raw in os.environ['AUTH_BODY'].splitlines():
+              line = raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit(f'invalid authorization line: {line!r}')
+              key, value = line.split('=', 1)
+              if key in rows:
+                  raise SystemExit(f'duplicate authorization key: {key}')
+              rows[key] = value
+          required = {'authorization_phrase','expected_main_sha','authorization_id','control_plane'}
+          if set(rows) != required:
+              raise SystemExit(f'authorization keys mismatch: {sorted(rows)}')
+          if rows['authorization_phrase'] != os.environ['EXPECTED_AUTHORIZATION_PHRASE']:
+              raise SystemExit('authorization phrase mismatch')
+          if rows['expected_main_sha'] != os.environ['GITHUB_SHA']:
+              raise SystemExit(f"main SHA mismatch: authorized={rows['expected_main_sha']} event={os.environ['GITHUB_SHA']}")
+          if rows['control_plane'] != 'CHAT_AUTHORIZATION_BRIDGE_R7_C3_v0.1':
+              raise SystemExit('control-plane identifier mismatch')
+          auth_id = rows['authorization_id']
+          if not re.fullmatch(r'[A-Za-z0-9._-]{8,80}', auth_id):
+              raise SystemExit('invalid authorization_id')
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as f:
+              f.write(f"authorization_id={auth_id}\n")
+          print('PASS: exact R7 C3-only authorization validated against current main SHA')
+          PY
+
+      - name: Pin authorized execution SHA and dispatch C3-only formal workflow
+        id: dispatch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          AUTHORIZATION_ID: ${{ steps.auth.outputs.authorization_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, urllib.request, urllib.error
+          repo=os.environ['GITHUB_REPOSITORY']
+          sha=os.environ['GITHUB_SHA']
+          workflow=os.environ['SCIENTIFIC_WORKFLOW']
+          auth_id=os.environ['AUTHORIZATION_ID']
+          token=os.environ['GITHUB_TOKEN']
+          tag=f"r7-c3-auth-{auth_id}"
+          base=f"https://api.github.com/repos/{repo}"
+          headers={
+              'Accept':'application/vnd.github+json',
+              'Authorization':f'Bearer {token}',
+              'X-GitHub-Api-Version':'2026-03-10',
+              'User-Agent':'r7-c3-chat-authorization-bridge',
+          }
+          def request(method,path,payload=None):
+              data=None if payload is None else json.dumps(payload).encode('utf-8')
+              req=urllib.request.Request(base+path,data=data,headers=headers,method=method)
+              try:
+                  with urllib.request.urlopen(req,timeout=30) as resp:
+                      body=resp.read().decode('utf-8')
+                      return resp.status,(json.loads(body) if body else {})
+              except urllib.error.HTTPError as e:
+                  detail=e.read().decode('utf-8',errors='replace')
+                  raise SystemExit(f'GitHub API {method} {path} failed: HTTP {e.code}: {detail}')
+          request('POST','/git/refs',{'ref':f'refs/tags/{tag}','sha':sha})
+          payload={
+              'ref':tag,
+              'inputs':{
+                  'replicates':os.environ['R7_REPLICATES'],
+                  'per_branch_spending_ceiling_usd':os.environ['R7_PER_BRANCH_CEILING_USD'],
+                  'total_spending_ceiling_usd':os.environ['R7_TOTAL_CEILING_USD'],
+                  'per_branch_max_calls':os.environ['R7_PER_BRANCH_MAX_CALLS'],
+                  'execution_scope':'C3_ONLY',
+                  'confirm':os.environ['EXPECTED_AUTHORIZATION_PHRASE'],
+              },
+              'return_run_details':True,
+          }
+          status,result=request('POST',f'/actions/workflows/{workflow}/dispatches',payload)
+          if status not in (200,204):
+              raise SystemExit(f'unexpected dispatch status: {status}')
+          run_id=result.get('workflow_run_id','')
+          html_url=result.get('html_url','')
+          with open(os.environ['GITHUB_OUTPUT'],'a',encoding='utf-8') as f:
+              f.write(f"authorization_tag={tag}\n")
+              f.write(f"workflow_run_id={run_id}\n")
+              f.write(f"workflow_run_url={html_url}\n")
+          print(f'PASS: R7 C3-only workflow dispatch accepted for pinned tag {tag} at {sha}')
+          if html_url:
+              print(f'RUN_URL={html_url}')
+          PY
+
+      - name: Record successful C3-only dispatch on authorization issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTH_TAG: ${{ steps.dispatch.outputs.authorization_tag }}
+          RUN_ID: ${{ steps.dispatch.outputs.workflow_run_id }}
+          RUN_URL: ${{ steps.dispatch.outputs.workflow_run_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="R7 C3-only authorization accepted.\n\nPinned execution ref: ${AUTH_TAG}\nExecution SHA: ${GITHUB_SHA}\nWorkflow run id: ${RUN_ID:-not-returned}\nWorkflow run: ${RUN_URL:-dispatch-accepted}\n\nFrozen scope: 2 C3 branches only, USD 0.25 per branch, USD 0.50 total ceiling, 64 calls per branch. C1/C2 are not rerun. No paid evaluator is enabled; CPR remains NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
