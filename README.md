@@ -79,6 +79,15 @@ Current v0.2 interfaces:
 - `arena/build_v5_cross_domain_case_ledger.py`
 - `arena/build_v5_cross_domain_first_round_registry.py`
 
+Post-run frozen-evidence triage interfaces:
+
+- `docs/cross_domain_semantic_triage_protocol_v0.1.md`
+- `configs/v5_cross_domain_semantic_triage_v0.1.json`
+- `schemas/v5_cross_domain_semantic_triage_case_v0.1.schema.json`
+- `arena/build_v5_cross_domain_semantic_triage.py`
+
+The triage stage deterministically compresses structural candidates into trajectory-bound localized semantic-audit cases. It does not adjudicate semantic adoption, authority error, System Inertia, CPR, R5 eligibility or R7 repairability.
+
 Prospective sample geometry:
 
 - 30 natural trajectories per held-out domain;

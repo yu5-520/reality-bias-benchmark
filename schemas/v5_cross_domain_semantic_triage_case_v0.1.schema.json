@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-V5-CROSS-DOMAIN-SEMANTIC-TRIAGE-CASE-v0.1",
+  "title": "V5 Cross-Domain Semantic Triage Case v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "first_round_id",
+    "source_run_id",
+    "domain_id",
+    "wave_id",
+    "source_evidence_batch_hash",
+    "candidate_ref",
+    "content_address",
+    "triage_roles",
+    "selection_reasons",
+    "source",
+    "structural_observability",
+    "downstream_visibility",
+    "downstream_call_summaries",
+    "downstream_call_summary_truncated",
+    "semantic_status",
+    "qualification_status",
+    "r5_probe_authorized",
+    "r7_repair_authorized",
+    "claim_boundary",
+    "case_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-V5-CROSS-DOMAIN-SEMANTIC-TRIAGE-CASE-v0.1"},
+    "first_round_id": {"type": "string"},
+    "source_run_id": {"type": "string"},
+    "domain_id": {"type": "string"},
+    "wave_id": {"type": "integer"},
+    "source_evidence_batch_hash": {"type": "string"},
+    "source_trace_hash": {"type": "string"},
+    "candidate_ref": {"type": "string"},
+    "content_address": {"type": "string"},
+    "triage_roles": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"enum": ["FORMATION_ANCHOR", "PROPAGATION_ANCHOR", "AUTHORITY_REVIEW_ANCHOR"]}
+    },
+    "selection_reasons": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "authority_review_markers": {"type": "array", "items": {"type": "string"}},
+    "source": {
+      "type": "object",
+      "required": ["event_index", "turn", "actor", "state_key", "status", "basis", "value"],
+      "properties": {
+        "event_index": {"type": "integer"},
+        "turn": {"type": "integer"},
+        "actor": {"type": "string"},
+        "state_key": {"type": "string"},
+        "status": {"type": ["string", "null"]},
+        "basis": {},
+        "value": {}
+      }
+    },
+    "structural_observability": {"type": "object"},
+    "downstream_visibility": {"type": "array", "items": {"type": "object"}},
+    "downstream_call_summaries": {"type": "array", "items": {"type": "object"}},
+    "downstream_call_summary_truncated": {"type": "boolean"},
+    "semantic_status": {"const": "NOT_ADJUDICATED"},
+    "qualification_status": {"const": "AWAITING_LOCALIZED_SEMANTIC_AUDIT"},
+    "r5_probe_authorized": {"const": false},
+    "r7_repair_authorized": {"const": false},
+    "claim_boundary": {"type": "string"},
+    "case_hash": {"type": "string"}
+  }
+}
