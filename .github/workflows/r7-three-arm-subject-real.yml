@@ -215,6 +215,9 @@ jobs:
               'r5r6_r7_entry_audit_hash':audit['audit_hash'],
               'r5r6_r7_entry_criteria_passed':audit['criteria_passed'],
               'r5r6_r7_entry_criteria_total':audit['criteria_total'],
+              'r5r6_r7_framework_coverage_full':audit['framework_coverage_full'],
+              'r5r6_r7_framework_coverage_count':audit['framework_coverage_count'],
+              'r5r6_r7_framework_requirement_count':audit['framework_requirement_count'],
               'common_reference_parent_state_hash':plan['source_binding']['source_parent_state_hash'],
               'c3_recovery_checkpoint_state_hash':plan['source_binding']['source_recovery_checkpoint_hash'],
               'per_branch_spending_ceiling_usd':float(os.environ['R7_PER_BRANCH_CEILING']),
@@ -301,6 +304,9 @@ jobs:
           assert a['r5r6_r7_entry_audit_hash']==audit['audit_hash']
           assert a['r5r6_r7_entry_criteria_passed']==audit['criteria_passed']==8
           assert a['r5r6_r7_entry_criteria_total']==audit['criteria_total']==8
+          assert a['r5r6_r7_framework_coverage_full'] is True
+          assert a['r5r6_r7_framework_coverage_count']==audit['framework_coverage_count']
+          assert a['r5r6_r7_framework_requirement_count']==audit['framework_requirement_count']
           assert audit['framework_coverage_full'] is True
           assert audit['framework_coverage_count']==audit['framework_requirement_count']
           assert audit['r7_entry_supported'] is True
