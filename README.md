@@ -88,6 +88,14 @@ Post-run frozen-evidence triage interfaces:
 
 The triage stage deterministically compresses structural candidates into trajectory-bound localized semantic-audit cases. It does not adjudicate semantic adoption, authority error, System Inertia, CPR, R5 eligibility or R7 repairability.
 
+Completed first-round triage:
+
+- source subject workflow: `35370679448`;
+- successful triage workflow: `35377246079`;
+- 90 frozen trajectories -> 167 unique localized-audit cases;
+- result report: `docs/reports/2026-09-19/V5_Cross_Domain_Semantic_Triage_Report_v1.md`;
+- result manifest: `manifests/v5_cross_domain_semantic_triage_2026-09-19_v0_1.json`.
+
 Prospective sample geometry:
 
 - 30 natural trajectories per held-out domain;
