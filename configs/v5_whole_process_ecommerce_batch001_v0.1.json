@@ -1,0 +1,56 @@
+{
+  "schema": "RB-V5-WHOLE-PROCESS-BATCH-DESIGN-v0.1",
+  "version": "0.1",
+  "date": "2026-09-18",
+  "status": "FROZEN_DESIGN_CANDIDATE_NOT_PROVIDER_AUTHORIZED",
+  "batch_id": "V5-WP-ECOMMERCE-BATCH001",
+  "experiment_family": "PROCESS_REALITY_V5_WHOLE_PROCESS",
+  "domain_id": "ecommerce",
+  "planned_repeats": 3,
+  "subject_condition": "NATURAL_UNMANIPULATED",
+  "arena_config_path": "arena/config/arena_v0.3.json",
+  "model_config_path": "arena/config/model_deepseek_v0.2.json",
+  "theory_contract_path": "theory/theory_contract_v0.11.md",
+  "measurement_contract_path": "configs/process_reality_measurement_contract_v1.0.json",
+  "scout_config_path": "configs/structural_support_scout_v0.1.json",
+  "experiment_profile_path": "configs/first_paper_experiment_profile_v1.0.json",
+  "report_standard_path": "docs/reporting/process_reality_report_standard_v1_5.md",
+  "core_recording_requirements": [
+    "MODEL_INPUT_OUTPUT",
+    "RUNTIME_SNAPSHOT",
+    "SHARED_STATE_BEFORE_AFTER",
+    "SHARED_STATE_METADATA",
+    "STATE_WRITER_AND_EVENT_INDEX",
+    "MESSAGE_LEDGER_SEND_READ",
+    "INVOCATION_LEDGER_SEND_READ",
+    "MODEL_CALL_EVENT_RANGES",
+    "QUEUE_AND_TERMINATION",
+    "JOURNAL_HASH_CHAIN",
+    "USAGE_IF_AVAILABLE"
+  ],
+  "structural_candidate_outputs": [
+    "FIRST_STRUCTURAL_SUPPORT_CANDIDATE",
+    "FIRST_STABLE_SHARED_POOL_CANDIDATE",
+    "FIRST_STRUCTURAL_EXPOSURE_CANDIDATE",
+    "POOL_VISIBILITY_LEDGER",
+    "UPSTREAM_PROVENANCE_REFS",
+    "CANDIDATE_DOWNSTREAM_CLOSURE",
+    "CANDIDATE_SEMANTIC_AUDIT_WINDOW"
+  ],
+  "semantic_boundaries": {
+    "pool_visibility_is_direct_consumption": false,
+    "structural_support_is_semantic_adoption": false,
+    "exposure_is_semantic_origin": false,
+    "stable_pool_is_epistemic_truth": false
+  },
+  "base_optional_phases": {
+    "driver_probe": false,
+    "control_surface_experiment": false,
+    "localized_recovery": false,
+    "cpr_adjudication": false,
+    "paid_semantic_evaluator": false
+  },
+  "no_outcome_aware_rerun": true,
+  "automatic_paid_evaluator": false,
+  "paid_subject_execution_authorized": false
+}
