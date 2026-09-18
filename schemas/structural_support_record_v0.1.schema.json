@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-STRUCTURAL-SUPPORT-RECORD-v0.1",
+  "title": "Process Reality Structural Support Record v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "record_id",
+    "trace_id",
+    "candidate_status",
+    "source_refs",
+    "support_refs",
+    "pool_entry_refs",
+    "direct_consumer_refs",
+    "exposure_anchor_refs",
+    "relation_evidence_refs",
+    "structural_facts",
+    "semantic_status"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-STRUCTURAL-SUPPORT-RECORD-v0.1"
+    },
+    "record_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_status": {
+      "enum": [
+        "STRUCTURAL_CANDIDATE_ONLY",
+        "SEMANTIC_AUDIT_PENDING",
+        "SEMANTIC_AUDIT_BOUND"
+      ]
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "semantic_transformation_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "support_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "pool_entry_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "direct_consumer_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "exposure_anchor_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "source_epistemic_status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "pool_epistemic_status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "shared_addressability_status": {
+      "enum": [
+        "OBSERVED",
+        "NOT_OBSERVED",
+        "UNRESOLVED"
+      ]
+    },
+    "direct_consumption_status": {
+      "enum": [
+        "OBSERVED",
+        "NOT_OBSERVED",
+        "UNRESOLVED"
+      ]
+    },
+    "relation_evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "structural_facts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "semantic_status": {
+      "enum": [
+        "NOT_ADJUDICATED",
+        "SUPPORTED",
+        "SUPPORTED_CANDIDATE",
+        "NOT_ESTABLISHED",
+        "CONTRADICTED"
+      ]
+    },
+    "record_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
