@@ -272,13 +272,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          body="V5 cross-domain authorization accepted and converted to the existing fail-closed six-wave subject workflow_dispatch.
-
-Pinned execution ref: ${AUTH_TAG}
-Execution SHA: ${GITHUB_SHA}
-
-Frozen geometry: 3 held-out domains / 90 natural trajectories / 6 domain-pure waves / 15 trajectories per wave.
-Hard ceilings: 64 calls per run, USD 0.25 per run, USD 3.75 per wave, USD 22.50 first round.
-No paid evaluator, R5 probe, R7 repair, or R8 CPR adjudication is enabled by this dispatch."
+          body="V5 cross-domain authorization accepted and converted to the existing fail-closed six-wave subject workflow_dispatch.\n\nPinned execution ref: ${AUTH_TAG}\nExecution SHA: ${GITHUB_SHA}\n\nFrozen geometry: 3 held-out domains / 90 natural trajectories / 6 domain-pure waves / 15 trajectories per wave.\nHard ceilings: 64 calls per run, USD 0.25 per run, USD 3.75 per wave, USD 22.50 first round.\nNo paid evaluator, R5 probe, R7 repair, or R8 CPR adjudication is enabled by this dispatch."
           gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
           gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
