@@ -1,0 +1,29 @@
+name: V5 semantic mechanism re-audit validate
+
+on:
+  pull_request:
+    paths:
+      - "configs/v5_semantic_mechanism_reaudit_source_binding_v0.1.json"
+      - "reviews/v5_semantic_mechanism_reaudit_2026-09-18/**"
+      - "docs/reports/2026-09-18/Process_Reality_V5_Semantic_Mechanism_ReAudit_v1.md"
+      - "scripts/validate_v5_semantic_mechanism_reaudit.py"
+      - ".github/workflows/v5-semantic-mechanism-reaudit-validate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate v5 semantic/mechanism re-audit
+        run: python scripts/validate_v5_semantic_mechanism_reaudit.py
+      - name: Re-run v5 method and historical projection gates
+        run: |
+          python scripts/validate_process_reality_v5.py
+          python scripts/derive_v5_historical_rederivation.py --check results/v5_historical_rederivation/rederivation_bundle_v0_1.json

@@ -145,3 +145,28 @@ Prepared:
 The exact phrase `CALL_REAL_V5_WHOLE_PROCESS_API` is necessary but not sufficient: positive call/spending limits are also required. Workflow budget inputs default to zero.
 
 Current provider execution status: **NOT AUTHORIZED**.
+
+
+## Semantic / mechanism re-audit update
+
+A second-pass v5 semantic/mechanism audit is now recorded under:
+
+- `reviews/v5_semantic_mechanism_reaudit_2026-09-18/audit_records.jsonl`
+- `reviews/v5_semantic_mechanism_reaudit_2026-09-18/audit_summary.json`
+- `docs/reports/2026-09-18/Process_Reality_V5_Semantic_Mechanism_ReAudit_v1.md`
+
+Key refinement:
+
+- E5 Unstable Information: **SUPPORTED**
+- E6 semantic operationalization: **SUPPORTED**
+- E8 cross-Agent adoption: **SUPPORTED**
+- E11 Structural Support: **SUPPORTED_CANDIDATE**
+- Stable Shared Pool existence by observed R6 continuation: **SUPPORTED**
+- first Stable Shared Pool entry: **NOT_ESTABLISHED**
+- direct semantic pool consumption: **SUPPORTED_CANDIDATE**
+- E32/J0 Structural Exposure anchor: **SUPPORTED_CANDIDATE**
+- semantic descendant persistence: **SUPPORTED**
+- J0-specific semantic inertia: **NOT_ESTABLISHED**
+- structure-only driver: **NOT_ESTABLISHED**
+
+This audit is non-blind, theory-aware, append-only, and uses no new subject/provider or paid evaluator calls. CPR remains `NOT_ADJUDICATED`.
