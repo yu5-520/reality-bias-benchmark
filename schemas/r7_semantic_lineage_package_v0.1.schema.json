@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-R7-SEMANTIC-LINEAGE-PACKAGE-v0.1",
+  "title": "R7 Semantic Lineage Package v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "package_id",
+    "repair_anchor_ref",
+    "target_semantic_id",
+    "content_address",
+    "source_refs",
+    "transformation_refs",
+    "authority_refs",
+    "pool_refs",
+    "descendant_candidate_refs",
+    "affected_closure_refs",
+    "repair_closure_refs",
+    "machine_disposition",
+    "semantic_disposition_status",
+    "observation_policy",
+    "package_hash"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-R7-SEMANTIC-LINEAGE-PACKAGE-v0.1"
+    },
+    "package_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repair_anchor_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_semantic_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content_address": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "transformation_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "authority_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "pool_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "descendant_candidate_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "affected_closure_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "repair_closure_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "machine_disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "invalidated_post_anchor_refs",
+        "preserved_pre_anchor_lineage_refs",
+        "unresolved_semantic_compatibility_refs"
+      ],
+      "properties": {
+        "invalidated_post_anchor_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "preserved_pre_anchor_lineage_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unresolved_semantic_compatibility_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "semantic_disposition_status": {
+      "const": "DEFERRED_NOT_ADJUDICATED"
+    },
+    "observation_policy": {
+      "const": "FULL_LINEAGE_ALL_ARMS"
+    },
+    "package_hash": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
