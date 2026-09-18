@@ -196,8 +196,7 @@ jobs:
           assert s['c1_direct_exposures']==1
           assert s['c2_direct_exposures']>=2
           assert s['c2_reinjections']>=1
-          assert s['c3_authority_transform_count']==0
-          assert s['c3_direct_anchor_revision_count']==1
+          assert s['c3_branch_state_repair_count']==1
           assert s['c3_semantic_repair_packet_consumed'] is True
           assert isinstance(s['c3_old_lineage_reentry_detected'], bool)
           assert isinstance(s['c3_preserved_unrelated_structure'], bool)
@@ -305,6 +304,8 @@ jobs:
             'replicates':plan['replicates'],
             'common_reference_parent_state_hash':plan['source_binding']['source_parent_state_hash'],
             'c3_recovery_checkpoint_state_hash':plan['source_binding']['source_recovery_checkpoint_hash'],
+            'c3_repaired_parent_state_hash':plan['c3_repaired_parent_state_hash'],
+            'c3_repair_application_hash':plan['c3_repair_application_hash'],
             'measurement_schema':plan['measurement_schema'],
             'c1_runtime_ready':True,
             'c2_runtime_ready':True,

@@ -9,55 +9,141 @@ from arena.r7_semantic_repair_runtime import (
 )
 
 
-def make_snapshot():
-    snap = {
+TARGET = "inventory_stockout_assessment_v1"
+
+
+def snapshot(*, turns, target_status, anchor_name, queue, include_post_anchor=False):
+    base_state = {
+        TARGET: {"A": {"preliminary_stock": 1520}},
+        "unrelated_finance_state": {"budget": 100},
+    }
+    base_meta = {
+        TARGET: {
+            "status": target_status,
+            "basis": "fixture",
+            "writer": "inventory",
+            "event_index": 32 if turns >= 8 else 10,
+        },
+        "unrelated_finance_state": {"status": "fact", "writer": "finance"},
+    }
+    events = []
+    for i in range(32):
+        events.append({
+            "event_index": i,
+            "actor": "ops_lead",
+            "turn": min(i, 7),
+            "action_type": "finalize" if i == 31 else "message",
+            "action": {"type": "finalize"} if i == 31 else {"type": "message"},
+            "realized_in_baseline": True,
+            "shared_state_after": copy.deepcopy(base_state),
+            "shared_state_metadata_after": copy.deepcopy(base_meta),
+            "final_state_after": {"state": copy.deepcopy(base_state), "state_metadata": copy.deepcopy(base_meta)},
+            "active_agents_after": ["inventory", "ops_lead"],
+            "queue_after": [],
+        })
+    if turns >= 8:
+        events.append({
+            "event_index": 32,
+            "actor": "inventory",
+            "turn": 8,
+            "action_type": "write_state",
+            "action": {"type": "write_state", "key": TARGET, "status": "fact", "value": copy.deepcopy(base_state[TARGET])},
+            "realized_in_baseline": True,
+            "shared_state_after": copy.deepcopy(base_state),
+            "shared_state_metadata_after": copy.deepcopy(base_meta),
+            "final_state_after": {"state": copy.deepcopy(base_state), "state_metadata": copy.deepcopy(base_meta)},
+            "active_agents_after": ["inventory", "ops_lead"],
+            "queue_after": [],
+        })
+        if include_post_anchor:
+            events.append({
+                "event_index": 33,
+                "actor": "inventory",
+                "turn": 8,
+                "action_type": "message",
+                "action": {
+                    "type": "message",
+                    "to": "ops_lead",
+                    "message_id": "M00020",
+                    "content": "old factual descendant",
+                },
+                "realized_in_baseline": True,
+                "shared_state_after": copy.deepcopy(base_state),
+                "shared_state_metadata_after": copy.deepcopy(base_meta),
+                "final_state_after": {"state": copy.deepcopy(base_state), "state_metadata": copy.deepcopy(base_meta)},
+                "active_agents_after": ["inventory", "ops_lead"],
+                "queue_after": ["ops_lead"],
+            })
+            events.append({
+                "event_index": 34,
+                "actor": "inventory",
+                "turn": 8,
+                "action_type": "finalize",
+                "action": {"type": "finalize", "answer": "old descendant final"},
+                "realized_in_baseline": True,
+                "shared_state_after": copy.deepcopy(base_state),
+                "shared_state_metadata_after": copy.deepcopy(base_meta),
+                "final_state_after": {"state": copy.deepcopy(base_state), "state_metadata": copy.deepcopy(base_meta)},
+                "active_agents_after": ["inventory", "ops_lead"],
+                "queue_after": ["ops_lead"],
+            })
+
+    inboxes = {"inventory": [], "ops_lead": [], "ads": [], "finance": []}
+    message_ledger = []
+    if include_post_anchor:
+        inboxes["ops_lead"] = [{
+            "_message_id": "M00020",
+            "type": "agent_message",
+            "from": "inventory",
+            "content": "old factual descendant",
+        }]
+        message_ledger = [{
+            "message_id": "M00020",
+            "sender": "inventory",
+            "recipient": "ops_lead",
+            "message_type": "agent_message",
+            "content": {"type": "agent_message", "from": "inventory", "content": "old factual descendant"},
+            "sent_turn": 8,
+            "delivered_turn": 8,
+            "read_turn": None,
+            "read_by": None,
+            "invocation_id": None,
+        }]
+
+    row = {
         "schema": "RB-EXPERIMENTAL-STATE-SNAPSHOT-v0.1",
-        "run_id": "fixture",
+        "run_id": "fixture-run",
         "domain_id": "ecommerce",
-        "anchor_ref": "after_turn:8",
+        "anchor_ref": anchor_name,
         "parent_trace_hash": "TRACE",
-        "turns": 8,
-        "shared_state": {
-            "inventory_stockout_assessment_v1": {"A": {"preliminary_stock": 1520}},
-            "unrelated_finance_state": {"budget": 100},
-        },
-        "shared_state_metadata": {
-            "inventory_stockout_assessment_v1": {
-                "status": "fact",
-                "writer": "inventory",
-                "event_index": 32,
-                "basis": "fixture",
-            },
-            "unrelated_finance_state": {"status": "fact", "writer": "finance"},
-        },
-        "final_state": None,
-        "active_agents": ["ops_lead"],
-        "inboxes": {"ops_lead": [], "inventory": [], "finance": [], "ads": []},
-        "queue": ["ops_lead"],
-        "events": [],
+        "turns": turns,
+        "shared_state": copy.deepcopy(base_state),
+        "shared_state_metadata": copy.deepcopy(base_meta),
+        "final_state": {"state": copy.deepcopy(base_state), "state_metadata": copy.deepcopy(base_meta)},
+        "active_agents": ["inventory", "ops_lead"],
+        "inboxes": inboxes,
+        "queue": list(queue),
+        "events": events,
         "total_invocations": 0,
-        "late_event_delivered": False,
-        "late_event_consumed": False,
+        "late_event_delivered": True,
+        "late_event_consumed": True,
         "terminated": False,
         "termination_reason": None,
-        "last_finalizer": None,
+        "last_finalizer": "inventory" if include_post_anchor else "ops_lead",
         "failures": [],
         "budget_hits": [],
-        "message_ledger": [],
+        "message_ledger": message_ledger,
         "invocation_ledger": [],
-        "execution_ledger": [],
-        "message_seq": 0,
+        "execution_ledger": [{"agent_id": "inventory", "turn": 8, "status": "completed"}] if turns >= 8 else [],
+        "message_seq": 20 if include_post_anchor else 19,
         "invocation_seq": 0,
-        "last_read_message_ids": [],
+        "last_read_message_ids": ["M00019"] if turns >= 8 else [],
         "last_read_invocation_ids": [],
         "replay_scope": "deterministic_arena_state_only",
         "provider_internal_state_captured": False,
     }
-    snap["state_hash"] = stable_hash(snap)
-    material = copy.deepcopy(snap)
-    material.pop("state_hash")
-    snap["state_hash"] = stable_hash(material)
-    return snap
+    row["state_hash"] = stable_hash({k: v for k, v in row.items() if k != "state_hash"})
+    return row
 
 
 def fixture_bundle():
@@ -96,114 +182,152 @@ def fixture_bundle():
         "gate_hash": "GATE_HASH",
         "status": "COMPLETE_FOR_AUTHORIZED_REPAIR",
     }
-    parent = make_snapshot()
-    binding = {
-        "state_key": "inventory_stockout_assessment_v1",
-        "from_status": "fact",
-        "to_status": "unconfirmed",
-        "jump_source_event_index": 32,
-        "common_reference_parent_state_hash": parent["state_hash"],
-    }
-    repaired, revision = build_repaired_parent_snapshot(
-        packet=packet,
-        gate=gate,
-        parent=parent,
-        binding=binding,
+    parent = snapshot(
+        turns=8,
+        target_status="fact",
+        anchor_name="after_turn:8",
+        queue=["ops_lead"],
+        include_post_anchor=True,
     )
-    binding["repaired_parent_state_hash"] = repaired["state_hash"]
-    return {
+    checkpoint = snapshot(
+        turns=7,
+        target_status="preliminary",
+        anchor_name="before_turn:8",
+        queue=["inventory"],
+        include_post_anchor=False,
+    )
+    bundle = {
         "semantic_repair_packet": packet,
         "lineage_completeness_gate": gate,
+        "c3_recovery_checkpoint": checkpoint,
         "source_parent_snapshot": parent,
-        "c3_repaired_parent_snapshot": repaired,
-        "c3_direct_anchor_revision": revision,
-        "c3_alr_binding": binding,
-    }
-
-
-def fixture_trace(*, reentry=False):
-    events = [
-        {
-            "event_index": 33,
-            "turn": 9,
-            "realized_in_baseline": True,
-            "action_type": "message",
-            "action": {"type": "message", "to": "ads"},
+        "c3_alr_binding": {
+            "state_key": TARGET,
+            "from_status": "fact",
+            "to_status": "unconfirmed",
+            "common_reference_parent_state_hash": parent["state_hash"],
+            "recovery_checkpoint_state_hash": checkpoint["state_hash"],
         },
-    ]
+    }
+    return bundle
+
+
+def fixture_trace(*, repaired_hash, start_event_count, reentry=False, unrelated_final_budget=100):
+    events = [{"event_index": i, "turn": 8, "action_type": "message", "action": {"type": "message"}, "realized_in_baseline": True} for i in range(start_event_count)]
+    events.append({
+        "event_index": start_event_count,
+        "turn": 9,
+        "realized_in_baseline": True,
+        "action_type": "message",
+        "action": {"type": "message", "to": "inventory"},
+    })
     if reentry:
         events.append({
-            "event_index": 34,
+            "event_index": start_event_count + 1,
             "turn": 10,
             "realized_in_baseline": True,
             "action_type": "write_state",
-            "action": {
-                "type": "write_state",
-                "key": "inventory_stockout_assessment_v1",
-                "status": "fact",
-            },
+            "action": {"type": "write_state", "key": TARGET, "status": "fact"},
         })
     return {
+        "r7_condition": {
+            "arm_id": "C3_ALR",
+            "condition_status": "OBSERVED",
+            "branch_start_state_hash": repaired_hash,
+        },
+        "runtime_transform_records": [],
+        "action_transform_records": [],
         "events": events,
         "model_calls": [{"turn": 9, "agent_id": "ops_lead"}],
         "final_state": {
             "state": {
-                "inventory_stockout_assessment_v1": {"A": {"preliminary_stock": 1520}},
-                "unrelated_finance_state": {"budget": 90},
+                TARGET: {"A": {"preliminary_stock": 1520}},
+                "unrelated_finance_state": {"budget": unrelated_final_budget},
             },
             "state_metadata": {
-                "inventory_stockout_assessment_v1": {"status": "unconfirmed"},
-                "unrelated_finance_state": {"status": "recommendation", "writer": "finance"},
+                TARGET: {"status": "unconfirmed", "basis": "fixture", "writer": "inventory", "event_index": 32},
+                "unrelated_finance_state": {"status": "fact", "writer": "finance"},
             },
         },
     }
 
 
 class R7SemanticRepairRuntimeTest(unittest.TestCase):
-    def test_direct_anchor_revision_preserves_target_value_and_unrelated_parent(self):
-        bundle = fixture_bundle()
-        parent = bundle["source_parent_snapshot"]
-        repaired = bundle["c3_repaired_parent_snapshot"]
-        self.assertEqual(parent["shared_state"]["inventory_stockout_assessment_v1"], repaired["shared_state"]["inventory_stockout_assessment_v1"])
-        self.assertEqual("fact", parent["shared_state_metadata"]["inventory_stockout_assessment_v1"]["status"])
-        self.assertEqual("unconfirmed", repaired["shared_state_metadata"]["inventory_stockout_assessment_v1"]["status"])
-        self.assertEqual(parent["shared_state"]["unrelated_finance_state"], repaired["shared_state"]["unrelated_finance_state"])
-
-    def test_packet_drives_direct_revision_and_downstream_verification(self):
+    def _build(self):
         bundle = fixture_bundle()
         plan = build_semantic_repair_runtime_plan(
             packet=bundle["semantic_repair_packet"],
             gate=bundle["lineage_completeness_gate"],
             bundle=bundle,
         )
-        verification = verify_semantic_repair_trace(
-            trace=fixture_trace(),
+        repaired, application = build_repaired_parent_snapshot(
+            parent_snapshot=bundle["source_parent_snapshot"],
             plan=plan,
-            source_parent=bundle["source_parent_snapshot"],
-            repaired_parent=bundle["c3_repaired_parent_snapshot"],
+        )
+        return bundle, plan, repaired, application
+
+    def test_repair_snapshot_repairs_anchor_and_invalidates_same_turn_descendants(self):
+        bundle, plan, repaired, application = self._build()
+        parent = bundle["source_parent_snapshot"]
+        self.assertEqual(parent["shared_state"][TARGET], repaired["shared_state"][TARGET])
+        self.assertEqual("fact", parent["shared_state_metadata"][TARGET]["status"])
+        self.assertEqual("unconfirmed", repaired["shared_state_metadata"][TARGET]["status"])
+        self.assertEqual(33, len(repaired["events"]))
+        self.assertEqual(["arena_event:33", "arena_event:34"], application["invalidated_event_refs"])
+        self.assertEqual(["M00020"], application["invalidated_message_ids"])
+        self.assertEqual([], repaired["inboxes"]["ops_lead"])
+        self.assertEqual(["ops_lead"], repaired["queue"])
+        self.assertEqual(["shared_state_metadata.inventory_stockout_assessment_v1.status"], application["changed_paths"])
+        self.assertTrue(application["direct_unrelated_anchor_state_preserved"])
+        self.assertTrue(application["post_anchor_descendants_invalidated"])
+
+    def test_packet_drives_runtime_plan_and_verification(self):
+        _, plan, repaired, application = self._build()
+        verification = verify_semantic_repair_trace(
+            trace=fixture_trace(
+                repaired_hash=repaired["state_hash"],
+                start_event_count=len(repaired["events"]),
+            ),
+            plan=plan,
+            repair_application=application,
         )
         self.assertTrue(verification["target_integrity_repair_executed"])
+        self.assertTrue(verification["authority_state_repair_applied"])
         self.assertTrue(verification["repair_closure_invalidated_at_branch_start"])
         self.assertTrue(verification["preserved_unrelated_structure"])
         self.assertFalse(verification["old_lineage_reentry_detected"])
+        self.assertEqual(["arena_event:33", "arena_event:34"], verification["invalidated_event_refs"])
+        self.assertEqual(["M00020"], verification["invalidated_message_ids"])
         self.assertGreaterEqual(len(verification["recomputed_descendant_refs"]), 1)
-        self.assertIn("shared_state:unrelated_finance_state", verification["post_repair_unrelated_change_refs"])
 
     def test_old_lineage_reentry_is_detected(self):
-        bundle = fixture_bundle()
-        plan = build_semantic_repair_runtime_plan(
-            packet=bundle["semantic_repair_packet"],
-            gate=bundle["lineage_completeness_gate"],
-            bundle=bundle,
-        )
+        _, plan, repaired, application = self._build()
         verification = verify_semantic_repair_trace(
-            trace=fixture_trace(reentry=True),
+            trace=fixture_trace(
+                repaired_hash=repaired["state_hash"],
+                start_event_count=len(repaired["events"]),
+                reentry=True,
+            ),
             plan=plan,
-            source_parent=bundle["source_parent_snapshot"],
-            repaired_parent=bundle["c3_repaired_parent_snapshot"],
+            repair_application=application,
         )
         self.assertTrue(verification["old_lineage_reentry_detected"])
         self.assertEqual(["arena_event:34"], verification["old_lineage_reentry_refs"])
+
+    def test_downstream_unrelated_drift_is_descriptive_not_direct_repair_collateral(self):
+        _, plan, repaired, application = self._build()
+        verification = verify_semantic_repair_trace(
+            trace=fixture_trace(
+                repaired_hash=repaired["state_hash"],
+                start_event_count=len(repaired["events"]),
+                unrelated_final_budget=90,
+            ),
+            plan=plan,
+            repair_application=application,
+        )
+        self.assertTrue(verification["preserved_unrelated_structure"])
+        self.assertIn("unrelated_finance_state", verification["post_recompute_unrelated_changed_keys"])
+        self.assertEqual("DIRECT_REPAIR_APPLICATION_AT_ANCHOR", verification["preservation_scope"])
 
 
 if __name__ == "__main__":
