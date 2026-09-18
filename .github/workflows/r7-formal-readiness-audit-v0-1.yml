@@ -155,6 +155,8 @@ jobs:
             --protocol "$R7_PROTOCOL" \
             --r5-plan-dir "$RUNNER_TEMP/r7_r5_prepared/results/r5mid_prospective_one_shot_plan_v0_3" \
             --source-snapshots "$RUNNER_TEMP/r7_raw_source/results/prospective_natural_raw/snapshots/prospective-ecommerce-natural-0001.jsonl" \
+            --semantic-repair-packet results/r5r6_engineering_gate/semantic_repair_packet.json \
+            --lineage-completeness-gate results/r5r6_engineering_gate/lineage_completeness_gate.json \
             --replicates 2 \
             --plan-code-sha '${{ github.sha }}' \
             --outdir results/r7_readiness_plan
@@ -170,6 +172,11 @@ jobs:
           assert p['real_subject_execution_authorized'] is False
           assert p['paid_subject_authorization_status']=='NOT_AUTHORIZED'
           assert p['semantic_cpr_status']=='NOT_ADJUDICATED'
+          packet=json.load(open('results/r5r6_engineering_gate/semantic_repair_packet.json'))
+          gate=json.load(open('results/r5r6_engineering_gate/lineage_completeness_gate.json'))
+          assert p['semantic_repair_packet_hash']==packet['packet_hash']
+          assert p['lineage_completeness_gate_hash']==gate['gate_hash']
+          assert p['repair_closure_refs']==packet['repair_closure_refs']
           print('R7_EXACT_SIX_BRANCH_PLAN=READY_OFFLINE')
           PY
 
@@ -188,6 +195,9 @@ jobs:
           assert s['c2_direct_exposures']>=2
           assert s['c2_reinjections']>=1
           assert s['c3_authority_transform_count']==1
+          assert s['c3_semantic_repair_packet_consumed'] is True
+          assert isinstance(s['c3_old_lineage_reentry_detected'], bool)
+          assert isinstance(s['c3_preserved_unrelated_structure'], bool)
           assert s['source_snapshots_immutable'] is True
           assert s['paid_api_called'] is False
           assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
@@ -228,6 +238,7 @@ jobs:
           assert s['measurement_count']==3
           assert s['r7a_comparison_count']==1
           assert s['r7b_comparison_count']==1
+          assert s['semantic_repair_verification_count']==1
           assert s['integrity_failure_count']==0
           assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
           print('R7_FREEZE_BEFORE_DERIVE_CHAIN=PASS')
@@ -295,6 +306,10 @@ jobs:
             'c1_runtime_ready':True,
             'c2_runtime_ready':True,
             'c3_runtime_ready':True,
+            'semantic_repair_packet_runtime_consumed':smoke['c3_semantic_repair_packet_consumed'],
+            'semantic_repair_verification_count':derived['semantic_repair_verification_count'],
+            'old_lineage_reentry_detected_count':derived['old_lineage_reentry_detected_count'],
+            'preserved_unrelated_structure_pass_count':derived['preserved_unrelated_structure_pass_count'],
             'deterministic_smoke_summary_hash':smoke['summary_hash'],
             'engineering_evidence_batch_hash':evidence['evidence_batch_hash'],
             'engineering_derivation_summary_hash':derived['summary_hash'],
