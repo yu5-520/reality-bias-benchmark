@@ -56,6 +56,23 @@ jobs:
           print('PAID_SUBJECT_AUTHORIZED=NO')
           PY
 
+      - name: Build and validate R5-R6 engineering entry package
+        run: |
+          set -euo pipefail
+          python -m arena.r5r6_engineering_package --outdir results/r5r6_engineering_gate
+          python - <<'PY'
+          import json
+          s=json.load(open('results/r5r6_engineering_gate/summary.json'))
+          p=json.load(open('results/r5r6_engineering_gate/semantic_repair_packet.json'))
+          g=json.load(open('results/r5r6_engineering_gate/lineage_completeness_gate.json'))
+          assert s['status']=='READY_FOR_R7_SEPARATE_AUTHORIZATION'
+          assert g['status']=='COMPLETE_FOR_AUTHORIZED_REPAIR'
+          assert g['automatic_repair_allowed'] is False
+          assert p['repair_authorization_status']=='READY_FOR_SEPARATE_AUTHORIZATION'
+          assert s['active_repair_authorized'] is False
+          print('R5R6_TO_R7_ENTRY_GATE=PASS')
+          PY
+
       - name: Validate protocol and full offline test suite
         run: |
           set -euo pipefail
@@ -243,6 +260,9 @@ jobs:
           smoke=json.load(open('results/r7_readiness_smoke/summary.json'))
           evidence=json.load(open('results/r7_readiness_smoke/evidence_batch.json'))
           derived=json.load(open('results/r7_readiness_derived/summary.json'))
+          eng=json.load(open('results/r5r6_engineering_gate/summary.json'))
+          packet=json.load(open('results/r5r6_engineering_gate/semantic_repair_packet.json'))
+          gate=json.load(open('results/r5r6_engineering_gate/lineage_completeness_gate.json'))
           report={
             'schema':'RB-R7-FORMAL-READINESS-AUDIT-RESULT-v0.1',
             'date':'2026-09-17',
@@ -265,6 +285,11 @@ jobs:
             'engineering_r7a_comparison_count':derived['r7a_comparison_count'],
             'engineering_r7b_comparison_count':derived['r7b_comparison_count'],
             'engineering_integrity_failure_count':derived['integrity_failure_count'],
+            'r5r6_engineering_entry_status':eng['status'],
+            'r5r6_engineering_summary_hash':eng['summary_hash'],
+            'semantic_repair_packet_hash':packet['packet_hash'],
+            'lineage_completeness_status':gate['status'],
+            'lineage_completeness_gate_hash':gate['gate_hash'],
             'real_runner_preflight_passed':True,
             'paid_subject_authorized':False,
             'paid_api_called':False,
@@ -288,6 +313,7 @@ jobs:
           mkdir -p r7_readiness_bundle
           cp "$AUDIT_REQUEST" r7_readiness_bundle/audit_request.json
           cp results/r7_readiness_report.json r7_readiness_bundle/readiness_report.json
+          cp -r results/r5r6_engineering_gate r7_readiness_bundle/r5r6_engineering_gate
           cp -r results/r7_readiness_plan r7_readiness_bundle/plan
           cp -r results/r7_readiness_smoke r7_readiness_bundle/engineering_smoke
           cp -r results/r7_readiness_derived r7_readiness_bundle/engineering_derivation
