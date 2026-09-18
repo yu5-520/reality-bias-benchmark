@@ -191,7 +191,10 @@ jobs:
           assert repaired['shared_state']==json.load(open('/tmp/r7_real_parent_bound_plan/source_parent_snapshot.json'))['shared_state']
           assert repaired['shared_state_metadata']['inventory_stockout_assessment_v1']['status']=='unconfirmed'
           assert repair['changed_paths']==['shared_state_metadata.inventory_stockout_assessment_v1.status']
-          assert repair['direct_unrelated_parent_state_preserved'] is True
+          assert repair['direct_unrelated_anchor_state_preserved'] is True
+          assert repair['post_anchor_descendants_invalidated'] is True
+          assert repair['invalidated_event_refs']==['arena_event:33','arena_event:34']
+          assert repair['invalidated_message_ids']==['M00020']
           assert c3['branch_start_state_hash']==repaired['state_hash']
           assert c3['branch_start_is_common_parent'] is False
           assert p['c3_repaired_parent_state_hash']==repaired['state_hash']
