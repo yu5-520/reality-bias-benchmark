@@ -220,8 +220,10 @@ def build_audit(binding_path: str = DEFAULT_BINDING) -> dict:
     _require_tokens(
         "arena/run_r7_three_arm_real.py",
         [
-            "build_semantic_repair_runtime_plan",
+            'bundle["semantic_repair_runtime_plan"]',
+            'bundle["c3_repair_application"]',
             "verify_semantic_repair_trace",
+            'trace["r7_repair_application"]',
             'trace["r7_semantic_repair_verification"]',
         ],
     )
