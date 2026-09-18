@@ -58,16 +58,16 @@ def _condition_integrity(trace: dict[str, Any], arm_id: str) -> dict[str, Any]:
     elif arm_id == "C3_ALR":
         status = condition.get("condition_status")
         repair_verification = trace.get("r7_semantic_repair_verification")
-        if status == "OBSERVED" and len(action_records) != 1:
-            failures.append("C3_OBSERVED_REQUIRES_ONE_AUTHORITY_TRANSFORM")
-        if status == "OBSERVED" and not isinstance(repair_verification, dict):
-            failures.append("C3_OBSERVED_REQUIRES_SEMANTIC_REPAIR_VERIFICATION")
-        if status == "OBSERVED" and isinstance(repair_verification, dict) and repair_verification.get("target_integrity_repair_executed") is not True:
-            failures.append("C3_REPAIR_VERIFICATION_TARGET_NOT_EXECUTED")
-        if status != "OBSERVED" and action_records:
-            failures.append("C3_NONREALIZED_MUST_NOT_HAVE_AUTHORITY_TRANSFORM")
+        if status != "OBSERVED":
+            failures.append("C3_DIRECT_ANCHOR_REVISION_MUST_BE_OBSERVED")
+        if action_records:
+            failures.append("C3_DIRECT_ANCHOR_REVISION_ACTION_TRANSFORM_FORBIDDEN")
         if runtime_records:
             failures.append("C3_PROMPT_RUNTIME_OVERLAY_FORBIDDEN")
+        if not isinstance(repair_verification, dict):
+            failures.append("C3_OBSERVED_REQUIRES_SEMANTIC_REPAIR_VERIFICATION")
+        elif repair_verification.get("target_integrity_repair_executed") is not True:
+            failures.append("C3_REPAIR_VERIFICATION_TARGET_NOT_EXECUTED")
     else:
         failures.append("UNKNOWN_ARM")
     return {
@@ -136,6 +136,7 @@ def derive_r7(*, plan_dir: str | Path, traces_path: str | Path, evidence_batch_p
             "common_reference_parent_state_hash": bundle["source_parent_snapshot"]["state_hash"],
             "branch_start_state_hash": condition.get("branch_start_state_hash"),
             "c3_recovery_checkpoint_state_hash": bundle["c3_recovery_checkpoint"]["state_hash"] if arm_id == "C3_ALR" else None,
+            "c3_repaired_parent_state_hash": bundle["c3_repaired_parent_snapshot"]["state_hash"] if arm_id == "C3_ALR" else None,
             "semantic_payload_hash": bundle["plan"]["semantic_payload_hash"],
             "observation_horizon_id": bundle["plan"]["matched_horizon"]["horizon_id"],
             "runtime_transform_count": integrity["runtime_transform_count"],

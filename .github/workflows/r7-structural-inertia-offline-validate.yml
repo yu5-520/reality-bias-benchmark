@@ -165,6 +165,8 @@ jobs:
           p=json.load(open('/tmp/r7_real_parent_bound_plan/r7_plan.json'))
           rows=[json.loads(x) for x in open('/tmp/r7_real_parent_bound_plan/arm_manifests.jsonl')]
           checkpoint=json.load(open('/tmp/r7_real_parent_bound_plan/c3_recovery_checkpoint.json'))
+          repaired=json.load(open('/tmp/r7_real_parent_bound_plan/c3_repaired_parent_snapshot.json'))
+          revision=json.load(open('/tmp/r7_real_parent_bound_plan/c3_direct_anchor_revision.json'))
           assert p['source_binding']['source_parent_state_hash']=='aca000a63106a393efe35dad4e0051e09f0e0cf0d6ced09640f6f9fd2eb2a47c'
           assert p['source_binding']['source_recovery_checkpoint_hash']=='99731abb4ffd1caa2e568a6c2d90987700b3d0b7a66a1c777f811b666912a349'
           assert p['source_binding']['source_r5_plan_hash']=='a24c98901422bbccfc9a040a6bc14575b1c710edd518c0d9c2facf7a57926351'
@@ -186,9 +188,13 @@ jobs:
           assert len({x['observation_horizon_id'] for x in rows})==1
           assert all(x['execution_readiness']=='RUNTIME_MECHANISM_READY' for x in rows)
           c3=[x for x in rows if x['arm_id']=='C3_ALR'][0]
-          assert c3['branch_start_state_hash']==checkpoint['state_hash']
+          assert c3['branch_start_state_hash']==repaired['state_hash']
           assert c3['branch_start_is_common_parent'] is False
-          print('PASS: R7 exact parent + pre-J0 ALR checkpoint binding verified')
+          assert repaired['turns']==8
+          assert repaired['shared_state_metadata']['inventory_stockout_assessment_v1']['status']=='unconfirmed'
+          assert revision['source_parent_state_hash']==p['source_binding']['source_parent_state_hash']
+          assert p['c3_repaired_parent_state_hash']==repaired['state_hash']
+          print('PASS: R7 exact parent + direct content-addressed anchor revision verified')
           PY
 
       - name: Exercise C1/C2/C3 in the real Arena loop with an offline deterministic provider
@@ -205,7 +211,8 @@ jobs:
           assert s['c1_direct_exposures']==1
           assert s['c2_direct_exposures']>=2
           assert s['c2_reinjections']>=1
-          assert s['c3_authority_transform_count']==1
+          assert s['c3_authority_transform_count']==0
+          assert s['c3_direct_anchor_revision_count']==1
           assert s['c3_semantic_repair_packet_consumed'] is True
           assert isinstance(s['c3_old_lineage_reentry_detected'], bool)
           assert isinstance(s['c3_preserved_unrelated_structure'], bool)

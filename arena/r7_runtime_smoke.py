@@ -6,7 +6,6 @@ import copy
 import json
 from pathlib import Path
 
-from .alr_recovery import AuthorityLocalizedEnvelopeTransform
 from .core import stable_hash
 from .engine import run_arena_once
 from .io_utils import load_json, load_jsonl, write_jsonl
@@ -29,6 +28,8 @@ def load_r7_plan_bundle(plan_dir: str | Path) -> dict:
         "plan": load_json(p / "r7_plan.json"),
         "source_parent_snapshot": load_json(p / "source_parent_snapshot.json"),
         "c3_recovery_checkpoint": load_json(p / "c3_recovery_checkpoint.json"),
+        "c3_repaired_parent_snapshot": load_json(p / "c3_repaired_parent_snapshot.json"),
+        "c3_direct_anchor_revision": load_json(p / "c3_direct_anchor_revision.json"),
         "c1_one_shot_envelope": load_json(p / "c1_one_shot_envelope.json"),
         "c2_persistent_field_envelope": load_json(p / "c2_persistent_field_envelope.json"),
         "c3_alr_binding": load_json(p / "c3_alr_binding.json"),
@@ -45,35 +46,16 @@ def load_r7_plan_bundle(plan_dir: str | Path) -> dict:
 class R7OfflineSmokeProvider:
     """Deterministic provider used only to exercise R7 runtime plumbing.
 
-    It is not a model replay and its traces are never scientific evidence. The
-    first C3 turn intentionally emits a J0-shaped `fact` write so the ALR action
-    transform can be verified inside the real Arena execution loop.
+    It is not a model replay and its traces are never scientific evidence. C3
+    starts from the already-revised post-J0 parent; the provider only exercises
+    downstream recomputation and never needs to reproduce J0.
     """
 
     def complete_agent(self, messages, metadata=None):
         metadata = metadata or {}
         actor = metadata.get("agent_id")
         turn = int(metadata.get("turn") or 0)
-        if actor == "inventory" and turn == 8:
-            envelope = {
-                "decision_summary": "offline smoke: reproduce J0-shaped authority commit",
-                "actions": [
-                    {
-                        "type": "write_state",
-                        "key": "inventory_stockout_assessment_v1",
-                        "value": {"offline_smoke": True, "turn": 8},
-                        "status": "fact",
-                        "basis": "offline engineering smoke only",
-                    },
-                    {
-                        "type": "message",
-                        "to": "ops_lead",
-                        "content": "offline smoke continuation after authority commit",
-                    },
-                    {"type": "finalize", "answer": "offline smoke turn 8"},
-                ],
-            }
-        elif actor == "ops_lead" and turn == 9:
+        if actor == "ops_lead" and turn == 9:
             envelope = {
                 "decision_summary": "offline smoke: keep one downstream turn pending",
                 "actions": [
@@ -112,6 +94,7 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
 
     parent_material_hash = stable_hash(bundle["source_parent_snapshot"])
     checkpoint_material_hash = stable_hash(bundle["c3_recovery_checkpoint"])
+    repaired_parent_material_hash = stable_hash(bundle["c3_repaired_parent_snapshot"])
     traces: list[dict] = []
     arm_summaries: dict[str, dict] = {}
 
@@ -127,21 +110,11 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
             start = bundle["source_parent_snapshot"]
             runtime_transform = PersistentFieldRuntimeViewTransform(bundle["c2_persistent_field_envelope"])
         else:
-            start = bundle["c3_recovery_checkpoint"]
-            alr = bundle["c3_alr_binding"]
+            start = bundle["c3_repaired_parent_snapshot"]
             semantic_repair_runtime_plan = build_semantic_repair_runtime_plan(
                 packet=bundle["semantic_repair_packet"],
                 gate=bundle["lineage_completeness_gate"],
                 bundle=bundle,
-            )
-            action_transform = AuthorityLocalizedEnvelopeTransform(
-                target_actor=alr["target_actor"],
-                target_turn=int(alr["target_reexecution_turn"]),
-                state_key=semantic_repair_runtime_plan["target_state_key"],
-                from_status=semantic_repair_runtime_plan["authority_from_status"],
-                to_status=semantic_repair_runtime_plan["authority_to_status"],
-                jump_ref=semantic_repair_runtime_plan["repair_anchor_ref"],
-                semantic_payload_hash=alr["semantic_payload_hash"],
             )
 
         trace = run_arena_once(
@@ -152,7 +125,7 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
             logical_seed=1,
             initial_state_snapshot=start,
             runtime_view_transform=runtime_transform,
-            action_envelope_transform=action_transform,
+            action_envelope_transform=None,
         )
         trace["r7_smoke_arm_id"] = arm_id
         trace["r7_smoke_manifest_hash"] = manifest["manifest_hash"]
@@ -169,43 +142,20 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
             _require(not trace["action_transform_records"], "r7_smoke_c2_action_transform_forbidden")
             arm_summaries[arm_id] = runtime_transform.summary()
         else:
-            action_transform.verify_finished()
-            _require(len(trace["action_transform_records"]) == 1, "r7_smoke_c3_authority_transform_count_invalid")
+            _require(not trace["action_transform_records"], "r7_smoke_c3_action_transform_forbidden")
             _require(not trace["runtime_transform_records"], "r7_smoke_c3_prompt_overlay_forbidden")
-            turn8 = next(call for call in trace["model_calls"] if call["agent_id"] == "inventory" and call["turn"] == 8)
-            raw_actions = turn8["parsed_envelope"]["actions"]
-            applied_actions = turn8["applied_envelope"]["actions"]
-            raw_target = [a for a in raw_actions if a.get("type") == "write_state" and a.get("key") == "inventory_stockout_assessment_v1"]
-            applied_target = [a for a in applied_actions if a.get("type") == "write_state" and a.get("key") == "inventory_stockout_assessment_v1"]
-            _require(len(raw_target) == len(applied_target) == 1, "r7_smoke_c3_target_action_missing")
-            _require(raw_target[0]["status"] == "fact", "r7_smoke_c3_raw_authority_status_not_preserved")
-            _require(applied_target[0]["status"] == "unconfirmed", "r7_smoke_c3_applied_authority_status_not_recovered")
-            _require(
-                trace["events"][32]["action_type"] == "write_state"
-                and trace["events"][32]["shared_state_metadata_after"]["inventory_stockout_assessment_v1"]["status"] == "unconfirmed",
-                "r7_smoke_c3_realized_state_did_not_use_recovered_authority_status",
-            )
-            revision = {
-                "schema": "RB-R7-C3-REVISION-LINEAGE-v0.1",
-                "common_reference_parent_state_hash": bundle["source_parent_snapshot"]["state_hash"],
-                "recovery_checkpoint_state_hash": bundle["c3_recovery_checkpoint"]["state_hash"],
-                "semantic_payload_hash": bundle["c3_alr_binding"]["semantic_payload_hash"],
-                "reopened_source_event_range": bundle["c3_alr_binding"]["reopened_source_event_range"],
-                "authority_transform_hashes": action_transform.summary()["transform_hashes"],
-                "result_trace_hash": stable_hash(trace),
-                "provider_internal_state_replayed": False,
-            }
-            revision["revision_hash"] = stable_hash(revision)
+            revision = copy.deepcopy(bundle["c3_direct_anchor_revision"])
             trace["r7_revision_lineage"] = revision
             repair_verification = verify_semantic_repair_trace(
                 trace=trace,
                 plan=semantic_repair_runtime_plan,
-                transform_summary=action_transform.summary(),
+                source_parent=bundle["source_parent_snapshot"],
+                repaired_parent=bundle["c3_repaired_parent_snapshot"],
             )
             trace["r7_semantic_repair_runtime_plan"] = semantic_repair_runtime_plan
             trace["r7_semantic_repair_verification"] = repair_verification
             arm_summaries[arm_id] = {
-                **action_transform.summary(),
+                "direct_anchor_revision_count": 1,
                 "revision_hash": revision["revision_hash"],
                 "semantic_repair_runtime_plan_hash": semantic_repair_runtime_plan["plan_hash"],
                 "semantic_repair_verification_hash": repair_verification["verification_hash"],
@@ -234,6 +184,7 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
 
     _require(stable_hash(bundle["source_parent_snapshot"]) == parent_material_hash, "r7_smoke_mutated_common_parent")
     _require(stable_hash(bundle["c3_recovery_checkpoint"]) == checkpoint_material_hash, "r7_smoke_mutated_recovery_checkpoint")
+    _require(stable_hash(bundle["c3_repaired_parent_snapshot"]) == repaired_parent_material_hash, "r7_smoke_mutated_repaired_parent")
     summary = {
         "schema": SMOKE_SCHEMA,
         "scientific_status": "ENGINEERING_ONLY_NOT_SCIENTIFIC_EVIDENCE",
@@ -245,7 +196,8 @@ def run_smoke(plan_dir: str | Path, domain_path: str | Path) -> tuple[list[dict]
         "c1_direct_exposures": arm_summaries["C1_ONE_SHOT"]["direct_experiment_origin_exposure_count"],
         "c2_direct_exposures": arm_summaries["C2_PERSISTENT_FIELD"]["direct_experiment_origin_exposure_count"],
         "c2_reinjections": arm_summaries["C2_PERSISTENT_FIELD"]["experiment_origin_reinjection_count"],
-        "c3_authority_transform_count": arm_summaries["C3_ALR"]["transform_count"],
+        "c3_authority_transform_count": 0,
+        "c3_direct_anchor_revision_count": arm_summaries["C3_ALR"]["direct_anchor_revision_count"],
         "c3_semantic_repair_packet_consumed": True,
         "c3_old_lineage_reentry_detected": arm_summaries["C3_ALR"]["old_lineage_reentry_detected"],
         "c3_preserved_unrelated_structure": arm_summaries["C3_ALR"]["preserved_unrelated_structure"],
@@ -278,6 +230,7 @@ def main() -> None:
     print("C2_DIRECT_EXPOSURES=" + str(summary["c2_direct_exposures"]))
     print("C2_REINJECTIONS=" + str(summary["c2_reinjections"]))
     print("C3_AUTHORITY_TRANSFORM_COUNT=" + str(summary["c3_authority_transform_count"]))
+    print("C3_DIRECT_ANCHOR_REVISION_COUNT=" + str(summary["c3_direct_anchor_revision_count"]))
     print("C3_SEMANTIC_REPAIR_PACKET_CONSUMED=YES")
     print("C3_OLD_LINEAGE_REENTRY_DETECTED=" + ("YES" if summary["c3_old_lineage_reentry_detected"] else "NO"))
     print("C3_PRESERVED_UNRELATED_STRUCTURE=" + ("YES" if summary["c3_preserved_unrelated_structure"] else "NO"))
