@@ -6,166 +6,169 @@ Historical evidence remains append-only. Forward methods are versioned rather th
 
 ## Current forward layer
 
-The current methodological layer is **v4.5.1**. It does not add a new R stage and does not mutate the frozen R6-D design.
+The current forward methodological layer is **Process Reality v5.0**.
+
+v5.0 is a major theory/experiment-chain migration. It does **not** add a new R stage and does **not** mutate historical v4.5.1 evidence, condition IDs or frozen design hashes.
 
 Core forward files:
 
-- `docs/R_Plan_v4.5.1.md`
-- `theory/theory_contract_v0.10.md`
-- `docs/system_behavior_measurement_plan_v4.5.1.md`
-- `docs/R6_inertia_identification_protocol_v0.4.md`
-- `docs/R5_R6_specificity_protocol_v0.4.md`
-- `docs/R7_structural_inertia_control_protocol_v0.5.md`
-- `docs/ALR_authority_localized_recovery_contract_v0.4.md`
-- `docs/R7_process_integrity_engineering_profile_v0.2.md`
-- `configs/r6/r6d_methodological_interpretation_gate_v0.1.json`
-- `manifests/process_reality_v4_5_1_methodological_closure_2026-09-17.json`
-- `docs/reporting/process_reality_report_standard_v1_3.md`
+- \`docs/R_Plan_v5.0.md\`
+- \`theory/theory_contract_v0.11.md\`
+- \`docs/first_paper_v5_scope.md\`
+- \`docs/v5_concept_mapping.md\`
+- \`docs/v5_structural_observability_contract_v0.1.md\`
+- \`docs/R5_structural_scouting_and_driver_probe_protocol_v1.0.md\`
+- \`docs/R6_structural_support_trace_control_surface_protocol_v1.0.md\`
+- \`docs/R7_localized_recovery_protocol_v1.0.md\`
+- \`docs/v5_whole_process_experiment_protocol_v0.1.md\`
+- \`docs/reporting/process_reality_report_standard_v1_5.md\`
+- \`manifests/process_reality_v5_methodological_migration_2026-09-18.json\`
 
-The exact R6-D pre-execution design remains frozen at:
+The historical v4.5.1 layer remains frozen for evidence already bound to it.
 
-`d8783a9c3e0a264c3119ee72e63db9b61d51f0d633ff6dde66068751c31701de`
+## v5 theory chain
 
-## Research geometry
+\`\`\`text
+Multi-source information / pressure / goal / boundary
+  -> Unstable Information
+  -> Agent-mediated transmission
+  -> Escape Structure
+  -> Semantic Transformation
+  -> Structural Support
+  -> Stable Shared Information Pool
+  -> Direct Agent Consumption
+  -> Constraint / Decision / Action Persistence
+\`\`\`
 
-```text
-R5 — perturb minimally
-  -> R6 — identify what persisted/changed and why
-  -> R7 — localize and repair an evidence-supported risk-bearing closure
-  -> R8 — adjudicate CPR semantics
-```
+Observation/control:
 
-No v4.5.1 update adds an R stage.
+\`\`\`text
+Structural Exposure
+  -> Structural Scout
+  -> Localized Semantic Audit
+  -> Upstream Trace
+  -> Downstream Closure
+  -> Intervention-Surface Selection
+  -> Local Repair
+  -> Recovery Verification
+\`\`\`
 
-## R6 — evidence pivot
+## Core distinctions
 
-R6 now explicitly separates **normal inheritance** from **System Inertia**.
+\`semantic genesis != structural support != stable-pool entry != structural exposure\`
 
-Normal coordination may legitimately carry information forward. An inertia candidate requires evidence that a prior epistemic status, commitment, constraint or action tendency continues to shape later process options, transition propensity or state after the originating event has passed.
+\`Detection Surface != Trace Root != Intervention Surface\`
 
-Carrier evidence should stop at the highest supported level:
+A stable shared pool is system-addressable/reusable state. It is **not** automatically true or confirmed information.
 
-`reachable -> delivered/read -> referenced -> adopted -> inherited -> propagated`
+Historical \`Jump\`/\`J0\` identifiers remain valid provenance labels but are not automatically semantic origin, first structural-support point or exposure anchor.
 
-Reachability/hash ancestry is not semantic adoption.
+## Forward R-stage responsibilities
 
-## Three comparison domains
+### R2-R4 — natural formation views
 
-R6 comparison is reported as separate vectors:
+Synchronously record one natural process; audit unstable information, transformations, adoption/coupling, support, pool entry and exposure asynchronously.
 
-1. **Structural** — topology, actor sequence, reach/depth, branch/merge/re-entry, path family, reconvergence.
-2. **Information inheritance** — delivery/read, reference, adoption/rejection, inherited state/action, propagation, source replacement.
-3. **Epistemic authority** — downstream authority use, response to downgrade, re-confirmation, authority reconstruction and independent new evidence.
+### R5 — structural scouting + driver probe
 
-No post-hoc total complexity score is used by default.
+R5 reduces semantic-audit surface and may use a minimal probe to test source-information dependence versus already materialized structural support.
 
-## R6-D specificity
+Historical \`fact -> unconfirmed\` remains one probe family, not the definition of R5.
 
-Frozen conditions remain:
+### R6 — structural support / trace / control surface
 
-- `S0_NATURAL_REFERENCE`
-- `S1_MATCHED_OR_ORDINARY_FACTUAL_INFORMATION_DOWNGRADE`
-- `S2_J0_TARGETED_ESCAPE_DERIVED_AUTHORITY_WITHDRAWAL`
+R6 maps source, transformations, support, pool, exposure, upstream trace, downstream closure and candidate intervention surfaces.
 
-Frozen targets remain:
+System Inertia remains a downstream property rather than the entire R6 object.
 
-- S1 `public_context.products.C.gross_margin_pct = 35`
-- S2 `shared_state.inventory_stockout_assessment_v1.A.preliminary_stock = 1520`
+### R7 — localized recovery
 
-S1/S2 use the same atomic one-shot operator, but **mechanical equivalence does not imply target exchangeability**. The targets may differ in relevance, provenance, structural position, downstream opportunity and decision weight.
+R7 repairs an explicitly selected intervention surface/RepairClosure while measuring preservation of unrelated structure.
 
-Therefore the preregistered `S2 - S1` contrast is first reported as:
+### R8 / R9
 
-> **FROZEN_TARGET_RESPONSE_CONTRAST**
+R8 remains CPR semantic closure. R9 remains supplementary reviewer/model/domain replication.
 
-A stronger Escape-derived/J0-specific interpretation requires a supported matching argument or later append-only ordinary-fact robustness controls.
+## Whole-Process Run
 
-The first S1 result may not be replaced after outcomes are observed.
+The default future subject profile is a **Whole-Process Run**:
 
-## Conditional scope
+\`\`\`text
+natural subject run
+  -> raw evidence freeze
+  -> integrity validation
+  -> structural indexing
+  -> support/pool/exposure scouting
+  -> localized semantic audit
+  -> reusable evidence bundle
+\`\`\`
 
-The first R6-D batch is conditional on the exact frozen `after_turn:8` historical prefix. Same-parent repeats are repeated realizations, not independent population samples.
+Optional controlled extensions:
 
-## Experiment-origin versus endogenous persistence
+- minimal driver probe;
+- control-surface experiment;
+- localized recovery;
+- CPR adjudication;
+- multi-reviewer/cross-model/cross-domain robustness.
 
-The frozen atomic operator still records `persistent_state_mutation=false`.
+The subject should not be rerun merely because a new semantic reviewer or analysis question is added.
 
-Forward interpretation is precise:
+## Optional robustness instead of mandatory chain growth
 
-> the experiment itself does not directly write persistent state.
+Historical modules remain available but are no longer default mandatory steps:
 
-Agents are still free to create state/messages/invocations after seeing the one-shot annotation. Those endogenous subject changes are scientific observations and possible carrier evidence.
+- S0-S4 specificity;
+- matched-stock controls;
+- R6-D Escape/J0 specificity;
+- re-Jump count/distance;
+- separate R6-A/B/C/D subject batches;
+- multiple semantic reviewers;
+- cross-model/domain replication.
 
-## R7 closure model
+This keeps the base experiment small while allowing later hypotheses to add only the modules they need.
 
-R7/ALR now separates three closure objects:
+## Process Integrity interfaces
 
-1. `PotentiallyAffectedClosure` — structurally reachable scouting set;
-2. `EvidenceSupportedAffectedClosure` — descendants with source-backed dependence evidence;
-3. `RepairClosure` — evidence-supported affected nodes plus only mechanically required replay dependencies.
+Forward v5 machine-readable interfaces include:
 
-Potential reachability is not automatically the repair set.
+- \`schemas/process_integrity_event_v0.3.schema.json\`
+- \`schemas/process_integrity_lineage_record_v0.3.schema.json\`
+- \`schemas/structural_support_record_v0.1.schema.json\`
+- \`schemas/semantic_audit_record_v0.2.schema.json\`
+- \`configs/structural_support_scout_v0.1.json\`
+- \`configs/process_reality_measurement_contract_v1.0.json\`
 
-Replay-only dependencies must remain labeled as replay dependencies rather than being silently called affected.
+Legacy Jump interfaces remain untouched for historical evidence compatibility.
 
-## Process Integrity engineering layer
+## Historical re-derivation
 
-The proposed engineering lifecycle is:
+Before a fresh v5 scientific run, existing R2-R6 evidence should be re-derived offline under:
 
-`Observe -> Address -> Trace -> Localize -> Separate Potential/Evidenced Closure -> Point Repair -> Resume -> Verify`
+- \`docs/v5_historical_rederivation_protocol_v0.1.md\`
+- \`docs/v5_legacy_j0_reinterpretation_boundary.md\`
+- \`docs/reports/2026-09-18/R2-R6_V5_Historical_Rederivation_Plan_v1.md\`
 
-Content hashes provide identity/version/lineage. Relation evidence provides semantic-use/adoption evidence.
-
-Machine-readable interfaces now include:
-
-- `schemas/process_integrity_event_v0.2.schema.json`
-- `schemas/process_integrity_relation_evidence_v0.1.schema.json`
-- `schemas/process_integrity_lineage_record_v0.2.schema.json`
-- `configs/r7_process_integrity_engineering_contract_v0.2.json`
-
-Observation/indexing can be protocol-agnostic through adapters. Active repair remains dependent on native state/replay/reopen/execution interfaces.
-
-## R6-D runtime readiness and gate
-
-The runtime-readiness implementation contains the plan builder, offline smoke path, guarded real runner, raw-evidence freezer and manual scientific workflow.
-
-The real subject workflow now fail-closes through both:
-
-1. the exact frozen design/authorization gate; and
-2. `scripts/validate_process_reality_v4_5_1.py` methodological interpretation validation.
-
-No scientific provider call is authorized by repository state alone.
+No historical raw evidence is rewritten.
 
 ## Current scientific status
 
-Supported/observed so far:
+The repository update itself creates no new subject evidence.
 
-- natural J0;
-- one-shot local perturbation response;
-- natural downstream inheritance/inertia candidates;
-- large natural variation;
-- process/terminal-outcome decoupling.
+Not authorized by the v5 method layer:
 
-Still prospective/unresolved:
+- scientific provider run;
+- paid evaluator run;
+- CPR adjudication;
+- active recovery.
 
-- intervention-related inertia beyond natural variability under repeated comparison;
-- stable carrier-mediated condition difference;
-- S2 relative to S1 frozen-target contrast from real scientific execution;
-- stronger Escape-derived specificity;
-- semantic C/P/R adjudication;
-- R7 localized-recovery efficacy.
-
-CPR remains `NOT_ADJUDICATED`.
+CPR remains \`NOT_ADJUDICATED\`.
 
 ## Validation
 
 Offline method synchronization:
 
-```bash
-python scripts/validate_process_reality_v4_5_1.py
-python scripts/validate_process_reality_v4_5.py
-python scripts/validate_r6d_specificity_exact_plan_v0_1.py
-python -m unittest discover arena/tests -v
-```
+\`\`\`bash
+python scripts/validate_process_reality_v5.py
+\`\`\`
 
-The v4.5.1 validator explicitly checks that the frozen R6-D design hash has not changed.
+Historical validators remain available for their own frozen layers.
