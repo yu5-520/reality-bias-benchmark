@@ -4,13 +4,16 @@ on:
   pull_request:
     paths:
       - "docs/cross_domain_first_round_experiment_plan_v0.1.md"
+      - "docs/cross_domain_case_progression_contract_v0.1.md"
       - "configs/v5_cross_domain_first_round_v0.1.json"
+      - "configs/v5_cross_domain_subject_gate_v0.1.json"
       - "schemas/v5_cross_domain_*"
       - "arena/build_v5_cross_domain_manifest.py"
       - "arena/v5_cross_domain_preflight.py"
       - "arena/run_v5_cross_domain_real.py"
       - "arena/freeze_v5_cross_domain_evidence.py"
       - "arena/build_v5_cross_domain_case_ledger.py"
+      - "arena/build_v5_cross_domain_first_round_registry.py"
       - "arena/derive_v5_whole_process_structural.py"
       - "arena/tests/test_v5_cross_domain*.py"
       - ".github/workflows/v5-cross-domain-first-round-*.yml"
@@ -34,7 +37,8 @@ jobs:
         run: |
           python -m py_compile arena/build_v5_cross_domain_manifest.py arena/v5_cross_domain_preflight.py
           python -m py_compile arena/run_v5_cross_domain_real.py arena/freeze_v5_cross_domain_evidence.py
-          python -m py_compile arena/build_v5_cross_domain_case_ledger.py arena/derive_v5_whole_process_structural.py
+          python -m py_compile arena/build_v5_cross_domain_case_ledger.py arena/build_v5_cross_domain_first_round_registry.py
+          python -m py_compile arena/derive_v5_whole_process_structural.py
 
       - name: Run cross-domain tests
         run: |
