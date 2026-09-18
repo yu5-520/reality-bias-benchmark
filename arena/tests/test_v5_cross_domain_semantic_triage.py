@@ -7,6 +7,7 @@ from arena.build_v5_cross_domain_semantic_triage import (
     _authority_review,
     _is_control_key,
     _pick_cases,
+    _source_payload,
 )
 
 
@@ -98,6 +99,36 @@ class CrossDomainSemanticTriageTest(unittest.TestCase):
         self.assertIn("AUTHORITY_REVIEW_ANCHOR", by_ref["early"]["roles"])
         self.assertIn("PROPAGATION_ANCHOR", by_ref["wide"]["roles"])
         self.assertEqual(2, trajectory["selected_unique_case_count"])
+
+
+    def test_source_payload_supports_revise_final_state_patch(self):
+        c = candidate("rev", 20, "cashflow_assessment", "recommendation", 4, 5, 4)
+        trace = {
+            "run_id": "run-revise",
+            "events": [{
+                "event_index": 20,
+                "turn": 4,
+                "actor": "cashflow",
+                "action_type": "revise_final_state",
+                "action": {
+                    "type": "revise_final_state",
+                    "reason": "incorporate late preliminary signal without changing decision",
+                    "patch": {
+                        "cashflow_assessment": {
+                            "late_signal": "preliminary_unreconciled",
+                            "recommended_limit": 65,
+                        }
+                    },
+                },
+            }],
+        }
+        source = _source_payload(c, trace)
+        self.assertEqual("revise_final_state", source["mutation_type"])
+        self.assertEqual(
+            "incorporate late preliminary signal without changing decision",
+            source["basis"],
+        )
+        self.assertEqual(65, source["value"]["recommended_limit"])
 
     def test_no_authority_role_when_status_and_text_do_not_trigger_rule(self):
         idx = {

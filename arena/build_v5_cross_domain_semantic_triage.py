@@ -44,18 +44,38 @@ def _source_payload(candidate: dict, trace: dict) -> dict:
             + str(candidate["source_event_index"])
         )
     action = event.get("action") or {}
-    if action.get("type") != "write_state":
-        raise ValueError("triage_candidate_source_not_write_state:" + candidate["candidate_ref"])
-    if action.get("key") != candidate.get("state_key"):
-        raise ValueError("triage_candidate_state_key_mismatch:" + candidate["candidate_ref"])
+    action_type = event.get("action_type") or action.get("type")
+    state_key = candidate.get("state_key")
+    if action_type == "write_state":
+        if action.get("key") != state_key:
+            raise ValueError("triage_candidate_state_key_mismatch:" + candidate["candidate_ref"])
+        basis = action.get("basis")
+        value = action.get("value")
+        revision_reason = None
+    elif action_type == "revise_final_state":
+        patch = action.get("patch") or {}
+        if not isinstance(patch, dict) or state_key not in patch:
+            raise ValueError("triage_candidate_revision_patch_missing:" + candidate["candidate_ref"])
+        basis = action.get("reason")
+        value = patch[state_key]
+        revision_reason = action.get("reason")
+    else:
+        raise ValueError(
+            "triage_candidate_source_not_supported_state_write:"
+            + candidate["candidate_ref"]
+            + ":"
+            + str(action_type)
+        )
     return {
         "event_index": candidate["source_event_index"],
         "turn": candidate["source_turn"],
         "actor": candidate["source_actor"],
         "state_key": candidate["state_key"],
         "status": candidate.get("source_status"),
-        "basis": action.get("basis"),
-        "value": action.get("value"),
+        "mutation_type": action_type,
+        "basis": basis,
+        "revision_reason": revision_reason,
+        "value": value,
     }
 
 
