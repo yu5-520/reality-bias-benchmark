@@ -73,6 +73,21 @@ jobs:
           print('R5R6_TO_R7_ENTRY_GATE=PASS')
           PY
 
+      - name: Audit R5-R6 experimental evidence sufficiency for R7
+        run: |
+          set -euo pipefail
+          python -m arena.r5r6_r7_entry_audit --out results/r5r6_r7_entry_audit.json
+          python - <<'PY'
+          import json
+          a=json.load(open('results/r5r6_r7_entry_audit.json'))
+          assert a['decision']=='PASS_R7_ENTRY_BOUNDED_ENGINEERING_EXPERIMENT'
+          assert a['criteria_passed']==a['criteria_total']==8
+          assert a['r7_entry_supported'] is True
+          assert a['active_r7_repair_authorized'] is False
+          assert a['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('R5R6_EXPERIMENTAL_EVIDENCE_SUPPORTS_R7_ENTRY=YES')
+          PY
+
       - name: Validate protocol and full offline test suite
         run: |
           set -euo pipefail
@@ -263,6 +278,7 @@ jobs:
           eng=json.load(open('results/r5r6_engineering_gate/summary.json'))
           packet=json.load(open('results/r5r6_engineering_gate/semantic_repair_packet.json'))
           gate=json.load(open('results/r5r6_engineering_gate/lineage_completeness_gate.json'))
+          audit=json.load(open('results/r5r6_r7_entry_audit.json'))
           report={
             'schema':'RB-R7-FORMAL-READINESS-AUDIT-RESULT-v0.1',
             'date':'2026-09-17',
@@ -290,6 +306,10 @@ jobs:
             'semantic_repair_packet_hash':packet['packet_hash'],
             'lineage_completeness_status':gate['status'],
             'lineage_completeness_gate_hash':gate['gate_hash'],
+            'r5r6_r7_entry_audit_decision':audit['decision'],
+            'r5r6_r7_entry_audit_hash':audit['audit_hash'],
+            'r5r6_r7_entry_criteria_passed':audit['criteria_passed'],
+            'r5r6_r7_entry_criteria_total':audit['criteria_total'],
             'real_runner_preflight_passed':True,
             'paid_subject_authorized':False,
             'paid_api_called':False,
@@ -314,6 +334,7 @@ jobs:
           cp "$AUDIT_REQUEST" r7_readiness_bundle/audit_request.json
           cp results/r7_readiness_report.json r7_readiness_bundle/readiness_report.json
           cp -r results/r5r6_engineering_gate r7_readiness_bundle/r5r6_engineering_gate
+          cp results/r5r6_r7_entry_audit.json r7_readiness_bundle/r5r6_r7_entry_audit.json
           cp -r results/r7_readiness_plan r7_readiness_bundle/plan
           cp -r results/r7_readiness_smoke r7_readiness_bundle/engineering_smoke
           cp -r results/r7_readiness_derived r7_readiness_bundle/engineering_derivation

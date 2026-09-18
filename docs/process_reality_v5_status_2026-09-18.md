@@ -276,3 +276,43 @@ Current scoped gate result:
 This gate does not claim global exhaustive semantic lineage, causal primacy of J0, first support/pool identity or exclusive pool-to-judgment attribution.
 
 The formal R7 subject workflow and the offline R7 readiness audit now both rebuild and hash-bind this package before R7 planning/execution. The prepared R7 bundle carries the exact Semantic Repair Packet and completeness-gate hashes forward so the audited engineering target cannot silently change between R6 handoff and R7 execution.
+
+
+## R5–R6 engineering audit gate for R7 entry
+
+A distinct pre-R7 Engineering Audit layer is now defined between the R5–R6 engineering translation and R7 recovery execution.
+
+Added:
+
+- audit source binding: configs/r5r6_r7_entry_engineering_audit_binding_v0.1.json;
+- deterministic audit builder: arena/r5r6_r7_entry_audit.py;
+- audit tests: arena/tests/test_r5r6_r7_entry_audit.py;
+- formal report: docs/reports/2026-09-18/R5-R6_Engineering_Audit_for_R7_Entry_v1.md.
+
+The audit asks a narrower question than R7 itself:
+
+Do frozen R5–R6 experimental results provide sufficient bounded engineering evidence to justify entering an R7 localized-recovery experiment?
+
+Entry criteria:
+
+1. R5 intervention isolation;
+2. matched downstream structural reorganization;
+3. post-consumption inertia object;
+4. persisted carrier / semantic-descendant support;
+5. machine-addressable Repair Anchor;
+6. bounded relevant-lineage completeness;
+7. R7 recovery question remains open;
+8. unresolved claims are not promoted into repair authorization.
+
+Expected gate decision when all frozen bindings remain intact:
+
+PASS_R7_ENTRY_BOUNDED_ENGINEERING_EXPERIMENT.
+
+The decision means R5–R6 are sufficient to justify and technically bind the R7 experiment. It does not establish R7 repair efficacy.
+
+The formal R7 readiness workflow and subject workflow now require both:
+
+- Semantic Repair Packet / Completeness Gate readiness; and
+- R5–R6 Engineering Audit PASS.
+
+The audit hash and 8/8 criteria result are frozen into the R7 prepared/authorization chain. Active repair still requires separate manual authorization. CPR remains NOT_ADJUDICATED.
