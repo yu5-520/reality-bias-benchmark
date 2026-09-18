@@ -4,13 +4,19 @@ on:
   pull_request:
     paths:
       - "docs/v5_fresh_whole_process_design_v0.1.md"
+      - "docs/v5_whole_process_runtime_guard_v0.1.md"
       - "configs/v5_whole_process_*"
-      - "schemas/v5_whole_process_subject_manifest_v0.1.schema.json"
+      - "schemas/v5_whole_process_*"
       - "arena/build_v5_whole_process_manifest.py"
       - "arena/v5_whole_process_index.py"
       - "arena/v5_whole_process_preflight.py"
+      - "arena/run_v5_whole_process_real.py"
+      - "arena/freeze_v5_whole_process_evidence.py"
+      - "arena/derive_v5_whole_process_structural.py"
       - "arena/tests/test_v5_whole_process.py"
+      - "arena/tests/test_v5_whole_process_runtime_guard.py"
       - ".github/workflows/v5-whole-process-offline-prepare.yml"
+      - ".github/workflows/v5-whole-process-subject-real.yml"
   workflow_dispatch:
 
 permissions:
@@ -25,9 +31,11 @@ jobs:
         with:
           python-version: "3.12"
       - name: Compile v5 Whole-Process modules
-        run: python -m py_compile arena/build_v5_whole_process_manifest.py arena/v5_whole_process_index.py arena/v5_whole_process_preflight.py
+        run: |
+          python -m py_compile arena/build_v5_whole_process_manifest.py arena/v5_whole_process_index.py arena/v5_whole_process_preflight.py
+          python -m py_compile arena/run_v5_whole_process_real.py arena/freeze_v5_whole_process_evidence.py arena/derive_v5_whole_process_structural.py
       - name: Run v5 Whole-Process tests
-        run: python -m unittest arena.tests.test_v5_whole_process -v
+        run: python -m unittest arena.tests.test_v5_whole_process arena.tests.test_v5_whole_process_runtime_guard -v
       - name: Run offline preflight
         run: python -m arena.v5_whole_process_preflight --outdir results/v5_whole_process_preflight --code-sha "$GITHUB_SHA"
       - name: Re-run v5 method and historical re-derivation gates
