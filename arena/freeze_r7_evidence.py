@@ -77,6 +77,7 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         runtime_records = [row for row in trace.get("runtime_transform_records") or [] if row.get("experiment_origin") is True]
         action_records = [row for row in trace.get("action_transform_records") or [] if row.get("experiment_origin") is True]
         revision = trace.get("r7_revision_lineage")
+        repair_verification = trace.get("r7_semantic_repair_verification")
         condition_rows.append({
             "run_id": trace.get("run_id"),
             "arm_id": arm_id,
@@ -86,6 +87,9 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
             "runtime_transform_count": len(runtime_records),
             "action_transform_count": len(action_records),
             "revision_hash": revision.get("revision_hash") if isinstance(revision, dict) else None,
+            "semantic_repair_verification_hash": repair_verification.get("verification_hash") if isinstance(repair_verification, dict) else None,
+            "old_lineage_reentry_detected": repair_verification.get("old_lineage_reentry_detected") if isinstance(repair_verification, dict) else None,
+            "preserved_unrelated_structure": repair_verification.get("preserved_unrelated_structure") if isinstance(repair_verification, dict) else None,
             "trace_hash": stable_hash(trace),
         })
 
@@ -97,6 +101,8 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         "c1_one_shot_envelope.json",
         "c2_persistent_field_envelope.json",
         "c3_alr_binding.json",
+        "semantic_repair_packet.json",
+        "lineage_completeness_gate.json",
         "r7_bounded_arena_config.json",
         "arm_manifests.jsonl",
         "execution_rows.jsonl",
@@ -117,6 +123,8 @@ def freeze_r7_evidence(*, raw_dir: str | Path, plan_dir: str | Path, authorizati
         "semantic_payload_hash": bundle["plan"]["semantic_payload_hash"],
         "observation_horizon_id": bundle["plan"]["matched_horizon"]["horizon_id"],
         "measurement_schema": bundle["plan"]["measurement_schema"],
+        "semantic_repair_packet_hash": bundle["semantic_repair_packet"].get("packet_hash"),
+        "lineage_completeness_gate_hash": bundle["lineage_completeness_gate"].get("gate_hash"),
         "planned_branch_count": len(bundle["execution_rows"]),
         "preserved_trace_count": len(traces),
         "missing_planned_run_ids": sorted(planned_ids - set(trace_ids)),
