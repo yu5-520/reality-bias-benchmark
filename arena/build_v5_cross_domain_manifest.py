@@ -10,8 +10,9 @@ from .core import stable_hash
 from .io_utils import load_json, sha256_file, write_jsonl
 
 ROOT = Path(__file__).resolve().parents[1]
-SCHEMA = "RB-V5-CROSS-DOMAIN-SUBJECT-MANIFEST-v0.1"
-STATUS = "V5_CROSS_DOMAIN_SUBJECT_CANDIDATE_AWAITING_EXPLICIT_PAID_AUTHORIZATION"
+SCHEMA = "RB-V5-CROSS-DOMAIN-SUBJECT-MANIFEST-v0.2"
+STATUS = "V5_CROSS_DOMAIN_HELD_OUT_SUBJECT_CANDIDATE_AWAITING_EXPLICIT_PAID_AUTHORIZATION"
+DEFAULT_PLAN = "configs/v5_cross_domain_first_round_v0.2.json"
 
 
 def _shared_bindings(plan: dict, plan_path: str, code_sha: str) -> dict:
@@ -24,6 +25,8 @@ def _shared_bindings(plan: dict, plan_path: str, code_sha: str) -> dict:
     arena = load_json(arena_path)
     model = load_json(model_path)
 
+    if plan.get("schema") != "RB-V5-CROSS-DOMAIN-FIRST-ROUND-PLAN-v0.2":
+        raise ValueError("cross_domain_v02_plan_schema_required")
     if plan.get("status") != "FROZEN_PROTOCOL_CANDIDATE_NOT_PROVIDER_AUTHORIZED":
         raise ValueError("cross_domain_plan_status_invalid")
     if plan.get("paid_subject_execution_authorized") is not False:
@@ -35,31 +38,54 @@ def _shared_bindings(plan: dict, plan_path: str, code_sha: str) -> dict:
     if model.get("provider") != "deepseek":
         raise ValueError("cross_domain_provider_binding_changed")
 
-    domains = plan.get("domains") or []
-    domain_ids = [row.get("domain_id") for row in domains]
-    if len(domain_ids) != 4 or len(set(domain_ids)) != 4:
-        raise ValueError("cross_domain_exact_four_unique_domains_required")
-    if set(domain_ids) != set(arena.get("default_domains") or []):
-        raise ValueError("cross_domain_plan_must_match_registered_arena_domains")
-    if plan.get("method_development_domain") != "ecommerce":
-        raise ValueError("cross_domain_method_development_domain_changed")
+    reference = plan.get("method_development_reference") or {}
+    if reference.get("domain_id") != "ecommerce":
+        raise ValueError("cross_domain_ecommerce_reference_required")
+    if reference.get("included_in_new_replication_sample") is not False:
+        raise ValueError("cross_domain_ecommerce_must_not_enter_replication_sample")
+    if reference.get("historical_evidence_mutated") is not False:
+        raise ValueError("cross_domain_historical_ecommerce_must_remain_immutable")
 
-    repeats = plan.get("planned_repeats_per_domain")
-    wave_size = plan.get("wave_size_per_domain")
-    wave_count = plan.get("wave_count")
-    if type(repeats) is not int or type(wave_size) is not int or type(wave_count) is not int:
-        raise ValueError("cross_domain_sample_plan_invalid")
-    if repeats < 1 or wave_size < 1 or wave_count < 1 or repeats != wave_size * wave_count:
-        raise ValueError("cross_domain_wave_partition_mismatch")
+    replication_domains = plan.get("replication_domains") or []
+    domain_ids = [row.get("domain_id") for row in replication_domains]
+    expected = {"finance", "supply_chain", "software_engineering"}
+    if len(domain_ids) != 3 or len(set(domain_ids)) != 3 or set(domain_ids) != expected:
+        raise ValueError("cross_domain_exact_three_held_out_domains_required")
+    if not expected.issubset(set(arena.get("default_domains") or [])):
+        raise ValueError("cross_domain_replication_domains_not_registered")
+
+    if plan.get("planned_repeats_per_domain") != 30:
+        raise ValueError("cross_domain_repeats_per_domain_must_be_30")
+    if plan.get("wave_size") != 15 or plan.get("waves_per_domain") != 2 or plan.get("wave_count") != 6:
+        raise ValueError("cross_domain_six_wave_geometry_invalid")
+    if plan.get("planned_new_natural_trajectories") != 90:
+        raise ValueError("cross_domain_planned_total_must_be_90")
+
+    waves = plan.get("execution_waves") or []
+    if len(waves) != 6:
+        raise ValueError("cross_domain_exact_six_wave_definitions_required")
+    wave_ids = [int(row["wave_id"]) for row in waves]
+    if set(wave_ids) != set(range(1, 7)) or len(set(wave_ids)) != 6:
+        raise ValueError("cross_domain_wave_ids_invalid")
+    if Counter(row["domain_id"] for row in waves) != {
+        "finance": 2, "supply_chain": 2, "software_engineering": 2
+    }:
+        raise ValueError("cross_domain_two_waves_per_domain_required")
+    for domain_id in expected:
+        dwaves = sorted((row for row in waves if row["domain_id"] == domain_id), key=lambda x: x["domain_wave_id"])
+        if [(w["domain_wave_id"], w["trial_start"], w["trial_end"]) for w in dwaves] != [(1, 1, 15), (2, 16, 30)]:
+            raise ValueError("cross_domain_domain_wave_trial_partition_invalid:" + domain_id)
 
     protocol_lock = plan.get("protocol_lock") or {}
     required_true = (
-        "same_arena_runtime_all_domains",
-        "same_agent_prompt_protocol_all_domains",
-        "same_model_provider_all_domains",
-        "same_recording_schema_all_domains",
-        "same_execution_code_sha_across_waves_required",
-        "domain_fixtures_frozen_before_first_provider_call",
+        "same_arena_runtime_all_replication_domains",
+        "same_agent_prompt_protocol_all_replication_domains",
+        "same_model_provider_all_replication_domains",
+        "same_recording_schema_all_replication_domains",
+        "same_execution_code_sha_across_all_six_waves_required",
+        "replication_domain_fixtures_frozen_before_first_provider_call",
+        "all_six_waves_preregistered_before_first_provider_call",
+        "all_six_waves_launched_under_one_authorization_event",
         "no_outcome_aware_rerun",
         "no_domain_specific_method_change_after_first_provider_call",
     )
@@ -99,40 +125,36 @@ def _shared_bindings(plan: dict, plan_path: str, code_sha: str) -> dict:
     }
 
 
-def build_rows(*, plan_path: str = "configs/v5_cross_domain_first_round_v0.1.json",
-               code_sha: str | None = None) -> list[dict]:
+def build_rows(*, plan_path: str = DEFAULT_PLAN, code_sha: str | None = None) -> list[dict]:
     plan = load_json(ROOT / plan_path)
     code_sha = code_sha or os.environ.get("GITHUB_SHA") or "LOCAL_OR_UNRECORDED"
     shared = _shared_bindings(plan, plan_path, code_sha)
+    role_by_domain = {row["domain_id"]: row["cohort_role"] for row in plan["replication_domains"]}
 
-    repeats = int(plan["planned_repeats_per_domain"])
-    wave_size = int(plan["wave_size_per_domain"])
     rows: list[dict] = []
-
-    for domain_row in plan["domains"]:
-        domain_id = domain_row["domain_id"]
-        cohort_role = domain_row["cohort_role"]
+    for wave in sorted(plan["execution_waves"], key=lambda x: x["wave_id"]):
+        domain_id = wave["domain_id"]
         domain_path = ROOT / f"arena/domains/{domain_id}.json"
         domain = load_json(domain_path)
         if domain.get("domain_id") != domain_id:
             raise ValueError("cross_domain_fixture_id_mismatch:" + domain_id)
-
         domain_binding = {
             "domain_id": domain_id,
-            "cohort_role": cohort_role,
+            "cohort_role": role_by_domain[domain_id],
             "domain_hash": sha256_file(domain_path),
             "task_hash": stable_hash(domain["task"]),
             "agent_pool_hash": stable_hash(domain["agents"]),
         }
-        for trial in range(1, repeats + 1):
-            wave_id = ((trial - 1) // wave_size) + 1
+        for trial in range(int(wave["trial_start"]), int(wave["trial_end"]) + 1):
             rows.append({
                 **shared,
                 **domain_binding,
                 "run_id": f"v5-xd-{domain_id}-fr001-{trial:04d}",
                 "trial": trial,
                 "logical_seed": trial,
-                "wave_id": wave_id,
+                "wave_id": int(wave["wave_id"]),
+                "wave_key": wave["wave_key"],
+                "domain_wave_id": int(wave["domain_wave_id"]),
             })
 
     verify_manifest(rows, plan=plan)
@@ -144,20 +166,15 @@ def verify_manifest(rows: list[dict], *, plan: dict | None = None) -> bool:
         raise ValueError("cross_domain_manifest_empty")
     if len({row["run_id"] for row in rows}) != len(rows):
         raise ValueError("cross_domain_manifest_duplicate_run_id")
-
     if plan is None:
         plan = load_json(ROOT / rows[0]["plan_path"])
 
-    expected_domains = {row["domain_id"]: row["cohort_role"] for row in plan["domains"]}
-    repeats = int(plan["planned_repeats_per_domain"])
-    wave_size = int(plan["wave_size_per_domain"])
-    wave_count = int(plan["wave_count"])
-    expected_total = repeats * len(expected_domains)
-    if len(rows) != expected_total:
-        raise ValueError("cross_domain_manifest_run_count_mismatch")
+    expected_domains = {row["domain_id"]: row["cohort_role"] for row in plan["replication_domains"]}
+    if len(rows) != 90:
+        raise ValueError("cross_domain_manifest_must_have_90_rows")
 
     immutable_shared = (
-        "experiment_family","first_round_id","subject_condition","code_commit_sha",
+        "schema","experiment_family","first_round_id","subject_condition","code_commit_sha",
         "plan_path","plan_hash","arena_config_path","arena_config_hash",
         "model_config_path","model_config_hash","theory_contract_path","theory_contract_hash",
         "measurement_contract_path","measurement_contract_hash","scout_config_path","scout_config_hash",
@@ -169,17 +186,26 @@ def verify_manifest(rows: list[dict], *, plan: dict | None = None) -> bool:
             raise ValueError("cross_domain_shared_binding_not_frozen:" + key)
 
     domain_counts = Counter(row["domain_id"] for row in rows)
-    if set(domain_counts) != set(expected_domains):
-        raise ValueError("cross_domain_manifest_domain_set_mismatch")
-    if any(domain_counts[d] != repeats for d in expected_domains):
+    if domain_counts != {"finance": 30, "supply_chain": 30, "software_engineering": 30}:
         raise ValueError("cross_domain_manifest_domain_count_mismatch")
+    if "ecommerce" in domain_counts:
+        raise ValueError("cross_domain_ecommerce_must_not_enter_new_sample")
 
     wave_counts = Counter(row["wave_id"] for row in rows)
-    expected_wave_size = wave_size * len(expected_domains)
-    if set(wave_counts) != set(range(1, wave_count + 1)):
-        raise ValueError("cross_domain_manifest_wave_set_mismatch")
-    if any(wave_counts[w] != expected_wave_size for w in wave_counts):
+    if wave_counts != {1:15,2:15,3:15,4:15,5:15,6:15}:
         raise ValueError("cross_domain_manifest_wave_count_mismatch")
+
+    wave_defs = {int(w["wave_id"]): w for w in plan["execution_waves"]}
+    for wave_id, wave in wave_defs.items():
+        group = [row for row in rows if row["wave_id"] == wave_id]
+        if {row["domain_id"] for row in group} != {wave["domain_id"]}:
+            raise ValueError("cross_domain_wave_must_be_domain_pure:" + str(wave_id))
+        if {row["wave_key"] for row in group} != {wave["wave_key"]}:
+            raise ValueError("cross_domain_wave_key_mismatch:" + str(wave_id))
+        if {row["domain_wave_id"] for row in group} != {int(wave["domain_wave_id"])}:
+            raise ValueError("cross_domain_domain_wave_id_mismatch:" + str(wave_id))
+        if [row["trial"] for row in sorted(group, key=lambda x:x["trial"])] != list(range(int(wave["trial_start"]), int(wave["trial_end"]) + 1)):
+            raise ValueError("cross_domain_wave_trial_range_mismatch:" + str(wave_id))
 
     for domain_id, role in expected_domains.items():
         group = [row for row in rows if row["domain_id"] == domain_id]
@@ -199,22 +225,22 @@ def verify_manifest(rows: list[dict], *, plan: dict | None = None) -> bool:
             raise ValueError("cross_domain_manifest_paid_evaluator_forbidden")
         if row.get("no_outcome_aware_rerun") is not True:
             raise ValueError("cross_domain_manifest_no_outcome_rerun_required")
-        if row["wave_id"] != ((row["trial"] - 1) // wave_size) + 1:
-            raise ValueError("cross_domain_manifest_wave_assignment_invalid")
     return True
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--plan", default="configs/v5_cross_domain_first_round_v0.1.json")
+    ap.add_argument("--plan", default=DEFAULT_PLAN)
     ap.add_argument("--code-sha")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
     rows = build_rows(plan_path=args.plan, code_sha=args.code_sha)
     write_jsonl(args.out, rows)
     print("CROSS_DOMAIN_MANIFEST_ROWS=" + str(len(rows)))
-    print("DOMAINS=4")
-    print("WAVES=" + str(max(row["wave_id"] for row in rows)))
+    print("HELD_OUT_DOMAINS=3")
+    print("WAVES=6")
+    print("RUNS_PER_WAVE=15")
+    print("ECOMMERCE_IN_NEW_SAMPLE=NO")
     print("PAID_API_AUTHORIZED=NO")
 
 
