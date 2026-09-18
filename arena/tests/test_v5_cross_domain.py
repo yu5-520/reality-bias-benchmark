@@ -1,8 +1,12 @@
+import json
+import tempfile
 import unittest
 from collections import Counter
+from pathlib import Path
 
 from arena.build_v5_cross_domain_manifest import build_rows, verify_manifest
 from arena.build_v5_cross_domain_case_ledger import build_rows as build_case_rows
+from arena.build_v5_cross_domain_first_round_registry import build_registry
 
 
 class V5CrossDomainTest(unittest.TestCase):
@@ -64,6 +68,36 @@ class V5CrossDomainTest(unittest.TestCase):
         )
         self.assertEqual("NO_QUALIFYING_NATURAL_STRUCTURE", rows[0]["qualification_status"])
         self.assertIsNone(rows[0]["candidate_ref"])
+
+    def test_registry_requires_six_waves_same_sha_and_plan(self):
+        with tempfile.TemporaryDirectory() as td:
+            paths = []
+            for wave in range(1, 7):
+                row = {
+                    "first_round_id": "FR",
+                    "selected_wave_id": wave,
+                    "selected_run_count": 20,
+                    "preserved_trace_count": 20,
+                    "runner_error_count": 0,
+                    "domain_trace_counts": {
+                        "ecommerce": 5,
+                        "finance": 5,
+                        "supply_chain": 5,
+                        "software_engineering": 5,
+                    },
+                    "code_commit_sha": "SHA",
+                    "plan_hash": "PLAN",
+                    "evidence_batch_hash": f"BATCH-{wave}",
+                }
+                path = Path(td) / f"wave-{wave}.json"
+                path.write_text(json.dumps(row), encoding="utf-8")
+                paths.append(str(path))
+            out = build_registry(paths)
+            self.assertEqual(120, out["planned_selected_run_count"])
+            self.assertEqual(120, out["preserved_trace_count"])
+            self.assertEqual(30, out["domain_trace_counts"]["finance"])
+            self.assertTrue(out["same_execution_sha"])
+            self.assertTrue(out["all_waves_present"])
 
 
 if __name__ == "__main__":
