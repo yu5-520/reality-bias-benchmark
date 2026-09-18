@@ -79,6 +79,7 @@ jobs:
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
+          set +e
           python -m arena.run_v5_cross_domain_real \
             --manifest results/v5_cross_domain/subject_manifest.jsonl \
             --wave-id "${{ inputs.wave_id }}" \
@@ -91,6 +92,10 @@ jobs:
             --currency USD \
             --authorization-phrase "${{ inputs.authorization_phrase }}" \
             --execute-real-api
+          rc=$?
+          set -e
+          echo "$rc" > results/v5_cross_domain/runner_exit_code.txt
+          echo "RUNNER_EXIT_CODE=$rc"
 
       - name: Freeze raw evidence before any derivation
         run: |
@@ -123,6 +128,13 @@ jobs:
           assert all(r['qualification_status'] in {'NO_QUALIFYING_NATURAL_STRUCTURE','AWAITING_LOCALIZED_SEMANTIC_AUDIT'} for r in rows)
           print('PASS: structural scouting does not auto-authorize probe or repair')
           PY
+
+      - name: Fail closed after evidence preservation if subject runner failed
+        if: always()
+        run: |
+          test -f results/v5_cross_domain/runner_exit_code.txt
+          rc="$(cat results/v5_cross_domain/runner_exit_code.txt)"
+          test "$rc" -eq 0
 
       - name: Upload frozen cross-domain wave bundle
         if: always()
