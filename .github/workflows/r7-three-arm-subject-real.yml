@@ -220,6 +220,8 @@ jobs:
               'r5r6_r7_framework_requirement_count':audit['framework_requirement_count'],
               'common_reference_parent_state_hash':plan['source_binding']['source_parent_state_hash'],
               'c3_recovery_checkpoint_state_hash':plan['source_binding']['source_recovery_checkpoint_hash'],
+              'c3_repaired_parent_state_hash':plan['c3_repaired_parent_state_hash'],
+              'c3_repair_application_hash':plan['c3_repair_application_hash'],
               'per_branch_spending_ceiling_usd':float(os.environ['R7_PER_BRANCH_CEILING']),
               'total_spending_ceiling_usd':float(os.environ['R7_TOTAL_CEILING']),
               'per_branch_max_calls':int(os.environ['R7_PER_BRANCH_MAX_CALLS']),
@@ -300,6 +302,8 @@ jobs:
           assert a['lineage_completeness_gate_hash']==lg['gate_hash']
           assert a['lineage_completeness_status']=='COMPLETE_FOR_AUTHORIZED_REPAIR'
           assert a['r7_entry_status']=='READY_FOR_R7_SEPARATE_AUTHORIZATION'
+          assert a['c3_repaired_parent_state_hash']==p['c3_repaired_parent_state_hash']
+          assert a['c3_repair_application_hash']==p['c3_repair_application_hash']
           assert a['r5r6_r7_entry_audit_decision']=='PASS_R7_ENTRY_FULL_REQUIREMENT_COVERAGE'
           assert a['r5r6_r7_entry_audit_hash']==audit['audit_hash']
           assert a['r5r6_r7_entry_criteria_passed']==audit['criteria_passed']==8
