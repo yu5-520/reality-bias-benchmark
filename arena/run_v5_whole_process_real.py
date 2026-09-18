@@ -40,7 +40,8 @@ def validate_paid_gate(*, execute_real_api: bool, authorization_phrase: str,
         raise SystemExit("positive per-run call cap required")
     if per_run_spending_ceiling <= 0 or global_spending_ceiling <= 0:
         raise SystemExit("positive spending ceilings required")
-    if global_spending_ceiling < per_run_spending_ceiling * run_count:
+    required_global = per_run_spending_ceiling * run_count
+    if global_spending_ceiling + 1e-12 < required_global:
         raise SystemExit("global ceiling must cover all symmetric per-run ceilings")
 
 
