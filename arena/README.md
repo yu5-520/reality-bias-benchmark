@@ -1,33 +1,44 @@
 # Process Reality v5 Cross-Domain First-Round forward layer
 
-The current next subject profile is **PR-FIRST-ROUND-CROSS-DOMAIN-001**.
+The current next subject profile is **PR-FIRST-ROUND-CROSS-DOMAIN-001 / v0.2**.
 
-It uses the existing Free-Agent Arena without changing the Arena engine or Agent prompt protocol.
+The ecommerce domain remains the historical **method-development / deep-reference case** and is not re-counted as prospective replication data.
 
-Domains:
+Held-out replication domains:
 
-- `ecommerce` — method-development reference + fresh final-protocol replication;
-- `finance` — frozen-protocol replication;
-- `supply_chain` — frozen-protocol replication;
-- `software_engineering` — frozen-protocol replication.
+- `finance`;
+- `supply_chain`;
+- `software_engineering`.
 
 Sample geometry:
 
-- 30 preregistered natural trajectories per domain;
-- 120 total natural trajectories;
-- 6 fixed waves;
-- 5 trajectories per domain per wave;
-- 20 trajectories per wave.
+- 30 preregistered natural trajectories per held-out domain;
+- 90 new natural trajectories total;
+- 2 waves per domain;
+- 15 trajectories per wave;
+- 6 domain-pure waves total.
+
+Wave mapping:
+
+```text
+finance             -> wave 1 / wave 2
+supply_chain        -> wave 3 / wave 4
+software_engineering-> wave 5 / wave 6
+```
+
+One real `workflow_dispatch` first prepares a common frozen 90-row manifest, then launches all six waves with a matrix (`max-parallel: 6`) under one GitHub run ID / authorization event and one exact execution SHA.
 
 Core files:
 
-- `../docs/cross_domain_first_round_experiment_plan_v0.1.md`
-- `../configs/v5_cross_domain_first_round_v0.1.json`
+- `../docs/cross_domain_first_round_experiment_plan_v0.2.md`
+- `../configs/v5_cross_domain_first_round_v0.2.json`
+- `../configs/v5_cross_domain_subject_gate_v0.2.json`
 - `build_v5_cross_domain_manifest.py`
 - `v5_cross_domain_preflight.py`
 - `run_v5_cross_domain_real.py`
 - `freeze_v5_cross_domain_evidence.py`
 - `build_v5_cross_domain_case_ledger.py`
+- `build_v5_cross_domain_first_round_registry.py`
 
 Execution rule:
 
@@ -35,7 +46,7 @@ Execution rule:
 
 R2/R3/R4 are simultaneous analysis views, not separate subject runs.
 
-The replication domains do not replay the historical ecommerce method-development path. They use the final frozen protocol directly.
+The held-out replication domains do not replay the historical ecommerce method-development path. They use the final frozen protocol directly.
 
 Important boundaries:
 
@@ -51,9 +62,9 @@ Offline preflight:
 python -m arena.v5_cross_domain_preflight --outdir results/v5_cross_domain_preflight
 ```
 
-Repository preparation authorizes no provider, R5 probe, R7 repair or paid evaluator call. Natural first-round execution requires the exact phrase `CALL_REAL_V5_CROSS_DOMAIN_FIRST_ROUND_API` plus the frozen execution SHA, fixed wave ID and positive call/spending ceilings.
+Repository preparation authorizes no provider, R5 probe, R7 repair or paid evaluator call. Natural first-round execution requires the exact phrase `CALL_REAL_V5_CROSS_DOMAIN_FIRST_ROUND_API`, the frozen execution SHA, and positive per-run / per-wave / first-round spending ceilings.
 
-The preceding ecommerce-only Whole-Process Batch001 files remain historical/compatible interfaces; they are not deleted or reinterpreted as cross-domain evidence.
+The preceding ecommerce-only Whole-Process and historical R2-R7 evidence remain immutable reference evidence; they are not reinterpreted as held-out replication samples.
 
 ---
 
