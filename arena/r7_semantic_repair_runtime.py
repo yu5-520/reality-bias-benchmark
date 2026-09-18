@@ -6,6 +6,7 @@ from typing import Any, Mapping
 from .core import stable_hash
 from .experimental_control import verify_state_snapshot
 
+# R7 v5.3 validation marker: repository-native offline chain must pass before subject redispatch.
 PLAN_SCHEMA = "RB-R7-SEMANTIC-REPAIR-RUNTIME-PLAN-v0.3"
 REPAIR_APPLICATION_SCHEMA = "RB-R7-SEMANTIC-REPAIR-APPLICATION-v0.2"
 VERIFY_SCHEMA = "RB-R7-SEMANTIC-REPAIR-VERIFICATION-v0.3"
