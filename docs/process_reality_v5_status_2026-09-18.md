@@ -127,3 +127,21 @@ Offline preflight status: **PASS**.
 The runtime/Agent prompts remain unchanged. The new index intentionally distinguishes mechanically observed shared-state visibility from semantic direct consumption.
 
 Real provider execution remains **NOT AUTHORIZED**.
+
+
+## Whole-Process runtime guard update
+
+The fresh Batch001 runtime path is now repository-complete but remains non-authorized.
+
+Prepared:
+
+- real subject runner: `arena/run_v5_whole_process_real.py`;
+- raw evidence freezer: `arena/freeze_v5_whole_process_evidence.py`;
+- deterministic structural derivation: `arena/derive_v5_whole_process_structural.py`;
+- paid authorization schema: `schemas/v5_whole_process_paid_authorization_v0.1.schema.json`;
+- runtime guard tests: `arena/tests/test_v5_whole_process_runtime_guard.py`;
+- workflow-dispatch-only runner: `.github/workflows/v5-whole-process-subject-real.yml`.
+
+The exact phrase `CALL_REAL_V5_WHOLE_PROCESS_API` is necessary but not sufficient: positive call/spending limits are also required. Workflow budget inputs default to zero.
+
+Current provider execution status: **NOT AUTHORIZED**.
