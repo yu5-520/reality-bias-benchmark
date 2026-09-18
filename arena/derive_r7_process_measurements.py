@@ -57,8 +57,13 @@ def _condition_integrity(trace: dict[str, Any], arm_id: str) -> dict[str, Any]:
             failures.append("C2_ACTION_TRANSFORM_FORBIDDEN")
     elif arm_id == "C3_ALR":
         status = condition.get("condition_status")
+        repair_verification = trace.get("r7_semantic_repair_verification")
         if status == "OBSERVED" and len(action_records) != 1:
             failures.append("C3_OBSERVED_REQUIRES_ONE_AUTHORITY_TRANSFORM")
+        if status == "OBSERVED" and not isinstance(repair_verification, dict):
+            failures.append("C3_OBSERVED_REQUIRES_SEMANTIC_REPAIR_VERIFICATION")
+        if status == "OBSERVED" and isinstance(repair_verification, dict) and repair_verification.get("target_integrity_repair_executed") is not True:
+            failures.append("C3_REPAIR_VERIFICATION_TARGET_NOT_EXECUTED")
         if status != "OBSERVED" and action_records:
             failures.append("C3_NONREALIZED_MUST_NOT_HAVE_AUTHORITY_TRANSFORM")
         if runtime_records:
