@@ -7,10 +7,12 @@ on:
       - "docs/cross_domain_case_progression_contract_v0.1.md"
       - "docs/cross_domain_semantic_triage_protocol_v0.1.md"
       - "docs/cross_domain_localized_semantic_audit_protocol_v0.1.md"
+      - "docs/v5_cross_domain_r5_first_wave_protocol_v0.1.md"
       - "manifests/v5_cross_domain_localized_semantic_audit_review_2026-09-19_v0_1.json"
       - "configs/v5_cross_domain_first_round_v0.2.json"
       - "configs/v5_cross_domain_subject_gate_v0.2.json"
       - "configs/v5_cross_domain_semantic_triage_v0.1.json"
+      - "configs/v5_cross_domain_r5_first_wave_v0.1.json"
       - "schemas/v5_cross_domain_*"
       - "arena/build_v5_cross_domain_manifest.py"
       - "arena/v5_cross_domain_preflight.py"
@@ -20,6 +22,10 @@ on:
       - "arena/build_v5_cross_domain_first_round_registry.py"
       - "arena/build_v5_cross_domain_semantic_triage.py"
       - "arena/build_v5_cross_domain_localized_semantic_audit.py"
+      - "arena/prepare_v5_cross_domain_r5_first_wave.py"
+      - "arena/run_v5_cross_domain_r5_first_wave.py"
+      - "arena/freeze_v5_cross_domain_r5_first_wave.py"
+      - "arena/derive_v5_cross_domain_r5_local_response.py"
       - "arena/derive_v5_whole_process_structural.py"
       - "arena/tests/test_v5_cross_domain*.py"
       - ".github/workflows/v5-cross-domain-first-round-*.yml"
@@ -47,11 +53,13 @@ jobs:
           python -m py_compile arena/build_v5_cross_domain_case_ledger.py arena/build_v5_cross_domain_first_round_registry.py
           python -m py_compile arena/build_v5_cross_domain_semantic_triage.py
           python -m py_compile arena/build_v5_cross_domain_localized_semantic_audit.py
+          python -m py_compile arena/prepare_v5_cross_domain_r5_first_wave.py arena/run_v5_cross_domain_r5_first_wave.py
+          python -m py_compile arena/freeze_v5_cross_domain_r5_first_wave.py arena/derive_v5_cross_domain_r5_local_response.py
           python -m py_compile arena/derive_v5_whole_process_structural.py
 
       - name: Run cross-domain tests
         run: |
-          python -m unittest arena.tests.test_v5_cross_domain arena.tests.test_v5_cross_domain_runtime_guard arena.tests.test_v5_cross_domain_semantic_triage arena.tests.test_v5_cross_domain_localized_semantic_audit -v
+          python -m unittest arena.tests.test_v5_cross_domain arena.tests.test_v5_cross_domain_runtime_guard arena.tests.test_v5_cross_domain_semantic_triage arena.tests.test_v5_cross_domain_localized_semantic_audit arena.tests.test_v5_cross_domain_r5_first_wave -v
 
       - name: Run held-out cross-domain offline preflight
         run: |
@@ -110,6 +118,35 @@ jobs:
           assert p['uniform_review_decision']['r5_probe_authorized'] is False
           assert p['uniform_review_decision']['r7_repair_authorized'] is False
           print('PASS: localized semantic audit pass 1 freezes review decisions but authorizes no active stage')
+          PY
+
+      - name: Validate cross-domain R5 first-wave frozen plan
+        run: |
+          python -m json.tool configs/v5_cross_domain_r5_first_wave_v0.1.json >/dev/null
+          python - <<'PY'
+          import json
+          p=json.load(open('configs/v5_cross_domain_r5_first_wave_v0.1.json'))
+          assert p['status']=='FROZEN_PRE_EXECUTION_PLAN'
+          assert p['geometry']=={
+              'case_count':6,
+              'replicate_pairs_per_case':2,
+              'branches_per_case':4,
+              'total_branch_count':24,
+              'pair_order_policy':'REPLICATE_1_CONTROL_FIRST_REPLICATE_2_INTERVENTION_FIRST',
+          }
+          assert [x['wave_id'] for x in p['selected_cases']]==[1,2,3,4,5,6]
+          assert len({x['source_case_hash'] for x in p['selected_cases']})==6
+          assert all(x['parent_state_hash'] for x in p['selected_cases'])
+          assert p['operator']['from_status']=='fact'
+          assert p['operator']['to_status']=='unconfirmed'
+          assert p['operator']['direct_exposure_limit']==1
+          assert p['operator']['persistent_state_mutation'] is False
+          assert p['budget']['per_branch_spending_ceiling_usd']==0.25
+          assert p['budget']['global_spending_ceiling_usd']==6.0
+          assert p['authorization']['paid_evaluator'] is False
+          assert p['authorization']['r7_repair'] is False
+          assert p['authorization']['r8_cpr_adjudication'] is False
+          print('PASS: cross-domain R5 first-wave selection, operator and active-stage boundaries are frozen')
           PY
 
       - name: Revalidate Process Reality method layer
