@@ -1,0 +1,136 @@
+{
+  "schema": "RB-V5-CROSS-DOMAIN-FIRST-ROUND-PLAN-v0.2",
+  "version": "0.2",
+  "date": "2026-09-18",
+  "status": "FROZEN_PROTOCOL_CANDIDATE_NOT_PROVIDER_AUTHORIZED",
+  "predecessor": "configs/v5_cross_domain_first_round_v0.1.json",
+  "first_round_id": "PR-FIRST-ROUND-CROSS-DOMAIN-001",
+  "experiment_family": "PROCESS_REALITY_V5_CROSS_DOMAIN_FIRST_ROUND",
+  "method_development_reference": {
+    "domain_id": "ecommerce",
+    "role": "METHOD_DEVELOPMENT_DEEP_REFERENCE",
+    "included_in_new_replication_sample": false,
+    "historical_evidence_mutated": false
+  },
+  "replication_domains": [
+    {
+      "domain_id": "finance",
+      "cohort_role": "FROZEN_PROTOCOL_REPLICATION"
+    },
+    {
+      "domain_id": "supply_chain",
+      "cohort_role": "FROZEN_PROTOCOL_REPLICATION"
+    },
+    {
+      "domain_id": "software_engineering",
+      "cohort_role": "FROZEN_PROTOCOL_REPLICATION"
+    }
+  ],
+  "planned_repeats_per_domain": 30,
+  "wave_size": 15,
+  "waves_per_domain": 2,
+  "wave_count": 6,
+  "planned_new_natural_trajectories": 90,
+  "execution_waves": [
+    {"wave_id": 1, "wave_key": "finance-w1", "domain_id": "finance", "domain_wave_id": 1, "trial_start": 1, "trial_end": 15},
+    {"wave_id": 2, "wave_key": "finance-w2", "domain_id": "finance", "domain_wave_id": 2, "trial_start": 16, "trial_end": 30},
+    {"wave_id": 3, "wave_key": "supply_chain-w1", "domain_id": "supply_chain", "domain_wave_id": 1, "trial_start": 1, "trial_end": 15},
+    {"wave_id": 4, "wave_key": "supply_chain-w2", "domain_id": "supply_chain", "domain_wave_id": 2, "trial_start": 16, "trial_end": 30},
+    {"wave_id": 5, "wave_key": "software_engineering-w1", "domain_id": "software_engineering", "domain_wave_id": 1, "trial_start": 1, "trial_end": 15},
+    {"wave_id": 6, "wave_key": "software_engineering-w2", "domain_id": "software_engineering", "domain_wave_id": 2, "trial_start": 16, "trial_end": 30}
+  ],
+  "subject_condition": "NATURAL_UNMANIPULATED",
+  "arena_config_path": "arena/config/arena_v0.3.json",
+  "model_config_path": "arena/config/model_deepseek_v0.2.json",
+  "theory_contract_path": "theory/theory_contract_v0.13.md",
+  "measurement_contract_path": "configs/process_reality_measurement_contract_v1.0.json",
+  "scout_config_path": "configs/structural_support_scout_v0.1.json",
+  "experiment_profile_path": "configs/first_paper_experiment_profile_v1.0.json",
+  "report_standard_path": "docs/reporting/process_reality_report_standard_v1_7.md",
+  "engineering_report_standard_path": "docs/reporting/process_reality_engineering_experiment_report_standard_v1_1.md",
+  "protocol_lock": {
+    "same_arena_runtime_all_replication_domains": true,
+    "same_agent_prompt_protocol_all_replication_domains": true,
+    "same_model_provider_all_replication_domains": true,
+    "same_recording_schema_all_replication_domains": true,
+    "same_execution_code_sha_across_all_six_waves_required": true,
+    "replication_domain_fixtures_frozen_before_first_provider_call": true,
+    "all_six_waves_preregistered_before_first_provider_call": true,
+    "all_six_waves_launched_under_one_authorization_event": true,
+    "no_outcome_aware_rerun": true,
+    "no_domain_specific_method_change_after_first_provider_call": true,
+    "historical_method_development_path_replayed_in_replication_domains": false,
+    "automatic_paid_evaluator": false,
+    "cpr_adjudication_in_first_round": false
+  },
+  "execution_stages": [
+    {
+      "stage_id": "S1_NATURAL_COLLECTION",
+      "mode": "REQUIRED_ALL_SIX_WAVES",
+      "description": "Run six preregistered 15-trajectory natural waves concurrently: two waves per held-out replication domain."
+    },
+    {
+      "stage_id": "S2_FREEZE_AND_STRUCTURAL_DERIVATION",
+      "mode": "REQUIRED_ALL_PRESERVED_TRACES",
+      "description": "Freeze raw evidence independently per wave before deterministic structural/content-address derivation."
+    },
+    {
+      "stage_id": "S3_LOCALIZED_SEMANTIC_AUDIT",
+      "mode": "REQUIRED_FOR_CANDIDATE_QUALIFICATION",
+      "description": "Audit only evidence-bound candidate windows; no raw evidence mutation."
+    },
+    {
+      "stage_id": "S4_R5_ATOMIC_PROBE",
+      "mode": "CONDITIONAL",
+      "description": "One minimal authority-withdrawal probe only for a naturally qualified target; one exposure and zero reinjection."
+    },
+    {
+      "stage_id": "S5_R6_DESCENDANT_INERTIA_OBSERVATION",
+      "mode": "CONDITIONAL_ON_R5",
+      "description": "Observe the full descendant continuation after the atomic probe and derive carrier/adoption/inertia evidence."
+    },
+    {
+      "stage_id": "S6_R7_LINEAGE_SCOPED_REPAIR",
+      "mode": "CONDITIONAL_ON_REPAIR_GATE",
+      "description": "Use the final Semantic Lineage Package repair operator only when the completeness gate passes."
+    },
+    {
+      "stage_id": "S7_POST_REPAIR_WATCH",
+      "mode": "CONDITIONAL_ON_R7",
+      "description": "Monitor old-lineage re-entry, authority escalation, recurrence and compatible-state preservation."
+    }
+  ],
+  "r5_contract": {
+    "requires_natural_candidate": true,
+    "requires_relation_level_semantic_audit": true,
+    "target_selection_must_precede_probe_outcome": true,
+    "operator_family": "ATOMIC_AUTHORITY_WITHDRAWAL",
+    "direct_exposure_count": 1,
+    "reinjection_count": 0,
+    "persistent_experiment_origin_mutation": false
+  },
+  "r6_contract": {
+    "full_descendant_observation": true,
+    "separate_local_response_from_post_consumption_inertia": true,
+    "carrier_visibility_not_semantic_adoption": true,
+    "natural_variability_preserved": true
+  },
+  "r7_contract": {
+    "operator": "SEMANTIC_LINEAGE_PACKAGE_REPAIR_v5.4",
+    "historical_replay_operator_forbidden": true,
+    "requires_lineage_completeness_gate": true,
+    "lineage_gap_blocks_repair": true,
+    "preserve_compatible_shared_state": true,
+    "post_repair_watch_required": true,
+    "cpr_adjudication": false
+  },
+  "technical_failure_policy": {
+    "preserve_failed_trace_and_error_record": true,
+    "no_silent_replacement": true,
+    "technical_rerun_requires_append_only_recovery_record": true,
+    "semantic_or_outcome_based_rerun_forbidden": true
+  },
+  "paid_subject_execution_authorized": false,
+  "active_probe_authorized": false,
+  "active_repair_authorized": false
+}
