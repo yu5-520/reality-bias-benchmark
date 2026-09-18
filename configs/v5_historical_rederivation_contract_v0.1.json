@@ -1,0 +1,49 @@
+{
+  "schema": "RB-V5-HISTORICAL-REDERIVATION-CONTRACT-v0.1",
+  "version": "0.1",
+  "date": "2026-09-18",
+  "status": "OFFLINE_FROZEN_EVIDENCE_ONLY",
+  "allowed_inputs": [
+    "FROZEN_RAW_EVIDENCE",
+    "FROZEN_STRUCTURAL_DERIVATION",
+    "APPEND_ONLY_SEMANTIC_AUDIT",
+    "EVIDENCE_BOUND_REPORT_TABLE"
+  ],
+  "required_objects": [
+    "UNSTABLE_INFORMATION_CANDIDATE",
+    "SEMANTIC_TRANSFORMATION_CANDIDATE",
+    "STRUCTURAL_SUPPORT_CANDIDATE",
+    "STABLE_POOL_ENTRY_CANDIDATE",
+    "DIRECT_POOL_CONSUMPTION_CANDIDATE",
+    "STRUCTURAL_EXPOSURE_CANDIDATE",
+    "DOWNSTREAM_CONSTRAINT_OR_ACTION"
+  ],
+  "legacy_j0_questions": [
+    "IS_SEMANTIC_ORIGIN",
+    "IS_FIRST_STRUCTURAL_SUPPORT",
+    "IS_FIRST_STABLE_POOL_ENTRY",
+    "IS_STRUCTURAL_EXPOSURE_ANCHOR"
+  ],
+  "invariants": {
+    "historical_artifacts_mutable": false,
+    "missing_events_may_be_reconstructed": false,
+    "cross_batch_continuity_may_be_invented": false,
+    "event_order_proves_causal_origin": false,
+    "later_exposure_proves_first_support": false
+  },
+  "allowed_statuses": [
+    "DIRECTLY_EVIDENCED",
+    "SUPPORTED",
+    "SUPPORTED_CANDIDATE",
+    "UNRESOLVED",
+    "NOT_ESTABLISHED",
+    "CONTRADICTED",
+    "NOT_ADJUDICATED"
+  ],
+  "authorization": {
+    "provider_run": false,
+    "evaluator_run": false,
+    "cpr_adjudication": false,
+    "active_repair": false
+  }
+}

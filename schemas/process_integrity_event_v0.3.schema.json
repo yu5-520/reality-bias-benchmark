@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-PROCESS-INTEGRITY-EVENT-v0.3",
+  "title": "Process Integrity Runtime Event v0.3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "event_type",
+    "event_hash",
+    "actor",
+    "turn",
+    "parent_refs",
+    "lineage_refs",
+    "relation_evidence_refs",
+    "native_aliases"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-PROCESS-INTEGRITY-EVENT-v0.3"
+    },
+    "event_type": {
+      "enum": [
+        "MessageEvent",
+        "StateEvent",
+        "InvocationEvent",
+        "EvidenceSourceEvent",
+        "RevisionEvent",
+        "ConstraintEvent"
+      ]
+    },
+    "event_hash": {
+      "type": "string",
+      "minLength": 16
+    },
+    "actor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "turn": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "timestamp": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "content_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "message_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "state_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "field_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "invocation_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "revision_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "authority_status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence_status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "delivery_status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "read_status": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "semantic_use_status": {
+      "enum": [
+        "NOT_ESTABLISHED",
+        "OBSERVED_REFERENCE_ONLY",
+        "ADOPTED_AS_PREMISE",
+        "REJECTED_OR_ABANDONED",
+        "UNRESOLVED",
+        null
+      ]
+    },
+    "addressability_status": {
+      "enum": [
+        "NOT_ADDRESSABLE",
+        "SYSTEM_ADDRESSABLE",
+        "UNRESOLVED",
+        null
+      ]
+    },
+    "pool_membership_status": {
+      "enum": [
+        "NOT_ESTABLISHED",
+        "POOL_ENTRY_CANDIDATE",
+        "DIRECTLY_CONSUMED_SHARED_STATE",
+        "UNRESOLVED",
+        null
+      ]
+    },
+    "parent_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "lineage_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "relation_evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "support_candidate_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "exposure_candidate_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true,
+      "default": []
+    },
+    "experiment_origin_persistent_state_mutation": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "endogenous_subject_state": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "native_aliases": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "string",
+          "integer",
+          "number",
+          "boolean",
+          "null"
+        ]
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

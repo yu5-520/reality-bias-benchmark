@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-V5-WHOLE-PROCESS-RUN-RECORD-v0.1",
+  "title": "Process Reality v5 Whole-Process Run Record v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "run_id",
+    "task_id",
+    "subject_identity",
+    "raw_evidence",
+    "integrity_status",
+    "structural_index",
+    "scout_output",
+    "semantic_audit_status",
+    "optional_phase_status",
+    "terminal_outcome",
+    "authorization"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-V5-WHOLE-PROCESS-RUN-RECORD-v0.1"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subject_identity": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "code_ref",
+        "model_config_ref",
+        "agent_pool_ref"
+      ],
+      "properties": {
+        "code_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model_config_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "agent_pool_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "domain_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "raw_evidence": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "frozen",
+        "evidence_ref",
+        "evidence_hash"
+      ],
+      "properties": {
+        "frozen": {
+          "const": true
+        },
+        "evidence_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "integrity_status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "UNRESOLVED"
+      ]
+    },
+    "structural_index": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "event_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "relation_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "state_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "index_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "index_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "scout_output": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "candidate_region_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "support_record_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "audit_surface_event_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "full_event_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    },
+    "semantic_audit_status": {
+      "enum": [
+        "NOT_RUN",
+        "PENDING",
+        "PARTIAL",
+        "COMPLETE_APPEND_ONLY"
+      ]
+    },
+    "optional_phase_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "driver_probe": {
+          "enum": [
+            "NOT_PLANNED",
+            "PLANNED_NOT_AUTHORIZED",
+            "COMPLETE",
+            "FAILED",
+            "CENSORED"
+          ]
+        },
+        "control_surface": {
+          "enum": [
+            "NOT_PLANNED",
+            "PLANNED_NOT_AUTHORIZED",
+            "COMPLETE",
+            "FAILED",
+            "CENSORED"
+          ]
+        },
+        "localized_recovery": {
+          "enum": [
+            "NOT_PLANNED",
+            "PLANNED_NOT_AUTHORIZED",
+            "COMPLETE",
+            "FAILED",
+            "CENSORED"
+          ]
+        },
+        "cpr_adjudication": {
+          "enum": [
+            "NOT_PLANNED",
+            "PENDING",
+            "COMPLETE_APPEND_ONLY"
+          ]
+        }
+      }
+    },
+    "terminal_outcome": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "run_complete": {
+          "type": "boolean"
+        },
+        "final_state_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject_provider_run",
+        "paid_evaluator",
+        "active_recovery"
+      ],
+      "properties": {
+        "subject_provider_run": {
+          "type": "boolean"
+        },
+        "paid_evaluator": {
+          "type": "boolean"
+        },
+        "active_recovery": {
+          "type": "boolean"
+        }
+      }
+    },
+    "record_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

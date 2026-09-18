@@ -1,0 +1,27 @@
+name: Process Reality v5 offline validation
+
+on:
+  pull_request:
+    paths:
+      - "theory/**"
+      - "docs/**"
+      - "configs/**"
+      - "schemas/**"
+      - "scripts/validate_process_reality_v5.py"
+      - ".github/workflows/process-reality-v5-offline-validate.yml"
+      - "README.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-v5-method:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate Process Reality v5 method layer
+        run: python scripts/validate_process_reality_v5.py

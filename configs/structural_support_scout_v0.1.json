@@ -1,0 +1,61 @@
+{
+  "schema": "RB-STRUCTURAL-SUPPORT-SCOUT-v0.1",
+  "version": "0.1",
+  "date": "2026-09-18",
+  "status": "FORWARD_OFFLINE_STRUCTURAL_CANDIDATE_ONLY",
+  "source_event_schema": "RB-PROCESS-INTEGRITY-EVENT-v0.3",
+  "rules": [
+    {
+      "rule_id": "ADDRESSABLE_STATE_MATERIALIZATION",
+      "candidate_type": "STRUCTURAL_SUPPORT_CANDIDATE",
+      "event_type": "StateEvent",
+      "require_state_or_field_hash": true,
+      "description": "A new system-addressable state/field identity is materialized. Semantic support remains unadjudicated."
+    },
+    {
+      "rule_id": "CROSS_ACTOR_DIRECT_CONSUMPTION",
+      "candidate_type": "DIRECT_POOL_CONSUMPTION_CANDIDATE",
+      "require_relation_type_any": [
+        "READ",
+        "EXPLICITLY_REFERENCED",
+        "ADOPTED_AS_DECISION_PREMISE"
+      ],
+      "require_distinct_actor_from_source_when_known": true,
+      "description": "A downstream actor directly consumes an addressable object or descendant without requiring the original relay to be replayed."
+    },
+    {
+      "rule_id": "SUPPORTED_DESCENDANT_MATERIALIZATION",
+      "candidate_type": "STRUCTURAL_SUPPORT_CANDIDATE",
+      "require_relation_type_any": [
+        "INHERITED_INTO_STATE_OR_ACTION",
+        "PROPAGATED_TO_DESCENDANT"
+      ],
+      "description": "A source-backed descendant is materialized in state/action structure."
+    },
+    {
+      "rule_id": "MULTI_CONSUMER_ADDRESSABLE_REUSE",
+      "candidate_type": "STABLE_SHARED_POOL_ENTRY_CANDIDATE",
+      "minimum_distinct_consumers": 2,
+      "description": "An addressable object or descendant is consumed by multiple downstream actors/opportunities."
+    },
+    {
+      "rule_id": "STRUCTURAL_PRESSURE_EXPOSURE",
+      "candidate_type": "STRUCTURAL_EXPOSURE_CANDIDATE",
+      "require_any_signal": [
+        "MULTI_CONSUMER_REUSE",
+        "CROSS_ACTOR_PROPAGATION",
+        "ACTION_CONSTRAINT_DESCENDANT",
+        "REENTRY_OR_REUSE",
+        "AUTHORITY_STATUS_MISMATCH"
+      ],
+      "description": "Accumulated support/reuse/dependency becomes structurally salient enough to nominate a bounded semantic-audit region."
+    }
+  ],
+  "non_claims": [
+    "Candidate output is not semantic origin.",
+    "Candidate output is not CPR.",
+    "Pool candidacy is not epistemic correctness.",
+    "Exposure candidacy is not first structural support.",
+    "Hash lineage alone is not semantic adoption."
+  ]
+}
