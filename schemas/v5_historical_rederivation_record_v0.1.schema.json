@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-V5-HISTORICAL-REDERIVATION-RECORD-v0.1",
+  "title": "Process Reality v5 Historical Re-derivation Record v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "record_id",
+    "evidence_set_id",
+    "legacy_anchor_ids",
+    "objects",
+    "j0_mapping",
+    "boundary"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-V5-HISTORICAL-REDERIVATION-RECORD-v0.1"
+    },
+    "record_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "evidence_set_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "legacy_anchor_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "object_type",
+          "evidence_refs",
+          "status",
+          "interpretation"
+        ],
+        "properties": {
+          "object_type": {
+            "enum": [
+              "UNSTABLE_INFORMATION_CANDIDATE",
+              "SEMANTIC_TRANSFORMATION_CANDIDATE",
+              "STRUCTURAL_SUPPORT_CANDIDATE",
+              "STABLE_POOL_ENTRY_CANDIDATE",
+              "DIRECT_POOL_CONSUMPTION_CANDIDATE",
+              "STRUCTURAL_EXPOSURE_CANDIDATE",
+              "DOWNSTREAM_CONSTRAINT_OR_ACTION"
+            ]
+          },
+          "evidence_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          },
+          "status": {
+            "enum": [
+              "DIRECTLY_EVIDENCED",
+              "SUPPORTED",
+              "SUPPORTED_CANDIDATE",
+              "UNRESOLVED",
+              "NOT_ESTABLISHED",
+              "CONTRADICTED",
+              "NOT_ADJUDICATED"
+            ]
+          },
+          "interpretation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "alternative_interpretation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mechanically_derived": {
+            "type": "boolean"
+          },
+          "semantically_audited": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "j0_mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "semantic_origin",
+        "first_structural_support",
+        "first_stable_pool_entry",
+        "structural_exposure_anchor"
+      ],
+      "properties": {
+        "semantic_origin": {
+          "$ref": "#/$defs/status"
+        },
+        "first_structural_support": {
+          "$ref": "#/$defs/status"
+        },
+        "first_stable_pool_entry": {
+          "$ref": "#/$defs/status"
+        },
+        "structural_exposure_anchor": {
+          "$ref": "#/$defs/status"
+        }
+      }
+    },
+    "boundary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "record_hash": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "$defs": {
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "evidence_refs",
+        "interpretation"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "SUPPORTED",
+            "SUPPORTED_CANDIDATE",
+            "UNRESOLVED",
+            "NOT_ESTABLISHED",
+            "CONTRADICTED",
+            "NOT_ADJUDICATED"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "interpretation": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
