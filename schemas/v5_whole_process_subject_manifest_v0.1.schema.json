@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-V5-WHOLE-PROCESS-SUBJECT-MANIFEST-v0.1",
+  "title": "Process Reality v5 Whole-Process Subject Manifest Row v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "experiment_family",
+    "batch_id",
+    "run_id",
+    "trial",
+    "logical_seed",
+    "domain_id",
+    "subject_condition",
+    "code_commit_sha",
+    "batch_design_hash",
+    "domain_hash",
+    "task_hash",
+    "agent_pool_hash",
+    "arena_config_hash",
+    "model_config_hash",
+    "theory_contract_hash",
+    "measurement_contract_hash",
+    "scout_config_hash",
+    "experiment_profile_hash",
+    "automatic_paid_evaluator",
+    "semantic_review",
+    "no_outcome_aware_rerun",
+    "scientific_status"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-V5-WHOLE-PROCESS-SUBJECT-MANIFEST-v0.1"
+    },
+    "experiment_family": {
+      "const": "PROCESS_REALITY_V5_WHOLE_PROCESS"
+    },
+    "batch_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trial": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "logical_seed": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "domain_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "subject_condition": {
+      "const": "NATURAL_UNMANIPULATED"
+    },
+    "code_commit_sha": {
+      "type": "string",
+      "minLength": 1
+    },
+    "batch_design_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "batch_design_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "domain_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agent_pool_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "arena_config_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "arena_config_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_config_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model_config_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "theory_contract_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "theory_contract_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "measurement_contract_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "measurement_contract_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scout_config_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scout_config_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "experiment_profile_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "experiment_profile_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "automatic_paid_evaluator": {
+      "const": false
+    },
+    "semantic_review": {
+      "const": "DEFERRED_APPEND_ONLY"
+    },
+    "no_outcome_aware_rerun": {
+      "const": true
+    },
+    "scientific_status": {
+      "const": "V5_WHOLE_PROCESS_SUBJECT_CANDIDATE_AWAITING_EXPLICIT_PAID_AUTHORIZATION"
+    }
+  }
+}

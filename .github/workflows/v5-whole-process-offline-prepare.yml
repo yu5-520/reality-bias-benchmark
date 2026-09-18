@@ -1,0 +1,36 @@
+name: V5 Whole-Process offline prepare
+
+on:
+  pull_request:
+    paths:
+      - "docs/v5_fresh_whole_process_design_v0.1.md"
+      - "configs/v5_whole_process_*"
+      - "schemas/v5_whole_process_subject_manifest_v0.1.schema.json"
+      - "arena/build_v5_whole_process_manifest.py"
+      - "arena/v5_whole_process_index.py"
+      - "arena/v5_whole_process_preflight.py"
+      - "arena/tests/test_v5_whole_process.py"
+      - ".github/workflows/v5-whole-process-offline-prepare.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile v5 Whole-Process modules
+        run: python -m py_compile arena/build_v5_whole_process_manifest.py arena/v5_whole_process_index.py arena/v5_whole_process_preflight.py
+      - name: Run v5 Whole-Process tests
+        run: python -m unittest arena.tests.test_v5_whole_process -v
+      - name: Run offline preflight
+        run: python -m arena.v5_whole_process_preflight --outdir results/v5_whole_process_preflight --code-sha "$GITHUB_SHA"
+      - name: Re-run v5 method and historical re-derivation gates
+        run: |
+          python scripts/validate_process_reality_v5.py
+          python scripts/derive_v5_historical_rederivation.py --check results/v5_historical_rederivation/rederivation_bundle_v0_1.json
