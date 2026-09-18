@@ -18,6 +18,7 @@ from .r7_runtime_smoke import load_r7_plan_bundle
 from .r7_semantic_repair_runtime import verify_semantic_repair_trace
 
 AUTH_PHRASE = "CALL_REAL_R7_THREE_ARM_API"
+C3_AUTH_PHRASE = "CALL_REAL_R7_C3_API"
 RUN_SCHEMA = "RB-R7-THREE-ARM-REAL-RUN-v0.1"
 
 
@@ -137,7 +138,7 @@ def _revision_lineage(bundle: dict, trace: dict) -> dict:
     return row
 
 
-def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, per_branch_max_calls: int, per_branch_spending_ceiling: float, global_spending_ceiling: float, currency: str, execution_code_sha: str) -> dict:
+def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, per_branch_max_calls: int, per_branch_spending_ceiling: float, global_spending_ceiling: float, currency: str, execution_code_sha: str, only_arm: str | None = None) -> dict:
     if outdir.exists():
         raise ValueError("refusing_to_overwrite_r7_real_output_dir")
     outdir.mkdir(parents=True)
@@ -155,6 +156,10 @@ def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, 
     branch_summaries = []
 
     ordered_rows = sorted(bundle["execution_rows"], key=lambda row: (int(row["replicate_index"]), int(row["execution_order"])))
+    if only_arm is not None:
+        _require(only_arm == "C3_ALR", "r7_only_arm_must_be_c3_alr")
+        ordered_rows = [row for row in ordered_rows if row["arm_id"] == only_arm]
+        _require(ordered_rows, "r7_selected_arm_has_no_execution_rows")
     for row in ordered_rows:
         if total_estimated_spend >= global_spending_ceiling:
             error = {
@@ -271,6 +276,7 @@ def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, 
             "provider_internal_state_replayed": False,
             "semantic_cpr_status": "NOT_ADJUDICATED",
             "terminal_outcome_is_primary": False,
+            "execution_scope": "C3_ONLY_OPERATOR_UPDATE" if only_arm == "C3_ALR" else "FULL_THREE_ARM",
         }
         if arm_id == "C3_ALR":
             revision = _revision_lineage(bundle, trace)
@@ -325,6 +331,8 @@ def execute_real_batch(*, bundle: dict, bindings: dict, upstream, outdir: Path, 
         "plan_hash": bundle["plan"]["plan_hash"],
         "execution_code_sha": execution_code_sha,
         "branch_count": len(ordered_rows),
+        "execution_scope": "C3_ONLY_OPERATOR_UPDATE" if only_arm == "C3_ALR" else "FULL_THREE_ARM",
+        "selected_arm": only_arm,
         "trace_count": len(branch_summaries),
         "run_complete_count": completed,
         "censored_or_nonrealized_count": censored,
@@ -362,6 +370,7 @@ def main() -> None:
     ap.add_argument("--global-spending-ceiling", type=float, required=True)
     ap.add_argument("--currency", default="USD")
     ap.add_argument("--authorization-phrase")
+    ap.add_argument("--only-arm", choices=["C3_ALR"])
     ap.add_argument("--execute-real-api", action="store_true")
     ap.add_argument("--preflight-only", action="store_true")
     args = ap.parse_args()
@@ -369,7 +378,8 @@ def main() -> None:
     if args.preflight_only and args.execute_real_api:
         raise SystemExit("preflight_only_and_execute_real_api_are_mutually_exclusive")
     bundle = load_r7_plan_bundle(args.plan_dir)
-    row_count = len(bundle["execution_rows"])
+    selected_rows = [row for row in bundle["execution_rows"] if args.only_arm is None or row["arm_id"] == args.only_arm]
+    row_count = len(selected_rows)
     validate_symmetric_limits(
         row_count=row_count,
         per_branch_max_calls=args.per_branch_max_calls,
@@ -389,14 +399,17 @@ def main() -> None:
         print("PLAN_HASH=" + bundle["plan"]["plan_hash"])
         print("EXECUTION_CODE_SHA=" + args.execution_code_sha)
         print("BRANCH_COUNT=" + str(row_count))
-        print("C1_RUNTIME=READY")
-        print("C2_RUNTIME=READY")
+        print("EXECUTION_SCOPE=" + ("C3_ONLY_OPERATOR_UPDATE" if args.only_arm == "C3_ALR" else "FULL_THREE_ARM"))
+        if args.only_arm is None:
+            print("C1_RUNTIME=READY")
+            print("C2_RUNTIME=READY")
         print("C3_RUNTIME=READY")
         print("PAID_API_CALLED=NO")
         return
 
-    if not args.execute_real_api or args.authorization_phrase != AUTH_PHRASE:
-        raise SystemExit("Refusing provider calls: exact R7 three-arm authorization required.")
+    expected_auth_phrase = C3_AUTH_PHRASE if args.only_arm == "C3_ALR" else AUTH_PHRASE
+    if not args.execute_real_api or args.authorization_phrase != expected_auth_phrase:
+        raise SystemExit("Refusing provider calls: exact R7 authorization required for selected execution scope.")
     if not args.outdir:
         raise SystemExit("outdir_required_for_real_r7_execution")
     _credential_check(bindings["model_config"])
@@ -411,8 +424,10 @@ def main() -> None:
         global_spending_ceiling=args.global_spending_ceiling,
         currency=args.currency,
         execution_code_sha=args.execution_code_sha,
+        only_arm=args.only_arm,
     )
-    print("R7_THREE_ARM_SUBJECT_RUN=COMPLETE")
+    print("R7_SUBJECT_RUN=COMPLETE")
+    print("EXECUTION_SCOPE=" + summary["execution_scope"])
     print("TRACE_COUNT=" + str(summary["trace_count"]))
     print("ESTIMATED_TOTAL_SPEND=" + str(summary["estimated_total_spend"]))
     print("SEMANTIC_CPR_STATUS=NOT_ADJUDICATED")
