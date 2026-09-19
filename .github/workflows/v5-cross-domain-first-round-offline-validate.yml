@@ -26,6 +26,9 @@ on:
       - "manifests/v5_cross_domain_r5_r6_semantic_audit_review_2026-09-19_v0_1.json"
       - "manifests/v5_cross_domain_r5_r6_semantic_audit_wave2_review_2026-09-19_v0_2.json"
       - "manifests/v5_cross_domain_r5r6_semantic_audit_wave1_2026-09-19_v0_1.json"
+      - "manifests/v5_cross_domain_r5r6_semantic_audit_wave2_2026-09-19_v0_1.json"
+      - "results/v5_cross_domain_r5r6_semantic_audit_wave2_v0_1/**"
+      - "docs/reports/2026-09-19/V5_3_Cross_Domain_R5_R6_Structural_Semantic_Audit_Wave2_Report_v1.md"
       - "results/v5_cross_domain_r5r6_semantic_audit_wave1_v0_1/**"
       - "docs/reports/2026-09-19/V5_3_Cross_Domain_R5_R6_Structural_Semantic_Audit_Wave1_Report_v1.md"
       - "configs/v5_cross_domain_first_round_v0.2.json"
@@ -382,6 +385,39 @@ jobs:
           assert p['uniform_decision']['r7_status']=='NOT_AUTHORIZED'
           assert p['uniform_decision']['semantic_cpr_status']=='NOT_ADJUDICATED'
           print('PASS: wave2 semantic-review decisions are frozen with v5.3 claim boundaries')
+          PY
+
+      - name: Validate completed R5-R6 semantic-audit wave2 result
+        run: |
+          python -m json.tool manifests/v5_cross_domain_r5r6_semantic_audit_wave2_2026-09-19_v0_1.json >/dev/null
+          python -m json.tool results/v5_cross_domain_r5r6_semantic_audit_wave2_v0_1/summary.json >/dev/null
+          python - <<'PY'
+          import json
+          m=json.load(open('manifests/v5_cross_domain_r5r6_semantic_audit_wave2_2026-09-19_v0_1.json'))
+          s=json.load(open('results/v5_cross_domain_r5r6_semantic_audit_wave2_v0_1/summary.json'))
+          assert m['status']=='FROZEN_R5R6_SEMANTIC_AUDIT_WAVE2_COMPLETE'
+          assert s['branch_audit_count']==10
+          assert s['case_count']==5
+          assert s['semantic_adoption_supported_branch_count']==10
+          assert s['decision_action_dependence_supported_branch_count']==10
+          assert s['post_stimulus_persistence_supported_branch_count']==10
+          assert s['system_inertia_supported_candidate_branch_count']==4
+          assert s['system_inertia_supported_candidate_case_count']==2
+          assert s['normal_or_reanchored_persistence_case_count']==3
+          assert s['problematic_bias_established_case_count']==0
+          assert s['r5_unique_causal_attribution_established_case_count']==0
+          assert s['lineage_completeness_assessed'] is False
+          assert s['r7_authorized'] is False
+          assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
+          assert m['balance_recovery']['successful_recovery_trace_count']==12
+          assert m['balance_recovery']['original_failed_evidence_overwritten'] is False
+          assert m['balance_recovery']['selection_scientific_outcome_aware'] is False
+          assert m['cumulative_r5r6_observation_pool']['total_preselected_case_count']==11
+          assert m['cumulative_r5r6_observation_pool']['total_intervention_branch_count']==22
+          assert m['cumulative_r5r6_observation_pool']['system_inertia_supported_candidate_case_count']==4
+          assert m['cumulative_r5r6_observation_pool']['is_domain_probability_denominator'] is False
+          assert m['frozen_evidence_mutated'] is False
+          print('PASS: completed wave2 semantic audit and cumulative mechanism pool preserve v5.3 claim boundaries')
           PY
 
       - name: Revalidate Process Reality method layer
