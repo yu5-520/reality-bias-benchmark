@@ -103,6 +103,11 @@ def main() -> None:
         "arena/run_r7_dual_intervention_real.py",
         "arena/freeze_r7_dual_intervention_evidence.py",
         "scripts/validate_canonical_r5_r7_geometry_v1.py",
+        "docs/cross_domain_case_progression_contract_v0.3.md",
+        "docs/R5_structural_scouting_and_driver_probe_protocol_v1.2.md",
+        "docs/R6_structural_support_trace_control_surface_protocol_v1.2.md",
+        "docs/reporting/process_reality_theory_experiment_report_standard_v1_2.md",
+        "docs/reporting/process_reality_engineering_experiment_report_standard_v1_2.md",
     ]
     for path in required_files:
         require((ROOT / path).exists(), f"missing required v5/v5.1 file: {path}")
