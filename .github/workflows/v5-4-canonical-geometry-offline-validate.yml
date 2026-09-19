@@ -39,6 +39,7 @@ on:
       - ".github/workflows/v5-4-r6-canonical-wave3-semantic.yml"
       - "docs/v5_4_r6_canonical_natural_vs_r5_protocol_v0.3.md"
       - ".github/workflows/v5-4-r6-canonical-wave3-structural.yml"
+      - ".github/workflows/v5-4-r6-canonical-wave4-structural.yml"
       - "configs/v5_4_cross_domain_r5_canonical_wave3_v0.1.json"
       - "configs/v5_4_cross_domain_r5_canonical_wave4_v0.1.json"
       - "docs/v5_4_cross_domain_r5_canonical_wave4_protocol_v0.1.md"
@@ -219,6 +220,20 @@ jobs:
           assert p['authorization']['r7_repair'] is False
           assert p['authorization']['r8_cpr_adjudication'] is False
           print('PASS: canonical Wave4 is four cases / four paid R5-I branches')
+          PY
+
+      - name: Validate Wave4 passive R6 materializer
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/v5-4-r6-canonical-wave4-structural.yml').read_text()
+          assert "R5_RUN_ID: '35445012458'" in p
+          assert "R5_ARTIFACT_ID: '10585287716'" in p
+          assert "R5_EVIDENCE_HASH: 249c7d980a1f51ee30f68c0e1680d6cb8fad29c377a973b7accabb0db903c4bf" in p
+          assert 'for i in 1 3 4 6; do' in p
+          assert "assert p['case_count']==4" in p
+          assert "assert p['canonical_intervention_trace_count']==4" in p
+          print('PASS: Wave4 R6 is exact-artifact-bound and passive')
           PY
 
       - name: Run canonical geometry unit tests
