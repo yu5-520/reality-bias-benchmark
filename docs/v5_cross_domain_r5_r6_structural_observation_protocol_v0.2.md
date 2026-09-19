@@ -15,6 +15,8 @@ Ineligible:
 
 `provider failure at first exposed model call -> no semantic response available`
 
+Machine status: `INCOMPLETE_FIRST_EXPOSURE_CALL_PROVIDER_FAILURE`.
+
 Ineligible branches are retained as frozen evidence and labeled `NOT_ELIGIBLE_INCOMPLETE_CONTINUATION`. They are not counted as no-response, no-adoption, or no-System-Inertia observations.
 
 Current second-wave source:
