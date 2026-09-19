@@ -1,0 +1,80 @@
+name: V5.4 R5-R7 Second Batch Engineering Reports Validate
+
+on:
+  pull_request:
+    paths:
+      - "docs/reports/2026-09-20/R5_Local_Semantic_Intervention_Engineering_Report_v1.md"
+      - "docs/reports/2026-09-20/R6_Lineage_Localization_and_Repair_Readiness_Report_v1.md"
+      - "docs/reports/2026-09-20/R7_Dual_Intervention_Engineering_Report_v1.md"
+      - "docs/reports/2026-09-20/R5-R7_Process_Integrity_Engineering_Synthesis_Report_v1.md"
+      - "manifests/v5_4_r5_r7_second_batch_engineering_reports_2026-09-20_v1.json"
+      - ".github/workflows/v5-4-r5-r7-second-batch-engineering-reports-validate.yml"
+  push:
+    branches: [ main ]
+    paths:
+      - "manifests/v5_4_r5_r7_second_batch_engineering_reports_2026-09-20_v1.json"
+      - ".github/workflows/v5-4-r5-r7-second-batch-engineering-reports-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate finalized engineering report bundle
+        run: |
+          set -euo pipefail
+          python -m json.tool manifests/v5_4_r5_r7_second_batch_engineering_reports_2026-09-20_v1.json >/dev/null
+          python scripts/validate_engineering_structural_semantic_audit_v0_1.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('manifests/v5_4_r5_r7_second_batch_engineering_reports_2026-09-20_v1.json')
+          m=json.loads(p.read_text())
+          assert m['status']=='R5_R7_SECOND_BATCH_FINAL_ENGINEERING_REPORTS'
+          assert m['report_standard']=='RB-PROCESS-REALITY-REPORT-STANDARD-v1.8'
+          assert m['engineering_report_standard']=='RB-PROCESS-REALITY-ENGINEERING-REPORT-STANDARD-v1.3'
+          assert m['engineering_semantic_audit']=='RB-ENGINEERING-STRUCTURAL-SEMANTIC-AUDIT-v0.1'
+          assert len(m['reports'])==4
+          assert m['visual_qa']['render_verified'] is True
+          assert m['visual_qa']['every_page_inspected'] is True
+          assert m['visual_qa']['page_count_total']==23
+          assert m['visual_qa']['clipping_or_overlap_detected'] is False
+          r=m['engineering_results']
+          assert r['candidate_case_count']==4
+          assert r['r7_p_trace_count']==4
+          assert r['r7_s_trace_count']==4
+          assert r['r7_route_node_count']==64
+          assert r['engineering_semantic_ledger_entry_count']==48
+          assert r['persistent_direct_exposure_count']==32
+          assert r['persistent_reinjection_count']==28
+          assert r['structured_repair_preserved_unrelated_case_count']==4
+          assert r['structural_old_fact_reentry_case_count']==1
+          assert r['semantic_blind_restoration_case_count']==0
+          assert r['material_divergence_case_count']==2
+          assert r['reconvergence_after_recompute_case_count']==2
+          assert m['reporting_only'] is True
+          assert m['raw_evidence_mutated'] is False
+          assert m['new_provider_calls_for_reports']==0
+          assert m['new_evaluator_calls_for_reports']==0
+          assert m['subject_reruns_for_reports']==0
+          assert m['structured_repair_universal_superiority']=='NOT_ESTABLISHED'
+          assert m['problematic_bias_status']=='NOT_ESTABLISHED'
+          assert m['r5_unique_causal_attribution']=='NOT_ESTABLISHED'
+          assert m['semantic_cpr_status']=='NOT_ADJUDICATED'
+          for report in m['reports']:
+              src=Path(report['report_source'])
+              assert src.is_file(), src
+              text=src.read_text(encoding='utf-8')
+              assert 'APPROVED FOR REPOSITORY' in text
+              assert 'DRAFT' not in text.upper()
+              assert len(report['finalized_docx_export_sha256'])==64
+              assert report['finalized_docx_export_size_bytes']>0
+          print('PASS: finalized R5-R7 second engineering report batch')
+          PY
