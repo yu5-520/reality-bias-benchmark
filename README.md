@@ -130,6 +130,41 @@ Completed pass-1 execution:
 - R5 scientific eligibility: **29**;
 - R5 execution authorization: **NO**.
 
+
+Completed cross-domain R5 first wave:
+
+- workflow: `35381406873`;
+- artifact: `10564055226`;
+- artifact digest: `sha256:a711f507365504bd59ca179bd3d76ea4c57d97caf6f6be85a6f4ef1f88629457`;
+- 6 source-bound cases / 12 matched pairs / 24 branches;
+- preserved traces: **24 / 24**;
+- runner errors: **0**;
+- estimated provider spend: **USD 1.504547232**;
+- raw evidence batch hash: `26f63b182ca704fbf8119f5c75894e9f219e0c22ce6fadeaa6eb2dd95b06ea68`;
+- exact structural inequality: 12 / 12 pairs at first response/action/path/final-state levels;
+- replicate-stable material semantic effect: **0 / 6 cases**;
+- one mixed material-response case: `wave-4-8b1731b57396`;
+- report: `docs/reports/2026-09-19/V5_Cross_Domain_R5_First_Wave_Semantic_Audit_R6_Candidate_Report_v1.md`;
+- result manifest: `manifests/v5_cross_domain_r5_first_wave_2026-09-19_v0_1.json`.
+
+The R5 result therefore distinguishes **structural sensitivity** from **semantic/material effect**. Universal exact-output divergence is not treated as causal evidence because provider stochasticity remains a competing explanation.
+
+R6 now retains one bounded mechanism candidate from supply-chain wave 4. In one intervention replicate, the one-shot authority withdrawal is followed by a new `inventory_coverage_assessment` and plan revision, then downstream adoption by risk, supply_lead and sales after the direct stimulus has disappeared. The second replicate does not reproduce the same material path reconfiguration, so:
+
+- post-consumption persistence in that branch: **OBSERVED**;
+- intervention specificity: **NOT ESTABLISHED**;
+- System Inertia: **NOT ESTABLISHED**;
+- R7 repair authorization: **NO**.
+
+A targeted R6 specificity follow-up is frozen for the same parent:
+
+- config: `configs/v5_cross_domain_r6_targeted_specificity_v0.1.json`;
+- target: `wave-4-8b1731b57396`;
+- 8 new matched pairs / 16 branches;
+- combined target-case evidence after success: 10 matched pairs;
+- exact operator remains one-shot `fact -> unconfirmed`;
+- paid evaluator / R7 / R8: disabled.
+
 Prospective sample geometry:
 
 - 30 natural trajectories per held-out domain;
