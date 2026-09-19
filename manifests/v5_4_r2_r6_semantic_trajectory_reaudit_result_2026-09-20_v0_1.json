@@ -1,0 +1,107 @@
+{
+  "schema": "RB-V5.4-R2R6-SEMANTIC-TRAJECTORY-REAUDIT-RESULT-MANIFEST-v0.1",
+  "date": "2026-09-20",
+  "status": "FROZEN_COMPLETE_ROUTE_SEMANTIC_REAUDIT",
+  "materialization": {
+    "workflow_run_id": 35457723047,
+    "execution_sha": "f22d8545f6edbe7182cd16bb9ec19637992fd128",
+    "artifact_id": 10588404740,
+    "artifact_name": "v5-4-r2-r6-semantic-trajectory-reaudit-35457723047",
+    "artifact_digest": "sha256:14fb11da98fae0afb5e82152c101fc5be937e43259f445b25ad10796b1801182",
+    "summary_hash": "38142f734f186217c16def3164259fee9b419f965d1f82000f95afe3623d6634",
+    "report_evidence_bundle_hash": "2ec48541f8e32cf68319bbecad672922318f5b453fc1959718f29ee5abe3d72b"
+  },
+  "scope": {
+    "primary_domains": [
+      "finance",
+      "supply_chain",
+      "software_engineering"
+    ],
+    "ecommerce_primary_evidence_count": 0,
+    "natural_population": 90,
+    "pass1_eligible_case_count": 29,
+    "canonical_r5_r6_case_count": 29,
+    "complete_route_audit_count": 32
+  },
+  "results": {
+    "natural_complete_route_audit_count": 3,
+    "canonical_r5_r6_complete_route_audit_count": 29,
+    "complete_route_node_count": 908,
+    "semantic_edge_count": 194,
+    "system_inertia_supported_candidate_case_count": 4,
+    "system_inertia_not_established_case_count": 25,
+    "historical_case_classification_change_count": 0,
+    "uniform_substantive_semantic_decision_used": false,
+    "report_gate_status": "READY_FOR_REPORT_DRAFT"
+  },
+  "representative_audits": [
+    {
+      "audit_id": "V54-R2R4-TRAJ-7ed0c65065a0",
+      "domain_id": "finance",
+      "audit_hash": "58ac94b0e425d8d6a7399e563fe8cb3280813822ec9d144f81acbb88d1c280f4",
+      "route_node_count": 32,
+      "semantic_edge_count": 8,
+      "role": "NATURAL_COMPLETE_ROUTE"
+    },
+    {
+      "audit_id": "V54-R2R4-TRAJ-a4d9503019bb",
+      "domain_id": "supply_chain",
+      "audit_hash": "20bc67fbf61386b2ab1e643a6ebfd0ea1d3cef50d83dbbba18c80474919bfa9b",
+      "route_node_count": 32,
+      "semantic_edge_count": 12,
+      "role": "NATURAL_COMPLETE_ROUTE"
+    },
+    {
+      "audit_id": "V54-R2R4-TRAJ-8c668b56a8c2",
+      "domain_id": "software_engineering",
+      "audit_hash": "eddc1a878757337509c719a0910889bd413d08dd5543dc25ed4f34f56a1e952b",
+      "route_node_count": 32,
+      "semantic_edge_count": 3,
+      "role": "NATURAL_COMPLETE_ROUTE"
+    },
+    {
+      "audit_id": "V54-R2R6-TRAJ-wave-3-56ee79f97f54",
+      "domain_id": "supply_chain",
+      "audit_hash": "071bc71b1534c471288ea2ea00e106362e5e74af3a37f0e9786b5c066cd7c918",
+      "route_node_count": 32,
+      "semantic_edge_count": 6,
+      "role": "STRONGER_SYSTEM_INERTIA_CANDIDATE"
+    },
+    {
+      "audit_id": "V54-R2R6-TRAJ-wave-1-92211309fb1b",
+      "domain_id": "finance",
+      "audit_hash": "7add91ef68b215a5c18c285f1ec947565f22fd8a5a19a7c87ce970c28d58a243",
+      "route_node_count": 23,
+      "semantic_edge_count": 3,
+      "role": "INDEPENDENT_REANCHORING_COMPARATOR"
+    },
+    {
+      "audit_id": "V54-R2R6-TRAJ-wave-6-7c7e526e4d91",
+      "domain_id": "software_engineering",
+      "audit_hash": "fd0efbe64a0d8663514427ec12a9979ff8146d4fc70ec813f5f3284f5b3d2759",
+      "route_node_count": 32,
+      "semantic_edge_count": 5,
+      "role": "STRONGER_SYSTEM_INERTIA_CANDIDATE"
+    }
+  ],
+  "execution_boundary": {
+    "reviewer": {
+      "kind": "MODEL",
+      "id": "GPT-5.6-Sol",
+      "blind_to_prior_semantic_labels": false
+    },
+    "new_provider_calls": 0,
+    "new_paid_evaluator_calls": 0,
+    "subject_reruns": 0,
+    "raw_evidence_mutated": false,
+    "historical_semantic_records_mutated": false,
+    "independent_blinded_replication": false
+  },
+  "interpretation_boundary": {
+    "historical_case_classification_change_count_explanation": "Zero changes are expected because the pass retains prior per-case semantic classes and strengthens complete-route evidence binding; it is not an independent blinded replication.",
+    "problematic_bias_status": "NOT_ESTABLISHED",
+    "r5_unique_causal_attribution": "NOT_ESTABLISHED",
+    "semantic_cpr_status": "NOT_ADJUDICATED",
+    "prevalence_claim_allowed": false
+  }
+}

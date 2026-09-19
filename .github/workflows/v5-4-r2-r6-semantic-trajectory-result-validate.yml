@@ -1,0 +1,65 @@
+name: V5.4 R2-R6 Semantic Trajectory Result Validate
+
+on:
+  pull_request:
+    paths:
+      - "manifests/v5_4_r2_r6_semantic_trajectory_reaudit_result_2026-09-20_v0_1.json"
+      - "docs/reports/2026-09-20/V5_4_R2_R6_Semantic_Trajectory_Reaudit_Result_v1.md"
+      - ".github/workflows/v5-4-r2-r6-semantic-trajectory-result-validate.yml"
+  push:
+    branches: [ main ]
+    paths:
+      - "manifests/v5_4_r2_r6_semantic_trajectory_reaudit_result_2026-09-20_v0_1.json"
+      - ".github/workflows/v5-4-r2-r6-semantic-trajectory-result-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate frozen result manifest
+        run: |
+          set -euo pipefail
+          python -m json.tool manifests/v5_4_r2_r6_semantic_trajectory_reaudit_result_2026-09-20_v0_1.json >/dev/null
+          python - <<'PY'
+          import json
+          p=json.load(open('manifests/v5_4_r2_r6_semantic_trajectory_reaudit_result_2026-09-20_v0_1.json'))
+          assert p['status']=='FROZEN_COMPLETE_ROUTE_SEMANTIC_REAUDIT'
+          assert p['scope']['primary_domains']==['finance','supply_chain','software_engineering']
+          assert p['scope']['ecommerce_primary_evidence_count']==0
+          assert p['scope']['natural_population']==90
+          assert p['scope']['pass1_eligible_case_count']==29
+          assert p['scope']['canonical_r5_r6_case_count']==29
+          assert p['scope']['complete_route_audit_count']==32
+          r=p['results']
+          assert r['natural_complete_route_audit_count']==3
+          assert r['canonical_r5_r6_complete_route_audit_count']==29
+          assert r['complete_route_node_count']==908
+          assert r['semantic_edge_count']==194
+          assert r['system_inertia_supported_candidate_case_count']==4
+          assert r['system_inertia_not_established_case_count']==25
+          assert r['historical_case_classification_change_count']==0
+          assert r['uniform_substantive_semantic_decision_used'] is False
+          assert r['report_gate_status']=='READY_FOR_REPORT_DRAFT'
+          e=p['execution_boundary']
+          assert e['new_provider_calls']==0
+          assert e['new_paid_evaluator_calls']==0
+          assert e['subject_reruns']==0
+          assert e['raw_evidence_mutated'] is False
+          assert e['historical_semantic_records_mutated'] is False
+          assert e['independent_blinded_replication'] is False
+          b=p['interpretation_boundary']
+          assert b['problematic_bias_status']=='NOT_ESTABLISHED'
+          assert b['r5_unique_causal_attribution']=='NOT_ESTABLISHED'
+          assert b['semantic_cpr_status']=='NOT_ADJUDICATED'
+          assert b['prevalence_claim_allowed'] is False
+          assert len(p['representative_audits'])==6
+          print('PASS: frozen R2-R6 semantic trajectory result preserves evidence and claim boundaries')
+          PY
