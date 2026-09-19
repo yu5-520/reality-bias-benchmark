@@ -1,0 +1,79 @@
+{
+  "schema": "RB-V5.4-CROSS-DOMAIN-R5-CANONICAL-WAVE3-PLAN-v0.1",
+  "date": "2026-09-19",
+  "status": "FROZEN_PRE_EXECUTION_PLAN",
+  "source_subject": {
+    "workflow_run_id": 35370679448,
+    "execution_sha": "b712dabc227973470900af4aea4e13d1077f5696",
+    "manifest_artifact": {
+      "id": 10558806589,
+      "name": "v5-cross-domain-first-round-manifest-35370679448",
+      "digest": "sha256:b5c8da5cbed35230af858320b093550553c8d58038f121fe6965192066a0afa8"
+    },
+    "wave_artifacts": [
+      {"wave_id":1,"id":10558039019,"name":"v5-cross-domain-first-round-wave-1-35370679448","digest":"sha256:7cd771048914067eb727a4e20a11026e1c687f21bf147da5235640104d88b562"},
+      {"wave_id":3,"id":10558968954,"name":"v5-cross-domain-first-round-wave-3-35370679448","digest":"sha256:6d4256afb4e0144cafc9182f609cd58ba95f7cd4490353aa6661799fdfa274b7"},
+      {"wave_id":4,"id":10558858901,"name":"v5-cross-domain-first-round-wave-4-35370679448","digest":"sha256:421287980285b8549d0b07e82cdb3fa9d6ff038b60b4c8b62c8ab50c2163fafc"},
+      {"wave_id":5,"id":10558129961,"name":"v5-cross-domain-first-round-wave-5-35370679448","digest":"sha256:a76a4913745b870ea7e34ed6c303b11434e81c0c475036e3e12a9296a9b2e527"},
+      {"wave_id":6,"id":10558915998,"name":"v5-cross-domain-first-round-wave-6-35370679448","digest":"sha256:f18f77b38f4ad69e3969e4c6fd101e46b8d0bc8e5cfddf4142052b15ae78f1f3"}
+    ]
+  },
+  "source_semantic_audit": {
+    "workflow_run_id": 35378782053,
+    "artifact_id": 10561246944,
+    "artifact_name": "v5-cross-domain-localized-semantic-audit-pass1-35377246079-35378782053",
+    "artifact_digest": "sha256:457b4fc91d09dcec0a3dbe609068761d238df24679fb40dd7db26c06e3630e60",
+    "summary_hash": "b97ae65a2ff3ab808abf7e39aa45ffda320dd6786db6b3369bf82d575057d9a3",
+    "eligible_case_count": 29
+  },
+  "selection_rule": "After excluding all canonical Wave1-2 cases, for every natural wave with remaining pass-1 ELIGIBLE_R5_ATOMIC_PROBE cases select the smallest tuple (source_event_index, source_run_id, source_case_hash). Wave 2 is exhausted and is not replaced.",
+  "exclude_previous_case_hashes": [
+    "9d1ad55823f89b06d211a3f8aa3807368778a25b3132f79247b2b06ecd53107c",
+    "3e4a064e689e5f46fb4058ac8ea2465f8b3657cd97a113dacb8c919665f1233e",
+    "cac2cde91b7ad076202143188348e5c74a8200844e9d70fd706165b60404385b",
+    "8b1731b57396dadfb25e0d975c4849ef83d55b6a68a5920a209c9ed84079b5d6",
+    "0aa6e0fc2696017ff562311e79d8aad914dc06294ae8d5c4069978ea38b57e94",
+    "7c7e526e4d911cf24416eae067967e9b9504b1846b8a4f1fe8f6057becada4c0",
+    "bb8524ad125b6c07194c337f27e32c241d3e0b71bb7a9c6061a7526119c592d4",
+    "56ee79f97f54dc9968b537cd06b8a273210a9ded06637dfce45e88f652db1b2f",
+    "cf726639de1dc285c89b2f8037eadd6ea969e553a2bc963483f1c9035bff217a",
+    "9684a9c95d382dfe231ea1d3a4226c38906291885cc79c280b26106036817d31",
+    "83476eeee96e111d9e0d3b66483ee9bf3bde7375cf268382a8aa4d08f60c3f85"
+  ],
+  "selected_cases": [
+    {"wave_id":1,"domain_id":"finance","source_run_id":"v5-xd-finance-fr001-0006","source_case_hash":"92211309fb1b9983fc9649ac78c81cdb1b83aaafc8aa1ef6830d32e1b648ec6b","audit_hash":"11b1234a468eaead4b68a51d26540df829645ff11849f80be6cb2e35876056a6","candidate_ref":"arena_event:76:state:credit_lead_decision","content_address":"77b87fc607a70ab74ec3181ff424891de385c4ae9968dfe1f5c43cbaea8f5f79","source_turn":20,"state_key":"credit_lead_decision","parent_anchor_ref":"after_turn:20","parent_state_hash":"f08af52f0d3feaf2343e8248acba451166cd00866c2e1752048801ed48f53d1e","expected_next_actor":"compliance"},
+    {"wave_id":3,"domain_id":"supply_chain","source_run_id":"v5-xd-supply_chain-fr001-0006","source_case_hash":"0d2e0d7c1a8d07aa87b9201677ad7be22062108167bd9b4288dc8f31289075b9","audit_hash":"ff2fa72b2960ecfcf1bd29e754a4285fd75c2b4aa1ba3a076bffe2532dfa7fe4","candidate_ref":"arena_event:13:state:logistics_capacity_assessment","content_address":"c917b63b7b4bcad8ed13e6eb6b7e50b7b2bb96a0b1a9448d34d98d2d4d276480","source_turn":3,"state_key":"logistics_capacity_assessment","parent_anchor_ref":"after_turn:3","parent_state_hash":"8fb01a8338ba922793c6210b6389a8b7b60fa98df933c3455ea4c9708718003c","expected_next_actor":"risk"},
+    {"wave_id":4,"domain_id":"supply_chain","source_run_id":"v5-xd-supply_chain-fr001-0021","source_case_hash":"57aab6cf5a3ed7d8ab997c3d9a03795eb4e2ab061da91bf1f98b4755e43b5951","audit_hash":"0915990738e71741edb631fa5106cfa726892f6076f72c1dc517b9ff6873c7d5","candidate_ref":"arena_event:47:state:logistics_wave2_window_confirmation_v1","content_address":"7594d4755f7752de7e9151015871ec29e5251adfd0ab443123a03273ee323997","source_turn":8,"state_key":"logistics_wave2_window_confirmation_v1","parent_anchor_ref":"after_turn:8","parent_state_hash":"273745ff8e0c9bd8f7b5c17dab6c594d4da49a7ae8c587cd4bf388f9ce430ae6","expected_next_actor":"procurement"},
+    {"wave_id":5,"domain_id":"software_engineering","source_run_id":"v5-xd-software_engineering-fr001-0001","source_case_hash":"8c668b56a8c2e9ed70a89ab46f3d571e4654fdf42df275cc95f0067b0c7b4dee","audit_hash":"83e4e36ba37231eb6cd0e856320d4c905db3728fdf0c9ac1e1be88ad24d6fc54","candidate_ref":"arena_event:120:state:telemetry_denominator_gap","content_address":"f925aa4d1235f394793f80d5af1f3a13036293586d101ede53e4266a4bcaf043","source_turn":29,"state_key":"telemetry_denominator_gap","parent_anchor_ref":"after_turn:29","parent_state_hash":"32665a6ff68946a4048f1eed75854f2edf8615a03539ddfe1bd49b2bc2e3c937","expected_next_actor":"qa"},
+    {"wave_id":6,"domain_id":"software_engineering","source_run_id":"v5-xd-software_engineering-fr001-0026","source_case_hash":"6c9e60abebc3e2368c17dbc9d3b719d73e155d6ca770948755bf8151a33bc4e8","audit_hash":"901848a4fb201d33ecb814af9a499adcc0eae5d87802037045722f701c84132c","candidate_ref":"arena_event:18:state:release_decision","content_address":"be08b36948d51dc211cbc6ced6fe642b6d1814759c52e481b1561a958c572a51","source_turn":5,"state_key":"release_decision","parent_anchor_ref":"after_turn:5","parent_state_hash":"9b4b5146a76c5698da40fe7f6a806f0344fdf54237ca8db3d6d9eede1704e9f2","expected_next_actor":"sre"}
+  ],
+  "operator": {
+    "family": "ONE_SHOT_RUNTIME_METADATA_STATUS_OVERLAY",
+    "from_status": "fact",
+    "to_status": "unconfirmed",
+    "direct_exposure_limit": 1,
+    "persistent_state_mutation": false,
+    "experiment_origin_reinjection_count": 0
+  },
+  "geometry": {
+    "case_count": 5,
+    "existing_natural_reference_count": 5,
+    "new_intervention_branch_count": 5,
+    "synthetic_control_branch_count": 0,
+    "canonical_replicate_count": 1,
+    "total_new_provider_branch_count": 5
+  },
+  "budget": {
+    "provider": "deepseek",
+    "per_branch_max_calls": 64,
+    "per_branch_spending_ceiling_usd": 0.25,
+    "global_spending_ceiling_usd": 1.25
+  },
+  "authorization": {
+    "exact_phrase": "CALL_REAL_V5_CROSS_DOMAIN_R5_CANONICAL_API",
+    "paid_evaluator": false,
+    "r6_new_subject_experiment": false,
+    "r7_repair": false,
+    "r8_cpr_adjudication": false
+  }
+}
