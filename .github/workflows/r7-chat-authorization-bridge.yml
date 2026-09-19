@@ -1431,3 +1431,138 @@ jobs:
           body="V5.3 cross-domain R5 second wave completed.\n\nGeometry: 5 source-bound cases / 10 matched pairs / 20 branches. Wave 2: EXHAUSTED_AFTER_WAVE1.\nPreserved traces: $TRACE_COUNT.\nEstimated provider spend: USD $SPEND.\nRun summary hash: $SUMMARY_HASH.\nEvidence batch hash: $EVIDENCE_HASH.\n\nNext stage is passive/offline R6 structural derivation from this frozen continuation. No paid evaluator. R7 not authorized. CPR NOT_ADJUDICATED."
           gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
           gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
+
+
+  materialize-cross-domain-r5r6-structural-observation-wave2:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5 CROSS-DOMAIN R5R6 STRUCTURAL OBSERVATION WAVE2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      REQUEST_BODY: ${{ github.event.issue.body }}
+      EXPECTED_EXECUTION_PHRASE: MATERIALIZE_FROZEN_V5_CROSS_DOMAIN_R5R6_STRUCTURAL_OBSERVATION_WAVE2
+      SOURCE_RUN_ID: '35436694271'
+      SOURCE_ARTIFACT_ID: '10582866320'
+      SOURCE_ARTIFACT_NAME: v5-cross-domain-r5-second-wave-35436694271
+      SOURCE_ARTIFACT_DIGEST: sha256:1efbb3095cd74a18b13eccf94f1ebe0d044e2d7cc79fed9e7af5d63977d975b3
+      SOURCE_EVIDENCE_HASH: b01e11cb041be4d3d29bd94d93552ac0bfdd56fc67cd5b7b011e8f90bb46d676
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact offline structural-wave2 request
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['REQUEST_BODY'].splitlines():
+              line=raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit(f'invalid structural-wave2 request line: {line!r}')
+              key,value=line.split('=',1)
+              if key in rows:
+                  raise SystemExit(f'duplicate structural-wave2 request key: {key}')
+              rows[key]=value
+          required={'execution_phrase','expected_main_sha','source_run_id','source_artifact_id','source_artifact_digest','source_evidence_hash','materialization_id','control_plane'}
+          if set(rows)!=required:
+              raise SystemExit(f'structural-wave2 request keys mismatch: {sorted(rows)}')
+          checks={
+              'execution_phrase':os.environ['EXPECTED_EXECUTION_PHRASE'],
+              'expected_main_sha':os.environ['GITHUB_SHA'],
+              'source_run_id':os.environ['SOURCE_RUN_ID'],
+              'source_artifact_id':os.environ['SOURCE_ARTIFACT_ID'],
+              'source_artifact_digest':os.environ['SOURCE_ARTIFACT_DIGEST'],
+              'source_evidence_hash':os.environ['SOURCE_EVIDENCE_HASH'],
+              'control_plane':'CHAT_EXECUTION_BRIDGE_V5_CROSS_DOMAIN_R5R6_STRUCTURAL_WAVE2_v0.2',
+          }
+          for k,v in checks.items():
+              if rows[k]!=v:
+                  raise SystemExit(f'structural-wave2 {k} mismatch')
+          if not re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['materialization_id']):
+              raise SystemExit('invalid structural-wave2 materialization_id')
+          print('PASS: exact structural-wave2 materialization request validated')
+          PY
+
+      - name: Verify exact frozen R5 second-wave artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          repo=os.environ['GITHUB_REPOSITORY']
+          payload=json.loads(subprocess.check_output(
+              ['gh','api',f"repos/{repo}/actions/runs/{os.environ['SOURCE_RUN_ID']}/artifacts"],text=True
+          ))
+          rows=[x for x in payload['artifacts'] if str(x['id'])==os.environ['SOURCE_ARTIFACT_ID'] and x['name']==os.environ['SOURCE_ARTIFACT_NAME']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==os.environ['SOURCE_ARTIFACT_DIGEST']
+          assert not rows[0].get('expired')
+          print('PASS: exact R5 second-wave artifact verified')
+          PY
+
+      - name: Download exact R5 second-wave artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/r5w2
+          gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$SOURCE_ARTIFACT_NAME" --dir source/r5w2
+          test -s source/r5w2/prepared/r5_second_wave/case_bindings.jsonl
+          test -s source/r5w2/results/v5_cross_domain_r5_second_wave/evidence_batch.json
+          test -s source/r5w2/results/v5_cross_domain_r5_second_wave/raw/traces.jsonl
+          python - <<'PY'
+          import json,os
+          p=json.load(open('source/r5w2/results/v5_cross_domain_r5_second_wave/evidence_batch.json'))
+          assert p['evidence_batch_hash']==os.environ['SOURCE_EVIDENCE_HASH']
+          assert p['preserved_trace_count']==20
+          assert p['case_count']==5
+          print('PASS: R5 second-wave evidence hash and geometry verified')
+          PY
+
+      - name: Derive evidence-quality-aware passive R6 structure
+        id: derive
+        run: |
+          set -euo pipefail
+          python -m arena.derive_v5_cross_domain_r5_r6_structural_observation_v0_2             --traces source/r5w2/results/v5_cross_domain_r5_second_wave/raw/traces.jsonl             --case-bindings source/r5w2/prepared/r5_second_wave/case_bindings.jsonl             --evidence-batch source/r5w2/results/v5_cross_domain_r5_second_wave/evidence_batch.json             --outdir results/v5_cross_domain_r5r6_structural_observation_wave2
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          p=json.load(open('results/v5_cross_domain_r5r6_structural_observation_wave2/summary.json'))
+          for k in ('intervention_trace_count','case_count','semantic_audit_eligible_intervention_count','incomplete_first_exposure_provider_failure_count','semantic_audit_eligible_case_count','incomplete_case_count','summary_hash'):
+              print(k+'='+str(p[k]))
+          PY
+
+      - name: Upload frozen structural-wave2 bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-cross-domain-r5r6-structural-observation-wave2-${{ github.run_id }}
+          path: |
+            docs/v5_cross_domain_r5_r6_structural_observation_protocol_v0.2.md
+            results/v5_cross_domain_r5r6_structural_observation_wave2/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record structural-wave2 materialization
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TRACE_COUNT: ${{ steps.derive.outputs.intervention_trace_count }}
+          CASE_COUNT: ${{ steps.derive.outputs.case_count }}
+          ELIGIBLE_BRANCHES: ${{ steps.derive.outputs.semantic_audit_eligible_intervention_count }}
+          INCOMPLETE_BRANCHES: ${{ steps.derive.outputs.incomplete_first_exposure_provider_failure_count }}
+          ELIGIBLE_CASES: ${{ steps.derive.outputs.semantic_audit_eligible_case_count }}
+          INCOMPLETE_CASES: ${{ steps.derive.outputs.incomplete_case_count }}
+          SUMMARY_HASH: ${{ steps.derive.outputs.summary_hash }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="V5.3 cross-domain R5-R6 structural observation wave 2 materialized from frozen R5 evidence.\n\nIntervention traces: $TRACE_COUNT across $CASE_COUNT cases.\nSemantic-audit eligible branches: $ELIGIBLE_BRANCHES.\nIncomplete first-exposure provider-failure branches: $INCOMPLETE_BRANCHES.\nEligible cases: $ELIGIBLE_CASES. Incomplete cases: $INCOMPLETE_CASES.\nSummary hash: $SUMMARY_HASH.\n\nProvider-failed branches are incomplete evidence, not negative semantic findings. New provider calls: 0. R7 not authorized. CPR NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
