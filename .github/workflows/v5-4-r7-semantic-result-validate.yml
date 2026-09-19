@@ -1,0 +1,58 @@
+name: V5.4 R7 Semantic Result Validate
+
+on:
+  pull_request:
+    paths:
+      - "manifests/v5_4_r7_dual_semantic_audit_result_2026-09-19_v0_1.json"
+      - "docs/reports/2026-09-19/V5_4_R7_Dual_Semantic_Audit_Result_v1.md"
+      - ".github/workflows/v5-4-r7-semantic-result-validate.yml"
+  push:
+    branches: [ main ]
+    paths:
+      - "manifests/v5_4_r7_dual_semantic_audit_result_2026-09-19_v0_1.json"
+      - ".github/workflows/v5-4-r7-semantic-result-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate frozen result and boundaries
+        run: |
+          set -euo pipefail
+          python -m json.tool manifests/v5_4_r7_dual_semantic_audit_result_2026-09-19_v0_1.json >/dev/null
+          python - <<'PY'
+          import json
+          p=json.load(open('manifests/v5_4_r7_dual_semantic_audit_result_2026-09-19_v0_1.json'))
+          assert p['status']=='FROZEN_R7_DUAL_SEMANTIC_AUDIT_COMPLETE'
+          r=p['results']
+          assert r['case_count']==4
+          assert r['trace_count']==8
+          assert r['persistent_correction_visibility_supported_case_count']==4
+          assert r['persistent_direct_exposure_count']==32
+          assert r['structured_repair_application_supported_case_count']==4
+          assert r['structured_repair_preserved_unrelated_structure_case_count']==4
+          assert r['material_action_or_parameter_divergence_case_count']==2
+          assert r['action_or_decision_reconvergence_case_count']==2
+          assert r['exact_old_fact_authority_reentry_case_count']==1
+          assert r['exact_reentry_semantically_blind_restoration_case_count']==0
+          i=p['interpretation']
+          assert i['intervention_mode_semantic_distinction']=='SUPPORTED'
+          assert i['structured_repair_universal_superiority']=='NOT_ESTABLISHED'
+          assert i['problematic_bias_status']=='NOT_ESTABLISHED'
+          assert i['r5_unique_causal_attribution']=='NOT_ESTABLISHED'
+          assert i['semantic_cpr_status']=='NOT_ADJUDICATED'
+          e=p['execution_boundary']
+          assert e['new_provider_calls']==0
+          assert e['new_paid_evaluator_calls']==0
+          assert e['subject_reruns']==0
+          assert e['raw_evidence_mutated'] is False
+          print('PASS: frozen R7 semantic result preserves evidence and claim boundaries')
+          PY
