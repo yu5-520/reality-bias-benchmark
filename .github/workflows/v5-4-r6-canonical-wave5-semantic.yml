@@ -1,0 +1,136 @@
+name: V5.4 R6 Canonical Wave5 Semantic Audit
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  materialize:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5.4 R6 CANONICAL WAVE5 SEMANTIC AUDIT'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      REQUEST_BODY: ${{ github.event.issue.body }}
+      EXPECTED_EXECUTION_PHRASE: MATERIALIZE_V5_4_R6_CANONICAL_WAVE5_SEMANTIC
+      SOURCE_RUN_ID: '35447899994'
+      SOURCE_ARTIFACT_ID: '10586265761'
+      SOURCE_ARTIFACT_NAME: v5-4-r6-canonical-wave5-structural-35447899994
+      SOURCE_ARTIFACT_DIGEST: sha256:d3b69334df7a5909e9608071c8dfafeba9431cc208d64e91218b9ce1dfe8a6ea
+      SOURCE_SUMMARY_HASH: 123055107bc18de589fcdc2f49c324037713d9fe6d4dec67ed38212e1bcc9f18
+      SOURCE_R5_EVIDENCE_HASH: 28c114bf110e6e12b6df5bd84ac8216bc402fd87bebbd09b6ee1b7082de8fba7
+      REVIEW_MANIFEST: manifests/v5_4_r6_canonical_wave5_semantic_review_2026-09-19_v0_3.json
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact semantic request
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['REQUEST_BODY'].splitlines():
+              line=raw.strip()
+              if not line: continue
+              if '=' not in line: raise SystemExit('invalid request line')
+              k,v=line.split('=',1)
+              if k in rows: raise SystemExit('duplicate request key '+k)
+              rows[k]=v
+          required={'execution_phrase','expected_main_sha','source_run_id','source_artifact_id','source_artifact_digest','source_summary_hash','source_r5_evidence_hash','materialization_id','control_plane'}
+          assert set(rows)==required, sorted(rows)
+          assert rows['execution_phrase']==os.environ['EXPECTED_EXECUTION_PHRASE']
+          assert rows['expected_main_sha']==os.environ['GITHUB_SHA']
+          assert rows['source_run_id']==os.environ['SOURCE_RUN_ID']
+          assert rows['source_artifact_id']==os.environ['SOURCE_ARTIFACT_ID']
+          assert rows['source_artifact_digest']==os.environ['SOURCE_ARTIFACT_DIGEST']
+          assert rows['source_summary_hash']==os.environ['SOURCE_SUMMARY_HASH']
+          assert rows['source_r5_evidence_hash']==os.environ['SOURCE_R5_EVIDENCE_HASH']
+          assert rows['control_plane']=='CHAT_EXECUTION_BRIDGE_V5_4_R6_CANONICAL_WAVE5_SEMANTIC_v0.3'
+          assert re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['materialization_id'])
+          print('PASS: exact canonical Wave5 semantic request')
+          PY
+
+      - name: Verify exact frozen structural artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          repo=os.environ['GITHUB_REPOSITORY']
+          payload=json.loads(subprocess.check_output(['gh','api',f"repos/{repo}/actions/runs/{os.environ['SOURCE_RUN_ID']}/artifacts"],text=True))
+          rows=[x for x in payload['artifacts'] if str(x['id'])==os.environ['SOURCE_ARTIFACT_ID'] and x['name']==os.environ['SOURCE_ARTIFACT_NAME']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==os.environ['SOURCE_ARTIFACT_DIGEST']
+          assert not rows[0].get('expired')
+          print('PASS: exact frozen Wave5 structural artifact verified')
+          PY
+
+      - name: Download structural bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/structural
+          gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$SOURCE_ARTIFACT_NAME" --dir source/structural
+          test -s source/structural/results/v5_4_r6_canonical_wave5_structural/case_structural_observations.jsonl
+          test -s source/structural/results/v5_4_r6_canonical_wave5_structural/semantic_review_packages.jsonl
+          python - <<'PY'
+          import json,os
+          p=json.load(open('source/structural/results/v5_4_r6_canonical_wave5_structural/summary.json'))
+          assert p['summary_hash']==os.environ['SOURCE_SUMMARY_HASH']
+          assert p['source_r5_evidence_batch_hash']==os.environ['SOURCE_R5_EVIDENCE_HASH']
+          assert p['case_count']==9
+          assert p['semantic_audit_eligible_case_count']==9
+          assert p['new_provider_calls']==0
+          print('PASS: exhaustive Wave5 structural geometry and hashes verified')
+          PY
+
+      - name: Materialize canonical semantic audit
+        id: audit
+        run: |
+          set -euo pipefail
+          python -m arena.build_v5_4_r6_canonical_semantic_audit_v0_3             --structural-records source/structural/results/v5_4_r6_canonical_wave5_structural/case_structural_observations.jsonl             --review-packages source/structural/results/v5_4_r6_canonical_wave5_structural/semantic_review_packages.jsonl             --review-manifest "$REVIEW_MANIFEST"             --outdir results/v5_4_r6_canonical_wave5_semantic_audit
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          p=json.load(open('results/v5_4_r6_canonical_wave5_semantic_audit/summary.json'))
+          assert p['case_count']==9
+          assert p['system_inertia_supported_candidate_case_count']==0
+          assert p['normal_or_reanchored_persistence_case_count']==9
+          for k in ('case_count','semantic_adoption_supported_case_count','post_stimulus_persistence_supported_case_count','system_inertia_supported_candidate_case_count','summary_hash'):
+              print(k+'='+str(p[k]))
+          PY
+
+      - name: Upload frozen semantic bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-4-r6-canonical-wave5-semantic-${{ github.run_id }}
+          path: |
+            manifests/v5_4_r6_canonical_wave5_semantic_review_2026-09-19_v0_3.json
+            schemas/v5_4_r6_canonical_semantic_audit_v0.3.schema.json
+            results/v5_4_r6_canonical_wave5_semantic_audit/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record semantic result
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CASE_COUNT: ${{ steps.audit.outputs.case_count }}
+          ADOPTION: ${{ steps.audit.outputs.semantic_adoption_supported_case_count }}
+          PERSIST: ${{ steps.audit.outputs.post_stimulus_persistence_supported_case_count }}
+          INERTIA: ${{ steps.audit.outputs.system_inertia_supported_candidate_case_count }}
+          SUMMARY_HASH: ${{ steps.audit.outputs.summary_hash }}
+        run: |
+          body="V5.4 canonical R6 Wave5 exhaustive semantic audit complete.\n\nCases: $CASE_COUNT. Semantic adoption: $ADOPTION/$CASE_COUNT. Post-stimulus persistence: $PERSIST/$CASE_COUNT. New stronger System Inertia candidates: $INERTIA/$CASE_COUNT. All nine are classified as normal/re-anchored/pre-existing-gate persistence.\nSummary hash: $SUMMARY_HASH.\n\nCombined with Waves 1-4, the complete Pass-1 eligible canonical pool is 29 cases; stronger System Inertia candidates remain 4/29. This 29-case pool is not a domain-prevalence denominator. Provider calls: 0. Paid evaluator calls: 0. Problematic bias NOT_ESTABLISHED. Unique R5 causality NOT_ESTABLISHED. Lineage completeness not assessed. R7 not authorized. CPR NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
