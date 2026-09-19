@@ -1,0 +1,60 @@
+name: V5.4 R2-R6 First Batch Reports Validate
+
+on:
+  pull_request:
+    paths:
+      - "docs/reports/2026-09-20/R2-R4_Natural_Emergence_and_Structural_Phenomena_Report_v1.md"
+      - "docs/reports/2026-09-20/R5_Minimal_Perturbation_Mechanism_Report_v1.md"
+      - "docs/reports/2026-09-20/R6_System_Inertia_Identification_Report_v1.md"
+      - "docs/reports/2026-09-20/R2-R6_Phenomenon_and_Mechanism_Synthesis_Report_v1.md"
+      - "manifests/v5_4_r2_r6_first_batch_reports_2026-09-20_v1.json"
+      - ".github/workflows/v5-4-r2-r6-first-batch-reports-validate.yml"
+  push:
+    branches: [ main ]
+    paths:
+      - "manifests/v5_4_r2_r6_first_batch_reports_2026-09-20_v1.json"
+      - ".github/workflows/v5-4-r2-r6-first-batch-reports-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate final first-batch report manifest
+        run: |
+          set -euo pipefail
+          python -m json.tool manifests/v5_4_r2_r6_first_batch_reports_2026-09-20_v1.json >/dev/null
+          python scripts/validate_semantic_trajectory_reporting_v0_1.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.load(open('manifests/v5_4_r2_r6_first_batch_reports_2026-09-20_v1.json'))
+          assert m['status']=='R2_R6_FIRST_BATCH_FINAL_REPORTS'
+          assert m['report_standard']=='RB-PROCESS-REALITY-REPORT-STANDARD-v1.8'
+          assert m['theory_report_standard']=='RB-PROCESS-REALITY-THEORY-REPORT-STANDARD-v1.3'
+          assert m['primary_domains']==['finance','supply_chain','software_engineering']
+          assert m['ecommerce_primary_evidence_count']==0
+          assert len(m['reports'])==4
+          assert m['visual_qa']['render_verified'] is True
+          assert m['visual_qa']['page_count_total']==18
+          assert m['visual_qa']['clipping_or_overlap_detected'] is False
+          assert m['reporting_only'] is True
+          assert m['raw_evidence_mutated'] is False
+          assert m['new_provider_calls_for_reports']==0
+          assert m['new_evaluator_calls_for_reports']==0
+          for r in m['reports']:
+              assert Path(r['report_source']).is_file(), r['report_source']
+              assert len(r['finalized_docx_export_sha256'])==64
+              assert r['finalized_docx_export_size_bytes']>0
+              text=Path(r['report_source']).read_text(encoding='utf-8')
+              assert 'APPROVED FOR REPOSITORY' in text
+              assert 'DRAFT' not in text.upper()
+          print('PASS: finalized R2-R6 first report batch is repository-ready')
+          PY
