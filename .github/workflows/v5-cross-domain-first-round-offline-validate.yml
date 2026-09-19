@@ -20,6 +20,9 @@ on:
       - "docs/v5_cross_domain_r5_r6_structural_semantic_audit_protocol_v0.1.md"
       - "manifests/v5_cross_domain_localized_semantic_audit_review_2026-09-19_v0_1.json"
       - "manifests/v5_cross_domain_r5_r6_semantic_audit_review_2026-09-19_v0_1.json"
+      - "manifests/v5_cross_domain_r5r6_semantic_audit_wave1_2026-09-19_v0_1.json"
+      - "results/v5_cross_domain_r5r6_semantic_audit_wave1_v0_1/**"
+      - "docs/reports/2026-09-19/V5_3_Cross_Domain_R5_R6_Structural_Semantic_Audit_Wave1_Report_v1.md"
       - "configs/v5_cross_domain_first_round_v0.2.json"
       - "configs/v5_cross_domain_subject_gate_v0.2.json"
       - "configs/v5_cross_domain_semantic_triage_v0.1.json"
@@ -230,6 +233,31 @@ jobs:
           assert p['uniform_decision']['problematic_bias_status']=='NOT_ESTABLISHED'
           assert p['uniform_decision']['r5_unique_causal_attribution']=='NOT_ESTABLISHED'
           print('PASS: R5-R6 semantic review decisions are frozen and authorize no active stage')
+          PY
+
+      - name: Validate completed R5-R6 semantic-audit wave-1 result
+        run: |
+          python -m json.tool manifests/v5_cross_domain_r5r6_semantic_audit_wave1_2026-09-19_v0_1.json >/dev/null
+          python -m json.tool results/v5_cross_domain_r5r6_semantic_audit_wave1_v0_1/summary.json >/dev/null
+          python - <<'PY'
+          import json
+          m=json.load(open('manifests/v5_cross_domain_r5r6_semantic_audit_wave1_2026-09-19_v0_1.json'))
+          s=json.load(open('results/v5_cross_domain_r5r6_semantic_audit_wave1_v0_1/summary.json'))
+          assert m['status']=='FROZEN_R5R6_SEMANTIC_AUDIT_WAVE1_COMPLETE'
+          assert s['branch_audit_count']==12
+          assert s['case_count']==6
+          assert s['semantic_adoption_supported_branch_count']==12
+          assert s['decision_action_dependence_supported_branch_count']==12
+          assert s['post_stimulus_persistence_supported_branch_count']==12
+          assert s['system_inertia_supported_candidate_case_count']==2
+          assert s['normal_or_reanchored_persistence_case_count']==4
+          assert s['problematic_bias_established_case_count']==0
+          assert s['r5_unique_causal_attribution_established_case_count']==0
+          assert s['lineage_completeness_assessed'] is False
+          assert s['r7_authorized'] is False
+          assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
+          assert m['frozen_evidence_mutated'] is False
+          print('PASS: completed R5-R6 semantic-audit wave 1 result is frozen with v5.3 claim boundaries')
           PY
 
       - name: Revalidate Process Reality method layer
