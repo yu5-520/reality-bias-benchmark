@@ -259,6 +259,16 @@ jobs:
           print('PASS: Wave4 semantic decisions preserve v5.4 claim boundaries')
           PY
 
+      - name: Validate semantic summary claim boundary is wave-agnostic
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('arena/build_v5_4_r6_canonical_semantic_audit_v0_3.py').read_text()
+          assert 'This canonical Wave3 pass classifies five' not in p
+          assert 'This canonical semantic pass classifies {len(case_summaries)} realized N0/R5-I case structures.' in p
+          print('PASS: canonical semantic summary is reusable across observation waves')
+          PY
+
       - name: Run canonical geometry unit tests
         run: |
           python -m unittest arena.tests.test_v5_4_canonical_geometry -v
