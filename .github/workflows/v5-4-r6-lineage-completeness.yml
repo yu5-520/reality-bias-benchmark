@@ -1,0 +1,172 @@
+name: V5.4 R6 Candidate Lineage Completeness
+
+on:
+  pull_request:
+    paths:
+      - "configs/v5_4_r6_lineage_completeness_candidates_v0.1.json"
+      - "arena/build_v5_4_r6_lineage_completeness.py"
+      - ".github/workflows/v5-4-r6-lineage-completeness.yml"
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  offline-validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate frozen lineage plan
+        run: |
+          set -euo pipefail
+          python -m json.tool configs/v5_4_r6_lineage_completeness_candidates_v0.1.json >/dev/null
+          python -m py_compile arena/build_v5_4_r6_lineage_completeness.py
+          python - <<'PY'
+          import json
+          p=json.load(open('configs/v5_4_r6_lineage_completeness_candidates_v0.1.json'))
+          assert p['status']=='FROZEN_PRE_MATERIALIZATION'
+          assert len(p['candidate_case_ids'])==4
+          assert len(set(p['candidate_case_ids']))==4
+          assert p['canonical_rule']['historical_wave12_selection']=='REPLICATE_INDEX_1_AND_ONE_SHOT_INTERVENTION'
+          assert p['canonical_rule']['canonical_replicate_count']==1
+          assert p['canonical_rule']['rerun_n0'] is False
+          assert p['canonical_rule']['rerun_r5_i'] is False
+          assert p['canonical_rule']['new_provider_calls']==0
+          assert p['canonical_rule']['paid_evaluator_calls']==0
+          assert p['gate_contract']['automatic_repair_allowed'] is False
+          assert p['gate_contract']['r7_authorized_by_gate'] is False
+          assert p['gate_contract']['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('PASS: four-candidate lineage completeness plan is passive and canonical')
+          PY
+
+  materialize:
+    if: >-
+      github.event_name == 'issues' &&
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5.4 R6 LINEAGE COMPLETENESS CANDIDATES'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      REQUEST_BODY: ${{ github.event.issue.body }}
+      PLAN_CONFIG: configs/v5_4_r6_lineage_completeness_candidates_v0.1.json
+      EXPECTED_EXECUTION_PHRASE: MATERIALIZE_V5_4_R6_LINEAGE_COMPLETENESS
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact passive materialization request
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['REQUEST_BODY'].splitlines():
+              line=raw.strip()
+              if not line: continue
+              if '=' not in line: raise SystemExit('invalid request line')
+              k,v=line.split('=',1)
+              if k in rows: raise SystemExit('duplicate request key '+k)
+              rows[k]=v
+          required={'execution_phrase','expected_main_sha','materialization_id','control_plane'}
+          assert set(rows)==required, sorted(rows)
+          assert rows['execution_phrase']==os.environ['EXPECTED_EXECUTION_PHRASE']
+          assert rows['expected_main_sha']==os.environ['GITHUB_SHA']
+          assert rows['control_plane']=='CHAT_EXECUTION_BRIDGE_V5_4_R6_LINEAGE_COMPLETENESS_v0.1'
+          assert re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['materialization_id'])
+          print('PASS: exact passive lineage-completeness request')
+          PY
+
+      - name: Verify exact frozen source artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          p=json.load(open(os.environ['PLAN_CONFIG']))
+          repo=os.environ['GITHUB_REPOSITORY']
+          checks=[]
+          for g in p['groups']:
+              for k in ('r5','structural','semantic'):
+                  x=g[k]
+                  checks.append((x['workflow_run_id'],x['artifact_id'],x['artifact_name'],x['artifact_digest']))
+              if g.get('canonical_recovery'):
+                  x=g['canonical_recovery']
+                  checks.append((x['workflow_run_id'],x['artifact_id'],x['artifact_name'],x['artifact_digest']))
+          for run_id,artifact_id,name,digest in checks:
+              payload=json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{run_id}/artifacts'],text=True))
+              rows=[x for x in payload['artifacts'] if x['id']==artifact_id and x['name']==name]
+              assert len(rows)==1, (run_id,artifact_id,name)
+              assert rows[0].get('digest')==digest, (artifact_id,rows[0].get('digest'),digest)
+              assert not rows[0].get('expired')
+          print('PASS: exact frozen R5/R6 source artifacts verified')
+          PY
+
+      - name: Download frozen Wave1 and Wave2 evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY' > "$RUNNER_TEMP/lineage_downloads.tsv"
+          import json,os
+          p=json.load(open(os.environ['PLAN_CONFIG']))
+          for g in p['groups']:
+              gid=g['group_id']
+              for kind in ('r5','structural','semantic'):
+                  x=g[kind]
+                  print('\t'.join([gid,kind,str(x['workflow_run_id']),x['artifact_name']]))
+          PY
+          while IFS=$'\t' read -r gid kind run_id name; do
+            mkdir -p "source/$gid/$kind"
+            gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name "$name" --dir "source/$gid/$kind"
+          done < "$RUNNER_TEMP/lineage_downloads.tsv"
+
+      - name: Materialize four case-level lineage closures and gates
+        id: lineage
+        run: |
+          set -euo pipefail
+          python -m arena.build_v5_4_r6_lineage_completeness             --config "$PLAN_CONFIG"             --source-root source             --outdir results/v5_4_r6_lineage_completeness_candidates
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          s=json.load(open('results/v5_4_r6_lineage_completeness_candidates/summary.json'))
+          assert s['candidate_case_count']==4
+          assert s['new_provider_calls']==0
+          assert s['new_paid_evaluator_calls']==0
+          assert s['n0_reruns']==0
+          assert s['r5_i_reruns']==0
+          assert s['r7_active_authorized'] is False
+          for k in ('candidate_case_count','complete_for_authorized_repair_count','lineage_gap_count','summary_hash'):
+              print(k+'='+str(s[k]))
+          PY
+
+      - name: Upload frozen lineage-completeness bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-4-r6-lineage-completeness-candidates-${{ github.run_id }}
+          path: |
+            configs/v5_4_r6_lineage_completeness_candidates_v0.1.json
+            results/v5_4_r6_lineage_completeness_candidates/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record passive gate result
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COUNT: ${{ steps.lineage.outputs.candidate_case_count }}
+          COMPLETE: ${{ steps.lineage.outputs.complete_for_authorized_repair_count }}
+          GAPS: ${{ steps.lineage.outputs.lineage_gap_count }}
+          SUMMARY_HASH: ${{ steps.lineage.outputs.summary_hash }}
+        run: |
+          body="V5.4 R6 case-level lineage completeness materialization complete.\n\nCandidates audited: $COUNT. COMPLETE_FOR_AUTHORIZED_REPAIR: $COMPLETE. LINEAGE_GAP: $GAPS.\nSummary hash: $SUMMARY_HASH.\n\nN0 reruns: 0. R5-I reruns: 0. Provider calls: 0. Paid evaluator calls: 0. The gate is bounded to the frozen canonical N0/R5-I observation horizon. It does not establish problematic bias, unique R5 causality, CPR, domain prevalence, or active R7 authorization."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
