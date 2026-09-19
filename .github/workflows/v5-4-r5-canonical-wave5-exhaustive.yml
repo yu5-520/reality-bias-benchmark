@@ -1,0 +1,196 @@
+name: V5.4 Cross-Domain R5 Canonical Wave5 Exhaustive Closure
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  execute:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5.4 CROSS-DOMAIN R5 CANONICAL WAVE5 EXHAUSTIVE'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      PLAN_CONFIG: configs/v5_4_cross_domain_r5_canonical_wave5_exhaustive_v0.1.json
+      PASS1_REVIEW_MANIFEST: manifests/v5_cross_domain_localized_semantic_audit_review_2026-09-19_v0_1.json
+      EXPECTED_AUTHORIZATION_PHRASE: CALL_REAL_V5_CROSS_DOMAIN_R5_CANONICAL_API
+      PER_BRANCH_MAX_CALLS: '64'
+      PER_BRANCH_CEILING_USD: '0.25'
+      GLOBAL_CEILING_USD: '2.25'
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact exhaustive Wave5 authorization
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['AUTH_BODY'].splitlines():
+              line=raw.strip()
+              if not line: continue
+              if '=' not in line: raise SystemExit('invalid authorization line')
+              k,v=line.split('=',1)
+              if k in rows: raise SystemExit('duplicate authorization key '+k)
+              rows[k]=v
+          required={'authorization_phrase','expected_main_sha','authorization_id','control_plane'}
+          assert set(rows)==required, sorted(rows)
+          assert rows['authorization_phrase']==os.environ['EXPECTED_AUTHORIZATION_PHRASE']
+          assert rows['expected_main_sha']==os.environ['GITHUB_SHA']
+          assert rows['control_plane']=='CHAT_AUTHORIZATION_BRIDGE_V5_4_R5_CANONICAL_WAVE5_EXHAUSTIVE_v0.1'
+          assert re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['authorization_id'])
+          print('PASS: exact exhaustive Wave5 authorization')
+          PY
+
+      - name: Prove exhaustive 29-case closure before provider calls
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os
+          p=json.load(open(os.environ['PLAN_CONFIG']))
+          review=json.load(open(os.environ['PASS1_REVIEW_MANIFEST']))
+          eligible=set(review['reviewed_case_hashes'])
+          completed=set(p['exclude_previous_case_hashes'])
+          selected={x['source_case_hash'] for x in p['selected_cases']}
+          assert len(eligible)==29
+          assert len(completed)==20
+          assert len(selected)==9
+          assert completed.isdisjoint(selected)
+          assert completed | selected == eligible
+          assert p['coverage_contract']['selection_is_exhaustive'] is True
+          assert p['coverage_contract']['planned_unexecuted_pass1_eligible_after_wave5']==0
+          assert p['geometry']['case_count']==9
+          assert p['geometry']['new_intervention_branch_count']==9
+          assert p['geometry']['synthetic_control_branch_count']==0
+          assert p['geometry']['canonical_replicate_count']==1
+          print('PASS: Wave5 is exact exhaustive set difference 29 - 20 = 9; no selection remainder')
+          PY
+
+      - name: Verify exact frozen source artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          p=json.load(open(os.environ['PLAN_CONFIG']))
+          repo=os.environ['GITHUB_REPOSITORY']
+          run_id=p['source_subject']['workflow_run_id']
+          payload=json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{run_id}/artifacts'],text=True))
+          expected=[p['source_subject']['manifest_artifact'],*p['source_subject']['wave_artifacts']]
+          for item in expected:
+              rows=[x for x in payload['artifacts'] if x['id']==item['id'] and x['name']==item['name']]
+              assert len(rows)==1
+              assert rows[0].get('digest')==item['digest']
+              assert not rows[0].get('expired')
+          audit=p['source_semantic_audit']
+          ap=json.loads(subprocess.check_output(['gh','api',f"repos/{repo}/actions/runs/{audit['workflow_run_id']}/artifacts"],text=True))
+          rr=[x for x in ap['artifacts'] if x['id']==audit['artifact_id'] and x['name']==audit['artifact_name']]
+          assert len(rr)==1
+          assert rr[0].get('digest')==audit['artifact_digest']
+          assert not rr[0].get('expired')
+          print('PASS: exact natural and Pass-1 semantic source artifacts verified')
+          PY
+
+      - name: Download natural source bundles
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/manifest source/waves
+          python - <<'PY' > "$RUNNER_TEMP/v54_wave5.env"
+          import json,os
+          p=json.load(open(os.environ['PLAN_CONFIG']))
+          print('RUN_ID='+str(p['source_subject']['workflow_run_id']))
+          print('MANIFEST_NAME='+p['source_subject']['manifest_artifact']['name'])
+          for x in p['source_subject']['wave_artifacts']:
+              print('WAVE_NAME_'+str(x['wave_id'])+'='+x['name'])
+          PY
+          source "$RUNNER_TEMP/v54_wave5.env"
+          gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$MANIFEST_NAME" --dir source/manifest
+          for i in 3 4 6; do
+            var="WAVE_NAME_$i"
+            mkdir -p "source/waves/artifact-$i"
+            gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" --name "${!var}" --dir "source/waves/artifact-$i"
+          done
+          test "$(find source/manifest -name subject_manifest.jsonl -type f | wc -l)" -eq 1
+          test "$(find source/waves -name traces.jsonl -type f | wc -l)" -eq 3
+
+      - name: Prepare exhaustive nine-branch canonical R5 plan
+        run: |
+          set -euo pipefail
+          SOURCE_MANIFEST="$(find source/manifest -name subject_manifest.jsonl -type f)"
+          python -m arena.prepare_v5_cross_domain_r5_canonical             --case-config "$PLAN_CONFIG"             --source-manifest "$SOURCE_MANIFEST"             --source-root source/waves             --branch-code-sha "$GITHUB_SHA"             --outdir prepared/r5_canonical_wave5
+          python - <<'PY'
+          import json
+          p=json.load(open('prepared/r5_canonical_wave5/plan.json'))
+          assert p['case_count']==9
+          assert p['branch_count']==9
+          assert p['synthetic_control_branch_count']==0
+          assert p['canonical_replicate_count']==1
+          assert p['natural_reference_rerun_required'] is False
+          print('PASS: exhaustive Wave5 geometry is exactly nine paid branches')
+          PY
+
+      - name: Run offline lifecycle preflight
+        run: |
+          python -m arena.run_v5_cross_domain_r5_canonical             --plan-dir prepared/r5_canonical_wave5             --provider deepseek             --execution-code-sha "$GITHUB_SHA"             --per-branch-max-calls "$PER_BRANCH_MAX_CALLS"             --per-branch-spending-ceiling "$PER_BRANCH_CEILING_USD"             --global-spending-ceiling "$GLOBAL_CEILING_USD"             --currency USD             --preflight-only
+
+      - name: Execute nine canonical R5-I continuations
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python -m arena.run_v5_cross_domain_r5_canonical             --plan-dir prepared/r5_canonical_wave5             --outdir results/v5_4_cross_domain_r5_canonical_wave5/raw             --provider deepseek             --execution-code-sha "$GITHUB_SHA"             --per-branch-max-calls "$PER_BRANCH_MAX_CALLS"             --per-branch-spending-ceiling "$PER_BRANCH_CEILING_USD"             --global-spending-ceiling "$GLOBAL_CEILING_USD"             --currency USD             --authorization-phrase "$EXPECTED_AUTHORIZATION_PHRASE"             --execute-real-api
+
+      - name: Freeze canonical R5 evidence
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -s results/v5_4_cross_domain_r5_canonical_wave5/raw/traces.jsonl ]; then
+            python -m arena.freeze_v5_cross_domain_r5_canonical               --raw-dir results/v5_4_cross_domain_r5_canonical_wave5/raw               --plan-dir prepared/r5_canonical_wave5               --out results/v5_4_cross_domain_r5_canonical_wave5/evidence_batch.json
+          else
+            echo 'No canonical Wave5 traces available to freeze.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload immutable exhaustive Wave5 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-4-cross-domain-r5-canonical-wave5-exhaustive-${{ github.run_id }}
+          path: |
+            configs/v5_4_cross_domain_r5_canonical_wave5_exhaustive_v0.1.json
+            docs/V5_4_R5_Wave5_Exhaustive_Closure_Plan_v1.md
+            prepared/r5_canonical_wave5/
+            results/v5_4_cross_domain_r5_canonical_wave5/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Record completed exhaustive Wave5 R5
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY' > "$RUNNER_TEMP/v54_wave5_done.env"
+          import json
+          p=json.load(open('results/v5_4_cross_domain_r5_canonical_wave5/raw/summary.json'))
+          e=json.load(open('results/v5_4_cross_domain_r5_canonical_wave5/evidence_batch.json'))
+          print('TRACE_COUNT='+str(p['preserved_trace_count']))
+          print('SPEND='+str(p['estimated_total_spend']))
+          print('SUMMARY_HASH='+p['summary_hash'])
+          print('EVIDENCE_HASH='+e['evidence_batch_hash'])
+          PY
+          source "$RUNNER_TEMP/v54_wave5_done.env"
+          body="V5.4 canonical R5 Wave5 exhaustive closure completed.\n\nRemaining Pass-1 eligible cases: 9/9. New R5-I trajectories: $TRACE_COUNT. Synthetic controls: 0. Canonical replicates: 1. Planned Pass-1 eligible coverage is now 29/29 with zero eligible cases intentionally left unexecuted.\nEstimated provider spend: USD $SPEND.\nRun summary hash: $SUMMARY_HASH.\nEvidence batch hash: $EVIDENCE_HASH.\n\nNext stage is passive R6 structural + semantic audit. R7 not authorized. CPR NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
