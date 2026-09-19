@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-V5-CROSS-DOMAIN-R5R6-SEMANTIC-AUDIT-v0.1",
+  "title": "V5 Cross-Domain R5-R6 Semantic Audit v0.1",
+  "type": "object",
+  "required": [
+    "schema","audit_id","case_id","wave_id","domain_id","r5_run_id","replicate_index",
+    "structural_observation_hash","reviewer","semantic_response_class",
+    "direct_carrier_semantic_use","downstream_read_adoption","decision_action_dependence",
+    "post_stimulus_persistence","system_inertia_status","r5_unique_causal_attribution",
+    "problematic_bias_status","lineage_completeness_status","interpretation","evidence_refs",
+    "r7_status","semantic_cpr_status","audit_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-V5-CROSS-DOMAIN-R5R6-SEMANTIC-AUDIT-v0.1"},
+    "audit_id": {"type":"string"},
+    "case_id": {"type":"string"},
+    "wave_id": {"type":"integer","minimum":1,"maximum":6},
+    "domain_id": {"type":"string"},
+    "r5_run_id": {"type":"string"},
+    "replicate_index": {"type":"integer","minimum":1},
+    "structural_observation_hash": {"type":"string"},
+    "reviewer": {"type":"object"},
+    "semantic_response_class": {"type":"string"},
+    "direct_carrier_semantic_use": {"enum":["SUPPORTED","NOT_ESTABLISHED"]},
+    "downstream_read_adoption": {"enum":["SUPPORTED","NOT_ESTABLISHED"]},
+    "decision_action_dependence": {"enum":["SUPPORTED","NOT_ESTABLISHED"]},
+    "post_stimulus_persistence": {"enum":["SUPPORTED","NOT_ESTABLISHED"]},
+    "system_inertia_status": {"type":"string"},
+    "r5_unique_causal_attribution": {"type":"string"},
+    "problematic_bias_status": {"type":"string"},
+    "lineage_completeness_status": {"type":"string"},
+    "interpretation": {"type":"string"},
+    "evidence_refs": {"type":"array","items":{"type":"string"},"minItems":3},
+    "r7_status": {"type":"string"},
+    "semantic_cpr_status": {"type":"string"},
+    "audit_hash": {"type":"string"}
+  }
+}
