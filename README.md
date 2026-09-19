@@ -341,15 +341,31 @@ Completed v5.3 passive R5-R6 structural + semantic audit wave 2:
 
 The wave-3 control replicate that encountered HTTP 402 only after 25 completed model calls was **not rerun**. It remains a late-truncated control context because restarting it from the frozen parent would create a new stochastic path rather than recover the realized trajectory.
 
-Cumulative R5-R6 mechanism-audit pool after waves 1 and 2:
+Canonical v5.4 R5-R6 mechanism-audit pool after Waves 1-3:
 
-- **11 preselected cases**;
-- **22 intervention continuations**;
-- semantic adoption: **22 / 22**;
-- post-stimulus persistence: **22 / 22**;
-- stronger System Inertia candidates: **8 / 22 branches, 4 / 11 cases**.
+- Wave1-2 historical evidence was reclassified canonically as **11 N0 references + 11 R5-I continuations**; historical extra same-parent branches remain supplementary sensitivity evidence;
+- Wave3 is the first native v5.4 run: **5 cases = 5 new R5-I trajectories**, zero synthetic controls, canonical replicate count 1;
+- Wave3 R5 workflow: `35443060553`, estimated provider spend **USD 0.2235309**;
+- Wave3 R6 structural workflow: `35443532744`, provider calls **0**;
+- Wave3 semantic workflow: `35444244497`, paid evaluator calls **0**;
+- total canonical source-bound cases: **16**;
+- total canonical R5-I continuations: **16**;
+- semantic adoption: **16 / 16**;
+- post-stimulus persistence: **16 / 16**;
+- stronger System Inertia candidates: **4 / 16 cases**;
+- problematic bias established: **0 / 16**;
+- unique R5 causality established: **0 / 16**;
+- remaining pass-1 R5-eligible cases: **13**.
 
-These cumulative numbers are **not a domain-probability denominator**. They describe a preselected case-structure / mechanism-audit pool.
+Wave3 adds five negative/control taxonomy cases — independent evidence re-anchoring, pre-existing plan re-anchoring, boundary/gate re-anchoring, raw-telemetry re-anchoring and a pre-existing staged-release gate. This further supports:
+
+`post-stimulus persistence != System Inertia by default`.
+
+These cumulative numbers are **not a domain-probability denominator**. They describe a preselected canonical case-mechanism audit pool.
+
+Wave3 report: `docs/reports/2026-09-19/V5_4_Canonical_R5_R6_Wave3_Result_Report_v1.md`.
+
+Wave3 result manifest: `manifests/v5_4_r5r6_canonical_wave3_2026-09-19_v0_1.json`.
 
 Prospective sample geometry:
 
