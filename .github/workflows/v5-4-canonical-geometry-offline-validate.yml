@@ -33,6 +33,8 @@ on:
       - "arena/build_v5_4_r6_canonical_semantic_audit_v0_3.py"
       - "schemas/v5_4_r6_canonical_semantic_audit_v0.3.schema.json"
       - "manifests/v5_4_r6_canonical_wave3_semantic_review_2026-09-19_v0_3.json"
+      - "manifests/v5_4_r6_canonical_wave4_semantic_review_2026-09-19_v0_3.json"
+      - ".github/workflows/v5-4-r6-canonical-wave4-semantic.yml"
       - "manifests/v5_4_r5r6_canonical_wave3_2026-09-19_v0_1.json"
       - "results/v5_4_r6_canonical_wave3_semantic_audit_v0_1/**"
       - "docs/reports/2026-09-19/V5_4_Canonical_R5_R6_Wave3_Result_Report_v1.md"
@@ -234,6 +236,27 @@ jobs:
           assert "assert p['case_count']==4" in p
           assert "assert p['canonical_intervention_trace_count']==4" in p
           print('PASS: Wave4 R6 is exact-artifact-bound and passive')
+          PY
+
+      - name: Validate Wave4 semantic review manifest
+        run: |
+          python -m json.tool manifests/v5_4_r6_canonical_wave4_semantic_review_2026-09-19_v0_3.json >/dev/null
+          python - <<'PY'
+          import json
+          p=json.load(open('manifests/v5_4_r6_canonical_wave4_semantic_review_2026-09-19_v0_3.json'))
+          assert p['status']=='MODEL_REVIEW_APPEND_ONLY'
+          assert p['expected_case_count']==4
+          assert len(p['case_decisions'])==4
+          assert len({x['case_id'] for x in p['case_decisions']})==4
+          assert sum(x['case_level_system_inertia_status']=='CASE_LEVEL_SYSTEM_INERTIA_SUPPORTED_CANDIDATE' for x in p['case_decisions'])==0
+          assert p['uniform_decision']['downstream_read_adoption']=='SUPPORTED'
+          assert p['uniform_decision']['decision_action_dependence']=='SUPPORTED'
+          assert p['uniform_decision']['post_stimulus_persistence']=='SUPPORTED'
+          assert p['uniform_decision']['problematic_bias_status']=='NOT_ESTABLISHED'
+          assert p['uniform_decision']['r5_unique_causal_attribution']=='NOT_ESTABLISHED'
+          assert p['uniform_decision']['r7_status']=='NOT_AUTHORIZED'
+          assert p['uniform_decision']['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('PASS: Wave4 semantic decisions preserve v5.4 claim boundaries')
           PY
 
       - name: Run canonical geometry unit tests
