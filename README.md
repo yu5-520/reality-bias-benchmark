@@ -249,6 +249,48 @@ Key R6 finding:
 
 Normal inheritance, evidence re-anchoring, boundary preservation and pre-existing conservative-gate reinforcement are separated from stronger new-carrier -> downstream-constraint persistence.
 
+Completed v5.3 passive R5-R6 structural + semantic audit wave 2:
+
+- original R5 second-wave workflow: `35436694271`;
+- original R5 artifact: `10582866320`;
+- balance-recovery workflow: `35438000140`;
+- recovery artifact: `10583013224`;
+- recovered pre-response HTTP-402 branches: **12 / 12**;
+- original failed traces overwritten: **NO**;
+- combined effective structural workflow: `35439212051`;
+- combined structural artifact: `10583133758`;
+- effective evidence hash: `4b1913a678f876b16e86e271a31936eebf2da82937009a61c4188c3ffb000b98`;
+- R6 structural summary hash: `1b19fbec44f10182c49e30d645247f51a3e084af035029951660971ec11d8d6e`;
+- semantic audit workflow: `35439402409`;
+- semantic artifact: `10583382240`;
+- semantic artifact digest: `sha256:caa46faa5af4446764a4647485e098e703c946edc28d1ab45558b729287dde4b`;
+- semantic summary hash: `208d97ff2d2ab2990cf92cabbb82f55f7be91a8956348807d49c268a54dd4ecb`;
+- 10 intervention branches / 5 source-bound cases;
+- downstream semantic adoption: **10 / 10**;
+- decision/action dependence: **10 / 10**;
+- post-stimulus persistence: **10 / 10**;
+- stronger case-level System Inertia candidates: **2 / 5 cases** — supply-chain wave 3 and wave 4;
+- normal / re-anchored / pre-existing-gate persistence: **3 / 5 cases**;
+- problematic bias established: **0 / 5**;
+- R5 unique causal attribution established: **0 / 5**;
+- lineage completeness: **not assessed in this pass**;
+- R7: **NOT AUTHORIZED**;
+- CPR: **NOT_ADJUDICATED**;
+- report: `docs/reports/2026-09-19/V5_3_Cross_Domain_R5_R6_Structural_Semantic_Audit_Wave2_Report_v1.md`;
+- result manifest: `manifests/v5_cross_domain_r5r6_semantic_audit_wave2_2026-09-19_v0_1.json`.
+
+The wave-3 control replicate that encountered HTTP 402 only after 25 completed model calls was **not rerun**. It remains a late-truncated control context because restarting it from the frozen parent would create a new stochastic path rather than recover the realized trajectory.
+
+Cumulative R5-R6 mechanism-audit pool after waves 1 and 2:
+
+- **11 preselected cases**;
+- **22 intervention continuations**;
+- semantic adoption: **22 / 22**;
+- post-stimulus persistence: **22 / 22**;
+- stronger System Inertia candidates: **8 / 22 branches, 4 / 11 cases**.
+
+These cumulative numbers are **not a domain-probability denominator**. They describe a preselected case-structure / mechanism-audit pool.
+
 Prospective sample geometry:
 
 - 30 natural trajectories per held-out domain;
