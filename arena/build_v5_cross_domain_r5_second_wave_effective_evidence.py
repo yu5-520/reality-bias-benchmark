@@ -67,6 +67,18 @@ def build(*,original_raw_dir,recovery_raw_dir,original_plan_dir,original_evidenc
     for t in orig:
         if _is_first_call_402(t):
             rt=copy.deepcopy(rec_by_source[t["run_id"]])
+            # Recovery traces intentionally use a new execution identity. Rebind only
+            # immutable source/case provenance from the original failed branch so
+            # passive R6 can consume the derived effective trace without mutating
+            # either raw source artifact.
+            for key in (
+                "source_run_id",
+                "source_case_hash",
+                "source_audit_hash",
+                "source_parent_state_hash",
+            ):
+                _require(t.get(key) is not None,"effective_original_source_binding_missing:"+key+":"+t["run_id"])
+                rt[key]=t[key]
             rt["effective_evidence_provenance"]={
                 "effective_role":"RECOVERY_REPLACES_PRE_RESPONSE_PROVIDER_FAILURE_FOR_DERIVED_ANALYSIS_ONLY",
                 "source_original_failed_run_id":t["run_id"],
