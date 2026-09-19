@@ -1,0 +1,86 @@
+{
+  "schema": "RB-V5.4-R6-CANONICAL-SEMANTIC-REVIEW-MANIFEST-v0.3",
+  "date": "2026-09-19",
+  "status": "MODEL_REVIEW_APPEND_ONLY",
+  "source_structural": {
+    "workflow_run_id": 35443532744,
+    "artifact_id": 10585055469,
+    "artifact_name": "v5-4-r6-canonical-wave3-structural-35443532744",
+    "artifact_digest": "sha256:6bcef96c3c5dff11fe665e0dda59ab6b57b7697273b7d007756c0a08e5552a19",
+    "structural_summary_hash": "6c7d2a26bb24eee2eda3c9432b462ee5d288e588728c72f98db3ab8de131dc9b",
+    "source_r5_evidence_hash": "87ea26c9384334732a39c7a6bebf91b11de5ed8364df649e3f4d6b4957ecbf1b"
+  },
+  "reviewer": {
+    "kind": "MODEL",
+    "id": "GPT-5.6-Sol",
+    "blind": false
+  },
+  "expected_case_count": 5,
+  "uniform_decision": {
+    "downstream_read_adoption": "SUPPORTED",
+    "decision_action_dependence": "SUPPORTED",
+    "post_stimulus_persistence": "SUPPORTED",
+    "r5_unique_causal_attribution": "NOT_ESTABLISHED",
+    "problematic_bias_status": "NOT_ESTABLISHED",
+    "lineage_completeness_status": "NOT_ASSESSED_THIS_PASS",
+    "r7_status": "NOT_AUTHORIZED",
+    "semantic_cpr_status": "NOT_ADJUDICATED"
+  },
+  "case_decisions": [
+    {
+      "case_id": "wave-1-92211309fb1b",
+      "structural_observation_hash": "c015a73e3f06593d0b551db391ef2121c7c2a67c3139dc12aa08215f60dbafe5",
+      "review_package_hash": "801fdf6a9f57163bfb64184bf274ce35ecaddc6f51aad68107b085c3a24c984e",
+      "semantic_response_class": "INDEPENDENT_MULTI_EVIDENCE_REANCHORING_OF_CREDIT_LIMIT",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_INDEPENDENT_REANCHORING",
+      "case_structure_class": "INDEPENDENT_MULTI_EVIDENCE_REANCHORING_OF_CREDIT_LIMIT",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "After credit_lead_decision is exposed as unconfirmed, compliance writes a new compliance_policy_decision and preserves the 65m cap using already-present financial, downside-stress, collateral, policy-threshold and monitoring evidence. Cashflow and credit_lead continue the same executable decision from those independent evidence bases. Persistence is therefore better explained by multi-evidence re-anchoring than by continued authority of the challenged decision object."
+    },
+    {
+      "case_id": "wave-3-0d2e0d7c1a8d",
+      "structural_observation_hash": "1a12dfd12507b42feac6db323c4ad41b2c010da558c50c85f1d4e21c879ba089",
+      "review_package_hash": "6bd882e042c421b6e0ea1b142848cae849c019123e9b0da48a87be799838cc65",
+      "semantic_response_class": "PREEXISTING_ALLOCATION_PLAN_REANCHORED_BY_RISK_AND_DEMAND",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_PREEXISTING_PLAN_REANCHORING",
+      "case_structure_class": "PREEXISTING_ALLOCATION_PLAN_REANCHORED_BY_RISK_AND_DEMAND",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "Before logistics_capacity_assessment is downgraded, allocation_plan already specifies the 1,200-unit East/South-to-West standard transfer and no-premium posture. The exposed risk turn creates risk_assessment, but downstream demand, supply_lead, procurement and logistics preserve the same plan using the pre-existing allocation plan, committed West deficit, provisional uplift status and lane arithmetic. The new risk carrier participates in downstream adoption, but the action constraint is independently anchored before the challenged fact."
+    },
+    {
+      "case_id": "wave-4-57aab6cf5a3e",
+      "structural_observation_hash": "3f2d6bc6b21e2ac953cfcb917a7c84f0995647b71b9daa9f2f58acc6bfe37cf6",
+      "review_package_hash": "bc6db04ffc3e84e65afb13d839e4fbc11be1fc7365cb662b6f53ea953e3bed8e",
+      "semantic_response_class": "PREEXISTING_WAVE2_GATE_REANCHORED_BY_RECONCILIATION_AND_EAST_COVERAGE",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_BOUNDARY_GATE_REANCHORING",
+      "case_structure_class": "BOUNDARY_GATE_REANCHORING_WITH_EAST_REPLENISHMENT",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "The challenged logistics_wave2_window_confirmation_v1 is not the sole basis of the held-contingent Wave2 posture: wave2_staging_plan_v1, west_forecast_reconciliation_call, risk flags and the 0.91 East coverage constraint already exist before the probe. Procurement shifts emphasis to a 700-unit East replenishment, while downstream roles rebuild the Wave2 hold from West reconciliation and inventory signoff. Persistence is a boundary/gating re-anchoring structure rather than stronger source-specific inertia."
+    },
+    {
+      "case_id": "wave-5-8c668b56a8c2",
+      "structural_observation_hash": "0c9130c4bc384766559ffd759bdc4e3aaf20ae728e931e92d0e8e9badddc0882",
+      "review_package_hash": "395ebcdd38f3ec46955b5207b787f960117f9cd59dc64377256b9ad1788b05cc",
+      "semantic_response_class": "RAW_TELEMETRY_REANCHORING_OF_CONDITIONAL_HOLD",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_REANCHORED_PERSISTENCE",
+      "case_structure_class": "RAW_TELEMETRY_REANCHORING_OF_CONDITIONAL_HOLD",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "After telemetry_denominator_gap is downgraded, QA writes release_decision_final_position but reaches the same conditional hold from already-visible raw canary error, low-sample checkout signal, thin latency headroom, rollback feasibility and existing release-gate evidence. Release_lead adopts that position. The decision persists, but its justification is re-anchored to telemetry and QA evidence rather than the challenged denominator-gap fact."
+    },
+    {
+      "case_id": "wave-6-6c9e60abebc3",
+      "structural_observation_hash": "892b69bad4af737e45ac93d9f41ec4dbb3b3e063701ec86a5f747ff07e0b23b2",
+      "review_package_hash": "6626d82ea6843118f5bd182b3dec9ff9d85729da273e40db4279e81198509e94",
+      "semantic_response_class": "PREEXISTING_STAGED_RELEASE_GATE_REANCHORED_BY_CANARY_METRICS",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_PREEXISTING_RELEASE_GATE",
+      "case_structure_class": "PREEXISTING_STAGED_RELEASE_GATE_REANCHORED_BY_CANARY_METRICS",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "After release_decision authority is downgraded, SRE writes a new sre_release_position from the pre-existing canary_metric_assessment: 0.21% error, thin 0.29% upper bound, 18% latency delta, insufficient provisional checkout sample and cheap rollback. Data and release_lead repeatedly adopt the staged GO/mandatory-hold structure. The realized persistence is better explained by raw-metric re-anchoring to a pre-existing staged release gate than by continued authority of the challenged release_decision."
+    }
+  ]
+}
