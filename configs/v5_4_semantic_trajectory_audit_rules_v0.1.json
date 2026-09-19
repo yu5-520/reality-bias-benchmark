@@ -1,0 +1,142 @@
+{
+  "schema": "RB-V5.4-SEMANTIC-TRAJECTORY-AUDIT-RULES-v0.1",
+  "date": "2026-09-20",
+  "status": "FORWARD_MACHINE_EXECUTION_RULE",
+  "purpose": "Upgrade semantic audit from summary classification over structural records to complete-route, node-level and relation-level semantic reconstruction over frozen raw trajectories.",
+  "evidence_policy": {
+    "raw_subject_evidence_mutable": false,
+    "semantic_audit_append_only": true,
+    "rerun_required": false,
+    "new_provider_call_required": false,
+    "missing_event_reconstruction_forbidden": true,
+    "structural_fact_may_not_be_promoted_to_semantic_claim_without_semantic_record": true
+  },
+  "primary_experiment_scope": {
+    "held_out_domains": [
+      "finance",
+      "supply_chain",
+      "software_engineering"
+    ],
+    "forbidden_primary_domains": [
+      "ecommerce"
+    ],
+    "ecommerce_role_if_mentioned": "HISTORICAL_METHOD_DEVELOPMENT_CONTEXT_ONLY",
+    "ecommerce_may_count_toward_domain_replication": false,
+    "ecommerce_may_serve_as_typical_primary_case": false
+  },
+  "audit_unit": {
+    "required_unit": "SEMANTIC_TRAJECTORY_AUDIT",
+    "full_actual_agent_route_required": true,
+    "all_executed_agent_turns_must_be_present": true,
+    "target_irrelevant_nodes_must_be_retained_and_marked": "IRRELEVANT_TO_TARGET_LINEAGE",
+    "semantic_lineage_is_overlay_on_full_route": true,
+    "semantic_overlay_may_not_replace_full_route": true
+  },
+  "node_requirements": [
+    "route_index",
+    "turn",
+    "agent_role",
+    "call_ref",
+    "event_refs",
+    "input_premises",
+    "observed_state_refs",
+    "message_or_invoke_refs",
+    "output_actions",
+    "output_state_refs",
+    "authority_or_status",
+    "termination_or_censoring"
+  ],
+  "semantic_node_requirements": [
+    "route_index",
+    "lineage_relevance",
+    "input_semantics",
+    "output_semantics",
+    "semantic_delta",
+    "semantic_function",
+    "independent_evidence_introduced",
+    "independent_evidence_refs",
+    "evidence_refs",
+    "claim_status"
+  ],
+  "semantic_edge_requirements": [
+    "from_route_index",
+    "to_route_index",
+    "propagation_type",
+    "relation_type",
+    "semantic_before",
+    "semantic_after",
+    "semantic_delta",
+    "evidence_refs",
+    "claim_status"
+  ],
+  "propagation_types": [
+    "DIRECT_RELAY",
+    "SEMANTIC_TRANSFORMATION",
+    "TRANSFORMED_DESCENDANT",
+    "DESCENDANT_INHERITANCE",
+    "INDEPENDENT_REANCHOR",
+    "PREEXISTING_GATE_REAFFIRMATION",
+    "BOUNDARY_PRESERVATION",
+    "AUTHORITY_MIGRATION",
+    "DECISION_APPLICATION",
+    "MERE_VISIBILITY",
+    "MERE_RELAY",
+    "NOT_ESTABLISHED"
+  ],
+  "semantic_functions": [
+    "SOURCE_OBSERVATION",
+    "UNSTABLE_INFORMATION",
+    "READ_OR_ADOPTION",
+    "TRANSFORMATION",
+    "NEW_DESCENDANT_CARRIER",
+    "INDEPENDENT_EVIDENCE_REANCHOR",
+    "AUTHORITY_MATERIALIZATION",
+    "CONSTRAINT_FORMATION",
+    "DECISION_FORMATION",
+    "ACTION_APPLICATION",
+    "REAFFIRMATION",
+    "FINALIZATION",
+    "IRRELEVANT_TO_TARGET_LINEAGE",
+    "NOT_ESTABLISHED"
+  ],
+  "result_derivation": {
+    "substantive_uniform_decision_forbidden": true,
+    "forbidden_uniform_result_fields": [
+      "semantic_adoption",
+      "downstream_read_adoption",
+      "decision_action_dependence",
+      "post_stimulus_persistence",
+      "system_inertia_status",
+      "problematic_bias_status"
+    ],
+    "per_case_semantic_result_must_be_derived_from_node_and_edge_records": true,
+    "aggregate_counts_must_be_computed_from_case_records": true,
+    "aggregate_counts_may_not_be_preassigned": true
+  },
+  "system_inertia_gate": {
+    "required_for_supported_candidate": [
+      "challenged_source_or_target_bound",
+      "direct_response_bound",
+      "carrier_after_challenge_bound",
+      "downstream_read_or_adoption_bound",
+      "decision_or_action_consequence_bound",
+      "direct_stimulus_end_bound",
+      "post_stimulus_descendant_persistence_bound"
+    ],
+    "independent_reanchoring_disqualifies_source_specific_inertia_by_default": true,
+    "preexisting_gate_reaffirmation_disqualifies_new_source_specific_inertia_by_default": true,
+    "mere_visibility_is_insufficient": true,
+    "literal_recurrence_is_insufficient": true
+  },
+  "comparison_policy": {
+    "same_endpoint_does_not_imply_same_process": true,
+    "structure_difference_does_not_imply_semantic_difference": true,
+    "stochastic_same_parent_repeats_are_realized_sensitivity_not_population_probability": true
+  },
+  "claim_boundaries": {
+    "problematic_bias_separate_from_system_inertia": true,
+    "unique_r5_causality_separate_from_persistence": true,
+    "cpr_separately_adjudicated": true,
+    "domain_probability_requires_natural_trajectory_denominator": true
+  }
+}
