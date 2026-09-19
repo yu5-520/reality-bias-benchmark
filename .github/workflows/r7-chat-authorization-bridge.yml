@@ -998,3 +998,127 @@ jobs:
           body="V5 cross-domain R6 targeted specificity collection completed.\n\nTarget: wave-4-8b1731b57396 from the exact frozen R5 parent.\nNew geometry: 8 matched pairs / 16 branches; combined with R5 this gives 10 observed pairs for the target case.\nPreserved traces: $TRACE_COUNT.\nEstimated provider spend: USD $SPEND.\nRun summary hash: $SUMMARY_HASH.\nEvidence batch hash: $EVIDENCE_HASH.\n\nNo paid evaluator. System Inertia remains NOT_ADJUDICATED until semantic specificity audit. R7 not authorized. CPR NOT_ADJUDICATED."
           gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
           gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
+
+
+  materialize-cross-domain-r5r6-structural-observation-wave1:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5 CROSS-DOMAIN R5R6 STRUCTURAL OBSERVATION WAVE1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      REQUEST_BODY: ${{ github.event.issue.body }}
+      EXPECTED_EXECUTION_PHRASE: MATERIALIZE_FROZEN_V5_CROSS_DOMAIN_R5R6_STRUCTURAL_OBSERVATION
+      SOURCE_RUN_ID: '35381406873'
+      SOURCE_ARTIFACT_ID: '10564055226'
+      SOURCE_ARTIFACT_NAME: v5-cross-domain-r5-first-wave-35381406873
+      SOURCE_ARTIFACT_DIGEST: sha256:a711f507365504bd59ca179bd3d76ea4c57d97caf6f6be85a6f4ef1f88629457
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact offline materialization request
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, re
+          rows={}
+          for raw in os.environ['REQUEST_BODY'].splitlines():
+              line=raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit(f'invalid structural-audit request line: {line!r}')
+              key,value=line.split('=',1)
+              if key in rows:
+                  raise SystemExit(f'duplicate structural-audit request key: {key}')
+              rows[key]=value
+          required={'execution_phrase','expected_main_sha','source_run_id','source_artifact_id','source_artifact_digest','materialization_id','control_plane'}
+          if set(rows)!=required:
+              raise SystemExit(f'structural-audit request keys mismatch: {sorted(rows)}')
+          if rows['execution_phrase']!=os.environ['EXPECTED_EXECUTION_PHRASE']:
+              raise SystemExit('structural-audit execution phrase mismatch')
+          if rows['expected_main_sha']!=os.environ['GITHUB_SHA']:
+              raise SystemExit('structural-audit main SHA mismatch')
+          if rows['source_run_id']!=os.environ['SOURCE_RUN_ID']:
+              raise SystemExit('structural-audit source run mismatch')
+          if rows['source_artifact_id']!=os.environ['SOURCE_ARTIFACT_ID']:
+              raise SystemExit('structural-audit source artifact id mismatch')
+          if rows['source_artifact_digest']!=os.environ['SOURCE_ARTIFACT_DIGEST']:
+              raise SystemExit('structural-audit source artifact digest mismatch')
+          if rows['control_plane']!='CHAT_EXECUTION_BRIDGE_V5_CROSS_DOMAIN_R5R6_STRUCTURAL_v0.1':
+              raise SystemExit('structural-audit control-plane mismatch')
+          if not re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['materialization_id']):
+              raise SystemExit('invalid structural-audit materialization_id')
+          print('PASS: exact offline R5-R6 structural materialization request validated')
+          PY
+
+      - name: Verify exact frozen R5 artifact identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, subprocess
+          repo=os.environ['GITHUB_REPOSITORY']
+          run_id=os.environ['SOURCE_RUN_ID']
+          payload=json.loads(subprocess.check_output(
+              ['gh','api',f'repos/{repo}/actions/runs/{run_id}/artifacts'],text=True
+          ))
+          rows=[x for x in payload['artifacts'] if str(x['id'])==os.environ['SOURCE_ARTIFACT_ID'] and x['name']==os.environ['SOURCE_ARTIFACT_NAME']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==os.environ['SOURCE_ARTIFACT_DIGEST']
+          assert not rows[0].get('expired')
+          print('PASS: exact frozen R5 artifact identity verified')
+          PY
+
+      - name: Download exact frozen R5 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/r5
+          gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$SOURCE_ARTIFACT_NAME" --dir source/r5
+          test -s source/r5/prepared/r5_first_wave/case_bindings.jsonl
+          test -s source/r5/results/v5_cross_domain_r5_first_wave/evidence_batch.json
+          test -s source/r5/results/v5_cross_domain_r5_first_wave/raw/traces.jsonl
+
+      - name: Derive passive R6 structural observations
+        id: derive
+        run: |
+          set -euo pipefail
+          python -m arena.derive_v5_cross_domain_r5_r6_structural_observation             --traces source/r5/results/v5_cross_domain_r5_first_wave/raw/traces.jsonl             --case-bindings source/r5/prepared/r5_first_wave/case_bindings.jsonl             --evidence-batch source/r5/results/v5_cross_domain_r5_first_wave/evidence_batch.json             --outdir results/v5_cross_domain_r5r6_structural_observation_wave1
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          p=json.load(open('results/v5_cross_domain_r5r6_structural_observation_wave1/summary.json'))
+          for k in ('intervention_trace_count','case_count','summary_hash'):
+              print(k+'='+str(p[k]))
+          PY
+
+      - name: Upload frozen structural observation bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-cross-domain-r5r6-structural-observation-wave1-${{ github.run_id }}
+          path: |
+            docs/v5_cross_domain_r5_r6_structural_semantic_audit_protocol_v0.1.md
+            results/v5_cross_domain_r5r6_structural_observation_wave1/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record offline structural materialization
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TRACE_COUNT: ${{ steps.derive.outputs.intervention_trace_count }}
+          CASE_COUNT: ${{ steps.derive.outputs.case_count }}
+          SUMMARY_HASH: ${{ steps.derive.outputs.summary_hash }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="V5.3 cross-domain R5-R6 passive structural observation materialized from frozen R5 evidence.\n\nIntervention continuations: $TRACE_COUNT.\nSource-bound cases: $CASE_COUNT.\nStructural summary hash: $SUMMARY_HASH.\n\nProvider calls: 0. Paid evaluator calls: 0. Semantic adoption/System Inertia remain NOT_ADJUDICATED in this structural bundle. R7 not authorized. CPR NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
