@@ -1122,3 +1122,142 @@ jobs:
           body="V5.3 cross-domain R5-R6 passive structural observation materialized from frozen R5 evidence.\n\nIntervention continuations: $TRACE_COUNT.\nSource-bound cases: $CASE_COUNT.\nStructural summary hash: $SUMMARY_HASH.\n\nProvider calls: 0. Paid evaluator calls: 0. Semantic adoption/System Inertia remain NOT_ADJUDICATED in this structural bundle. R7 not authorized. CPR NOT_ADJUDICATED."
           gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
           gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
+
+
+  materialize-cross-domain-r5r6-semantic-audit-wave1:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5 CROSS-DOMAIN R5R6 SEMANTIC AUDIT WAVE1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      REQUEST_BODY: ${{ github.event.issue.body }}
+      EXPECTED_EXECUTION_PHRASE: MATERIALIZE_FROZEN_V5_CROSS_DOMAIN_R5R6_SEMANTIC_AUDIT
+      SOURCE_RUN_ID: '35429085193'
+      SOURCE_ARTIFACT_ID: '10580091785'
+      SOURCE_ARTIFACT_NAME: v5-cross-domain-r5r6-structural-observation-wave1-35429085193
+      SOURCE_ARTIFACT_DIGEST: sha256:57f56587e4ab3b556a0bf98f0726e4f7790e5906caa20339cc1d43074a8d99d7
+      SOURCE_SUMMARY_HASH: 2abc88cc08b5c21adf6321101d295b9e4ba82a35dad2d7736fae7c352d5bf3e8
+      REVIEW_MANIFEST: manifests/v5_cross_domain_r5_r6_semantic_audit_review_2026-09-19_v0_1.json
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact semantic-audit materialization request
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, re
+          rows={}
+          for raw in os.environ['REQUEST_BODY'].splitlines():
+              line=raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit(f'invalid semantic-audit request line: {line!r}')
+              key,value=line.split('=',1)
+              if key in rows:
+                  raise SystemExit(f'duplicate semantic-audit request key: {key}')
+              rows[key]=value
+          required={'execution_phrase','expected_main_sha','source_run_id','source_artifact_id','source_artifact_digest','source_summary_hash','materialization_id','control_plane'}
+          if set(rows)!=required:
+              raise SystemExit(f'semantic-audit request keys mismatch: {sorted(rows)}')
+          checks={
+              'execution_phrase':os.environ['EXPECTED_EXECUTION_PHRASE'],
+              'expected_main_sha':os.environ['GITHUB_SHA'],
+              'source_run_id':os.environ['SOURCE_RUN_ID'],
+              'source_artifact_id':os.environ['SOURCE_ARTIFACT_ID'],
+              'source_artifact_digest':os.environ['SOURCE_ARTIFACT_DIGEST'],
+              'source_summary_hash':os.environ['SOURCE_SUMMARY_HASH'],
+              'control_plane':'CHAT_EXECUTION_BRIDGE_V5_CROSS_DOMAIN_R5R6_SEMANTIC_v0.1',
+          }
+          for key,value in checks.items():
+              if rows[key]!=value:
+                  raise SystemExit(f'semantic-audit {key} mismatch')
+          if not re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['materialization_id']):
+              raise SystemExit('invalid semantic-audit materialization_id')
+          print('PASS: exact R5-R6 semantic-audit materialization request validated')
+          PY
+
+      - name: Verify exact frozen structural artifact identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, subprocess
+          repo=os.environ['GITHUB_REPOSITORY']
+          payload=json.loads(subprocess.check_output(
+              ['gh','api',f"repos/{repo}/actions/runs/{os.environ['SOURCE_RUN_ID']}/artifacts"],text=True
+          ))
+          rows=[x for x in payload['artifacts'] if str(x['id'])==os.environ['SOURCE_ARTIFACT_ID'] and x['name']==os.environ['SOURCE_ARTIFACT_NAME']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==os.environ['SOURCE_ARTIFACT_DIGEST']
+          assert not rows[0].get('expired')
+          print('PASS: exact R5-R6 structural artifact verified')
+          PY
+
+      - name: Download frozen structural observation bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/structural
+          gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$SOURCE_ARTIFACT_NAME" --dir source/structural
+          test -s source/structural/results/v5_cross_domain_r5r6_structural_observation_wave1/branch_structural_observations.jsonl
+          python - <<'PY'
+          import json, os
+          p=json.load(open('source/structural/results/v5_cross_domain_r5r6_structural_observation_wave1/summary.json'))
+          assert p['summary_hash']==os.environ['SOURCE_SUMMARY_HASH']
+          assert p['intervention_trace_count']==12
+          assert p['case_count']==6
+          print('PASS: structural summary hash and geometry verified')
+          PY
+
+      - name: Materialize frozen semantic audit
+        id: audit
+        run: |
+          set -euo pipefail
+          python -m arena.build_v5_cross_domain_r5_r6_semantic_audit             --structural-records source/structural/results/v5_cross_domain_r5r6_structural_observation_wave1/branch_structural_observations.jsonl             --review-manifest "$REVIEW_MANIFEST"             --outdir results/v5_cross_domain_r5r6_semantic_audit_wave1
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          p=json.load(open('results/v5_cross_domain_r5r6_semantic_audit_wave1/summary.json'))
+          for k in (
+              'branch_audit_count','case_count','semantic_adoption_supported_branch_count',
+              'post_stimulus_persistence_supported_branch_count',
+              'system_inertia_supported_candidate_case_count','summary_hash'
+          ):
+              print(k+'='+str(p[k]))
+          PY
+
+      - name: Upload frozen semantic audit bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-cross-domain-r5r6-semantic-audit-wave1-${{ github.run_id }}
+          path: |
+            manifests/v5_cross_domain_r5_r6_semantic_audit_review_2026-09-19_v0_1.json
+            schemas/v5_cross_domain_r5_r6_semantic_audit_v0.1.schema.json
+            results/v5_cross_domain_r5r6_semantic_audit_wave1/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record completed semantic audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH_COUNT: ${{ steps.audit.outputs.branch_audit_count }}
+          CASE_COUNT: ${{ steps.audit.outputs.case_count }}
+          ADOPTION_COUNT: ${{ steps.audit.outputs.semantic_adoption_supported_branch_count }}
+          PERSIST_COUNT: ${{ steps.audit.outputs.post_stimulus_persistence_supported_branch_count }}
+          INERTIA_CASES: ${{ steps.audit.outputs.system_inertia_supported_candidate_case_count }}
+          SUMMARY_HASH: ${{ steps.audit.outputs.summary_hash }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="V5.3 cross-domain R5-R6 semantic audit wave 1 materialized from the frozen structural observation bundle.\n\nBranch audits: $BRANCH_COUNT. Cases: $CASE_COUNT.\nSemantic adoption supported: $ADOPTION_COUNT/$BRANCH_COUNT branches.\nPost-stimulus persistence supported: $PERSIST_COUNT/$BRANCH_COUNT branches.\nStronger case-level System Inertia candidates: $INERTIA_CASES/$CASE_COUNT cases.\nSummary hash: $SUMMARY_HASH.\n\nProvider calls: 0. Paid evaluator calls: 0. Problematic bias remains NOT_ESTABLISHED. R5 unique causal attribution remains NOT_ESTABLISHED. Lineage completeness not assessed in this pass. R7 not authorized. CPR NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
