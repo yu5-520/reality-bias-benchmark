@@ -1,0 +1,150 @@
+name: V5.4 R6 Canonical Wave5 Structural Materialization
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  materialize:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5.4 R6 CANONICAL WAVE5 STRUCTURAL'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      REQUEST_BODY: ${{ github.event.issue.body }}
+      EXPECTED_EXECUTION_PHRASE: MATERIALIZE_V5_4_R6_CANONICAL_WAVE5_STRUCTURAL
+      R5_RUN_ID: '35447065280'
+      R5_ARTIFACT_ID: '10585925815'
+      R5_ARTIFACT_NAME: v5-4-cross-domain-r5-canonical-wave5-exhaustive-35447065280
+      R5_ARTIFACT_DIGEST: sha256:08fccf6652f29cb58ae9705b5464e532792ea3f29b65612a6181a2d01f74a0f2
+      R5_EVIDENCE_HASH: 28c114bf110e6e12b6df5bd84ac8216bc402fd87bebbd09b6ee1b7082de8fba7
+      PLAN_CONFIG: configs/v5_4_cross_domain_r5_canonical_wave5_exhaustive_v0.1.json
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact structural request
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['REQUEST_BODY'].splitlines():
+              line=raw.strip()
+              if not line: continue
+              if '=' not in line: raise SystemExit('invalid request line')
+              k,v=line.split('=',1)
+              if k in rows: raise SystemExit('duplicate request key '+k)
+              rows[k]=v
+          required={'execution_phrase','expected_main_sha','source_run_id','source_artifact_id','source_artifact_digest','source_evidence_hash','materialization_id','control_plane'}
+          assert set(rows)==required, sorted(rows)
+          assert rows['execution_phrase']==os.environ['EXPECTED_EXECUTION_PHRASE']
+          assert rows['expected_main_sha']==os.environ['GITHUB_SHA']
+          assert rows['source_run_id']==os.environ['R5_RUN_ID']
+          assert rows['source_artifact_id']==os.environ['R5_ARTIFACT_ID']
+          assert rows['source_artifact_digest']==os.environ['R5_ARTIFACT_DIGEST']
+          assert rows['source_evidence_hash']==os.environ['R5_EVIDENCE_HASH']
+          assert rows['control_plane']=='CHAT_EXECUTION_BRIDGE_V5_4_R6_CANONICAL_WAVE5_v0.3'
+          assert re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['materialization_id'])
+          print('PASS: exact canonical R6 Wave5 request')
+          PY
+
+      - name: Verify exact frozen R5 artifact and natural artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          repo=os.environ['GITHUB_REPOSITORY']
+          payload=json.loads(subprocess.check_output(['gh','api',f"repos/{repo}/actions/runs/{os.environ['R5_RUN_ID']}/artifacts"],text=True))
+          rows=[x for x in payload['artifacts'] if str(x['id'])==os.environ['R5_ARTIFACT_ID'] and x['name']==os.environ['R5_ARTIFACT_NAME']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==os.environ['R5_ARTIFACT_DIGEST']
+          assert not rows[0].get('expired')
+          p=json.load(open(os.environ['PLAN_CONFIG']))
+          natural=json.loads(subprocess.check_output(['gh','api',f"repos/{repo}/actions/runs/{p['source_subject']['workflow_run_id']}/artifacts"],text=True))
+          for item in p['source_subject']['wave_artifacts']:
+              rr=[x for x in natural['artifacts'] if x['id']==item['id'] and x['name']==item['name']]
+              assert len(rr)==1 and rr[0].get('digest')==item['digest'] and not rr[0].get('expired')
+          print('PASS: frozen Wave5 R5 + natural source artifact identities verified')
+          PY
+
+      - name: Download R5 and natural evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/r5 source/natural
+          gh run download "$R5_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$R5_ARTIFACT_NAME" --dir source/r5
+          python - <<'PY' > "$RUNNER_TEMP/r6_wave5.env"
+          import json,os
+          p=json.load(open(os.environ['PLAN_CONFIG']))
+          print('NATURAL_RUN_ID='+str(p['source_subject']['workflow_run_id']))
+          for x in p['source_subject']['wave_artifacts']:
+              print('WAVE_NAME_'+str(x['wave_id'])+'='+x['name'])
+          PY
+          source "$RUNNER_TEMP/r6_wave5.env"
+          for i in 3 4 6; do
+            var="WAVE_NAME_$i"
+            mkdir -p "source/natural/artifact-$i"
+            gh run download "$NATURAL_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "${!var}" --dir "source/natural/artifact-$i"
+          done
+          test -s source/r5/results/v5_4_cross_domain_r5_canonical_wave5/evidence_batch.json
+          test -s source/r5/results/v5_4_cross_domain_r5_canonical_wave5/raw/traces.jsonl
+          test -s source/r5/prepared/r5_canonical_wave5/case_bindings.jsonl
+          python - <<'PY'
+          import json,os
+          p=json.load(open('source/r5/results/v5_4_cross_domain_r5_canonical_wave5/evidence_batch.json'))
+          assert p['evidence_batch_hash']==os.environ['R5_EVIDENCE_HASH']
+          assert p['case_count']==9
+          assert p['canonical_intervention_trace_count']==9
+          assert p['synthetic_control_trace_count']==0
+          assert p['canonical_replicate_count']==1
+          print('PASS: exhaustive canonical R5 evidence geometry verified')
+          PY
+
+      - name: Derive canonical natural-vs-R5 structure
+        id: derive
+        run: |
+          set -euo pipefail
+          python -m arena.derive_v5_4_r6_canonical_natural_vs_r5             --r5-traces source/r5/results/v5_4_cross_domain_r5_canonical_wave5/raw/traces.jsonl             --case-bindings source/r5/prepared/r5_canonical_wave5/case_bindings.jsonl             --r5-evidence source/r5/results/v5_4_cross_domain_r5_canonical_wave5/evidence_batch.json             --natural-root source/natural             --outdir results/v5_4_r6_canonical_wave5_structural
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          p=json.load(open('results/v5_4_r6_canonical_wave5_structural/summary.json'))
+          assert p['case_count']==9
+          assert p['semantic_audit_eligible_case_count']==9
+          assert p['new_provider_calls']==0
+          for k in ('case_count','semantic_audit_eligible_case_count','summary_hash'):
+              print(k+'='+str(p[k]))
+          PY
+
+      - name: Upload frozen structural bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-4-r6-canonical-wave5-structural-${{ github.run_id }}
+          path: |
+            docs/v5_4_r6_canonical_natural_vs_r5_protocol_v0.3.md
+            results/v5_4_r6_canonical_wave5_structural/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record structural result
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CASE_COUNT: ${{ steps.derive.outputs.case_count }}
+          ELIGIBLE: ${{ steps.derive.outputs.semantic_audit_eligible_case_count }}
+          SUMMARY_HASH: ${{ steps.derive.outputs.summary_hash }}
+        run: |
+          body="V5.4 canonical R6 Wave5 structural materialization complete.\n\nCases: $CASE_COUNT. Semantic-audit eligible: $ELIGIBLE.\nSummary hash: $SUMMARY_HASH.\n\nN0 + R5-I only; provider calls: 0. Structural inequality is not semantic effect. This closes passive structural coverage for all 29/29 Pass-1 R5-eligible cases once combined with Waves 1-4. R7 not authorized. CPR NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
