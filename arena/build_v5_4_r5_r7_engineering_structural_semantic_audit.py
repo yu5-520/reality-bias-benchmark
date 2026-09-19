@@ -723,7 +723,7 @@ def build(
         "date": cfg["date"],
         "status": "READY_FOR_ENGINEERING_REPORT_DRAFT",
         "engineering_report_standard":
-            "RB-PROCESS-REALITY-ENGINEERING-REPORT-STANDARD-v1.2",
+            "RB-PROCESS-REALITY-ENGINEERING-REPORT-STANDARD-v1.3",
         "report_standard": "RB-PROCESS-REALITY-REPORT-STANDARD-v1.8",
         "primary_evidence_role":
             "STRUCTURAL_ENGINEERING_SEMANTICS_OVER_FROZEN_R5_R7_PROCESS",
