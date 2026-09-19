@@ -341,31 +341,34 @@ Completed v5.3 passive R5-R6 structural + semantic audit wave 2:
 
 The wave-3 control replicate that encountered HTTP 402 only after 25 completed model calls was **not rerun**. It remains a late-truncated control context because restarting it from the frozen parent would create a new stochastic path rather than recover the realized trajectory.
 
-Canonical v5.4 R5-R6 mechanism-audit pool after Waves 1-3:
+Canonical v5.4 R5-R6 mechanism-audit pool after Waves 1-4:
 
 - Wave1-2 historical evidence was reclassified canonically as **11 N0 references + 11 R5-I continuations**; historical extra same-parent branches remain supplementary sensitivity evidence;
-- Wave3 is the first native v5.4 run: **5 cases = 5 new R5-I trajectories**, zero synthetic controls, canonical replicate count 1;
-- Wave3 R5 workflow: `35443060553`, estimated provider spend **USD 0.2235309**;
-- Wave3 R6 structural workflow: `35443532744`, provider calls **0**;
-- Wave3 semantic workflow: `35444244497`, paid evaluator calls **0**;
-- total canonical source-bound cases: **16**;
-- total canonical R5-I continuations: **16**;
-- semantic adoption: **16 / 16**;
-- post-stimulus persistence: **16 / 16**;
-- stronger System Inertia candidates: **4 / 16 cases**;
-- problematic bias established: **0 / 16**;
-- unique R5 causality established: **0 / 16**;
-- remaining pass-1 R5-eligible cases: **13**.
+- Wave3: **5 cases = 5 R5-I trajectories**, estimated provider spend **USD 0.2235309**;
+- Wave4: **4 cases = 4 R5-I trajectories**, estimated provider spend **USD 0.23939382**;
+- Wave4 R5 workflow: `35445012458`; R6 structural workflow: `35445411177`; corrected semantic workflow: `35445795406`;
+- total canonical source-bound cases: **20**;
+- total canonical R5-I continuations: **20**;
+- semantic adoption: **20 / 20**;
+- post-stimulus persistence: **20 / 20**;
+- stronger System Inertia candidates: **4 / 20 cases**;
+- problematic bias established: **0 / 20**;
+- unique R5 causality established: **0 / 20**;
+- remaining pass-1 R5-eligible cases: **9**.
 
-Wave3 adds five negative/control taxonomy cases — independent evidence re-anchoring, pre-existing plan re-anchoring, boundary/gate re-anchoring, raw-telemetry re-anchoring and a pre-existing staged-release gate. This further supports:
+Wave4 adds four more explicit re-anchoring structures: pre-existing compliance/portfolio gate, released allocation plan, feasibility/risk gate, and SRE/canary release gate. Together with Wave3, this further sharpens:
 
 `post-stimulus persistence != System Inertia by default`.
+
+The first Wave4 semantic materialization is retained as a superseded metadata artifact because its reusable summary text still said Wave3/five cases; the corrected materialization changes no case-level semantic decisions.
 
 These cumulative numbers are **not a domain-probability denominator**. They describe a preselected canonical case-mechanism audit pool.
 
 Wave3 report: `docs/reports/2026-09-19/V5_4_Canonical_R5_R6_Wave3_Result_Report_v1.md`.
 
-Wave3 result manifest: `manifests/v5_4_r5r6_canonical_wave3_2026-09-19_v0_1.json`.
+Wave4 report: `docs/reports/2026-09-19/V5_4_Canonical_R5_R6_Wave4_Result_Report_v1.md`.
+
+Wave4 result manifest: `manifests/v5_4_r5r6_canonical_wave4_2026-09-19_v0_1.json`.
 
 Prospective sample geometry:
 
