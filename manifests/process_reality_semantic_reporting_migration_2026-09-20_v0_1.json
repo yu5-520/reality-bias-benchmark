@@ -1,0 +1,36 @@
+{
+  "schema": "RB-PROCESS-REALITY-SEMANTIC-REPORTING-MIGRATION-v0.1",
+  "date": "2026-09-20",
+  "status": "FORWARD_RULES_UPDATED_EXISTING_EVIDENCE_UNCHANGED",
+  "reason": "Publication-grade reports require complete realized Agent routes and explicit semantic-before/after/delta evidence; prior structural-summary semantic audits remain historical evidence but are insufficient as the sole basis for new R2-R6 main reports.",
+  "new_machine_rules": {
+    "semantic_rules": "configs/v5_4_semantic_trajectory_audit_rules_v0.1.json",
+    "semantic_schema": "schemas/semantic_trajectory_audit_v0.1.schema.json",
+    "report_rules": "configs/process_reality_report_write_rules_v1_8.json",
+    "report_bundle_schema": "schemas/process_reality_report_evidence_bundle_v0.1.schema.json",
+    "validator": "scripts/validate_semantic_trajectory_reporting_v0_1.py",
+    "report_standard": "docs/reporting/process_reality_report_standard_v1_8.md",
+    "theory_standard": "docs/reporting/process_reality_theory_experiment_report_standard_v1_3.md",
+    "report_template": "docs/reporting/process_reality_experiment_report_template_v4.md"
+  },
+  "first_round_primary_domains": [
+    "finance",
+    "supply_chain",
+    "software_engineering"
+  ],
+  "ecommerce_role": "HISTORICAL_METHOD_DEVELOPMENT_CONTEXT_ONLY",
+  "semantic_audit_migration": {
+    "raw_rerun_required": false,
+    "provider_call_required": false,
+    "historical_semantic_records_mutated": false,
+    "new_complete_route_semantic_audit_required_before_rewriting_first_batch_reports": true,
+    "uniform_substantive_semantic_decisions_forbidden_forward": true
+  },
+  "report_migration": {
+    "previously_drafted_r2_r6_reports_status": "DRAFT_NOT_FOR_REPOSITORY_UNTIL_NEW_SEMANTIC_GATE",
+    "primary_visual": "TIME_ALIGNED_ACTUAL_AGENT_ROUTE_WITH_SEMANTIC_LINEAGE_OVERLAY",
+    "semantic_audit_role": "PRIMARY_INTERPRETIVE_CONTENT",
+    "structural_data_role": "FACTUAL_SUBSTRATE_AND_SUPPORTING_DISPLAY"
+  },
+  "next_step": "Materialize append-only path-level semantic trajectory audits over the frozen finance, supply_chain and software_engineering evidence, then rebuild the first-batch reports from validated report evidence bundles."
+}

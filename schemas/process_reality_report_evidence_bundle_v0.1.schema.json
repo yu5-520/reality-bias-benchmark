@@ -1,0 +1,421 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-PROCESS-REALITY-REPORT-EVIDENCE-BUNDLE-v0.1",
+  "title": "Process Reality Report Evidence Bundle v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "report_id",
+    "report_family",
+    "reporting_standard",
+    "evidence_policy",
+    "experiment_accounting",
+    "domain_scope",
+    "trajectory_cases",
+    "contrast_sets",
+    "structural_summary",
+    "semantic_summary",
+    "claim_registry",
+    "figure_specs",
+    "provenance",
+    "report_gate_status"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-PROCESS-REALITY-REPORT-EVIDENCE-BUNDLE-v0.1"
+    },
+    "report_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "report_family": {
+      "enum": [
+        "THEORY_PHENOMENON",
+        "ENGINEERING_CONTROL",
+        "SYNTHESIS"
+      ]
+    },
+    "reporting_standard": {
+      "const": "RB-PROCESS-REALITY-REPORT-STANDARD-v1.8"
+    },
+    "evidence_policy": {
+      "enum": [
+        "FROZEN",
+        "FROZEN_SOURCE_SYNTHESIS"
+      ]
+    },
+    "experiment_accounting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "natural_trajectory_population_size",
+        "selected_source_bound_case_count",
+        "existing_frozen_natural_reference_count",
+        "canonical_new_r5i_trajectory_count",
+        "r6_new_provider_trajectory_count",
+        "canonical_new_r7p_trajectory_count",
+        "canonical_new_r7s_trajectory_count",
+        "supplementary_repeated_trajectory_count",
+        "provider_call_count",
+        "token_usage_or_null",
+        "spend_usd_or_null"
+      ],
+      "properties": {
+        "natural_trajectory_population_size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "selected_source_bound_case_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "existing_frozen_natural_reference_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "canonical_new_r5i_trajectory_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "r6_new_provider_trajectory_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "canonical_new_r7p_trajectory_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "canonical_new_r7s_trajectory_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "supplementary_repeated_trajectory_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "provider_call_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "token_usage_or_null": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "spend_usd_or_null": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    },
+    "domain_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary_experiment_domains",
+        "historical_context_domains"
+      ],
+      "properties": {
+        "primary_experiment_domains": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "finance",
+              "supply_chain",
+              "software_engineering"
+            ]
+          }
+        },
+        "historical_context_domains": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "ecommerce",
+              "finance",
+              "supply_chain",
+              "software_engineering"
+            ]
+          }
+        }
+      }
+    },
+    "trajectory_cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "case_id",
+          "domain_id",
+          "evidence_role",
+          "selection_reason",
+          "semantic_trajectory_audit_ref",
+          "semantic_trajectory_audit_hash",
+          "complete_actual_route",
+          "semantic_lineage_overlay_present"
+        ],
+        "properties": {
+          "case_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "domain_id": {
+            "enum": [
+              "finance",
+              "supply_chain",
+              "software_engineering",
+              "ecommerce"
+            ]
+          },
+          "evidence_role": {
+            "enum": [
+              "PRIMARY_EXPERIMENT_CASE",
+              "TYPICAL_POSITIVE_CASE",
+              "TYPICAL_NEGATIVE_COMPARATOR",
+              "SUPPLEMENTARY_SENSITIVITY",
+              "HISTORICAL_METHOD_DEVELOPMENT_CONTEXT"
+            ]
+          },
+          "selection_reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "semantic_trajectory_audit_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "semantic_trajectory_audit_hash": {
+            "type": "string",
+            "minLength": 16
+          },
+          "complete_actual_route": {
+            "const": true
+          },
+          "semantic_lineage_overlay_present": {
+            "const": true
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "domain_id": {
+                  "const": "ecommerce"
+                }
+              },
+              "required": [
+                "domain_id"
+              ]
+            },
+            "then": {
+              "properties": {
+                "evidence_role": {
+                  "const": "HISTORICAL_METHOD_DEVELOPMENT_CONTEXT"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "contrast_sets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contrast_id",
+          "purpose",
+          "case_ids",
+          "contrast_dimension",
+          "claim_supported"
+        ],
+        "properties": {
+          "contrast_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1
+          },
+          "case_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 2
+          },
+          "contrast_dimension": {
+            "type": "string",
+            "minLength": 1
+          },
+          "claim_supported": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "structural_summary": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "role"
+      ],
+      "properties": {
+        "role": {
+          "const": "FACTUAL_SUBSTRATE_AND_SUPPORTING_DISPLAY"
+        }
+      }
+    },
+    "semantic_summary": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "role"
+      ],
+      "properties": {
+        "role": {
+          "const": "PRIMARY_INTERPRETIVE_CONTENT"
+        }
+      }
+    },
+    "claim_registry": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "claim_id",
+          "claim_text",
+          "claim_status",
+          "semantic_audit_refs",
+          "structural_support_refs",
+          "boundary"
+        ],
+        "properties": {
+          "claim_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "claim_text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "claim_status": {
+            "enum": [
+              "DIRECTLY_EVIDENCED",
+              "SUPPORTED",
+              "SUPPORTED_CANDIDATE",
+              "UNRESOLVED",
+              "NOT_ESTABLISHED",
+              "NOT_OBSERVED",
+              "CONTRADICTED",
+              "NOT_ADJUDICATED"
+            ]
+          },
+          "semantic_audit_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "structural_support_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "boundary": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "figure_specs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "figure_id",
+          "figure_type",
+          "case_ids",
+          "all_actual_nodes_required",
+          "semantic_overlay_required"
+        ],
+        "properties": {
+          "figure_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "figure_type": {
+            "enum": [
+              "TIME_ALIGNED_ACTUAL_AGENT_ROUTE_WITH_SEMANTIC_LINEAGE_OVERLAY",
+              "CONTRASTED_AGENT_ROUTE_PAIR",
+              "SUPPORTING_STRUCTURAL_SUMMARY"
+            ]
+          },
+          "case_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "all_actual_nodes_required": {
+            "type": "boolean"
+          },
+          "semantic_overlay_required": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "raw_evidence_mutation",
+        "missing_events_reconstructed",
+        "new_subject_provider_evaluator_calls_for_report"
+      ],
+      "properties": {
+        "raw_evidence_mutation": {
+          "const": false
+        },
+        "missing_events_reconstructed": {
+          "const": false
+        },
+        "new_subject_provider_evaluator_calls_for_report": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "report_gate_status": {
+      "enum": [
+        "READY_FOR_REPORT_DRAFT",
+        "BLOCKED_MISSING_SEMANTIC_TRAJECTORY_EVIDENCE"
+      ]
+    }
+  }
+}
