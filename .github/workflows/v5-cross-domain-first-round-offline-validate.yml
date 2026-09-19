@@ -24,6 +24,7 @@ on:
       - "docs/v5_cross_domain_r5_r6_structural_observation_protocol_v0.2.md"
       - "manifests/v5_cross_domain_localized_semantic_audit_review_2026-09-19_v0_1.json"
       - "manifests/v5_cross_domain_r5_r6_semantic_audit_review_2026-09-19_v0_1.json"
+      - "manifests/v5_cross_domain_r5_r6_semantic_audit_wave2_review_2026-09-19_v0_2.json"
       - "manifests/v5_cross_domain_r5r6_semantic_audit_wave1_2026-09-19_v0_1.json"
       - "results/v5_cross_domain_r5r6_semantic_audit_wave1_v0_1/**"
       - "docs/reports/2026-09-19/V5_3_Cross_Domain_R5_R6_Structural_Semantic_Audit_Wave1_Report_v1.md"
@@ -39,6 +40,7 @@ on:
       - "scripts/validate_probability_structure_separation_v1.py"
       - "schemas/v5_cross_domain_*"
       - "schemas/v5_cross_domain_r5_r6_semantic_audit_v0.1.schema.json"
+      - "schemas/v5_cross_domain_r5_r6_semantic_audit_v0.2.schema.json"
       - "arena/build_v5_cross_domain_manifest.py"
       - "arena/v5_cross_domain_preflight.py"
       - "arena/run_v5_cross_domain_real.py"
@@ -61,6 +63,7 @@ on:
       - "arena/derive_v5_cross_domain_r5_r6_structural_observation.py"
       - "arena/derive_v5_cross_domain_r5_r6_structural_observation_v0_2.py"
       - "arena/build_v5_cross_domain_r5_r6_semantic_audit.py"
+      - "arena/build_v5_cross_domain_r5_r6_semantic_audit_v0_2.py"
       - "arena/tests/test_v5_cross_domain_r5_r6_structural_observation.py"
       - "arena/tests/test_v5_cross_domain_r5_r6_semantic_audit.py"
       - "arena/prepare_v5_cross_domain_r6_targeted_specificity.py"
@@ -101,6 +104,7 @@ jobs:
           python -m py_compile arena/derive_v5_cross_domain_r5_r6_structural_observation.py
           python -m py_compile arena/derive_v5_cross_domain_r5_r6_structural_observation_v0_2.py
           python -m py_compile arena/build_v5_cross_domain_r5_r6_semantic_audit.py
+          python -m py_compile arena/build_v5_cross_domain_r5_r6_semantic_audit_v0_2.py
           python -m py_compile arena/prepare_v5_cross_domain_r6_targeted_specificity.py arena/run_v5_cross_domain_r6_targeted_specificity.py arena/freeze_v5_cross_domain_r6_targeted_specificity.py
           python -m py_compile arena/derive_v5_whole_process_structural.py
 
@@ -355,6 +359,29 @@ jobs:
           assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
           assert m['frozen_evidence_mutated'] is False
           print('PASS: completed R5-R6 semantic-audit wave 1 result is frozen with v5.3 claim boundaries')
+          PY
+
+      - name: Validate frozen R5-R6 semantic-review wave2 manifest
+        run: |
+          python -m json.tool manifests/v5_cross_domain_r5_r6_semantic_audit_wave2_review_2026-09-19_v0_2.json >/dev/null
+          python -m json.tool schemas/v5_cross_domain_r5_r6_semantic_audit_v0.2.schema.json >/dev/null
+          python - <<'PY'
+          import json
+          p=json.load(open('manifests/v5_cross_domain_r5_r6_semantic_audit_wave2_review_2026-09-19_v0_2.json'))
+          assert p['status']=='MODEL_REVIEW_APPEND_ONLY'
+          assert p['expected_branch_count']==10
+          assert p['expected_case_count']==5
+          assert len(p['branch_decisions'])==10
+          assert len({(x['case_id'],x['replicate_index']) for x in p['branch_decisions']})==10
+          assert len(p['case_decisions'])==5
+          assert len({x['case_id'] for x in p['case_decisions']})==5
+          assert sum(x['system_inertia_status']=='CASE_LEVEL_SYSTEM_INERTIA_SUPPORTED_CANDIDATE' for x in p['branch_decisions'])==4
+          assert sum(x['case_level_system_inertia_status']=='CASE_LEVEL_SYSTEM_INERTIA_SUPPORTED_CANDIDATE' for x in p['case_decisions'])==2
+          assert p['uniform_decision']['problematic_bias_status']=='NOT_ESTABLISHED'
+          assert p['uniform_decision']['r5_unique_causal_attribution']=='NOT_ESTABLISHED'
+          assert p['uniform_decision']['r7_status']=='NOT_AUTHORIZED'
+          assert p['uniform_decision']['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('PASS: wave2 semantic-review decisions are frozen with v5.3 claim boundaries')
           PY
 
       - name: Revalidate Process Reality method layer
