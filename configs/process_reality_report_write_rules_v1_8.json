@@ -1,0 +1,91 @@
+{
+  "schema": "RB-PROCESS-REALITY-REPORT-WRITE-RULES-v1.8",
+  "date": "2026-09-20",
+  "status": "FORWARD_MACHINE_REPORT_RULE",
+  "predecessor": "RB-PROCESS-REALITY-REPORT-STANDARD-v1.7",
+  "report_evidence_order": [
+    "FROZEN_EVIDENCE_BINDING",
+    "COMPLETE_ACTUAL_AGENT_ROUTE",
+    "SEMANTIC_LINEAGE_OVERLAY",
+    "NODE_AND_EDGE_SEMANTIC_INTERPRETATION",
+    "TYPICAL_CONTRAST",
+    "SUPPORTING_STRUCTURAL_DATA",
+    "AGGREGATE_COUNTS",
+    "CLAIM_BOUNDARY",
+    "PROVENANCE"
+  ],
+  "central_visual": {
+    "required": true,
+    "type": "TIME_ALIGNED_ACTUAL_AGENT_ROUTE_WITH_SEMANTIC_LINEAGE_OVERLAY",
+    "all_actual_nodes_required": true,
+    "actual_execution_edges_required": true,
+    "semantic_relevant_nodes_are_subset_of_actual_nodes": true,
+    "semantic_relation_edges_must_bind_audited_edges": true,
+    "fabricated_or_synthetic_nodes_forbidden": true,
+    "structural_summary_network_may_not_be_primary_visual": true
+  },
+  "primary_content_rule": "SEMANTIC_AUDIT_IS_PRIMARY_INTERPRETIVE_CONTENT; STRUCTURAL_DATA_IS_FACTUAL_SUBSTRATE_AND_SUPPORTING_DISPLAY",
+  "illustrative_case_policy": {
+    "illustrative_cases_do_not_define_statistical_denominator": true,
+    "selection_reason_must_be_declared": true,
+    "outcome_cherrypicking_forbidden": true,
+    "minimum_mechanism_coverage_not_effect_size_selection": true
+  },
+  "cross_domain_r2_r4_rule": {
+    "primary_domains": [
+      "finance",
+      "supply_chain",
+      "software_engineering"
+    ],
+    "complete_route_example_required_per_domain": true,
+    "minimum_primary_examples": 3,
+    "ecommerce_primary_example_forbidden": true,
+    "ecommerce_if_mentioned_role": "HISTORICAL_METHOD_DEVELOPMENT_CONTEXT_ONLY"
+  },
+  "r5_rule": {
+    "canonical_geometry": "N0_EXISTING_PLUS_R5I_ONCE",
+    "at_least_one_complete_n0_vs_r5i_realized_contrast_required": true,
+    "opposite_or_heterogeneous_realized_paths_must_be_shown_before_summary_if_used": true,
+    "directional_treatment_law_from_single_realization_forbidden": true
+  },
+  "r6_rule": {
+    "if_claiming_persistence_not_equal_system_inertia": {
+      "complete_positive_inertia_candidate_required": true,
+      "complete_negative_or_reanchored_comparator_required": true,
+      "both_must_include_full_actual_route": true,
+      "both_must_include_semantic_lineage_overlay": true,
+      "different_semantic_ancestry_must_be_explicit": true
+    },
+    "stronger_candidate_count_is_mechanism_pool_classification_not_prevalence": true
+  },
+  "semantic_text_rule": {
+    "labels_without_actual_semantic_content_are_insufficient": true,
+    "every_major_transformation_must_show_semantic_before": true,
+    "every_major_transformation_must_show_semantic_after": true,
+    "every_major_transformation_must_show_semantic_delta": true,
+    "every_major_adoption_claim_must_bind_reader_node": true,
+    "every_reanchoring_claim_must_bind_independent_evidence_refs": true
+  },
+  "structural_data_role": {
+    "required": true,
+    "role": "FOUNDATIONAL_DISPLAY",
+    "examples": [
+      "turns",
+      "calls",
+      "state_writes",
+      "messages",
+      "lineage_edges",
+      "reach",
+      "depth",
+      "branch_merge",
+      "censoring",
+      "hashes"
+    ],
+    "may_not_replace_semantic_trajectory_evidence": true
+  },
+  "report_gate": {
+    "report_evidence_bundle_required": true,
+    "semantic_trajectory_audit_refs_required_for_major_cases": true,
+    "report_generation_before_semantic_gate_pass_forbidden": true
+  }
+}
