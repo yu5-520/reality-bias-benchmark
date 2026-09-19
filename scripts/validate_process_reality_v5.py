@@ -79,6 +79,30 @@ def main() -> None:
         "docs/reporting/process_reality_theory_experiment_report_standard_v1_1.md",
         "manifests/v5_cross_domain_probability_structure_reclassification_2026-09-19_v0_1.json",
         "scripts/validate_probability_structure_separation_v1.py",
+        # v5.4 canonical intervention geometry
+        "theory/theory_contract_v0.15.md",
+        "theory/change_notes/CN-R-061_canonical_r5_r7_geometry.md",
+        "docs/R_Plan_v5.4.md",
+        "docs/first_paper_v5_4_scope.md",
+        "docs/v5_whole_process_experiment_protocol_v0.3.md",
+        "docs/R5_canonical_single_intervention_protocol_v1.0.md",
+        "docs/R7_dual_intervention_protocol_v2.0.md",
+        "docs/canonical_stochastic_realization_principle_v1.0.md",
+        "docs/legacy_execution_geometry_registry_v1.0.md",
+        "configs/process_reality_canonical_experiment_geometry_v1.0.json",
+        "configs/r7_process_integrity_engineering_contract_v0.5.json",
+        "manifests/v5_4_r5_r7_canonical_reclassification_2026-09-19_v0_1.json",
+        "schemas/r5_canonical_case_plan_v0.1.schema.json",
+        "schemas/r5_canonical_evidence_pair_v0.1.schema.json",
+        "schemas/r7_dual_intervention_plan_v0.1.schema.json",
+        "schemas/r7_dual_intervention_result_v0.1.schema.json",
+        "arena/prepare_v5_cross_domain_r5_canonical.py",
+        "arena/run_v5_cross_domain_r5_canonical.py",
+        "arena/freeze_v5_cross_domain_r5_canonical.py",
+        "arena/prepare_r7_dual_intervention_plan.py",
+        "arena/run_r7_dual_intervention_real.py",
+        "arena/freeze_r7_dual_intervention_evidence.py",
+        "scripts/validate_canonical_r5_r7_geometry_v1.py",
     ]
     for path in required_files:
         require((ROOT / path).exists(), f"missing required v5/v5.1 file: {path}")
@@ -186,7 +210,7 @@ def main() -> None:
         "preserved_unrelated_structure",
     ])
     require_tokens("README.md", [
-        "Process Reality v5.3",
+        "Process Reality v5.4",
         "Semantic Lineage Closure",
         "LINEAGE_GAP",
         "Theory Experiment Report",
@@ -202,12 +226,32 @@ def main() -> None:
     require(separation["invariants"]["fixed_parent_nonreproduction_negates_realized_case_structure"] is False, "fixed-parent nonreproduction incorrectly negates case structure")
     require(separation["invariants"]["r7_gate_depends_on_fixed_parent_recurrence_frequency"] is False, "R7 incorrectly depends on fixed-parent recurrence")
 
+    geometry = load_json("configs/process_reality_canonical_experiment_geometry_v1.0.json")
+    require(geometry["status"] == "FORWARD_ACTIVE_V5_4", "v5.4 canonical geometry not active")
+    require(geometry["r5"]["new_control_branches_per_case"] == 0, "v5.4 R5 synthetic control must be zero")
+    require(geometry["r5"]["new_intervention_branches_per_case"] == 1, "v5.4 R5 intervention count mismatch")
+    require(geometry["r5"]["canonical_replicate_count"] == 1, "v5.4 R5 replicate count mismatch")
+    require(geometry["r5"]["natural_reference_must_be_rerun"] is False, "v5.4 natural reference must not be rerun")
+    require(geometry["r6"]["new_subject_provider_branches_per_case"] == 0, "v5.4 R6 must remain passive")
+    require(geometry["r7"]["canonical_arms"] == ["R7_P_PERSISTENT_SEMANTIC", "R7_S_STRUCTURED_LINEAGE_REPAIR"], "v5.4 R7 arm set mismatch")
+    require(geometry["r7"]["new_c1_one_shot_branches_per_case"] == 0, "v5.4 R7 may not rerun C1")
+    require(geometry["r7"]["new_provider_branches_per_case"] == 2, "v5.4 R7 branch count mismatch")
+    require(geometry["r7"]["canonical_replicate_count"] == 1, "v5.4 R7 replicate count mismatch")
+    require(geometry["full_case_to_r7_new_provider_trajectory_count"] == 3, "v5.4 full provider geometry mismatch")
+
+    canonical_reclass = load_json("manifests/v5_4_r5_r7_canonical_reclassification_2026-09-19_v0_1.json")
+    require(canonical_reclass["historical_evidence_mutated"] is False, "v5.4 reclassification mutated historical evidence")
+    require(canonical_reclass["r5"]["forward_canonical_rule"]["selection_is_outcome_aware"] is False, "v5.4 historical R5 selection must be deterministic")
+    require(canonical_reclass["r7"]["mapping"]["C1_ONE_SHOT"] == "R5_I_REFERENCE_NOT_CANONICAL_R7_EXECUTION", "v5.4 C1 mapping mismatch")
+    require(canonical_reclass["r7"]["mapping"]["C2_PERSISTENT_FIELD"] == "R7_P_PERSISTENT_SEMANTIC", "v5.4 C2 mapping mismatch")
+    require(canonical_reclass["r7"]["mapping"]["C3_ALR"] == "R7_S_STRUCTURED_LINEAGE_REPAIR", "v5.4 C3 mapping mismatch")
+
     reclass = load_json("manifests/v5_cross_domain_probability_structure_reclassification_2026-09-19_v0_1.json")
     require(reclass["frozen_evidence_mutated"] is False, "v5.3 reclassification mutated frozen evidence")
     require(reclass["reclassified_followup"]["forward_role"] == "SUPPLEMENTARY_LOCAL_CONDITIONAL_SENSITIVITY", "targeted follow-up role mismatch")
     require(reclass["wave4_forward_status"]["r7_status"] == "NOT_AUTHORIZED_PENDING_CASE_LEVEL_LINEAGE_COMPLETENESS_REASSESSMENT", "wave4 R7 boundary mismatch")
 
-    print("PASS: Process Reality v5.3 probability/structure + semantic-lineage layers are synchronized")
+    print("PASS: Process Reality v5.4 probability/structure + canonical intervention geometry are synchronized")
     print(f"LEGACY_R6D_DESIGN_HASH={LEGACY_R6D_DESIGN_HASH}")
     print("HISTORICAL_EVIDENCE_MUTATED=NO")
     print("SCIENTIFIC_PROVIDER_RUN_AUTHORIZED=NO")
