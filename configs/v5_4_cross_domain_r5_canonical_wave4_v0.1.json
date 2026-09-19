@@ -1,0 +1,154 @@
+{
+  "schema": "RB-V5.4-CROSS-DOMAIN-R5-CANONICAL-WAVE4-PLAN-v0.1",
+  "date": "2026-09-19",
+  "status": "FROZEN_PRE_EXECUTION_PLAN",
+  "source_subject": {
+    "workflow_run_id": 35370679448,
+    "execution_sha": "b712dabc227973470900af4aea4e13d1077f5696",
+    "manifest_artifact": {
+      "id": 10558806589,
+      "name": "v5-cross-domain-first-round-manifest-35370679448",
+      "digest": "sha256:b5c8da5cbed35230af858320b093550553c8d58038f121fe6965192066a0afa8"
+    },
+    "wave_artifacts": [
+      {
+        "wave_id": 1,
+        "id": 10558039019,
+        "name": "v5-cross-domain-first-round-wave-1-35370679448",
+        "digest": "sha256:7cd771048914067eb727a4e20a11026e1c687f21bf147da5235640104d88b562"
+      },
+      {
+        "wave_id": 3,
+        "id": 10558968954,
+        "name": "v5-cross-domain-first-round-wave-3-35370679448",
+        "digest": "sha256:6d4256afb4e0144cafc9182f609cd58ba95f7cd4490353aa6661799fdfa274b7"
+      },
+      {
+        "wave_id": 4,
+        "id": 10558858901,
+        "name": "v5-cross-domain-first-round-wave-4-35370679448",
+        "digest": "sha256:421287980285b8549d0b07e82cdb3fa9d6ff038b60b4c8b62c8ab50c2163fafc"
+      },
+      {
+        "wave_id": 6,
+        "id": 10558915998,
+        "name": "v5-cross-domain-first-round-wave-6-35370679448",
+        "digest": "sha256:f18f77b38f4ad69e3969e4c6fd101e46b8d0bc8e5cfddf4142052b15ae78f1f3"
+      }
+    ]
+  },
+  "source_semantic_audit": {
+    "workflow_run_id": 35378782053,
+    "artifact_id": 10561246944,
+    "artifact_name": "v5-cross-domain-localized-semantic-audit-pass1-35377246079-35378782053",
+    "artifact_digest": "sha256:457b4fc91d09dcec0a3dbe609068761d238df24679fb40dd7db26c06e3630e60",
+    "summary_hash": "b97ae65a2ff3ab808abf7e39aa45ffda320dd6786db6b3369bf82d575057d9a3",
+    "eligible_case_count": 29
+  },
+  "selection_rule": "After excluding all 16 canonical Wave1-3 cases, for every natural wave with remaining pass-1 ELIGIBLE_R5_ATOMIC_PROBE cases select the smallest tuple (source_event_index, source_run_id, source_case_hash). Natural waves 2 and 5 are exhausted and are not replaced.",
+  "exclude_previous_case_hashes": [
+    "9d1ad55823f89b06d211a3f8aa3807368778a25b3132f79247b2b06ecd53107c",
+    "3e4a064e689e5f46fb4058ac8ea2465f8b3657cd97a113dacb8c919665f1233e",
+    "cac2cde91b7ad076202143188348e5c74a8200844e9d70fd706165b60404385b",
+    "8b1731b57396dadfb25e0d975c4849ef83d55b6a68a5920a209c9ed84079b5d6",
+    "0aa6e0fc2696017ff562311e79d8aad914dc06294ae8d5c4069978ea38b57e94",
+    "7c7e526e4d911cf24416eae067967e9b9504b1846b8a4f1fe8f6057becada4c0",
+    "bb8524ad125b6c07194c337f27e32c241d3e0b71bb7a9c6061a7526119c592d4",
+    "56ee79f97f54dc9968b537cd06b8a273210a9ded06637dfce45e88f652db1b2f",
+    "cf726639de1dc285c89b2f8037eadd6ea969e553a2bc963483f1c9035bff217a",
+    "9684a9c95d382dfe231ea1d3a4226c38906291885cc79c280b26106036817d31",
+    "83476eeee96e111d9e0d3b66483ee9bf3bde7375cf268382a8aa4d08f60c3f85",
+    "92211309fb1b9983fc9649ac78c81cdb1b83aaafc8aa1ef6830d32e1b648ec6b",
+    "0d2e0d7c1a8d07aa87b9201677ad7be22062108167bd9b4288dc8f31289075b9",
+    "57aab6cf5a3ed7d8ab997c3d9a03795eb4e2ab061da91bf1f98b4755e43b5951",
+    "8c668b56a8c2e9ed70a89ab46f3d571e4654fdf42df275cc95f0067b0c7b4dee",
+    "6c9e60abebc3e2368c17dbc9d3b719d73e155d6ca770948755bf8151a33bc4e8"
+  ],
+  "selected_cases": [
+    {
+      "wave_id": 1,
+      "domain_id": "finance",
+      "source_run_id": "v5-xd-finance-fr001-0004",
+      "source_case_hash": "7ed0c65065a0ad615ae4c06e8f9bf4a8a80e58016232d12f5abe115692a03488",
+      "audit_hash": "ed159e0f1976c59ad6550aed1671e736642d940ab7ae90d44e5cff7ad1038d4f",
+      "candidate_ref": "arena_event:113:state:final_decision.concentration_cap_status",
+      "content_address": "713d64310fe27d721c816e21edae0777cb85532d0c8bd874e4440b05e3240bde",
+      "source_turn": 24,
+      "state_key": "final_decision.concentration_cap_status",
+      "parent_anchor_ref": "after_turn:24",
+      "parent_state_hash": "80f11aa0120d01081e25b24952ca9bb4450587a9e5434bb67fb62aa86e94bd80",
+      "expected_next_actor": "cashflow"
+    },
+    {
+      "wave_id": 3,
+      "domain_id": "supply_chain",
+      "source_run_id": "v5-xd-supply_chain-fr001-0004",
+      "source_case_hash": "907d3ff32f501361c3b613974cd1bd81b8807553dbe79c90a7da64338b60d679",
+      "audit_hash": "3ebd71486aa07bc8d1933ca415801090fa5bc9e5dbc9366a50f763177bb5f60c",
+      "candidate_ref": "arena_event:17:state:logistics_capacity_confirmation",
+      "content_address": "aa4a105d8ff238e0fade7adc8327d1c24da9287697076303086e4d1582a615a9",
+      "source_turn": 4,
+      "state_key": "logistics_capacity_confirmation",
+      "parent_anchor_ref": "after_turn:4",
+      "parent_state_hash": "54f6867f4a231f8d26fc802ab38050f3368a0dc5a60e54e3e84aded522353bbd",
+      "expected_next_actor": "demand"
+    },
+    {
+      "wave_id": 4,
+      "domain_id": "supply_chain",
+      "source_run_id": "v5-xd-supply_chain-fr001-0023",
+      "source_case_hash": "31c8e9e27e036e985a255643ee0c1b7b704e376d031a8a625577fd2788b48939",
+      "audit_hash": "3558f3485f41b888ca1c41e96fa59ab6be9ade323eb0a84270644ed122dacc42",
+      "candidate_ref": "arena_event:58:state:logistics_dispatch_confirmation",
+      "content_address": "0eebe6aba400bfe703c47d804247bbf62e9610e3d4c51093911b57a9de7f4190",
+      "source_turn": 11,
+      "state_key": "logistics_dispatch_confirmation",
+      "parent_anchor_ref": "after_turn:11",
+      "parent_state_hash": "5a303b37ef60f7dedd33d9684f60edc66a4ed4b65315571d9131e5be29f9085c",
+      "expected_next_actor": "risk"
+    },
+    {
+      "wave_id": 6,
+      "domain_id": "software_engineering",
+      "source_run_id": "v5-xd-software_engineering-fr001-0017",
+      "source_case_hash": "31e80d6171638c481c6f6dea44d9082c58621377df8bfd4100bc8a32760bc69c",
+      "audit_hash": "356e1c99a603525fcfdbd29dce449493db0f784e0613accece4ea224b08cd86c",
+      "candidate_ref": "arena_event:21:state:release_decision",
+      "content_address": "014b895cb77c22412edab7b91917dc6d7ac2abde6dbbeb810473f36d2c883d98",
+      "source_turn": 5,
+      "state_key": "release_decision",
+      "parent_anchor_ref": "after_turn:5",
+      "parent_state_hash": "e2a2ca1a7eaf48068c04734c3780e2ee0297fd02c2095e0c7eaed32c45964080",
+      "expected_next_actor": "data"
+    }
+  ],
+  "operator": {
+    "family": "ONE_SHOT_RUNTIME_METADATA_STATUS_OVERLAY",
+    "from_status": "fact",
+    "to_status": "unconfirmed",
+    "direct_exposure_limit": 1,
+    "persistent_state_mutation": false,
+    "experiment_origin_reinjection_count": 0
+  },
+  "geometry": {
+    "case_count": 4,
+    "existing_natural_reference_count": 4,
+    "new_intervention_branch_count": 4,
+    "synthetic_control_branch_count": 0,
+    "canonical_replicate_count": 1,
+    "total_new_provider_branch_count": 4
+  },
+  "budget": {
+    "provider": "deepseek",
+    "per_branch_max_calls": 64,
+    "per_branch_spending_ceiling_usd": 0.25,
+    "global_spending_ceiling_usd": 1
+  },
+  "authorization": {
+    "exact_phrase": "CALL_REAL_V5_CROSS_DOMAIN_R5_CANONICAL_API",
+    "paid_evaluator": false,
+    "r6_new_subject_experiment": false,
+    "r7_repair": false,
+    "r8_cpr_adjudication": false
+  }
+}
