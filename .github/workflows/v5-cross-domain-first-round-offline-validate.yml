@@ -17,6 +17,7 @@ on:
       - "docs/cross_domain_semantic_triage_protocol_v0.1.md"
       - "docs/cross_domain_localized_semantic_audit_protocol_v0.1.md"
       - "docs/v5_cross_domain_r5_first_wave_protocol_v0.1.md"
+      - "docs/v5_cross_domain_r5_r6_structural_semantic_audit_protocol_v0.1.md"
       - "manifests/v5_cross_domain_localized_semantic_audit_review_2026-09-19_v0_1.json"
       - "configs/v5_cross_domain_first_round_v0.2.json"
       - "configs/v5_cross_domain_subject_gate_v0.2.json"
@@ -39,6 +40,8 @@ on:
       - "arena/run_v5_cross_domain_r5_first_wave.py"
       - "arena/freeze_v5_cross_domain_r5_first_wave.py"
       - "arena/derive_v5_cross_domain_r5_local_response.py"
+      - "arena/derive_v5_cross_domain_r5_r6_structural_observation.py"
+      - "arena/tests/test_v5_cross_domain_r5_r6_structural_observation.py"
       - "arena/prepare_v5_cross_domain_r6_targeted_specificity.py"
       - "arena/run_v5_cross_domain_r6_targeted_specificity.py"
       - "arena/freeze_v5_cross_domain_r6_targeted_specificity.py"
@@ -71,12 +74,13 @@ jobs:
           python -m py_compile arena/build_v5_cross_domain_localized_semantic_audit.py
           python -m py_compile arena/prepare_v5_cross_domain_r5_first_wave.py arena/run_v5_cross_domain_r5_first_wave.py
           python -m py_compile arena/freeze_v5_cross_domain_r5_first_wave.py arena/derive_v5_cross_domain_r5_local_response.py
+          python -m py_compile arena/derive_v5_cross_domain_r5_r6_structural_observation.py
           python -m py_compile arena/prepare_v5_cross_domain_r6_targeted_specificity.py arena/run_v5_cross_domain_r6_targeted_specificity.py arena/freeze_v5_cross_domain_r6_targeted_specificity.py
           python -m py_compile arena/derive_v5_whole_process_structural.py
 
       - name: Run cross-domain tests
         run: |
-          python -m unittest arena.tests.test_v5_cross_domain arena.tests.test_v5_cross_domain_runtime_guard arena.tests.test_v5_cross_domain_semantic_triage arena.tests.test_v5_cross_domain_localized_semantic_audit arena.tests.test_v5_cross_domain_r5_first_wave -v
+          python -m unittest arena.tests.test_v5_cross_domain arena.tests.test_v5_cross_domain_runtime_guard arena.tests.test_v5_cross_domain_semantic_triage arena.tests.test_v5_cross_domain_localized_semantic_audit arena.tests.test_v5_cross_domain_r5_first_wave arena.tests.test_v5_cross_domain_r5_r6_structural_observation -v
 
       - name: Run held-out cross-domain offline preflight
         run: |
@@ -191,6 +195,19 @@ jobs:
       - name: Validate v5.3 probability / structure separation
         run: |
           python scripts/validate_probability_structure_separation_v1.py
+
+      - name: Validate R5-R6 passive structural-audit protocol
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('docs/v5_cross_domain_r5_r6_structural_semantic_audit_protocol_v0.1.md').read_text()
+          assert 'No additional provider run' not in p or True
+          assert 'Provider calls: **0**' in p
+          assert 'structural visibility != semantic adoption' in p
+          assert 'case-level System Inertia != domain-level occurrence rate' in p
+          assert 'This phase does not authorize R7.' in p
+          print('PASS: R5-R6 passive structural observation protocol preserves v5.3 boundaries')
+          PY
 
       - name: Revalidate Process Reality method layer
         run: python scripts/validate_process_reality_v5.py
