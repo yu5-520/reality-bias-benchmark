@@ -1736,3 +1736,181 @@ jobs:
           body="V5.3 R5 second-wave balance recovery completed.\n\nMechanically selected provider-failure branches: 12 across waves 4/5/6.\nSuccessful recovered traces: $SUCCESS_COUNT/$TRACE_COUNT.\nEstimated provider spend: USD $SPEND.\nRun summary hash: $SUMMARY_HASH.\nRecovery evidence hash: $EVIDENCE_HASH.\n\nOriginal 402 traces remain immutable and were not overwritten. Selection was not scientific-outcome-aware. Next stage: combine original valid wave1/3 continuations with recovered wave4/5/6 continuations for passive R6 structural + semantic audit. R7 not authorized. CPR NOT_ADJUDICATED."
           gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
           gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
+
+
+  materialize-cross-domain-r5r6-wave2-combined-structural:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5 CROSS-DOMAIN R5R6 WAVE2 COMBINED STRUCTURAL'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      REQUEST_BODY: ${{ github.event.issue.body }}
+      EXPECTED_EXECUTION_PHRASE: MATERIALIZE_V5_CROSS_DOMAIN_R5R6_WAVE2_COMBINED_STRUCTURAL
+
+      ORIGINAL_RUN_ID: '35436694271'
+      ORIGINAL_ARTIFACT_ID: '10582866320'
+      ORIGINAL_ARTIFACT_NAME: v5-cross-domain-r5-second-wave-35436694271
+      ORIGINAL_ARTIFACT_DIGEST: sha256:1efbb3095cd74a18b13eccf94f1ebe0d044e2d7cc79fed9e7af5d63977d975b3
+      ORIGINAL_EVIDENCE_HASH: b01e11cb041be4d3d29bd94d93552ac0bfdd56fc67cd5b7b011e8f90bb46d676
+
+      RECOVERY_RUN_ID: '35438000140'
+      RECOVERY_ARTIFACT_ID: '10583013224'
+      RECOVERY_ARTIFACT_NAME: v5-cross-domain-r5-second-wave-balance-recovery-35438000140
+      RECOVERY_ARTIFACT_DIGEST: sha256:1331f55ec45f8fdbf71c7dd3aeee061d74f426c11dd3c51e17f4f2f78e443d5c
+      RECOVERY_EVIDENCE_HASH: 62f39fe00cd427066559558f52d1b2b18c163c7e76e9787190846797b21d6578
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact combined-structural request
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['REQUEST_BODY'].splitlines():
+              line=raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit(f'invalid combined-structural request line: {line!r}')
+              k,v=line.split('=',1)
+              if k in rows:
+                  raise SystemExit(f'duplicate combined-structural key: {k}')
+              rows[k]=v
+          required={
+              'execution_phrase','expected_main_sha','materialization_id',
+              'original_run_id','original_artifact_id','original_artifact_digest','original_evidence_hash',
+              'recovery_run_id','recovery_artifact_id','recovery_artifact_digest','recovery_evidence_hash',
+              'control_plane'
+          }
+          if set(rows)!=required:
+              raise SystemExit(f'combined-structural request keys mismatch: {sorted(rows)}')
+          checks={
+              'execution_phrase':os.environ['EXPECTED_EXECUTION_PHRASE'],
+              'expected_main_sha':os.environ['GITHUB_SHA'],
+              'original_run_id':os.environ['ORIGINAL_RUN_ID'],
+              'original_artifact_id':os.environ['ORIGINAL_ARTIFACT_ID'],
+              'original_artifact_digest':os.environ['ORIGINAL_ARTIFACT_DIGEST'],
+              'original_evidence_hash':os.environ['ORIGINAL_EVIDENCE_HASH'],
+              'recovery_run_id':os.environ['RECOVERY_RUN_ID'],
+              'recovery_artifact_id':os.environ['RECOVERY_ARTIFACT_ID'],
+              'recovery_artifact_digest':os.environ['RECOVERY_ARTIFACT_DIGEST'],
+              'recovery_evidence_hash':os.environ['RECOVERY_EVIDENCE_HASH'],
+              'control_plane':'CHAT_EXECUTION_BRIDGE_V5_CROSS_DOMAIN_R5R6_WAVE2_COMBINED_STRUCTURAL_v0.1',
+          }
+          for k,v in checks.items():
+              if rows[k]!=v:
+                  raise SystemExit(f'combined-structural {k} mismatch')
+          if not re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['materialization_id']):
+              raise SystemExit('invalid combined-structural materialization_id')
+          print('PASS: exact combined-structural request validated')
+          PY
+
+      - name: Verify exact source artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          repo=os.environ['GITHUB_REPOSITORY']
+          for prefix in ('ORIGINAL','RECOVERY'):
+              run_id=os.environ[prefix+'_RUN_ID']
+              payload=json.loads(subprocess.check_output(
+                  ['gh','api',f'repos/{repo}/actions/runs/{run_id}/artifacts'],text=True
+              ))
+              rows=[x for x in payload['artifacts']
+                    if str(x['id'])==os.environ[prefix+'_ARTIFACT_ID']
+                    and x['name']==os.environ[prefix+'_ARTIFACT_NAME']]
+              assert len(rows)==1
+              assert rows[0].get('digest')==os.environ[prefix+'_ARTIFACT_DIGEST']
+              assert not rows[0].get('expired')
+          print('PASS: exact original and recovery artifacts verified')
+          PY
+
+      - name: Download original and recovery artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/original source/recovery
+          gh run download "$ORIGINAL_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$ORIGINAL_ARTIFACT_NAME" --dir source/original
+          gh run download "$RECOVERY_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$RECOVERY_ARTIFACT_NAME" --dir source/recovery
+          test -s source/original/prepared/r5_second_wave/case_bindings.jsonl
+          test -s source/original/results/v5_cross_domain_r5_second_wave/evidence_batch.json
+          test -s source/original/results/v5_cross_domain_r5_second_wave/raw/traces.jsonl
+          test -s source/recovery/results/v5_cross_domain_r5_second_wave_balance_recovery/evidence_batch.json
+          test -s source/recovery/results/v5_cross_domain_r5_second_wave_balance_recovery/raw/traces.jsonl
+          python - <<'PY'
+          import json,os
+          o=json.load(open('source/original/results/v5_cross_domain_r5_second_wave/evidence_batch.json'))
+          r=json.load(open('source/recovery/results/v5_cross_domain_r5_second_wave_balance_recovery/evidence_batch.json'))
+          assert o['evidence_batch_hash']==os.environ['ORIGINAL_EVIDENCE_HASH']
+          assert r['evidence_batch_hash']==os.environ['RECOVERY_EVIDENCE_HASH']
+          print('PASS: source evidence hashes verified')
+          PY
+
+      - name: Build append-only effective R5 second-wave evidence
+        id: effective
+        run: |
+          set -euo pipefail
+          python -m arena.build_v5_cross_domain_r5_second_wave_effective_evidence             --original-raw-dir source/original/results/v5_cross_domain_r5_second_wave/raw             --recovery-raw-dir source/recovery/results/v5_cross_domain_r5_second_wave_balance_recovery/raw             --original-plan-dir source/original/prepared/r5_second_wave             --original-evidence source/original/results/v5_cross_domain_r5_second_wave/evidence_batch.json             --recovery-evidence source/recovery/results/v5_cross_domain_r5_second_wave_balance_recovery/evidence_batch.json             --outdir results/v5_cross_domain_r5_second_wave_effective
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          p=json.load(open('results/v5_cross_domain_r5_second_wave_effective/summary.json'))
+          for k in ('effective_trace_count','effective_intervention_count','original_trace_used_count',
+                    'recovery_trace_used_count','evidence_batch_hash','summary_hash'):
+              print(k+'='+str(p[k]))
+          PY
+
+      - name: Derive complete passive R6 structure over effective evidence
+        id: structural
+        run: |
+          set -euo pipefail
+          python -m arena.derive_v5_cross_domain_r5_r6_structural_observation_v0_2             --traces results/v5_cross_domain_r5_second_wave_effective/effective_traces.jsonl             --case-bindings results/v5_cross_domain_r5_second_wave_effective/case_bindings.jsonl             --evidence-batch results/v5_cross_domain_r5_second_wave_effective/summary.json             --outdir results/v5_cross_domain_r5r6_structural_observation_wave2_combined
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          p=json.load(open('results/v5_cross_domain_r5r6_structural_observation_wave2_combined/summary.json'))
+          for k in ('intervention_trace_count','case_count','semantic_audit_eligible_intervention_count',
+                    'incomplete_first_exposure_provider_failure_count','semantic_audit_eligible_case_count',
+                    'incomplete_case_count','summary_hash'):
+              print(k+'='+str(p[k]))
+          PY
+
+      - name: Upload combined effective + structural bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-cross-domain-r5r6-wave2-combined-structural-${{ github.run_id }}
+          path: |
+            docs/v5_cross_domain_r5_second_wave_effective_evidence_contract_v0.1.md
+            docs/v5_cross_domain_r5_r6_structural_observation_protocol_v0.2.md
+            results/v5_cross_domain_r5_second_wave_effective/
+            results/v5_cross_domain_r5r6_structural_observation_wave2_combined/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record combined structural materialization
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EFFECTIVE_TRACES: ${{ steps.effective.outputs.effective_trace_count }}
+          EFFECTIVE_INTERVENTIONS: ${{ steps.effective.outputs.effective_intervention_count }}
+          ORIGINAL_USED: ${{ steps.effective.outputs.original_trace_used_count }}
+          RECOVERY_USED: ${{ steps.effective.outputs.recovery_trace_used_count }}
+          EFFECTIVE_HASH: ${{ steps.effective.outputs.evidence_batch_hash }}
+          ELIGIBLE_INTERVENTIONS: ${{ steps.structural.outputs.semantic_audit_eligible_intervention_count }}
+          ELIGIBLE_CASES: ${{ steps.structural.outputs.semantic_audit_eligible_case_count }}
+          INCOMPLETE_INTERVENTIONS: ${{ steps.structural.outputs.incomplete_first_exposure_provider_failure_count }}
+          INCOMPLETE_CASES: ${{ steps.structural.outputs.incomplete_case_count }}
+          STRUCTURAL_HASH: ${{ steps.structural.outputs.summary_hash }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="V5.3 R5-R6 wave2 combined structural materialization completed.\n\nEffective traces: $EFFECTIVE_TRACES; interventions: $EFFECTIVE_INTERVENTIONS.\nOriginal continuations used: $ORIGINAL_USED. Recovery continuations used: $RECOVERY_USED.\nEffective evidence hash: $EFFECTIVE_HASH.\nR6 semantic-audit eligible interventions: $ELIGIBLE_INTERVENTIONS. Eligible cases: $ELIGIBLE_CASES.\nIncomplete first-exposure interventions after recovery: $INCOMPLETE_INTERVENTIONS. Incomplete cases: $INCOMPLETE_CASES.\nR6 structural summary hash: $STRUCTURAL_HASH.\n\nOriginal 402 evidence remains immutable; wave3 late-402 control remains explicit rather than rerun. New provider calls: 0. R7 not authorized. CPR NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
