@@ -221,6 +221,34 @@ A later fixed-parent follow-up was executed for the same parent, but is now recl
 
 The follow-up bounds local recurrence of one exact phenotype. It does not negate the original realized carrier/read/adoption/persistence chain. R7 status is now `NOT_AUTHORIZED_PENDING_CASE_LEVEL_LINEAGE_COMPLETENESS_REASSESSMENT`.
 
+Completed v5.3 passive R5-R6 structural + semantic audit wave 1:
+
+- R5 source workflow: `35381406873`;
+- passive structural materialization workflow: `35429085193`;
+- structural artifact: `10580091785`;
+- semantic audit workflow: `35429324484`;
+- semantic artifact: `10580655035`;
+- semantic summary hash: `d78d411c612afd31f24c6b572c560a619bdcc0c86ee437ab196648cb8af0e823`;
+- 12 intervention branches / 6 source-bound cases;
+- downstream semantic adoption: **12 / 12**;
+- decision/action dependence: **12 / 12**;
+- post-stimulus persistence: **12 / 12**;
+- stronger case-level System Inertia candidates: **2 / 6 cases** — supply-chain wave 4 and software-engineering wave 6;
+- normal / re-anchored / boundary-preserving persistence: **4 / 6 cases**;
+- problematic bias established: **0 / 6**;
+- R5 unique causal attribution established: **0 / 6**;
+- lineage completeness: **not assessed in this pass**;
+- R7: **NOT AUTHORIZED**;
+- CPR: **NOT_ADJUDICATED**;
+- report: `docs/reports/2026-09-19/V5_3_Cross_Domain_R5_R6_Structural_Semantic_Audit_Wave1_Report_v1.md`;
+- result manifest: `manifests/v5_cross_domain_r5r6_semantic_audit_wave1_2026-09-19_v0_1.json`.
+
+Key R6 finding:
+
+`post-stimulus semantic persistence != System Inertia by default`.
+
+Normal inheritance, evidence re-anchoring, boundary preservation and pre-existing conservative-gate reinforcement are separated from stronger new-carrier -> downstream-constraint persistence.
+
 Prospective sample geometry:
 
 - 30 natural trajectories per held-out domain;
