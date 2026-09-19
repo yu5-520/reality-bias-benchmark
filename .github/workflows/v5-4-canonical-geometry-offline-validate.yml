@@ -29,6 +29,9 @@ on:
       - "arena/run_r7_dual_intervention_real.py"
       - "arena/freeze_r7_dual_intervention_evidence.py"
       - "arena/build_v5_4_r5r6_canonical_reclassification.py"
+      - "arena/derive_v5_4_r6_canonical_natural_vs_r5.py"
+      - "docs/v5_4_r6_canonical_natural_vs_r5_protocol_v0.3.md"
+      - ".github/workflows/v5-4-r6-canonical-wave3-structural.yml"
       - "configs/v5_4_cross_domain_r5_canonical_wave3_v0.1.json"
       - "docs/v5_4_cross_domain_r5_canonical_wave3_protocol_v0.1.md"
       - ".github/workflows/v5-4-r5-canonical-wave3.yml"
@@ -116,6 +119,18 @@ jobs:
           assert p['authorization']['r6_new_subject_experiment'] is False
           assert p['authorization']['r7_repair'] is False
           print('PASS: canonical Wave3 is five cases / five paid R5-I branches')
+          PY
+
+      - name: Validate canonical R6 natural-vs-R5 protocol
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('docs/v5_4_r6_canonical_natural_vs_r5_protocol_v0.3.md').read_text()
+          assert 'N0 frozen natural continuation + one frozen R5-I continuation' in p
+          assert 'does not compare intervention replicates' in p
+          assert 'Structural inequality is explicitly non-semantic' in p
+          assert 'zero provider calls' in p
+          print('PASS: R6 v0.3 consumes N0 + one R5-I and stays passive')
           PY
 
       - name: Run canonical geometry unit tests
