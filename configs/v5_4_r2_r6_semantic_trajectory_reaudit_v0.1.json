@@ -1,0 +1,168 @@
+{
+  "schema": "RB-V5.4-R2R6-SEMANTIC-TRAJECTORY-REAUDIT-CONFIG-v0.1",
+  "date": "2026-09-20",
+  "status": "FROZEN_SOURCE_BINDING_READY_FOR_PASSIVE_MATERIALIZATION",
+  "reviewer": {
+    "kind": "MODEL",
+    "id": "GPT-5.6-Sol",
+    "blind_to_prior_semantic_labels": false
+  },
+  "purpose": "Materialize complete-route semantic trajectory audits over already-frozen R2-R6 evidence without rerunning subjects or changing historical case classifications.",
+  "primary_domains": [
+    "finance",
+    "supply_chain",
+    "software_engineering"
+  ],
+  "ecommerce_role": "HISTORICAL_METHOD_DEVELOPMENT_CONTEXT_ONLY",
+  "natural_example_selection": {
+    "rule": "FIRST_PASS1_ELIGIBLE_BY_SOURCE_RUN_ID_THEN_CANDIDATE_REF_PER_DOMAIN",
+    "outcome_aware": false,
+    "selected_source_case_hashes": {
+      "finance": "7ed0c65065a0ad615ae4c06e8f9bf4a8a80e58016232d12f5abe115692a03488",
+      "supply_chain": "a4d9503019bb28b5f82a3a62589c859b72883c81bab2005fa85e6d01730562f2",
+      "software_engineering": "8c668b56a8c2e9ed70a89ab46f3d571e4654fdf42df275cc95f0067b0c7b4dee"
+    }
+  },
+  "expected": {
+    "natural_population": 90,
+    "pass1_eligible_cases": 29,
+    "canonical_r5_r6_cases": 29,
+    "complete_route_audits": 32,
+    "r5_r6_domain_counts": {
+      "finance": 5,
+      "supply_chain": 16,
+      "software_engineering": 8
+    },
+    "stronger_system_inertia_candidates": 4,
+    "non_inertia_cases": 25,
+    "stronger_candidate_case_ids": [
+      "wave-3-56ee79f97f54",
+      "wave-4-8b1731b57396",
+      "wave-4-cf726639de1d",
+      "wave-6-7c7e526e4d91"
+    ]
+  },
+  "artifacts": {
+    "pass1": {
+      "id": 10561246944,
+      "name": "v5-cross-domain-localized-semantic-audit-pass1-35377246079-35378782053",
+      "digest": "sha256:457b4fc91d09dcec0a3dbe609068761d238df24679fb40dd7db26c06e3630e60"
+    },
+    "natural": [
+      {
+        "wave": 1,
+        "id": 10558039019,
+        "name": "v5-cross-domain-first-round-wave-1-35370679448",
+        "digest": "sha256:7cd771048914067eb727a4e20a11026e1c687f21bf147da5235640104d88b562"
+      },
+      {
+        "wave": 2,
+        "id": 10557859045,
+        "name": "v5-cross-domain-first-round-wave-2-35370679448",
+        "digest": "sha256:4e24f88be8df125165caeb712735034a21b2e997cfb89afbc9c467816521cb2f"
+      },
+      {
+        "wave": 3,
+        "id": 10558968954,
+        "name": "v5-cross-domain-first-round-wave-3-35370679448",
+        "digest": "sha256:6d4256afb4e0144cafc9182f609cd58ba95f7cd4490353aa6661799fdfa274b7"
+      },
+      {
+        "wave": 4,
+        "id": 10558858901,
+        "name": "v5-cross-domain-first-round-wave-4-35370679448",
+        "digest": "sha256:421287980285b8549d0b07e82cdb3fa9d6ff038b60b4c8b62c8ab50c2163fafc"
+      },
+      {
+        "wave": 5,
+        "id": 10558129961,
+        "name": "v5-cross-domain-first-round-wave-5-35370679448",
+        "digest": "sha256:a76a4913745b870ea7e34ed6c303b11434e81c0c475036e3e12a9296a9b2e527"
+      },
+      {
+        "wave": 6,
+        "id": 10558915998,
+        "name": "v5-cross-domain-first-round-wave-6-35370679448",
+        "digest": "sha256:f18f77b38f4ad69e3969e4c6fd101e46b8d0bc8e5cfddf4142052b15ae78f1f3"
+      }
+    ],
+    "r5": [
+      {
+        "slot": "wave1",
+        "id": 10564055226,
+        "name": "v5-cross-domain-r5-first-wave-35381406873",
+        "digest": "sha256:a711f507365504bd59ca179bd3d76ea4c57d97caf6f6be85a6f4ef1f88629457"
+      },
+      {
+        "slot": "wave2_original",
+        "id": 10582866320,
+        "name": "v5-cross-domain-r5-second-wave-35436694271",
+        "digest": "sha256:1efbb3095cd74a18b13eccf94f1ebe0d044e2d7cc79fed9e7af5d63977d975b3"
+      },
+      {
+        "slot": "wave2_recovery",
+        "id": 10583013224,
+        "name": "v5-cross-domain-r5-second-wave-balance-recovery-35438000140",
+        "digest": "sha256:1331f55ec45f8fdbf71c7dd3aeee061d74f426c11dd3c51e17f4f2f78e443d5c"
+      },
+      {
+        "slot": "wave3",
+        "id": 10585010131,
+        "name": "v5-4-cross-domain-r5-canonical-wave3-35443060553",
+        "digest": "sha256:73258fc96ce845bf7a718e474b16a8b1867ebbf52d6e6a84f2d8637291cc01af"
+      },
+      {
+        "slot": "wave4",
+        "id": 10585287716,
+        "name": "v5-4-cross-domain-r5-canonical-wave4-35445012458",
+        "digest": "sha256:956db33a1d362b97eac2df0592479678d1f085f3764f4b4f205a88d79e522bb8"
+      },
+      {
+        "slot": "wave5",
+        "id": 10585925815,
+        "name": "v5-4-cross-domain-r5-canonical-wave5-exhaustive-35447065280",
+        "digest": "sha256:08fccf6652f29cb58ae9705b5464e532792ea3f29b65612a6181a2d01f74a0f2"
+      }
+    ],
+    "semantic": [
+      {
+        "slot": "wave1",
+        "id": 10580655035,
+        "name": "v5-cross-domain-r5r6-semantic-audit-wave1-35429324484",
+        "digest": "sha256:5fe13f15eed1771fb3e1f9ac1ab2f45d44ea8aeb48ec5cd1adc5c8f93456e717"
+      },
+      {
+        "slot": "wave2",
+        "id": 10583382240,
+        "name": "v5-cross-domain-r5r6-semantic-audit-wave2-35439402409",
+        "digest": "sha256:caa46faa5af4446764a4647485e098e703c946edc28d1ab45558b729287dde4b"
+      },
+      {
+        "slot": "wave3",
+        "id": 10584806811,
+        "name": "v5-4-r6-canonical-wave3-semantic-35444244497",
+        "digest": "sha256:096d062c878adfd9a7665fb517a916e382329a456b21e60357e1909a1b2014b2"
+      },
+      {
+        "slot": "wave4",
+        "id": 10584363936,
+        "name": "v5-4-r6-canonical-wave4-semantic-35445795406",
+        "digest": "sha256:4ba6d5414cab98c2fe6cfb54c609721ece6e5229f4644a1d9347e536e1cfb34d"
+      },
+      {
+        "slot": "wave5",
+        "id": 10586316150,
+        "name": "v5-4-r6-canonical-wave5-semantic-35448283795",
+        "digest": "sha256:7455ac4e16b393e5ddbc74195c6b0699fd6d3fd5e20ce0fab508060025b4cddf"
+      }
+    ]
+  },
+  "execution_boundary": {
+    "new_provider_calls": 0,
+    "new_paid_evaluator_calls": 0,
+    "subject_reruns": 0,
+    "mutate_raw_evidence": false,
+    "mutate_historical_semantic_audits": false,
+    "independent_blinded_replication": false
+  }
+}
