@@ -1,0 +1,66 @@
+name: Semantic Trajectory Reporting v1.8 Validate
+
+on:
+  pull_request:
+    paths:
+      - "configs/v5_4_semantic_trajectory_audit_rules_v0.1.json"
+      - "configs/process_reality_report_write_rules_v1_8.json"
+      - "schemas/semantic_trajectory_audit_v0.1.schema.json"
+      - "schemas/process_reality_report_evidence_bundle_v0.1.schema.json"
+      - "docs/semantic_trajectory_audit_contract_v0.1.md"
+      - "docs/reporting/process_reality_report_standard_v1_8.md"
+      - "docs/reporting/process_reality_theory_experiment_report_standard_v1_3.md"
+      - "docs/reporting/process_reality_experiment_report_template_v4.md"
+      - "scripts/validate_semantic_trajectory_reporting_v0_1.py"
+      - ".github/workflows/semantic-trajectory-reporting-v1-8-validate.yml"
+  push:
+    branches: [ main ]
+    paths:
+      - "configs/v5_4_semantic_trajectory_audit_rules_v0.1.json"
+      - "configs/process_reality_report_write_rules_v1_8.json"
+      - "schemas/semantic_trajectory_audit_v0.1.schema.json"
+      - "schemas/process_reality_report_evidence_bundle_v0.1.schema.json"
+      - "docs/semantic_trajectory_audit_contract_v0.1.md"
+      - "docs/reporting/process_reality_report_standard_v1_8.md"
+      - "docs/reporting/process_reality_theory_experiment_report_standard_v1_3.md"
+      - "docs/reporting/process_reality_experiment_report_template_v4.md"
+      - "scripts/validate_semantic_trajectory_reporting_v0_1.py"
+      - ".github/workflows/semantic-trajectory-reporting-v1-8-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate machine-readable semantic and reporting rules
+        run: python scripts/validate_semantic_trajectory_reporting_v0_1.py
+      - name: Assert reporting/audit rule layer cannot execute real subjects
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          files=[
+            'configs/v5_4_semantic_trajectory_audit_rules_v0.1.json',
+            'configs/process_reality_report_write_rules_v1_8.json',
+            'scripts/validate_semantic_trajectory_reporting_v0_1.py',
+            '.github/workflows/semantic-trajectory-reporting-v1-8-validate.yml',
+          ]
+          forbidden=['DEEPSEEK_API_KEY','DASHSCOPE_API_KEY','OPENAI_API_KEY','--execute-real','CALL_REAL_']
+          hits=[]
+          for f in files:
+              t=Path(f).read_text(encoding='utf-8')
+              for x in forbidden:
+                  if x in t:
+                      hits.append((f,x))
+          if hits:
+              raise SystemExit('real-provider capability in semantic/report rule layer: '+repr(hits))
+          print('PASS: rule layer contains no subject/provider execution authorization')
+          PY
