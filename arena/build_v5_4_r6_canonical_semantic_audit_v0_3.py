@@ -129,7 +129,7 @@ def build(*,structural_records_path: str, review_packages_path: str, review_mani
         "new_paid_evaluator_calls":0,
         "semantic_cpr_status":"NOT_ADJUDICATED",
         "is_domain_probability_denominator":False,
-        "claim_boundary":"This canonical Wave3 pass classifies five realized N0/R5-I case structures. It does not estimate domain prevalence, establish problematic bias, establish unique R5 causality, assess lineage completeness, authorize R7, or adjudicate CPR."
+        "claim_boundary":f"This canonical semantic pass classifies {len(case_summaries)} realized N0/R5-I case structures. It does not estimate domain prevalence, establish problematic bias, establish unique R5 causality, assess lineage completeness, authorize R7, or adjudicate CPR."
     }
     summary["summary_hash"]=stable_hash(summary)
     return audits,case_summaries,summary
