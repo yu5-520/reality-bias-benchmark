@@ -1,0 +1,100 @@
+name: V5.4 Wave5 Exhaustive Result Offline Validate
+
+on:
+  pull_request:
+    paths:
+      - "README.md"
+      - "manifests/v5_4_r5r6_canonical_wave5_exhaustive_2026-09-19_v0_1.json"
+      - "results/v5_4_r6_canonical_wave5_semantic_audit_v0_1/**"
+      - "docs/reports/2026-09-19/V5_4_Canonical_R5_R6_Wave5_Exhaustive_Result_Report_v1.md"
+      - ".github/workflows/v5-4-wave5-result-offline-validate.yml"
+  push:
+    branches: [ main ]
+    paths:
+      - "manifests/v5_4_r5r6_canonical_wave5_exhaustive_2026-09-19_v0_1.json"
+      - "results/v5_4_r6_canonical_wave5_semantic_audit_v0_1/**"
+      - ".github/workflows/v5-4-wave5-result-offline-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate frozen JSON
+        run: |
+          python -m json.tool manifests/v5_4_r5r6_canonical_wave5_exhaustive_2026-09-19_v0_1.json >/dev/null
+          python -m json.tool results/v5_4_r6_canonical_wave5_semantic_audit_v0_1/summary.json >/dev/null
+
+      - name: Validate exhaustive closure and cumulative pool
+        run: |
+          python - <<'PY'
+          import json
+          m=json.load(open('manifests/v5_4_r5r6_canonical_wave5_exhaustive_2026-09-19_v0_1.json'))
+          s=json.load(open('results/v5_4_r6_canonical_wave5_semantic_audit_v0_1/summary.json'))
+          assert m['status']=='FROZEN_CANONICAL_WAVE5_EXHAUSTIVE_COMPLETE'
+          assert m['scientific_role']=='EXHAUSTIVE_CLOSURE_OF_FROZEN_PASS1_R5_ELIGIBLE_SET'
+          assert m['r5']['case_count']==9
+          assert m['r5']['new_provider_branch_count']==9
+          assert m['r5']['synthetic_control_branch_count']==0
+          assert m['r5']['canonical_replicate_count']==1
+          assert m['r5']['natural_reference_rerun_count']==0
+          assert m['r6_structural']['case_count']==9
+          assert m['r6_structural']['semantic_audit_eligible_case_count']==9
+          assert m['r6_structural']['new_provider_calls']==0
+          assert m['r6_semantic']['case_count']==9
+          assert m['r6_semantic']['summary_hash']=='ecc84eec84d9f1f0fa11f4e9aff2eab89c22c3a7ac29f7ee472557e6aa24d2f3'
+          assert s['case_count']==9
+          assert s['semantic_adoption_supported_case_count']==9
+          assert s['decision_action_dependence_supported_case_count']==9
+          assert s['post_stimulus_persistence_supported_case_count']==9
+          assert s['system_inertia_supported_candidate_case_count']==0
+          assert s['normal_or_reanchored_persistence_case_count']==9
+          assert s['problematic_bias_established_case_count']==0
+          assert s['r5_unique_causal_attribution_established_case_count']==0
+          c=m['pass1_eligible_coverage']
+          assert c['frozen_pass1_r5_eligible_case_count']==29
+          assert c['canonical_completed_before_wave5']==20
+          assert c['exhaustive_wave5_case_count']==9
+          assert c['canonical_completed_after_wave5']==29
+          assert c['intentionally_unexecuted_pass1_eligible_case_count']==0
+          assert c['random_sampling_used'] is False
+          assert c['outcome_aware_case_selection_used'] is False
+          assert c['discretionary_screening_used'] is False
+          p=m['cumulative_canonical_mechanism_pool']
+          assert p['canonical_case_count']==29
+          assert p['canonical_r5_intervention_count']==29
+          assert p['semantic_adoption_supported_case_count']==29
+          assert p['post_stimulus_persistence_supported_case_count']==29
+          assert p['system_inertia_supported_candidate_case_count']==4
+          assert p['normal_or_reanchored_persistence_case_count']==25
+          assert p['remaining_pass1_r5_eligible_case_count']==0
+          assert p['pass1_eligible_coverage_complete'] is True
+          assert p['is_domain_probability_denominator'] is False
+          assert m['lineage_completeness_assessed'] is False
+          assert m['r7_authorized'] is False
+          assert m['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('PASS: Wave5 closes the frozen Pass-1 eligible set at 29/29 without changing claim boundaries')
+          PY
+
+      - name: Validate report boundary language
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('docs/reports/2026-09-19/V5_4_Canonical_R5_R6_Wave5_Exhaustive_Result_Report_v1.md').read_text()
+          assert '29 / 29' in p
+          assert 'remaining Pass-1 R5-eligible cases: **0**' in p
+          assert 'domain occurrence rate' in p
+          assert 'must not be generalized' in p
+          assert 'No existing N0 or R5-I branch should be rerun.' in p
+          assert 'R7 remains **NOT AUTHORIZED**' in p
+          assert 'CPR remains **NOT_ADJUDICATED**' in p
+          print('PASS: report preserves exhaustive-set and prevalence boundaries')
+          PY

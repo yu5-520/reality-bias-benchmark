@@ -341,34 +341,46 @@ Completed v5.3 passive R5-R6 structural + semantic audit wave 2:
 
 The wave-3 control replicate that encountered HTTP 402 only after 25 completed model calls was **not rerun**. It remains a late-truncated control context because restarting it from the frozen parent would create a new stochastic path rather than recover the realized trajectory.
 
-Canonical v5.4 R5-R6 mechanism-audit pool after Waves 1-4:
+Canonical v5.4 R5-R6 mechanism-audit pool after exhaustive Wave5 closure:
 
 - Wave1-2 historical evidence was reclassified canonically as **11 N0 references + 11 R5-I continuations**; historical extra same-parent branches remain supplementary sensitivity evidence;
 - Wave3: **5 cases = 5 R5-I trajectories**, estimated provider spend **USD 0.2235309**;
 - Wave4: **4 cases = 4 R5-I trajectories**, estimated provider spend **USD 0.23939382**;
-- Wave4 R5 workflow: `35445012458`; R6 structural workflow: `35445411177`; corrected semantic workflow: `35445795406`;
-- total canonical source-bound cases: **20**;
-- total canonical R5-I continuations: **20**;
-- semantic adoption: **20 / 20**;
-- post-stimulus persistence: **20 / 20**;
-- stronger System Inertia candidates: **4 / 20 cases**;
-- problematic bias established: **0 / 20**;
-- unique R5 causality established: **0 / 20**;
-- remaining pass-1 R5-eligible cases: **9**.
+- Wave5 exhaustive closure: **9 cases = 9 R5-I trajectories**, estimated provider spend **USD 0.608222526**;
+- Wave5 R5 workflow: `35447065280`; R6 structural workflow: `35447899994`; semantic workflow: `35448283795`;
+- frozen Pass-1 R5-eligible coverage: **29 / 29**;
+- intentionally unexecuted Pass-1 eligible cases: **0**;
+- total canonical source-bound cases: **29**;
+- total canonical R5-I continuations: **29**;
+- semantic adoption: **29 / 29**;
+- post-stimulus persistence: **29 / 29**;
+- stronger System Inertia candidates: **4 / 29 cases**;
+- normal / re-anchored persistence: **25 / 29 cases**;
+- problematic bias established: **0 / 29**;
+- unique R5 causality established: **0 / 29**;
+- remaining Pass-1 R5-eligible cases: **0**.
 
-Wave4 adds four more explicit re-anchoring structures: pre-existing compliance/portfolio gate, released allocation plan, feasibility/risk gate, and SRE/canary release gate. Together with Wave3, this further sharpens:
+Wave5 is an exhaustive set-difference closure, not a new sampled wave:
+
+`Pass1Eligible29 - CanonicalCompleted20 = 9`.
+
+No random sampling, outcome-aware ranking, replacement or discretionary screening was used inside this final nine-case batch. This closes one avoidable methodological criticism: within the already-frozen 29-case Pass-1 R5-eligible set, the final mechanism pool is not produced by stopping after convenient cases.
+
+All nine Wave5 cases again show downstream semantic adoption and persistence, but each is better explained by independent evidence re-anchoring or a pre-existing plan/gate than by a new source-specific constraint. The stronger distinction therefore remains:
 
 `post-stimulus persistence != System Inertia by default`.
 
 The first Wave4 semantic materialization is retained as a superseded metadata artifact because its reusable summary text still said Wave3/five cases; the corrected materialization changes no case-level semantic decisions.
 
-These cumulative numbers are **not a domain-probability denominator**. They describe a preselected canonical case-mechanism audit pool.
+The complete **4 / 29** classification is still **not a domain-probability denominator**. It describes the exhaustive frozen Pass-1 eligible mechanism-audit set, not the 90 natural-trajectory population.
 
 Wave3 report: `docs/reports/2026-09-19/V5_4_Canonical_R5_R6_Wave3_Result_Report_v1.md`.
 
 Wave4 report: `docs/reports/2026-09-19/V5_4_Canonical_R5_R6_Wave4_Result_Report_v1.md`.
 
-Wave4 result manifest: `manifests/v5_4_r5r6_canonical_wave4_2026-09-19_v0_1.json`.
+Wave5 exhaustive result report: `docs/reports/2026-09-19/V5_4_Canonical_R5_R6_Wave5_Exhaustive_Result_Report_v1.md`.
+
+Wave5 result manifest: `manifests/v5_4_r5r6_canonical_wave5_exhaustive_2026-09-19_v0_1.json`.
 
 Prospective sample geometry:
 
