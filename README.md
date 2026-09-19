@@ -6,23 +6,27 @@ Historical evidence remains append-only. Forward methods are versioned rather th
 
 ## Current forward layer
 
-The current forward methodological layer is **Process Reality v5.1**.
+The current forward methodological layer is **Process Reality v5.3**.
 
-v5.0 established the major theory/experiment-chain migration. v5.1 refines the engineering layer around semantic-lineage scoped repair. It does **not** add a new R stage and does **not** mutate historical v4.5.1 evidence, condition IDs or frozen design hashes.
+v5.1/v5.2 remain predecessor forward layers for semantic-lineage repair and R7/R8 separation. v5.3 adds the mandatory scientific boundary:
+
+`domain-level probability != case-level structure != fixed-parent local sensitivity`.
+
+It adds no new R stage and mutates no frozen historical or executed evidence.
 
 Core forward files:
 
-- \`docs/R_Plan_v5.0.md\`
-- \`theory/theory_contract_v0.11.md\`
-- \`docs/first_paper_v5_scope.md\`
-- \`docs/v5_concept_mapping.md\`
-- \`docs/v5_structural_observability_contract_v0.1.md\`
-- \`docs/R5_structural_scouting_and_driver_probe_protocol_v1.0.md\`
-- \`docs/R6_structural_support_trace_control_surface_protocol_v1.0.md\`
-- \`docs/R7_localized_recovery_protocol_v1.0.md\`
-- \`docs/v5_whole_process_experiment_protocol_v0.1.md\`
-- \`docs/reporting/process_reality_report_standard_v1_7.md\`
-- \`manifests/process_reality_v5_methodological_migration_2026-09-18.json\`
+- `docs/R_Plan_v5.3.md`
+- `theory/theory_contract_v0.14.md`
+- `docs/first_paper_v5_3_scope.md`
+- `configs/process_reality_probability_structure_separation_v1.0.json`
+- `docs/cross_domain_probability_structure_interpretation_addendum_v0.1.md`
+- `docs/R5_structural_scouting_and_driver_probe_protocol_v1.1.md`
+- `docs/R6_structural_support_trace_control_surface_protocol_v1.1.md`
+- `docs/cross_domain_case_progression_contract_v0.2.md`
+- `docs/v5_whole_process_experiment_protocol_v0.2.md`
+- `docs/reporting/process_reality_theory_experiment_report_standard_v1_1.md`
+- `docs/R7_localized_recovery_protocol_v1.0.md`
 
 The historical v4.5.1 layer remains frozen for evidence already bound to it.
 
@@ -32,7 +36,7 @@ Forward reports now use a trajectory-semantic evidence profile:
 
 - `docs/reporting/process_reality_report_standard_v1_7.md`
 - `docs/reporting/process_reality_experiment_report_template_v3.md`
-- `docs/reporting/process_reality_theory_experiment_report_standard_v1_0.md`
+- `docs/reporting/process_reality_theory_experiment_report_standard_v1_1.md`
 - `docs/reporting/process_reality_engineering_experiment_report_standard_v1_1.md`
 
 Core rule:
@@ -45,6 +49,39 @@ Current R7 engineering report:
 
 - `docs/reports/2026-09-18/R7_Process_Integrity_Engineering_Experiment_Report_v2.md`
 - `manifests/r7_process_integrity_engineering_report_2026-09-18_v1.json`
+
+## Probability / structure separation
+
+The cross-domain program now uses two different scientific units.
+
+**Probability layer**
+
+`Domain Environment -> natural stochastic trajectory population -> occurrence / distribution`
+
+The held-out three-domain first round is the probability experiment:
+
+- finance: 30 natural trajectories;
+- supply_chain: 30 natural trajectories;
+- software_engineering: 30 natural trajectories.
+
+**Structure layer**
+
+`realized natural case -> localized semantic audit -> optional R5 probe -> passive R6 structure -> lineage completeness gate -> optional R7`
+
+R5/R6 do not re-estimate domain probability.
+
+Entering R6 does **not** require an additional provider run.
+
+Repeated trials from one frozen parent are only:
+
+`SUPPLEMENTARY_LOCAL_CONDITIONAL_SENSITIVITY`
+
+They cannot estimate domain prevalence, gate R6, gate R7, or erase a carrier/read/adoption/persistence chain already recorded in a realized case.
+
+Interpretation correction:
+
+- `docs/reports/2026-09-19/V5_Cross_Domain_Probability_Structure_Interpretation_Correction_v1.md`;
+- `manifests/v5_cross_domain_probability_structure_reclassification_2026-09-19_v0_1.json`.
 
 ## Cross-domain first-round experiment
 
@@ -149,14 +186,17 @@ Completed cross-domain R5 first wave:
 
 The R5 result therefore distinguishes **structural sensitivity** from **semantic/material effect**. Universal exact-output divergence is not treated as causal evidence because provider stochasticity remains a competing explanation.
 
-R6 now retains one bounded mechanism candidate from supply-chain wave 4. In one intervention replicate, the one-shot authority withdrawal is followed by a new `inventory_coverage_assessment` and plan revision, then downstream adoption by risk, supply_lead and sales after the direct stimulus has disappeared. The second replicate does not reproduce the same material path reconfiguration, so:
+R6 has one evidence-bound realized structure from supply-chain wave 4. In one R5 intervention continuation, the one-shot authority withdrawal is followed by a new `inventory_coverage_assessment` and plan revision, then downstream read/adoption by risk, supply_lead and sales after the direct stimulus has disappeared.
 
-- post-consumption persistence in that branch: **OBSERVED**;
-- intervention specificity: **NOT ESTABLISHED**;
-- System Inertia: **NOT ESTABLISHED**;
-- R7 repair authorization: **NO**.
+Under v5.3 this is interpreted at the **case-structure** level:
 
-A targeted R6 specificity follow-up was executed for the same parent:
+- carrier/read/adoption/persistence chain: **SUPPORTED IN THE REALIZED BRANCH**;
+- R6 entry: **already satisfied from frozen R5 evidence**;
+- case-level System Inertia: **SUPPORTED CANDIDATE PENDING LINEAGE COMPLETENESS REVIEW**;
+- domain-level occurrence rate: **must be derived from natural supply-chain trajectories**;
+- R7 repair authorization: **NO — pending case-level lineage completeness reassessment**.
+
+A later fixed-parent follow-up was executed for the same parent, but is now reclassified as supplementary local conditional sensitivity:
 
 - config: `configs/v5_cross_domain_r6_targeted_specificity_v0.1.json`;
 - target: `wave-4-8b1731b57396`;
@@ -170,13 +210,16 @@ A targeted R6 specificity follow-up was executed for the same parent:
 - combined target-case evidence: **10 matched pairs**;
 - exact `no standard transfer -> procurement / expedite` phenotype: control **0 / 10**, intervention **1 / 10**;
 - the eight new intervention branches reproduced that exact phenotype **0 / 8**;
-- intervention specificity: **NOT ESTABLISHED AFTER TARGETED EXTENSION**;
-- System Inertia: **NOT ESTABLISHED**;
-- R7 entry: **R7_NOT_RUN**;
-- report: `docs/reports/2026-09-19/V5_Cross_Domain_R6_Targeted_Specificity_Result_v1.md`;
-- result manifest: `manifests/v5_cross_domain_r6_targeted_specificity_2026-09-19_v0_1.json`.
+- exact-phenotype local recurrence: control **0 / 10**, intervention **1 / 10**;
+- eight new intervention branches reproduced the exact phenotype **0 / 8**;
+- forward role: **SUPPLEMENTARY_LOCAL_CONDITIONAL_SENSITIVITY**;
+- estimates domain probability: **NO**;
+- required for R6 entry: **NO**;
+- required for R7 entry: **NO**;
+- historical result report: `docs/reports/2026-09-19/V5_Cross_Domain_R6_Targeted_Specificity_Result_v1.md`;
+- reclassification: `docs/cross_domain_probability_structure_interpretation_addendum_v0.1.md`.
 
-The original wave-4 intervention branch remains a valid carrier/read/adoption/persistence observation. It is retained as a low-frequency mechanism candidate, but the targeted extension did not establish intervention-specific recurrence. R7 is therefore not entered for this case.
+The follow-up bounds local recurrence of one exact phenotype. It does not negate the original realized carrier/read/adoption/persistence chain. R7 status is now `NOT_AUTHORIZED_PENDING_CASE_LEVEL_LINEAGE_COMPLETENESS_REASSESSMENT`.
 
 Prospective sample geometry:
 
@@ -248,11 +291,13 @@ R5 reduces semantic-audit surface and may use a minimal probe to test source-inf
 
 Historical \`fact -> unconfirmed\` remains one probe family, not the definition of R5.
 
-### R6 — structural support / trace / control surface
+### R6 — passive case-level structural identification
 
-R6 maps source, transformations, support, pool, exposure, upstream trace, downstream closure and candidate intervention surfaces.
+R6 consumes already-frozen natural/R5 evidence and maps source, carrier/support, downstream read, adoption, persistence, affected closure and candidate intervention surfaces.
 
-System Inertia remains a downstream property rather than the entire R6 object.
+Entering R6 does not require an additional provider experiment.
+
+System Inertia may be reported as a case-level property; its domain-level occurrence rate belongs to the natural trajectory population.
 
 ### R7 — localized recovery
 

@@ -67,6 +67,18 @@ def main() -> None:
         "arena/tests/test_r5r6_r7_entry_audit.py",
         "arena/r7_semantic_repair_runtime.py",
         "arena/tests/test_r7_semantic_repair_runtime.py",
+        # v5.3 probability / structure separation
+        "docs/R_Plan_v5.3.md",
+        "theory/theory_contract_v0.14.md",
+        "docs/first_paper_v5_3_scope.md",
+        "configs/process_reality_probability_structure_separation_v1.0.json",
+        "docs/R5_structural_scouting_and_driver_probe_protocol_v1.1.md",
+        "docs/R6_structural_support_trace_control_surface_protocol_v1.1.md",
+        "docs/cross_domain_case_progression_contract_v0.2.md",
+        "docs/v5_whole_process_experiment_protocol_v0.2.md",
+        "docs/reporting/process_reality_theory_experiment_report_standard_v1_1.md",
+        "manifests/v5_cross_domain_probability_structure_reclassification_2026-09-19_v0_1.json",
+        "scripts/validate_probability_structure_separation_v1.py",
     ]
     for path in required_files:
         require((ROOT / path).exists(), f"missing required v5/v5.1 file: {path}")
@@ -174,14 +186,28 @@ def main() -> None:
         "preserved_unrelated_structure",
     ])
     require_tokens("README.md", [
-        "Process Reality v5.1",
+        "Process Reality v5.3",
         "Semantic Lineage Closure",
         "LINEAGE_GAP",
         "Theory Experiment Report",
         "Engineering Experiment Report",
     ])
 
-    print("PASS: Process Reality v5.1 semantic-lineage scoped repair layer is synchronized")
+    separation = load_json("configs/process_reality_probability_structure_separation_v1.0.json")
+    require(separation["status"] == "FORWARD_ACTIVE_V5_3", "v5.3 separation contract not active")
+    require(separation["primary_separation"]["probability_unit"] == "DOMAIN_ENVIRONMENT_TRAJECTORY_POPULATION", "v5.3 probability unit mismatch")
+    require(separation["primary_separation"]["structure_unit"] == "NATURALLY_REALIZED_SOURCE_BOUND_CASE", "v5.3 structure unit mismatch")
+    require(separation["invariants"]["r6_requires_new_subject_experiment"] is False, "R6 incorrectly requires a new subject experiment")
+    require(separation["invariants"]["fixed_parent_repetition_estimates_domain_probability"] is False, "fixed-parent repetition incorrectly estimates domain probability")
+    require(separation["invariants"]["fixed_parent_nonreproduction_negates_realized_case_structure"] is False, "fixed-parent nonreproduction incorrectly negates case structure")
+    require(separation["invariants"]["r7_gate_depends_on_fixed_parent_recurrence_frequency"] is False, "R7 incorrectly depends on fixed-parent recurrence")
+
+    reclass = load_json("manifests/v5_cross_domain_probability_structure_reclassification_2026-09-19_v0_1.json")
+    require(reclass["frozen_evidence_mutated"] is False, "v5.3 reclassification mutated frozen evidence")
+    require(reclass["reclassified_followup"]["forward_role"] == "SUPPLEMENTARY_LOCAL_CONDITIONAL_SENSITIVITY", "targeted follow-up role mismatch")
+    require(reclass["wave4_forward_status"]["r7_status"] == "NOT_AUTHORIZED_PENDING_CASE_LEVEL_LINEAGE_COMPLETENESS_REASSESSMENT", "wave4 R7 boundary mismatch")
+
+    print("PASS: Process Reality v5.3 probability/structure + semantic-lineage layers are synchronized")
     print(f"LEGACY_R6D_DESIGN_HASH={LEGACY_R6D_DESIGN_HASH}")
     print("HISTORICAL_EVIDENCE_MUTATED=NO")
     print("SCIENTIFIC_PROVIDER_RUN_AUTHORIZED=NO")
