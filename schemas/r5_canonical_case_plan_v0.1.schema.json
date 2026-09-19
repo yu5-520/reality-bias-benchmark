@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-R5-CANONICAL-CASE-PLAN-v0.1",
+  "title": "R5 Canonical Case Plan",
+  "type": "object",
+  "required": [
+    "schema",
+    "case_id",
+    "source_run_id",
+    "source_trace_hash",
+    "natural_reference",
+    "parent_state_hash",
+    "state_key",
+    "source_event_index",
+    "expected_first_resume_actor",
+    "one_shot_envelope_hash",
+    "branch_hash"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-R5-CANONICAL-CASE-PLAN-v0.1"
+    },
+    "case_id": {
+      "type": "string"
+    },
+    "source_run_id": {
+      "type": "string"
+    },
+    "source_trace_hash": {
+      "type": "string"
+    },
+    "natural_reference": {
+      "type": "object"
+    },
+    "parent_state_hash": {
+      "type": "string"
+    },
+    "state_key": {
+      "type": "string"
+    },
+    "source_event_index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "expected_first_resume_actor": {
+      "type": "string"
+    },
+    "one_shot_envelope_hash": {
+      "type": "string"
+    },
+    "branch_hash": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "RB-V5.4-R5-R7-CANONICAL-RECLASSIFICATION-v0.1",
+  "date": "2026-09-19",
+  "status": "APPEND_ONLY_FORWARD_RECLASSIFICATION",
+  "historical_evidence_mutated": false,
+  "r5": {
+    "historical_wave1": {
+      "workflow_run_id": 35381406873,
+      "case_count": 6,
+      "executed_branch_count": 24
+    },
+    "historical_wave2": {
+      "workflow_run_id": 35436694271,
+      "case_count": 5,
+      "executed_branch_count": 20
+    },
+    "forward_canonical_rule": {
+      "natural_reference": "ORIGINAL_FROZEN_NATURAL_TRAJECTORY",
+      "intervention_selection": "REPLICATE_INDEX_1_AND_CONDITION_ONE_SHOT_JUMP_INTERVENTION",
+      "selection_is_outcome_aware": false,
+      "canonical_new_intervention_count_per_case": 1,
+      "synthetic_control_role": "SUPPLEMENTARY_LOCAL_CONDITIONAL_SENSITIVITY",
+      "additional_intervention_repeats_role": "SUPPLEMENTARY_LOCAL_CONDITIONAL_SENSITIVITY"
+    },
+    "canonical_case_count_first_two_waves": 11,
+    "canonical_r5_intervention_count_first_two_waves": 11
+  },
+  "r7": {
+    "historical_formal_workflow_run_id": 35337137091,
+    "historical_c3_v5_4_workflow_run_id": 35345821598,
+    "mapping": {
+      "C1_ONE_SHOT": "R5_I_REFERENCE_NOT_CANONICAL_R7_EXECUTION",
+      "C2_PERSISTENT_FIELD": "R7_P_PERSISTENT_SEMANTIC",
+      "C3_ALR": "R7_S_STRUCTURED_LINEAGE_REPAIR"
+    },
+    "historical_extra_triads_role": "SUPPLEMENTARY_ENGINEERING_ROBUSTNESS",
+    "forward_canonical_replicate_count": 1,
+    "forward_new_branch_count_per_case": 2
+  },
+  "negative_operator_evidence": {
+    "workflow_run_id": 35336287388,
+    "interpretation": "STOCHASTIC_ROLLBACK_REPLAY_DID_NOT_RELIABLY_REGENERATE_KNOWN_HISTORICAL_SEMANTIC_OBJECT",
+    "forward_role": "NEGATIVE_OPERATOR_EVIDENCE_FOR_REPLAY_AS_REPAIR"
+  },
+  "frozen_evidence_mutated": false,
+  "provider_call_authorized": false
+}

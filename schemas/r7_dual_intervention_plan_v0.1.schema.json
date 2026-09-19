@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-R7-DUAL-INTERVENTION-EXECUTION-PLAN-v0.1",
+  "title": "R7 Canonical Dual Intervention Plan",
+  "type": "object",
+  "required": [
+    "schema",
+    "case_id",
+    "canonical_arm_ids",
+    "canonical_replicate_count",
+    "branch_count",
+    "r5_c1_reference_execution_count",
+    "new_provider_branch_count",
+    "plan_hash"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-R7-DUAL-INTERVENTION-EXECUTION-PLAN-v0.1"
+    },
+    "case_id": {
+      "type": "string"
+    },
+    "canonical_arm_ids": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "const": "R7_P_PERSISTENT_SEMANTIC"
+        },
+        {
+          "const": "R7_S_STRUCTURED_LINEAGE_REPAIR"
+        }
+      ],
+      "items": false
+    },
+    "canonical_replicate_count": {
+      "const": 1
+    },
+    "branch_count": {
+      "const": 2
+    },
+    "r5_c1_reference_execution_count": {
+      "const": 0
+    },
+    "new_provider_branch_count": {
+      "const": 2
+    },
+    "plan_hash": {
+      "type": "string"
+    }
+  }
+}

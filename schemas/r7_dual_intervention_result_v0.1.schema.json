@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-R7-DUAL-INTERVENTION-RESULT-v0.1",
+  "title": "R7 Canonical Dual Intervention Result",
+  "type": "object",
+  "required": [
+    "schema",
+    "case_id",
+    "r7_p_run_id",
+    "r7_s_run_id",
+    "r5_reference_rerun",
+    "canonical_replicate_count",
+    "semantic_cpr_status"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-R7-DUAL-INTERVENTION-RESULT-v0.1"
+    },
+    "case_id": {
+      "type": "string"
+    },
+    "r7_p_run_id": {
+      "type": "string"
+    },
+    "r7_s_run_id": {
+      "type": "string"
+    },
+    "r5_reference_rerun": {
+      "const": false
+    },
+    "canonical_replicate_count": {
+      "const": 1
+    },
+    "semantic_cpr_status": {
+      "const": "NOT_ADJUDICATED"
+    }
+  }
+}

@@ -1,0 +1,104 @@
+name: V5.4 Canonical Geometry Offline Validate
+
+on:
+  pull_request:
+    paths:
+      - "theory/theory_contract_v0.15.md"
+      - "theory/change_notes/CN-R-061_canonical_r5_r7_geometry.md"
+      - "docs/R_Plan_v5.4.md"
+      - "docs/first_paper_v5_4_scope.md"
+      - "docs/v5_whole_process_experiment_protocol_v0.3.md"
+      - "docs/R5_canonical_single_intervention_protocol_v1.0.md"
+      - "docs/R7_dual_intervention_protocol_v2.0.md"
+      - "docs/canonical_stochastic_realization_principle_v1.0.md"
+      - "docs/legacy_execution_geometry_registry_v1.0.md"
+      - "docs/cross_domain_case_progression_contract_v0.3.md"
+      - "docs/R5_structural_scouting_and_driver_probe_protocol_v1.2.md"
+      - "docs/R6_structural_support_trace_control_surface_protocol_v1.2.md"
+      - "docs/reporting/process_reality_theory_experiment_report_standard_v1_2.md"
+      - "docs/reporting/process_reality_engineering_experiment_report_standard_v1_2.md"
+      - "configs/process_reality_canonical_experiment_geometry_v1.0.json"
+      - "configs/r7_process_integrity_engineering_contract_v0.5.json"
+      - "manifests/v5_4_r5_r7_canonical_reclassification_2026-09-19_v0_1.json"
+      - "schemas/r5_canonical_*.json"
+      - "schemas/r7_dual_*.json"
+      - "arena/prepare_v5_cross_domain_r5_canonical.py"
+      - "arena/run_v5_cross_domain_r5_canonical.py"
+      - "arena/freeze_v5_cross_domain_r5_canonical.py"
+      - "arena/prepare_r7_dual_intervention_plan.py"
+      - "arena/run_r7_dual_intervention_real.py"
+      - "arena/freeze_r7_dual_intervention_evidence.py"
+      - "arena/tests/test_v5_4_canonical_geometry.py"
+      - "scripts/validate_canonical_r5_r7_geometry_v1.py"
+      - "scripts/validate_process_reality_v5.py"
+      - "README.md"
+      - ".github/workflows/v5-4-canonical-geometry-offline-validate.yml"
+  push:
+    branches: [ main ]
+    paths:
+      - "theory/theory_contract_v0.15.md"
+      - "docs/R_Plan_v5.4.md"
+      - "configs/process_reality_canonical_experiment_geometry_v1.0.json"
+      - "arena/*canonical*.py"
+      - "arena/*dual_intervention*.py"
+      - "scripts/validate_canonical_r5_r7_geometry_v1.py"
+      - ".github/workflows/v5-4-canonical-geometry-offline-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  canonical-geometry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate JSON contracts
+        run: |
+          set -euo pipefail
+          python -m json.tool configs/process_reality_canonical_experiment_geometry_v1.0.json >/dev/null
+          python -m json.tool configs/r7_process_integrity_engineering_contract_v0.5.json >/dev/null
+          python -m json.tool manifests/v5_4_r5_r7_canonical_reclassification_2026-09-19_v0_1.json >/dev/null
+          python -m json.tool schemas/r5_canonical_case_plan_v0.1.schema.json >/dev/null
+          python -m json.tool schemas/r5_canonical_evidence_pair_v0.1.schema.json >/dev/null
+          python -m json.tool schemas/r7_dual_intervention_plan_v0.1.schema.json >/dev/null
+          python -m json.tool schemas/r7_dual_intervention_result_v0.1.schema.json >/dev/null
+
+      - name: Compile forward canonical runners
+        run: |
+          set -euo pipefail
+          python -m py_compile             arena/prepare_v5_cross_domain_r5_canonical.py             arena/run_v5_cross_domain_r5_canonical.py             arena/freeze_v5_cross_domain_r5_canonical.py             arena/prepare_r7_dual_intervention_plan.py             arena/run_r7_dual_intervention_real.py             arena/freeze_r7_dual_intervention_evidence.py             scripts/validate_canonical_r5_r7_geometry_v1.py             scripts/validate_process_reality_v5.py
+
+      - name: Run canonical geometry unit tests
+        run: |
+          python -m unittest arena.tests.test_v5_4_canonical_geometry -v
+
+      - name: Run v5.4 canonical geometry validator
+        run: |
+          python scripts/validate_canonical_r5_r7_geometry_v1.py
+
+      - name: Revalidate full Process Reality method layer
+        run: |
+          python scripts/validate_process_reality_v5.py
+
+      - name: Verify no execution authorization
+        run: |
+          python - <<'PY'
+          import json
+          g=json.load(open('configs/process_reality_canonical_experiment_geometry_v1.0.json'))
+          assert g['authorization']=={
+              'provider_calls':False,
+              'paid_evaluator':False,
+              'active_r7':False,
+              'cpr':False,
+          }
+          assert g['r5']['new_provider_branches_per_case']==1
+          assert g['r6']['new_subject_provider_branches_per_case']==0
+          assert g['r7']['new_provider_branches_per_case']==2
+          print('PASS: v5.4 update changes method/code geometry only; no subject run authorized')
+          PY

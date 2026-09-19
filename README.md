@@ -6,27 +6,32 @@ Historical evidence remains append-only. Forward methods are versioned rather th
 
 ## Current forward layer
 
-The current forward methodological layer is **Process Reality v5.3**.
+The current forward methodological layer is **Process Reality v5.4**.
 
-v5.1/v5.2 remain predecessor forward layers for semantic-lineage repair and R7/R8 separation. v5.3 adds the mandatory scientific boundary:
+v5.3 remains the probability/structure separation predecessor. v5.4 adds the canonical stochastic-realization geometry:
 
-`domain-level probability != case-level structure != fixed-parent local sensitivity`.
+`domain probability != realized case != intervention mode != supplementary repetition`.
 
-It adds no new R stage and mutates no frozen historical or executed evidence.
+No new R stage is added and no frozen historical evidence is mutated.
+
+Canonical case matrix:
+
+`N0 frozen natural -> R5-I one-shot -> R6 passive -> {R7-P persistent, R7-S structured repair} -> R8`.
 
 Core forward files:
 
-- `docs/R_Plan_v5.3.md`
-- `theory/theory_contract_v0.14.md`
-- `docs/first_paper_v5_3_scope.md`
-- `configs/process_reality_probability_structure_separation_v1.0.json`
-- `docs/cross_domain_probability_structure_interpretation_addendum_v0.1.md`
-- `docs/R5_structural_scouting_and_driver_probe_protocol_v1.1.md`
-- `docs/R6_structural_support_trace_control_surface_protocol_v1.1.md`
-- `docs/cross_domain_case_progression_contract_v0.2.md`
-- `docs/v5_whole_process_experiment_protocol_v0.2.md`
-- `docs/reporting/process_reality_theory_experiment_report_standard_v1_1.md`
-- `docs/R7_localized_recovery_protocol_v1.0.md`
+- `docs/R_Plan_v5.4.md`
+- `theory/theory_contract_v0.15.md`
+- `docs/first_paper_v5_4_scope.md`
+- `configs/process_reality_canonical_experiment_geometry_v1.0.json`
+- `docs/R5_canonical_single_intervention_protocol_v1.0.md`
+- `docs/R7_dual_intervention_protocol_v2.0.md`
+- `docs/v5_whole_process_experiment_protocol_v0.3.md`
+- `docs/canonical_stochastic_realization_principle_v1.0.md`
+- `docs/legacy_execution_geometry_registry_v1.0.md`
+- `configs/r7_process_integrity_engineering_contract_v0.5.json`
+
+v5.3 source files remain frozen predecessor interfaces, including `docs/R_Plan_v5.3.md`, `theory/theory_contract_v0.14.md` and `configs/process_reality_probability_structure_separation_v1.0.json`.
 
 The historical v4.5.1 layer remains frozen for evidence already bound to it.
 
@@ -36,12 +41,14 @@ Forward reports now use a trajectory-semantic evidence profile:
 
 - `docs/reporting/process_reality_report_standard_v1_7.md`
 - `docs/reporting/process_reality_experiment_report_template_v3.md`
-- `docs/reporting/process_reality_theory_experiment_report_standard_v1_1.md`
-- `docs/reporting/process_reality_engineering_experiment_report_standard_v1_1.md`
+- `docs/reporting/process_reality_theory_experiment_report_standard_v1_2.md`
+- `docs/reporting/process_reality_engineering_experiment_report_standard_v1_2.md`
 
 Core rule:
 
 `Frozen structural facts -> realized Agent path -> evidence-bound semantic interpretation -> claim boundary`
+
+v5.4 reporting additionally requires separate accounting for canonical new provider trajectories versus supplementary repeated sampling. Historical executed branch totals cannot substitute for canonical case counts.
 
 Aggregate topology and hashes remain the factual substrate, but they do not replace the realized Agent path when path evidence exists.
 
@@ -49,6 +56,59 @@ Current R7 engineering report:
 
 - `docs/reports/2026-09-18/R7_Process_Integrity_Engineering_Experiment_Report_v2.md`
 - `manifests/r7_process_integrity_engineering_report_2026-09-18_v1.json`
+
+## Canonical R5 / R7 geometry
+
+Forward subject execution now uses realized-path geometry rather than same-parent resampling as the main experiment.
+
+**R5**
+
+`1 selected case = existing N0 natural reference + exactly 1 new R5-I one-shot continuation`.
+
+Machine boundary:
+
+- new synthetic control branches: **0**;
+- new intervention branches per case: **1**;
+- canonical replicate count: **1**;
+- natural reference rerun: **NO**.
+
+Forward interfaces:
+
+- `arena/prepare_v5_cross_domain_r5_canonical.py`;
+- `arena/run_v5_cross_domain_r5_canonical.py`;
+- `arena/freeze_v5_cross_domain_r5_canonical.py`.
+
+**R6**
+
+R6 remains passive and adds **0** subject/provider trajectories.
+
+**R7**
+
+R7 now has exactly two canonical intervention modes:
+
+- `R7-P` — persistent semantic correction;
+- `R7-S` — structured lineage repair.
+
+R5-I/C1 is a frozen reference and is not rerun inside R7.
+
+Per R7-qualified case:
+
+- R7-P: **1** new trajectory;
+- R7-S: **1** new trajectory;
+- C1 reruns: **0**;
+- canonical replicates: **1**.
+
+Forward interfaces:
+
+- `arena/prepare_r7_dual_intervention_plan.py`;
+- `arena/run_r7_dual_intervention_real.py`;
+- `arena/freeze_r7_dual_intervention_evidence.py`.
+
+Historical matched-pair R5 and historical C1/C2/C3 R7 runs remain immutable. Their extra same-parent branches are reclassified as supplementary local sensitivity / engineering robustness rather than canonical evidence admission.
+
+Canonical provider geometry for a case reaching R7:
+
+`R5 1 + R6 0 + R7 2 = 3 new provider trajectories`.
 
 ## Probability / structure separation
 
