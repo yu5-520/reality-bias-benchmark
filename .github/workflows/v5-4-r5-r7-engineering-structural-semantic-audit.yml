@@ -1,0 +1,233 @@
+name: V5.4 R5-R7 Engineering Structural Semantic Audit
+
+on:
+  pull_request:
+    paths:
+      - "configs/v5_4_r5_r7_engineering_structural_semantic_audit_v0.1.json"
+      - "schemas/engineering_structural_semantic_audit_v0.1.schema.json"
+      - "schemas/engineering_report_evidence_bundle_v0.1.schema.json"
+      - "docs/engineering_structural_semantic_audit_contract_v0.1.md"
+      - "docs/reporting/process_reality_engineering_experiment_report_standard_v1_3.md"
+      - "arena/build_v5_4_r5_r7_engineering_structural_semantic_audit.py"
+      - "scripts/validate_engineering_structural_semantic_audit_v0_1.py"
+      - ".github/workflows/v5-4-r5-r7-engineering-structural-semantic-audit.yml"
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  offline-validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate engineering semantic contracts
+        run: |
+          set -euo pipefail
+          python -m json.tool configs/v5_4_r5_r7_engineering_structural_semantic_audit_v0.1.json >/dev/null
+          python -m json.tool schemas/engineering_structural_semantic_audit_v0.1.schema.json >/dev/null
+          python -m json.tool schemas/engineering_report_evidence_bundle_v0.1.schema.json >/dev/null
+          python -m py_compile arena/build_v5_4_r5_r7_engineering_structural_semantic_audit.py
+          python scripts/validate_engineering_structural_semantic_audit_v0_1.py
+
+  materialize:
+    if: >-
+      github.event_name == 'issues' &&
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5.4 R5-R7 ENGINEERING STRUCTURAL SEMANTIC AUDIT'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      REQUEST_BODY: ${{ github.event.issue.body }}
+      EXPECTED_EXECUTION_PHRASE: MATERIALIZE_V5_4_R5_R7_ENGINEERING_STRUCTURAL_SEMANTIC
+      CONFIG: configs/v5_4_r5_r7_engineering_structural_semantic_audit_v0.1.json
+      OUTDIR: results/v5_4_r5_r7_engineering_structural_semantic_audit
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact passive request
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['REQUEST_BODY'].splitlines():
+              line=raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit('invalid request line')
+              k,v=line.split('=',1)
+              if k in rows:
+                  raise SystemExit('duplicate request key '+k)
+              rows[k]=v
+          required={'execution_phrase','expected_main_sha','materialization_id','control_plane'}
+          assert set(rows)==required,sorted(rows)
+          assert rows['execution_phrase']==os.environ['EXPECTED_EXECUTION_PHRASE']
+          assert rows['expected_main_sha']==os.environ['GITHUB_SHA']
+          assert rows['control_plane']=='CHAT_EXECUTION_BRIDGE_V5_4_R5_R7_ENGINEERING_SEMANTIC_v0.1'
+          assert re.fullmatch(r'[A-Za-z0-9._-]{8,100}',rows['materialization_id'])
+          print('PASS: exact passive R5-R7 engineering semantic request')
+          PY
+
+      - name: Validate contracts and exact frozen artifact identities
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python scripts/validate_engineering_structural_semantic_audit_v0_1.py
+          python - <<'PY'
+          import json,os,subprocess
+          cfg=json.load(open(os.environ['CONFIG']))
+          repo=os.environ['GITHUB_REPOSITORY']
+          rows=[
+              ('r2r6_complete_route',cfg['artifacts']['r2r6_complete_route']),
+              ('r6_lineage',cfg['artifacts']['r6_lineage']),
+              ('r7_raw',cfg['artifacts']['r7_raw']),
+              ('r7_structural',cfg['artifacts']['r7_structural']),
+              ('r7_semantic',cfg['artifacts']['r7_semantic']),
+          ]
+          for label,x in rows:
+              meta=json.loads(subprocess.check_output(
+                  ['gh','api',f"repos/{repo}/actions/artifacts/{x['id']}"],text=True
+              ))
+              assert meta['name']==x['name'],(label,'name',meta['name'],x['name'])
+              assert meta.get('digest')==x['digest'],(label,'digest',meta.get('digest'),x['digest'])
+              assert not meta.get('expired'),(label,'expired')
+          print('PASS: all R5-R7 frozen source artifact identities verified')
+          PY
+
+      - name: Download required frozen engineering evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source /tmp/eng-zips
+          python - <<'PY' > /tmp/engineering-artifacts.tsv
+          import json,os
+          p=json.load(open(os.environ['CONFIG']))
+          for key in ['r2r6_complete_route','r6_lineage','r7_raw','r7_structural','r7_semantic']:
+              print(key+'\t'+str(p['artifacts'][key]['id']))
+          PY
+          while IFS=$'\t' read -r kind id; do
+            zip="/tmp/eng-zips/${kind}-${id}.zip"
+            dest="source/${kind}"
+            mkdir -p "$dest"
+            curl -L --fail --silent --show-error               -H "Authorization: Bearer $GH_TOKEN"               -H "Accept: application/vnd.github+json"               -H "X-GitHub-Api-Version: 2022-11-28"               "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$id/zip"               -o "$zip"
+            case "$kind" in
+              r2r6_complete_route)
+                unzip -q "$zip" '*semantic_trajectory_audits.jsonl' -d "$dest"
+                ;;
+              r6_lineage)
+                unzip -q "$zip"                   '*case_summaries.jsonl'                   '*lineage_completeness_gates.jsonl'                   '*semantic_lineage_closures.jsonl'                   '*semantic_repair_packets.jsonl'                   -d "$dest"
+                ;;
+              r7_raw)
+                unzip -q "$zip" 'results/*/raw/cases/*/raw/traces.jsonl' -d "$dest"
+                ;;
+              r7_structural)
+                unzip -q "$zip"                   '*r7_dual_case_index.jsonl'                   '*r7_dual_structural_comparisons.jsonl'                   -d "$dest"
+                ;;
+              r7_semantic)
+                unzip -q "$zip" '*semantic_audit_records.jsonl' -d "$dest"
+                ;;
+              *)
+                echo "unknown artifact kind: $kind" >&2
+                exit 1
+                ;;
+            esac
+          done < /tmp/engineering-artifacts.tsv
+          test "$(find source/r7_raw -name traces.jsonl | wc -l)" -eq 4
+          test "$(find source -name semantic_trajectory_audits.jsonl | wc -l)" -eq 1
+          test "$(find source -name case_summaries.jsonl | wc -l)" -eq 1
+          test "$(find source -name r7_dual_case_index.jsonl | wc -l)" -eq 1
+          test "$(find source -name semantic_audit_records.jsonl | wc -l)" -eq 1
+          echo "PASS: frozen engineering evidence selectively materialized"
+
+      - name: Materialize structural engineering semantic audits
+        run: |
+          set -euo pipefail
+          python -m arena.build_v5_4_r5_r7_engineering_structural_semantic_audit             --config "$CONFIG"             --source-root source             --outdir "$OUTDIR"
+
+      - name: Validate every engineering audit and report handoff
+        run: |
+          set -euo pipefail
+          count=0
+          for f in "$OUTDIR"/audits/*.json; do
+            python scripts/validate_engineering_structural_semantic_audit_v0_1.py --audit "$f" >/dev/null
+            count=$((count+1))
+          done
+          test "$count" -eq 4
+          python scripts/validate_engineering_structural_semantic_audit_v0_1.py             --bundle "$OUTDIR/engineering_report_evidence_bundle.json"
+          python - <<'PY'
+          import json,os
+          cfg=json.load(open(os.environ['CONFIG']))
+          s=json.load(open(os.path.join(os.environ['OUTDIR'],'summary.json')))
+          e=cfg['expected']
+          assert s['case_count']==e['case_count']
+          assert s['r6_lineage_complete_case_count']==e['lineage_complete_count']
+          assert s['r7_p_trace_count']==e['r7_p_trace_count']
+          assert s['r7_s_trace_count']==e['r7_s_trace_count']
+          assert s['r7_route_node_count']==e['r7_route_node_count']
+          assert s['engineering_semantic_ledger_entry_count']==e['engineering_semantic_ledger_entry_count']
+          assert s['persistent_direct_exposure_count']==e['persistent_direct_exposure_count']
+          assert s['persistent_reinjection_count']==e['persistent_reinjection_count']
+          assert s['structured_repair_preserved_unrelated_case_count']==e['structured_repair_preserved_unrelated_case_count']
+          assert s['structural_old_fact_reentry_case_count']==e['structural_old_fact_reentry_case_count']
+          assert s['semantic_blind_restoration_case_count']==e['blind_old_fact_restoration_case_count']
+          assert s['material_divergence_case_count']==e['material_divergence_case_count']
+          assert s['reconvergence_after_recompute_case_count']==e['reconvergence_case_count']
+          assert s['fixed_horizon_censored_trace_count']==e['fixed_horizon_censored_trace_count']
+          assert s['engineering_control_surface_distinction']=='SUPPORTED'
+          assert s['same_endpoint_not_same_engineering_process']=='SUPPORTED'
+          assert s['structural_recomputation_not_semantic_novelty']=='SUPPORTED'
+          assert s['structured_repair_universal_superiority']=='NOT_ESTABLISHED'
+          assert s['problematic_bias_status']=='NOT_ESTABLISHED'
+          assert s['r5_unique_causal_attribution']=='NOT_ESTABLISHED'
+          assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
+          assert s['new_provider_calls']==0
+          assert s['new_paid_evaluator_calls']==0
+          assert s['subject_reruns']==0
+          assert s['raw_evidence_mutated'] is False
+          print('PASS: R5-R7 engineering structural semantic audit closure')
+          PY
+
+      - name: Upload frozen engineering semantic audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-4-r5-r7-engineering-structural-semantic-audit-${{ github.run_id }}
+          path: |
+            configs/v5_4_r5_r7_engineering_structural_semantic_audit_v0.1.json
+            results/v5_4_r5_r7_engineering_structural_semantic_audit/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record bounded engineering result
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          read -r summary_hash bundle_hash <<EOF
+          $(python - <<'PY'
+          import json,os
+          root=os.environ['OUTDIR']
+          s=json.load(open(os.path.join(root,'summary.json')))
+          b=json.load(open(os.path.join(root,'engineering_report_evidence_bundle.json')))
+          print(s['summary_hash'],b['bundle_hash'])
+          PY
+          )
+          EOF
+          body="V5.4 R5-R7 structural engineering semantic audit materialized.\n\nCases: 4. R7-P/R7-S traces: 4/4; complete R7 route nodes: 64. R7-P direct correction exposures: 32; experiment-origin reinjections: 28. R7-S preserved unrelated structure: 4/4. Exact old-fact structural re-entry: 1/4; semantic blind restoration: 0/4. Material divergence: 2/4; reconvergence after recomputation: 2/4.\n\nEngineering interpretation: R5 probe != R6 repair readiness != R7-P persistent reader-surface correction != R7-S internal lineage repair. Same endpoint != same engineering process. Structural recomputation != semantic novelty.\n\nNew provider calls: 0. Paid evaluator calls: 0. Subject reruns: 0. Structured repair universal superiority / problematic bias / unique R5 causality remain NOT_ESTABLISHED; CPR remains NOT_ADJUDICATED.\n\nSummary hash: $summary_hash\nEngineering report bundle hash: $bundle_hash"
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed

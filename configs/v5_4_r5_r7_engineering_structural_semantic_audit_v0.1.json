@@ -1,0 +1,95 @@
+{
+  "schema": "RB-V5.4-R5R7-ENGINEERING-STRUCTURAL-SEMANTIC-AUDIT-CONFIG-v0.1",
+  "date": "2026-09-20",
+  "status": "FROZEN_SOURCE_BINDING_READY_FOR_PASSIVE_MATERIALIZATION",
+  "purpose": "Audit the engineering meaning of structural interventions from R5 probe through R6 repair localization to R7 persistent correction versus structured lineage repair.",
+  "candidate_case_ids": [
+    "wave-3-56ee79f97f54",
+    "wave-4-8b1731b57396",
+    "wave-4-cf726639de1d",
+    "wave-6-7c7e526e4d91"
+  ],
+  "artifacts": {
+    "r2r6_complete_route": {
+      "id": 10588404740,
+      "name": "v5-4-r2-r6-semantic-trajectory-reaudit-35457723047",
+      "digest": "sha256:14fb11da98fae0afb5e82152c101fc5be937e43259f445b25ad10796b1801182",
+      "summary_hash": "38142f734f186217c16def3164259fee9b419f965d1f82000f95afe3623d6634"
+    },
+    "r6_lineage": {
+      "id": 10586243376,
+      "name": "v5-4-r6-lineage-completeness-candidates-35449354017",
+      "digest": "sha256:1a13ad31f0eef2dc0bb9181340a4e581c1738bab947dbfd0f5989d54cd9c5b6d",
+      "summary_hash": "eabb3251df2f6582cd5f720e0672b4dea76be68a10cb5ce3dfe3f79625e17a96"
+    },
+    "r7_raw": {
+      "id": 10586686291,
+      "name": "v5-4-r7-dual-four-candidates-35449794516",
+      "digest": "sha256:ce0d0e4fa53ab75f756947f1d315bac498bf65f894b1eeeaf6650c789638e3d8",
+      "evidence_batch_hash": "15da67c93f7b9cac5bd1e2000ddecadef229f5a7f08e735fab2626f66c039d74"
+    },
+    "r7_structural": {
+      "id": 10586267940,
+      "name": "v5-4-r7-dual-structural-35450177379",
+      "digest": "sha256:242498dac7ad07e764e56d0e69c606256ac5b8d0294fcedd92b2e150b7385bee",
+      "summary_hash": "6b769407e498479c91d6abf635d7485ef278cd7d884e1c27a06bb525d87245ab"
+    },
+    "r7_semantic": {
+      "id": 10587430720,
+      "name": "v5-4-r7-dual-semantic-35452208156",
+      "digest": "sha256:dbe8d38c3105f0a645eeaf902ff1fb7dfa4acfd8dc0680d4b63371d441924acf",
+      "summary_hash": "78a014105a9a44ec41471fe750e272dd82e758cf72c680e3e12e301d256f7f8b"
+    }
+  },
+  "operator_semantics": {
+    "R5_I": {
+      "operator": "TRANSIENT_READER_SURFACE_AUTHORITY_PROBE",
+      "mutates_underlying_shared_state": false,
+      "purpose": "diagnose downstream dependence after one local authority withdrawal",
+      "engineering_role": "PROBE_NOT_REPAIR"
+    },
+    "R6": {
+      "operator": "LINEAGE_LOCALIZATION_AND_CONTENT_ADDRESSING",
+      "mutates_underlying_shared_state": false,
+      "purpose": "bind source, transformations, authority history, pool state and affected descendants into a repairable object",
+      "engineering_role": "REPAIR_READINESS_NOT_REPAIR"
+    },
+    "R7_P": {
+      "operator": "PERSISTENT_READER_SURFACE_SEMANTIC_CORRECTION",
+      "mutates_underlying_shared_state": false,
+      "purpose": "keep uncertainty/correction visible at every downstream read while leaving the inherited shared-state lineage intact",
+      "engineering_role": "EXTERNAL_CORRECTION_NOT_INTERNAL_REPAIR"
+    },
+    "R7_S": {
+      "operator": "INTERNAL_LINEAGE_REPAIR_AND_SELECTIVE_RECOMPUTE",
+      "mutates_underlying_shared_state": true,
+      "purpose": "repair authority at the anchor, invalidate affected post-anchor lineage, reopen/recompute dependent process, preserve compatible structure and monitor re-entry",
+      "engineering_role": "STRUCTURAL_REPAIR"
+    }
+  },
+  "expected": {
+    "case_count": 4,
+    "lineage_complete_count": 4,
+    "r7_p_trace_count": 4,
+    "r7_s_trace_count": 4,
+    "persistent_direct_exposure_count": 32,
+    "structured_repair_preserved_unrelated_case_count": 4,
+    "structural_old_fact_reentry_case_count": 1,
+    "blind_old_fact_restoration_case_count": 0,
+    "material_divergence_case_count": 2,
+    "reconvergence_case_count": 2,
+    "fixed_horizon_censored_trace_count": 8,
+    "persistent_reinjection_count": 28,
+    "r7_route_node_count": 64,
+    "engineering_semantic_ledger_entry_count": 48
+  },
+  "execution_boundary": {
+    "subject_reruns": 0,
+    "new_provider_calls": 0,
+    "new_paid_evaluator_calls": 0,
+    "raw_evidence_mutated": false,
+    "historical_semantic_records_mutated": false,
+    "cpr_adjudicated": false,
+    "intervention_superiority_adjudicated": false
+  }
+}
