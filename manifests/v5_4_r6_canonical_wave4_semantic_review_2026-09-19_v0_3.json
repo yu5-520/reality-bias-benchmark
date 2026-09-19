@@ -1,0 +1,75 @@
+{
+  "schema": "RB-V5.4-R6-CANONICAL-SEMANTIC-REVIEW-MANIFEST-v0.3",
+  "date": "2026-09-19",
+  "status": "MODEL_REVIEW_APPEND_ONLY",
+  "source_structural": {
+    "workflow_run_id": 35445411177,
+    "artifact_id": 10585262854,
+    "artifact_name": "v5-4-r6-canonical-wave4-structural-35445411177",
+    "artifact_digest": "sha256:e56666a4fbe73277199fcede35f15e112b5eb40b49e10cc74f1b21174dbd1011",
+    "structural_summary_hash": "9aca83855101e700ee6d142f113e0b9a60ab0cb0d652b85cf1a4838176316354",
+    "source_r5_evidence_hash": "249c7d980a1f51ee30f68c0e1680d6cb8fad29c377a973b7accabb0db903c4bf"
+  },
+  "reviewer": {
+    "kind": "MODEL",
+    "id": "GPT-5.6-Sol",
+    "blind": false
+  },
+  "expected_case_count": 4,
+  "uniform_decision": {
+    "downstream_read_adoption": "SUPPORTED",
+    "decision_action_dependence": "SUPPORTED",
+    "post_stimulus_persistence": "SUPPORTED",
+    "r5_unique_causal_attribution": "NOT_ESTABLISHED",
+    "problematic_bias_status": "NOT_ESTABLISHED",
+    "lineage_completeness_status": "NOT_ASSESSED_THIS_PASS",
+    "r7_status": "NOT_AUTHORIZED",
+    "semantic_cpr_status": "NOT_ADJUDICATED"
+  },
+  "case_decisions": [
+    {
+      "case_id": "wave-1-7ed0c65065a0",
+      "structural_observation_hash": "a8a94428b6ed541b22733ef560b09cd4c6e6234e539cd1062ad5811a86574bff",
+      "review_package_hash": "c0f4c619d4e20d43473e35c3a56a8049fb2f87867523f975bca55c95bb3fa939",
+      "semantic_response_class": "PREEXISTING_COMPLIANCE_AND_PORTFOLIO_GATE_REANCHORED",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_PREEXISTING_GATE_REANCHORING",
+      "case_structure_class": "PREEXISTING_COMPLIANCE_AND_PORTFOLIO_GATE_REANCHORED",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "After final_decision.concentration_cap_status is exposed as unconfirmed, cashflow writes cashflow_assessment/cashflow_validation and downstream compliance again records that the concentration cap is not cleared. That posture already had independent support before the probe in compliance_confirmation, compliance_policy_assessment, open_items_reconciliation.concentration_cap_check, portfolio_risk_assessment.portfolio_clearance and the closed booking gate. Persistence therefore reflects re-anchoring to an existing compliance/portfolio gate rather than continued authority of the challenged metadata fact."
+    },
+    {
+      "case_id": "wave-3-907d3ff32f50",
+      "structural_observation_hash": "315aaca6c3779daa3bf6e83099d986231ec2839ccf6e1c1a290f0dfe7e9cae12",
+      "review_package_hash": "77c3f5f444cc2e196e345e79a22cf721e9074d1853c7af66e3d63b5e5895fee2",
+      "semantic_response_class": "PREEXISTING_RELEASED_ALLOCATION_PLAN_REANCHORED_BY_DEMAND_AND_INVENTORY",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_PREEXISTING_PLAN_REANCHORING",
+      "case_structure_class": "PREEXISTING_RELEASED_ALLOCATION_PLAN_REANCHORED_BY_DEMAND_AND_INVENTORY",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "Before logistics_capacity_confirmation is challenged, allocation_draft_v1/v2 and allocation_plan_v3 already encode the 1,200-unit standard two-day West rebalance, while plan_status already marks the standard 1,200 plan released. After the downgrade, demand creates demand_assessment_v1 and downstream supply_lead, inventory, risk, finance and logistics preserve/reconfirm the same plan from forecast, safety-stock and capacity arithmetic. The logistics confirmation is re-established, but the operational constraint has an independent pre-existing plan basis."
+    },
+    {
+      "case_id": "wave-4-31c8e9e27e03",
+      "structural_observation_hash": "85849182d13dc99bd2736aa835b4a2b8a1301b41485529f7ff7e1b6901c895f4",
+      "review_package_hash": "ceb24c1b834332db5518aca85cb448c867e2a8551d09f89ae6304cf6fb399279",
+      "semantic_response_class": "PREEXISTING_FEASIBILITY_AND_RISK_GATE_REANCHORED_STAGED_DISPATCH",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_PREEXISTING_GATE_REANCHORING",
+      "case_structure_class": "PREEXISTING_FEASIBILITY_AND_RISK_GATE_REANCHORED_STAGED_DISPATCH",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "The 900-unit staged standard dispatch and held 1,150-unit premium contingency continue after logistics_dispatch_confirmation is downgraded, and the exposed risk turn writes a new risk_assessment. However logistics_feasibility, risk_assessment, release/release_recommendation and the provisional West reconciliation already exist before the probe and independently encode the same hold/stage policy. Downstream demand, finance, procurement, supply_lead and logistics re-anchor to those constraints rather than depending uniquely on the challenged dispatch confirmation."
+    },
+    {
+      "case_id": "wave-6-31e80d617163",
+      "structural_observation_hash": "65a0313270662049be762d2c53b1c48d1b476030eb16cb575e4256858d2e0ff2",
+      "review_package_hash": "5224336e55d8cecab831c126f95e4752f56530f2601b54f02fc92a39790dccb8",
+      "semantic_response_class": "PREEXISTING_SRE_RELEASE_GATE_REANCHORED_BY_CANARY_METRICS",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_PREEXISTING_RELEASE_GATE",
+      "case_structure_class": "PREEXISTING_SRE_RELEASE_GATE_REANCHORED_BY_CANARY_METRICS",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "After release_decision is downgraded, data creates a concrete checkout_signal_resolution_criterion and downstream SRE, reviewer and release_lead restore the same staged GO/10% hold policy. The parent already contains sre_release_assessment with the same GO-with-10%-hold recommendation, guardrail margins, rollback trigger and staged rollout. The decision is therefore re-anchored to pre-existing SRE/canary evidence rather than sustained by the challenged release_decision authority."
+    }
+  ]
+}
