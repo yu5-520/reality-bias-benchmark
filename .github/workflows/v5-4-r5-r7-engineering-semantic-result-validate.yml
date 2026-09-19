@@ -1,0 +1,87 @@
+name: V5.4 R5-R7 Engineering Semantic Result Validate
+
+on:
+  pull_request:
+    paths:
+      - "manifests/v5_4_r5_r7_engineering_structural_semantic_audit_result_2026-09-20_v0_1.json"
+      - "docs/reports/2026-09-20/V5_4_R5_R7_Engineering_Structural_Semantic_Audit_Result_v1.md"
+      - ".github/workflows/v5-4-r5-r7-engineering-semantic-result-validate.yml"
+  push:
+    branches: [ main ]
+    paths:
+      - "manifests/v5_4_r5_r7_engineering_structural_semantic_audit_result_2026-09-20_v0_1.json"
+      - ".github/workflows/v5-4-r5-r7-engineering-semantic-result-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate frozen engineering result
+        run: |
+          set -euo pipefail
+          python -m json.tool manifests/v5_4_r5_r7_engineering_structural_semantic_audit_result_2026-09-20_v0_1.json >/dev/null
+          python scripts/validate_engineering_structural_semantic_audit_v0_1.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.load(open('manifests/v5_4_r5_r7_engineering_structural_semantic_audit_result_2026-09-20_v0_1.json'))
+          assert p['status']=='FROZEN_ENGINEERING_STRUCTURAL_SEMANTIC_AUDIT_COMPLETE'
+          m=p['materialization']
+          assert m['successful_workflow_run_id']==35460658147
+          assert m['artifact_id']==10588768777
+          assert m['artifact_digest']=='sha256:0e694f57a3c81b7164dea999993e4af47a29a734a38c979d63c293a640c94a93'
+          assert m['summary_hash']=='0bacc8faadde50be1f70b2b396c497b4b51f8aa1ac11e71f7e3b1daf3a9ed0a4'
+          assert m['engineering_report_bundle_hash']=='e394d55011941da567b28805a08419c12d25e78b641c3468d0247a011e3988ab'
+          assert m['failed_predecessor_workflow_run_id']==35460546582
+          assert m['failed_predecessor_result_output_created'] is False
+          assert m['failed_predecessor_subject_provider_evaluator_calls']==0
+          assert p['scope']['candidate_case_count']==4
+          assert p['scope']['engineering_stages']==['R5_I','R6','R7_P','R7_S']
+          r=p['results']
+          assert r['r7_route_node_count']==64
+          assert r['engineering_semantic_ledger_entry_count']==48
+          assert r['persistent_direct_exposure_count']==32
+          assert r['persistent_reinjection_count']==28
+          assert r['structured_repair_preserved_unrelated_case_count']==4
+          assert r['structural_old_fact_reentry_case_count']==1
+          assert r['semantic_blind_restoration_case_count']==0
+          assert r['material_divergence_case_count']==2
+          assert r['reconvergence_after_recompute_case_count']==2
+          assert r['fixed_horizon_censored_trace_count']==8
+          assert r['engineering_control_surface_distinction']=='SUPPORTED'
+          assert r['same_endpoint_not_same_engineering_process']=='SUPPORTED'
+          assert r['structural_recomputation_not_semantic_novelty']=='SUPPORTED'
+          assert r['structured_repair_universal_superiority']=='NOT_ESTABLISHED'
+          assert r['report_gate_status']=='READY_FOR_ENGINEERING_REPORT_DRAFT'
+          assert len(p['case_results'])==4
+          cf=[x for x in p['case_results'] if x['case_id']=='wave-4-cf726639de1d'][0]
+          assert cf['old_lineage_reentry'] is True
+          assert cf['old_lineage_reentry_interpretation']=='STRUCTURALLY_YES_SEMANTICALLY_REDERIVED'
+          e=p['execution_boundary']
+          assert e['new_provider_calls']==0
+          assert e['new_paid_evaluator_calls']==0
+          assert e['subject_reruns']==0
+          assert e['raw_evidence_mutated'] is False
+          b=p['claim_boundary']
+          assert b['problematic_bias_status']=='NOT_ESTABLISHED'
+          assert b['r5_unique_causal_attribution']=='NOT_ESTABLISHED'
+          assert b['semantic_cpr_status']=='NOT_ADJUDICATED'
+          assert b['structured_repair_universal_superiority']=='NOT_ESTABLISHED'
+          report=Path('docs/reports/2026-09-20/V5_4_R5_R7_Engineering_Structural_Semantic_Audit_Result_v1.md').read_text(encoding='utf-8')
+          for phrase in [
+              'R5 probe != R6 repair readiness != R7-P persistent reader-surface correction != R7-S structural repair',
+              'exact key/status re-entry != blind repair failure',
+              'same endpoint != same engineering process',
+              'READY_FOR_ENGINEERING_REPORT_DRAFT',
+          ]:
+              assert phrase in report, phrase
+          print('PASS: frozen R5-R7 engineering structural semantic result')
+          PY
