@@ -1,0 +1,47 @@
+name: V5.4 R6 Lineage Completeness Result Validate
+
+on:
+  pull_request:
+    paths:
+      - "manifests/v5_4_r6_lineage_completeness_candidates_2026-09-19_v0_1.json"
+      - "docs/reports/2026-09-19/V5_4_R6_Four_Candidate_Lineage_Completeness_Result_v1.md"
+      - ".github/workflows/v5-4-r6-lineage-result-validate.yml"
+  push:
+    branches: [ main ]
+    paths:
+      - "manifests/v5_4_r6_lineage_completeness_candidates_2026-09-19_v0_1.json"
+      - ".github/workflows/v5-4-r6-lineage-result-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate result boundaries
+        run: |
+          set -euo pipefail
+          python -m json.tool manifests/v5_4_r6_lineage_completeness_candidates_2026-09-19_v0_1.json >/dev/null
+          python - <<'PY'
+          import json
+          p=json.load(open('manifests/v5_4_r6_lineage_completeness_candidates_2026-09-19_v0_1.json'))
+          assert p['status']=='FROZEN_FOUR_CANDIDATE_LINEAGE_COMPLETENESS_COMPLETE'
+          assert p['results']['candidate_case_count']==4
+          assert p['results']['complete_for_authorized_repair_count']==4
+          assert p['results']['lineage_gap_count']==0
+          assert p['results']['n0_rerun_count']==0
+          assert p['results']['r5_i_rerun_count']==0
+          assert p['results']['new_provider_calls']==0
+          assert p['handoff']['all_candidates_ready_for_separate_r7_authorization'] is True
+          assert p['handoff']['active_r7_authorized'] is False
+          assert p['handoff']['new_provider_trajectories_per_qualified_case']==2
+          assert p['boundaries']['problematic_bias_established'] is False
+          assert p['boundaries']['unique_r5_causality_established'] is False
+          assert p['boundaries']['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('PASS: four candidates are lineage-complete but R7 remains separately gated')
+          PY
