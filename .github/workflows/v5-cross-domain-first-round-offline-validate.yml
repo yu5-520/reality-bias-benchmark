@@ -18,6 +18,7 @@ on:
       - "docs/cross_domain_localized_semantic_audit_protocol_v0.1.md"
       - "docs/v5_cross_domain_r5_first_wave_protocol_v0.1.md"
       - "docs/v5_cross_domain_r5_second_wave_protocol_v0.1.md"
+      - "docs/v5_cross_domain_r5_second_wave_balance_recovery_protocol_v0.1.md"
       - "docs/v5_cross_domain_r5_r6_structural_semantic_audit_protocol_v0.1.md"
       - "docs/v5_cross_domain_r5_r6_structural_observation_protocol_v0.2.md"
       - "manifests/v5_cross_domain_localized_semantic_audit_review_2026-09-19_v0_1.json"
@@ -30,6 +31,7 @@ on:
       - "configs/v5_cross_domain_semantic_triage_v0.1.json"
       - "configs/v5_cross_domain_r5_first_wave_v0.1.json"
       - "configs/v5_cross_domain_r5_second_wave_v0.1.json"
+      - "configs/v5_cross_domain_r5_second_wave_balance_recovery_v0.1.json"
       - "configs/v5_cross_domain_r6_targeted_specificity_v0.1.json"
       - "configs/process_reality_probability_structure_separation_v1.0.json"
       - "manifests/v5_cross_domain_probability_structure_reclassification_2026-09-19_v0_1.json"
@@ -46,10 +48,13 @@ on:
       - "arena/build_v5_cross_domain_localized_semantic_audit.py"
       - "arena/prepare_v5_cross_domain_r5_first_wave.py"
       - "arena/prepare_v5_cross_domain_r5_second_wave.py"
+      - "arena/prepare_v5_cross_domain_r5_second_wave_recovery.py"
       - "arena/run_v5_cross_domain_r5_first_wave.py"
       - "arena/run_v5_cross_domain_r5_second_wave.py"
+      - "arena/run_v5_cross_domain_r5_second_wave_recovery.py"
       - "arena/freeze_v5_cross_domain_r5_first_wave.py"
       - "arena/freeze_v5_cross_domain_r5_second_wave.py"
+      - "arena/freeze_v5_cross_domain_r5_second_wave_recovery.py"
       - "arena/derive_v5_cross_domain_r5_local_response.py"
       - "arena/derive_v5_cross_domain_r5_r6_structural_observation.py"
       - "arena/derive_v5_cross_domain_r5_r6_structural_observation_v0_2.py"
@@ -89,6 +94,7 @@ jobs:
           python -m py_compile arena/prepare_v5_cross_domain_r5_first_wave.py arena/run_v5_cross_domain_r5_first_wave.py
           python -m py_compile arena/freeze_v5_cross_domain_r5_first_wave.py arena/derive_v5_cross_domain_r5_local_response.py
           python -m py_compile arena/prepare_v5_cross_domain_r5_second_wave.py arena/run_v5_cross_domain_r5_second_wave.py arena/freeze_v5_cross_domain_r5_second_wave.py
+          python -m py_compile arena/prepare_v5_cross_domain_r5_second_wave_recovery.py arena/run_v5_cross_domain_r5_second_wave_recovery.py arena/freeze_v5_cross_domain_r5_second_wave_recovery.py
           python -m py_compile arena/derive_v5_cross_domain_r5_r6_structural_observation.py
           python -m py_compile arena/derive_v5_cross_domain_r5_r6_structural_observation_v0_2.py
           python -m py_compile arena/build_v5_cross_domain_r5_r6_semantic_audit.py
@@ -253,6 +259,31 @@ jobs:
           assert 'case-level System Inertia != domain-level occurrence rate' in p
           assert 'This phase does not authorize R7.' in p
           print('PASS: R5-R6 passive structural observation protocol preserves v5.3 boundaries')
+          PY
+
+      - name: Validate R5 second-wave balance-recovery plan
+        run: |
+          python -m json.tool configs/v5_cross_domain_r5_second_wave_balance_recovery_v0.1.json >/dev/null
+          python - <<'PY'
+          import json
+          p=json.load(open('configs/v5_cross_domain_r5_second_wave_balance_recovery_v0.1.json'))
+          assert p['status']=='FROZEN_PRE_EXECUTION_RECOVERY_PLAN'
+          assert p['expected_geometry']['wave_ids']==[4,5,6]
+          assert p['expected_geometry']['case_count']==3
+          assert p['expected_geometry']['branch_count']==12
+          assert p['selection_rule']['termination_reason']=='model_call_failure'
+          assert p['selection_rule']['model_call_count']==1
+          assert p['selection_rule']['first_call_status']=='failed'
+          assert p['selection_rule']['completed_model_call_count']==0
+          assert p['selection_rule']['selection_is_scientific_outcome_aware'] is False
+          assert p['recovery_policy']['preserve_original_failed_traces'] is True
+          assert p['recovery_policy']['overwrite_original_evidence'] is False
+          assert p['budget']['global_spending_ceiling_usd']==3.0
+          assert p['authorization']['paid_evaluator'] is False
+          assert p['authorization']['r6_new_subject_experiment'] is False
+          assert p['authorization']['r7_repair'] is False
+          assert p['authorization']['r8_cpr_adjudication'] is False
+          print('PASS: balance recovery is mechanically scoped to pre-response HTTP 402 failures')
           PY
 
       - name: Validate evidence-quality-aware R6 structural protocol v0.2

@@ -1566,3 +1566,173 @@ jobs:
           body="V5.3 cross-domain R5-R6 structural observation wave 2 materialized from frozen R5 evidence.\n\nIntervention traces: $TRACE_COUNT across $CASE_COUNT cases.\nSemantic-audit eligible branches: $ELIGIBLE_BRANCHES.\nIncomplete first-exposure provider-failure branches: $INCOMPLETE_BRANCHES.\nEligible cases: $ELIGIBLE_CASES. Incomplete cases: $INCOMPLETE_CASES.\nSummary hash: $SUMMARY_HASH.\n\nProvider-failed branches are incomplete evidence, not negative semantic findings. New provider calls: 0. R7 not authorized. CPR NOT_ADJUDICATED."
           gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
           gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
+
+
+  execute-cross-domain-r5-second-wave-balance-recovery:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5 CROSS-DOMAIN R5 SECOND WAVE BALANCE RECOVERY'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      RECOVERY_CONFIG: configs/v5_cross_domain_r5_second_wave_balance_recovery_v0.1.json
+      EXPECTED_AUTHORIZATION_PHRASE: CALL_REAL_V5_CROSS_DOMAIN_R5_SECOND_WAVE_BALANCE_RECOVERY_API
+      SOURCE_RUN_ID: '35436694271'
+      SOURCE_ARTIFACT_ID: '10582866320'
+      SOURCE_ARTIFACT_NAME: v5-cross-domain-r5-second-wave-35436694271
+      SOURCE_ARTIFACT_DIGEST: sha256:1efbb3095cd74a18b13eccf94f1ebe0d044e2d7cc79fed9e7af5d63977d975b3
+      SOURCE_EVIDENCE_HASH: b01e11cb041be4d3d29bd94d93552ac0bfdd56fc67cd5b7b011e8f90bb46d676
+      PER_BRANCH_MAX_CALLS: '64'
+      PER_BRANCH_CEILING_USD: '0.25'
+      GLOBAL_CEILING_USD: '3.00'
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact R5 balance-recovery authorization
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['AUTH_BODY'].splitlines():
+              line=raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit(f'invalid balance-recovery authorization line: {line!r}')
+              key,value=line.split('=',1)
+              if key in rows:
+                  raise SystemExit(f'duplicate balance-recovery authorization key: {key}')
+              rows[key]=value
+          required={'authorization_phrase','expected_main_sha','authorization_id','source_run_id','source_artifact_id','source_artifact_digest','source_evidence_hash','control_plane'}
+          if set(rows)!=required:
+              raise SystemExit(f'balance-recovery authorization keys mismatch: {sorted(rows)}')
+          checks={
+              'authorization_phrase':os.environ['EXPECTED_AUTHORIZATION_PHRASE'],
+              'expected_main_sha':os.environ['GITHUB_SHA'],
+              'source_run_id':os.environ['SOURCE_RUN_ID'],
+              'source_artifact_id':os.environ['SOURCE_ARTIFACT_ID'],
+              'source_artifact_digest':os.environ['SOURCE_ARTIFACT_DIGEST'],
+              'source_evidence_hash':os.environ['SOURCE_EVIDENCE_HASH'],
+              'control_plane':'CHAT_AUTHORIZATION_BRIDGE_V5_CROSS_DOMAIN_R5_SECOND_BALANCE_RECOVERY_v0.1',
+          }
+          for k,v in checks.items():
+              if rows[k]!=v:
+                  raise SystemExit(f'balance-recovery {k} mismatch')
+          if not re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['authorization_id']):
+              raise SystemExit('invalid balance-recovery authorization_id')
+          print('PASS: exact balance-recovery authorization validated')
+          PY
+
+      - name: Verify exact source R5 second-wave artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          repo=os.environ['GITHUB_REPOSITORY']
+          payload=json.loads(subprocess.check_output(
+              ['gh','api',f"repos/{repo}/actions/runs/{os.environ['SOURCE_RUN_ID']}/artifacts"],text=True
+          ))
+          rows=[x for x in payload['artifacts'] if str(x['id'])==os.environ['SOURCE_ARTIFACT_ID'] and x['name']==os.environ['SOURCE_ARTIFACT_NAME']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==os.environ['SOURCE_ARTIFACT_DIGEST']
+          assert not rows[0].get('expired')
+          print('PASS: exact source R5 second-wave artifact verified')
+          PY
+
+      - name: Download exact source R5 second-wave artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/r5w2
+          gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$SOURCE_ARTIFACT_NAME" --dir source/r5w2
+          test -s source/r5w2/prepared/r5_second_wave/plan.json
+          test -s source/r5w2/results/v5_cross_domain_r5_second_wave/evidence_batch.json
+          test -s source/r5w2/results/v5_cross_domain_r5_second_wave/raw/traces.jsonl
+          python - <<'PY'
+          import json,os
+          p=json.load(open('source/r5w2/results/v5_cross_domain_r5_second_wave/evidence_batch.json'))
+          assert p['evidence_batch_hash']==os.environ['SOURCE_EVIDENCE_HASH']
+          assert p['preserved_trace_count']==20
+          print('PASS: source R5 second-wave evidence hash verified')
+          PY
+
+      - name: Prepare mechanically selected balance-recovery plan
+        run: |
+          set -euo pipefail
+          python -m arena.prepare_v5_cross_domain_r5_second_wave_recovery             --source-plan-dir source/r5w2/prepared/r5_second_wave             --source-raw-dir source/r5w2/results/v5_cross_domain_r5_second_wave/raw             --source-evidence-batch source/r5w2/results/v5_cross_domain_r5_second_wave/evidence_batch.json             --recovery-config "$RECOVERY_CONFIG"             --branch-code-sha "$GITHUB_SHA"             --outdir prepared/r5_second_wave_balance_recovery
+          python - <<'PY'
+          import json
+          p=json.load(open('prepared/r5_second_wave_balance_recovery/plan.json'))
+          assert p['case_count']==3
+          assert p['branch_count']==12
+          assert p['wave_ids']==[4,5,6]
+          assert p['selection_rule']['selection_is_scientific_outcome_aware'] is False
+          assert len(p['source_failed_trace_hashes'])==12
+          print('PASS: exactly 12 mechanical balance-failure branches selected')
+          PY
+
+      - name: Run full offline balance-recovery lifecycle preflight
+        run: |
+          set -euo pipefail
+          python -m arena.run_v5_cross_domain_r5_second_wave_recovery             --plan-dir prepared/r5_second_wave_balance_recovery             --provider deepseek             --execution-code-sha "$GITHUB_SHA"             --per-branch-max-calls "$PER_BRANCH_MAX_CALLS"             --per-branch-spending-ceiling "$PER_BRANCH_CEILING_USD"             --global-spending-ceiling "$GLOBAL_CEILING_USD"             --currency USD             --preflight-only
+
+      - name: Execute 12 balance-recovery branches
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          set -euo pipefail
+          python -m arena.run_v5_cross_domain_r5_second_wave_recovery             --plan-dir prepared/r5_second_wave_balance_recovery             --outdir results/v5_cross_domain_r5_second_wave_balance_recovery/raw             --provider deepseek             --execution-code-sha "$GITHUB_SHA"             --per-branch-max-calls "$PER_BRANCH_MAX_CALLS"             --per-branch-spending-ceiling "$PER_BRANCH_CEILING_USD"             --global-spending-ceiling "$GLOBAL_CEILING_USD"             --currency USD             --authorization-phrase "$EXPECTED_AUTHORIZATION_PHRASE"             --execute-real-api
+
+      - name: Freeze balance-recovery evidence
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -s results/v5_cross_domain_r5_second_wave_balance_recovery/raw/traces.jsonl ]; then
+            python -m arena.freeze_v5_cross_domain_r5_second_wave_recovery               --raw-dir results/v5_cross_domain_r5_second_wave_balance_recovery/raw               --plan-dir prepared/r5_second_wave_balance_recovery               --out results/v5_cross_domain_r5_second_wave_balance_recovery/evidence_batch.json
+          else
+            echo 'No recovery traces available to freeze.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload immutable balance-recovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-cross-domain-r5-second-wave-balance-recovery-${{ github.run_id }}
+          path: |
+            configs/v5_cross_domain_r5_second_wave_balance_recovery_v0.1.json
+            prepared/r5_second_wave_balance_recovery/
+            results/v5_cross_domain_r5_second_wave_balance_recovery/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Record completed balance recovery
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY' > "$RUNNER_TEMP/recovery_done.env"
+          import json
+          p=json.load(open('results/v5_cross_domain_r5_second_wave_balance_recovery/raw/summary.json'))
+          e=json.load(open('results/v5_cross_domain_r5_second_wave_balance_recovery/evidence_batch.json'))
+          print('TRACE_COUNT='+str(p['preserved_trace_count']))
+          print('SUCCESS_COUNT='+str(p['successful_recovery_trace_count']))
+          print('SPEND='+str(p['estimated_total_spend']))
+          print('SUMMARY_HASH='+p['summary_hash'])
+          print('EVIDENCE_HASH='+e['evidence_batch_hash'])
+          PY
+          source "$RUNNER_TEMP/recovery_done.env"
+          body="V5.3 R5 second-wave balance recovery completed.\n\nMechanically selected provider-failure branches: 12 across waves 4/5/6.\nSuccessful recovered traces: $SUCCESS_COUNT/$TRACE_COUNT.\nEstimated provider spend: USD $SPEND.\nRun summary hash: $SUMMARY_HASH.\nRecovery evidence hash: $EVIDENCE_HASH.\n\nOriginal 402 traces remain immutable and were not overwritten. Selection was not scientific-outcome-aware. Next stage: combine original valid wave1/3 continuations with recovered wave4/5/6 continuations for passive R6 structural + semantic audit. R7 not authorized. CPR NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
