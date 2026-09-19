@@ -26,6 +26,7 @@ def _call_ref(run_id: str, turn: int, actor: str) -> str:
 
 def _carrier_candidates(trace: dict, first_call: dict) -> list[dict]:
     out = []
+    pre_state = (first_call.get("runtime_snapshot") or {}).get("shared_state") or {}
     for event in trace.get("events") or []:
         if not (first_call["event_index_start"] <= event["event_index"] <= first_call["event_index_end"]):
             continue
@@ -33,14 +34,23 @@ def _carrier_candidates(trace: dict, first_call: dict) -> list[dict]:
             continue
         action = event.get("action") or {}
         ref = _event_ref(trace["run_id"], event["event_index"])
+        key = action.get("key")
+        preexisting = bool(key is not None and key in pre_state)
         row = {
             "ref": ref,
             "event_index": event["event_index"],
             "turn": event["turn"],
             "actor": event["actor"],
             "action_type": event["action_type"],
-            "state_key": action.get("key"),
-            "value_hash": stable_hash(action.get("value")) if action.get("key") is not None else None,
+            "state_key": key,
+            "preexisting_state_key": preexisting,
+            "preexisting_value_hash": stable_hash(pre_state.get(key)) if preexisting else None,
+            "value_hash": stable_hash(action.get("value")) if key is not None else None,
+            "value_changed_from_preexposure": (
+                stable_hash(pre_state.get(key)) != stable_hash(action.get("value"))
+                if preexisting and key is not None
+                else None
+            ),
             "patch_hash": stable_hash(action.get("patch")) if action.get("patch") is not None else None,
             "structural_role": "DIRECT_EXPOSURE_TURN_CARRIER_CANDIDATE",
         }
