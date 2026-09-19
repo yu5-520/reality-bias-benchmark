@@ -1,0 +1,149 @@
+name: V5.4 R7 Dual Structural Materialization
+
+on:
+  pull_request:
+    paths:
+      - "arena/derive_v5_4_r7_dual_structural.py"
+      - ".github/workflows/v5-4-r7-dual-structural.yml"
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  offline-validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile structural derivation
+        run: |
+          python -m py_compile arena/derive_v5_4_r7_dual_structural.py
+
+  materialize:
+    if: >-
+      github.event_name == 'issues' &&
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5.4 R7 DUAL STRUCTURAL MATERIALIZATION'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      REQUEST_BODY: ${{ github.event.issue.body }}
+      EXPECTED_EXECUTION_PHRASE: MATERIALIZE_V5_4_R7_DUAL_STRUCTURAL
+      SOURCE_RUN_ID: '35449794516'
+      SOURCE_ARTIFACT_ID: '10586686291'
+      SOURCE_ARTIFACT_NAME: v5-4-r7-dual-four-candidates-35449794516
+      SOURCE_ARTIFACT_DIGEST: sha256:ce0d0e4fa53ab75f756947f1d315bac498bf65f894b1eeeaf6650c789638e3d8
+      SOURCE_EVIDENCE_HASH: 15da67c93f7b9cac5bd1e2000ddecadef229f5a7f08e735fab2626f66c039d74
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact passive structural request
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['REQUEST_BODY'].splitlines():
+              line=raw.strip()
+              if not line: continue
+              if '=' not in line: raise SystemExit('invalid request line')
+              k,v=line.split('=',1)
+              if k in rows: raise SystemExit('duplicate request key '+k)
+              rows[k]=v
+          required={'execution_phrase','expected_main_sha','materialization_id','control_plane'}
+          assert set(rows)==required,sorted(rows)
+          assert rows['execution_phrase']==os.environ['EXPECTED_EXECUTION_PHRASE']
+          assert rows['expected_main_sha']==os.environ['GITHUB_SHA']
+          assert rows['control_plane']=='CHAT_EXECUTION_BRIDGE_V5_4_R7_DUAL_STRUCTURAL_v0.1'
+          assert re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['materialization_id'])
+          print('PASS: exact passive structural request')
+          PY
+
+      - name: Verify exact frozen R7 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          repo=os.environ['GITHUB_REPOSITORY']
+          run_id=os.environ['SOURCE_RUN_ID']
+          p=json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{run_id}/artifacts'],text=True))
+          rows=[x for x in p['artifacts'] if str(x['id'])==os.environ['SOURCE_ARTIFACT_ID'] and x['name']==os.environ['SOURCE_ARTIFACT_NAME']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==os.environ['SOURCE_ARTIFACT_DIGEST']
+          assert not rows[0].get('expired')
+          print('PASS: exact frozen R7 artifact verified')
+          PY
+
+      - name: Download frozen R7 evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/r7
+          gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$SOURCE_ARTIFACT_NAME" --dir source/r7
+          test -s source/r7/prepared/v5_4_r7_dual/batch_plan.json
+          test -s source/r7/results/v5_4_r7_dual_four_candidates/raw/batch_run_summary.json
+          test -s source/r7/results/v5_4_r7_dual_four_candidates/evidence_batch.json
+          python - <<'PY'
+          import json,os
+          e=json.load(open('source/r7/results/v5_4_r7_dual_four_candidates/evidence_batch.json'))
+          assert e['evidence_batch_hash']==os.environ['SOURCE_EVIDENCE_HASH']
+          assert e['raw_evidence_frozen_before_derived_analysis'] is True
+          assert e['trace_count']==8
+          assert e['n0_rerun_count']==0
+          assert e['r5_i_rerun_count']==0
+          print('PASS: frozen R7 evidence binding')
+          PY
+
+      - name: Materialize structural comparison
+        id: derive
+        run: |
+          set -euo pipefail
+          python -m arena.derive_v5_4_r7_dual_structural             --plan-root source/r7/prepared/v5_4_r7_dual             --raw-root source/r7/results/v5_4_r7_dual_four_candidates/raw             --evidence-batch source/r7/results/v5_4_r7_dual_four_candidates/evidence_batch.json             --outdir results/v5_4_r7_dual_structural
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          s=json.load(open('results/v5_4_r7_dual_structural/summary.json'))
+          assert s['case_count']==4
+          assert s['measurement_count']==8
+          assert s['fixed_horizon_censored_trace_count']==8
+          assert s['new_provider_calls']==0
+          assert s['new_paid_evaluator_calls']==0
+          assert s['n0_reruns']==0
+          assert s['r5_i_reruns']==0
+          for k in ('comparison_count','integrity_failure_count','structured_repair_old_lineage_reentry_case_count','structured_repair_preserved_unrelated_structure_case_count','summary_hash'):
+              print(k+'='+str(s[k]))
+          PY
+
+      - name: Upload structural artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-4-r7-dual-structural-${{ github.run_id }}
+          path: results/v5_4_r7_dual_structural/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record structural result
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMPARISONS: ${{ steps.derive.outputs.comparison_count }}
+          FAILURES: ${{ steps.derive.outputs.integrity_failure_count }}
+          REENTRY: ${{ steps.derive.outputs.structured_repair_old_lineage_reentry_case_count }}
+          PRESERVED: ${{ steps.derive.outputs.structured_repair_preserved_unrelated_structure_case_count }}
+          SUMMARY_HASH: ${{ steps.derive.outputs.summary_hash }}
+        run: |
+          body="V5.4 R7 dual passive structural materialization complete.\n\nMeasurements: 8. P-vs-S structural comparisons: $COMPARISONS/4. Integrity failures: $FAILURES. All 8 traces ended at the preregistered fixed 8-turn horizon; this is fixed-horizon censoring, not a monetary/API failure. R7-S old-lineage reentry detected in $REENTRY/4 cases; unrelated structure preserved in $PRESERVED/4 cases.\nSummary hash: $SUMMARY_HASH.\n\nProvider calls: 0. Paid evaluator calls: 0. No reruns. Semantic repair success, problematic bias, unique R5 causality and CPR remain unadjudicated."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
