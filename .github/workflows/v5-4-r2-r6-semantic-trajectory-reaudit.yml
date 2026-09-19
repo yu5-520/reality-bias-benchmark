@@ -1,0 +1,224 @@
+name: V5.4 R2-R6 Semantic Trajectory Reaudit
+
+on:
+  pull_request:
+    paths:
+      - "configs/v5_4_r2_r6_semantic_trajectory_reaudit_v0.1.json"
+      - "arena/build_v5_4_r2_r6_semantic_trajectory_reaudit.py"
+      - ".github/workflows/v5-4-r2-r6-semantic-trajectory-reaudit.yml"
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  offline-validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate frozen config and materializer syntax
+        run: |
+          set -euo pipefail
+          python -m json.tool configs/v5_4_r2_r6_semantic_trajectory_reaudit_v0.1.json >/dev/null
+          python -m py_compile arena/build_v5_4_r2_r6_semantic_trajectory_reaudit.py
+          python scripts/validate_semantic_trajectory_reporting_v0_1.py
+          python - <<'PY'
+          import json
+          p=json.load(open('configs/v5_4_r2_r6_semantic_trajectory_reaudit_v0.1.json'))
+          assert p['primary_domains']==['finance','supply_chain','software_engineering']
+          assert p['ecommerce_role']=='HISTORICAL_METHOD_DEVELOPMENT_CONTEXT_ONLY'
+          assert p['expected']['natural_population']==90
+          assert p['expected']['pass1_eligible_cases']==29
+          assert p['expected']['canonical_r5_r6_cases']==29
+          assert p['expected']['complete_route_audits']==32
+          assert p['expected']['stronger_system_inertia_candidates']==4
+          assert p['expected']['non_inertia_cases']==25
+          e=p['execution_boundary']
+          assert e['new_provider_calls']==0
+          assert e['new_paid_evaluator_calls']==0
+          assert e['subject_reruns']==0
+          assert e['mutate_raw_evidence'] is False
+          assert e['mutate_historical_semantic_audits'] is False
+          print('PASS: frozen passive complete-route reaudit configuration')
+          PY
+
+  materialize:
+    if: >-
+      github.event_name == 'issues' &&
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5.4 R2-R6 SEMANTIC TRAJECTORY REAUDIT'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      REQUEST_BODY: ${{ github.event.issue.body }}
+      EXPECTED_EXECUTION_PHRASE: MATERIALIZE_V5_4_R2_R6_SEMANTIC_TRAJECTORY
+      CONFIG: configs/v5_4_r2_r6_semantic_trajectory_reaudit_v0.1.json
+      OUTDIR: results/v5_4_r2_r6_semantic_trajectory_reaudit
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact passive request
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['REQUEST_BODY'].splitlines():
+              line=raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit('invalid request line')
+              k,v=line.split('=',1)
+              if k in rows:
+                  raise SystemExit('duplicate request key '+k)
+              rows[k]=v
+          required={'execution_phrase','expected_main_sha','materialization_id','control_plane'}
+          assert set(rows)==required,sorted(rows)
+          assert rows['execution_phrase']==os.environ['EXPECTED_EXECUTION_PHRASE']
+          assert rows['expected_main_sha']==os.environ['GITHUB_SHA']
+          assert rows['control_plane']=='CHAT_EXECUTION_BRIDGE_V5_4_R2_R6_SEMANTIC_TRAJECTORY_v0.1'
+          assert re.fullmatch(r'[A-Za-z0-9._-]{8,100}',rows['materialization_id'])
+          print('PASS: exact passive semantic-trajectory materialization request')
+          PY
+
+      - name: Validate contracts and exact artifact metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python scripts/validate_semantic_trajectory_reporting_v0_1.py
+          python - <<'PY'
+          import json,os,subprocess
+          cfg=json.load(open(os.environ['CONFIG']))
+          repo=os.environ['GITHUB_REPOSITORY']
+          rows=[('pass1','pass1',cfg['artifacts']['pass1'])]
+          rows += [('natural',str(x['wave']),x) for x in cfg['artifacts']['natural']]
+          rows += [('r5',x['slot'],x) for x in cfg['artifacts']['r5']]
+          rows += [('semantic',x['slot'],x) for x in cfg['artifacts']['semantic']]
+          for kind,slot,x in rows:
+              meta=json.loads(subprocess.check_output(
+                  ['gh','api',f"repos/{repo}/actions/artifacts/{x['id']}"],text=True
+              ))
+              assert meta['name']==x['name'],(kind,slot,'name',meta['name'],x['name'])
+              assert meta.get('digest')==x['digest'],(kind,slot,'digest',meta.get('digest'),x['digest'])
+              assert not meta.get('expired'),(kind,slot,'expired')
+          print('PASS: all frozen source artifact identities verified')
+          PY
+
+      - name: Download only required frozen evidence files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source /tmp/reaudit-zips
+          python - <<'PY' > /tmp/artifacts.tsv
+          import json,os
+          p=json.load(open(os.environ['CONFIG']))
+          print("pass1\tpass1\t"+str(p['artifacts']['pass1']['id']))
+          for x in p['artifacts']['natural']:
+              print("natural\twave"+str(x['wave'])+"\t"+str(x['id']))
+          for x in p['artifacts']['r5']:
+              print("r5\t"+x['slot']+"\t"+str(x['id']))
+          for x in p['artifacts']['semantic']:
+              print("semantic\t"+x['slot']+"\t"+str(x['id']))
+          PY
+          while IFS=$'\t' read -r kind slot id; do
+            zip="/tmp/reaudit-zips/${kind}-${slot}-${id}.zip"
+            dest="source/${kind}/${slot}"
+            mkdir -p "$dest"
+            curl -L --fail --silent --show-error               -H "Authorization: Bearer $GH_TOKEN"               -H "Accept: application/vnd.github+json"               -H "X-GitHub-Api-Version: 2022-11-28"               "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$id/zip"               -o "$zip"
+            case "$kind" in
+              pass1)
+                unzip -q "$zip" '*localized_semantic_audit_records.jsonl' -d "$dest"
+                ;;
+              natural)
+                unzip -q "$zip" 'wave-*/raw/traces.jsonl' -d "$dest"
+                ;;
+              r5)
+                unzip -q "$zip" '*raw/traces.jsonl' '*case_bindings.jsonl' -d "$dest"
+                ;;
+              semantic)
+                unzip -q "$zip" '*semantic_audit_records.jsonl' -d "$dest"
+                ;;
+              *)
+                echo "unknown artifact kind: $kind" >&2
+                exit 1
+                ;;
+            esac
+          done < /tmp/artifacts.tsv
+          test "$(find source/natural -name traces.jsonl | wc -l)" -eq 6
+          test "$(find source/r5 -name traces.jsonl | wc -l)" -eq 6
+          test "$(find source/semantic -name semantic_audit_records.jsonl | wc -l)" -eq 5
+          test "$(find source/pass1 -name localized_semantic_audit_records.jsonl | wc -l)" -eq 1
+          echo "PASS: required frozen files selectively materialized"
+
+      - name: Materialize complete-route semantic trajectory audits
+        run: |
+          set -euo pipefail
+          python -m arena.build_v5_4_r2_r6_semantic_trajectory_reaudit             --config "$CONFIG"             --source-root source             --outdir "$OUTDIR"
+
+      - name: Validate every semantic trajectory audit and report evidence bundle
+        run: |
+          set -euo pipefail
+          count=0
+          for f in "$OUTDIR"/audits/*.json; do
+            python scripts/validate_semantic_trajectory_reporting_v0_1.py --semantic-audit "$f" >/dev/null
+            count=$((count+1))
+          done
+          test "$count" -eq 32
+          python scripts/validate_semantic_trajectory_reporting_v0_1.py             --report-bundle "$OUTDIR/report_evidence_bundle.json"             --profile synthesis
+          python - <<'PY'
+          import json,os
+          s=json.load(open(os.path.join(os.environ['OUTDIR'],'summary.json')))
+          assert s['semantic_trajectory_audit_count']==32
+          assert s['natural_complete_route_audit_count']==3
+          assert s['canonical_r5_r6_complete_route_audit_count']==29
+          assert s['complete_route_node_count']==908
+          assert s['system_inertia_supported_candidate_case_count']==4
+          assert s['system_inertia_not_established_case_count']==25
+          assert s['ecommerce_primary_evidence_count']==0
+          assert s['uniform_substantive_semantic_decision_used'] is False
+          assert s['new_provider_calls']==0
+          assert s['new_paid_evaluator_calls']==0
+          assert s['subject_reruns']==0
+          assert s['raw_evidence_mutated'] is False
+          assert s['report_gate_status']=='READY_FOR_REPORT_DRAFT'
+          print('PASS: complete-route R2-R6 semantic reaudit closure')
+          PY
+
+      - name: Upload frozen semantic trajectory re-audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-4-r2-r6-semantic-trajectory-reaudit-${{ github.run_id }}
+          path: |
+            configs/v5_4_r2_r6_semantic_trajectory_reaudit_v0.1.json
+            results/v5_4_r2_r6_semantic_trajectory_reaudit/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record bounded result
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          summary_hash="$(python - <<'PY'
+          import json,os
+          print(json.load(open(os.path.join(os.environ['OUTDIR'],'summary.json')))['summary_hash'])
+          PY
+          )"
+          body="V5.4 R2-R6 complete-route semantic trajectory re-audit materialized.\n\nAudits: 32 = 3 deterministic held-out natural complete routes + 29 canonical R5-R6 complete routes. Complete route nodes: 908. Stronger System Inertia candidates: 4; System Inertia not established: 25. Ecommerce primary evidence: 0. Uniform substantive semantic decisions: forbidden/not used. Report gate: READY_FOR_REPORT_DRAFT.\n\nNew provider calls: 0. Paid evaluator calls: 0. Subject reruns: 0. Historical case-class change count: 0 by design; this is non-blind evidence re-binding, not independent replication. Problematic bias and unique R5 causality remain NOT_ESTABLISHED; CPR remains NOT_ADJUDICATED.\n\nSummary hash: $summary_hash"
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
