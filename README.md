@@ -156,14 +156,27 @@ R6 now retains one bounded mechanism candidate from supply-chain wave 4. In one 
 - System Inertia: **NOT ESTABLISHED**;
 - R7 repair authorization: **NO**.
 
-A targeted R6 specificity follow-up is frozen for the same parent:
+A targeted R6 specificity follow-up was executed for the same parent:
 
 - config: `configs/v5_cross_domain_r6_targeted_specificity_v0.1.json`;
 - target: `wave-4-8b1731b57396`;
+- workflow: `35423813470`;
+- artifact: `10577929510`;
+- artifact digest: `sha256:88a85d71b4c7784b7479b36c93c1cdbcf1f52e9a208a3c9e7c28d4553e9b1198`;
 - 8 new matched pairs / 16 branches;
-- combined target-case evidence after success: 10 matched pairs;
-- exact operator remains one-shot `fact -> unconfirmed`;
-- paid evaluator / R7 / R8: disabled.
+- preserved traces: **16 / 16**;
+- runner errors: **0**;
+- estimated provider spend: **USD 1.43038968**;
+- combined target-case evidence: **10 matched pairs**;
+- exact `no standard transfer -> procurement / expedite` phenotype: control **0 / 10**, intervention **1 / 10**;
+- the eight new intervention branches reproduced that exact phenotype **0 / 8**;
+- intervention specificity: **NOT ESTABLISHED AFTER TARGETED EXTENSION**;
+- System Inertia: **NOT ESTABLISHED**;
+- R7 entry: **R7_NOT_RUN**;
+- report: `docs/reports/2026-09-19/V5_Cross_Domain_R6_Targeted_Specificity_Result_v1.md`;
+- result manifest: `manifests/v5_cross_domain_r6_targeted_specificity_2026-09-19_v0_1.json`.
+
+The original wave-4 intervention branch remains a valid carrier/read/adoption/persistence observation. It is retained as a low-frequency mechanism candidate, but the targeted extension did not establish intervention-specific recurrence. R7 is therefore not entered for this case.
 
 Prospective sample geometry:
 
