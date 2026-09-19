@@ -18,6 +18,8 @@ Selection rule:
 
 A separate wave-3 control branch failed with HTTP 402 only after 25 successful model calls. It is **not** replaced or rerun, because doing so from the frozen parent would create a new stochastic control path rather than recover the already-realized trajectory. Its late truncation remains explicit control-context quality metadata.
 
+Machine invariant: the wave-3 late-402 control is not replaced or rerun.
+
 The effective scientific intervention set contains 10 intervention continuations across five cases. Every intervention continuation has a completed direct-exposure response and is eligible for passive R6 structural derivation subject to the normal structural evidence checks.
 
 This derived layer makes no new provider call and does not estimate domain probability.
