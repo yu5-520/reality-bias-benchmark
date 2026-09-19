@@ -1,0 +1,200 @@
+name: V5.4 R7 Dual Semantic Audit
+
+on:
+  pull_request:
+    paths:
+      - "manifests/v5_4_r7_dual_semantic_review_2026-09-19_v0_1.json"
+      - "arena/build_v5_4_r7_dual_semantic_audit.py"
+      - ".github/workflows/v5-4-r7-dual-semantic.yml"
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  offline-validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate semantic audit sources and code
+        run: |
+          set -euo pipefail
+          python -m json.tool manifests/v5_4_r7_dual_semantic_review_2026-09-19_v0_1.json >/dev/null
+          python -m py_compile arena/build_v5_4_r7_dual_semantic_audit.py
+          python - <<'PY'
+          import json
+          p=json.load(open('manifests/v5_4_r7_dual_semantic_review_2026-09-19_v0_1.json'))
+          assert p['status']=='MODEL_REVIEW_APPEND_ONLY'
+          assert len(p['case_decisions'])==4
+          assert len({x['case_id'] for x in p['case_decisions']})==4
+          assert p['review_contract']['no_new_provider_call'] is True
+          assert p['review_contract']['no_paid_evaluator_call'] is True
+          assert p['review_contract']['no_rerun'] is True
+          a=p['aggregate_judgement']
+          assert a['persistent_correction_visibility_supported_case_count']==4
+          assert a['persistent_direct_exposure_count']==32
+          assert a['structured_repair_application_supported_case_count']==4
+          assert a['structured_repair_preserved_unrelated_structure_case_count']==4
+          assert a['exact_old_fact_authority_reentry_case_count']==1
+          assert a['exact_reentry_semantically_blind_restoration_case_count']==0
+          assert a['material_action_or_parameter_divergence_case_count']==2
+          assert a['action_or_decision_reconvergence_case_count']==2
+          assert a['structured_repair_universal_superiority']=='NOT_ESTABLISHED'
+          assert a['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('PASS: frozen R7 semantic review manifest preserves claim boundaries')
+          PY
+
+  materialize:
+    if: >-
+      github.event_name == 'issues' &&
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5.4 R7 DUAL SEMANTIC AUDIT'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      REQUEST_BODY: ${{ github.event.issue.body }}
+      EXPECTED_EXECUTION_PHRASE: MATERIALIZE_V5_4_R7_DUAL_SEMANTIC
+      RAW_RUN_ID: '35449794516'
+      RAW_ARTIFACT_ID: '10586686291'
+      RAW_ARTIFACT_NAME: v5-4-r7-dual-four-candidates-35449794516
+      RAW_ARTIFACT_DIGEST: sha256:ce0d0e4fa53ab75f756947f1d315bac498bf65f894b1eeeaf6650c789638e3d8
+      RAW_EVIDENCE_HASH: 15da67c93f7b9cac5bd1e2000ddecadef229f5a7f08e735fab2626f66c039d74
+      STRUCTURAL_RUN_ID: '35450177379'
+      STRUCTURAL_ARTIFACT_ID: '10586267940'
+      STRUCTURAL_ARTIFACT_NAME: v5-4-r7-dual-structural-35450177379
+      STRUCTURAL_ARTIFACT_DIGEST: sha256:242498dac7ad07e764e56d0e69c606256ac5b8d0294fcedd92b2e150b7385bee
+      STRUCTURAL_SUMMARY_HASH: 6b769407e498479c91d6abf635d7485ef278cd7d884e1c27a06bb525d87245ab
+      REVIEW_MANIFEST: manifests/v5_4_r7_dual_semantic_review_2026-09-19_v0_1.json
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact passive semantic request
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['REQUEST_BODY'].splitlines():
+              line=raw.strip()
+              if not line: continue
+              if '=' not in line: raise SystemExit('invalid request line')
+              k,v=line.split('=',1)
+              if k in rows: raise SystemExit('duplicate request key '+k)
+              rows[k]=v
+          required={'execution_phrase','expected_main_sha','materialization_id','control_plane'}
+          assert set(rows)==required,sorted(rows)
+          assert rows['execution_phrase']==os.environ['EXPECTED_EXECUTION_PHRASE']
+          assert rows['expected_main_sha']==os.environ['GITHUB_SHA']
+          assert rows['control_plane']=='CHAT_EXECUTION_BRIDGE_V5_4_R7_DUAL_SEMANTIC_v0.1'
+          assert re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['materialization_id'])
+          print('PASS: exact passive R7 semantic request')
+          PY
+
+      - name: Verify exact frozen raw and structural artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          repo=os.environ['GITHUB_REPOSITORY']
+          checks=[
+            (os.environ['RAW_RUN_ID'],os.environ['RAW_ARTIFACT_ID'],os.environ['RAW_ARTIFACT_NAME'],os.environ['RAW_ARTIFACT_DIGEST']),
+            (os.environ['STRUCTURAL_RUN_ID'],os.environ['STRUCTURAL_ARTIFACT_ID'],os.environ['STRUCTURAL_ARTIFACT_NAME'],os.environ['STRUCTURAL_ARTIFACT_DIGEST']),
+          ]
+          for run_id,artifact_id,name,digest in checks:
+              p=json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{run_id}/artifacts'],text=True))
+              rows=[x for x in p['artifacts'] if str(x['id'])==artifact_id and x['name']==name]
+              assert len(rows)==1,(run_id,artifact_id,name)
+              assert rows[0].get('digest')==digest,(artifact_id,rows[0].get('digest'),digest)
+              assert not rows[0].get('expired')
+          print('PASS: exact frozen R7 raw and structural artifacts verified')
+          PY
+
+      - name: Download frozen evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/raw source/structural
+          gh run download "$RAW_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$RAW_ARTIFACT_NAME" --dir source/raw
+          gh run download "$STRUCTURAL_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$STRUCTURAL_ARTIFACT_NAME" --dir source/structural
+          test -s source/raw/results/v5_4_r7_dual_four_candidates/evidence_batch.json
+          test -s source/raw/results/v5_4_r7_dual_four_candidates/raw/batch_run_summary.json
+          test -s source/structural/summary.json
+          test -s source/structural/r7_dual_process_measurements.jsonl
+          test -s source/structural/r7_dual_structural_comparisons.jsonl
+          python - <<'PY'
+          import json,os
+          e=json.load(open('source/raw/results/v5_4_r7_dual_four_candidates/evidence_batch.json'))
+          s=json.load(open('source/structural/summary.json'))
+          assert e['evidence_batch_hash']==os.environ['RAW_EVIDENCE_HASH']
+          assert s['summary_hash']==os.environ['STRUCTURAL_SUMMARY_HASH']
+          assert e['raw_evidence_frozen_before_derived_analysis'] is True
+          assert e['trace_count']==8
+          assert s['case_count']==4
+          assert s['measurement_count']==8
+          assert s['integrity_failure_count']==0
+          print('PASS: semantic audit source bindings')
+          PY
+
+      - name: Materialize semantic audit
+        id: audit
+        run: |
+          set -euo pipefail
+          python -m arena.build_v5_4_r7_dual_semantic_audit             --review-manifest "$REVIEW_MANIFEST"             --raw-root source/raw             --structural-root source/structural             --outdir results/v5_4_r7_dual_semantic_audit
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          s=json.load(open('results/v5_4_r7_dual_semantic_audit/summary.json'))
+          assert s['case_count']==4
+          assert s['trace_count']==8
+          assert s['persistent_correction_visibility_supported_case_count']==4
+          assert s['structured_repair_application_supported_case_count']==4
+          assert s['structured_repair_preserved_unrelated_structure_case_count']==4
+          assert s['material_action_or_parameter_divergence_case_count']==2
+          assert s['action_or_decision_reconvergence_case_count']==2
+          assert s['exact_old_fact_authority_reentry_case_count']==1
+          assert s['exact_reentry_semantically_blind_restoration_case_count']==0
+          assert s['new_provider_calls']==0
+          assert s['new_paid_evaluator_calls']==0
+          assert s['subject_reruns']==0
+          assert s['structured_repair_universal_superiority']=='NOT_ESTABLISHED'
+          assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
+          for k in ('summary_hash','material_action_or_parameter_divergence_case_count','action_or_decision_reconvergence_case_count','exact_old_fact_authority_reentry_case_count','exact_reentry_semantically_blind_restoration_case_count'):
+              print(k+'='+str(s[k]))
+          PY
+
+      - name: Upload frozen semantic audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-4-r7-dual-semantic-${{ github.run_id }}
+          path: |
+            manifests/v5_4_r7_dual_semantic_review_2026-09-19_v0_1.json
+            results/v5_4_r7_dual_semantic_audit/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record semantic result
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SUMMARY_HASH: ${{ steps.audit.outputs.summary_hash }}
+          DIVERGENCE: ${{ steps.audit.outputs.material_action_or_parameter_divergence_case_count }}
+          RECONVERGENCE: ${{ steps.audit.outputs.action_or_decision_reconvergence_case_count }}
+          REENTRY: ${{ steps.audit.outputs.exact_old_fact_authority_reentry_case_count }}
+          BLIND: ${{ steps.audit.outputs.exact_reentry_semantically_blind_restoration_case_count }}
+        run: |
+          body="V5.4 R7 dual semantic audit complete.\n\nCases: 4. Persistent-correction visibility supported: 4/4 (32 direct experiment-origin exposures). Structured repair applied with unrelated structure preserved: 4/4. Material action/parameter divergence between R7-P and R7-S: $DIVERGENCE/4. Action/decision reconvergence: $RECONVERGENCE/4. Exact old factual target-key re-entry: $REENTRY/4; semantically blind restoration: $BLIND/4.\nSummary hash: $SUMMARY_HASH.\n\nThe one exact factual re-entry is classified as fresh evidence-based re-derivation, not blind restoration. R7-P and R7-S are therefore semantically distinct intervention modes, but universal superiority is NOT_ESTABLISHED. Provider calls: 0. Paid evaluator calls: 0. Subject reruns: 0. Problematic bias and unique R5 causality remain NOT_ESTABLISHED; CPR remains NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed

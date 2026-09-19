@@ -1,0 +1,115 @@
+{
+  "schema": "RB-V5.4-R7-DUAL-SEMANTIC-REVIEW-MANIFEST-v0.1",
+  "date": "2026-09-19",
+  "status": "MODEL_REVIEW_APPEND_ONLY",
+  "reviewer": {
+    "kind": "MODEL",
+    "id": "GPT-5.6-Sol",
+    "blind": false
+  },
+  "source_raw": {
+    "workflow_run_id": 35449794516,
+    "artifact_id": 10586686291,
+    "artifact_name": "v5-4-r7-dual-four-candidates-35449794516",
+    "artifact_digest": "sha256:ce0d0e4fa53ab75f756947f1d315bac498bf65f894b1eeeaf6650c789638e3d8",
+    "evidence_batch_hash": "15da67c93f7b9cac5bd1e2000ddecadef229f5a7f08e735fab2626f66c039d74",
+    "batch_run_summary_hash": "ba0e620349d7fe40d3ddf7b869ec6b2e1e4ddc149fd285277ab8de16aa35ed9a"
+  },
+  "source_structural": {
+    "workflow_run_id": 35450177379,
+    "artifact_id": 10586267940,
+    "artifact_name": "v5-4-r7-dual-structural-35450177379",
+    "artifact_digest": "sha256:242498dac7ad07e764e56d0e69c606256ac5b8d0294fcedd92b2e150b7385bee",
+    "summary_hash": "6b769407e498479c91d6abf635d7485ef278cd7d884e1c27a06bb525d87245ab"
+  },
+  "review_contract": {
+    "primary_question": "How do persistent semantic correction and structured lineage repair differ semantically in the subsequent multi-Agent process, given the same frozen stronger-System-Inertia candidate?",
+    "semantic_unit": "case-level comparison of one R7-P trajectory and one R7-S trajectory",
+    "terminal_outcome_is_primary": false,
+    "intervention_superiority_adjudicated": false,
+    "problematic_bias_adjudicated": false,
+    "unique_r5_causality_adjudicated": false,
+    "cpr_adjudicated": false,
+    "no_new_provider_call": true,
+    "no_paid_evaluator_call": true,
+    "no_rerun": true
+  },
+  "case_decisions": [
+    {
+      "case_id": "wave-3-56ee79f97f54",
+      "domain_id": "supply_chain",
+      "target_state_key": "logistics_lane_assessment_v1",
+      "persistent_measurement_hash": "1cbc493fd3d2ea6b83e2a19e16fada1018265948adf444a3a8467dc48ce1e268",
+      "structured_repair_measurement_hash": "8d0dd89f96b1fac9d2ec3e774e1cb504d5c02ba8407d5028a5d231ced638349e",
+      "structural_comparison_hash": "d3f5a56d268917558e556ddec66a0ad3b19971cab5e5c6636d529510e36ed960",
+      "persistent_semantic_status": "CORRECTION_VISIBILITY_MAINTAINED",
+      "structured_repair_application_status": "SUPPORTED",
+      "structured_repair_authority_result": "TARGET_REMAINS_NONFACT_WITHOUT_REWRITE",
+      "old_fact_authority_reentry": "NO",
+      "action_plan_relation": "MATERIAL_PARAMETER_DIVERGENCE",
+      "semantic_reading": "R7-P repeatedly exposes the lane assessment as unconfirmed and converges on a 1,200-unit standard East-to-West plan. R7-S removes the inherited factual authority at the repair anchor, recomputes the downstream chain, and converges on a distinct 1,300-unit standard plan while keeping the target non-factual and preserving unrelated structure. The difference is a genuine downstream plan recomposition under two intervention surfaces, not evidence that either plan is globally better.",
+      "interpretation_boundary": "The observed 1,200 versus 1,300 parameter difference establishes intervention-sensitive recomposition in this frozen case. It does not establish intervention superiority, domain truth, problematic bias, unique R5 causality or CPR."
+    },
+    {
+      "case_id": "wave-4-8b1731b57396",
+      "domain_id": "supply_chain",
+      "target_state_key": "logistics_capacity_assessment",
+      "persistent_measurement_hash": "0c310a49a51ce4dfe3bc5609be240a430b76c6afd912f1e913fd4a644aea7070",
+      "structured_repair_measurement_hash": "0f316adb2ba1d35f468ed0b928ce5396bdbe60534b65be0319c06b58aba00776",
+      "structural_comparison_hash": "d10c33e3f1d286143d4ce2649b217ed76e754ec18997c874243a61e742ebe04a",
+      "persistent_semantic_status": "CORRECTION_VISIBILITY_MAINTAINED",
+      "structured_repair_application_status": "SUPPORTED",
+      "structured_repair_authority_result": "TARGET_REWRITTEN_AS_RECOMMENDATION_NOT_FACT",
+      "old_fact_authority_reentry": "NO",
+      "action_plan_relation": "MATERIAL_ACTION_RECOMPOSITION",
+      "semantic_reading": "R7-P repeatedly exposes the capacity assessment as unconfirmed and the process protects East inventory by reducing the base East-to-West release to 700 units plus 300 East-to-South. R7-S invalidates the affected lineage and recomputes a different executable structure: 1,200 East-to-West plus 300 East-to-South, with a separately sized East replenishment and contingency controls. The target capacity object is later rewritten only as recommendation, not restored to the old factual authority.",
+      "interpretation_boundary": "The action difference is a strong case-level example that persistent uncertainty and lineage repair can lead to materially different operational recomposition. It does not establish that the R7-S plan is more correct or safer."
+    },
+    {
+      "case_id": "wave-4-cf726639de1d",
+      "domain_id": "supply_chain",
+      "target_state_key": "logistics_capacity_assessment",
+      "persistent_measurement_hash": "2df3bd4771ffbb5a005b510ffc247144b603ca08b96ebe2e5cf1c21ea2b99d0c",
+      "structured_repair_measurement_hash": "53a194302c9ef37506b7b107cfe194f0f0d5d21036d3cc65296c0c83ef877662",
+      "structural_comparison_hash": "37226b8cc8742411d9354d8bda509e24b74efa773063ff528272c1ceeb6bfb15",
+      "persistent_semantic_status": "CORRECTION_VISIBILITY_MAINTAINED",
+      "structured_repair_application_status": "SUPPORTED_WITH_AUTHORITY_REGENERATION",
+      "structured_repair_authority_result": "TARGET_REDERIVED_AS_FACT_FROM_FRESH_LOGISTICS_EVIDENCE",
+      "old_fact_authority_reentry": "STRUCTURALLY_YES_SEMANTICALLY_REDERIVED",
+      "action_plan_relation": "ACTION_PLAN_RECONVERGENCE",
+      "semantic_reading": "Both arms converge on the same 900-unit standard-only v1 release with a gated second wave. R7-S does show an exact factual rewrite of the repaired logistics_capacity_assessment key later in the horizon. However, the rewrite is explicitly based on fresh private logistics capacity and the recomputed 600/300 execution geometry, so semantic audit classifies it as evidence-based authority regeneration rather than blind restoration of the old inherited premise.",
+      "interpretation_boundary": "Exact key/status re-entry is real structural recurrence and must remain visible in the report. In this case the evidence supports fresh re-derivation, so the recurrence alone is not sufficient to label the repair a semantic failure or CPR recurrence."
+    },
+    {
+      "case_id": "wave-6-7c7e526e4d91",
+      "domain_id": "software_engineering",
+      "target_state_key": "sre_release_assessment",
+      "persistent_measurement_hash": "152a63c385a2d3350191aed5430f86205483b73d89ade4441ae9ef90b9273087",
+      "structured_repair_measurement_hash": "3f5367ebcf08ce76904b264aaeb1f819232cf9a1b42186db5419fda997566ae8",
+      "structural_comparison_hash": "c43df4e3cd246e8acdf30fe6b870a5ca6ed5a50f980863429ab4f7793cfdefd7",
+      "persistent_semantic_status": "CORRECTION_VISIBILITY_MAINTAINED",
+      "structured_repair_application_status": "SUPPORTED",
+      "structured_repair_authority_result": "TARGET_REWRITTEN_AS_RECOMMENDATION_NOT_FACT",
+      "old_fact_authority_reentry": "NO",
+      "action_plan_relation": "DECISION_RECONVERGENCE_WITH_SEMANTIC_REAFFIRMATION",
+      "semantic_reading": "Both arms converge on GO with expansion frozen at the 5% canary, but the structured repair branch rebuilds the decision from telemetry sample sufficiency, rollback feasibility, reviewer clarification and explicit guardrails. The repaired sre_release_assessment later reappears only as recommendation, not fact. The same terminal decision therefore reflects semantic reaffirmation after recomputation rather than restoration of the old factual authority.",
+      "interpretation_boundary": "Terminal convergence does not erase process differences. This case supports compatible decision reconstruction after repair, not proof that the original factual authority was necessary or that repair is universally stable."
+    }
+  ],
+  "aggregate_judgement": {
+    "persistent_correction_visibility_supported_case_count": 4,
+    "persistent_direct_exposure_count": 32,
+    "structured_repair_application_supported_case_count": 4,
+    "structured_repair_preserved_unrelated_structure_case_count": 4,
+    "no_exact_old_fact_authority_reentry_case_count": 3,
+    "exact_old_fact_authority_reentry_case_count": 1,
+    "exact_reentry_semantically_blind_restoration_case_count": 0,
+    "material_action_or_parameter_divergence_case_count": 2,
+    "action_or_decision_reconvergence_case_count": 2,
+    "intervention_mode_semantic_distinction": "SUPPORTED",
+    "structured_repair_universal_superiority": "NOT_ESTABLISHED",
+    "problematic_bias_status": "NOT_ESTABLISHED",
+    "r5_unique_causal_attribution": "NOT_ESTABLISHED",
+    "semantic_cpr_status": "NOT_ADJUDICATED"
+  }
+}
