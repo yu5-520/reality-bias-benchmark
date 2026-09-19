@@ -1,0 +1,82 @@
+{
+  "schema": "RB-V5-CROSS-DOMAIN-R5-SECOND-WAVE-PLAN-v0.1",
+  "date": "2026-09-19",
+  "status": "FROZEN_PRE_EXECUTION_PLAN",
+  "source_subject": {
+    "workflow_run_id": 35370679448,
+    "execution_sha": "b712dabc227973470900af4aea4e13d1077f5696",
+    "manifest_artifact": {
+      "id": 10558806589,
+      "name": "v5-cross-domain-first-round-manifest-35370679448",
+      "digest": "sha256:b5c8da5cbed35230af858320b093550553c8d58038f121fe6965192066a0afa8"
+    },
+    "wave_artifacts": [
+      {"wave_id":1,"id":10558039019,"name":"v5-cross-domain-first-round-wave-1-35370679448","digest":"sha256:7cd771048914067eb727a4e20a11026e1c687f21bf147da5235640104d88b562"},
+      {"wave_id":2,"id":10557859045,"name":"v5-cross-domain-first-round-wave-2-35370679448","digest":"sha256:4e24f88be8df125165caeb712735034a21b2e997cfb89afbc9c467816521cb2f"},
+      {"wave_id":3,"id":10558968954,"name":"v5-cross-domain-first-round-wave-3-35370679448","digest":"sha256:6d4256afb4e0144cafc9182f609cd58ba95f7cd4490353aa6661799fdfa274b7"},
+      {"wave_id":4,"id":10558858901,"name":"v5-cross-domain-first-round-wave-4-35370679448","digest":"sha256:421287980285b8549d0b07e82cdb3fa9d6ff038b60b4c8b62c8ab50c2163fafc"},
+      {"wave_id":5,"id":10558129961,"name":"v5-cross-domain-first-round-wave-5-35370679448","digest":"sha256:a76a4913745b870ea7e34ed6c303b11434e81c0c475036e3e12a9296a9b2e527"},
+      {"wave_id":6,"id":10558915998,"name":"v5-cross-domain-first-round-wave-6-35370679448","digest":"sha256:f18f77b38f4ad69e3969e4c6fd101e46b8d0bc8e5cfddf4142052b15ae78f1f3"}
+    ]
+  },
+  "source_semantic_audit": {
+    "workflow_run_id": 35378782053,
+    "artifact_id": 10561246944,
+    "artifact_name": "v5-cross-domain-localized-semantic-audit-pass1-35377246079-35378782053",
+    "artifact_digest": "sha256:457b4fc91d09dcec0a3dbe609068761d238df24679fb40dd7db26c06e3630e60",
+    "summary_hash": "b97ae65a2ff3ab808abf7e39aa45ffda320dd6786db6b3369bf82d575057d9a3",
+    "eligible_case_count": 29
+  },
+  "exclude_first_wave_case_hashes": [
+    "9d1ad55823f89b06d211a3f8aa3807368778a25b3132f79247b2b06ecd53107c",
+    "3e4a064e689e5f46fb4058ac8ea2465f8b3657cd97a113dacb8c919665f1233e",
+    "cac2cde91b7ad076202143188348e5c74a8200844e9d70fd706165b60404385b",
+    "8b1731b57396dadfb25e0d975c4849ef83d55b6a68a5920a209c9ed84079b5d6",
+    "0aa6e0fc2696017ff562311e79d8aad914dc06294ae8d5c4069978ea38b57e94",
+    "7c7e526e4d911cf24416eae067967e9b9504b1846b8a4f1fe8f6057becada4c0"
+  ],
+  "selection_rule": "For each natural wave with remaining pass-1 ELIGIBLE_R5_ATOMIC_PROBE records after excluding first-wave cases, select the smallest tuple (source_event_index, source_run_id, source_case_hash). Wave 2 is explicitly exhausted and is not replaced.",
+  "wave_status": {
+    "1": "SECOND_ELIGIBLE_SELECTED",
+    "2": "EXHAUSTED_AFTER_WAVE1",
+    "3": "SECOND_ELIGIBLE_SELECTED",
+    "4": "SECOND_ELIGIBLE_SELECTED",
+    "5": "SECOND_ELIGIBLE_SELECTED",
+    "6": "SECOND_ELIGIBLE_SELECTED"
+  },
+  "selected_cases": [
+    {"wave_id":1,"domain_id":"finance","source_run_id":"v5-xd-finance-fr001-0007","source_case_hash":"bb8524ad125b6c07194c337f27e32c241d3e0b71bb7a9c6061a7526119c592d4","audit_hash":"589fc1bd01fae16ff331dd7b34ffb107539e317299b555b90d60385549fbd604","candidate_ref":"arena_event:61:state:collateral_assessment","content_address":"da2b14feb38541a6c9c45500c750e1507633b2c6d8d579ad2cb459f0affc4a40","source_turn":16,"state_key":"collateral_assessment","parent_anchor_ref":"after_turn:16","parent_state_hash":"82228065705b20c906b823678ae9f0199677eb5495a97c6b0937684070edc0b9","expected_next_actor":"risk"},
+    {"wave_id":3,"domain_id":"supply_chain","source_run_id":"v5-xd-supply_chain-fr001-0009","source_case_hash":"56ee79f97f54dc9968b537cd06b8a273210a9ded06637dfce45e88f652db1b2f","audit_hash":"9c4c7548d0342a7be6b63b3500eae7b66fc253f921558671bd77b578ff5f9ba1","candidate_ref":"arena_event:6:state:logistics_lane_assessment_v1","content_address":"4f99887286a53efa3cf841e2c480f28f9bea8508141430e6402fd1585f01af31","source_turn":2,"state_key":"logistics_lane_assessment_v1","parent_anchor_ref":"after_turn:2","parent_state_hash":"511cd17128904dc05ab0615a4b8a28390124990a921b63fcefbf3e48f2713951","expected_next_actor":"inventory"},
+    {"wave_id":4,"domain_id":"supply_chain","source_run_id":"v5-xd-supply_chain-fr001-0016","source_case_hash":"cf726639de1dc285c89b2f8037eadd6ea969e553a2bc963483f1c9035bff217a","audit_hash":"c8654ab201d2638d0717ea5182e0b2cced6c11e825e113eb16cf99fd4c28a1a4","candidate_ref":"arena_event:25:state:logistics_capacity_assessment","content_address":"a2ab574f08f455e320057245d25e592ee5c4c0d08398e82999cafd09b1cc5700","source_turn":5,"state_key":"logistics_capacity_assessment","parent_anchor_ref":"after_turn:5","parent_state_hash":"4334ba3557a2ae172c4bd460f194dd159b17a623e2cc2de0f34af57b34699fdc","expected_next_actor":"risk"},
+    {"wave_id":5,"domain_id":"software_engineering","source_run_id":"v5-xd-software_engineering-fr001-0002","source_case_hash":"9684a9c95d382dfe231ea1d3a4226c38906291885cc79c280b26106036817d31","audit_hash":"711c0a542a3a6851cc0961acfd7d79d1db3358a8941237fa950fb0c1528295d0","candidate_ref":"arena_event:38:state:reviewer_findings","content_address":"05e7edb4f666666c1b440122c8a1a173d085e443445a1e617e6d697be3281c08","source_turn":9,"state_key":"reviewer_findings","parent_anchor_ref":"after_turn:9","parent_state_hash":"de218c0e741a6648ca282e66e3d22dd548531697cd4efeddf992ef4069459dff","expected_next_actor":"data"},
+    {"wave_id":6,"domain_id":"software_engineering","source_run_id":"v5-xd-software_engineering-fr001-0018","source_case_hash":"83476eeee96e111d9e0d3b66483ee9bf3bde7375cf268382a8aa4d08f60c3f85","audit_hash":"400905d48b78ba1e727e7a387dfc3461f9407863ab4b9b3f4348520dd28f618c","candidate_ref":"arena_event:17:state:telemetry_assessment","content_address":"a42c02645408b323680ba4c0a08ee30511e16f6dd26dfd16b0e18b86aa824902","source_turn":4,"state_key":"telemetry_assessment","parent_anchor_ref":"after_turn:4","parent_state_hash":"a824acc6df4c240bc726b214471f243f53ef05a5c6541158c1d55eacdde66064","expected_next_actor":"release_lead"}
+  ],
+  "operator": {
+    "family": "ONE_SHOT_RUNTIME_METADATA_STATUS_OVERLAY",
+    "from_status": "fact",
+    "to_status": "unconfirmed",
+    "direct_exposure_limit": 1,
+    "persistent_state_mutation": false,
+    "experiment_origin_reinjection_count": 0
+  },
+  "geometry": {
+    "case_count": 5,
+    "replicate_pairs_per_case": 2,
+    "branches_per_case": 4,
+    "total_branch_count": 20,
+    "pair_order_policy": "REPLICATE_1_CONTROL_FIRST_REPLICATE_2_INTERVENTION_FIRST"
+  },
+  "budget": {
+    "provider": "deepseek",
+    "per_branch_max_calls": 64,
+    "per_branch_spending_ceiling_usd": 0.25,
+    "global_spending_ceiling_usd": 5.0
+  },
+  "authorization": {
+    "exact_phrase": "CALL_REAL_V5_CROSS_DOMAIN_R5_SECOND_WAVE_API",
+    "paid_evaluator": false,
+    "r6_new_subject_experiment": false,
+    "r7_repair": false,
+    "r8_cpr_adjudication": false
+  }
+}
