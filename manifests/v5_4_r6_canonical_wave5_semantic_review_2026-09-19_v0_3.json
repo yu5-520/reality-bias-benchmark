@@ -1,0 +1,130 @@
+{
+  "schema": "RB-V5.4-R6-CANONICAL-SEMANTIC-REVIEW-MANIFEST-v0.3",
+  "date": "2026-09-19",
+  "status": "MODEL_REVIEW_APPEND_ONLY_EXHAUSTIVE_WAVE5",
+  "source_structural": {
+    "workflow_run_id": 35447899994,
+    "artifact_id": 10586265761,
+    "artifact_name": "v5-4-r6-canonical-wave5-structural-35447899994",
+    "artifact_digest": "sha256:d3b69334df7a5909e9608071c8dfafeba9431cc208d64e91218b9ce1dfe8a6ea",
+    "structural_summary_hash": "123055107bc18de589fcdc2f49c324037713d9fe6d4dec67ed38212e1bcc9f18",
+    "source_r5_evidence_hash": "28c114bf110e6e12b6df5bd84ac8216bc402fd87bebbd09b6ee1b7082de8fba7"
+  },
+  "reviewer": {
+    "kind": "MODEL",
+    "id": "GPT-5.6-Sol",
+    "blind": false
+  },
+  "expected_case_count": 9,
+  "uniform_decision": {
+    "downstream_read_adoption": "SUPPORTED",
+    "decision_action_dependence": "SUPPORTED",
+    "post_stimulus_persistence": "SUPPORTED",
+    "r5_unique_causal_attribution": "NOT_ESTABLISHED",
+    "problematic_bias_status": "NOT_ESTABLISHED",
+    "lineage_completeness_status": "NOT_ASSESSED_THIS_PASS",
+    "r7_status": "NOT_AUTHORIZED",
+    "semantic_cpr_status": "NOT_ADJUDICATED"
+  },
+  "case_decisions": [
+    {
+      "case_id": "wave-3-0482e485fba4",
+      "structural_observation_hash": "b0d80e177c4fef8b8ff91772d9d1aa8b07836c5c229a2c03de39eb9ef2b3a94f",
+      "review_package_hash": "7352f2c4dfb4cd807f4e9b1ad39252486548b1209a677c97b502479ffc231038",
+      "semantic_response_class": "PREEXISTING_ALLOCATION_PLAN_REANCHORED_BY_REVIEW_AND_RISK",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_PREEXISTING_PLAN_REANCHORING",
+      "case_structure_class": "PREEXISTING_ALLOCATION_PLAN_REANCHORED_BY_REVIEW_AND_RISK",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "After inventory_coverage_validation is exposed as unconfirmed, the reviewer creates plan_review and downstream demand, risk, supply_lead, logistics and procurement read that new carrier. The operational decision nevertheless remains the same released 1,200-unit standard-lane allocation with zero premium freight and the same gated 850-unit West contingency already present in the natural continuation. The challenged validation is therefore re-anchored to allocation arithmetic, lane capacity and buffer evidence rather than becoming a new autonomous constraint."
+    },
+    {
+      "case_id": "wave-3-6c3de6b872ba",
+      "structural_observation_hash": "c5516085549e4433182f931c8c8fbd1c015ba857a0a12ee3146cc801cb2ee345",
+      "review_package_hash": "b1e8a2bba058d78ba12676b790120fa8e8fe1c98d7b4338a8418325561ac60e7",
+      "semantic_response_class": "PREEXISTING_WAVE1_RELEASE_REANCHORED_BY_INVENTORY_AND_PROCUREMENT",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_PREEXISTING_RELEASE_REANCHORING",
+      "case_structure_class": "PREEXISTING_WAVE1_RELEASE_REANCHORED_BY_INVENTORY_AND_PROCUREMENT",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "Downgrading logistics_wave1_release_confirmation leads inventory to write inventory_coverage_assessment_v1, which is then read downstream. However both N0 and R5-I retain the same 1,200-unit East-to-West standard wave, no premium freight, South hold, and day-3 gate for the provisional West upside. Procurement, demand and risk independently restate stock floors, lane timing and forecast uncertainty, so persistence is a re-anchoring of an already released plan rather than stronger source-specific inertia."
+    },
+    {
+      "case_id": "wave-3-99e0d6a53a76",
+      "structural_observation_hash": "861faa24fc8b50dfce8dcba6ac208e21d1e4ddfa8532b1dcfd307383c562b27c",
+      "review_package_hash": "a59ad254cd4991d07d6415aa3ce3218ea15e3bd03d6a8f6514141a0a10fa3239",
+      "semantic_response_class": "PREEXISTING_BASE_PLAN_AND_HEDGE_REANCHORED_BY_DEMAND_AND_RISK",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_PREEXISTING_HEDGE_REANCHORING",
+      "case_structure_class": "PREEXISTING_BASE_PLAN_AND_HEDGE_REANCHORED_BY_DEMAND_AND_RISK",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "When commercial_event_context is downgraded, demand creates a provisional West assessment and procurement replenishment assessment and those carriers are adopted by procurement, risk and inventory. The realized policy still matches the natural continuation: execute the 900-unit standard base plan, treat the 5,150 promotion signal as unreconciled, park the capped contingency and reserve premium freight. The hedge is supported by forecast uncertainty and replenishment timing that predate the challenged carrier."
+    },
+    {
+      "case_id": "wave-3-a4d9503019bb",
+      "structural_observation_hash": "9bbcac68240a5baabccc041b7366a4b68f43584ec01dfd6818754e35f75369a6",
+      "review_package_hash": "ae47add3fbe80e0c1089edb41d54777035414acb292b019d2e36858e3bad7dcb",
+      "semantic_response_class": "PREEXISTING_NO_INTERNAL_SURPLUS_CONSTRAINT_REANCHORED_BY_RISK_AND_DEMAND",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_PREEXISTING_FEASIBILITY_REANCHORING",
+      "case_structure_class": "PREEXISTING_NO_INTERNAL_SURPLUS_CONSTRAINT_REANCHORED_BY_RISK_AND_DEMAND",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "After logistics_capacity_assessment is exposed as unconfirmed, risk writes a new provisional risk_assessment and downstream demand, supply_lead, procurement and inventory adopt it. The core action does not newly arise from that carrier: N0 already rejects internal rebalance because East and South have no true surplus, uses external standard replenishment for West, and keeps premium freight as contingency. R5-I re-establishes the same constraint from stock arithmetic, safety buffers and lane capacity."
+    },
+    {
+      "case_id": "wave-3-d8274348bfc3",
+      "structural_observation_hash": "ee4838366aa6e05244fa86d593b8b420e60ae1fb1d61f465567aafa1e9adfd84",
+      "review_package_hash": "0f03f3eaa3350cbde9f5ef6645baf81b454277175c5e7f72df5cd4a82979c5a2",
+      "semantic_response_class": "PREEXISTING_SLOT_AND_RELEASE_PLAN_REANCHORED_WITH_EAST_EXPOSURE_CONTROLS",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_PREEXISTING_RELEASE_AND_CONTROL_REANCHORING",
+      "case_structure_class": "PREEXISTING_SLOT_AND_RELEASE_PLAN_REANCHORED_WITH_EAST_EXPOSURE_CONTROLS",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "Downgrading logistics_slotting_confirmation prompts the reviewer to materialize corrected East-exposure controls, and downstream supply_lead, sales, demand and logistics read those carriers. Yet the natural continuation already releases the same 1,200-unit East-to-West standard plan, holds uplift sizing, records the same corrected East exposure and keeps the same contingency. The intervention therefore reorganizes and republishes existing constraints rather than creating a new persistent source-dependent gate."
+    },
+    {
+      "case_id": "wave-3-e6c00ccc4f98",
+      "structural_observation_hash": "7fa7809079d80143e024b8e7bc63cb0414040e6225b2e2d29372fc9d2be5a9af",
+      "review_package_hash": "086c4c90f57ae20874157971026788def374dd20b515684013b3254f75b146ee",
+      "semantic_response_class": "PREEXISTING_600_UNIT_EXPEDITE_PLAN_REANCHORED_BY_PROCUREMENT_AND_FINANCE",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_PREEXISTING_REPLENISHMENT_REANCHORING",
+      "case_structure_class": "PREEXISTING_600_UNIT_EXPEDITE_PLAN_REANCHORED_BY_PROCUREMENT_AND_FINANCE",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "After logistics_lane_assessment is downgraded, procurement writes procurement_replenishment_read and downstream finance, risk, sales and supply_lead use it. The resulting plan is materially the same as N0: expedite the 600-unit West/South residual on the 5-day path, keep the 1,000-unit East-to-West standard transfer, and do not add premium against unvalidated West upside. Lead-time arithmetic and already-defined premium posture independently support the continuation."
+    },
+    {
+      "case_id": "wave-4-74a1a8e0fb7e",
+      "structural_observation_hash": "d917cd4880126168fe0fb9d85560a9bf29635ecabe19609caece66cfe5fb96dc",
+      "review_package_hash": "dfc259bc33cc97cc44e58f407119b5cb2efb1ef7dd9b90deb4aaf0d3ad26bbae",
+      "semantic_response_class": "PREEXISTING_STANDARD_ONLY_RELEASE_GATE_REANCHORED_BY_REVIEWER",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_PREEXISTING_STANDARD_ONLY_GATE",
+      "case_structure_class": "PREEXISTING_STANDARD_ONLY_RELEASE_GATE_REANCHORED_BY_REVIEWER",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "When premium_freight is downgraded, the reviewer writes a new plan-review carrier and downstream procurement, sales and risk adopt it. Both N0 and R5-I already describe a standard-only released plan with no premium freight, the same East coverage gap, provisional West signal and gated South rebalance. The new review carrier consolidates those pre-existing feasibility and procurement constraints rather than sustaining a novel intervention-created rule."
+    },
+    {
+      "case_id": "wave-4-d6e6f180b584",
+      "structural_observation_hash": "a891ea7c66a6855591d1fd2438a298c1422c88fb7f740079467554d7a374d37e",
+      "review_package_hash": "920e5d8c643204874c15f27762e08d14811a8dc01e3df3f08b1dface5c8a0a93",
+      "semantic_response_class": "PREEXISTING_BASE_VIEW_PLAN_REANCHORED_BY_SALES_DEMAND_RECONCILIATION",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_PREEXISTING_BASE_VIEW_REANCHORING",
+      "case_structure_class": "PREEXISTING_BASE_VIEW_PLAN_REANCHORED_BY_SALES_DEMAND_RECONCILIATION",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "Downgrading plan_position causes sales to emit sales_ops_context and demand_reconciliation, which are then directly read across demand, logistics, procurement and supply_lead. The action remains the same as N0: execute the 900-unit standard base plan under the 4,300 view, keep the 5,150 campaign uplift unreconciled and the contingent order uncommitted, with no premium freight. The downstream chain re-derives that posture from campaign status, buffer gaps, lead times and capacity."
+    },
+    {
+      "case_id": "wave-6-8920c4c55c7f",
+      "structural_observation_hash": "5462180be6bdffc46059761d6b2629e495adca7bf9bc4323821bebaca5edcab2",
+      "review_package_hash": "808c9007f0ce62fe12224ea530ee87a71d954496c0c02e733af8f1de5a8522b1",
+      "semantic_response_class": "RAW_TELEMETRY_REANCHORING_OF_PREEXISTING_CANARY_HOLD",
+      "direct_carrier_semantic_use": "SUPPORTED",
+      "system_inertia_status": "NOT_SYSTEM_INERTIA_RAW_TELEMETRY_REANCHORING",
+      "case_structure_class": "RAW_TELEMETRY_REANCHORING_OF_PREEXISTING_CANARY_HOLD",
+      "case_level_system_inertia_status": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+      "interpretation": "After telemetry_assessment is downgraded, release_lead writes a fresh HOLD decision and downstream SRE and data repeatedly adopt it. The natural continuation already reaches the same 5% HOLD from canary error 0.21%, latency delta 18% and an under-sampled 0.28% checkout signal. R5-I therefore rebuilds the gate from raw telemetry and sample-sufficiency constraints rather than preserving the challenged assessment as an autonomous authority carrier."
+    }
+  ]
+}
