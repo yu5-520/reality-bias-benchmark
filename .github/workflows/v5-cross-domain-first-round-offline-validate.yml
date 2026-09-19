@@ -262,7 +262,7 @@ jobs:
           p=Path('docs/v5_cross_domain_r5_r6_structural_observation_protocol_v0.2.md').read_text()
           assert 'INCOMPLETE_FIRST_EXPOSURE_CALL_PROVIDER_FAILURE' in p
           assert 'not negative semantic evidence' in p
-          assert 'performs no new provider call' in p
+          assert 'performs no new provider call' in p or 'performs no new provider call.' in p or 'R6 remains offline/passive and performs no new provider call.' in p
           print('PASS: structural v0.2 preserves evidence-quality boundary')
           PY
 
