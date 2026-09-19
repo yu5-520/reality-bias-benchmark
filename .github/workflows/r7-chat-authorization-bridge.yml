@@ -1261,3 +1261,173 @@ jobs:
           body="V5.3 cross-domain R5-R6 semantic audit wave 1 materialized from the frozen structural observation bundle.\n\nBranch audits: $BRANCH_COUNT. Cases: $CASE_COUNT.\nSemantic adoption supported: $ADOPTION_COUNT/$BRANCH_COUNT branches.\nPost-stimulus persistence supported: $PERSIST_COUNT/$BRANCH_COUNT branches.\nStronger case-level System Inertia candidates: $INERTIA_CASES/$CASE_COUNT cases.\nSummary hash: $SUMMARY_HASH.\n\nProvider calls: 0. Paid evaluator calls: 0. Problematic bias remains NOT_ESTABLISHED. R5 unique causal attribution remains NOT_ESTABLISHED. Lineage completeness not assessed in this pass. R7 not authorized. CPR NOT_ADJUDICATED."
           gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
           gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
+
+
+  execute-cross-domain-r5-second-wave:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5 CROSS-DOMAIN R5 SECOND WAVE'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      PLAN_CONFIG: configs/v5_cross_domain_r5_second_wave_v0.1.json
+      EXPECTED_AUTHORIZATION_PHRASE: CALL_REAL_V5_CROSS_DOMAIN_R5_SECOND_WAVE_API
+      PER_BRANCH_MAX_CALLS: '64'
+      PER_BRANCH_CEILING_USD: '0.25'
+      GLOBAL_CEILING_USD: '5.00'
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact R5 second-wave authorization
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['AUTH_BODY'].splitlines():
+              line=raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit(f'invalid R5 second-wave authorization line: {line!r}')
+              key,value=line.split('=',1)
+              if key in rows:
+                  raise SystemExit(f'duplicate R5 second-wave authorization key: {key}')
+              rows[key]=value
+          required={'authorization_phrase','expected_main_sha','authorization_id','control_plane'}
+          if set(rows)!=required:
+              raise SystemExit(f'R5 second-wave authorization keys mismatch: {sorted(rows)}')
+          if rows['authorization_phrase']!=os.environ['EXPECTED_AUTHORIZATION_PHRASE']:
+              raise SystemExit('R5 second-wave authorization phrase mismatch')
+          if rows['expected_main_sha']!=os.environ['GITHUB_SHA']:
+              raise SystemExit('R5 second-wave main SHA mismatch')
+          if rows['control_plane']!='CHAT_AUTHORIZATION_BRIDGE_V5_CROSS_DOMAIN_R5_SECOND_v0.1':
+              raise SystemExit('R5 second-wave control-plane mismatch')
+          if not re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['authorization_id']):
+              raise SystemExit('invalid R5 second-wave authorization_id')
+          print('PASS: exact R5 second-wave authorization validated')
+          PY
+
+      - name: Verify exact frozen source artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          p=json.load(open(os.environ['PLAN_CONFIG']))
+          repo=os.environ['GITHUB_REPOSITORY']
+          def artifacts(run_id):
+              return json.loads(subprocess.check_output(
+                  ['gh','api',f'repos/{repo}/actions/runs/{run_id}/artifacts'],text=True
+              ))['artifacts']
+          subject=artifacts(p['source_subject']['workflow_run_id'])
+          audit=artifacts(p['source_semantic_audit']['workflow_run_id'])
+          for item in [p['source_subject']['manifest_artifact'],*p['source_subject']['wave_artifacts']]:
+              rows=[x for x in subject if x['id']==item['id'] and x['name']==item['name']]
+              assert len(rows)==1
+              assert rows[0].get('digest')==item['digest']
+              assert not rows[0].get('expired')
+          item=p['source_semantic_audit']
+          rows=[x for x in audit if x['id']==item['artifact_id'] and x['name']==item['artifact_name']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==item['artifact_digest']
+          assert not rows[0].get('expired')
+          print('PASS: exact natural and semantic-audit source artifacts verified')
+          PY
+
+      - name: Download frozen natural sources and semantic audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/manifest source/waves source/audit
+          python - <<'PY' > "$RUNNER_TEMP/r5_second_source.env"
+          import json,os
+          p=json.load(open(os.environ['PLAN_CONFIG']))
+          print('SUBJECT_RUN='+str(p['source_subject']['workflow_run_id']))
+          print('MANIFEST_NAME='+p['source_subject']['manifest_artifact']['name'])
+          print('AUDIT_RUN='+str(p['source_semantic_audit']['workflow_run_id']))
+          print('AUDIT_NAME='+p['source_semantic_audit']['artifact_name'])
+          for x in p['source_subject']['wave_artifacts']:
+              print('WAVE_NAME_'+str(x['wave_id'])+'='+x['name'])
+          PY
+          source "$RUNNER_TEMP/r5_second_source.env"
+          gh run download "$SUBJECT_RUN" --repo "$GITHUB_REPOSITORY" --name "$MANIFEST_NAME" --dir source/manifest
+          for i in 1 2 3 4 5 6; do
+            var="WAVE_NAME_$i"
+            mkdir -p "source/waves/artifact-$i"
+            gh run download "$SUBJECT_RUN" --repo "$GITHUB_REPOSITORY" --name "${!var}" --dir "source/waves/artifact-$i"
+          done
+          gh run download "$AUDIT_RUN" --repo "$GITHUB_REPOSITORY" --name "$AUDIT_NAME" --dir source/audit
+          test "$(find source/waves -name traces.jsonl -type f | wc -l)" -eq 6
+          test "$(find source/manifest -name subject_manifest.jsonl -type f | wc -l)" -eq 1
+          test "$(find source/audit -name localized_semantic_audit_records.jsonl -type f | wc -l)" -eq 1
+
+      - name: Prepare deterministic R5 second-wave plan
+        run: |
+          set -euo pipefail
+          AUDIT_RECORDS="$(find source/audit -name localized_semantic_audit_records.jsonl -type f)"
+          SOURCE_MANIFEST="$(find source/manifest -name subject_manifest.jsonl -type f)"
+          python -m arena.prepare_v5_cross_domain_r5_second_wave             --audit-records "$AUDIT_RECORDS"             --source-manifest "$SOURCE_MANIFEST"             --source-root source/waves             --plan-config "$PLAN_CONFIG"             --branch-code-sha "$GITHUB_SHA"             --outdir prepared/r5_second_wave
+
+      - name: Run full offline R5 second-wave lifecycle preflight
+        run: |
+          set -euo pipefail
+          python -m arena.run_v5_cross_domain_r5_second_wave             --plan-dir prepared/r5_second_wave             --provider deepseek             --execution-code-sha "$GITHUB_SHA"             --per-branch-max-calls "$PER_BRANCH_MAX_CALLS"             --per-branch-spending-ceiling "$PER_BRANCH_CEILING_USD"             --global-spending-ceiling "$GLOBAL_CEILING_USD"             --currency USD             --preflight-only
+
+      - name: Execute 20 R5 second-wave branches
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          set -euo pipefail
+          python -m arena.run_v5_cross_domain_r5_second_wave             --plan-dir prepared/r5_second_wave             --outdir results/v5_cross_domain_r5_second_wave/raw             --provider deepseek             --execution-code-sha "$GITHUB_SHA"             --per-branch-max-calls "$PER_BRANCH_MAX_CALLS"             --per-branch-spending-ceiling "$PER_BRANCH_CEILING_USD"             --global-spending-ceiling "$GLOBAL_CEILING_USD"             --currency USD             --authorization-phrase "$EXPECTED_AUTHORIZATION_PHRASE"             --execute-real-api
+
+      - name: Freeze R5 second-wave evidence
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -s results/v5_cross_domain_r5_second_wave/raw/traces.jsonl ]; then
+            python -m arena.freeze_v5_cross_domain_r5_second_wave               --raw-dir results/v5_cross_domain_r5_second_wave/raw               --plan-dir prepared/r5_second_wave               --out results/v5_cross_domain_r5_second_wave/evidence_batch.json
+          else
+            echo 'No R5 second-wave traces available to freeze.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload immutable R5 second-wave evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-cross-domain-r5-second-wave-${{ github.run_id }}
+          path: |
+            configs/v5_cross_domain_r5_second_wave_v0.1.json
+            prepared/r5_second_wave/
+            results/v5_cross_domain_r5_second_wave/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Record completed R5 second wave
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY' > "$RUNNER_TEMP/r5_second_done.env"
+          import json
+          p=json.load(open('results/v5_cross_domain_r5_second_wave/raw/summary.json'))
+          e=json.load(open('results/v5_cross_domain_r5_second_wave/evidence_batch.json'))
+          print('TRACE_COUNT='+str(p['preserved_trace_count']))
+          print('SPEND='+str(p['estimated_total_spend']))
+          print('SUMMARY_HASH='+p['summary_hash'])
+          print('EVIDENCE_HASH='+e['evidence_batch_hash'])
+          PY
+          source "$RUNNER_TEMP/r5_second_done.env"
+          body="V5.3 cross-domain R5 second wave completed.\n\nGeometry: 5 source-bound cases / 10 matched pairs / 20 branches. Wave 2: EXHAUSTED_AFTER_WAVE1.\nPreserved traces: $TRACE_COUNT.\nEstimated provider spend: USD $SPEND.\nRun summary hash: $SUMMARY_HASH.\nEvidence batch hash: $EVIDENCE_HASH.\n\nNext stage is passive/offline R6 structural derivation from this frozen continuation. No paid evaluator. R7 not authorized. CPR NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
