@@ -44,7 +44,7 @@ Engineering report evidence-bundle hash: `e394d55011941da567b28805a08419c12d25e7
 
 The audit supports a strict engineering distinction:
 
-`R5 probe != R6 repair readiness != R7-P persistent correction != R7-S structural repair`.
+`R5 probe != R6 repair readiness != R7-P persistent reader-surface correction != R7-S structural repair`.
 
 ### R5-I — probe, not repair
 
