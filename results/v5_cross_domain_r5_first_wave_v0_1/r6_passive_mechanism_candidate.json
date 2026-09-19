@@ -1,0 +1,41 @@
+{
+  "schema": "RB-V5-CROSS-DOMAIN-R6-PASSIVE-MECHANISM-CANDIDATE-v0.1",
+  "source_case_id": "wave-4-8b1731b57396",
+  "source_case_hash": "8b1731b57396dadfb25e0d975c4849ef83d55b6a68a5920a209c9ed84079b5d6",
+  "source_pair_id": "wave-4-8b1731b57396:pair:1",
+  "intervention_run_id": "wave-4-8b1731b57396:pair:1:one_shot_jump_intervention",
+  "control_run_id": "wave-4-8b1731b57396:pair:1:control_continuation",
+  "direct_perturbation": {
+    "target": "shared_state_metadata.logistics_capacity_assessment.status",
+    "from": "fact",
+    "to": "unconfirmed",
+    "delivery_actor": "inventory",
+    "delivery_turn": 5,
+    "delivery_hash": "33e12ae104ede1823a1209b56aef63ee72fceb58563f18757416add398889764",
+    "persistent_state_mutation": false,
+    "reinjection_count": 0
+  },
+  "candidate_carriers": [
+    {"ref":"event:23:state:inventory_coverage_assessment","actor":"inventory","turn":5,"semantic_role":"recomputes transfer capacity under safety-stock constraints"},
+    {"ref":"event:24:final_state_revision","actor":"inventory","turn":5,"semantic_role":"rewrites plan_draft to remove standard transfers"}
+  ],
+  "downstream_adoption": [
+    {"actor":"risk","turn":6,"event_window":[26,30],"reading":"adopts no-covered-surplus interpretation and recommends no standard transfers"},
+    {"actor":"supply_lead","turn":7,"event_window":[30,36],"reading":"adopts non-releasable plan and shifts to procurement/expedite"},
+    {"actor":"sales","turn":8,"event_window":[36,40],"reading":"repeats no-covered-regional-source interpretation"}
+  ],
+  "post_consumption_persistence": "OBSERVED_IN_THIS_INTERVENTION_BRANCH",
+  "replicate_specificity": {
+    "replicate_1_material_path_reconfiguration": true,
+    "replicate_2_material_path_reconfiguration": false,
+    "control_also_contains_inventory_buffer_concern": true,
+    "provider_stochasticity_competing_explanation": true
+  },
+  "r6_status": "MECHANISM_CANDIDATE_SPECIFICITY_NOT_CLOSED",
+  "system_inertia_status": "NOT_ESTABLISHED",
+  "causal_specificity_status": "NOT_ESTABLISHED",
+  "next_action": "TARGETED_MATCHED_CONTROL_REPLICATION_FROM_SAME_FROZEN_PARENT",
+  "r7_repair_authorized": false,
+  "semantic_cpr_status": "NOT_ADJUDICATED",
+  "record_hash": "2060b167769972b23cc6f257265be2061ae60a5ecee76a73408ef6930ebb76b0"
+}

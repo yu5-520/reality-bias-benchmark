@@ -820,3 +820,181 @@ jobs:
           body="V5 cross-domain R5 first wave completed and raw evidence was frozen before derivation.\n\nGeometry: 6 source-bound cases / 12 matched pairs / 24 branches.\nOperator: one-shot fact -> unconfirmed on the first resumed Agent view only; no persistent mutation or reinjection.\nStructural pairs: $PAIR_COUNT.\nFirst parsed action changed: $FIRST_ACTION_CHANGED.\nFirst decision summary changed: $FIRST_DECISION_CHANGED.\nAgent path changed: $PATH_CHANGED.\nFinal state changed: $FINAL_CHANGED.\nDerived summary hash: $SUMMARY_HASH.\n\nPaid evaluator: 0. R6 semantic inertia remains NOT_ADJUDICATED. R7 not authorized. CPR NOT_ADJUDICATED."
           gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
           gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
+
+
+  execute-cross-domain-r6-targeted-specificity:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5 CROSS-DOMAIN R6 TARGETED SPECIFICITY'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      PLAN_CONFIG: configs/v5_cross_domain_r6_targeted_specificity_v0.1.json
+      EXPECTED_AUTHORIZATION_PHRASE: CALL_REAL_V5_CROSS_DOMAIN_R6_TARGETED_SPECIFICITY_API
+      PER_BRANCH_MAX_CALLS: '64'
+      PER_BRANCH_CEILING_USD: '0.25'
+      GLOBAL_CEILING_USD: '4.00'
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact R6 targeted authorization
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, re
+          rows={}
+          for raw in os.environ['AUTH_BODY'].splitlines():
+              line=raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit(f'invalid R6 authorization line: {line!r}')
+              key,value=line.split('=',1)
+              if key in rows:
+                  raise SystemExit(f'duplicate R6 authorization key: {key}')
+              rows[key]=value
+          required={'authorization_phrase','expected_main_sha','authorization_id','control_plane'}
+          if set(rows)!=required:
+              raise SystemExit(f'R6 authorization keys mismatch: {sorted(rows)}')
+          if rows['authorization_phrase']!=os.environ['EXPECTED_AUTHORIZATION_PHRASE']:
+              raise SystemExit('R6 authorization phrase mismatch')
+          if rows['expected_main_sha']!=os.environ['GITHUB_SHA']:
+              raise SystemExit(
+                  f"R6 main SHA mismatch: authorized={rows['expected_main_sha']} event={os.environ['GITHUB_SHA']}"
+              )
+          if rows['control_plane']!='CHAT_AUTHORIZATION_BRIDGE_V5_CROSS_DOMAIN_R6_v0.1':
+              raise SystemExit('R6 control-plane identifier mismatch')
+          if not re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['authorization_id']):
+              raise SystemExit('invalid R6 authorization_id')
+          print('PASS: exact R6 targeted authorization validated')
+          PY
+
+      - name: Verify exact frozen R5 source artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, subprocess
+          p=json.load(open(os.environ['PLAN_CONFIG']))
+          repo=os.environ['GITHUB_REPOSITORY']
+          src=p['source_r5']
+          payload=json.loads(subprocess.check_output(
+              ['gh','api',f"repos/{repo}/actions/runs/{src['workflow_run_id']}/artifacts"],text=True
+          ))
+          rows=[x for x in payload['artifacts'] if x['id']==src['artifact_id'] and x['name']==src['artifact_name']]
+          assert len(rows)==1
+          assert rows[0].get('digest')==src['artifact_digest']
+          assert not rows[0].get('expired')
+          print('PASS: exact R5 frozen artifact identity verified')
+          PY
+
+      - name: Download exact frozen R5 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/r5
+          python - <<'PY' > "$RUNNER_TEMP/r6_source.env"
+          import json, os
+          p=json.load(open(os.environ['PLAN_CONFIG']))['source_r5']
+          print('SOURCE_RUN='+str(p['workflow_run_id']))
+          print('SOURCE_NAME='+p['artifact_name'])
+          PY
+          source "$RUNNER_TEMP/r6_source.env"
+          gh run download "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --name "$SOURCE_NAME" --dir source/r5
+          test -s source/r5/prepared/r5_first_wave/plan.json
+          test -s source/r5/prepared/r5_first_wave/case_bindings.jsonl
+          test -s source/r5/results/v5_cross_domain_r5_first_wave/evidence_batch.json
+          test -s source/r5/results/v5_cross_domain_r5_first_wave/raw/traces.jsonl
+
+      - name: Prepare exact wave-4 targeted specificity plan
+        run: |
+          set -euo pipefail
+          python -m arena.prepare_v5_cross_domain_r6_targeted_specificity \
+            --source-r5-root source/r5 \
+            --config "$PLAN_CONFIG" \
+            --branch-code-sha "$GITHUB_SHA" \
+            --outdir prepared/r6_targeted
+
+      - name: Run full offline lifecycle preflight
+        run: |
+          set -euo pipefail
+          python -m arena.run_v5_cross_domain_r6_targeted_specificity \
+            --plan-dir prepared/r6_targeted \
+            --provider deepseek \
+            --execution-code-sha "$GITHUB_SHA" \
+            --per-branch-max-calls "$PER_BRANCH_MAX_CALLS" \
+            --per-branch-spending-ceiling "$PER_BRANCH_CEILING_USD" \
+            --global-spending-ceiling "$GLOBAL_CEILING_USD" \
+            --currency USD \
+            --preflight-only
+
+      - name: Execute 16 targeted specificity branches
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          set -euo pipefail
+          python -m arena.run_v5_cross_domain_r6_targeted_specificity \
+            --plan-dir prepared/r6_targeted \
+            --outdir results/v5_cross_domain_r6_targeted_specificity/raw \
+            --provider deepseek \
+            --execution-code-sha "$GITHUB_SHA" \
+            --per-branch-max-calls "$PER_BRANCH_MAX_CALLS" \
+            --per-branch-spending-ceiling "$PER_BRANCH_CEILING_USD" \
+            --global-spending-ceiling "$GLOBAL_CEILING_USD" \
+            --currency USD \
+            --authorization-phrase "$EXPECTED_AUTHORIZATION_PHRASE" \
+            --execute-real-api
+
+      - name: Freeze R6 targeted raw evidence
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -s results/v5_cross_domain_r6_targeted_specificity/raw/traces.jsonl ]; then
+            python -m arena.freeze_v5_cross_domain_r6_targeted_specificity \
+              --raw-dir results/v5_cross_domain_r6_targeted_specificity/raw \
+              --plan-dir prepared/r6_targeted \
+              --out results/v5_cross_domain_r6_targeted_specificity/evidence_batch.json
+          else
+            echo 'No R6 targeted traces available to freeze.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload immutable R6 targeted evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-cross-domain-r6-targeted-specificity-${{ github.run_id }}
+          path: |
+            configs/v5_cross_domain_r6_targeted_specificity_v0.1.json
+            prepared/r6_targeted/
+            results/v5_cross_domain_r6_targeted_specificity/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Record completed R6 targeted collection
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY' > "$RUNNER_TEMP/r6_done.env"
+          import json
+          p=json.load(open('results/v5_cross_domain_r6_targeted_specificity/raw/summary.json'))
+          e=json.load(open('results/v5_cross_domain_r6_targeted_specificity/evidence_batch.json'))
+          print('TRACE_COUNT='+str(p['preserved_trace_count']))
+          print('SPEND='+str(p['estimated_total_spend']))
+          print('SUMMARY_HASH='+p['summary_hash'])
+          print('EVIDENCE_HASH='+e['evidence_batch_hash'])
+          PY
+          source "$RUNNER_TEMP/r6_done.env"
+          body="V5 cross-domain R6 targeted specificity collection completed.\n\nTarget: wave-4-8b1731b57396 from the exact frozen R5 parent.\nNew geometry: 8 matched pairs / 16 branches; combined with R5 this gives 10 observed pairs for the target case.\nPreserved traces: $TRACE_COUNT.\nEstimated provider spend: USD $SPEND.\nRun summary hash: $SUMMARY_HASH.\nEvidence batch hash: $EVIDENCE_HASH.\n\nNo paid evaluator. System Inertia remains NOT_ADJUDICATED until semantic specificity audit. R7 not authorized. CPR NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed

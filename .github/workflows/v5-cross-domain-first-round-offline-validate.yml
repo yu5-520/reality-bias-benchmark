@@ -13,6 +13,7 @@ on:
       - "configs/v5_cross_domain_subject_gate_v0.2.json"
       - "configs/v5_cross_domain_semantic_triage_v0.1.json"
       - "configs/v5_cross_domain_r5_first_wave_v0.1.json"
+      - "configs/v5_cross_domain_r6_targeted_specificity_v0.1.json"
       - "schemas/v5_cross_domain_*"
       - "arena/build_v5_cross_domain_manifest.py"
       - "arena/v5_cross_domain_preflight.py"
@@ -26,6 +27,9 @@ on:
       - "arena/run_v5_cross_domain_r5_first_wave.py"
       - "arena/freeze_v5_cross_domain_r5_first_wave.py"
       - "arena/derive_v5_cross_domain_r5_local_response.py"
+      - "arena/prepare_v5_cross_domain_r6_targeted_specificity.py"
+      - "arena/run_v5_cross_domain_r6_targeted_specificity.py"
+      - "arena/freeze_v5_cross_domain_r6_targeted_specificity.py"
       - "arena/derive_v5_whole_process_structural.py"
       - "arena/tests/test_v5_cross_domain*.py"
       - ".github/workflows/v5-cross-domain-first-round-*.yml"
@@ -55,6 +59,7 @@ jobs:
           python -m py_compile arena/build_v5_cross_domain_localized_semantic_audit.py
           python -m py_compile arena/prepare_v5_cross_domain_r5_first_wave.py arena/run_v5_cross_domain_r5_first_wave.py
           python -m py_compile arena/freeze_v5_cross_domain_r5_first_wave.py arena/derive_v5_cross_domain_r5_local_response.py
+          python -m py_compile arena/prepare_v5_cross_domain_r6_targeted_specificity.py arena/run_v5_cross_domain_r6_targeted_specificity.py arena/freeze_v5_cross_domain_r6_targeted_specificity.py
           python -m py_compile arena/derive_v5_whole_process_structural.py
 
       - name: Run cross-domain tests
@@ -147,6 +152,28 @@ jobs:
           assert p['authorization']['r7_repair'] is False
           assert p['authorization']['r8_cpr_adjudication'] is False
           print('PASS: cross-domain R5 first-wave selection, operator and active-stage boundaries are frozen')
+          PY
+
+      - name: Validate R6 targeted specificity frozen plan
+        run: |
+          python -m json.tool configs/v5_cross_domain_r6_targeted_specificity_v0.1.json >/dev/null
+          python - <<'PY'
+          import json
+          p=json.load(open('configs/v5_cross_domain_r6_targeted_specificity_v0.1.json'))
+          assert p['status']=='FROZEN_POSTHOC_MECHANISM_FOLLOWUP'
+          assert p['target_case']['case_id']=='wave-4-8b1731b57396'
+          assert p['followup_geometry']['new_pair_count']==8
+          assert p['followup_geometry']['new_branch_count']==16
+          assert p['followup_geometry']['combined_pair_count_after_success']==10
+          assert p['operator']['from_status']=='fact'
+          assert p['operator']['to_status']=='unconfirmed'
+          assert p['operator']['direct_exposure_limit']==1
+          assert p['operator']['persistent_state_mutation'] is False
+          assert p['budget']['global_spending_ceiling_usd']==4.0
+          assert p['authorization']['paid_evaluator'] is False
+          assert p['authorization']['r7_repair'] is False
+          assert p['authorization']['r8_cpr_adjudication'] is False
+          print('PASS: R6 targeted specificity is frozen as a post-hoc mechanism follow-up')
           PY
 
       - name: Revalidate Process Reality method layer
