@@ -1,0 +1,221 @@
+name: V5.4 R7 Dual Four Candidates
+
+on:
+  pull_request:
+    paths:
+      - "configs/v5_4_r7_dual_four_candidates_v0.1.json"
+      - "arena/prepare_v5_4_r7_dual_canonical.py"
+      - "arena/run_v5_4_r7_dual_canonical.py"
+      - "arena/freeze_v5_4_r7_dual_canonical.py"
+      - ".github/workflows/v5-4-r7-dual-four-candidates.yml"
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  offline-validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate canonical R7 dual plan and code
+        run: |
+          set -euo pipefail
+          python -m json.tool configs/v5_4_r7_dual_four_candidates_v0.1.json >/dev/null
+          python -m py_compile             arena/prepare_v5_4_r7_dual_canonical.py             arena/run_v5_4_r7_dual_canonical.py             arena/freeze_v5_4_r7_dual_canonical.py
+          python - <<'PY'
+          import json
+          p=json.load(open('configs/v5_4_r7_dual_four_candidates_v0.1.json'))
+          assert p['status']=='FROZEN_PRE_EXECUTION_PLAN'
+          assert len(p['candidate_case_ids'])==4
+          assert len(set(p['candidate_case_ids']))==4
+          g=p['canonical_geometry']
+          assert g['arms']==['R7_P_PERSISTENT_SEMANTIC','R7_S_STRUCTURED_LINEAGE_REPAIR']
+          assert g['new_provider_trajectories_per_case']==2
+          assert g['total_new_provider_trajectories']==8
+          assert g['canonical_replicate_count']==1
+          assert g['n0_rerun_count']==0
+          assert g['r5_i_rerun_count']==0
+          assert p['r7_s_source_geometry']['exact_target_event_may_be_mid_turn'] is True
+          assert p['r7_s_source_geometry']['legacy_first_event_of_turn_checkpoint_requirement'] is False
+          assert p['budget']['global_spending_ceiling_usd']==2.0
+          assert p['authorization']['paid_evaluator'] is False
+          assert p['authorization']['semantic_cpr_adjudication'] is False
+          print('PASS: v5.4 R7 dual geometry is 4 cases x 2 arms with no reference reruns')
+          PY
+
+  execute:
+    if: >-
+      github.event_name == 'issues' &&
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5.4 R7 DUAL FOUR CANDIDATES'
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      REQUEST_BODY: ${{ github.event.issue.body }}
+      PLAN_CONFIG: configs/v5_4_r7_dual_four_candidates_v0.1.json
+      EXPECTED_AUTHORIZATION_PHRASE: CALL_REAL_V5_4_R7_DUAL_API
+      MODEL_CONFIG: arena/config/model_deepseek_v0.2.json
+      PROVIDER: deepseek
+      PER_BRANCH_MAX_CALLS: '64'
+      PER_BRANCH_CEILING_USD: '0.25'
+      GLOBAL_CEILING_USD: '2.00'
+      CURRENCY: USD
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact active R7 authorization
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['REQUEST_BODY'].splitlines():
+              line=raw.strip()
+              if not line: continue
+              if '=' not in line: raise SystemExit('invalid authorization line')
+              k,v=line.split('=',1)
+              if k in rows: raise SystemExit('duplicate authorization key '+k)
+              rows[k]=v
+          required={'authorization_phrase','expected_main_sha','authorization_id','control_plane'}
+          assert set(rows)==required, sorted(rows)
+          assert rows['authorization_phrase']==os.environ['EXPECTED_AUTHORIZATION_PHRASE']
+          assert rows['expected_main_sha']==os.environ['GITHUB_SHA']
+          assert rows['control_plane']=='CHAT_AUTHORIZATION_BRIDGE_V5_4_R7_DUAL_v0.1'
+          assert re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['authorization_id'])
+          print('PASS: exact active R7 dual authorization')
+          PY
+
+      - name: Verify exact frozen R5 and lineage artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          p=json.load(open(os.environ['PLAN_CONFIG']))
+          repo=os.environ['GITHUB_REPOSITORY']
+          checks=[]
+          x=p['source_lineage_gate']
+          checks.append((x['workflow_run_id'],x['artifact_id'],x['artifact_name'],x['artifact_digest']))
+          for x in p['source_r5_groups']:
+              checks.append((x['workflow_run_id'],x['artifact_id'],x['artifact_name'],x['artifact_digest']))
+          for run_id,artifact_id,name,digest in checks:
+              payload=json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{run_id}/artifacts'],text=True))
+              rows=[a for a in payload['artifacts'] if a['id']==artifact_id and a['name']==name]
+              assert len(rows)==1,(run_id,artifact_id,name)
+              assert rows[0].get('digest')==digest,(artifact_id,rows[0].get('digest'),digest)
+              assert not rows[0].get('expired')
+          print('PASS: exact frozen source artifacts verified')
+          PY
+
+      - name: Download exact frozen sources
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/wave1 source/wave2 source/lineage
+          gh run download 35381406873 --repo "$GITHUB_REPOSITORY"             --name v5-cross-domain-r5-first-wave-35381406873 --dir source/wave1
+          gh run download 35436694271 --repo "$GITHUB_REPOSITORY"             --name v5-cross-domain-r5-second-wave-35436694271 --dir source/wave2
+          gh run download 35449354017 --repo "$GITHUB_REPOSITORY"             --name v5-4-r6-lineage-completeness-candidates-35449354017 --dir source/lineage
+          test -s source/wave1/prepared/r5_first_wave/case_bindings.jsonl
+          test -s source/wave2/prepared/r5_second_wave/case_bindings.jsonl
+          test -s source/lineage/results/v5_4_r6_lineage_completeness_candidates/summary.json
+
+      - name: Verify frozen lineage gate summary
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('source/lineage/results/v5_4_r6_lineage_completeness_candidates/summary.json'))
+          assert p['summary_hash']=='eabb3251df2f6582cd5f720e0672b4dea76be68a10cb5ce3dfe3f79625e17a96'
+          assert p['candidate_case_count']==4
+          assert p['complete_for_authorized_repair_count']==4
+          assert p['lineage_gap_count']==0
+          assert p['r7_active_authorized'] is False
+          assert p['semantic_cpr_status']=='NOT_ADJUDICATED'
+          print('PASS: all four candidates pass passive lineage gate')
+          PY
+
+      - name: Prepare exact four-case canonical R7 dual plans
+        run: |
+          set -euo pipefail
+          python -m arena.prepare_v5_4_r7_dual_canonical             --config "$PLAN_CONFIG"             --source-root source             --lineage-root source/lineage             --plan-code-sha "$GITHUB_SHA"             --outdir prepared/v5_4_r7_dual
+          python - <<'PY'
+          import json
+          p=json.load(open('prepared/v5_4_r7_dual/batch_plan.json'))
+          assert p['case_count']==4
+          assert p['branch_count']==8
+          assert p['canonical_replicate_count']==1
+          assert p['n0_rerun_count']==0
+          assert p['r5_i_rerun_count']==0
+          assert p['paid_subject_authorization_status']=='NOT_AUTHORIZED'
+          print('PASS: prepared exactly eight new R7 provider branches')
+          PY
+
+      - name: Guarded R7 dual preflight
+        run: |
+          set -euo pipefail
+          python -m arena.run_v5_4_r7_dual_canonical             --plan-root prepared/v5_4_r7_dual             --model-config "$MODEL_CONFIG"             --provider "$PROVIDER"             --execution-code-sha "$GITHUB_SHA"             --per-branch-max-calls "$PER_BRANCH_MAX_CALLS"             --per-branch-spending-ceiling "$PER_BRANCH_CEILING_USD"             --global-spending-ceiling "$GLOBAL_CEILING_USD"             --currency "$CURRENCY"             --preflight-only
+
+      - name: Execute R7-P and R7-S once for each lineage-complete case
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          set -euo pipefail
+          python -m arena.run_v5_4_r7_dual_canonical             --plan-root prepared/v5_4_r7_dual             --outdir results/v5_4_r7_dual_four_candidates/raw             --model-config "$MODEL_CONFIG"             --provider "$PROVIDER"             --execution-code-sha "$GITHUB_SHA"             --per-branch-max-calls "$PER_BRANCH_MAX_CALLS"             --per-branch-spending-ceiling "$PER_BRANCH_CEILING_USD"             --global-spending-ceiling "$GLOBAL_CEILING_USD"             --currency "$CURRENCY"             --authorization-phrase "$EXPECTED_AUTHORIZATION_PHRASE"             --execute-real-api
+
+      - name: Freeze raw R7 evidence before interpretation
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -s results/v5_4_r7_dual_four_candidates/raw/batch_run_summary.json ]; then
+            python -m arena.freeze_v5_4_r7_dual_canonical               --plan-root prepared/v5_4_r7_dual               --raw-root results/v5_4_r7_dual_four_candidates/raw               --out results/v5_4_r7_dual_four_candidates/evidence_batch.json
+          else
+            echo 'No complete batch summary available to freeze.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload immutable R7 raw evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-4-r7-dual-four-candidates-${{ github.run_id }}
+          path: |
+            configs/v5_4_r7_dual_four_candidates_v0.1.json
+            prepared/v5_4_r7_dual/
+            results/v5_4_r7_dual_four_candidates/
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Record completed active R7 run
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY' > "$RUNNER_TEMP/r7_done.env"
+          import json
+          r=json.load(open('results/v5_4_r7_dual_four_candidates/raw/batch_run_summary.json'))
+          e=json.load(open('results/v5_4_r7_dual_four_candidates/evidence_batch.json'))
+          print('TRACE_COUNT='+str(r['trace_count']))
+          print('COMPLETE='+str(r['run_complete_count']))
+          print('CENSORED='+str(r['censored_or_nonrealized_count']))
+          print('FAILED='+str(r['failed_count']))
+          print('SPEND='+str(r['estimated_total_spend']))
+          print('SUMMARY_HASH='+r['summary_hash'])
+          print('EVIDENCE_HASH='+e['evidence_batch_hash'])
+          PY
+          source "$RUNNER_TEMP/r7_done.env"
+          body="V5.4 canonical R7 dual subject run completed and raw evidence frozen.\n\nCases: 4. New branches: 8 = one R7-P + one R7-S per case. Traces: $TRACE_COUNT. Run complete: $COMPLETE. Censored/nonrealized: $CENSORED. Failed: $FAILED. N0 reruns: 0. R5-I reruns: 0.\nEstimated provider spend: USD $SPEND.\nRun summary hash: $SUMMARY_HASH.\nEvidence batch hash: $EVIDENCE_HASH.\n\nNo automatic replicate or stochastic rerun is authorized. Next step is passive structural analysis over this frozen evidence, then semantic audit. Problematic bias and unique R5 causality remain NOT_ESTABLISHED; CPR remains NOT_ADJUDICATED."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
