@@ -1,0 +1,62 @@
+{
+  "schema": "RB-V5-CROSS-DOMAIN-R5-SECOND-WAVE-BALANCE-RECOVERY-PLAN-v0.1",
+  "date": "2026-09-19",
+  "status": "FROZEN_PRE_EXECUTION_RECOVERY_PLAN",
+  "source_r5_second_wave": {
+    "workflow_run_id": 35436694271,
+    "artifact_id": 10582866320,
+    "artifact_name": "v5-cross-domain-r5-second-wave-35436694271",
+    "artifact_digest": "sha256:1efbb3095cd74a18b13eccf94f1ebe0d044e2d7cc79fed9e7af5d63977d975b3",
+    "evidence_batch_hash": "b01e11cb041be4d3d29bd94d93552ac0bfdd56fc67cd5b7b011e8f90bb46d676",
+    "run_summary_hash": "f5700be13d372572bc9e6bef1431d7042f2a7e5128a33f1597421eaf3d4551b9"
+  },
+  "source_r6_structural_observation": {
+    "workflow_run_id": 35437793458,
+    "artifact_id": 10582682354,
+    "artifact_name": "v5-cross-domain-r5r6-structural-observation-wave2-35437793458",
+    "artifact_digest": "sha256:92d8f37f3851c67480126a543dc76c9d5561eb7130256f7c3466f8604e9a029b",
+    "summary_hash": "a1b8bdd31fad404ac606177c976ade46da0078a756925ffe140c515675f5bfbd"
+  },
+  "selection_rule": {
+    "termination_reason": "model_call_failure",
+    "model_call_count": 1,
+    "first_call_status": "failed",
+    "error_must_contain": ["HTTP 402", "Insufficient Balance"],
+    "completed_model_call_count": 0,
+    "selection_is_scientific_outcome_aware": false
+  },
+  "expected_geometry": {
+    "case_ids": [
+      "wave-4-cf726639de1d",
+      "wave-5-9684a9c95d38",
+      "wave-6-83476eeee96e"
+    ],
+    "wave_ids": [4,5,6],
+    "case_count": 3,
+    "replicate_pairs_per_case": 2,
+    "branches_per_case": 4,
+    "branch_count": 12
+  },
+  "recovery_policy": {
+    "preserve_original_failed_traces": true,
+    "overwrite_original_evidence": false,
+    "reuse_exact_frozen_parent": true,
+    "reuse_exact_condition": true,
+    "reuse_exact_replicate_index": true,
+    "new_branch_execution_identity": true,
+    "new_run_id_suffix": "recovery-balance-001"
+  },
+  "budget": {
+    "provider": "deepseek",
+    "per_branch_max_calls": 64,
+    "per_branch_spending_ceiling_usd": 0.25,
+    "global_spending_ceiling_usd": 3.0
+  },
+  "authorization": {
+    "exact_phrase": "CALL_REAL_V5_CROSS_DOMAIN_R5_SECOND_WAVE_BALANCE_RECOVERY_API",
+    "paid_evaluator": false,
+    "r6_new_subject_experiment": false,
+    "r7_repair": false,
+    "r8_cpr_adjudication": false
+  }
+}
