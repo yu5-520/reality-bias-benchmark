@@ -1,0 +1,86 @@
+{
+  "schema": "RB-V5.4-R7-DUAL-FOUR-CANDIDATE-PLAN-v0.1",
+  "date": "2026-09-19",
+  "status": "FROZEN_PRE_EXECUTION_PLAN",
+  "source_lineage_gate": {
+    "workflow_run_id": 35449354017,
+    "artifact_id": 10586243376,
+    "artifact_name": "v5-4-r6-lineage-completeness-candidates-35449354017",
+    "artifact_digest": "sha256:1a13ad31f0eef2dc0bb9181340a4e581c1738bab947dbfd0f5989d54cd9c5b6d",
+    "summary_hash": "eabb3251df2f6582cd5f720e0672b4dea76be68a10cb5ce3dfe3f79625e17a96",
+    "complete_for_authorized_repair_count": 4
+  },
+  "source_r5_groups": [
+    {
+      "group_id": "wave1",
+      "workflow_run_id": 35381406873,
+      "artifact_id": 10564055226,
+      "artifact_name": "v5-cross-domain-r5-first-wave-35381406873",
+      "artifact_digest": "sha256:a711f507365504bd59ca179bd3d76ea4c57d97caf6f6be85a6f4ef1f88629457",
+      "prepared_root": "prepared/r5_first_wave",
+      "case_ids": [
+        "wave-4-8b1731b57396",
+        "wave-6-7c7e526e4d91"
+      ]
+    },
+    {
+      "group_id": "wave2",
+      "workflow_run_id": 35436694271,
+      "artifact_id": 10582866320,
+      "artifact_name": "v5-cross-domain-r5-second-wave-35436694271",
+      "artifact_digest": "sha256:1efbb3095cd74a18b13eccf94f1ebe0d044e2d7cc79fed9e7af5d63977d975b3",
+      "prepared_root": "prepared/r5_second_wave",
+      "case_ids": [
+        "wave-3-56ee79f97f54",
+        "wave-4-cf726639de1d"
+      ]
+    }
+  ],
+  "candidate_case_ids": [
+    "wave-4-8b1731b57396",
+    "wave-6-7c7e526e4d91",
+    "wave-3-56ee79f97f54",
+    "wave-4-cf726639de1d"
+  ],
+  "canonical_geometry": {
+    "arms": [
+      "R7_P_PERSISTENT_SEMANTIC",
+      "R7_S_STRUCTURED_LINEAGE_REPAIR"
+    ],
+    "new_provider_trajectories_per_case": 2,
+    "total_case_count": 4,
+    "total_new_provider_trajectories": 8,
+    "canonical_replicate_count": 1,
+    "n0_rerun_count": 0,
+    "r5_i_rerun_count": 0,
+    "synthetic_control_count": 0
+  },
+  "horizon": {
+    "distance_basis": "post_source_parent_agent_turn",
+    "post_source_turn_cap": 8,
+    "termination_policy": "natural_termination_or_common_cap",
+    "early_termination_policy": "record_as_censored_not_extended"
+  },
+  "r7_s_source_geometry": {
+    "branch_start_policy": "DIRECT_REPAIR_OF_FROZEN_POST_SOURCE_PARENT_AT_EXACT_TARGET_EVENT",
+    "exact_target_event_may_be_mid_turn": true,
+    "invalidate_post_anchor_events_already_materialized_in_source_turn": true,
+    "provider_hidden_state_replay": false,
+    "legacy_first_event_of_turn_checkpoint_requirement": false
+  },
+  "budget": {
+    "provider": "deepseek",
+    "model_config": "arena/config/model_deepseek_v0.2.json",
+    "per_branch_max_calls": 64,
+    "per_branch_spending_ceiling_usd": 0.25,
+    "global_spending_ceiling_usd": 2,
+    "currency": "USD"
+  },
+  "authorization": {
+    "exact_phrase": "CALL_REAL_V5_4_R7_DUAL_API",
+    "paid_evaluator": false,
+    "semantic_cpr_adjudication": false,
+    "r8": false
+  },
+  "claim_boundary": "R7 is an engineering mechanism intervention over four lineage-complete stronger System Inertia candidates. It does not by itself establish problematic bias, unique R5 causality, CPR, domain prevalence, or a universal repair winner."
+}
