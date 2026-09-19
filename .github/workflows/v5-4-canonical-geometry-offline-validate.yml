@@ -36,6 +36,9 @@ on:
       - "manifests/v5_4_r6_canonical_wave4_semantic_review_2026-09-19_v0_3.json"
       - ".github/workflows/v5-4-r6-canonical-wave4-semantic.yml"
       - "manifests/v5_4_r5r6_canonical_wave3_2026-09-19_v0_1.json"
+      - "manifests/v5_4_r5r6_canonical_wave4_2026-09-19_v0_1.json"
+      - "results/v5_4_r6_canonical_wave4_semantic_audit_v0_1/**"
+      - "docs/reports/2026-09-19/V5_4_Canonical_R5_R6_Wave4_Result_Report_v1.md"
       - "results/v5_4_r6_canonical_wave3_semantic_audit_v0_1/**"
       - "docs/reports/2026-09-19/V5_4_Canonical_R5_R6_Wave3_Result_Report_v1.md"
       - ".github/workflows/v5-4-r6-canonical-wave3-semantic.yml"
@@ -267,6 +270,42 @@ jobs:
           assert 'This canonical Wave3 pass classifies five' not in p
           assert 'This canonical semantic pass classifies {len(case_summaries)} realized N0/R5-I case structures.' in p
           print('PASS: canonical semantic summary is reusable across observation waves')
+          PY
+
+      - name: Validate completed canonical Wave4 result
+        run: |
+          python -m json.tool manifests/v5_4_r5r6_canonical_wave4_2026-09-19_v0_1.json >/dev/null
+          python -m json.tool results/v5_4_r6_canonical_wave4_semantic_audit_v0_1/summary.json >/dev/null
+          python - <<'PY'
+          import json
+          m=json.load(open('manifests/v5_4_r5r6_canonical_wave4_2026-09-19_v0_1.json'))
+          s=json.load(open('results/v5_4_r6_canonical_wave4_semantic_audit_v0_1/summary.json'))
+          assert m['status']=='FROZEN_CANONICAL_WAVE4_COMPLETE'
+          assert m['r5']['case_count']==4
+          assert m['r5']['new_provider_branch_count']==4
+          assert m['r5']['synthetic_control_branch_count']==0
+          assert m['r5']['canonical_replicate_count']==1
+          assert m['r6_structural']['new_provider_calls']==0
+          assert m['r6_semantic']['case_count']==4
+          assert m['r6_semantic']['summary_hash']=='7ca1d05afd9de7e6d7ce049dd2827c9cbbd6e3ffc88a19c9d39eb360499264a2'
+          assert m['r6_semantic']['superseded_materialization']['summary_hash']=='e889c643f018505c0a47f5d16684934c0399f83bdcd2c9944a3f48f7809785de'
+          assert s['claim_boundary'].startswith('This canonical semantic pass classifies 4 realized N0/R5-I')
+          assert s['semantic_adoption_supported_case_count']==4
+          assert s['decision_action_dependence_supported_case_count']==4
+          assert s['post_stimulus_persistence_supported_case_count']==4
+          assert s['system_inertia_supported_candidate_case_count']==0
+          assert s['problematic_bias_established_case_count']==0
+          assert s['r5_unique_causal_attribution_established_case_count']==0
+          assert s['lineage_completeness_assessed'] is False
+          assert s['r7_authorized'] is False
+          assert s['semantic_cpr_status']=='NOT_ADJUDICATED'
+          assert m['cumulative_canonical_mechanism_pool']['canonical_case_count']==20
+          assert m['cumulative_canonical_mechanism_pool']['canonical_r5_intervention_count']==20
+          assert m['cumulative_canonical_mechanism_pool']['system_inertia_supported_candidate_case_count']==4
+          assert m['cumulative_canonical_mechanism_pool']['remaining_pass1_r5_eligible_case_count']==9
+          assert m['cumulative_canonical_mechanism_pool']['is_domain_probability_denominator'] is False
+          assert m['frozen_evidence_mutated'] is False
+          print('PASS: completed Wave4 preserves canonical geometry and corrected metadata')
           PY
 
       - name: Run canonical geometry unit tests
