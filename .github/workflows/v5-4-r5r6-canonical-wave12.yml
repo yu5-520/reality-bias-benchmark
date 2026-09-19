@@ -1,0 +1,124 @@
+name: V5.4 R5-R6 Canonical Wave1-2 Reclassification
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+jobs:
+  materialize:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'V5.4 R5R6 CANONICAL WAVE12 RECLASSIFICATION'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      REQUEST_BODY: ${{ github.event.issue.body }}
+      EXPECTED_EXECUTION_PHRASE: MATERIALIZE_V5_4_R5R6_CANONICAL_WAVE12
+
+      W1_RUN_ID: '35429324484'
+      W1_ARTIFACT_ID: '10580655035'
+      W1_ARTIFACT_NAME: v5-cross-domain-r5r6-semantic-audit-wave1-35429324484
+      W1_ARTIFACT_DIGEST: sha256:5fe13f15eed1771fb3e1f9ac1ab2f45d44ea8aeb48ec5cd1adc5c8f93456e717
+
+      W2_RUN_ID: '35439402409'
+      W2_ARTIFACT_ID: '10583382240'
+      W2_ARTIFACT_NAME: v5-cross-domain-r5r6-semantic-audit-wave2-35439402409
+      W2_ARTIFACT_DIGEST: sha256:caa46faa5af4446764a4647485e098e703c946edc28d1ab45558b729287dde4b
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact materialization request
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['REQUEST_BODY'].splitlines():
+              line=raw.strip()
+              if not line: continue
+              if '=' not in line: raise SystemExit('invalid request line')
+              k,v=line.split('=',1)
+              if k in rows: raise SystemExit('duplicate request key '+k)
+              rows[k]=v
+          required={'execution_phrase','expected_main_sha','materialization_id','control_plane'}
+          assert set(rows)==required, sorted(rows)
+          assert rows['execution_phrase']==os.environ['EXPECTED_EXECUTION_PHRASE']
+          assert rows['expected_main_sha']==os.environ['GITHUB_SHA']
+          assert rows['control_plane']=='CHAT_EXECUTION_BRIDGE_V5_4_R5R6_CANONICAL_WAVE12_v0.1'
+          assert re.fullmatch(r'[A-Za-z0-9._-]{8,80}',rows['materialization_id'])
+          print('PASS: exact canonical reclassification request')
+          PY
+
+      - name: Verify exact semantic artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          repo=os.environ['GITHUB_REPOSITORY']
+          for prefix in ('W1','W2'):
+              run=os.environ[prefix+'_RUN_ID']
+              payload=json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/actions/runs/{run}/artifacts'],text=True))
+              rows=[x for x in payload['artifacts'] if str(x['id'])==os.environ[prefix+'_ARTIFACT_ID'] and x['name']==os.environ[prefix+'_ARTIFACT_NAME']]
+              assert len(rows)==1
+              assert rows[0].get('digest')==os.environ[prefix+'_ARTIFACT_DIGEST']
+              assert not rows[0].get('expired')
+          print('PASS: exact wave1/wave2 semantic artifacts')
+          PY
+
+      - name: Download semantic bundles
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source/w1 source/w2
+          gh run download "$W1_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$W1_ARTIFACT_NAME" --dir source/w1
+          gh run download "$W2_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$W2_ARTIFACT_NAME" --dir source/w2
+          W1_RECORDS="$(find source/w1 -name semantic_audit_records.jsonl -type f | head -n1)"
+          W2_RECORDS="$(find source/w2 -name semantic_audit_records.jsonl -type f | head -n1)"
+          test -s "$W1_RECORDS"
+          test -s "$W2_RECORDS"
+          echo "W1_RECORDS=$W1_RECORDS" >> "$GITHUB_ENV"
+          echo "W2_RECORDS=$W2_RECORDS" >> "$GITHUB_ENV"
+
+      - name: Build canonical 11-case ledger
+        id: build
+        run: |
+          set -euo pipefail
+          python -m arena.build_v5_4_r5r6_canonical_reclassification             --wave1-records "$W1_RECORDS"             --wave2-records "$W2_RECORDS"             --outdir results/v5_4_r5r6_canonical_wave12
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          p=json.load(open('results/v5_4_r5r6_canonical_wave12/summary.json'))
+          for k in ('case_count','canonical_r5_intervention_count','system_inertia_supported_candidate_case_count','summary_hash'):
+              print(k+'='+str(p[k]))
+          PY
+
+      - name: Upload frozen canonical bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: v5-4-r5r6-canonical-wave12-${{ github.run_id }}
+          path: results/v5_4_r5r6_canonical_wave12/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record result
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CASE_COUNT: ${{ steps.build.outputs.case_count }}
+          R5_COUNT: ${{ steps.build.outputs.canonical_r5_intervention_count }}
+          INERTIA_CASES: ${{ steps.build.outputs.system_inertia_supported_candidate_case_count }}
+          SUMMARY_HASH: ${{ steps.build.outputs.summary_hash }}
+        run: |
+          body="V5.4 canonical Wave1-2 reclassification completed.\n\nCases: $CASE_COUNT. Canonical R5-I: $R5_COUNT. Stronger System Inertia candidate cases: $INERTIA_CASES.\nSummary hash: $SUMMARY_HASH.\n\nNew provider calls: 0. Selection rule: replicate 1 intervention only, outcome-independent. Historical extra branches remain supplementary."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
