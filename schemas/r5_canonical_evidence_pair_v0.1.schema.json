@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-R5-CANONICAL-EVIDENCE-PAIR-v0.1",
+  "title": "R5 Canonical Evidence Pair",
+  "type": "object",
+  "required": [
+    "schema",
+    "case_id",
+    "natural_reference",
+    "r5_intervention_reference",
+    "new_provider_branch_count",
+    "synthetic_control_branch_count",
+    "canonical_replicate_count"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-R5-CANONICAL-EVIDENCE-PAIR-v0.1"
+    },
+    "case_id": {
+      "type": "string"
+    },
+    "natural_reference": {
+      "type": "object"
+    },
+    "r5_intervention_reference": {
+      "type": "object"
+    },
+    "new_provider_branch_count": {
+      "const": 1
+    },
+    "synthetic_control_branch_count": {
+      "const": 0
+    },
+    "canonical_replicate_count": {
+      "const": 1
+    }
+  }
+}
