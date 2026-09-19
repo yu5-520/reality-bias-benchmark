@@ -41,12 +41,14 @@ Forward reports now use a trajectory-semantic evidence profile:
 
 - `docs/reporting/process_reality_report_standard_v1_7.md`
 - `docs/reporting/process_reality_experiment_report_template_v3.md`
-- `docs/reporting/process_reality_theory_experiment_report_standard_v1_1.md`
-- `docs/reporting/process_reality_engineering_experiment_report_standard_v1_1.md`
+- `docs/reporting/process_reality_theory_experiment_report_standard_v1_2.md`
+- `docs/reporting/process_reality_engineering_experiment_report_standard_v1_2.md`
 
 Core rule:
 
 `Frozen structural facts -> realized Agent path -> evidence-bound semantic interpretation -> claim boundary`
+
+v5.4 reporting additionally requires separate accounting for canonical new provider trajectories versus supplementary repeated sampling. Historical executed branch totals cannot substitute for canonical case counts.
 
 Aggregate topology and hashes remain the factual substrate, but they do not replace the realized Agent path when path evidence exists.
 
