@@ -166,18 +166,17 @@ def build(
         source.rglob("semantic_trajectory_audits.jsonl"),
         "r2r6_complete_route_records",
     )
+    candidate_set = set(cfg["candidate_case_ids"])
     r2r6 = [
         row for row in load_jsonl(r2r6_path)
         if row.get("experiment_scope", {}).get("stage") == "R5-R6"
+        and row.get("experiment_scope", {}).get("case_id") in candidate_set
     ]
-    r5_by_case = _keyed(
-        r2r6,
-        "experiment_scope",
-        "unused",
-    ) if False else {
+    r5_by_case = {
         row["experiment_scope"]["case_id"]: row for row in r2r6
     }
     _require(len(r5_by_case) == len(r2r6), "r5_complete_route_case_collision")
+    _require(set(r5_by_case) == candidate_set, "r5_candidate_subset_incomplete")
 
     summaries = _keyed(
         load_jsonl(_one(source.rglob("case_summaries.jsonl"), "r6_case_summaries")),
@@ -235,7 +234,7 @@ def build(
         "r7_result_case_class",
     )
 
-    expected_cases = set(cfg["candidate_case_ids"])
+    expected_cases = candidate_set
     for label, mapping in (
         ("r5", r5_by_case),
         ("r6_summary", summaries),
