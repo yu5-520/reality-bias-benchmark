@@ -29,6 +29,12 @@ on:
       - "arena/run_r7_dual_intervention_real.py"
       - "arena/freeze_r7_dual_intervention_evidence.py"
       - "arena/build_v5_4_r5r6_canonical_reclassification.py"
+      - "configs/v5_4_cross_domain_r5_canonical_wave3_v0.1.json"
+      - "docs/v5_4_cross_domain_r5_canonical_wave3_protocol_v0.1.md"
+      - ".github/workflows/v5-4-r5-canonical-wave3.yml"
+      - "results/v5_4_r5r6_canonical_wave12_v0_1/**"
+      - "manifests/v5_4_r5r6_canonical_wave12_2026-09-19_v0_1.json"
+      - "docs/reports/2026-09-19/V5_4_R5_R6_Canonical_Wave1_2_Reclassification_Report_v1.md"
       - ".github/workflows/v5-4-r5r6-canonical-wave12.yml"
       - "arena/tests/test_v5_4_canonical_geometry.py"
       - "scripts/validate_canonical_r5_r7_geometry_v1.py"
@@ -86,6 +92,30 @@ jobs:
           assert p['r5']['forward_canonical_rule']['selection_is_outcome_aware'] is False
           assert p['r5']['forward_canonical_rule']['intervention_selection']=='REPLICATE_INDEX_1_AND_CONDITION_ONE_SHOT_JUMP_INTERVENTION'
           print('PASS: Wave1-2 canonical selection is deterministic and one-per-case')
+          PY
+
+      - name: Validate canonical Wave3 plan
+        run: |
+          python -m json.tool configs/v5_4_cross_domain_r5_canonical_wave3_v0.1.json >/dev/null
+          python -m json.tool results/v5_4_r5r6_canonical_wave12_v0_1/summary.json >/dev/null
+          python -m json.tool manifests/v5_4_r5r6_canonical_wave12_2026-09-19_v0_1.json >/dev/null
+          python - <<'PY'
+          import json
+          p=json.load(open('configs/v5_4_cross_domain_r5_canonical_wave3_v0.1.json'))
+          assert p['status']=='FROZEN_PRE_EXECUTION_PLAN'
+          assert [x['wave_id'] for x in p['selected_cases']]==[1,3,4,5,6]
+          assert len({x['source_case_hash'] for x in p['selected_cases']})==5
+          assert len(p['exclude_previous_case_hashes'])==11
+          assert p['geometry']['case_count']==5
+          assert p['geometry']['new_intervention_branch_count']==5
+          assert p['geometry']['synthetic_control_branch_count']==0
+          assert p['geometry']['canonical_replicate_count']==1
+          assert p['geometry']['total_new_provider_branch_count']==5
+          assert p['budget']['provider']=='deepseek'
+          assert p['budget']['global_spending_ceiling_usd']==1.25
+          assert p['authorization']['r6_new_subject_experiment'] is False
+          assert p['authorization']['r7_repair'] is False
+          print('PASS: canonical Wave3 is five cases / five paid R5-I branches')
           PY
 
       - name: Run canonical geometry unit tests
