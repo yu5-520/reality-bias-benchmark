@@ -5,6 +5,15 @@ on:
     paths:
       - "docs/cross_domain_first_round_experiment_plan_v0.2.md"
       - "docs/cross_domain_case_progression_contract_v0.1.md"
+      - "docs/cross_domain_case_progression_contract_v0.2.md"
+      - "docs/cross_domain_probability_structure_interpretation_addendum_v0.1.md"
+      - "docs/R_Plan_v5.3.md"
+      - "theory/theory_contract_v0.14.md"
+      - "docs/first_paper_v5_3_scope.md"
+      - "docs/R5_structural_scouting_and_driver_probe_protocol_v1.1.md"
+      - "docs/R6_structural_support_trace_control_surface_protocol_v1.1.md"
+      - "docs/v5_whole_process_experiment_protocol_v0.2.md"
+      - "docs/reporting/process_reality_theory_experiment_report_standard_v1_1.md"
       - "docs/cross_domain_semantic_triage_protocol_v0.1.md"
       - "docs/cross_domain_localized_semantic_audit_protocol_v0.1.md"
       - "docs/v5_cross_domain_r5_first_wave_protocol_v0.1.md"
@@ -14,6 +23,9 @@ on:
       - "configs/v5_cross_domain_semantic_triage_v0.1.json"
       - "configs/v5_cross_domain_r5_first_wave_v0.1.json"
       - "configs/v5_cross_domain_r6_targeted_specificity_v0.1.json"
+      - "configs/process_reality_probability_structure_separation_v1.0.json"
+      - "manifests/v5_cross_domain_probability_structure_reclassification_2026-09-19_v0_1.json"
+      - "scripts/validate_probability_structure_separation_v1.py"
       - "schemas/v5_cross_domain_*"
       - "arena/build_v5_cross_domain_manifest.py"
       - "arena/v5_cross_domain_preflight.py"
@@ -154,7 +166,7 @@ jobs:
           print('PASS: cross-domain R5 first-wave selection, operator and active-stage boundaries are frozen')
           PY
 
-      - name: Validate R6 targeted specificity frozen plan
+      - name: Validate historical fixed-parent local-sensitivity frozen plan
         run: |
           python -m json.tool configs/v5_cross_domain_r6_targeted_specificity_v0.1.json >/dev/null
           python - <<'PY'
@@ -173,8 +185,12 @@ jobs:
           assert p['authorization']['paid_evaluator'] is False
           assert p['authorization']['r7_repair'] is False
           assert p['authorization']['r8_cpr_adjudication'] is False
-          print('PASS: R6 targeted specificity is frozen as a post-hoc mechanism follow-up')
+          print('PASS: historical fixed-parent follow-up remains frozen and is interpreted as supplementary local sensitivity')
           PY
+
+      - name: Validate v5.3 probability / structure separation
+        run: |
+          python scripts/validate_probability_structure_separation_v1.py
 
       - name: Revalidate Process Reality method layer
         run: python scripts/validate_process_reality_v5.py
