@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-V5.4-R5R7-ENGINEERING-REPORT-EVIDENCE-BUNDLE-v0.1",
+  "title": "R5-R7 Engineering Report Evidence Bundle v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "date",
+    "status",
+    "engineering_report_standard",
+    "report_standard",
+    "primary_evidence_role",
+    "candidate_case_count",
+    "case_audit_refs",
+    "recommended_report_family",
+    "required_central_visuals",
+    "primary_contrasts",
+    "aggregate_structural_support",
+    "claim_boundaries",
+    "new_provider_calls",
+    "new_paid_evaluator_calls",
+    "subject_reruns",
+    "raw_evidence_mutated",
+    "bundle_hash"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-V5.4-R5R7-ENGINEERING-REPORT-EVIDENCE-BUNDLE-v0.1"
+    },
+    "date": {
+      "type": "string"
+    },
+    "status": {
+      "const": "READY_FOR_ENGINEERING_REPORT_DRAFT"
+    },
+    "engineering_report_standard": {
+      "const": "RB-PROCESS-REALITY-ENGINEERING-REPORT-STANDARD-v1.3"
+    },
+    "report_standard": {
+      "const": "RB-PROCESS-REALITY-REPORT-STANDARD-v1.8"
+    },
+    "primary_evidence_role": {
+      "const": "STRUCTURAL_ENGINEERING_SEMANTICS_OVER_FROZEN_R5_R7_PROCESS"
+    },
+    "candidate_case_count": {
+      "const": 4
+    },
+    "case_audit_refs": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "case_id",
+          "audit_id",
+          "audit_hash",
+          "engineering_case_class"
+        ],
+        "properties": {
+          "case_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "audit_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "audit_hash": {
+            "type": "string",
+            "minLength": 16
+          },
+          "engineering_case_class": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "recommended_report_family": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_central_visuals": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "string"
+      }
+    },
+    "primary_contrasts": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "case_id",
+          "reason"
+        ],
+        "properties": {
+          "case_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "aggregate_structural_support": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "claim_boundaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "structured_repair_universal_superiority",
+        "problematic_bias_status",
+        "r5_unique_causal_attribution",
+        "semantic_cpr_status"
+      ],
+      "properties": {
+        "structured_repair_universal_superiority": {
+          "const": "NOT_ESTABLISHED"
+        },
+        "problematic_bias_status": {
+          "const": "NOT_ESTABLISHED"
+        },
+        "r5_unique_causal_attribution": {
+          "const": "NOT_ESTABLISHED"
+        },
+        "semantic_cpr_status": {
+          "const": "NOT_ADJUDICATED"
+        }
+      }
+    },
+    "new_provider_calls": {
+      "const": 0
+    },
+    "new_paid_evaluator_calls": {
+      "const": 0
+    },
+    "subject_reruns": {
+      "const": 0
+    },
+    "raw_evidence_mutated": {
+      "const": false
+    },
+    "bundle_hash": {
+      "type": "string",
+      "minLength": 16
+    }
+  }
+}
