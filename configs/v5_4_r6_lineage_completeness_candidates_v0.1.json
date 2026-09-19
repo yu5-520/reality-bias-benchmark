@@ -1,0 +1,101 @@
+{
+  "schema": "RB-V5.4-R6-LINEAGE-COMPLETENESS-CANDIDATE-PLAN-v0.1",
+  "date": "2026-09-19",
+  "status": "FROZEN_PRE_MATERIALIZATION",
+  "scientific_role": "CASE_LEVEL_LINEAGE_COMPLETENESS_FOR_FOUR_STRONGER_SYSTEM_INERTIA_CANDIDATES",
+  "candidate_case_ids": [
+    "wave-4-8b1731b57396",
+    "wave-6-7c7e526e4d91",
+    "wave-3-56ee79f97f54",
+    "wave-4-cf726639de1d"
+  ],
+  "canonical_rule": {
+    "historical_wave12_selection": "REPLICATE_INDEX_1_AND_ONE_SHOT_INTERVENTION",
+    "canonical_replicate_count": 1,
+    "use_only_canonical_r5_i": true,
+    "rerun_n0": false,
+    "rerun_r5_i": false,
+    "new_provider_calls": 0,
+    "paid_evaluator_calls": 0
+  },
+  "groups": [
+    {
+      "group_id": "wave1_historical_canonical",
+      "candidate_case_ids": [
+        "wave-4-8b1731b57396",
+        "wave-6-7c7e526e4d91"
+      ],
+      "r5": {
+        "workflow_run_id": 35381406873,
+        "artifact_id": 10564055226,
+        "artifact_name": "v5-cross-domain-r5-first-wave-35381406873",
+        "artifact_digest": "sha256:a711f507365504bd59ca179bd3d76ea4c57d97caf6f6be85a6f4ef1f88629457",
+        "plan_root": "prepared/r5_first_wave"
+      },
+      "structural": {
+        "workflow_run_id": 35429085193,
+        "artifact_id": 10580091785,
+        "artifact_name": "v5-cross-domain-r5r6-structural-observation-wave1-35429085193",
+        "artifact_digest": "sha256:57f56587e4ab3b556a0bf98f0726e4f7790e5906caa20339cc1d43074a8d99d7",
+        "records_path": "results/v5_cross_domain_r5r6_structural_observation_wave1/branch_structural_observations.jsonl"
+      },
+      "semantic": {
+        "workflow_run_id": 35429324484,
+        "artifact_id": 10580655035,
+        "artifact_name": "v5-cross-domain-r5r6-semantic-audit-wave1-35429324484",
+        "artifact_digest": "sha256:5fe13f15eed1771fb3e1f9ac1ab2f45d44ea8aeb48ec5cd1adc5c8f93456e717",
+        "records_path": "results/v5_cross_domain_r5r6_semantic_audit_wave1/semantic_audit_records.jsonl"
+      }
+    },
+    {
+      "group_id": "wave2_historical_canonical",
+      "candidate_case_ids": [
+        "wave-3-56ee79f97f54",
+        "wave-4-cf726639de1d"
+      ],
+      "r5": {
+        "workflow_run_id": 35436694271,
+        "artifact_id": 10582866320,
+        "artifact_name": "v5-cross-domain-r5-second-wave-35436694271",
+        "artifact_digest": "sha256:1efbb3095cd74a18b13eccf94f1ebe0d044e2d7cc79fed9e7af5d63977d975b3",
+        "plan_root": "prepared/r5_second_wave"
+      },
+      "canonical_recovery": {
+        "workflow_run_id": 35438000140,
+        "artifact_id": 10583013224,
+        "artifact_name": "v5-cross-domain-r5-second-wave-balance-recovery-35438000140",
+        "artifact_digest": "sha256:1331f55ec45f8fdbf71c7dd3aeee061d74f426c11dd3c51e17f4f2f78e443d5c",
+        "note": "Used by the effective Wave2 evidence layer for pre-response HTTP-402 recovery branches; original failed evidence is retained."
+      },
+      "structural": {
+        "workflow_run_id": 35439212051,
+        "artifact_id": 10583133758,
+        "artifact_name": "v5-cross-domain-r5r6-wave2-combined-structural-35439212051",
+        "artifact_digest": "sha256:fa05461d99862771ecaeb1f96e8d4b1cfe7bbf203773e7274df65432b43e74c0",
+        "records_path": "results/v5_cross_domain_r5r6_structural_observation_wave2_combined/branch_structural_observations.jsonl"
+      },
+      "semantic": {
+        "workflow_run_id": 35439402409,
+        "artifact_id": 10583382240,
+        "artifact_name": "v5-cross-domain-r5r6-semantic-audit-wave2-35439402409",
+        "artifact_digest": "sha256:caa46faa5af4446764a4647485e098e703c946edc28d1ab45558b729287dde4b",
+        "records_path": "results/v5_cross_domain_r5r6_semantic_audit_wave2/semantic_audit_records.jsonl"
+      }
+    }
+  ],
+  "gate_contract": {
+    "dimensions": [
+      "source_bound",
+      "transformations_bound",
+      "authority_history_bound",
+      "pool_state_bound",
+      "affected_descendants_bound",
+      "evidence_pointers_bound"
+    ],
+    "complete_status": "COMPLETE_FOR_AUTHORIZED_REPAIR",
+    "complete_scope": "FROZEN_CANONICAL_N0_PLUS_R5_I_DECLARED_OBSERVATION_HORIZON",
+    "automatic_repair_allowed": false,
+    "r7_authorized_by_gate": false,
+    "semantic_cpr_status": "NOT_ADJUDICATED"
+  }
+}
