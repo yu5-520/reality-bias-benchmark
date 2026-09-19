@@ -91,7 +91,7 @@ jobs:
           p=Path('docs/reports/2026-09-19/V5_4_Canonical_R5_R6_Wave5_Exhaustive_Result_Report_v1.md').read_text()
           assert '29 / 29' in p
           assert 'remaining Pass-1 R5-eligible cases: **0**' in p
-          assert 'not a domain occurrence rate' in p
+          assert 'domain occurrence rate' in p\n          assert 'must not be generalized' in p
           assert 'No existing N0 or R5-I branch should be rerun.' in p
           assert 'R7 remains **NOT AUTHORIZED**' in p
           assert 'CPR remains **NOT_ADJUDICATED**' in p
