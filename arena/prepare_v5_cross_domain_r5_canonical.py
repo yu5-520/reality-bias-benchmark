@@ -34,6 +34,7 @@ def _hash_without(row,key):
 def prepare(*,case_config_path:str,source_manifest_path:str,source_root:str,branch_code_sha:str):
     cfg=load_json(case_config_path)
     selected=list(cfg.get("selected_cases") or [])
+    provider_name=((cfg.get("budget") or {}).get("provider") or "deepseek")
     _require(bool(selected),"r5_canonical_selected_cases_required")
     source_manifest=load_jsonl(source_manifest_path)
     manifest_by_run={row["run_id"]:row for row in source_manifest}
@@ -89,7 +90,7 @@ def prepare(*,case_config_path:str,source_manifest_path:str,source_root:str,bran
         )
         case_id=f"wave-{wave_id}-{expected['source_case_hash'][:12]}"
         model_identity={
-            "provider":manifest_row["provider"],
+            "provider":provider_name,
             "model_config_path":manifest_row["model_config_path"],
             "model_config_hash":manifest_row["model_config_hash"],
         }
