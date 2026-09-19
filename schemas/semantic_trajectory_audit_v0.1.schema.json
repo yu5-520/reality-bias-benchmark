@@ -1,0 +1,703 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-SEMANTIC-TRAJECTORY-AUDIT-v0.1",
+  "title": "Reality Bias Complete-Route Semantic Trajectory Audit v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "audit_id",
+    "reviewer",
+    "evidence_binding",
+    "experiment_scope",
+    "actual_agent_route",
+    "semantic_nodes",
+    "semantic_edges",
+    "case_judgement",
+    "claim_boundaries",
+    "audit_hash"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-SEMANTIC-TRAJECTORY-AUDIT-v0.1"
+    },
+    "audit_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "blind_to_prior_semantic_labels"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "MODEL",
+            "HUMAN",
+            "HYBRID"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blind_to_prior_semantic_labels": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "evidence_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trace_id",
+        "raw_evidence_ref",
+        "raw_evidence_hash",
+        "structural_bundle_ref",
+        "structural_bundle_hash"
+      ],
+      "properties": {
+        "trace_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "raw_evidence_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "raw_evidence_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "structural_bundle_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "structural_bundle_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "workflow_run_id": {
+          "type": [
+            "integer",
+            "string",
+            "null"
+          ]
+        },
+        "artifact_id": {
+          "type": [
+            "integer",
+            "string",
+            "null"
+          ]
+        },
+        "artifact_digest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "experiment_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage",
+        "domain_id",
+        "case_id",
+        "evidence_role"
+      ],
+      "properties": {
+        "stage": {
+          "enum": [
+            "R2",
+            "R3",
+            "R4",
+            "R2-R4",
+            "R5",
+            "R6",
+            "R5-R6",
+            "R7"
+          ]
+        },
+        "domain_id": {
+          "enum": [
+            "finance",
+            "supply_chain",
+            "software_engineering",
+            "ecommerce"
+          ]
+        },
+        "case_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "condition_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_role": {
+          "enum": [
+            "PRIMARY_EXPERIMENT_CASE",
+            "TYPICAL_POSITIVE_CASE",
+            "TYPICAL_NEGATIVE_COMPARATOR",
+            "SUPPLEMENTARY_SENSITIVITY",
+            "HISTORICAL_METHOD_DEVELOPMENT_CONTEXT"
+          ]
+        }
+      }
+    },
+    "actual_agent_route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "complete_route_verified",
+        "route_node_count",
+        "executed_agent_turn_count",
+        "nodes",
+        "termination"
+      ],
+      "properties": {
+        "complete_route_verified": {
+          "const": true
+        },
+        "route_node_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "executed_agent_turn_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "nodes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "route_index",
+              "turn",
+              "agent_role",
+              "call_ref",
+              "event_refs",
+              "input_premises",
+              "observed_state_refs",
+              "message_or_invoke_refs",
+              "output_actions",
+              "output_state_refs",
+              "authority_or_status",
+              "termination_or_censoring"
+            ],
+            "properties": {
+              "route_index": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "turn": {
+                "type": [
+                  "integer",
+                  "string"
+                ]
+              },
+              "agent_role": {
+                "type": "string",
+                "minLength": 1
+              },
+              "call_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "event_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1
+              },
+              "input_premises": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "observed_state_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "message_or_invoke_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "output_actions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "output_state_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "authority_or_status": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "termination_or_censoring": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "termination": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "run_status",
+            "termination_reason"
+          ],
+          "properties": {
+            "run_status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "termination_reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "semantic_nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "route_index",
+          "lineage_relevance",
+          "input_semantics",
+          "output_semantics",
+          "semantic_delta",
+          "semantic_function",
+          "independent_evidence_introduced",
+          "independent_evidence_refs",
+          "evidence_refs",
+          "claim_status"
+        ],
+        "properties": {
+          "route_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "lineage_relevance": {
+            "enum": [
+              "TARGET_LINEAGE",
+              "SUPPORTING_CONTEXT",
+              "IRRELEVANT_TO_TARGET_LINEAGE"
+            ]
+          },
+          "input_semantics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "output_semantics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "semantic_delta": {
+            "type": "string",
+            "minLength": 1
+          },
+          "semantic_function": {
+            "enum": [
+              "SOURCE_OBSERVATION",
+              "UNSTABLE_INFORMATION",
+              "READ_OR_ADOPTION",
+              "TRANSFORMATION",
+              "NEW_DESCENDANT_CARRIER",
+              "INDEPENDENT_EVIDENCE_REANCHOR",
+              "AUTHORITY_MATERIALIZATION",
+              "CONSTRAINT_FORMATION",
+              "DECISION_FORMATION",
+              "ACTION_APPLICATION",
+              "REAFFIRMATION",
+              "FINALIZATION",
+              "IRRELEVANT_TO_TARGET_LINEAGE",
+              "NOT_ESTABLISHED"
+            ]
+          },
+          "independent_evidence_introduced": {
+            "type": "boolean"
+          },
+          "independent_evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "claim_status": {
+            "enum": [
+              "DIRECTLY_EVIDENCED",
+              "SUPPORTED",
+              "SUPPORTED_CANDIDATE",
+              "UNRESOLVED",
+              "NOT_ESTABLISHED",
+              "NOT_OBSERVED",
+              "CONTRADICTED"
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "independent_evidence_introduced": {
+                  "const": true
+                }
+              },
+              "required": [
+                "independent_evidence_introduced"
+              ]
+            },
+            "then": {
+              "properties": {
+                "independent_evidence_refs": {
+                  "minItems": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "semantic_edges": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "edge_id",
+          "from_route_index",
+          "to_route_index",
+          "propagation_type",
+          "relation_type",
+          "semantic_before",
+          "semantic_after",
+          "semantic_delta",
+          "evidence_refs",
+          "claim_status"
+        ],
+        "properties": {
+          "edge_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "from_route_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "to_route_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "propagation_type": {
+            "enum": [
+              "DIRECT_RELAY",
+              "SEMANTIC_TRANSFORMATION",
+              "TRANSFORMED_DESCENDANT",
+              "DESCENDANT_INHERITANCE",
+              "INDEPENDENT_REANCHOR",
+              "PREEXISTING_GATE_REAFFIRMATION",
+              "BOUNDARY_PRESERVATION",
+              "AUTHORITY_MIGRATION",
+              "DECISION_APPLICATION",
+              "MERE_VISIBILITY",
+              "MERE_RELAY",
+              "NOT_ESTABLISHED"
+            ]
+          },
+          "relation_type": {
+            "enum": [
+              "SUPPORTS",
+              "CONSTRAINS",
+              "DEPENDS_ON",
+              "ENABLES",
+              "CONFLICTS_WITH",
+              "REFRAMES",
+              "DROPS",
+              "RECONSTRUCTS",
+              "INHERITS",
+              "PRESERVES",
+              "INVALIDATES",
+              "REOPENS",
+              "TRANSFORMS_TO",
+              "MERE_VISIBILITY",
+              "MERE_RELAY",
+              "NOT_ESTABLISHED"
+            ]
+          },
+          "semantic_before": {
+            "type": "string",
+            "minLength": 1
+          },
+          "semantic_after": {
+            "type": "string",
+            "minLength": 1
+          },
+          "semantic_delta": {
+            "type": "string",
+            "minLength": 1
+          },
+          "independent_evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "claim_status": {
+            "enum": [
+              "DIRECTLY_EVIDENCED",
+              "SUPPORTED",
+              "SUPPORTED_CANDIDATE",
+              "UNRESOLVED",
+              "NOT_ESTABLISHED",
+              "NOT_OBSERVED",
+              "CONTRADICTED"
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "propagation_type": {
+                  "const": "INDEPENDENT_REANCHOR"
+                }
+              },
+              "required": [
+                "propagation_type"
+              ]
+            },
+            "then": {
+              "required": [
+                "independent_evidence_refs"
+              ],
+              "properties": {
+                "independent_evidence_refs": {
+                  "minItems": 1
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "case_judgement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "semantic_adoption",
+        "decision_action_dependence",
+        "post_stimulus_persistence",
+        "system_inertia_status",
+        "semantic_structure_class",
+        "derivation_edge_ids",
+        "problematic_bias_status",
+        "r5_unique_causal_attribution",
+        "semantic_cpr_status"
+      ],
+      "properties": {
+        "semantic_adoption": {
+          "enum": [
+            "SUPPORTED",
+            "NOT_ESTABLISHED"
+          ]
+        },
+        "decision_action_dependence": {
+          "enum": [
+            "SUPPORTED",
+            "NOT_ESTABLISHED"
+          ]
+        },
+        "post_stimulus_persistence": {
+          "enum": [
+            "SUPPORTED",
+            "NOT_ESTABLISHED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "system_inertia_status": {
+          "enum": [
+            "CASE_LEVEL_SYSTEM_INERTIA_SUPPORTED_CANDIDATE",
+            "SYSTEM_INERTIA_NOT_ESTABLISHED",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "semantic_structure_class": {
+          "type": "string",
+          "minLength": 1
+        },
+        "derivation_edge_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "challenged_source_or_target_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "direct_stimulus_end_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "post_stimulus_persistence_node_refs": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "problematic_bias_status": {
+          "enum": [
+            "NOT_ESTABLISHED",
+            "SUPPORTED_CANDIDATE",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "r5_unique_causal_attribution": {
+          "enum": [
+            "NOT_ESTABLISHED",
+            "SUPPORTED_CANDIDATE",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "semantic_cpr_status": {
+          "enum": [
+            "NOT_ADJUDICATED",
+            "NOT_APPLICABLE"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "system_inertia_status": {
+                "const": "CASE_LEVEL_SYSTEM_INERTIA_SUPPORTED_CANDIDATE"
+              }
+            },
+            "required": [
+              "system_inertia_status"
+            ]
+          },
+          "then": {
+            "required": [
+              "challenged_source_or_target_ref",
+              "direct_stimulus_end_ref",
+              "post_stimulus_persistence_node_refs"
+            ],
+            "properties": {
+              "challenged_source_or_target_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "direct_stimulus_end_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "post_stimulus_persistence_node_refs": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "claim_boundaries": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "audit_hash": {
+      "type": "string",
+      "minLength": 16
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "experiment_scope": {
+            "properties": {
+              "domain_id": {
+                "const": "ecommerce"
+              },
+              "evidence_role": {
+                "enum": [
+                  "PRIMARY_EXPERIMENT_CASE",
+                  "TYPICAL_POSITIVE_CASE",
+                  "TYPICAL_NEGATIVE_COMPARATOR"
+                ]
+              }
+            },
+            "required": [
+              "domain_id",
+              "evidence_role"
+            ]
+          }
+        }
+      },
+      "then": false
+    }
+  ]
+}
