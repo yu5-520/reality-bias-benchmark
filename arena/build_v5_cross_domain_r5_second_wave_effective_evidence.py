@@ -136,6 +136,9 @@ def build(*,original_raw_dir,recovery_raw_dir,original_plan_dir,original_evidenc
         "effective_trace_count":20,
         "effective_case_count":5,
         "effective_intervention_count":10,
+        "preserved_trace_count":20,
+        "case_count":5,
+        "runner_error_count":0,
         "original_trace_used_count":8,
         "recovery_trace_used_count":12,
         "original_first_call_402_trace_count":12,
@@ -150,6 +153,7 @@ def build(*,original_raw_dir,recovery_raw_dir,original_plan_dir,original_evidenc
         "r7_authorized":False,
         "semantic_cpr_status":"NOT_ADJUDICATED",
     }
+    summary["evidence_batch_hash"]=stable_hash(summary)
     summary["summary_hash"]=stable_hash(summary)
     (out/"summary.json").write_text(json.dumps(summary,ensure_ascii=False,indent=2,sort_keys=True)+"\n",encoding="utf-8")
     print("V5_R5_SECOND_WAVE_EFFECTIVE_EVIDENCE=FROZEN")
