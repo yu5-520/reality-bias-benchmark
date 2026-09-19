@@ -53,7 +53,13 @@ jobs:
             'scripts/validate_semantic_trajectory_reporting_v0_1.py',
             '.github/workflows/semantic-trajectory-reporting-v1-8-validate.yml',
           ]
-          forbidden=['DEEPSEEK_API_KEY','DASHSCOPE_API_KEY','OPENAI_API_KEY','--execute-real','CALL_REAL_']
+          forbidden=[
+              'DEEPSEEK' + '_API_KEY',
+              'DASHSCOPE' + '_API_KEY',
+              'OPENAI' + '_API_KEY',
+              '--execute-' + 'real',
+              'CALL_' + 'REAL_',
+          ]
           hits=[]
           for f in files:
               t=Path(f).read_text(encoding='utf-8')
