@@ -817,3 +817,39 @@ Core outputs:
 Cross-model/provider/topology and independent-lab replication remain future **external validation**, not already-established robustness.
 
 No new subject/provider/evaluator execution is authorized by R9.
+
+## R9 v2 — Inter-System Process Reality
+
+R9 v2 sharpens the first-paper innovation layer from component-level novelty defense to a system-level synthesis.
+
+Controlled experimental realization:
+
+`multi-Agent Process Reality`.
+
+Broader research direction:
+
+`Inter-System Process Reality / Semantic Process Integrity`.
+
+Primary integrated innovation target:
+
+`Semantic Object -> Content Address -> Hash/Evidence Lineage -> Functional Semantic Lineage -> Authority History -> Dynamic CPR Audit -> Affected Closure -> Semantic Repair Packet -> Selective Reopen/Recompute -> Preserve Unrelated Semantics -> Re-entry Watch`.
+
+This is treated as a **Semantic Process Integrity Stack**: the same semantic object remains addressable from observation through repair rather than being discarded after diagnosis.
+
+R9 v2 also records three explicit boundaries:
+
+- Supplementary Note S1 is a provenance-backed Human-AI **P-like reflexive illustration**, not formal CPR evidence.
+- Open-sourcing the repository provides reproducibility and an external-replication interface; it does **not** mean independent external replication is already complete.
+- Inter-System Process Reality, Cross-System Semantic Lineage and Semantic-Authority Interface Contracts are **future research directions**, not experimentally established universal generalizations.
+
+Canonical R9 v2 files:
+
+- `docs/reports/2026-09-20/R9_Inter_System_Process_Reality_Innovation_Synthesis_and_Outlook_Report_v2.md`
+- `docs/R_Plan_v5.9.md`
+- `docs/related_work/R9_Innovation_Boundary_Matrix_v2.md`
+- `docs/related_work/R9_First_Paper_Contribution_Ledger_v2.md`
+- `configs/r9_innovation_boundary_contract_v2.json`
+- `manifests/r9_inter_system_process_reality_synthesis_2026-09-20_v2.json`
+- `theory/change_notes/CN-R-072_r9_inter_system_process_reality_rebase.md`
+
+No new subject/provider/evaluator execution or frozen-evidence mutation is authorized by this synthesis layer.
