@@ -1,0 +1,23 @@
+name: NMI P4 EA09 Validate
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.11.md'
+      - 'docs/submission/nmi/NMI_P4_Editorial_Significance_Attack_v1.md'
+      - 'docs/submission/nmi/NMI_Editorial_Criteria_Snapshot_2026-09-21.md'
+      - 'docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v2.0.md'
+      - 'docs/submission/nmi/NMI_P4_Final_Attack_Status_v1.0.md'
+      - 'configs/nmi_submission_contract_v1.12.json'
+      - 'manifests/nmi_p4_ea09_editorial_significance_2026-09-21_v0_1.json'
+      - 'scripts/validate_nmi_p4_ea09_v0_1.py'
+      - '.github/workflows/nmi-p4-ea09-validate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python scripts/validate_nmi_p4_ea09_v0_1.py
