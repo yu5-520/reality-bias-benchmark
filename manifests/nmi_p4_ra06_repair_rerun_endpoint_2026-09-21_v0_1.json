@@ -1,0 +1,50 @@
+{
+  "schema": "RB-NMI-P4-RA06-MANIFEST-v0.1",
+  "date": "2026-09-21",
+  "status": "RA06_REPAIR_RERUN_ENDPOINT_HARDENED",
+  "base_commit": "df6192ee6764a7ff02b9cc7958a17ebceb9e6521",
+  "outputs": [
+    "docs/submission/nmi/NMI_Manuscript_v0.7.md",
+    "docs/submission/nmi/NMI_P4_Repair_Rerun_Same_Endpoint_Attack_v1.md",
+    "docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.6.md",
+    "docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.6.md",
+    "configs/nmi_submission_contract_v1.8.json",
+    "theory/change_notes/CN-R-084_nmi_p4_repair_rerun_same_endpoint_attack.md"
+  ],
+  "frozen_repair_geometry": {
+    "canonical_r7s_cases": 4,
+    "preservation": "4/4",
+    "divergence": "2/4",
+    "reconvergence": "2/4",
+    "reopened_calls": [
+      8,
+      8,
+      8,
+      8
+    ],
+    "recomputed_descendants": [
+      43,
+      35,
+      28,
+      29
+    ]
+  },
+  "reduction_guards": {
+    "persistent_correction_equals_internal_repair": false,
+    "selective_recompute_equals_whole_run_rerun": false,
+    "same_endpoint_equals_no_process_effect": false,
+    "universal_r7s_superiority": false
+  },
+  "manuscript_word_budget": {
+    "abstract_words": 147,
+    "main_text_before_methods": 3275,
+    "tracked_ceiling": 3500
+  },
+  "execution_boundary": {
+    "new_subject_runs": 0,
+    "provider_calls": 0,
+    "evaluator_calls": 0,
+    "new_semantic_adjudication": false,
+    "raw_evidence_mutation": false
+  }
+}

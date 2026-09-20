@@ -1,0 +1,26 @@
+name: NMI P4 RA06 Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.7.md'
+      - 'docs/submission/nmi/NMI_P4_Repair_Rerun_Same_Endpoint_Attack_v1.md'
+      - 'docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.6.md'
+      - 'docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.6.md'
+      - 'configs/nmi_submission_contract_v1.8.json'
+      - 'manifests/nmi_p4_ra06_repair_rerun_endpoint_2026-09-21_v0_1.json'
+      - 'scripts/validate_nmi_p4_ra06_v0_1.py'
+      - '.github/workflows/nmi-p4-ra06-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate RA06
+        run: python scripts/validate_nmi_p4_ra06_v0_1.py
