@@ -792,3 +792,28 @@ The canonical trajectory-first R8 theory/phenomenon report is now repository mat
 It follows Process Reality Report Standard v1.5 and the Theory Experiment Report Standard v1.0.
 
 The report preserves separate denominators, censor-aware interpretation, and explicit typical chains for Dynamic C, P, R and supported cross-penetration relations. Paper-level freeze remains `NOT_YET`.
+
+## R9 Innovation Synthesis / Prior-Art Boundary / Outlook
+
+R9 is now the first-paper **innovation/contribution closure layer**, not a mandatory compute-heavy replication stage.
+
+Canonical role:
+
+`R2-R8 frozen evidence -> prior-art boundary -> contribution ledger -> synthesis -> research outlook`.
+
+R9 v1 binds 12 peer-reviewed anchor papers plus 3 high-risk/synthesis preprints and explicitly constrains novelty claims against MAS failure taxonomies, communication topology/information propagation, execution/epistemic provenance, memory propagation, rollback/recovery and task-scoped semantic transactions.
+
+Core outputs:
+
+- `docs/R_Plan_v5.8.md`
+- `docs/R9_Innovation_Synthesis_Prior_Art_Outlook_Protocol_v1.md`
+- `docs/related_work/R9_Prior_Art_Literature_Map_v1.md`
+- `docs/related_work/R9_Innovation_Boundary_Matrix_v1.md`
+- `docs/related_work/R9_First_Paper_Contribution_Ledger_v1.md`
+- `docs/reports/2026-09-20/R9_Innovation_Synthesis_Prior_Art_Boundary_and_Outlook_Report_v1.md`
+- `configs/r9_innovation_boundary_contract_v1.json`
+- `configs/r9_literature_registry_v1.json`
+
+Cross-model/provider/topology and independent-lab replication remain future **external validation**, not already-established robustness.
+
+No new subject/provider/evaluator execution is authorized by R9.
