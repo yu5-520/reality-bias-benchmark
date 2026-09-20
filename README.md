@@ -1123,3 +1123,42 @@ Forward P4 files:
 - `theory/change_notes/CN-R-080_nmi_p4_foundational_attack_02_monitor_repair_outlook.md`
 
 Inter-System Process Reality remains an **outlook**, not an experimentally established universal generalization.
+
+## NMI-P4 RA03 Semantic Subjectivity / Post-hoc Attack
+
+P4 now explicitly treats the canonical R8 trajectory-first audit as **retrospective mechanism analysis**, not preregistered confirmation.
+
+Chronology:
+
+- held-out 90 natural trajectories completed first;
+- deterministic triage was frozen after subject generation and was prohibited from assigning C/P/R verdicts;
+- canonical R8 v0.5 trajectory-first semantics was finalized later;
+- the combined R8 audit was then frozen.
+
+The attack therefore retains a real limitation:
+
+> **semantic reviewer dependence and post-generation rubric evolution remain.**
+
+At the same time, the strongest cherry-picking interpretation is constrained because:
+
+- the complete 90-trajectory held-out natural cohort is reviewed;
+- subject trajectories were not outcome-conditionally regenerated;
+- legacy narrow-window analyses remain immutable;
+- healthy, NOT_ESTABLISHED, unresolved and censor-aware outcomes remain admissible.
+
+Paper claim mode:
+
+> **RETROSPECTIVE_MECHANISM_EVIDENCE**
+
+not:
+
+> preregistered prevalence confirmation.
+
+Canonical files:
+
+- `docs/submission/nmi/NMI_Manuscript_v0.4.md`
+- `docs/submission/nmi/NMI_P4_Semantic_Subjectivity_Posthoc_Attack_Report_v1.md`
+- `docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.3.md`
+- `docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.3.md`
+- `configs/nmi_submission_contract_v1.5.json`
+- `theory/change_notes/CN-R-081_nmi_p4_semantic_subjectivity_posthoc_attack.md`

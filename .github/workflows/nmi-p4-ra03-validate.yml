@@ -1,0 +1,26 @@
+name: NMI P4 RA03 Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.4.md'
+      - 'docs/submission/nmi/NMI_P4_Semantic_Subjectivity_Posthoc_Attack_Report_v1.md'
+      - 'docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.3.md'
+      - 'docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.3.md'
+      - 'configs/nmi_submission_contract_v1.5.json'
+      - 'manifests/nmi_p4_ra03_semantic_subjectivity_posthoc_2026-09-20_v0_1.json'
+      - 'scripts/validate_nmi_p4_ra03_v0_1.py'
+      - '.github/workflows/nmi-p4-ra03-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate RA03
+        run: python scripts/validate_nmi_p4_ra03_v0_1.py
