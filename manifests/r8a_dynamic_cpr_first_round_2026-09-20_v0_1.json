@@ -1,0 +1,59 @@
+{
+  "schema": "RB-R8A-DYNAMIC-CPR-FIRST-ROUND-MANIFEST-v0.1",
+  "date": "2026-09-20",
+  "status": "FROZEN_DERIVATIVE_R8A_MATERIAL",
+  "materialization_mode": "CHAT_CONTAINER_REPRODUCTION_FROM_EXACT_FROZEN_GITHUB_ARTIFACT_BYTES",
+  "source_artifacts": [
+    {
+      "artifact_id": 10588404740,
+      "role": "R2_R6_COMPLETE_ROUTE",
+      "sha256": "14fb11da98fae0afb5e82152c101fc5be937e43259f445b25ad10796b1801182"
+    },
+    {
+      "artifact_id": 10586243376,
+      "role": "R6_LINEAGE_COMPLETENESS",
+      "sha256": "1a13ad31f0eef2dc0bb9181340a4e581c1738bab947dbfd0f5989d54cd9c5b6d"
+    },
+    {
+      "artifact_id": 10586267940,
+      "role": "R7_STRUCTURAL",
+      "sha256": "242498dac7ad07e764e56d0e69c606256ac5b8d0294fcedd92b2e150b7385bee"
+    },
+    {
+      "artifact_id": 10587430720,
+      "role": "R7_SEMANTIC",
+      "sha256": "dbe8d38c3105f0a645eeaf902ff1fb7dfa4acfd8dc0680d4b63371d441924acf"
+    }
+  ],
+  "theory_binding": {
+    "adjudication_contract": "configs/cpr_adjudication_contract_v0.3.json",
+    "definition_contract": "configs/cpr_definition_contract_v0.3.json",
+    "r8_protocol": "docs/R8_Dynamic_CPR_Permission_Penetration_Protocol_v0.3.md",
+    "r_plan": "docs/R_Plan_v5.5.md",
+    "theory_contract": "theory/theory_contract_v0.16.md"
+  },
+  "outputs": {
+    "case_index.jsonl": {
+      "sha256": "cf4208d9de14a345304abad0195c78f9e19d9077fe61d5a51f2109b11ccac96d",
+      "size_bytes": 29392
+    },
+    "permission_review_packets.jsonl": {
+      "sha256": "cdd79fb745ef7b096703332bbc5a2b82047c57d88f6f76e80787ad01c7a3b882",
+      "size_bytes": 120049
+    },
+    "semantic_event_ledger.jsonl": {
+      "sha256": "717a9948516845cc1d4edf4c0efc25e64216bee819907b8c0a8ac67638cad013",
+      "size_bytes": 3336982
+    },
+    "summary.json": {
+      "sha256": "b24d30d00472bdae1a6f15027d387a4395828912fe35dbc2ffd3f3ffa1aaa1eb",
+      "size_bytes": 1958
+    },
+    "frozen_package_zip": {
+      "sha256": "8d5894a531523663737a0d06934258977cc7fa142d266a8e9db90dfd016503ac",
+      "size_bytes": 417796
+    }
+  },
+  "control_plane_note": "Issue #142 created through the connected GitHub app did not emit the issues workflow trigger. The same deterministic builder logic was executed against the exact verified artifact bytes in the chat runtime; no provider/evaluator/subject calls were made.",
+  "semantic_cpr_status": "NOT_ADJUDICATED"
+}
