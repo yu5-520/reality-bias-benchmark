@@ -1162,3 +1162,35 @@ Canonical files:
 - `docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.3.md`
 - `configs/nmi_submission_contract_v1.5.json`
 - `theory/change_notes/CN-R-081_nmi_p4_semantic_subjectivity_posthoc_attack.md`
+
+## NMI-P4 RA04 Propagation / Failure-Taxonomy Reduction
+
+P4 now explicitly tests whether Process Reality collapses into ordinary information propagation, collaboration/activity, reopening or persistence.
+
+Frozen reduction guards:
+
+- functional semantic continuation is observed in **9/9** reviewed e-commerce discovery-history trajectories, but continuation is broader than Dynamic C;
+- an earlier first-new-Agent P proxy captured only **4/13** later P-supported trajectories;
+- reopening/recomputation without a generated C/P event is not Dynamic R;
+- in canonical R5, **25/29** persistence cases are better explained by ordinary/healthy alternatives, while **4/29** show stronger case-level structures.
+
+Canonical non-equivalences:
+
+> **propagation != authority migration**
+
+> **collaboration/activity != scope-permission expansion**
+
+> **retrieval/reopen != retrospective-generative permission**
+
+> **persistence != System Inertia**
+
+The paper does not claim to replace failure-taxonomy, provenance, memory or propagation research. It frames Process Reality as an execution-level integrity object connecting permission change to functional lineage, perturbation and localized repair.
+
+Canonical files:
+
+- `docs/submission/nmi/NMI_Manuscript_v0.5.md`
+- `docs/submission/nmi/NMI_P4_Propagation_Failure_Taxonomy_Reduction_Attack_v1.md`
+- `docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.4.md`
+- `docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.4.md`
+- `configs/nmi_submission_contract_v1.6.json`
+- `theory/change_notes/CN-R-082_nmi_p4_propagation_taxonomy_reduction_attack.md`

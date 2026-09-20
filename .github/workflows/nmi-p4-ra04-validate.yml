@@ -1,0 +1,26 @@
+name: NMI P4 RA04 Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.5.md'
+      - 'docs/submission/nmi/NMI_P4_Propagation_Failure_Taxonomy_Reduction_Attack_v1.md'
+      - 'docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.4.md'
+      - 'docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.4.md'
+      - 'configs/nmi_submission_contract_v1.6.json'
+      - 'manifests/nmi_p4_ra04_propagation_taxonomy_2026-09-20_v0_1.json'
+      - 'scripts/validate_nmi_p4_ra04_v0_1.py'
+      - '.github/workflows/nmi-p4-ra04-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate RA04
+        run: python scripts/validate_nmi_p4_ra04_v0_1.py
