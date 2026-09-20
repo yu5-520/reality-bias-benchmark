@@ -1,0 +1,65 @@
+{
+  "schema": "RB-R8-TRAJECTORY-FIRST-SECOND-AUDIT-COMBINED-MANIFEST-v0.3",
+  "date": "2026-09-20",
+  "status": "FROZEN_APPEND_ONLY_COMBINED",
+  "components": {
+    "heldout_mechanism": {
+      "summary_blob": "8aec561c69668b336cd92e013463c00b6e411978",
+      "trajectory_count": 141
+    },
+    "ecommerce_discovery": {
+      "summary_blob": "2381fefe6508596c4a1c62698ed74c2529b88a0e",
+      "trajectory_count": 9
+    }
+  },
+  "outputs": {
+    "summary": {
+      "path": "results/r8_trajectory_first_second_audit_combined_v0_2/summary.json",
+      "git_blob": "51407206a802981fbfb8840c85fb3192a7c7b0f9"
+    },
+    "report": {
+      "path": "docs/reports/2026-09-20/R8_Trajectory_First_Second_Audit_Combined_Result_v1.md",
+      "git_blob": "7ee200cb158dcfe295da2099203444e8840d9032"
+    },
+    "change_note": {
+      "path": "theory/change_notes/CN-R-069_r8_second_audit_combined_freeze.md",
+      "git_blob": "4b69d650b292278106995587eea177500f35a95f"
+    },
+    "source_registry": {
+      "path": "configs/r8_trajectory_first_source_registry_v0.2.json",
+      "git_blob": "c8c78f9c4e215609d3c246d1f3783c4d6d8f8002"
+    },
+    "forward_status": {
+      "path": "results/r8_forward_semantic_chain_status_v0_5/summary.json",
+      "git_blob": "2e88a225d20e90cdbf717fef68e80e8d673bf99f"
+    }
+  },
+  "combined_inventory": {
+    "trajectory_count": 150,
+    "active_censored": 70,
+    "failure_prefix": 3
+  },
+  "mechanism_lower_bounds": {
+    "C": 3,
+    "P": 23,
+    "R": 18,
+    "R_GENERATES_P": 17,
+    "R_GENERATES_C": 1,
+    "C_DRIVES_P": 2,
+    "P_REINFORCES_C_candidate": 2
+  },
+  "separate_denominators": {
+    "ecommerce_formal_batch001": 3,
+    "heldout_natural": 90
+  },
+  "external_package": {
+    "filename": "r8_second_audit_with_ecommerce_discovery_v0_2.zip",
+    "sha256": "cf4d3d8158cc1bbd76649e6f236217283c4f5b3a33d3531ae400325141b44966"
+  },
+  "execution_boundary": {
+    "new_provider_calls": 0,
+    "new_paid_evaluator_calls": 0,
+    "subject_reruns": 0,
+    "raw_evidence_mutated": false
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "schema": "RB-R8-TRAJECTORY-FIRST-SECOND-AUDIT-SUMMARY-v0.1",
+  "date": "2026-09-20",
+  "status": "TRAJECTORY_FIRST_SECOND_AUDIT_V0_1_FROZEN",
+  "canonical_method": "R8_TRAJECTORY_FIRST_DYNAMIC_SEMANTIC_AUDIT_v0.5",
+  "review_population": {
+    "trajectory_count": 141,
+    "source_counts": {
+      "R2-R4_NATURAL": 90,
+      "R5_CANONICAL": 29,
+      "R7_ATTEMPT1": 6,
+      "R7_V03": 6,
+      "R7_V54": 2,
+      "R7_V54_DUAL": 8
+    },
+    "active_censored_count": 69
+  },
+  "C": {
+    "supported_unique_trajectory_count": 2,
+    "supported_run_ids": [
+      "wave-3-56ee79f97f54:pair:1:one_shot_jump_intervention",
+      "wave-4-cf726639de1d:pair:1:one_shot_jump_intervention:recovery-balance-001"
+    ],
+    "interpretation": "High-confidence information-permission anchors only; functional semantic continuation is broader than C."
+  },
+  "P": {
+    "supported_trajectory_count": 19,
+    "supported_source_counts": {
+      "R2-R4_NATURAL": 13,
+      "R5_CANONICAL": 4,
+      "R7_V03": 1,
+      "R7_V54_DUAL": 1
+    }
+  },
+  "R": {
+    "supported_trajectory_count": 13,
+    "supported_source_counts": {
+      "R2-R4_NATURAL": 12,
+      "R7_V03": 1
+    }
+  },
+  "coupling": {
+    "supported_edge_counts": {
+      "C_DRIVES_P": 2,
+      "R_GENERATES_P": 13
+    },
+    "supported_candidate_edge_counts": {
+      "P_REINFORCES_C": 2
+    }
+  },
+  "censoring": {
+    "active_censored_count": 69,
+    "unresolved_P_due_or_related_to_censor": 54,
+    "unresolved_R_due_or_related_to_censor": 39,
+    "negative_tail_claim_allowed": false
+  },
+  "priority_findings": {
+    "historical_r7_c3": {
+      "run_id": "r7:prospective-ecommerce-natural-0001:triad:0001:c3_alr",
+      "P": "SUPPORTED",
+      "R": "SUPPORTED_RETROSPECTIVE_GENERATIVE_R",
+      "coupling": "R_GENERATES_P",
+      "termination": "turn_budget_exhausted",
+      "remaining_queue": [
+        "inventory",
+        "finance",
+        "ops_lead"
+      ]
+    }
+  },
+  "claim_boundary": {
+    "prevalence_claim_allowed": false,
+    "population_rate_claim_allowed": false,
+    "independent_reviewer_replication_complete": false,
+    "cross_model_robustness_complete": false,
+    "supported_counts_are": "MECHANISM_EVIDENCE_LOWER_BOUNDS"
+  },
+  "execution_boundary": {
+    "new_provider_calls": 0,
+    "new_paid_evaluator_calls": 0,
+    "subject_reruns": 0,
+    "raw_evidence_mutated": false
+  }
+}

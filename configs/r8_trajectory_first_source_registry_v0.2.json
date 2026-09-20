@@ -1,0 +1,51 @@
+{
+  "schema": "RB-R8-TRAJECTORY-FIRST-SOURCE-REGISTRY-v0.2",
+  "date": "2026-09-20",
+  "status": "FROZEN_SOURCE_INVENTORY_DISCOVERY_PLUS_HELDOUT_REAUDIT",
+  "predecessor": "configs/r8_trajectory_first_source_registry_v0.1.json",
+  "rule": "Historical/superseded trajectories remain auditable if frozen. Discovery-development, censored and failure-prefix traces are mechanism evidence and do not automatically enter prevalence denominators.",
+  "ecommerce_discovery_sources": [
+    {
+      "workflow_run": 34958866944,
+      "artifact_id": 10392382759,
+      "digest": "sha256:b8f977cdeff7434e594f4ffae83ef57d88241ced3cc8f46e33cb0b622daf2721",
+      "role": "EARLY_FAILURE_PREFIX"
+    },
+    {
+      "workflow_run": 34959285562,
+      "artifact_id": 10392966101,
+      "digest": "sha256:81780ba6f1ff56f4685c1a0581f233a4f6edc7685288c234271df014ae18a285",
+      "role": "V0_3_1_COMPLETE_NATURAL"
+    },
+    {
+      "workflow_run": 34960602410,
+      "artifact_id": 10393047235,
+      "digest": "sha256:cf70e461fb3e48b71f94c57defce26d7d5f770334636af87133e8fab2e767d93",
+      "role": "MICROBATCH003_COMPLETE_AND_FAILURE_PREFIXES"
+    },
+    {
+      "workflow_run": 34962065864,
+      "artifact_id": 10393337841,
+      "digest": "sha256:83485e4125350be43ad002dd75ced3ce1e7ea9e9747b34716af28d1d3009b81a",
+      "role": "FORMAT005_ACTIVE_CENSORED"
+    },
+    {
+      "workflow_run": 34970142001,
+      "artifact_id": 10397420968,
+      "digest": "sha256:ea8ccab5fd890a94dc8e6db3f91f703f0eb09202c3a4278548ffcae0d33b64e5",
+      "role": "FORMAL_DISCOVERY_BATCH001"
+    }
+  ],
+  "ecommerce_discovery_denominator": {
+    "formal_batch001_trajectory_count": 3,
+    "all_discovery_history_trajectory_count": 9,
+    "all_history_is_prevalence_denominator": false
+  },
+  "heldout_and_mechanism_source_registry": "configs/r8_trajectory_first_source_registry_v0.1.json",
+  "execution_boundary": {
+    "new_provider_calls": 0,
+    "new_paid_evaluator_calls": 0,
+    "subject_reruns": 0,
+    "raw_evidence_mutated": false
+  }
+}

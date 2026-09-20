@@ -752,3 +752,33 @@ Forward files:
 - `docs/reports/2026-09-20/R8_Audit_Chain_Repair_Result_v1.md`
 
 Current status: `TRAJECTORY_FIRST_CHAIN_REPAIR_COMPLETE_REAUDIT_REQUIRED`.
+
+## R8 Trajectory-First Second Audit — Discovery Included
+
+The canonical R8 second audit now includes the original E-commerce discovery-domain multi-Agent evidence as well as the held-out/mechanism evidence.
+
+Forward frozen state:
+
+- analysis inventory: `150` trajectories (not a prevalence denominator);
+- E-commerce formal discovery Batch001 denominator: `n=3`;
+- held-out natural replication denominator: `n=90`;
+- high-confidence Dynamic C anchors: `3`;
+- Dynamic P supported trajectories: `23`;
+- retrospective-generative Dynamic R supported trajectories: `18`;
+- supported coupling: `R_GENERATES_P=17`, `R_GENERATES_C=1`, `C_DRIVES_P=2`;
+- `P_REINFORCES_C=2` remains candidate evidence, not a closed mutual-maintenance loop.
+
+E-commerce discovery formal Batch001 is `C=1, P=1, R=2`; functional semantic continuation is observed in all 9 reviewed discovery-history traces but is reported separately from permission penetration.
+
+Complete per-trajectory adjudication records are frozen as compressed JSONL. Active-censored/failure-prefix tails are never treated as negative evidence.
+
+Forward files:
+
+- `results/r8_trajectory_first_second_audit_v0_1/summary.json`
+- `results/r8_ecommerce_discovery_trajectory_first_reaudit_v0_1/summary.json`
+- `results/r8_trajectory_first_second_audit_combined_v0_2/summary.json`
+- `configs/r8_trajectory_first_source_registry_v0.2.json`
+- `results/r8_forward_semantic_chain_status_v0_5/summary.json`
+- `docs/reports/2026-09-20/R8_Trajectory_First_Second_Audit_Combined_Result_v1.md`
+
+No subject reruns, new provider calls or paid evaluator calls were used for this audit.

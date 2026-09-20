@@ -1,0 +1,91 @@
+{
+  "schema": "RB-R8-TRAJECTORY-FIRST-SECOND-AUDIT-COMBINED-SUMMARY-v0.2",
+  "date": "2026-09-20",
+  "status": "TRAJECTORY_FIRST_SECOND_AUDIT_COMBINED_FROZEN",
+  "canonical_method": "R8_TRAJECTORY_FIRST_DYNAMIC_SEMANTIC_AUDIT_v0.5",
+  "analysis_inventory": {
+    "trajectory_count": 150,
+    "components": {
+      "heldout_mechanism_second_audit": 141,
+      "ecommerce_discovery_reaudit": 9
+    },
+    "active_censored_count": 70,
+    "failure_terminated_discovery_prefix_count": 3,
+    "warning": "150 is a heterogeneous analysis inventory, not a prevalence denominator."
+  },
+  "separate_denominators": {
+    "ecommerce_formal_discovery_batch001": 3,
+    "heldout_natural_population": 90,
+    "r5_canonical_mechanism_set": 29,
+    "r7_historical_and_control_trajectories": 22,
+    "ecommerce_discovery_development_history_nonprevalence": 6
+  },
+  "dynamic_C": {
+    "supported_high_confidence_unique_count": 3,
+    "supported_anchors": [
+      "wave-3-56ee79f97f54:pair:1:one_shot_jump_intervention",
+      "wave-4-cf726639de1d:pair:1:one_shot_jump_intervention:recovery-balance-001",
+      "ec-discovery::formal_batch001::2::arena-ecommerce-0002"
+    ],
+    "interpretation": "High-confidence permission-penetration anchors, not all functional semantic propagation."
+  },
+  "dynamic_P": {
+    "supported_trajectory_count": 23,
+    "component_counts": {
+      "heldout_mechanism_second_audit": 19,
+      "ecommerce_discovery_reaudit": 4
+    }
+  },
+  "dynamic_R": {
+    "supported_retrospective_generative_trajectory_count": 18,
+    "component_counts": {
+      "heldout_mechanism_second_audit": 13,
+      "ecommerce_discovery_reaudit": 5
+    }
+  },
+  "coupling": {
+    "supported_edge_counts": {
+      "R_GENERATES_P": 17,
+      "R_GENERATES_C": 1,
+      "C_DRIVES_P": 2
+    },
+    "supported_candidate_edge_counts": {
+      "P_REINFORCES_C": 2
+    },
+    "closed_mutual_maintenance_loop_established": false
+  },
+  "ecommerce_discovery": {
+    "formal_batch001": {
+      "n": 3,
+      "C_supported": 1,
+      "P_supported": 1,
+      "R_supported": 2
+    },
+    "all_nine_history": {
+      "n": 9,
+      "C_supported": 1,
+      "P_supported": 4,
+      "R_supported": 5
+    },
+    "functional_semantic_continuation_observed": "9/9"
+  },
+  "censoring": {
+    "active_censored_count": 70,
+    "failure_terminated_prefix_count": 3,
+    "negative_tail_claim_allowed": false
+  },
+  "claim_boundary": {
+    "prevalence_claim_allowed": false,
+    "population_rate_claim_allowed_on_combined_150": false,
+    "cross_version_rate_comparison_allowed": false,
+    "cross_model_robustness_complete": false,
+    "independent_reviewer_replication_complete": false,
+    "supported_counts_are": "MECHANISM_EVIDENCE_LOWER_BOUNDS"
+  },
+  "execution_boundary": {
+    "new_provider_calls": 0,
+    "new_paid_evaluator_calls": 0,
+    "subject_reruns": 0,
+    "raw_evidence_mutated": false
+  }
+}
