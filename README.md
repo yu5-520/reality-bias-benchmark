@@ -987,3 +987,45 @@ Next gate remains:
 `NMI-P3 — Manuscript v0.1`.
 
 No new subject run, provider/evaluator call, CPR adjudication or raw-evidence mutation is authorized by this narrative update.
+
+## NMI-P3 Manuscript v0.1
+
+The first complete journal-facing manuscript draft is now frozen for reviewer attack.
+
+Canonical manuscript:
+
+- `docs/submission/nmi/NMI_Manuscript_v0.1.md`
+
+Working title:
+
+> **Process reality in multi-agent AI systems**
+
+Opening:
+
+`~1,520 preliminary/unreconciled -> no new independent warehouse reconciliation -> ~1,520 fact/reconciled`.
+
+Hook:
+
+> **The value remained unchanged. Its permission to count as reality did not.**
+
+Current manuscript budget:
+
+- abstract: ~147 words;
+- main text before Methods: ~2,641 words;
+- official NMI main-text ceiling: 3,500 words.
+
+The manuscript remains intentionally below the local 3,200-3,350 working target. Remaining space is reserved for reviewer-attack-driven clarification rather than filler.
+
+Current submission stage:
+
+`NMI-P3 COMPLETE -> NMI-P4 REVIEWER ATTACK`.
+
+Canonical P3 files:
+
+- `docs/submission/nmi/NMI_P3_Manuscript_Status_v0.1.md`
+- `configs/nmi_submission_contract_v1.2.json`
+- `manifests/nmi_p3_manuscript_2026-09-20_v0_1.json`
+- `docs/submission/nmi/NMI_Submission_Track_v1.2.md`
+- `theory/change_notes/CN-R-076_nmi_p3_manuscript_v0_1.md`
+
+No new experimental execution or frozen-evidence mutation is authorized.
