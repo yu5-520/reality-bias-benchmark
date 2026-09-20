@@ -890,3 +890,54 @@ Scientific status:
 `APPLICATION OUTLOOK / CONCEPTUAL INSTANTIATION / NO NEW EXPERIMENTAL EVIDENCE`.
 
 No formal game-system CPR claim, provider execution, evaluator execution or frozen-evidence mutation is authorized.
+
+## NMI Submission Track
+
+The first-paper programme has transitioned from R-series research construction to **Nature Machine Intelligence submission engineering**.
+
+Current rule:
+
+`R8 scientific closure + R9 innovation/outlook closure -> NMI submission track`
+
+No R10 is created for the first submission.
+
+New experiments are blocked by default unless they repair a concrete scientific or submission defect. New applications and broader system directions default to Discussion / Outlook / future work.
+
+Current implemented stages:
+
+- **NMI-P0 — Paper Freeze**
+- **NMI-P1 — Figure Architecture**
+- **NMI-P2 — Claim-to-Evidence Map**
+
+Next gate:
+
+- **NMI-P3 — Manuscript v0.1**
+
+Target NMI Article constraints currently bound in the repository:
+
+- 3,500-word main-text maximum;
+- 150-word abstract maximum;
+- up to 6 figures/tables;
+- local target: 3,200-3,350 main-text words and 5 main display items.
+
+The manuscript narrative will not mirror R2-R9 chronology. The forward Results story is:
+
+`endpoint/process separation`
+-> `Dynamic CPR`
+-> `Functional Semantic Lineage`
+-> `local authority perturbation / inertia`
+-> `lineage-level semantic repair`.
+
+Canonical submission-engineering files:
+
+- `docs/submission/nmi/NMI_Submission_Track_v1.md`
+- `docs/submission/nmi/NMI_P0_Paper_Freeze_v1.md`
+- `docs/submission/nmi/NMI_P1_Figure_Architecture_v1.md`
+- `docs/submission/nmi/NMI_P2_Claim_Evidence_Map_v1.md`
+- `docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.md`
+- `docs/submission/nmi/NMI_Official_Submission_Requirements_2026-09-20.md`
+- `configs/nmi_submission_contract_v1.json`
+- `manifests/nmi_submission_track_2026-09-20_v1.json`
+- `theory/change_notes/CN-R-074_nmi_submission_track_handoff.md`
+
+No new subject/provider/evaluator execution or frozen-evidence mutation is authorized by this transition.
