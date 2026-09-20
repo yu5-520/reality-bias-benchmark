@@ -1,0 +1,25 @@
+name: NMI P5 Finalization Validate
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.12.md'
+      - 'docs/submission/nmi/NMI_P5_Reference_Audit_v1.md'
+      - 'docs/submission/nmi/NMI_P5_Figure_Package_v1.md'
+      - 'docs/submission/nmi/figures/p5/**'
+      - 'docs/submission/nmi/NMI_Supplementary_Information_Structure_v1.md'
+      - 'docs/submission/nmi/NMI_Cover_Letter_v0.1.md'
+      - 'docs/submission/nmi/NMI_P5_Finalization_Status_v1.md'
+      - 'configs/nmi_submission_contract_v1.13.json'
+      - 'manifests/nmi_p5_finalization_2026-09-21_v0_1.json'
+      - 'scripts/validate_nmi_p5_v0_1.py'
+      - '.github/workflows/nmi-p5-finalization-validate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python scripts/validate_nmi_p5_v0_1.py
