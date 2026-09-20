@@ -703,3 +703,20 @@ Core forward files:
 - `docs/reports/2026-09-20/R8_Cross_Stage_Observation_Surface_Registry_Result_v1.md`
 
 Current overall semantic status: `PARTIAL_B1_ONLY`. No new subject runs are authorized by this rebase.
+
+## R8 B2/B3/B4 semantic status
+
+The cross-stage semantic pass now has:
+
+- `B1` — frozen complete: 2 C-supported target-bound lineages;
+- `B2` — natural high-risk window audit v0.1 complete but explicitly nonexhaustive: 21 C / 15 P / 44 R selected windows, no supported permission penetration in those selected windows;
+- `B3` — frozen complete over 29 R6 complete routes: C=2, P=0, R=0;
+- `B4` — frozen complete over four R7 dual cases: 32 reopened calls / 135 recomputed descendants, no new post-repair C/P and no Dynamic R established.
+
+`R8-C` remains blocked for final cross-stage coupling synthesis until B2 reaches exhaustive semantic coverage or a predeclared natural-window stopping rule is frozen.
+
+See:
+
+- `docs/reports/2026-09-20/R8_B2_B3_B4_Cross_Stage_Semantic_Audit_Result_v1.md`
+- `results/r8_cross_stage_semantic_status_v0_2/summary.json`
+- `manifests/r8_b2_b3_b4_cross_stage_semantic_audit_2026-09-20_v0_1.json`

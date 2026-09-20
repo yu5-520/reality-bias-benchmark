@@ -1,0 +1,105 @@
+{
+  "schema": "RB-R8-B234-CROSS-STAGE-SEMANTIC-AUDIT-MANIFEST-v0.1",
+  "date": "2026-09-20",
+  "status": "FROZEN_APPEND_ONLY_B2_B3_B4_SEMANTIC_AUDIT",
+  "source_bindings": {
+    "natural_wave_artifacts": [
+      [
+        10558039019,
+        "sha256:7cd771048914067eb727a4e20a11026e1c687f21bf147da5235640104d88b562"
+      ],
+      [
+        10557859045,
+        "sha256:4e24f88be8df125165caeb712735034a21b2e997cfb89afbc9c467816521cb2f"
+      ],
+      [
+        10558968954,
+        "sha256:6d4256afb4e0144cafc9182f609cd58ba95f7cd4490353aa6661799fdfa274b7"
+      ],
+      [
+        10558858901,
+        "sha256:421287980285b8549d0b07e82cdb3fa9d6ff038b60b4c8b62c8ab50c2163fafc"
+      ],
+      [
+        10558129961,
+        "sha256:a76a4913745b870ea7e34ed6c303b11434e81c0c475036e3e12a9296a9b2e527"
+      ],
+      [
+        10558915998,
+        "sha256:f18f77b38f4ad69e3969e4c6fd101e46b8d0bc8e5cfddf4142052b15ae78f1f3"
+      ]
+    ],
+    "r2_r6_complete_route_artifact": [
+      10588404740,
+      "sha256:14fb11da98fae0afb5e82152c101fc5be937e43259f445b25ad10796b1801182"
+    ],
+    "r7_engineering_artifact": [
+      10588768777,
+      "sha256:0e694f57a3c81b7164dea999993e4af47a29a734a38c979d63c293a640c94a93"
+    ],
+    "b1_commit": "d38f410b8c35a329f2d209315ca3f3bc698c83a1",
+    "cross_stage_rebase_commit": "56a30a1ab323e093307195c068c59865a6c7f78d"
+  },
+  "results": {
+    "B2": {
+      "selected_windows": {
+        "C": 21,
+        "P": 15,
+        "R": 44,
+        "unique_trajectories": 52
+      },
+      "supported": {
+        "C": 0,
+        "P": 0,
+        "R": 0
+      },
+      "exhaustive": false
+    },
+    "B3": {
+      "source_cases": 29,
+      "supported": {
+        "C": 2,
+        "P": 0,
+        "R": 0
+      },
+      "supported_C_case_ids": [
+        "wave-3-56ee79f97f54",
+        "wave-4-cf726639de1d"
+      ]
+    },
+    "B4": {
+      "source_cases": 4,
+      "r7_s_reopened_calls": 32,
+      "r7_s_recomputed_descendants": 135,
+      "supported": {
+        "new_C": 0,
+        "new_P": 0,
+        "R": 0
+      }
+    },
+    "R8C": {
+      "status": "BLOCKED_FOR_FINAL_SYNTHESIS_UNTIL_B2_EXHAUSTIVENESS_OR_PREDECLARED_STOP_RULE"
+    }
+  },
+  "output_git_blobs": {
+    "b2_config": "dab2b83b0bf9f67e9e4389fede4047df9a7cae52",
+    "b2_summary": "88790390895b84d16a61da62c5d2353d06b659c9",
+    "b3_summary": "faa7d789c056efbb2c5e12e4183690f62585a277",
+    "b4_summary": "9765148fab293cc74efd96dcd336bb2c79b4f0ca",
+    "cross_stage_status": "e30d6ec7deb3cbf5f3395265f5433677fe99d905",
+    "report": "b3b9461e9eccbe72020a82553262477ef17efe34",
+    "change_note": "54b518cfd8b6bd97192e6a297832b85127ab39d4"
+  },
+  "reviewer": {
+    "kind": "MODEL",
+    "id": "GPT-5.6-Sol",
+    "blind": false,
+    "independent_replication": false
+  },
+  "execution_boundary": {
+    "new_provider_calls": 0,
+    "new_paid_evaluator_calls": 0,
+    "subject_reruns": 0,
+    "raw_evidence_mutated": false
+  }
+}

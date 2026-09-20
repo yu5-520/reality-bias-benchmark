@@ -1,0 +1,63 @@
+{
+  "schema": "RB-R8-B2-NATURAL-HIGH-RISK-WINDOW-AUDIT-SUMMARY-v0.1",
+  "date": "2026-09-20",
+  "status": "COMPLETE_FOR_FROZEN_HIGH_RISK_SELECTION_NONEXHAUSTIVE",
+  "source_population": 90,
+  "structurally_selected_unique_trajectories": 52,
+  "selected_windows": {
+    "C": 21,
+    "P": 15,
+    "R": 44
+  },
+  "domain_window_counts": {
+    "C": {
+      "finance": 6,
+      "supply_chain": 10,
+      "software_engineering": 5
+    },
+    "P": {
+      "finance": 1,
+      "supply_chain": 6,
+      "software_engineering": 8
+    },
+    "R": {
+      "finance": 14,
+      "supply_chain": 10,
+      "software_engineering": 20
+    }
+  },
+  "adjudication": {
+    "C_supported": 0,
+    "C_not_established": 21,
+    "P_supported": 0,
+    "P_not_established": 15,
+    "R_supported": 0,
+    "R_not_established_within_selected_review_windows": 44
+  },
+  "healthy_counterclasses": [
+    "UNCERTAINTY_PRESERVING_GATE_FORMALIZATION",
+    "PLAN_OR_DECISION_FINALIZATION_NOT_EPISTEMIC_PROMOTION",
+    "RECOMPUTED_ASSESSMENT_WITH_UNCERTAINTY_RETAINED",
+    "TASK_REQUIRED_EVIDENCE_SEEKING",
+    "NECESSARY_SPECIALIST_DECOMPOSITION",
+    "REVIEW_REENTRY_WITHOUT_POST_BOUNDARY_C_OR_P"
+  ],
+  "interpretation": {
+    "main_finding": "The frozen natural population contains abundant review/re-entry/authority-transition surfaces, but the selected high-risk windows do not establish permission penetration. Added Agents remain task-relevant; explicit fact promotions either finalize decisions/assessments or preserve unresolved gates rather than laundering uncertainty.",
+    "natural_cpr_absence_claim_allowed": false,
+    "prevalence_claim_allowed": false,
+    "exhaustiveness_claim_allowed": false
+  },
+  "reviewer": {
+    "kind": "MODEL",
+    "id": "GPT-5.6-Sol",
+    "blind": false,
+    "independent_replication": false
+  },
+  "execution_boundary": {
+    "new_provider_calls": 0,
+    "new_paid_evaluator_calls": 0,
+    "subject_reruns": 0,
+    "raw_evidence_mutated": false
+  }
+}

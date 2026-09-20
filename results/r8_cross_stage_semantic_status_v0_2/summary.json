@@ -1,0 +1,60 @@
+{
+  "schema": "RB-R8-CROSS-STAGE-SEMANTIC-STATUS-v0.2",
+  "date": "2026-09-20",
+  "status": "B1_B3_B4_COMPLETE_B2_HIGH_RISK_V0_1_COMPLETE_R8C_BLOCKED",
+  "branches": {
+    "B1": {
+      "status": "FROZEN_COMPLETE",
+      "C_supported": 2,
+      "P_supported": 0,
+      "R_supported": 0,
+      "scope": "29 R5/R6 target-bound packets"
+    },
+    "B2": {
+      "status": "HIGH_RISK_WINDOW_AUDIT_V0_1_COMPLETE_NONEXHAUSTIVE",
+      "C_supported": 0,
+      "P_supported": 0,
+      "R_supported": 0,
+      "scope": "90 natural traces structurally scanned; 21 C + 15 P + 44 R high-risk windows semantically reviewed"
+    },
+    "B3": {
+      "status": "FROZEN_COMPLETE",
+      "C_supported": 2,
+      "P_supported": 0,
+      "R_supported": 0,
+      "scope": "29 R6 complete routes / 194 semantic edges"
+    },
+    "B4": {
+      "status": "FROZEN_COMPLETE",
+      "new_C_supported": 0,
+      "new_P_supported": 0,
+      "R_supported": 0,
+      "scope": "4 R7 dual cases / 8 traces / 32 reopen / 135 recomputed descendants"
+    }
+  },
+  "unique_supported_semantic_lineages": {
+    "C": [
+      "wave-3-56ee79f97f54",
+      "wave-4-cf726639de1d"
+    ],
+    "P": [],
+    "R": []
+  },
+  "cross_stage_coupling": {
+    "supported_edges": 0,
+    "status": "BLOCKED_FOR_FINAL_SYNTHESIS_UNTIL_B2_EXHAUSTIVENESS_OR_PREDECLARED_STOP_RULE"
+  },
+  "interpretation": {
+    "main_finding": "Information Permission Penetration is supported in two frozen supply-chain lineages. Selected natural high-risk windows do not establish additional C/P/R. R7 retrospective repair/recompute provides a negative temporal control. Full cross-stage coupling synthesis remains blocked because B2 v0.1 is explicitly nonexhaustive.",
+    "first_round_P_absence_claim_allowed": false,
+    "first_round_R_absence_claim_allowed": false,
+    "B2_natural_absence_claim_allowed": false,
+    "prevalence_claim_allowed": false
+  },
+  "execution_boundary": {
+    "new_provider_calls": 0,
+    "new_paid_evaluator_calls": 0,
+    "subject_reruns": 0,
+    "raw_evidence_mutated": false
+  }
+}
