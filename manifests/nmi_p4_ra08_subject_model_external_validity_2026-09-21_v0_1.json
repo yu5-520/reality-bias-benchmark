@@ -1,0 +1,29 @@
+{
+  "schema": "RB-NMI-P4-RA08-MANIFEST-v0.1",
+  "date": "2026-09-21",
+  "status": "RA08_SUBJECT_MODEL_EXTERNAL_VALIDITY_HARDENED",
+  "base_commit": "ef430ee2f5f37237bac23501c3c422f042b6a6d6",
+  "outputs": [
+    "docs/submission/nmi/NMI_Manuscript_v0.10.md",
+    "docs/submission/nmi/NMI_P4_Subject_Model_External_Validity_Attack_v1.md",
+    "docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.9.md",
+    "docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.9.md",
+    "configs/nmi_submission_contract_v1.11.json",
+    "theory/change_notes/CN-R-087_nmi_p4_subject_model_external_validity_attack.md"
+  ],
+  "guards": {
+    "cross_domain_equals_cross_model_robustness": false,
+    "cross_model_review_equals_subject_replication": false,
+    "subject_model_robustness_established": false,
+    "provider_robustness_established": false,
+    "topology_robustness_established": false,
+    "independent_external_replication_complete": false
+  },
+  "execution_boundary": {
+    "new_subject_runs": 0,
+    "provider_calls": 0,
+    "evaluator_calls": 0,
+    "new_semantic_adjudication": false,
+    "raw_evidence_mutation": false
+  }
+}

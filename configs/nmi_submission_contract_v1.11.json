@@ -1,0 +1,84 @@
+{
+  "schema": "RB-NMI-SUBMISSION-CONTRACT-v1.11",
+  "date": "2026-09-21",
+  "status": "NMI_P4_ACTIVE_RA08_SUBJECT_MODEL_EXTERNAL_VALIDITY_HARDENED",
+  "predecessor": "RB-NMI-SUBMISSION-CONTRACT-v1.10",
+  "target_journal": "Nature Machine Intelligence",
+  "target_content_type": "Article",
+  "manuscript": {
+    "path": "docs/submission/nmi/NMI_Manuscript_v0.10.md",
+    "title": "Process reality in multi-agent AI systems",
+    "abstract_word_estimate": 147,
+    "main_text_word_estimate_before_methods": 3239,
+    "official_main_text_max_words": 3500,
+    "subject_model_external_validity_hardened": true
+  },
+  "p4_reviewer_attacks": {
+    "RA03_semantic_subjectivity_posthoc": {
+      "status": "HARDENED_LIMITATION_RETAINED"
+    },
+    "RA04_propagation_failure_taxonomy_reduction": {
+      "status": "HARDENED"
+    },
+    "RA05_r5_causal_boundary": {
+      "status": "HARDENED"
+    },
+    "RA06_repair_rerun_same_endpoint": {
+      "status": "HARDENED"
+    },
+    "RA07_inter_system_extrapolation": {
+      "status": "HARDENED_OUTLOOK_BOUNDARY_EXPLICIT"
+    },
+    "RA08_subject_model_external_validity": {
+      "status": "HARDENED_LIMITATION_EXPLICIT",
+      "core_subject_provider": "deepseek",
+      "core_subject_model_alias": "deepseek-flash",
+      "expected_model_version": "DeepSeek-V4.1-Flash",
+      "heldout_same_model_provider_lock": true,
+      "cross_domain_supported": true,
+      "subject_model_robustness_established": false,
+      "provider_robustness_established": false,
+      "topology_robustness_established": false,
+      "memory_architecture_robustness_established": false,
+      "independent_external_replication_complete": false,
+      "cross_model_review_counts_as_subject_replication": false
+    }
+  },
+  "p4_foundational_attacks": {
+    "FA01_structural_scout_recall": {
+      "status": "CALIBRATED_ON_FROZEN_DATA"
+    },
+    "FA02_capability_absorption_system_boundary": {
+      "status": "THEORY_BOUNDARY_HARDENED_OUTLOOK_ONLY"
+    },
+    "FA03_recursive_monitor_repair_governance": {
+      "status": "THEORY_SELF_CONSISTENCY_HARDENED_OUTLOOK_ONLY"
+    }
+  },
+  "external_validity_ladder": {
+    "domain_variation": "SUPPORTED",
+    "stochastic_trajectory_variation": "SUPPORTED",
+    "subject_model_variation": "NOT_ESTABLISHED",
+    "provider_variation": "NOT_ESTABLISHED",
+    "reasoning_mode_variation": "NOT_ESTABLISHED",
+    "topology_variation": "NOT_ESTABLISHED",
+    "memory_architecture_variation": "NOT_ESTABLISHED",
+    "independent_external_replication": "NOT_COMPLETE"
+  },
+  "p6_blockers": {
+    "r8_full_record_repository_integrity": {
+      "status": "RECOVERY_SOURCE_IDENTIFIED",
+      "current_repository_copy_valid": false,
+      "append_recovered_copy_required": true,
+      "overwrite_old_object": false
+    }
+  },
+  "next_gate": "NMI_P4_ATTACK_EDITORIAL_SIGNIFICANCE",
+  "authorization": {
+    "new_subject_runs": 0,
+    "provider_calls": 0,
+    "evaluator_calls": 0,
+    "new_semantic_adjudication": false,
+    "raw_evidence_mutation": false
+  }
+}
