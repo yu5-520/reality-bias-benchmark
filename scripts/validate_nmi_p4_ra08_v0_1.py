@@ -9,7 +9,7 @@ c=json.loads((ROOT/"configs/nmi_submission_contract_v1.11.json").read_text(encod
 ra=c["p4_reviewer_attacks"]["RA08_subject_model_external_validity"]
 req("Subject-model coverage is substantially narrower than domain coverage" in m,"discussion boundary")
 req("### Subject-model coverage and external validity" in m,"methods subsection")
-req("cross-model semantic review is a different axis" in m,"review/subject distinction")
+req("cross-model semantic review is a different axis" in m.lower(),"review/subject distinction")
 req(ra["heldout_same_model_provider_lock"] is True,"model lock")
 req(ra["cross_domain_supported"] is True,"domain support")
 req(ra["subject_model_robustness_established"] is False,"subject robustness")
