@@ -941,3 +941,49 @@ Canonical submission-engineering files:
 - `theory/change_notes/CN-R-074_nmi_submission_track_handoff.md`
 
 No new subject/provider/evaluator execution or frozen-evidence mutation is authorized by this transition.
+
+## NMI Opening Rebase
+
+The submission opening has been sharpened around one natural Dynamic C anchor:
+
+`ec-discovery::formal_batch001::2::arena-ecommerce-0002`.
+
+The first-page anomaly is intentionally simple:
+
+`~1,520 preliminary/unreconciled -> ~1,520 fact/reconciled`
+
+with no new independent warehouse reconciliation in the reviewed trajectory.
+
+Canonical hook:
+
+> **The value remained unchanged. Its permission to count as reality did not.**
+
+The submission theory order is now:
+
+`natural case`
+-> `Process Reality`
+-> `Semantic Authority Migration`
+-> `Dynamic C`
+-> `Dynamic C/P/R`
+-> `Functional Semantic Lineage`
+-> `local perturbation / inertia`
+-> `lineage-addressed repair`
+-> `Inter-System Process Reality outlook`.
+
+This supersedes the earlier generic Figure-1-first framing for submission purposes while preserving all predecessor files.
+
+Current canonical NMI files:
+
+- `docs/submission/nmi/NMI_Submission_Track_v1.1.md`
+- `docs/submission/nmi/NMI_Editorial_Opening_Strategy_v1.md`
+- `docs/submission/nmi/NMI_P1_Figure_Architecture_v1.1.md`
+- `docs/submission/nmi/NMI_P2_Claim_Evidence_Map_v1.1.md`
+- `configs/nmi_submission_contract_v1.1.json`
+- `manifests/nmi_opening_rebase_2026-09-20_v1.json`
+- `theory/change_notes/CN-R-075_nmi_opening_rebase_natural_authority_migration.md`
+
+Next gate remains:
+
+`NMI-P3 — Manuscript v0.1`.
+
+No new subject run, provider/evaluator call, CPR adjudication or raw-evidence mutation is authorized by this narrative update.
