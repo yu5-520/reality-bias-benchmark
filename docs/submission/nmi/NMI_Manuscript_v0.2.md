@@ -1,0 +1,162 @@
+# Process reality in multi-agent AI systems
+
+**Manuscript status:** NMI-P4 v0.2 / structural-scout attack hardened  
+**Target:** Nature Machine Intelligence — Article  
+**Date:** 2026-09-20  
+**Citation status:** repository citation keys `[L#]` are provisional and will be converted to journal-formatted references during NMI-P5.  
+**Figure status:** text binds to the frozen NMI-P1 v1.1 storyboard; artwork not yet rendered.
+
+## Abstract
+
+Multi-agent AI systems are usually evaluated by their final answers or task success, yet interacting agents can change how information is treated while leaving its content unchanged. In a natural planning trajectory, an inventory estimate of approximately 1,520 units entered as preliminary and unreconciled, received no new independent warehouse confirmation, but later appeared as a reconciled fact and became decision-effective. We call the evolving set of representations that a system is permitted to treat as real, actionable or still operative its **process reality**. Across frozen natural, perturbation and repair trajectories, we identify dynamic changes in information, execution-scope and historical-process permission; trace these changes through functional semantic lineage; and distinguish ordinary inheritance from stronger permission drift. We further show that affected semantic lineages can be content-addressed and selectively repaired while preserving compatible state. These results motivate process reality as a mechanism-level target for reliable interacting AI systems.
+
+---
+
+Multi-agent AI systems are increasingly evaluated through task success, answer quality, collaboration efficiency and failure rates [L1-L4]. These measurements are necessary, but they privilege the endpoint. They say much less about how the system decided what information was sufficiently real to use, how far a collaboration was allowed to expand, or whether historical process state was allowed to become active again. These questions become important when agents share intermediate state, transform one another's outputs and repeatedly build decisions on semantic objects whose status can change during execution.
+
+A natural trajectory from our study makes the gap visible. A multi-agent system was constructing a seven-day operating plan. An inventory estimate of approximately 1,520 units entered the process explicitly marked as **preliminary and unreconciled**. Subsequent agents performed arithmetic, capacity checks, risk interpretation and planning around that estimate, but the frozen trajectory contains no new independent warehouse reconciliation. The same inventory object nevertheless later appeared as a **fact**, marked as reconciled by inventory, and was consumed by the final plan (Fig. 1a). The value remained unchanged. **Its permission to count as reality did not.**
+
+This transition is not well described as a conventional hallucination: the study does not establish that 1,520 was false, and the central observation is not a newly invented value. Nor is it captured by message propagation alone, because the important change concerns what the representation is permitted to mean and do downstream. We call the evolving set of representations that an interacting AI system is permitted to treat as real, actionable or still operative during execution its **process reality** (Fig. 1b). When a representation acquires greater epistemic or operational permission through transformation, inheritance or reuse without a commensurate increase in independent evidential support, we refer to the mechanism as **semantic authority migration**.
+
+This perspective complements work on multi-agent failure analysis [L1], communication topology and information propagation [L2,L3], clarification and data gaps [L4], fault attribution [L5,L6], provenance [L7], workflow control [L8], rollback [L9], memory management [L10] and collaborative recovery [L11,L12]. Those lines of work establish important components of reliable agent systems. Our question is different: **how does operational permission itself evolve through a complete semantic trajectory, including trajectories whose final result remains plausible or stable?**
+
+We study this question in frozen multi-agent trajectories spanning an e-commerce discovery environment and held-out Finance, Supply Chain and Software Engineering domains. Rather than treating communication turns or graph edges as semantic verdicts, we reconstruct complete trajectories before adjudicating how meaning, authority, scope and historical state change. We then apply bounded authority perturbations to already-realized cases, trace downstream dependence without replacing the original stochastic realization, and carry the same addressable semantic object into localized repair. This yields a mechanism-first account that connects natural emergence, semantic lineage, perturbation, inertia and repair without using the combined evidence inventory as a prevalence estimate.
+
+## An unchanged value can acquire a different reality permission
+
+The opening e-commerce case illustrates the narrowest form of the problem. The source condition was not “inventory equals 1,520 as a confirmed warehouse fact.” It was approximately 1,520, explicitly preliminary and unreconciled. Later agents generated provisional inventory assessments and performed calculations that were relevant to planning, but those operations did not independently close the warehouse-reconciliation gap. Nevertheless, the semantic object later carried `fact / reconciled_by_inventory` authority and became an operational premise in the final plan (Fig. 1a).
+
+The distinction is between **value**, **evidential status** and **operational permission**. These dimensions can move together, but they need not. In this trajectory, the numeric value stayed stable while the epistemic and operational status increased. Process reality is intended to name that execution-level layer. It is not a claim that every status update is erroneous. A preliminary representation may legitimately become a fact when new independent evidence arrives. The relevant question is whether the increase in permission is justified by the evidence and authorization conditions carried through the process.
+
+The opening case is one of three high-confidence information-permission anchors identified by trajectory-first semantic review. It should therefore be read as a mechanism exemplar, not a frequency estimate. The same distinction also prevents a common analytical shortcut: semantic continuation is not itself permission drift. Information can be reused conditionally while its uncertainty remains visible, or it can be independently re-anchored by new evidence. Those are healthy alternatives and remain explicit comparators throughout the study.
+
+## Process reality evolves through dynamic permission transitions
+
+The natural trajectories showed that information permission is only one dimension of the phenomenon. We therefore model process reality through three dynamic permission dimensions, denoted C, P and R (Fig. 2). **C** asks what information may be treated as real or directly usable. **P** asks how far the system may expand collaboration or execution scope relative to the authorized goal. **R** asks under what conditions prior process reality may become operational again through reopening, recomputation, re-evaluation or another retrospective operation. The dimensions are not sequential stages, and a single trajectory can contain more than one.
+
+Dynamic C includes semantic authority migration. Across the heterogeneous R8 audit inventory, three trajectories were adjudicated as high-confidence C anchors. The opening inventory case is the clearest natural example: independent support remains materially flat while operational authority increases. Two additional anchors occur in the held-out mechanism material and show that the relevant lineage can survive semantic transformation rather than literal repetition.
+
+Dynamic P concerns authorization fidelity between the requested goal and the realized process. In a held-out Software Engineering trajectory, the requested output was an executable release decision for that night. The result became broadly executable, yet later collaboration continued generating monitoring, verification, ownership and rollout obligations without materially changing the requested decision. The issue is not simply that more agents were called. P is supported when the realized collaboration or execution boundary expands beyond what the original goal required or authorized. Twenty-three trajectories in the combined semantic inventory support Dynamic P under this criterion.
+
+Dynamic R is not a synonym for memory retrieval or reopening. It is supported when a retrospective operation reactivates generative process conditions and produces new C or P events. In a natural e-commerce trajectory, an executable plan was reopened by a late stock signal; the post-boundary process then generated additional reconciliation, acknowledgement, monitoring and re-finalization work. In the combined audit inventory, eighteen trajectories support retrospective-generative R.
+
+These dimensions can couple. We observe two supported C-to-P relations, seventeen R-to-P relations and one R-to-C relation. Two P-to-C relations remain supported candidates rather than established couplings. We found no evidence sufficient to claim a closed mutual-maintenance attractor. These counts are mechanism-support counts inside a heterogeneous 150-trajectory audit inventory, not population rates. The inventory intentionally contains natural runs, selected mechanism cases, interventions, engineering controls, censored trajectories and development evidence, and is therefore not a valid pooled prevalence denominator.
+
+## Semantic influence persists through transformed descendants
+
+Following process reality requires more than event provenance. The same proposition is often not repeated verbatim. Instead, its function can migrate into a risk assessment, a constraint, a plan, a guardrail or an execution decision. We therefore distinguish **propositional lineage** from **functional semantic lineage** (Fig. 3).
+
+Propositional lineage tracks a statement or close paraphrase. Functional semantic lineage tracks whether the source continues to supply a constraint, causal role, decision implication, action implication or operational premise after its linguistic carrier changes. This distinction matters because source wording can disappear while source influence remains active. A preliminary fact can become a “capacity constraint,” which becomes a staged plan, which becomes an execution gate. A lexical search may no longer find the original proposition even though downstream behaviour still depends on its function.
+
+The frozen e-commerce discovery history makes the distinction explicit: functional semantic continuation is observed in all nine reviewed discovery-history trajectories, but only a subset qualify as Dynamic C. Continuation is therefore broader than permission penetration. A healthy path may preserve uncertainty and condition downstream action on later confirmation. Another healthy path may obtain fresh independent evidence and legitimately regenerate authority. A penetration path differs because uncertainty detaches or authority rises without a corresponding increase in independent support.
+
+This also changes how shared state should be interpreted. A stable shared pool is not equivalent to a pool of true facts. It is a reusable process-reality layer. Multiple agents can read and transform the same lineage, but agent multiplicity does not turn descendants of one source into independent evidence. The scientific object is thus not only “who communicated with whom,” but what semantic function and authority survived the communication.
+
+## Local authority perturbation reveals lineage and inertia
+
+Natural trajectories establish that these transitions occur, but they do not by themselves show which downstream structures depend on a challenged authority state. We therefore use a bounded perturbation strategy rather than repeatedly regenerating entire stochastic runs (Fig. 4).
+
+For canonical R5 cases, an already-recorded authority state is exposed once to the next relevant reader as `fact -> unconfirmed`. The persistent historical state is not rewritten by the one-shot probe. This makes the perturbation local: it tests what happens when one reader encounters reduced authority while preserving the original stochastic evidence as a frozen reference. R6 then passively reconstructs the relevant lineage from the resulting evidence: source, local response, semantic carrier, downstream read, semantic adoption, decision or action dependence, and post-stimulus persistence.
+
+Across the canonical 29-case R5 mechanism set, downstream semantic adoption and persistence are widespread, but persistence is not automatically System Inertia. Twenty-five of the 29 cases are better explained by normal inheritance, uncertainty-preserving continuation, independent re-anchoring or pre-existing conservative gates. Four show stronger case-level structures in which a new carrier continues to constrain downstream process after the direct stimulus has disappeared. This contrast is central. A shared system is supposed to remember useful information; the target is not memory itself, but unjustified or overly constraining process authority.
+
+The perturbation evidence also cautions against brute-force causal claims. Repeating the same parent condition can produce different stochastic continuations, and one exact phenotype need not recur. The study therefore treats realized carrier/read/adoption/persistence chains as mechanism evidence and avoids defining causality by whether repeated samples recreate an identical trajectory. R5 narrows the dependence surface; R6 establishes whether the relevant semantic lineage is sufficiently complete and bounded for intervention.
+
+## Process reality can be repaired at lineage level
+
+Once a problematic or disputed process-reality lineage is localized, the engineering question changes: must the entire agent run be reset, or can the affected meaning be addressed directly? We implement a lineage-level control stack built around a semantic object identifier, content address, semantic-lineage closure, completeness gate, evidence-supported affected closure, repair packet, selective reopening/recomputation, preservation of unrelated state and post-repair re-entry watch (Fig. 5).
+
+The control surfaces are deliberately separated. R5 is a one-reader diagnostic probe. R6 makes the relevant semantic lineage addressable and determines repair readiness. R7-P persistently changes what downstream readers see while leaving inherited state intact. R7-S repairs the internal lineage itself by revising authority, invalidating affected descendants, reopening dependent recipients and selectively recomputing only the bounded closure.
+
+Across four canonical repair cases with complete R6 packages, R7-S preserved compatible or unrelated structure in all four. Two cases materially diverged after repair, whereas two recomputed and reconverged to the same broad endpoint. The divergence cases show that internal semantic repair can change the executable plan. The reconvergence cases are equally informative because they show why endpoint equality is not sufficient to judge repair.
+
+In `wave-4-8b1731b57396`, R7-S invalidated one reference, reopened eight calls and recomputed 35 descendants; the resulting executable plan was materially recomposed. In `wave-4-cf726639de1d`, R7-S reopened eight calls and recomputed 28 descendants but returned to the same broad 900-unit staged plan. One structural fact later re-entered, but the semantic audit attributed that recurrence to fresh post-repair logistics evidence rather than blind restoration of old authority. Thus the same endpoint can be rebuilt from a different and better-supported internal lineage.
+
+These results do not establish universal superiority of structured repair over persistent correction. They establish a narrower engineering possibility: **the repair unit need not be the whole stochastic run**. An addressable semantic lineage can be revised, dependent descendants can be recomputed, compatible state can be preserved, and exact old-authority re-entry can be watched explicitly. This shifts the control problem from run-level rerolling toward lineage-level semantic repair.
+
+## Discussion
+
+The central result of this study is that reliability in interacting AI systems cannot always be reduced to whether the final answer is correct or whether the task succeeds. The system also constructs an internal process reality: representations acquire or lose permission to count as facts, to justify action, to expand collaboration and to re-enter from historical state. These changes can occur while the underlying value remains unchanged and while the final result remains plausible.
+
+This framing does not replace existing work on failure taxonomies, communication topology, provenance, memory, workflow control or rollback [L1-L12]. It connects a different chain around the same addressable process object: semantic formation and authority migration, functional lineage, trajectory-level audit, bounded perturbation, affected closure, localized repair, selective recomputation, preservation and re-entry watch. The contribution is therefore integrative and mechanism-level rather than a claim that every component is individually unprecedented.
+
+The study also has clear boundaries. The combined 150-trajectory inventory is heterogeneous and cannot estimate overall C/P/R prevalence. Cross-model, cross-provider and cross-topology robustness remain external-validity questions. Independent reviewer replication is not complete. The repair evidence is bounded to the frozen experimental process and does not establish a universal control policy. These limitations matter because process reality is partly semantic: structural logs can establish chronology and provenance, but they cannot by themselves determine whether a transformed representation still carries the same functional meaning or whether a scope extension was authorized.
+
+The retrospective structural-screening calibration makes this limitation concrete. A narrow structural selector missed 3 of 13 trajectories that later full-trajectory review supported for P and/or R, even though broader triage packets retained post-late-event evidence in all 13. This distinction matters: a structural representation can preserve the relevant process region while a rule built on the wrong proxy still fails to nominate the semantic mechanism. We therefore use structural machinery to localize evidence, not to produce negative semantic verdicts.
+
+The broader implication is that multi-agent interaction may be an experimentally tractable form of a larger **inter-system process reality** problem. When one system's output becomes another system's input, successful transfer may require more than a value and schema. Provenance, epistemic status, authority scope, validity window, permitted downstream use, lineage address and re-entry policy can matter as well. We treat this as an outlook rather than an experimentally established generalization.
+
+Two application directions make this system-level question concrete. In AI-assisted software development, code can remain fully visible while the semantic history that turned a requirement into an assumption, interface, module and repository dependency becomes opaque; artifact transparency does not necessarily imply process transparency. In long-running business systems, persistent state must change without allowing every local context to rewrite system identity or authority. A game-world example makes the separation intuitive: a Character System and a World/Social System may both evolve, but neither should gain unrestricted write permission over the other's persistent reality merely because information crossed their interface. Such cases motivate future semantic-authority contracts between systems.
+
+The production question is therefore shifting from capability alone toward **process qualification**. A capable system may still be difficult to trust operationally if an organization cannot reconstruct what evidence was used, how authority changed, why scope expanded, which descendants depend on a disputed object, how that object can be repaired locally, and whether superseded authority can re-enter later. Process reality provides one framework for making those questions explicit and experimentally addressable.
+
+## Methods
+
+### Experimental programme and evidence geometry
+
+The study used an e-commerce environment for natural discovery and deep mechanism development, followed by a held-out natural cohort comprising 30 Finance, 30 Supply Chain and 30 Software Engineering trajectories. E-commerce discovery history, held-out natural trajectories, selected R5 mechanism cases, R7 control/repair trajectories, development traces and censored trajectories were later combined into a 150-trajectory R8 semantic-analysis inventory. Because these evidence blocks have different selection rules and scientific roles, the combined inventory was never treated as a prevalence denominator.
+
+Historical evidence was maintained append-only. Later theory revisions and semantic audits consumed frozen trajectories rather than replacing stochastic realizations with newly generated runs intended to match the final theory. Development traces, healthy comparators, failure prefixes and active-censored trajectories were retained rather than silently discarded.
+
+### Trajectory-first semantic audit
+
+The canonical semantic unit was a **Dynamic Semantic Episode** embedded in a complete realized trajectory. Structural records established chronology, message transfer, invocations, shared-state versions, termination, censoring and evidence pointers. Structural features were used for indexing and localization but were not allowed to determine semantic verdicts on their own.
+
+Each trajectory-first audit reconstructed: (1) chronological process; (2) semantic episodes; (3) functional semantic lineage; (4) original goal, authorization boundary, realized process and final-result alignment; (5) retrospective and censor timeline; (6) C; (7) P; (8) R; (9) cross-dimensional coupling; (10) unresolved or missing evidence; and (11) claim boundary. A verdict without prior trajectory reconstruction was invalid under the audit contract.
+
+C was supported when a semantic lineage acquired greater operational or epistemic permission than its independent evidential support justified. P was supported when collaboration or execution scope expanded beyond the authorized task boundary rather than merely involving more agents. R was supported when a retrospective operation reactivated generative process conditions and produced a new C or P event. Reopening, recomputation, information propagation and persistence were not sufficient by themselves.
+
+### Structural pre-screening calibration
+
+Structural scouting was treated as a localization layer rather than an exhaustive detector. To test the risk of omission, we retrospectively compared the earlier frozen B2 structural high-risk selector with the later full-trajectory R8 adjudication on the same 90 held-out natural trajectories. The narrow B2 rules selected 52 trajectories in total. Among 13 trajectories later supported for Dynamic P and/or R, the union of B2 rules captured 10 (76.9%) and missed 3 (23.1%). Dimension-specific capture was 4/13 for P and 9/12 for R. The misses reflected proxy mismatch rather than demonstrated loss of structural evidence: the earlier P rule required first activation of a new Agent after a reviewer boundary, whereas process-side P can be carried by already-active Agents; the R rule centered on reviewer-mediated re-entry, whereas later-supported R also arose from natural late-event reopening. The broader deterministic triage preserved post-late-event structural evidence in all 13 later-supported trajectories. These percentages are conditional calibration values for this frozen selector and cohort, not prevalence estimates or universal scout-recall rates.
+
+### Functional semantic lineage
+
+Two lineage forms were tracked. **Propositional lineage** recorded direct or paraphrastic continuation of a proposition. **Functional semantic lineage** recorded continuation of uncertainty, constraint meaning, causal role, decision implication, action implication and operational reuse across transformed carriers. Source-text disappearance was therefore not interpreted as source-influence disappearance.
+
+Independent evidence and lineage-derived semantic support were separated. Multiple descendants from a common source did not count as independent evidential confirmation merely because they were produced by different agents.
+
+### Local authority perturbation and passive inertia analysis
+
+Canonical R5 used one already-frozen natural reference plus exactly one one-shot continuation per selected case. The perturbation exposed the relevant next reader to a reduced authority view, typically `fact -> unconfirmed`, without rewriting the persistent historical source state. Repeated same-parent sampling from earlier development work was retained as supplementary sensitivity evidence rather than promoted to the canonical experiment.
+
+R6 required no new provider run. It passively reconstructed the source, carrier, downstream reads, semantic adoption, decision/action dependence, persistence, affected closure and candidate intervention surface from already-frozen natural/R5 evidence. System Inertia was not equated with persistence: normal inheritance, evidence re-anchoring, boundary preservation and pre-existing conservative gates were explicit alternative explanations.
+
+### Lineage-addressed repair
+
+Repair used an addressable semantic-lineage package rather than a whole-run reset. The package included a target semantic identifier, content address, source provenance, transformations, authority transitions, shared-pool representations, adoption relations, dependent decisions, descendant candidates, affected closure and repair closure. A lineage-completeness gate blocked authorized repair when relevant source, transformation, authority-history, pool-state or dependent-descendant information was unresolved.
+
+R7-P applied persistent downstream semantic correction while inherited shared state remained in place. R7-S revised the internal lineage and could invalidate affected descendants, reopen dependent recipients, selectively recompute the affected closure, preserve compatible unrelated state and monitor exact old-authority re-entry or closure expansion. The four canonical structured-repair cases were evaluated descriptively; no universal superiority test was performed.
+
+### Censoring
+
+Trajectories were distinguished as natural complete, control-boundary complete, externally censored active process or failure terminated. Active processes truncated by turn or budget limits were not interpreted as negative evidence for later events that could no longer be observed. Positive prefixes before censoring remained valid evidence; unobserved tails did not support absence claims.
+
+### AI systems and human responsibility
+
+Large language models served as experimental subjects and, in the R8 semantic-closure stage, as a trajectory reviewer under an explicit audit contract. The semantic reviewer used frozen evidence and was not permitted to modify subject trajectories. Independent reviewer replication remains incomplete and is reported as a limitation.
+
+LLM assistance was also used during research engineering and manuscript organization. All scientific claims, evidence boundaries, manuscript wording and submission decisions remain the responsibility of the human author. LLM outputs are not treated as authorship and do not independently establish scientific verdicts.
+
+### Data and code availability — draft
+
+The repository is designed to expose claim-to-case-to-audit-to-manifest-to-hash-to-raw-evidence routes. Frozen evidence, schemas, manifests, validators and code are intended for public release with the submission/publication package subject to final repository hygiene and licensing review. Exact Data Availability and Code Availability statements will be frozen during NMI-P6.
+
+## Provisional reference key map
+
+The manuscript currently uses repository literature keys rather than final journal-formatted references.
+
+- **L1** — *Why Do Multi-Agent LLM Systems Fail?*, NeurIPS 2025 Datasets and Benchmarks.
+- **L2** — *G-Designer: Architecting Multi-agent Communication Topologies via Graph Neural Networks*, ICML 2025.
+- **L3** — *Understanding the Information Propagation Effects of Communication Topologies in LLM-based Multi-Agent Systems*, EMNLP 2025.
+- **L4** — *AgentAsk: Multi-Agent Systems Need to Ask*, ACL 2026.
+- **L5** — *Towards Self-Improving Error Diagnosis in Multi-Agent Systems*, Findings ACL 2026.
+- **L6** — *RAFFLES: Reasoning-based Attribution of Faults for LLM Systems*, EACL 2026.
+- **L7** — *PROV-AGENT: Unified Provenance for Tracking AI Agent Interactions in Agentic Workflows*, IEEE eScience 2025.
+- **L8** — *ControlA: Agentic Workflow Control Mechanisms for Reliable Science*, IEEE eScience 2025.
+- **L9** — *Generator-Assistant Stepwise Rollback Framework for Large Language Model Agent*, EMNLP 2025.
+- **L10** — *How Memory Management Impacts LLM Agents: An Empirical Study of Experience-Following Behavior*, ACL 2026.
+- **L11** — *SyncMind: Measuring Agent Out-of-Sync Recovery in Collaborative Software Engineering*, ICML 2025.
+- **L12** — *RepoAudit: An Autonomous LLM-Agent for Repository-Level Code Auditing*, ICML 2025.
+
+Frontier preprints F1-F3 remain novelty-boundary material and are not yet promoted into the v0.1 main-text reference set.

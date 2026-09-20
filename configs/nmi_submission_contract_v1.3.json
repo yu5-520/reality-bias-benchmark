@@ -1,0 +1,46 @@
+{
+  "schema": "RB-NMI-SUBMISSION-CONTRACT-v1.3",
+  "date": "2026-09-20",
+  "status": "NMI_P4_ACTIVE_STRUCTURAL_SCOUT_ATTACK_CALIBRATED",
+  "predecessor": "RB-NMI-SUBMISSION-CONTRACT-v1.2.1",
+  "target_journal": "Nature Machine Intelligence",
+  "target_content_type": "Article",
+  "manuscript": {
+    "path": "docs/submission/nmi/NMI_Manuscript_v0.2.md",
+    "title": "Process reality in multi-agent AI systems",
+    "abstract_word_estimate": 147,
+    "main_text_word_estimate_before_methods": 2565,
+    "official_main_text_max_words": 3500,
+    "structural_scout_attack_hardened": true
+  },
+  "p4_closed_attacks": {
+    "structural_scout_recall": {
+      "status": "CALIBRATED",
+      "same_cohort_n": 90,
+      "narrow_union_capture": "10/13",
+      "narrow_union_capture_percent": 76.9231,
+      "narrow_union_miss_percent": 23.0769,
+      "P_capture": "4/13",
+      "R_capture": "9/12",
+      "broad_post_late_packet_proxy": "13/13",
+      "conclusion": "STRUCTURAL_SCOUT_LOCALIZES_EVIDENCE_NOT_SEMANTIC_VERDICTS"
+    }
+  },
+  "p6_blockers": {
+    "r8_full_record_repository_integrity": {
+      "status": "RECOVERY_SOURCE_IDENTIFIED",
+      "current_repository_copy_valid": false,
+      "valid_external_package_sha256": "cf4d3d8158cc1bbd76649e6f236217283c4f5b3a33d3531ae400325141b44966",
+      "append_recovered_copy_required": true,
+      "overwrite_old_object": false
+    }
+  },
+  "next_gate": "NMI_P4_CONTINUE_REVIEWER_ATTACKS",
+  "authorization": {
+    "new_subject_runs": 0,
+    "provider_calls": 0,
+    "evaluator_calls": 0,
+    "new_semantic_adjudication": false,
+    "raw_evidence_mutation": false
+  }
+}
