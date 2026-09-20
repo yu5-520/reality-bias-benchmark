@@ -1,0 +1,22 @@
+name: NMI P4 RA07 Validate
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.9.md'
+      - 'docs/submission/nmi/NMI_P4_Inter_System_Extrapolation_Attack_v1.md'
+      - 'docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.8.md'
+      - 'docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.8.md'
+      - 'configs/nmi_submission_contract_v1.10.json'
+      - 'manifests/nmi_p4_ra07_inter_system_extrapolation_2026-09-21_v0_1.json'
+      - 'scripts/validate_nmi_p4_ra07_v0_1.py'
+      - '.github/workflows/nmi-p4-ra07-validate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python scripts/validate_nmi_p4_ra07_v0_1.py
