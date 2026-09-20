@@ -1,0 +1,130 @@
+{
+  "schema": "RB-NMI-P4-STRUCTURAL-SCOUT-RECALL-CALIBRATION-v0.2",
+  "date": "2026-09-20",
+  "status": "CALIBRATED_ON_FROZEN_HELDOUT_DATA",
+  "population": {
+    "heldout_natural_trajectories": 90,
+    "later_full_trajectory_C_supported": 0,
+    "later_full_trajectory_P_supported": 13,
+    "later_full_trajectory_R_supported": 12,
+    "later_full_trajectory_unique_P_or_R_supported": 13,
+    "denominator_boundary": "CONDITIONAL_CALIBRATION_REFERENCE_NOT_PREVALENCE"
+  },
+  "broad_triage": {
+    "structural_candidate_rows": 2127,
+    "selected_unique_cases": 167,
+    "candidate_surface_retention_percent": 7.8514,
+    "candidate_surface_compression_percent": 92.1486,
+    "formation_assignments": 90,
+    "propagation_assignments": 90,
+    "authority_review_assignments": 85,
+    "later_positive_post_late_packet_coverage": "13/13",
+    "post_late_packet_coverage_proxy_percent": 100,
+    "final_turn_reach": "12/13",
+    "exact_semantic_episode_recall_claim_allowed": false
+  },
+  "narrow_b2": {
+    "selected_unique_trajectories": 52,
+    "P": {
+      "selected_by_rule": 15,
+      "later_supported": 13,
+      "captured": 4,
+      "missed": 9,
+      "conditional_capture_percent": 30.7692,
+      "conditional_miss_percent": 69.2308,
+      "missed_run_ids": [
+        "v5-xd-finance-fr001-0027",
+        "v5-xd-supply_chain-fr001-0014",
+        "v5-xd-supply_chain-fr001-0019",
+        "v5-xd-supply_chain-fr001-0029",
+        "v5-xd-software_engineering-fr001-0007",
+        "v5-xd-software_engineering-fr001-0013",
+        "v5-xd-software_engineering-fr001-0025",
+        "v5-xd-software_engineering-fr001-0027",
+        "v5-xd-software_engineering-fr001-0029"
+      ]
+    },
+    "R": {
+      "selected_by_rule": 44,
+      "later_supported": 12,
+      "captured": 9,
+      "missed": 3,
+      "conditional_capture_percent": 75,
+      "conditional_miss_percent": 25,
+      "missed_run_ids": [
+        "v5-xd-software_engineering-fr001-0007",
+        "v5-xd-supply_chain-fr001-0019",
+        "v5-xd-supply_chain-fr001-0029"
+      ]
+    },
+    "union": {
+      "selected_unique_trajectories": 52,
+      "later_unique_P_or_R_supported": 13,
+      "captured": 10,
+      "missed": 3,
+      "conditional_capture_percent": 76.9231,
+      "conditional_miss_percent": 23.0769,
+      "missed_run_ids": [
+        "v5-xd-software_engineering-fr001-0007",
+        "v5-xd-supply_chain-fr001-0019",
+        "v5-xd-supply_chain-fr001-0029"
+      ]
+    },
+    "C": {
+      "later_supported": 0,
+      "recall_estimable": false
+    }
+  },
+  "miss_mechanisms": {
+    "v5-xd-software_engineering-fr001-0007": {
+      "late_event_turn": 1,
+      "reviewer_turns": [],
+      "broad_triage": "FORMATION+AUTHORITY turn4; PROPAGATION turn6; downstream summaries through turn24",
+      "failure_mode": "REVIEWER_BOUNDARY_PROXY_MISS"
+    },
+    "v5-xd-supply_chain-fr001-0019": {
+      "late_event_turn": 1,
+      "reviewer_turns": [
+        32
+      ],
+      "broad_triage": "PROPAGATION+AUTHORITY late_event_west_forecast turn2; eight visible actors; evidence through turn32",
+      "failure_mode": "REVIEWER_BOUNDARY_TEMPORALLY_MISALIGNED"
+    },
+    "v5-xd-supply_chain-fr001-0029": {
+      "late_event_turn": 4,
+      "reviewer_turns": [],
+      "broad_triage": "single draft_plan packet carries FORMATION+PROPAGATION+AUTHORITY; evidence through turn32",
+      "failure_mode": "REVIEWER_BOUNDARY_PROXY_MISS"
+    }
+  },
+  "r8_source_integrity": {
+    "repository_object": {
+      "size_bytes": 14999,
+      "sha256": "c047ae222f6bd4a58e57c109d9c573b0180e0fa3ea5c48ad4f49857098deb508",
+      "gzip_readable": false,
+      "matches_manifest": false
+    },
+    "recovered_frozen_external_package": {
+      "filename": "r8_second_audit_with_ecommerce_discovery_v0_2.zip",
+      "sha256": "cf4d3d8158cc1bbd76649e6f236217283c4f5b3a33d3531ae400325141b44966",
+      "internal_gzip_size_bytes": 90834,
+      "internal_compressed_sha256": "d8e51328f23ff6619fef5dce37f5768de319d16c3be0e7b478d27c7b614d9957",
+      "internal_uncompressed_size_bytes": 629892,
+      "internal_uncompressed_sha256": "f4b1ee053d47fb3fe5b681831acd37469549af0f741660b81e28fb0df54f3e61",
+      "jsonl_record_count": 141,
+      "matches_frozen_manifest": true
+    },
+    "recovery_policy": "APPEND_RECOVERED_COPY_LATER_DO_NOT_OVERWRITE_FROZEN_REPOSITORY_OBJECT"
+  },
+  "scientific_boundary": {
+    "prevalence_claim": false,
+    "candidate_retention_equals_semantic_recall": false,
+    "post_late_packet_proxy_equals_exact_episode_recall": false,
+    "exact_event_level_semantic_recall_established": false,
+    "new_subject_run": false,
+    "new_provider_call": false,
+    "new_evaluator_call": false,
+    "new_semantic_adjudication": false,
+    "raw_evidence_mutation": false
+  }
+}

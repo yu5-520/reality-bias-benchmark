@@ -1029,3 +1029,50 @@ Canonical P3 files:
 - `theory/change_notes/CN-R-076_nmi_p3_manuscript_v0_1.md`
 
 No new experimental execution or frozen-evidence mutation is authorized.
+
+## NMI-P4 Structural Scout Recall Attack
+
+A frozen-data reviewer attack now calibrates whether structural pre-screening can omit later semantic findings.
+
+Same held-out natural cohort:
+
+- trajectories: **90**;
+- structural candidate rows: **2,127**;
+- deterministic triage cases: **167**;
+- candidate-surface compression: **92.1486%**.
+
+Later full-trajectory R8 supports:
+
+- Dynamic P: **13**;
+- Dynamic R: **12**;
+- unique P-or-R-supported trajectories: **13**.
+
+Earlier narrow B2 high-risk structural selection:
+
+- P selector captures **4/13 = 30.77%**, misses **69.23%**;
+- R selector captures **9/12 = 75.00%**, misses **25.00%**;
+- union of B2 structural rules captures **10/13 = 76.92%**, misses **3/13 = 23.08%**.
+
+The three union misses are:
+
+- `v5-xd-software_engineering-fr001-0007`;
+- `v5-xd-supply_chain-fr001-0019`;
+- `v5-xd-supply_chain-fr001-0029`.
+
+All three remain visible in the broader deterministic triage. Across all 13 later P/R-supported trajectories, selected triage packets preserve post-late-event structural evidence in **13/13**. Therefore the main observed failure is a **narrow selector / semantic-proxy miss**, not demonstrated absence of underlying structural evidence.
+
+Methodological consequence:
+
+> **Structural scouting is a localization layer, not the semantic verdict layer.**
+
+The attack also detected a repository-integrity defect in the committed 141-record R8 gzip. A previously frozen external package was recovered and matches the manifest's compressed and uncompressed SHA-256 values exactly. The old repository object remains immutable; P6 must append a valid recovered canonical copy.
+
+Canonical files:
+
+- `docs/submission/nmi/NMI_P4_Structural_Scout_Recall_Attack_Report_v1.md`
+- `results/nmi_p4_structural_scout_recall_calibration_v0_2/summary.json`
+- `docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.1.md`
+- `manifests/nmi_p4_structural_scout_recall_attack_2026-09-20_v0_2.json`
+- `theory/change_notes/CN-R-078_nmi_p4_structural_scout_recall_calibration.md`
+
+These percentages are conditional calibration values for the frozen selector against later R8 full-trajectory adjudication; they are **not CPR prevalence estimates**.

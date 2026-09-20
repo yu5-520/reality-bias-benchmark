@@ -1,0 +1,42 @@
+{
+  "schema": "RB-NMI-P4-STRUCTURAL-SCOUT-RECALL-ATTACK-MANIFEST-v0.2",
+  "date": "2026-09-20",
+  "status": "P4_STRUCTURAL_SCOUT_ATTACK_CALIBRATED",
+  "base_commit": "e3c31fb7d3fbdf3c4c40867faa973b846905201d",
+  "source_artifacts": {
+    "triage_artifact_id": 10560253559,
+    "triage_artifact_digest": "sha256:b0e8b264cd6ee5b8970f3dbe186a49b3e23a5ae33eb67c01076afc7d8baf0550",
+    "valid_r8_external_package": {
+      "filename": "r8_second_audit_with_ecommerce_discovery_v0_2.zip",
+      "sha256": "cf4d3d8158cc1bbd76649e6f236217283c4f5b3a33d3531ae400325141b44966"
+    }
+  },
+  "outputs": [
+    "docs/submission/nmi/NMI_P4_Structural_Scout_Recall_Attack_Report_v1.md",
+    "results/nmi_p4_structural_scout_recall_calibration_v0_2/summary.json",
+    "docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.1.md",
+    "theory/change_notes/CN-R-078_nmi_p4_structural_scout_recall_calibration.md"
+  ],
+  "calibrated_values": {
+    "broad_candidate_surface_compression_percent": 92.1486,
+    "narrow_union_capture_percent": 76.9231,
+    "narrow_union_miss_percent": 23.0769,
+    "P_capture_percent": 30.7692,
+    "P_miss_percent": 69.2308,
+    "R_capture_percent": 75,
+    "R_miss_percent": 25,
+    "broad_post_late_packet_coverage_proxy_percent": 100
+  },
+  "integrity": {
+    "current_repo_r8_full_records_valid": false,
+    "valid_external_copy_recovered": true,
+    "p6_recovery_required": true
+  },
+  "execution_boundary": {
+    "new_subject_runs": 0,
+    "provider_calls": 0,
+    "evaluator_calls": 0,
+    "new_semantic_adjudication": false,
+    "raw_evidence_mutation": false
+  }
+}
