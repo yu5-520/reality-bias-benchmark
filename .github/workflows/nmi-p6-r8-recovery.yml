@@ -1,0 +1,65 @@
+name: NMI P6 R8 Canonical Recovery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'recovery/p6/R8_RECOVERY_READY'
+
+permissions:
+  contents: write
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Decode and verify append-only canonical recovery
+        run: |
+          set -euo pipefail
+          out="results/r8_trajectory_first_second_audit_recovered_v0_1/trajectory_second_audit_records.jsonl.gz"
+          old="results/r8_trajectory_first_second_audit_v0_1/trajectory_second_audit_records.jsonl.gz"
+          mkdir -p "$(dirname "$out")"
+
+          test -f "$old"
+          test "$(wc -c < "$old")" -eq 14999
+          echo "c047ae222f6bd4a58e57c109d9c573b0180e0fa3ea5c48ad4f49857098deb508  $old" | sha256sum -c -
+
+          cat             recovery/p6/r8_gzip_base64/part-00.b64             recovery/p6/r8_gzip_base64/part-01.b64             recovery/p6/r8_gzip_base64/part-02.b64             recovery/p6/r8_gzip_base64/p03-0.b64             recovery/p6/r8_gzip_base64/p03-1.b64             recovery/p6/r8_gzip_base64/p04-0.b64             recovery/p6/r8_gzip_base64/p04-1.b64             recovery/p6/r8_gzip_base64/p05-0.b64             recovery/p6/r8_gzip_base64/p05-1.b64             recovery/p6/r8_gzip_base64/p06-0.b64             recovery/p6/r8_gzip_base64/p06-1.b64             recovery/p6/r8_gzip_base64/p07-0.b64             recovery/p6/r8_gzip_base64/p07-1.b64             > /tmp/r8_recovered.b64
+
+          test "$(wc -c < /tmp/r8_recovered.b64)" -eq 121112
+          base64 -d /tmp/r8_recovered.b64 > "$out"
+
+          test "$(wc -c < "$out")" -eq 90834
+          echo "d8e51328f23ff6619fef5dce37f5768de319d16c3be0e7b478d27c7b614d9957  $out" | sha256sum -c -
+
+          python - <<'PY'
+          import gzip, hashlib
+          from pathlib import Path
+          p = Path("results/r8_trajectory_first_second_audit_recovered_v0_1/trajectory_second_audit_records.jsonl.gz")
+          raw = p.read_bytes()
+          plain = gzip.decompress(raw)
+          assert hashlib.sha256(raw).hexdigest() == "d8e51328f23ff6619fef5dce37f5768de319d16c3be0e7b478d27c7b614d9957"
+          assert len(raw) == 90834
+          assert hashlib.sha256(plain).hexdigest() == "f4b1ee053d47fb3fe5b681831acd37469549af0f741660b81e28fb0df54f3e61"
+          assert len(plain) == 629892
+          assert sum(1 for line in plain.splitlines() if line.strip()) == 141
+          print("R8_RECOVERED_CANONICAL=PASS")
+          PY
+
+      - name: Commit recovered binary as new canonical copy
+        run: |
+          set -euo pipefail
+          out="results/r8_trajectory_first_second_audit_recovered_v0_1/trajectory_second_audit_records.jsonl.gz"
+          git add "$out"
+          if git diff --cached --quiet; then
+            echo "Recovered canonical copy already present."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "P6 append recovered canonical R8 full-record gzip"
+          git push
