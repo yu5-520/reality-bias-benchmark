@@ -853,3 +853,40 @@ Canonical R9 v2 files:
 - `theory/change_notes/CN-R-072_r9_inter_system_process_reality_rebase.md`
 
 No new subject/provider/evaluator execution or frozen-evidence mutation is authorized by this synthesis layer.
+
+## R9 outlook application — Character–World Process Reality Protocol
+
+R9 v2 remains frozen and unchanged. A new append-only application-outlook note instantiates **Inter-System Process Reality** inside the existing business-deployment branch:
+
+`Character System <-> Process Reality Protocol <-> World / Social System`.
+
+This does **not** create a third top-level outlook direction. It belongs under:
+
+`Business deployment / persistent operational reality`.
+
+The note distinguishes two persistence problems:
+
+- **Persistent Character Reality** — identity, traits, beliefs, relationships, memory and current behaviour;
+- **Persistent World / Social Reality** — world rules, institutions, authority, public state, local environment and historical revisions.
+
+Core protocol principles:
+
+- retrieval is not authorization;
+- language is not world-write permission;
+- fast state does not automatically rewrite slow state;
+- local events do not automatically authorize global structural change;
+- historical state re-entry requires a valid re-entry path.
+
+Canonical files:
+
+- `docs/outlook/R9_Character_World_Process_Reality_Protocol_Outlook_v1.md`
+- `configs/r9_character_world_process_reality_outlook_v0.1.json`
+- `manifests/r9_character_world_outlook_2026-09-20_v0_1.json`
+- `theory/change_notes/CN-R-073_character_world_process_reality_protocol_outlook.md`
+- `scripts/validate_r9_character_world_outlook_v0_1.py`
+
+Scientific status:
+
+`APPLICATION OUTLOOK / CONCEPTUAL INSTANTIATION / NO NEW EXPERIMENTAL EVIDENCE`.
+
+No formal game-system CPR claim, provider execution, evaluator execution or frozen-evidence mutation is authorized.
