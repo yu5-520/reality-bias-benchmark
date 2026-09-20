@@ -782,3 +782,13 @@ Forward files:
 - `docs/reports/2026-09-20/R8_Trajectory_First_Second_Audit_Combined_Result_v1.md`
 
 No subject reruns, new provider calls or paid evaluator calls were used for this audit.
+
+## R8 Dynamic CPR Semantic Closure Report
+
+The canonical trajectory-first R8 theory/phenomenon report is now repository material:
+
+- `docs/reports/2026-09-20/R8_Trajectory_First_Dynamic_CPR_Semantic_Closure_Report_v1.md`
+
+It follows Process Reality Report Standard v1.5 and the Theory Experiment Report Standard v1.0.
+
+The report preserves separate denominators, censor-aware interpretation, and explicit typical chains for Dynamic C, P, R and supported cross-penetration relations. Paper-level freeze remains `NOT_YET`.
