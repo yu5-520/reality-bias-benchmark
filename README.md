@@ -1076,3 +1076,50 @@ Canonical files:
 - `theory/change_notes/CN-R-078_nmi_p4_structural_scout_recall_calibration.md`
 
 These percentages are conditional calibration values for the frozen selector against later R8 full-trajectory adjudication; they are **not CPR prevalence estimates**.
+
+## NMI-P4 Foundational Attack Expansion
+
+P4 now separates ordinary reviewer attacks from **foundational attacks** that test whether the method or research object survives deeper assumption changes.
+
+### Foundational Attack 01 — structural omission
+
+Frozen held-out calibration:
+
+- B2 union structural capture: **10/13 = 76.92%**;
+- conditional miss: **23.08%**;
+- broader post-late structural evidence-preservation proxy: **13/13**.
+
+Conclusion:
+
+> **Structural scouting is a localization layer, not the semantic verdict layer.**
+
+### Foundational Attack 02 — future model capability absorption
+
+The paper no longer relies on a claim that today's failure manifestations must persist as models improve.
+
+The hardened boundary is:
+
+> **Model capability is not identical to external evidence, authorization, provenance, validity, re-entry permission or target-system write authority.**
+
+A future consolidated foundation-model system may absorb today's external monitor implementation. That changes protocol placement, not necessarily the independently governed system boundaries through which reality, authority and state are exchanged.
+
+Canonical formulation:
+
+> **Protocol location can change; boundary integrity does not disappear merely because model capability increases.**
+
+The linked engineering outlook is:
+
+`Process Reality Monitor -> semantic lineage / affected closure -> Repair Authority Gate -> bounded Repair Agent -> selective reopen/recompute -> re-entry watch`.
+
+The monitor does not automatically receive broad execution authority, and the repair agent is bounded to the target lineage, affected closure and authorized operation.
+
+Forward P4 files:
+
+- `docs/submission/nmi/NMI_Manuscript_v0.3.md`
+- `docs/submission/nmi/NMI_P4_Capability_Absorption_System_Boundary_Attack_v1.md`
+- `docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.2.md`
+- `docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.2.md`
+- `configs/nmi_submission_contract_v1.4.json`
+- `theory/change_notes/CN-R-080_nmi_p4_foundational_attack_02_monitor_repair_outlook.md`
+
+Inter-System Process Reality remains an **outlook**, not an experimentally established universal generalization.

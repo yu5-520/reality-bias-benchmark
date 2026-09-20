@@ -1,0 +1,26 @@
+name: NMI P4 Foundational Attacks Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.3.md'
+      - 'docs/submission/nmi/NMI_P4_Capability_Absorption_System_Boundary_Attack_v1.md'
+      - 'docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.2.md'
+      - 'docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.2.md'
+      - 'configs/nmi_submission_contract_v1.4.json'
+      - 'manifests/nmi_p4_foundational_attacks_2026-09-20_v0_1.json'
+      - 'scripts/validate_nmi_p4_foundational_attacks_v0_1.py'
+      - '.github/workflows/nmi-p4-foundational-attacks-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate P4 foundational attacks
+        run: python scripts/validate_nmi_p4_foundational_attacks_v0_1.py
