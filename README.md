@@ -678,3 +678,28 @@ Core forward files:
 - `scripts/validate_r8_dynamic_cpr_v0_3.py`
 
 Historical R8/CPR contracts and all frozen R2-R7 evidence remain immutable. This update authorizes no provider subject run and no paid evaluator call.
+
+## R8 Cross-stage Dynamic CPR (v5.6)
+
+Forward R8 now treats R2-R7 as multiple observation contexts rather than using R5 as the sole semantic entry point.
+
+Branch geometry:
+
+- `R8-B1` — frozen R5/R6 target-bound authority audit;
+- `R8-B2` — R2-R4 natural Dynamic CPR audit over the 90 frozen trajectories;
+- `R8-B3` — R6 carrier/reader/adoption/inertia mechanism windows;
+- `R8-B4` — R7 persistent-correction and repair/reopen/recompute windows;
+- `R8-C` — cross-stage coupling synthesis after B2/B3/B4 closure.
+
+The historical R8-B result is preserved and repositioned as B1. Its P=0/R=0 findings apply only to the 29 target-bound B1 packets, not to the whole first round.
+
+Core forward files:
+
+- `docs/R_Plan_v5.6.md`
+- `theory/theory_contract_v0.17.md`
+- `docs/R8_Dynamic_CPR_Permission_Penetration_Protocol_v0.4.md`
+- `configs/r8_cross_stage_observation_surface_registry_v0.1.json`
+- `results/r8_cross_stage_observation_surface_registry_v0_1/summary.json`
+- `docs/reports/2026-09-20/R8_Cross_Stage_Observation_Surface_Registry_Result_v1.md`
+
+Current overall semantic status: `PARTIAL_B1_ONLY`. No new subject runs are authorized by this rebase.
