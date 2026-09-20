@@ -22,11 +22,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh api repos/${{ github.repository }}/actions/artifacts/10560253559/zip > /tmp/triage.zip
-      - name: Probe frozen R8 record schema and binding
+      - name: Run integrity and calibration attack
         run: |
           python scripts/nmi_p4_structural_scout_recall_probe.py \
             --triage-zip /tmp/triage.zip \
             --r8-records results/r8_trajectory_first_second_audit_v0_1/trajectory_second_audit_records.jsonl.gz \
+            --r8-manifest manifests/r8_trajectory_first_second_audit_repository_freeze_2026-09-20_v0_2.json \
+            --triage-summary results/v5_cross_domain_semantic_triage_v0_1/summary.json \
+            --r8-summary results/r8_trajectory_first_second_audit_v0_1/summary.json \
+            --legacy-b2-summary results/r8_b2_natural_high_risk_window_audit_v0_1/summary.json \
             --outdir /tmp/nmi_p4_probe
       - uses: actions/upload-artifact@v4
         with:
