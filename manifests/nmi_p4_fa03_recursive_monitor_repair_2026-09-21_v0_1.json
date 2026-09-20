@@ -1,0 +1,34 @@
+{
+  "schema": "RB-NMI-P4-FA03-MANIFEST-v0.1",
+  "date": "2026-09-21",
+  "status": "FA03_RECURSIVE_MONITOR_REPAIR_GOVERNANCE_HARDENED",
+  "base_commit": "91dae742c3ac7783134822ce6969b8e1f805a83f",
+  "outputs": [
+    "docs/submission/nmi/NMI_Manuscript_v0.8.md",
+    "docs/submission/nmi/NMI_P4_Recursive_Monitor_Repair_Governance_Attack_v1.md",
+    "docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.7.md",
+    "docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.7.md",
+    "configs/nmi_submission_contract_v1.9.json",
+    "theory/change_notes/CN-R-085_nmi_p4_recursive_monitor_repair_governance_attack.md"
+  ],
+  "guards": {
+    "detection_equals_authority": false,
+    "monitor_read_equals_repair_write": false,
+    "verdict_equals_repair_authorization": false,
+    "repair_authorization_equals_global_write": false,
+    "reentry_equals_renewed_authority": false,
+    "infinite_monitor_chain_required": false
+  },
+  "evidence_boundary": {
+    "external_monitor_empirically_validated": false,
+    "repair_authority_gate_empirically_validated": false,
+    "recursive_production_governance_empirically_validated": false
+  },
+  "execution_boundary": {
+    "new_subject_runs": 0,
+    "provider_calls": 0,
+    "evaluator_calls": 0,
+    "new_semantic_adjudication": false,
+    "raw_evidence_mutation": false
+  }
+}
