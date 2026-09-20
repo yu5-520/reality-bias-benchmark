@@ -1,0 +1,54 @@
+{
+  "schema": "RB-R8B-DYNAMIC-CPR-FIRST-ROUND-MANIFEST-v0.1",
+  "date": "2026-09-20",
+  "status": "FROZEN_APPEND_ONLY_SEMANTIC_ADJUDICATION",
+  "source_r8a": {
+    "report": "docs/reports/2026-09-20/R8A_Dynamic_CPR_Semantic_Event_Reconstruction_Result_v1.md",
+    "manifest": "manifests/r8a_dynamic_cpr_first_round_2026-09-20_v0_1.json",
+    "source_packet_count": 29,
+    "r8a_summary_hash": "092fcc30a5976e7d11ce72cb18a6f3b8db60fd8518e981ce19e3a7d2e43513bb"
+  },
+  "theory_binding": {
+    "r_plan": "docs/R_Plan_v5.5.md",
+    "theory_contract": "theory/theory_contract_v0.16.md",
+    "r8_protocol": "docs/R8_Dynamic_CPR_Permission_Penetration_Protocol_v0.3.md",
+    "definition_contract": "configs/cpr_definition_contract_v0.3.json",
+    "adjudication_contract": "configs/cpr_adjudication_contract_v0.3.json"
+  },
+  "reviewer": {
+    "kind": "MODEL",
+    "id": "GPT-5.6-Sol",
+    "blind_to_prior_structural_class": false,
+    "independent_replication": false,
+    "review_mode": "EVIDENCE_BOUND_APPEND_ONLY_SEMANTIC_ADJUDICATION"
+  },
+  "outputs": {
+    "detailed_adjudication_records_jsonl": {
+      "sha256": "af75b189700f3544895afbf9a51eadfc3840ae47cfbc5b626b6db470c6ad26ce",
+      "size_bytes": 118008
+    },
+    "compact_adjudications_jsonl": {
+      "sha256": "a07b1ce50d9688b0b2a89ca626dd9e702acb4ed8dbd445d3d52654db94295aba",
+      "size_bytes": 20071
+    },
+    "summary_json": {
+      "sha256": "d6f3f94ac798438f78586dc7b5034221a2b9405688668ea8a3dd50369da4906e",
+      "size_bytes": 1501
+    },
+    "frozen_package_zip": {
+      "sha256": "a21be3450082f2cabbfcbbaa4ceed21aa6bb69d2d52760981d133b251ca4d44d",
+      "size_bytes": 18815
+    }
+  },
+  "result_boundary": {
+    "positive_C_count": 2,
+    "positive_P_count": 0,
+    "positive_R_count": 0,
+    "coupling_edge_count": 0,
+    "denominator_interpretation": "29-case frozen R5-eligible mechanism-audit set only; not prevalence",
+    "new_provider_calls": 0,
+    "new_paid_evaluator_calls": 0,
+    "subject_reruns": 0,
+    "raw_evidence_mutated": false
+  }
+}
