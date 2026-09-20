@@ -1,0 +1,175 @@
+name: R8A Dynamic CPR First-Round Materialization
+
+on:
+  pull_request:
+    paths:
+      - "configs/r8a_dynamic_cpr_first_round_source_binding_v0.1.json"
+      - "arena/build_r8a_dynamic_cpr_first_round.py"
+      - "scripts/validate_r8a_dynamic_cpr_first_round.py"
+      - ".github/workflows/r8a-dynamic-cpr-first-round-materialize.yml"
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  offline-validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          set -euo pipefail
+          python -m json.tool configs/r8a_dynamic_cpr_first_round_source_binding_v0.1.json >/dev/null
+          python -m py_compile arena/build_r8a_dynamic_cpr_first_round.py
+          python scripts/validate_r8a_dynamic_cpr_first_round.py --config-only
+
+  materialize:
+    if: >-
+      github.event_name == 'issues' &&
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'R8A DYNAMIC CPR FIRST ROUND MATERIALIZE'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CONFIG: configs/r8a_dynamic_cpr_first_round_source_binding_v0.1.json
+      OUTDIR: results/r8a_dynamic_cpr_first_round_v0_1
+      REQUEST_BODY: ${{ github.event.issue.body }}
+      EXPECTED_EXECUTION_PHRASE: MATERIALIZE_R8A_DYNAMIC_CPR_FIRST_ROUND
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate exact passive request
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os,re
+          rows={}
+          for raw in os.environ['REQUEST_BODY'].splitlines():
+              line=raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit('invalid request line')
+              k,v=line.split('=',1)
+              if k in rows:
+                  raise SystemExit('duplicate request key '+k)
+              rows[k]=v
+          required={'execution_phrase','expected_main_sha','materialization_id','control_plane'}
+          assert set(rows)==required,sorted(rows)
+          assert rows['execution_phrase']==os.environ['EXPECTED_EXECUTION_PHRASE']
+          assert rows['expected_main_sha']==os.environ['GITHUB_SHA']
+          assert rows['control_plane']=='CHAT_EXECUTION_BRIDGE_R8A_DYNAMIC_CPR_v0.1'
+          assert re.fullmatch(r'[A-Za-z0-9._-]{8,100}',rows['materialization_id'])
+          print('PASS: exact passive R8-A request')
+          PY
+
+      - name: Validate theory and source binding
+        run: |
+          set -euo pipefail
+          python scripts/validate_r8a_dynamic_cpr_first_round.py --config-only
+
+      - name: Verify frozen source artifact identities
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          cfg=json.load(open(os.environ['CONFIG']))
+          repo=os.environ['GITHUB_REPOSITORY']
+          for role,x in cfg['artifacts'].items():
+              meta=json.loads(subprocess.check_output(
+                  ['gh','api',f"repos/{repo}/actions/artifacts/{x['id']}"],text=True
+              ))
+              assert meta['name']==x['name'],(role,'name',meta['name'],x['name'])
+              assert meta.get('digest')==x['digest'],(role,'digest',meta.get('digest'),x['digest'])
+              assert not meta.get('expired'),(role,'expired')
+          print('PASS: frozen R8-A source artifact identities')
+          PY
+
+      - name: Download exact frozen source files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source /tmp/r8a-zips
+          python - <<'PY' > /tmp/r8a-artifacts.tsv
+          import json,os
+          cfg=json.load(open(os.environ['CONFIG']))
+          for role,x in cfg['artifacts'].items():
+              print(role+"\t"+str(x['id'])+"\t"+x['required_file'])
+          PY
+          while IFS=$'\t' read -r role id required; do
+            zip="/tmp/r8a-zips/${role}-${id}.zip"
+            mkdir -p "source/${role}"
+            curl -L --fail --silent --show-error \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$id/zip" \
+              -o "$zip"
+            unzip -q "$zip" "$required" -d "source/${role}"
+            test -f "source/${role}/$required"
+          done < /tmp/r8a-artifacts.tsv
+          echo "PASS: exact frozen source files downloaded"
+
+      - name: Build R8-A semantic-event ledger and permission packets
+        run: |
+          set -euo pipefail
+          python -m arena.build_r8a_dynamic_cpr_first_round \
+            --r2r6-audits source/r2_r6_complete_route/results/v5_4_r2_r6_semantic_trajectory_reaudit/semantic_trajectory_audits.jsonl \
+            --lineage-closures source/r6_lineage_completeness/results/v5_4_r6_lineage_completeness_candidates/semantic_lineage_closures.jsonl \
+            --r7-structural source/r7_structural/r7_dual_structural_comparisons.jsonl \
+            --r7-semantic source/r7_semantic/results/v5_4_r7_dual_semantic_audit/semantic_audit_records.jsonl \
+            --outdir "$OUTDIR"
+
+      - name: Validate materialized R8-A output
+        run: |
+          set -euo pipefail
+          python scripts/validate_r8a_dynamic_cpr_first_round.py --result-dir "$OUTDIR"
+
+      - name: Upload frozen R8-A derivative material
+        uses: actions/upload-artifact@v4
+        with:
+          name: r8a-dynamic-cpr-first-round-${{ github.run_id }}
+          path: |
+            configs/r8a_dynamic_cpr_first_round_source_binding_v0.1.json
+            results/r8a_dynamic_cpr_first_round_v0_1/
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Record bounded result
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          summary_hash="$(python - <<'PY'
+          import json,os
+          print(json.load(open(os.path.join(os.environ['OUTDIR'],'summary.json')))['summary_hash'])
+          PY
+          )"
+          body="R8-A Dynamic CPR first-round semantic event reconstruction complete.
+
+Complete-route audits: 32 (3 natural + 29 R5/R6).
+Ledger events: 1175.
+Permission-review packets: 29.
+R6 lineage closures: 4.
+R7 control overlays: 8 across 4 cases.
+CPR adjudicated cases: 0; status remains NOT_ADJUDICATED.
+
+New provider calls: 0. Paid evaluator calls: 0. Subject reruns: 0. Raw evidence mutation: NO.
+
+Summary hash: $summary_hash"
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed

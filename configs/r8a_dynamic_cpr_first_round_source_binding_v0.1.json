@@ -1,0 +1,57 @@
+{
+  "schema": "RB-R8A-DYNAMIC-CPR-FIRST-ROUND-SOURCE-BINDING-v0.1",
+  "date": "2026-09-20",
+  "status": "FROZEN_SOURCE_BINDING_NO_NEW_SUBJECT_RUN",
+  "theory_binding": {
+    "r_plan": "docs/R_Plan_v5.5.md",
+    "theory_contract": "theory/theory_contract_v0.16.md",
+    "r8_protocol": "docs/R8_Dynamic_CPR_Permission_Penetration_Protocol_v0.3.md",
+    "definition_contract": "configs/cpr_definition_contract_v0.3.json",
+    "adjudication_contract": "configs/cpr_adjudication_contract_v0.3.json"
+  },
+  "artifacts": {
+    "r2_r6_complete_route": {
+      "id": 10588404740,
+      "name": "v5-4-r2-r6-semantic-trajectory-reaudit-35457723047",
+      "digest": "sha256:14fb11da98fae0afb5e82152c101fc5be937e43259f445b25ad10796b1801182",
+      "required_file": "results/v5_4_r2_r6_semantic_trajectory_reaudit/semantic_trajectory_audits.jsonl"
+    },
+    "r6_lineage_completeness": {
+      "id": 10586243376,
+      "name": "v5-4-r6-lineage-completeness-candidates-35449354017",
+      "digest": "sha256:1a13ad31f0eef2dc0bb9181340a4e581c1738bab947dbfd0f5989d54cd9c5b6d",
+      "required_file": "results/v5_4_r6_lineage_completeness_candidates/semantic_lineage_closures.jsonl"
+    },
+    "r7_structural": {
+      "id": 10586267940,
+      "name": "v5-4-r7-dual-structural-35450177379",
+      "digest": "sha256:242498dac7ad07e764e56d0e69c606256ac5b8d0294fcedd92b2e150b7385bee",
+      "required_file": "r7_dual_structural_comparisons.jsonl"
+    },
+    "r7_semantic": {
+      "id": 10587430720,
+      "name": "v5-4-r7-dual-semantic-35452208156",
+      "digest": "sha256:dbe8d38c3105f0a645eeaf902ff1fb7dfa4acfd8dc0680d4b63371d441924acf",
+      "required_file": "results/v5_4_r7_dual_semantic_audit/semantic_audit_records.jsonl"
+    }
+  },
+  "expected": {
+    "complete_route_audits": 32,
+    "natural_audits": 3,
+    "canonical_r5_r6_audits": 29,
+    "route_nodes": 908,
+    "semantic_edges": 194,
+    "permission_review_packets": 29,
+    "stronger_system_inertia_cases": 4,
+    "lineage_closures": 4,
+    "r7_overlay_cases": 4,
+    "r7_overlay_arms": 8
+  },
+  "execution_boundary": {
+    "new_provider_calls": 0,
+    "new_paid_evaluator_calls": 0,
+    "subject_reruns": 0,
+    "mutate_raw_evidence": false,
+    "adjudicate_cpr": false
+  }
+}
