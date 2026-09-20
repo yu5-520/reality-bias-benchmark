@@ -655,3 +655,26 @@ Engineering core outputs:
 First support / first pool / first exposure remain recorded as **optional mechanism observables**, not engineering prerequisites.
 
 Real provider execution remains **NOT AUTHORIZED**.
+
+## R8 Dynamic CPR semantic closure (v5.5)
+
+Forward R8 semantics are now append-only and use a dynamic three-dimensional Process Reality Permission-Penetration model:
+
+- C — information permission penetration;
+- P — collaboration/execution boundary permission penetration;
+- R — temporal permission penetration.
+
+C/P/R are not treated as three exclusive static task labels. They may overlap, transition and mutually maintain one another through the Shared Process-Reality Layer.
+
+Core forward files:
+
+- `docs/R_Plan_v5.5.md`
+- `theory/theory_contract_v0.16.md`
+- `docs/R8_Dynamic_CPR_Permission_Penetration_Protocol_v0.3.md`
+- `configs/cpr_definition_contract_v0.3.json`
+- `configs/cpr_adjudication_contract_v0.3.json`
+- `schemas/r8_dynamic_cpr_event_v0.2.schema.json`
+- `arena/prepare_r8_dynamic_cpr_audit_material.py`
+- `scripts/validate_r8_dynamic_cpr_v0_3.py`
+
+Historical R8/CPR contracts and all frozen R2-R7 evidence remain immutable. This update authorizes no provider subject run and no paid evaluator call.

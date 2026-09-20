@@ -1,0 +1,115 @@
+{
+  "schema": "RB-CPR-ADJUDICATION-CONTRACT-v0.3",
+  "version": "0.3",
+  "date": "2026-09-20",
+  "status": "FORWARD_APPEND_ONLY_DYNAMIC_CPR_REVIEW_CONTRACT",
+  "definition_contract": "RB-CPR-DEFINITION-CONTRACT-v0.3",
+  "review_principle": "FROZEN_STRUCTURE_FIRST_DYNAMIC_SEMANTICS_SECOND",
+  "candidate_eligibility": {
+    "requires_frozen_structural_candidate_or_window": true,
+    "requires_source_refs": true,
+    "requires_version_bound_evidence": true,
+    "requires_freeze_contract_to_allow_append_only_review": true,
+    "historical_evidence_not_mutated": true
+  },
+  "review_stages": [
+    "SEMANTIC_EVENT_RECONSTRUCTION",
+    "PERMISSION_BOUNDARY_ADJUDICATION",
+    "COUPLING_EDGE_ADJUDICATION",
+    "EVIDENCE_FREEZE"
+  ],
+  "review_packet": {
+    "common_fields": [
+      "candidate_id",
+      "run_id",
+      "event_window_refs",
+      "root_lineage_refs",
+      "shared_pool_refs",
+      "independent_evidence_refs",
+      "lineage_derived_support_refs",
+      "operational_use_refs",
+      "authorized_boundary_refs",
+      "retrospective_boundary_refs",
+      "missingness",
+      "terminal_outcome_separate"
+    ],
+    "C_required_fields": [
+      "source_epistemic_state",
+      "semantic_descendant_refs",
+      "semantic_support_progression",
+      "independent_evidence_progression",
+      "operational_authority_progression",
+      "proposition_or_lineage_identity"
+    ],
+    "P_required_fields": [
+      "baseline_scope",
+      "expansion_reason",
+      "new_agents_tools_information_stages",
+      "reopened_refs",
+      "result_side_modifications",
+      "user_visible_scope_vs_realized_scope",
+      "legitimate_decomposition_or_evidence_seeking_alternative"
+    ],
+    "R_required_fields": [
+      "retrospective_operation",
+      "pre_boundary_cpr_refs",
+      "historical_material_reentered",
+      "post_boundary_cpr_refs",
+      "r_form",
+      "fresh_independent_evidence_refs"
+    ],
+    "coupling_required_fields": [
+      "source_semantic_event_ref",
+      "target_semantic_event_ref",
+      "coupling_edge_type",
+      "temporal_or_lineage_support_refs"
+    ]
+  },
+  "allowed_labels": [
+    "ADJUDICATED_C",
+    "ADJUDICATED_P",
+    "ADJUDICATED_R",
+    "ADJUDICATED_MULTI_LABEL",
+    "ADJUDICATED_COUPLED_EPISODE",
+    "ADJUDICATED_NON_CPR",
+    "UNRESOLVED",
+    "NOT_APPLICABLE"
+  ],
+  "r_forms": [
+    "LINEAGE_PRESERVING_R",
+    "RETROSPECTIVE_GENERATIVE_R",
+    "NOT_APPLICABLE",
+    "UNRESOLVED"
+  ],
+  "reviewer_output_requirements": [
+    "label",
+    "permission_dimension",
+    "supported_relation_checks",
+    "failed_or_missing_relation_checks",
+    "evidence_refs",
+    "independent_vs_lineage_support_assessment",
+    "counter_explanation_considered",
+    "confidence_or_uncertainty",
+    "reviewer_identity_and_model_or_human_metadata"
+  ],
+  "aggregation": {
+    "default_mode": "NO_AUTOMATIC_MAJORITY_PROMOTION",
+    "disagreement_status": "REVIEW_DISAGREEMENT",
+    "aggregate_label_requires_explicit_frozen_rule": true,
+    "unresolved_allowed": true,
+    "non_cpr_allowed": true,
+    "coupled_episode_requires_explicit_supported_edges": true
+  },
+  "independence": {
+    "reviewer_must_not_edit_structural_evidence": true,
+    "reviewer_must_not_create_missing_lineage": true,
+    "reviewer_must_not_invent_hidden_reasoning": true,
+    "new_reviews_append_only": true,
+    "prior_reviewer_outputs_immutable": true
+  },
+  "authorization": {
+    "semantic_adjudication": false,
+    "paid_evaluator_run": false,
+    "provider_subject_run": false
+  }
+}
