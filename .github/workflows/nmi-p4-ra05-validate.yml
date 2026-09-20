@@ -1,0 +1,26 @@
+name: NMI P4 RA05 Validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.6.md'
+      - 'docs/submission/nmi/NMI_P4_R5_Causal_Boundary_Attack_v1.md'
+      - 'docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.5.md'
+      - 'docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.5.md'
+      - 'configs/nmi_submission_contract_v1.7.json'
+      - 'manifests/nmi_p4_ra05_r5_causal_boundary_2026-09-21_v0_1.json'
+      - 'scripts/validate_nmi_p4_ra05_v0_1.py'
+      - '.github/workflows/nmi-p4-ra05-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate RA05
+        run: python scripts/validate_nmi_p4_ra05_v0_1.py

@@ -1194,3 +1194,45 @@ Canonical files:
 - `docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.4.md`
 - `configs/nmi_submission_contract_v1.6.json`
 - `theory/change_notes/CN-R-082_nmi_p4_propagation_taxonomy_reduction_attack.md`
+
+## NMI-P4 RA05 R5 Causal Boundary
+
+P4 now explicitly bounds what the canonical one-shot R5 intervention can support.
+
+Canonical geometry per selected case:
+
+- one frozen natural reference N0;
+- one R5-I intervention continuation;
+- zero newly sampled natural controls;
+- one canonical replicate;
+- zero matched synthetic controls.
+
+The operator is a one-shot next-reader runtime transition:
+
+`fact -> unconfirmed`
+
+with no persistent shared-state mutation and no automatic reinjection.
+
+Canonical interpretation:
+
+> **R5 is a localized intervention-response probe, not a treatment-effect estimator.**
+
+R5 supports controlled local authority exposure and the realized downstream response under that exposure. It does not establish unique causality, an average treatment effect, a universal direction or a treatment probability.
+
+R6 then distinguishes semantic ancestry; R7 adds a separate lineage-level repair/recompute intervention. The cross-stage chain is mechanism triangulation, not randomized causal identification.
+
+Frozen mechanism counts retained:
+
+- canonical R5/R6 cases: **29**;
+- stronger System Inertia candidates: **4/29**;
+- ordinary/healthy/re-anchored alternatives: **25/29**;
+- unique R5 causality established: **0/29**.
+
+Canonical files:
+
+- `docs/submission/nmi/NMI_Manuscript_v0.6.md`
+- `docs/submission/nmi/NMI_P4_R5_Causal_Boundary_Attack_v1.md`
+- `docs/submission/nmi/NMI_Reviewer_Attack_Matrix_v1.5.md`
+- `docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.5.md`
+- `configs/nmi_submission_contract_v1.7.json`
+- `theory/change_notes/CN-R-083_nmi_p4_r5_causal_boundary_attack.md`
