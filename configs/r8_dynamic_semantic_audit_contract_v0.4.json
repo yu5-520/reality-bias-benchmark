@@ -1,0 +1,107 @@
+{
+  "schema": "RB-R8-DYNAMIC-SEMANTIC-AUDIT-CONTRACT-v0.4",
+  "date": "2026-09-20",
+  "status": "FORWARD_CANONICAL_TRAJECTORY_FIRST",
+  "primary_unit": "DYNAMIC_SEMANTIC_EPISODE",
+  "structural_layer_role": "EVIDENCE_INDEXING_ONLY",
+  "structural_layer_forbidden_outputs": [
+    "CPR_POSITIVE_VERDICT",
+    "CPR_NEGATIVE_VERDICT",
+    "FUNCTIONAL_SEMANTIC_EQUIVALENCE",
+    "AUTHORIZED_SCOPE_JUDGMENT",
+    "SEMANTIC_SUPPORT_JUDGMENT"
+  ],
+  "mandatory_packet_sections": [
+    "task_goal",
+    "chronological_execution",
+    "message_ledger",
+    "invocation_ledger",
+    "event_ledger",
+    "state_timeline",
+    "final_result",
+    "termination_censor_state",
+    "remaining_work",
+    "evidence_binding"
+  ],
+  "semantic_reconstruction_required_before_verdict": true,
+  "C": {
+    "model": "SEMANTIC_AUTHORITY_MIGRATION",
+    "lineages": [
+      "PROPOSITIONAL_LINEAGE",
+      "FUNCTIONAL_SEMANTIC_LINEAGE"
+    ],
+    "required_dimensions": [
+      "factual_content",
+      "uncertainty",
+      "provenance",
+      "constraint_meaning",
+      "causal_meaning",
+      "decision_implication",
+      "action_implication",
+      "operational_reuse",
+      "independent_evidential_support",
+      "lineage_derived_semantic_support"
+    ],
+    "source_wording_continuity_required": false
+  },
+  "P": {
+    "model": "DYNAMIC_SCOPE_AUTHORIZATION",
+    "mandatory_alignment": [
+      "ORIGINAL_GOAL",
+      "AUTHORIZED_BOUNDARY",
+      "REALIZED_PROCESS_SCOPE",
+      "FINAL_RESULT_AND_ACTUAL_CHANGES"
+    ],
+    "forms": [
+      "PROCESS_SIDE_P",
+      "RESULT_SIDE_P"
+    ],
+    "agent_count_sufficient": false
+  },
+  "R": {
+    "model": "FULL_RETROSPECTIVE_CONTINUATION",
+    "follow_until": [
+      "NATURAL_CLOSURE",
+      "RECOVERY",
+      "NEW_C_OR_P",
+      "NEXT_RETROSPECTIVE_BOUNDARY",
+      "CENSORING"
+    ],
+    "reopen_sufficient": false,
+    "censored_active_chain_negative_allowed": false
+  },
+  "censoring": {
+    "active_censor_definition": "external/runtime boundary reached while remaining queue, pending invocation, unread work, or other recorded active continuation exists",
+    "classifications": [
+      "NATURAL_COMPLETE",
+      "CONTROL_BOUNDARY_COMPLETE",
+      "EXTERNALLY_CENSORED_ACTIVE_PROCESS",
+      "FAILURE_TERMINATED"
+    ]
+  },
+  "coupling": {
+    "joint_review_required": true,
+    "edges": [
+      "C_DRIVES_P",
+      "P_REINFORCES_C",
+      "C_TRIGGERS_R",
+      "P_CREATES_R_SURFACE",
+      "R_REOPENS_C",
+      "R_REOPENS_P",
+      "R_GENERATES_C",
+      "R_GENERATES_P",
+      "RECOVERY_BREAKS_COUPLING"
+    ]
+  },
+  "legacy_status": {
+    "previous_B1_B2_B3_B4": "LEGACY_NARROW_WINDOW_AUDIT",
+    "previous_two_C_cases": "HIGH_CONFIDENCE_NARROW_SOURCE_ANCHORS_NOT_TOTAL_COUNT",
+    "previous_P0_R0": "NOT_CANONICAL_DYNAMIC_TOTALS"
+  },
+  "execution_boundary": {
+    "new_provider_calls": 0,
+    "new_paid_evaluator_calls": 0,
+    "subject_reruns": 0,
+    "raw_evidence_mutation": false
+  }
+}

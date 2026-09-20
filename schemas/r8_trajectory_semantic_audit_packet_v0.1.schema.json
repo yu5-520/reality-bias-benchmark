@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-R8-TRAJECTORY-SEMANTIC-AUDIT-PACKET-v0.1",
+  "title": "R8 trajectory-first semantic audit packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "packet_id",
+    "run_id",
+    "source_stage",
+    "domain_id",
+    "task_goal",
+    "chronological_execution",
+    "message_ledger",
+    "invocation_ledger",
+    "event_ledger",
+    "model_calls",
+    "state_timeline",
+    "final_result",
+    "termination_censor_state",
+    "remaining_work",
+    "evidence_binding",
+    "semantic_status"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-R8-TRAJECTORY-SEMANTIC-AUDIT-PACKET-v0.1"
+    },
+    "packet_id": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "source_stage": {
+      "type": "string"
+    },
+    "domain_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "condition": {
+      "type": [
+        "string",
+        "object",
+        "null"
+      ]
+    },
+    "task_goal": {
+      "type": [
+        "string",
+        "object",
+        "null"
+      ]
+    },
+    "initial_context": {
+      "type": [
+        "object",
+        "array",
+        "string",
+        "null"
+      ]
+    },
+    "chronological_execution": {
+      "type": "array"
+    },
+    "message_ledger": {
+      "type": "array"
+    },
+    "invocation_ledger": {
+      "type": "array"
+    },
+    "event_ledger": {
+      "type": "array"
+    },
+    "model_calls": {
+      "type": "array"
+    },
+    "state_timeline": {
+      "type": "array"
+    },
+    "final_result": {
+      "type": [
+        "object",
+        "string",
+        "array",
+        "null"
+      ]
+    },
+    "retrospective_boundaries": {
+      "type": "array"
+    },
+    "termination_censor_state": {
+      "type": "object"
+    },
+    "remaining_work": {
+      "type": "object"
+    },
+    "evidence_binding": {
+      "type": "object"
+    },
+    "semantic_status": {
+      "const": "NOT_ADJUDICATED_TRAJECTORY_FIRST"
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "schema": "RB-R8-FORWARD-SEMANTIC-CHAIN-STATUS-v0.3",
+  "date": "2026-09-20",
+  "status": "TRAJECTORY_FIRST_CHAIN_REPAIR_COMPLETE_REAUDIT_REQUIRED",
+  "canonical_method": "R8_TRAJECTORY_FIRST_DYNAMIC_SEMANTIC_AUDIT_v0.5",
+  "historical_results": {
+    "B1": "LEGACY_NARROW_WINDOW_AUDIT",
+    "B2": "LEGACY_NARROW_WINDOW_AUDIT",
+    "B3": "LEGACY_NARROW_WINDOW_AUDIT",
+    "B4": "LEGACY_NARROW_WINDOW_AUDIT"
+  },
+  "preserved_anchors": {
+    "high_confidence_C_case_ids": [
+      "wave-3-56ee79f97f54",
+      "wave-4-cf726639de1d"
+    ],
+    "interpretation": "high-confidence narrow-source anchors; not the total Dynamic C count"
+  },
+  "invalid_forward_aggregates": [
+    "C_TOTAL_EQUALS_2",
+    "P_TOTAL_EQUALS_0",
+    "R_TOTAL_EQUALS_0"
+  ],
+  "mandatory_reaudit_scope": [
+    "R2_R4_90_NATURAL_TRAJECTORIES",
+    "R5_R6_COMPLETE_AVAILABLE_TRAJECTORIES",
+    "R7_ALL_FROZEN_HISTORICAL_AND_CANONICAL_TRAJECTORIES",
+    "ALL_CENSORED_ACTIVE_CONTINUATIONS"
+  ],
+  "known_censor_priority": [
+    {
+      "run_id": "r7:prospective-ecommerce-natural-0001:triad:0001:c3_alr",
+      "termination_reason": "turn_budget_exhausted",
+      "observation_censored": true,
+      "note": "historical R7 C3 active continuation must be included in full-chain retrospective audit"
+    },
+    {
+      "source": "R2_R4_NATURAL_POPULATION",
+      "known_turn_budget_exhausted_count": 42,
+      "note": "budget-censored natural traces require censor-aware dynamic semantic review"
+    }
+  ],
+  "r8c_status": "BLOCKED_UNTIL_TRAJECTORY_FIRST_REAUDIT",
+  "execution_boundary": {
+    "new_provider_calls": 0,
+    "new_paid_evaluator_calls": 0,
+    "subject_reruns": 0,
+    "raw_evidence_mutated": false
+  }
+}

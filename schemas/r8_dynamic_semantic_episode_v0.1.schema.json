@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-R8-DYNAMIC-SEMANTIC-EPISODE-v0.1",
+  "title": "R8 Dynamic Semantic Episode",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "episode_id",
+    "run_id",
+    "trajectory_reconstruction",
+    "functional_lineages",
+    "goal_process_result_alignment",
+    "retrospective_censor_timeline",
+    "C",
+    "P",
+    "R",
+    "coupling",
+    "claim_boundary"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-R8-DYNAMIC-SEMANTIC-EPISODE-v0.1"
+    },
+    "episode_id": {
+      "type": "string"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "trajectory_reconstruction": {
+      "type": "string",
+      "minLength": 1
+    },
+    "functional_lineages": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "goal_process_result_alignment": {
+      "type": "object"
+    },
+    "retrospective_censor_timeline": {
+      "type": "object"
+    },
+    "C": {
+      "type": "object"
+    },
+    "P": {
+      "type": "object"
+    },
+    "R": {
+      "type": "object"
+    },
+    "coupling": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "unresolved": {
+      "type": "array"
+    },
+    "claim_boundary": {
+      "type": "array"
+    }
+  }
+}

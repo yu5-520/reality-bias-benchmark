@@ -720,3 +720,35 @@ See:
 - `docs/reports/2026-09-20/R8_B2_B3_B4_Cross_Stage_Semantic_Audit_Result_v1.md`
 - `results/r8_cross_stage_semantic_status_v0_2/summary.json`
 - `manifests/r8_b2_b3_b4_cross_stage_semantic_audit_2026-09-20_v0_1.json`
+
+## R8 Trajectory-First Dynamic Semantic Audit (v5.7)
+
+Forward canonical R8 now audits **complete dynamic semantic trajectories**, not structurally selected screenshots/windows.
+
+Canonical chain:
+
+`full frozen trajectory -> dynamic semantic reconstruction -> functional semantic lineage -> goal/boundary/process/result alignment -> retrospective/censor timeline -> joint C/P/R -> coupling`.
+
+Key rules:
+
+- structure is evidence indexing only;
+- source wording may disappear while functional semantic influence persists;
+- P requires original-goal vs authorized-boundary vs realized-process vs final-result comparison;
+- R requires full post-review/reopen/recompute continuation;
+- active censored chains cannot enter a negative pool;
+- historical/superseded R7 trajectories remain auditable evidence;
+- previous `C=2 / P=0 / R=0` aggregates are not canonical Dynamic CPR totals.
+
+Forward files:
+
+- `docs/R_Plan_v5.7.md`
+- `theory/theory_contract_v0.18.md`
+- `docs/R8_Trajectory_First_Dynamic_Semantic_Audit_Protocol_v0.5.md`
+- `configs/r8_dynamic_semantic_audit_contract_v0.4.json`
+- `configs/r8_trajectory_first_source_registry_v0.1.json`
+- `arena/build_r8_trajectory_first_semantic_packets.py`
+- `schemas/r8_trajectory_semantic_audit_packet_v0.1.schema.json`
+- `schemas/r8_dynamic_semantic_episode_v0.1.schema.json`
+- `docs/reports/2026-09-20/R8_Audit_Chain_Repair_Result_v1.md`
+
+Current status: `TRAJECTORY_FIRST_CHAIN_REPAIR_COMPLETE_REAUDIT_REQUIRED`.
