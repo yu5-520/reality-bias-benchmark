@@ -184,11 +184,11 @@ Large language models served as experimental subjects and as semantic reviewers 
 
 ## Data availability
 
-[Carry forward validated public frozen-raw release language from v0.17 after final rewrite.]
+The frozen multi-agent trajectory records and derived audit artifacts used in this study are publicly available in the project repository at https://github.com/yu5-520/reality-bias-benchmark. Byte-preserved raw evidence packages are publicly downloadable from the repository's **Frozen Raw Evidence v1** release at https://github.com/yu5-520/reality-bias-benchmark/releases/tag/frozen-raw-evidence-v1. The release contains 24 historical evidence archives covering the e-commerce discovery history, held-out natural R2-R4 cohort, canonical R5 raw batches, R7 raw runs and earlier mechanism evidence. Each release asset is bound to its historical GitHub Actions artifact identity and SHA-256 in `evidence/frozen_raw/SHA256SUMS_v1.txt`, with per-artifact internal file catalogs under `evidence/frozen_raw/catalog_v1/`. Paper-facing exemplar ledgers under `evidence/paper/nmi_p9/` bind the main evidence routes to frozen artifacts, run identifiers and event locations without altering the raw evidence. Runtime working directories remain excluded from Git only to prevent accidental mutation of active executions; completed frozen evidence is public. The repository also preserves the historical malformed R8 gzip object as an immutable integrity record and separately appends a canonical recovered copy whose compressed and uncompressed SHA-256 values match the original frozen manifest. An immutable archival DOI has not yet been assigned; any later archival release will be linked from the public repository.
 
 ## Code availability
 
-[Carry forward validated public code/release language from v0.17 after final rewrite.]
+Custom code for trajectory recording, structural localization, semantic-audit materialization, lineage construction, perturbation analysis, repair packaging, raw-evidence publication and repository validation is publicly available with the frozen evidence and manifests at https://github.com/yu5-520/reality-bias-benchmark. The repository includes machine-readable contracts, claim-to-evidence locators, paper-facing evidence ledgers, raw-evidence release registries, SHA-256 manifests and validators so that both the reported evidence geometry and the public frozen-raw packages can be checked independently. An immutable archival code DOI has not yet been assigned; any later archival release will be linked from the public repository.
 
 ## Author contributions
 
@@ -200,8 +200,27 @@ The author declares no competing interests.
 
 ## References
 
-[Preserve verified reference set; prior-art matrix moves to SI.]
+1. Cemri, M. et al. Why Do Multi-Agent LLM Systems Fail? *Advances in Neural Information Processing Systems — Datasets and Benchmarks Track* (2025). doi:10.52202/085713-4082.
+2. Zhang, G. et al. G-Designer: Architecting Multi-agent Communication Topologies via Graph Neural Networks. *Proc. 42nd International Conference on Machine Learning*, PMLR **267**, 76678–76692 (2025).
+3. Shen, X. et al. Understanding the Information Propagation Effects of Communication Topologies in LLM-based Multi-Agent Systems. *Proc. EMNLP 2025* (2025). doi:10.18653/v1/2025.emnlp-main.623.
+4. Lin, B. et al. AgentAsk: Multi-Agent Systems Need to Ask. *Proc. ACL 2026*, 28055–28077 (2026). doi:10.18653/v1/2026.acl-long.1294.
+5. Li, J., Yilmaz, E., Chen, B. & Le, T. Towards Self-Improving Error Diagnosis in Multi-Agent Systems. *Findings of ACL 2026* (2026). doi:10.18653/v1/2026.findings-acl.98.
+6. Zhu, C. et al. RAFFLES: Reasoning-based Attribution of Faults for LLM Systems. *Proc. EACL 2026*, 7659–7688 (2026). doi:10.18653/v1/2026.eacl-long.359.
+7. Souza, R. et al. PROV-AGENT: Unified Provenance for Tracking AI Agent Interactions in Agentic Workflows. *2025 IEEE International Conference on eScience* (2025). doi:10.1109/eScience65000.2025.00093.
+8. Gueroudji, A. et al. ControlA: Agentic Workflow Control Mechanisms for Reliable Science. *2025 IEEE International Conference on eScience*, 415–426 (2025). doi:10.1109/eScience65000.2025.00086.
+9. Li, X. et al. Generator-Assistant Stepwise Rollback Framework for Large Language Model Agent. *Proc. EMNLP 2025*, 17683–17700 (2025). doi:10.18653/v1/2025.emnlp-main.892.
+10. Xiong, Z. et al. How Memory Management Impacts LLM Agents: An Empirical Study of Experience-Following Behavior. *Proc. ACL 2026* (2026). doi:10.18653/v1/2026.acl-long.27.
+11. Guo, X. et al. SyncMind: Measuring Agent Out-of-Sync Recovery in Collaborative Software Engineering. *Proc. 42nd International Conference on Machine Learning*, PMLR **267**, 20993–21066 (2025).
+12. Guo, J. et al. RepoAudit: An Autonomous LLM-Agent for Repository-Level Code Auditing. *Proc. 42nd International Conference on Machine Learning*, PMLR **267**, 21083–21100 (2025).
 
 ## Figure legends
 
-[Write only after P9 figure evidence routes are frozen.]
+**Figure 1 | Natural emergence of information-permission change.** **a,** In `arena-ecommerce-0002`, Product A inventory enters as preliminary and unreconciled, remains provisional through specialist calculation and downstream reuse, and is later rewritten as `fact / reconciled_by_inventory` without an intervening warehouse reconciliation before final-plan use. **b,** In the healthy comparator `arena-ecommerce-0001`, the same 1,520-unit signal influences planning but retains “if confirmed” semantics. The comparison separates information use from unsupported authority growth.
+
+**Figure 2 | Goal-preserving process-authorization expansion.** A Software Engineering trajectory retains the requested GO/HOLD release-decision target while supporting concerns are promoted into validation, ownership and bug-scoping obligations that trigger new invocations and shared-state objects. The evidence-bearing object is obligation promotion and operationalization, not Agent count or path length alone.
+
+**Figure 3 | A one-point challenge exposes Functional Semantic Lineage.** **a,** In Supply Chain, a one-shot `fact -> unconfirmed` exposure is followed by a new Inventory carrier that preserves the challenged lane relation through Risk, Review and release decisions without equivalent new independent lane evidence. **b,** In Finance, the same broad CNY 65 million endpoint is independently rebuilt from policy, stress, collateral and cash-flow evidence. The contrast separates descendant inheritance from independent re-anchoring.
+
+**Figure 4 | From lineage localization to bounded intervention.** R5 changes one next-reader authority view, R6 binds an addressable source/carrier/descendant package, R7-P persistently corrects downstream reads, and R7-S changes the repair anchor and recomputes a bounded post-anchor continuation. The 4/4 preservation check concerns non-target state at direct repair application; the implementation is not claimed to recover a mathematically minimal dependency closure for arbitrary workflows.
+
+**Figure 5 | Divergence, reconvergence and cumulative Process Reality synthesis.** **a,** `wave-4-8b1731b57396`: one reference is invalidated, eight calls are reopened and 35 descendants are recomputed, producing material action recomposition. **b,** `wave-4-cf726639de1d`: eight calls and 28 descendants are recomputed before reconvergence to the same broad 900-unit plan, with authority re-derived from lineage-independent logistics evidence. **c,** Dynamic C, P and R summarize information, collaboration/execution and retrospective permission changes across the heterogeneous frozen evidence inventory; counts are mechanism-support counts, not prevalence estimates.
