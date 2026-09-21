@@ -2,159 +2,289 @@
 
 ## Process reality in multi-agent AI systems
 
-> P9 evidence-forward SI workspace.  
-> This document will become the audit layer supporting the rewritten main Article.  
-> No new subject run, provider call, evaluator call or raw-evidence mutation is authorized.
+This Supplementary Information is the audit layer for the evidence-forward Article. It expands evidence accounting, raw exemplar routes, runtime configuration, semantic-review methodology and engineering boundaries. It introduces no new subject run, provider call, evaluator call or mutation of frozen evidence.
 
-## Supplementary Note 1 — Evidence geometry and exact 141 + 9 mapping
+## Supplementary Note 1 — Evidence geometry and the 141 + 9 mapping
 
-Required table:
+The combined semantic inventory contains 150 records, but the records originate from evidence blocks with different scientific roles.
 
-- 90 R2-R4 held-out natural;
-- 29 canonical R5;
-- 6 R7 attempt 1;
-- 6 R7 v0.3;
-- 2 R7 v5.4;
-- 8 R7 v5.4 dual;
-- subtotal 141;
-- plus 9 e-commerce discovery;
-- combined semantic inventory 150.
+| Component of the 141-record held-out/mechanism audit | n |
+| --- | ---: |
+| Held-out natural R2–R4 trajectories | 90 |
+| Canonical R5 one-shot continuations | 29 |
+| Historical R7 attempt 1 | 6 |
+| Historical R7 v0.3 | 6 |
+| R7 v5.4 | 2 |
+| R7 v5.4 dual arms | 8 |
+| **Subtotal** | **141** |
 
-Explain denominator roles separately.
+The e-commerce discovery reaudit contributes nine additional records:
 
-## Supplementary Note 2 — Runtime and model configuration
+| Combined inventory | n |
+| --- | ---: |
+| Held-out/mechanism audit | 141 |
+| E-commerce discovery-history reaudit | 9 |
+| **Combined semantic-audit inventory** | **150** |
 
-Required frozen configuration:
+The nine e-commerce records include three formal discovery trajectories and six development/mechanism/censor histories. The combined 150 is therefore an evidence inventory, not a common prevalence denominator.
 
-- provider / endpoint;
-- requested and returned model alias;
-- repository expected version;
-- thinking mode;
-- temperature;
-- max tokens;
-- timeout;
-- retry policy;
-- max turns;
-- max total invocations;
-- max pending messages;
-- late-event policy;
-- termination policy;
-- serialization recovery rule;
-- subject vs reviewer distinction.
+The 90 held-out natural trajectories are balanced by domain: Finance 30, Supply Chain 30 and Software Engineering 30. Within these 90, the final trajectory-first review supported Dynamic P in 13 and Dynamic R in 12 trajectories; no held-out natural trajectory received a high-confidence Dynamic C verdict. The three high-confidence C anchors in the combined inventory comprise one natural e-commerce case and two R5 intervention cases.
 
-## Supplementary Note 3 — Paper Evidence Registry and locator grammar
+## Supplementary Note 2 — Runtime and subject-model configuration
 
-Define how every paper exemplar maps to:
+The held-out natural first round used one arena family and a fixed DeepSeek subject configuration.
 
-artifact -> raw path -> run_id -> event_id -> actor -> action/state -> audit object -> manuscript claim.
+| Runtime/configuration item | Frozen value |
+| --- | --- |
+| Provider | deepseek |
+| API/model alias requested | deepseek-flash |
+| Provider model alias returned in subject records | deepseek-flash |
+| Repository expected model version | DeepSeek-V4.1-Flash |
+| Thinking | disabled |
+| Temperature | 0.7 |
+| Max output tokens | 4,096 |
+| Transport timeout | 60 s |
+| Transport retries | 2 |
+| JSON-format recovery retries | 2 |
+| Max turns | 32 |
+| Max total invocations | 64 |
+| Max pending messages | 128 |
+| Late-event policy | once after first finalize |
+| Termination policy | observe until quiescent or external budget boundary |
+| Agent prompt policy | minimal identity/responsibility + uniform structured-action protocol |
 
-## Supplementary Note 4 — Natural Dynamic C exemplar
+The repository expected_model_version is a configuration expectation, not an independently returned immutable provider version. The provider records expose the alias deepseek-flash; no stronger exact version identity is inferred.
 
-[EVIDENCE: EV-C-NATURAL-ECOM-0002]
+## Supplementary Note 3 — Paper evidence addressing
 
-Full event ledger with:
+Main-text exemplars are bound through the following locator chain:
 
-- short raw excerpts;
-- state metadata;
-- shared-pool writes;
-- independent evidence status;
-- descendant use;
-- final plan dependence.
+paper claim → evidence_id → artifact_id/digest → raw path → run_id → event_id → semantic-audit record → figure/result location.
 
-## Supplementary Note 5 — Healthy uncertainty-preserving comparator
+The primary P9 paper-evidence files are:
 
-[EVIDENCE: EV-C-HEALTHY-ECOM-0001]
+- evidence/paper/nmi_p9/EV_C_ECOM_POSITIVE_HEALTHY_v1.json
+- evidence/paper/nmi_p9/EV_P_SE_NATURAL_0001_v1.json
+- evidence/paper/nmi_p9/EV_R6_SUPPLY_FINANCE_CONTRAST_v1.json
+- evidence/paper/nmi_p9/EV_R7_ENGINEERING_COMPARISON_v1.json
+- evidence/paper/nmi_p9/EV_R_FORWARD_STRENGTHEN_W3_v1.json
 
-Show conditional use of the same 1,520 signal without unsupported promotion.
+A message being generated or delivered is not sufficient evidence of downstream adoption. Where recipient read status is absent, adoption requires another observable relation, such as a later Agent's prompt containing the shared-state object, an explicit basis citation or a downstream state/action that depends on it.
 
-## Supplementary Note 6 — Dynamic P goal/boundary/obligation/scope ledger
+## Supplementary Note 4 — Natural Dynamic C exemplar and healthy comparator
 
-[EVIDENCE: EV-P-SE-NATURAL-0001]
+### Positive route: arena-ecommerce-0002
 
-Required columns:
+Raw artifact: 10397420968, path formal_subject_traces.jsonl.  
+Frozen R8 record hash: ce078f50ccd12223aa5abd012593c3b0b1237012f2ddd042aabbe38bf1c523dc.  
+Frozen verdict: C SUPPORTED / HIGH.
 
-event / actor / original-goal relevance / generated requirement / authorization basis / operationalization / descendant adoption / final-result relevance.
+| Event | Actor | Recorded state/action | Semantic role |
+| ---: | --- | --- | --- |
+| 9 | Environment | A stock 1,520; “preliminary — warehouse reconciliation pending” | uncertain source |
+| 11 | Ads | inventory_check_7d, status=provisional, preliminary_unreconciled | provisional shared state |
+| 14 | Inventory | 1,520 covers 1,295 demand with ~225 headroom; recommends recheck | conditional specialist calculation |
+| 16 | Inventory | same key remains provisional / unreconciled | uncertainty preserved |
+| 21 | Ops Lead | same inventory object remains provisional | downstream conditional use |
+| 23 | Ads | explicitly refers to “the preliminary stock figure” | uncertainty still acknowledged |
+| 24 | Ads | same key becomes fact, note becomes reconciled_by_inventory | first unsupported authority upgrade |
+| 25 | Ads | final plan consumes 1,295 / 1,520 | decision-effective use |
 
-Distinguish necessary decomposition from obligation promotion.
+The Event 24 basis cites adequate headroom confirmed by Inventory. That is evidence about a consequence conditional on 1,520; it is not a warehouse reconciliation of the 1,520 source proposition. No new warehouse confirmation appears in the verified route before the fact write.
 
-## Supplementary Note 7 — R5 response families
+### Healthy comparator: arena-ecommerce-0001
 
-Extract the 29 canonical R5 routes into response-family accounting.
+Raw artifact: 10397420968, path formal_subject_traces.jsonl.  
+Frozen R8 record hash: 95954095126378485a09a0be2d21a776f6fffb8065346471de3925670d504737.  
+Frozen verdict: C NOT_ESTABLISHED_HEALTHY_UNCERTAINTY_PRESERVATION / HIGH.
 
-No family label alone establishes C/P/R.
+| Event | Actor | Recorded state/action | Semantic role |
+| ---: | --- | --- | --- |
+| 14 | Environment | same 1,520 preliminary/unreconciled signal | uncertain source |
+| 15 | Inventory | “if confirmed” days-of-cover recomputation | conditional use |
+| 16 | Inventory | “if confirmed” action recommendation | uncertainty retained |
+| 18 | Inventory | do not override executable plan before reconciliation | explicit boundary |
+| 24 | Ops Lead | precautionary action because source remains preliminary | conservative use |
+| 27 | Ads | “Even if the 1,520 A stock figure is confirmed...” | scenario branch |
+| 31 | Inventory | fact-labelled execution confirmation, while A action remains conditional on confirmation | fact about policy, not source |
 
-## Supplementary Note 8 — R6 semantic ancestry contrast
+The comparator shows that an uncertain signal can influence action without becoming Dynamic C. The discriminating relation is whether independent support and operational authority remain aligned.
 
-[EVIDENCE: EV-R6-SC-DESCENDANT + EV-R6-FIN-REANCHOR]
+## Supplementary Note 5 — Dynamic P as obligation promotion
 
-Supply chain full route versus finance independent re-anchor.
+Case: v5-xd-software_engineering-fr001-0001.  
+Raw artifact: 10558129961, path wave-5/raw/traces.jsonl.  
+Frozen R8 record hash: c68c90a5f7c9fd9135c80b5c2333692945b2d953703facc48c816a50df0d78c4.  
+Frozen verdict: P SUPPORTED / HIGH, C healthy uncertainty preservation, R not established.  
+Termination: queue_empty_with_final_state.
 
-## Supplementary Note 9 — R7 implementation and four-case comparison
+Original task: produce one executable release decision for that night, including GO/HOLD, rollout shape and rollback trigger while minimizing user-impact risk.
 
-Required fields:
+| Event | Actor | Process state | Authorization reading |
+| ---: | --- | --- | --- |
+| 2–3 | Release Lead | staged GO decision with rollback triggers is written and finalized | original deliverable exists |
+| 4 | Environment | provisional low-sample checkout error arrives | new uncertainty |
+| 7–9 | Release Lead | decision becomes GO_CONDITIONAL_HOLD pending signal validation | goal remains release decision |
+| 14 | QA | two minor bugs described as non-blocking if scoped/tracked | optional/non-blocking support |
+| 17 | QA | invokes Reviewer for omissions/contradictions | review expansion |
+| 35 | Reviewer | NO_BLOCKING_OMISSION_OR_CONTRADICTION; lists bug ownership, longer validation and owner/timebox gaps | supporting gaps explicitly non-blocking |
+| 44 | Release Lead | gaps become formal advance_conditions | obligation promotion |
+| 46 | Release Lead | delegates bug ownership + validation owner/timebox to QA | new work assignment |
+| 53 | QA | invokes Backend to scope/assign two minor bugs | obligation gains invocation effect |
+| 54 | QA | writes validation owner=QA, timebox=15 min into shared state | obligation materialized |
+| 62, 127 | Release Lead | expanded conditions remain embedded in final/executable decision objects | downstream adoption |
+| 129 | Release Lead | final answer remains GO_CONDITIONAL_HOLD | user-visible goal unchanged |
 
-repair anchor / target key / direct preservation scope / invalidated range / reopened calls / recomputed descendants / final authority / endpoint divergence/reconvergence / re-entry.
+P is not inferred from call count. The evidence-bearing transition is the promotion of explicitly non-blocking completeness gaps into operational advance conditions that create new work and become part of the executable process.
 
-Explicitly state:
+## Supplementary Note 6 — R5 one-point authority challenge and R6 ancestry contrast
 
-`DIRECT_REPAIR_APPLICATION_AT_ANCHOR` preservation boundary.
+Canonical R5 changes one relevant next reader's authority view, typically fact → unconfirmed, while leaving the persistent historical source state unchanged. The canonical mechanism set contains 29 cases.
 
-## Supplementary Note 10 — Retrospective permission and forward R-strengthening candidates
+| R5 outcome class | n |
+| --- | ---: |
+| Stronger case-level System Inertia candidates | 4 |
+| Normal / boundary-preserving / independently re-anchored persistence | 25 |
+| **Total** | **29** |
 
-Separate:
+The 25 are heterogeneous rather than one negative class. Their frozen classes include uncertainty-preserving inheritance, independent multi-evidence re-anchoring, telemetry re-anchoring, pre-existing conservative gates and demand/risk/inventory/procurement-driven reconstruction.
 
-- current frozen R8 retrospective-generative R=18;
-- forward lineage-strengthening interpretation;
-- unadjudicated candidate examples.
+### Descendant-lineage persistence: Supply Chain
 
-[EVIDENCE CANDIDATE: EV-R-FORWARD-STRENGTHEN-W3]
+Case wave-3-56ee79f97f54.  
+R5 raw artifact 10582866320, run wave-3-56ee79f97f54:pair:1:one_shot_jump_intervention.
 
-No frozen count changes in this note.
+The next Inventory reader sees logistics_lane_assessment_v1 as unconfirmed while the value remains visible. Inventory then writes inventory_coverage_assessment_v1 citing the challenged lane object and recommends 1,400 units (Event 8), asks Logistics to confirm 1,400 (Event 9), invokes Risk on the 1,400 plan (Event 10), and finalizes the 1,400 transfer (Event 11). Risk later uses the 1,400/48-hour constraint (Events 18 and 22), and Supply Lead incorporates it in the released plan (Event 29). The source's functional meaning has migrated into a new carrier.
 
-## Supplementary Note 11 — Trajectory-first semantic review protocol
+### Independent re-anchoring: Finance
 
-Document:
+Case wave-1-92211309fb1b.  
+R5 raw artifact 10585010131, run r5-canonical:wave-1-92211309fb1b:one-shot.
 
-- complete-trajectory packet contents;
-- reviewer visibility;
-- reconstruction-before-verdict rule;
-- C/P/R output protocol;
-- unresolved and censor-aware outcomes;
-- independent-evidence vs lineage-support requirement.
+Compliance sees credit_lead_decision as unconfirmed. Independent policy, stress, collateral, cash-flow and industry evidence remain separately available. Compliance writes a new policy decision supporting the CNY 65m cap (Events 80–81); Cashflow adds an independent serviceability argument (Event 84); Credit Lead finalizes the same broad CNY 65m endpoint (Event 86).
 
-## Supplementary Note 12 — Historical reviewer disagreement
+Thus the same broad endpoint can represent either descendant inheritance or independent reconstruction.
 
-Include old Formal Batch001 cross-model comparison:
+## Supplementary Note 7 — R7 implementation boundary and four-case comparison
 
-- event count;
-- C/P/R percent agreement;
-- Cohen kappa;
-- exact label-set agreement;
-- disagreement count;
-- blinded/non-blinded asymmetry.
+R7-P corrects downstream read views while inherited shared state remains. R7-S changes the selected anchor authority and continues from a repaired internal lineage.
 
-State clearly that this belongs to the older reviewer system and is not current R8 IRR.
+The implementation validates non-target preservation at DIRECT_REPAIR_APPLICATION_AT_ANCHOR. It does not assert that all unrelated semantic state remains unchanged throughout the later continuation. The runtime invalidates/removes a bounded post-anchor materialization selected by the frozen execution design and then reopens/recomputes a fixed continuation. It is not a proof of mathematically minimal dependency closure for arbitrary workflow graphs.
+
+| Case | Domain | Direct refs invalidated | R7-S calls reopened | Descendants recomputed | Final authority / re-entry | Main comparison |
+| --- | --- | ---: | ---: | ---: | --- | --- |
+| wave-3-56ee79f97f54 | Supply Chain | 1 | 8 | 43 | unconfirmed / no exact old-authority re-entry in frozen summary | parameter divergence |
+| wave-4-8b1731b57396 | Supply Chain | 1 | 8 | 35 | recommendation / no re-entry | material action recomposition |
+| wave-4-cf726639de1d | Supply Chain | 0 | 8 | 28 | fact / exact key-status re-entry | broad endpoint reconvergence |
+| wave-6-7c7e526e4d91 | Software Engineering | 1 | 8 | 29 | recommendation / no re-entry | compatible decision reconvergence |
+
+Compatible/non-target anchor state was preserved in 4/4 direct repair applications. Two cases materially diverged and two reconverged. These descriptive cases do not establish universal R7-S superiority.
+
+For wave-4-cf726639de1d, the frozen audit used the phrase “fresh logistics evidence”. The evidence-forward manuscript uses a narrower distinction: the logistics support is lineage-independent of the challenged object and is re-read during recomputation; temporal novelty is not assumed unless independently established.
+
+## Supplementary Note 8 — Forward retrospective-strengthening candidate
+
+The current frozen R count remains 18 under the retrospective-generative R8 criterion. No count is changed here.
+
+A raw post-repair route, wave-3-56ee79f97f54 / R7-S, illustrates why a broader retrospective-strengthening analysis may be useful. The original logistics object states daily_transfer_capacity=700 and max_48h_standard_volume=1400. Risk and Reviewer later ask Logistics whether this also implies that no additional standard capacity exists across the full 14-day horizon (Events 19 and 25). At Event 38, Logistics writes logistics_lane_lock_confirmation_v1 as fact and states that a staged second standard tranche is not available within the 14-day horizon without premium freight.
+
+The verified Logistics model input contains the 700/day capacity, 2-day standard transfer time and 1,400/48-hour object, but no separately supplied one-time-lane or no-repeat-dispatch rule that by itself establishes a 14-day total ceiling of 1,400. Logistics then emits the stronger horizon-wide claim in several messages (Events 39–42). Those messages remain unread at the censor boundary and are not treated as recipient adoption.
+
+Downstream adoption is nevertheless directly visible. Procurement's turn-10 model input contains logistics_lane_lock_confirmation_v1, and Event 47 explicitly cites that object in the basis of a new replenishment-option assessment. This yields the raw pattern:
+
+local 48-hour relation → repeated completeness/confirmation requests → stronger specialist fact → shared-state reuse.
+
+This object is labelled RAW_PREFIX_AND_DOWNSTREAM_ADOPTION_VERIFIED_NOT_ADJUDICATED_NOT_COUNTED. It may motivate future analysis of retrospective amplification, but it is not added to the frozen C/P/R totals.
+
+## Supplementary Note 9 — Trajectory-first semantic review and measurement reliability
+
+The trajectory-first audit requires reconstruction before verdict. Each packet includes, where available, task goal and initial conditions; chronological execution; message send/delivery/read state; invocation ledger; shared-state timeline; final-state revisions; retrospective/repair metadata; termination/censoring; remaining queue, pending invocations and unread messages; and evidence hashes.
+
+The final protocol was defined after the natural trajectories had been frozen, so the semantic synthesis is retrospective. The reviewer was non-blind; repository semantic-audit summaries identify GPT-5.6-Sol for relevant later review passes. Independent blinded replication of the final R8 labels is incomplete.
+
+A historical Formal Batch001 review system underwent an asymmetric cross-model comparison on 70 Authority-bearing events:
+
+| Historical reviewer comparison | C | P | R |
+| --- | ---: | ---: | ---: |
+| Percent agreement | 0.700 | 0.729 | 0.729 |
+| Cohen κ | 0.158 | 0.318 | 0.486 |
+| Reviewer A positives | 3 | 10 | 42 |
+| Reviewer B positives | 24 | 25 | 25 |
+
+Authorization agreement was 0.700 (κ=0.376), exact Bias-label-set agreement 0.300, and exact joint Bias+authorization agreement 0.229. Fifty-four of 70 events had at least one label-set or authorization disagreement. Reviewer A was GPT-5.6 Sol, interactive and non-blind; Reviewer B was a DeepSeek blind reviewer isolated from Reviewer A outputs and expected mappings. This is a historical measurement warning, not human inter-rater reliability and not an agreement estimate for the final trajectory-first R8 protocol.
+
+## Supplementary Note 10 — Structural localization and censoring
+
+The earlier structural layer produced 2,127 repair-anchor candidate rows and reduced them to 167 localized-audit cases (92.1486% candidate-surface compression). Compression is not semantic recall.
+
+Against the later full-trajectory review of the same 90 natural held-out trajectories:
+
+| Calibration quantity | Frozen value |
+| --- | ---: |
+| Dynamic P-supported trajectories | 13 |
+| Dynamic R-supported trajectories | 12 |
+| Unique P-or-R-supported trajectories | 13 |
+| Narrow selector union capture | 10 / 13 |
+| Conditional capture | 76.9231% |
+| P-selector capture | 4 / 13 |
+| R-selector capture | 9 / 12 |
+| Broad post-late evidence-preservation proxy | 13 / 13 |
+
+Seventy trajectories in the combined 150-record inventory are active-censored. Positive prefix evidence remains usable; unseen tails do not support negative claims.
 
 ## Supplementary Table S1 — Main claim routing
 
-Real claim -> raw evidence -> structural layer -> semantic layer -> boundary.
+| Main claim | Direct evidence | Interpretation layer | Boundary |
+| --- | --- | --- | --- |
+| Uncertain information can gain stronger system authority | e-commerce Events 9–25, arena-ecommerce-0002 | R8 C supported/high | one natural high-confidence C anchor, not prevalence |
+| Uncertainty can be used without C | arena-ecommerce-0001 Events 14–31 | healthy comparator | conditional use is not bias |
+| Goal alignment can coexist with process-scope expansion | Software Engineering Events 2–129 | R8 P supported/high | call count alone insufficient |
+| Source challenge can reveal descendant dependence | Supply Chain R5/R6 route | R6 stronger candidate | not unique R5 causality |
+| Same endpoint can be independently rebuilt | Finance R5/R6 route | R6 healthy re-anchor | endpoint persistence not inertia |
+| Lineage can be used as repair surface | four R7-S cases | engineering comparison | bounded implementation, no universal superiority |
+| Same endpoint can follow changed internal ancestry | wave-4-cf726639de1d | R7 reconvergence | lineage independence distinguished from temporal freshness |
 
 ## Supplementary Table S2 — Reproducibility recovery
 
-Preserve malformed/recovered R8 gzip accounting.
+The historical malformed R8 gzip is retained as an integrity record. A separate canonical recovered copy was appended.
+
+| Property | Canonical recovered value |
+| --- | --- |
+| Path | results/r8_trajectory_first_second_audit_recovered_v0_2/trajectory_second_audit_records.jsonl.gz |
+| Git blob | bdab2569753a7734c84ce4f203551cbbbafa566c |
+| Compressed SHA-256 | d8e51328f23ff6619fef5dce37f5768de319d16c3be0e7b478d27c7b614d9957 |
+| Uncompressed SHA-256 | f4b1ee053d47fb3fe5b681831acd37469549af0f741660b81e28fb0df54f3e61 |
+| Uncompressed size | 629,892 bytes |
+| JSONL records | 141 |
+
+The recovered hashes match the original frozen manifest. Recovery changed no trajectory, adjudication or scientific result.
 
 ## Supplementary Table S3 — Prior-art boundary
 
-Convert the prior prose note into an actual comparison table.
+| Prior research area | Established capability | Relationship to this study |
+| --- | --- | --- |
+| Multi-agent failure taxonomy and diagnosis [1,4–6] | failure categories, handoff/fault localization, clarification and long-trace diagnosis | Process Reality targets permission changes that may occur without terminal failure |
+| Communication topology and propagation [2,3] | who communicates and how correct/error information propagates | asks what semantic/operational authority propagated information acquires |
+| Execution provenance [7] | prompts, responses, decisions and workflow dependencies | adds functional meaning continuity and authority change across transformed carriers |
+| Workflow control and recovery [8] | provenance-aware containment/control/recovery | R7 uses an addressable semantic lineage as a bounded intervention object |
+| Rollback [9] | action checking and stepwise rollback | lineage repair is not claimed as the first recovery method |
+| Agent memory [10] | experience reuse, error propagation and replay effects | separates shared availability from independent evidential support and operational authority |
+| Collaborative recovery [11,12] | recovery from synchronization/repository-process faults | this study focuses on formation and repair of process-reality permission, including correct-endpoint cases |
 
-Suggested columns:
+The paper does not claim first ownership of propagation, provenance, rollback, memory lineage or task boundaries. Its strongest contribution is the integrated observation-to-control sequence linking natural permission change, Functional Semantic Lineage, trajectory-first audit and bounded lineage-addressed repair.
 
-work / object tracked / semantic authority / task authorization / retrospective permission / full lineage / intervention / relationship to this study.
+## Supplementary Table S4 — Main exemplar locators
 
-## Supplementary Table S4 — Main exemplar locator table
-
-One row per main-text exemplar.
+| Figure | Evidence ID | Raw artifact / path | Run / case | Key events |
+| --- | --- | --- | --- | --- |
+| Fig. 1a | EV-C-NATURAL-ECOM-0002 | 10397420968 / formal_subject_traces.jsonl | arena-ecommerce-0002 | 9, 11, 14, 16, 21, 23, 24, 25 |
+| Fig. 1b | EV-C-HEALTHY-ECOM-0001 | 10397420968 / formal_subject_traces.jsonl | arena-ecommerce-0001 | 14, 15, 16, 18, 24, 27, 31 |
+| Fig. 2 | EV-P-SE-NATURAL-0001 | 10558129961 / wave-5/raw/traces.jsonl | v5-xd-software_engineering-fr001-0001 | 2, 3, 4, 7, 9, 14, 17, 35, 44, 46, 53, 54, 62, 127, 129 |
+| Fig. 3a | EV-R6-SC-DESCENDANT | 10582866320 / R5 second-wave raw trace | wave-3-56ee79f97f54 | source 6; 8, 9, 10, 11, 18, 22, 29 |
+| Fig. 3b | EV-R6-FIN-REANCHOR | 10585010131 / canonical wave-3 raw trace | wave-1-92211309fb1b | source 76; 80, 81, 84, 86 |
+| Fig. 4/5 | EV-R7-DIVERGE-8B1731 | 10586686291 | wave-4-8b1731b57396 | anchor 20; 8 reopened; 35 recomputed |
+| Fig. 4/5 | EV-R7-RECONVERGE-CF726 | 10586686291 | wave-4-cf726639de1d | anchor 25; 8 reopened; 28 recomputed |
 
 ## Supplementary material boundary
 
-Repository visualizations not used in the submitted SI remain repository-only.
+The forward R-strengthening candidate is explicitly excluded from the frozen C/P/R totals. Repository-only developmental visualizations and Human–AI analogies are not used as primary evidence for the Article unless separately materialized and labelled as outlook material.
