@@ -21,7 +21,7 @@ P8 re-checked the current Nature Machine Intelligence initial-submission require
 | Code Availability | PASS |
 | LLM use disclosed in Methods | PASS |
 | Cover letter explains importance / NMI relevance | PASS |
-| Supplementary Information | PASS — assembled v0.2 |
+| Supplementary Information | PASS — assembled v0.3 |
 | Initial Word/PDF accepted | PASS as planned |
 | Author names / affiliations | WAITING VERIFIED HUMAN METADATA unless double-anonymized is selected |
 | Competing-interest declaration | WAITING VERIFIED HUMAN DECLARATION |
@@ -76,3 +76,14 @@ Once the required fields in `configs/nmi_p8_portal_metadata_template_v1.json` ar
 3. generate final DOCX/PDF files;
 4. render and visually verify every page;
 5. freeze a final upload manifest.
+
+
+## P8 supplement cleanup
+
+The P7 Supplementary Information contained a planning-only “Supplementary Figure plan” without corresponding submission figure assets. P8 removed that planning surface from the actual submission-facing Supplementary Information v0.3.
+
+The resulting Supplementary Information contains only material that is actually present: evidence-accounting notes and tables. Repository-only audit visualizations are not represented as submission display items.
+
+All five **main** figure assets are present and frozen in:
+
+`docs/submission/nmi/NMI_P8_Figure_Asset_Inventory_v1.md`.
