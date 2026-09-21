@@ -69,12 +69,12 @@ The analysis also records candidate affected closure and intervention surfaces. 
 
 R7-P and R7-S operate on different control surfaces. R7-P persistently corrects downstream reads while inherited shared state remains. R7-S changes the internal lineage, invalidates affected descendants where needed, reopens dependent recipients and selectively recomputes the affected closure while preserving compatible state.
 
-| Case | Domain | Engineering class | Invalidated | Reopened | Recomputed | Final authority | Re-entry |
-| --- | --- | --- | ---: | ---: | ---: | --- | --- |
-| wave-3-56ee79f97f54 | Supply Chain | selective recompute / parameter divergence | 1 | 8 | 43 | unconfirmed | false |
-| wave-4-8b1731b57396 | Supply Chain | selective recompute / action recomposition | 1 | 8 | 35 | recommendation | false |
-| wave-4-cf726639de1d | Supply Chain | reconvergence with fresh authority regeneration | 0 | 8 | 28 | fact | true |
-| wave-6-7c7e526e4d91 | Software Engineering | reconvergence with compatible decision reaffirmation | 1 | 8 | 29 | recommendation | false |
+The four canonical structured-repair cases are:
+
+- **wave-3-56ee79f97f54 — Supply Chain.** Selective recompute with parameter divergence; 1 reference invalidated, 8 calls reopened and 43 descendants recomputed. Final authority: unconfirmed. Re-entry: false.
+- **wave-4-8b1731b57396 — Supply Chain.** Selective recompute with action recomposition; 1 reference invalidated, 8 calls reopened and 35 descendants recomputed. Final authority: recommendation. Re-entry: false.
+- **wave-4-cf726639de1d — Supply Chain.** Reconvergence with fresh authority regeneration; 0 references invalidated, 8 calls reopened and 28 descendants recomputed. Final authority: fact. Re-entry: true.
+- **wave-6-7c7e526e4d91 — Software Engineering.** Reconvergence with compatible decision reaffirmation; 1 reference invalidated, 8 calls reopened and 29 descendants recomputed. Final authority: recommendation. Re-entry: false.
 
 Compatible or unrelated structure was preserved in 4/4 canonical repair cases. Two materially diverged and two reconverged after recomputation. This does not establish universal superiority of R7-S over persistent correction.
 
