@@ -1,0 +1,26 @@
+name: NMI P8H2 Public Frozen Raw Validate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.17_PUBLIC_RAW.md'
+      - 'configs/nmi_p8_portal_metadata_template_v1.json'
+      - 'configs/nmi_submission_contract_v1.19.json'
+      - 'configs/nmi_release_locator_registry_v1.1.json'
+      - 'evidence/frozen_raw/release_manifest_v1.json'
+      - 'evidence/frozen_raw/SHA256SUMS_v1.txt'
+      - 'manifests/nmi_p8h2_public_frozen_raw_final_export_2026-09-21_v1.json'
+      - 'scripts/validate_nmi_p8h2_public_frozen_raw_v1.py'
+      - '.github/workflows/nmi-p8h2-public-frozen-raw-validate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python scripts/validate_nmi_p8h2_public_frozen_raw_v1.py
