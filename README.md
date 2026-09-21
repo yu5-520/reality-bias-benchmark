@@ -1306,9 +1306,13 @@ The current Nature Machine Intelligence Article limits remain compatible with th
 
 Current submission state:
 
-`NMI_P8_REVALIDATION_COMPLETE_AWAITING_HUMAN_METADATA`
+`NMI_P8_AUTOMATED_PREFLIGHT_COMPLETE_WAITING_HUMAN_METADATA`
+
+Supplementary Information v0.3 removes planning-only supplementary-figure promises, and 5/5 main figure assets are inventoried.
 
 Final portal-ready export is intentionally blocked until the author supplies verified submission metadata and selects standard vs double-anonymized peer review.
+
+Next gate: `NMI_P8H_METADATA_BIND_AND_FINAL_EXPORT`.
 
 No author identity, affiliation, correspondence data, competing-interest declaration or archive identifier is inferred from repository/account data.
 
