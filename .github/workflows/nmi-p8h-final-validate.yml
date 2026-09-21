@@ -1,0 +1,22 @@
+name: NMI P8H Final Validate
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.15_STANDARD.md'
+      - 'docs/submission/nmi/NMI_Cover_Letter_v0.4_FINAL.md'
+      - 'docs/submission/nmi/NMI_Supplementary_Information_v0.3.md'
+      - 'configs/nmi_p8_portal_metadata_template_v1.json'
+      - 'configs/nmi_submission_contract_v1.17.json'
+      - 'manifests/nmi_p8h_final_export_2026-09-21_v1.json'
+      - 'scripts/validate_nmi_p8h_final_v1.py'
+      - '.github/workflows/nmi-p8h-final-validate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python scripts/validate_nmi_p8h_final_v1.py
