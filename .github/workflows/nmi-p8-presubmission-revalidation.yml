@@ -1,0 +1,25 @@
+name: NMI P8 Pre-Submission Revalidation
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.14.md'
+      - 'docs/submission/nmi/NMI_Cover_Letter_v0.3.md'
+      - 'docs/submission/nmi/NMI_Official_Submission_Requirements_2026-09-21.md'
+      - 'docs/submission/nmi/NMI_P8_Pre_Submission_Revalidation_v1.md'
+      - 'docs/submission/nmi/NMI_P8_Status_v1.md'
+      - 'configs/nmi_p8_portal_metadata_template_v1.json'
+      - 'configs/nmi_submission_contract_v1.16.json'
+      - 'manifests/nmi_p8_presubmission_revalidation_2026-09-21_v1.json'
+      - 'scripts/validate_nmi_p8_v1.py'
+      - 'theory/change_notes/CN-R-092_nmi_p8_presubmission_revalidation.md'
+      - '.github/workflows/nmi-p8-presubmission-revalidation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python scripts/validate_nmi_p8_v1.py
