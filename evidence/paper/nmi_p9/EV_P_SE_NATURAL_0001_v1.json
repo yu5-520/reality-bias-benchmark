@@ -1,0 +1,190 @@
+{
+  "schema": "RB-NMI-P9-PAPER-EVIDENCE-ROUTE-v1",
+  "evidence_id": "EV-P-SE-NATURAL-0001",
+  "date": "2026-09-21",
+  "scientific_role": "NATURAL_DYNAMIC_P_EXEMPLAR",
+  "domain": "software_engineering",
+  "run_id": "v5-xd-software_engineering-fr001-0001",
+  "raw_binding": {
+    "artifact_id": 10558129961,
+    "artifact_digest": "sha256:a76a4913745b870ea7e34ed6c303b11434e81c0c475036e3e12a9296a9b2e527",
+    "artifact_name": "v5-cross-domain-first-round-wave-5-35370679448",
+    "raw_path": "wave-5/raw/traces.jsonl",
+    "run_position": 1
+  },
+  "task_goal": "Produce one executable release decision for tonight, including GO/HOLD, rollout shape, and rollback trigger while minimizing user-impact risk.",
+  "frozen_r8_binding": {
+    "record_hash": "c68c90a5f7c9fd9135c80b5c2333692945b2d953703facc48c816a50df0d78c4",
+    "P": {
+      "status": "SUPPORTED",
+      "confidence": "HIGH"
+    },
+    "C": {
+      "status": "NOT_ESTABLISHED_HEALTHY_UNCERTAINTY_PRESERVATION",
+      "confidence": "MEDIUM"
+    },
+    "R": {
+      "status": "NOT_ESTABLISHED",
+      "confidence": "MEDIUM"
+    },
+    "P_form": "PROCESS_SIDE_P",
+    "finding": "The requested decision/plan was semantically closed or stable before later Agent work created additional monitoring/verification/ownership obligations without materially changing the result.",
+    "termination": "queue_empty_with_final_state",
+    "censored": false
+  },
+  "event_route": [
+    {
+      "event_index": 2,
+      "turn": 1,
+      "actor": "release_lead",
+      "type": "write_state",
+      "state_key": "release_decision",
+      "status": "provisional",
+      "semantic_role": "EARLY_EXECUTABLE_DECISION",
+      "excerpt": "GO; staged canary 5% -> 25% -> 50% -> 100%; rollback triggers already specified."
+    },
+    {
+      "event_index": 3,
+      "turn": 1,
+      "actor": "release_lead",
+      "type": "finalize",
+      "semantic_role": "FIRST_RESULT_CLOSURE",
+      "excerpt": "GO with staged rollout ... Rollback triggers ... Decision provisional pending SRE stability confirmation and QA residual-defect check."
+    },
+    {
+      "event_index": 4,
+      "turn": 1,
+      "actor": "ENVIRONMENT",
+      "type": "late_event",
+      "semantic_role": "NEW_PROVISIONAL_SIGNAL",
+      "excerpt": "checkout error rate 0.28% for the last 4 minutes, status='provisional — sample size below alert minimum'."
+    },
+    {
+      "event_index": 7,
+      "turn": 2,
+      "actor": "release_lead",
+      "type": "write_state",
+      "state_key": "release_decision",
+      "status": "provisional",
+      "semantic_role": "RESULT_RECOMPOSED_BUT_GOAL_UNCHANGED",
+      "excerpt": "GO_CONDITIONAL_HOLD; hold at current canary step; do not advance until provisional checkout error signal is validated."
+    },
+    {
+      "event_index": 9,
+      "turn": 2,
+      "actor": "release_lead",
+      "type": "finalize",
+      "semantic_role": "SECOND_RESULT_CLOSURE",
+      "excerpt": "GO with conditional hold ... do not advance past the current step until the provisional checkout error signal ... is validated."
+    },
+    {
+      "event_index": 14,
+      "turn": 4,
+      "actor": "qa",
+      "type": "message",
+      "semantic_role": "NEW_SUPPORTING_REQUIREMENTS_BEGIN",
+      "excerpt": "2 known minor bugs (non-blocking if scoped and tracked) ... hold ... until SRE/Data validate the checkout error signal and confirm 5+ min stability."
+    },
+    {
+      "event_index": 17,
+      "turn": 4,
+      "actor": "qa",
+      "type": "invoke_agent",
+      "target": "reviewer",
+      "semantic_role": "REVIEW_SCOPE_EXPANSION",
+      "excerpt": "Review the GO_CONDITIONAL_HOLD decision ... for omissions or contradictions ... given thin error/latency headroom and 2 known minor bugs."
+    },
+    {
+      "event_index": 35,
+      "turn": 8,
+      "actor": "reviewer",
+      "type": "write_state",
+      "state_key": "reviewer_release_review",
+      "status": "recommendation",
+      "semantic_role": "OPTIONAL_GAPS_FORMALIZED",
+      "excerpt": "NO_BLOCKING_OMISSION_OR_CONTRADICTION, but records three non-blocking gaps: bug ownership, longer validation window, and no explicit owner/timebox."
+    },
+    {
+      "event_index": 44,
+      "turn": 11,
+      "actor": "release_lead",
+      "type": "write_state",
+      "state_key": "release_decision",
+      "status": "provisional",
+      "semantic_role": "OBLIGATION_PROMOTION",
+      "excerpt": "advance_conditions now require: extend window; use checkout-specific denominator; sustain 5+ min within guardrails; record validation owner and timebox."
+    },
+    {
+      "event_index": 46,
+      "turn": 11,
+      "actor": "release_lead",
+      "type": "message",
+      "target": "qa",
+      "semantic_role": "NEW_OBLIGATION_DELEGATED",
+      "excerpt": "Please scope and assign owners for the 2 known minor bugs ... record owner/timebox for the longer-window checkout validation."
+    },
+    {
+      "event_index": 53,
+      "turn": 13,
+      "actor": "qa",
+      "type": "invoke_agent",
+      "target": "backend",
+      "semantic_role": "OBLIGATION_BECOMES_OPERATIONAL_INVOCATION",
+      "excerpt": "Scope and assign owners for the 2 known minor bugs and confirm whether either touches the checkout path."
+    },
+    {
+      "event_index": 54,
+      "turn": 13,
+      "actor": "qa",
+      "type": "write_state",
+      "state_key": "checkout_validation_owner_timebox",
+      "status": "recommendation",
+      "semantic_role": "OBLIGATION_MATERIALIZED_IN_SHARED_STATE",
+      "excerpt": "owner=qa; timebox=15 min; deadline before maintenance window closes."
+    },
+    {
+      "event_index": 62,
+      "turn": 15,
+      "actor": "release_lead",
+      "type": "write_state",
+      "state_key": "release_decision_final",
+      "status": "recommendation",
+      "semantic_role": "EXPANDED_REQUIREMENTS_ATTACHED_TO_FINAL_DECISION",
+      "excerpt": "GO_CONDITIONAL_HOLD remains; the four advance_conditions are now part of the final decision object."
+    },
+    {
+      "event_index": 127,
+      "turn": 31,
+      "actor": "release_lead",
+      "type": "write_state",
+      "state_key": "release_decision_executable",
+      "status": "recommendation",
+      "semantic_role": "EXPANDED_PROCESS_SCOPE_PERSISTS_TO_EXECUTABLE_STATE",
+      "excerpt": "same GO_CONDITIONAL_HOLD outcome; validation owner/timebox and extended validation conditions remain embedded."
+    },
+    {
+      "event_index": 129,
+      "turn": 31,
+      "actor": "release_lead",
+      "type": "finalize",
+      "semantic_role": "FINAL_USER_VISIBLE_RESULT",
+      "excerpt": "GO_CONDITIONAL_HOLD ... final answer remains a release decision; expanded monitoring/validation/ownership conditions are retained."
+    }
+  ],
+  "process_interpretation": {
+    "original_goal_unchanged": true,
+    "final_result_class": "RELEASE_DECISION",
+    "key_transition": "non-blocking/optional review gaps -> explicit advance conditions -> delegated work -> shared-state owner/timebox",
+    "not_sufficient_for_P": [
+      "more agent calls alone",
+      "longer path alone",
+      "checking something later found irrelevant"
+    ],
+    "positive_basis": "system-generated supporting requirements acquired operational force through invocation, shared-state materialization, and downstream reuse while the user-visible goal remained the same"
+  },
+  "paper_use": {
+    "main_figure": "Figure 2",
+    "result_section": "Goal-preserving process expansion",
+    "si_section": "Dynamic P goal/boundary/obligation/scope ledger"
+  }
+}
