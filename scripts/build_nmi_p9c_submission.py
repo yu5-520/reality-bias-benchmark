@@ -133,7 +133,7 @@ m=MANUSCRIPT.read_text(encoding='utf-8')
 for i,(label,svg) in enumerate(FIGS,1):
     png=TMP/(svg.stem+'.png')
     pat=re.compile(rf'(\*\*Figure {i} \|[^\n]*\*\*[^\n]*\n)')
-    rel=png.relative_to(ROOT).as_posix(); m,n=pat.subn(rf'\1\n![{label}]({rel}){{ width=6.25in }}\n',m,count=1)
+    rel=png.relative_to(ROOT).as_posix(); m,n=pat.subn(rf'\1\n![{label}]({rel}){{ width=6.5in }}\n',m,count=1)
     if n!=1: raise SystemExit(f'figure insertion failed: {i}')
 md=TMP/'manuscript_p9c.md'; md.write_text(m,encoding='utf-8')
 
@@ -161,7 +161,7 @@ def polish(path,man=False):
     if man:
         for i,p in enumerate(d.paragraphs):
             if p.text.strip().startswith('Figure ') and '|' in p.text:
-                p.paragraph_format.page_break_before=True; p.paragraph_format.keep_with_next=True
+                p.paragraph_format.page_break_before=not p.text.strip().startswith('Figure 1 |'); p.paragraph_format.keep_with_next=True
                 for q in d.paragraphs[i+1:i+4]:
                     if q._p.xpath('.//w:drawing'): q.paragraph_format.keep_together=True; q.paragraph_format.space_after=Pt(8); break
     d.core_properties.author='Yeyu Zheng'; d.core_properties.title='Process reality in multi-agent AI systems'; d.save(str(path))
