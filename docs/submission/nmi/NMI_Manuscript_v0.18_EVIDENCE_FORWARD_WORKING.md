@@ -10,53 +10,15 @@ Correspondence: zhengyeyu520@gmail.com
 
 ## Abstract
 
-[EVIDENCE GATE: write only after Results evidence routes are complete.]
+Multi-agent AI systems can return plausible answers while changing what information, tasks and historical states are treated as authoritative during execution. We first observed this in a natural planning trajectory: an unreconciled inventory estimate remained numerically unchanged but, after several agent transformations, was rewritten as fact and consumed by the final plan without new warehouse confirmation. We froze natural trajectories across four domains, applied one-point authority challenges, traced functional semantic descendants, and then tested bounded lineage-addressed repair. The experiments separate descendant persistence from independent re-anchoring and show that the same endpoint can arise from different internal evidential ancestry. They also reveal goal-preserving expansion in which agent-generated supporting requirements become operational obligations. We synthesize these phenomena as changes in process reality across information, execution-scope and retrospective dimensions. The results motivate semantic lineage as both an audit object and an engineering intervention surface for reliable multi-agent systems.
 
-Target sequence:
+Multi-agent AI systems are commonly evaluated through task success, answer quality, coordination efficiency and failure rates [1–4]. Those measures are necessary, but they privilege the endpoint. They do not directly show which intermediate representations the system came to treat as established, which internally generated requirements acquired execution force, or how historical process state re-entered later computation. These questions become consequential when Agents share state, transform one another's outputs and reuse semantic descendants whose wording, evidential status and operational role can change across the trajectory.
 
-natural anomaly -> frozen trajectory evidence -> one-point challenge -> functional semantic lineage -> bounded lineage repair -> Process Reality synthesis.
+The problem first appeared in an unmanipulated e-commerce run. A seven-day planning system received Product A inventory of approximately 1,520 units explicitly marked **preliminary and unreconciled**. Inventory later calculated that the value would cover projected demand and recommended a recheck, while the shared state still retained the uncertainty. A downstream Ads Agent then rewrote the same object as a **fact**, marked it `reconciled_by_inventory`, and used it in the final plan despite no intervening warehouse reconciliation. The value did not change; what changed was the system's permission to rely on it. A matched natural trajectory used the same preliminary value conditionally while preserving “if confirmed” semantics, showing that propagation of uncertain information is not itself the phenomenon.
 
-The abstract must not lead with C/P/R labels before the empirical phenomenon is visible.
+We call the evolving set of information, process obligations and historical states that an interacting AI system treats as sufficiently authorized to influence current execution its **process reality**. This shifts attention from whether a message travelled to whether its semantic descendants acquired additional operational force. A shared state can function as a process-reality layer: one Agent writes a provisional object, another calculates a consequence, another turns that consequence into a risk constraint or plan, and later Agents may consume the descendant without reassessing the original evidence. Several locally reasonable transformations can therefore create system-level certainty without equivalent growth in independent support.
 
-## Introduction
-
-### Opening observation
-
-[EVIDENCE: EV-C-NATURAL-ECOM-0002]
-
-Lead with the actual 1,520 inventory trajectory and exact raw-node sequence.
-
-Required contrast:
-
-- value unchanged;
-- independent warehouse reconciliation absent;
-- source uncertainty initially explicit;
-- later authority/operational use increases.
-
-### Why endpoint evaluation misses the phenomenon
-
-Introduce the gap between:
-
-- output correctness / plausibility;
-- internal evidential ancestry;
-- process authorization;
-- historical-process re-entry.
-
-### Process Reality
-
-Introduce Process Reality only after the natural observation.
-
-Definition target:
-
-the evolving set of information, process obligations and historical states that the system treats as sufficiently authorized to influence current execution.
-
-### Research programme
-
-Reader-facing sequence:
-
-natural emergence -> systematic experiment -> one-point probe -> mechanism discovery -> engineering intervention -> comparison -> cumulative C/P/R synthesis.
-
-R2-R8 identifiers move to Methods/provenance.
+This question complements work on multi-agent failure analysis [1], communication topology and information propagation [2,3], clarification and missing information [4], fault attribution [5,6], provenance [7], workflow control [8], rollback [9], memory management [10] and collaborative recovery [11,12]. Our focus is the permission history of a semantic object across a complete process. We therefore follow a discovery-to-mechanism sequence rather than beginning from a fixed error taxonomy: natural emergence, frozen cross-domain observation, one-point authority challenge, functional-lineage reconstruction, bounded intervention, controlled comparison and only then cumulative semantic synthesis. This design allows the same object to be followed from natural use through challenge and repair while preserving the original stochastic trajectory.
 
 ## Results
 
