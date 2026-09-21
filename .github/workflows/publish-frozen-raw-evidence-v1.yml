@@ -1,0 +1,75 @@
+name: Publish Frozen Raw Evidence v1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'configs/frozen_raw_public_release_registry_v1.json'
+      - 'scripts/publish_frozen_raw_release.py'
+      - '.github/workflows/publish-frozen-raw-evidence-v1.yml'
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download, verify and catalog frozen raw evidence
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python scripts/publish_frozen_raw_release.py
+
+      - name: Create public frozen-raw release surface
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          tag="frozen-raw-evidence-v1"
+
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" \
+              --title "Frozen Raw Evidence v1" \
+              --notes-file dist/frozen_raw_release_v1/RELEASE_NOTES.md \
+              --target "$GITHUB_SHA"
+          fi
+
+          existing="$(gh release view "$tag" --json assets --jq '.assets[].name' || true)"
+
+          for f in dist/frozen_raw_release_v1/assets/* \
+                   dist/frozen_raw_release_v1/release_manifest_v1.json \
+                   dist/frozen_raw_release_v1/SHA256SUMS_v1.txt; do
+            name="$(basename "$f")"
+            if printf '%s\n' "$existing" | grep -Fxq "$name"; then
+              echo "PRESERVE_EXISTING_RELEASE_ASSET=$name"
+            else
+              gh release upload "$tag" "$f"
+              echo "PUBLISHED_RELEASE_ASSET=$name"
+            fi
+          done
+
+      - name: Commit public evidence catalog
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add evidence/frozen_raw
+          if git diff --cached --quiet; then
+            echo "FROZEN_RAW_CATALOG_ALREADY_CURRENT=YES"
+            exit 0
+          fi
+          git commit -m "Publish frozen raw evidence access catalog"
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Publication summary
+        run: |
+          echo "FROZEN_RAW_RELEASE=https://github.com/${GITHUB_REPOSITORY}/releases/tag/frozen-raw-evidence-v1"
+          echo "FROZEN_RAW_POLICY=PUBLIC_READ_APPEND_ONLY_VERSIONING"
