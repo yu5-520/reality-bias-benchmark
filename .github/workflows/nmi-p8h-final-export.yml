@@ -1,0 +1,43 @@
+name: NMI P8H Final Submission Export
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.15_STANDARD.md'
+      - 'docs/submission/nmi/NMI_Cover_Letter_v0.4_FINAL.md'
+      - 'docs/submission/nmi/NMI_Supplementary_Information_v0.3.md'
+      - 'configs/nmi_p8_portal_metadata_template_v1.json'
+      - 'scripts/build_nmi_p8h_submission.py'
+      - '.github/workflows/nmi-p8h-final-export.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install document toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc libreoffice
+          python -m pip install --upgrade pip
+          python -m pip install python-docx cairosvg
+      - name: Build final submission package
+        run: python scripts/build_nmi_p8h_submission.py
+      - name: Upload final package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nmi-p8h-final-submission-package
+          path: |
+            dist/nmi_p8h/NMI_Manuscript_Yeyu_Zheng_STANDARD.docx
+            dist/nmi_p8h/NMI_Manuscript_Yeyu_Zheng_STANDARD.pdf
+            dist/nmi_p8h/NMI_Supplementary_Information.docx
+            dist/nmi_p8h/NMI_Supplementary_Information.pdf
+            dist/nmi_p8h/NMI_Cover_Letter_Yeyu_Zheng.docx
+            dist/nmi_p8h/NMI_Cover_Letter_Yeyu_Zheng.pdf
+            dist/nmi_p8h/figures/*.svg
+            dist/nmi_p8h/submission_manifest.json
+            dist/nmi_p8h/NMI_P8H_Submission_Package_Yeyu_Zheng.zip
+          if-no-files-found: error
+          retention-days: 30
