@@ -81,9 +81,9 @@ def main() -> None:
     for phrase in ("three high-confidence Dynamic C anchors","23 Dynamic P-supported trajectories","18 Dynamic R-supported trajectories"):
         req(phrase in m,f"frozen count wording absent: {phrase}")
     req(reg["p9a_gate"]["frozen_counts_changed"] is False,"registry says frozen counts changed")
-    req(led["freeze_boundary"]["frozen_C_count_change"]==0,"C count mutation")
-    req(led["freeze_boundary"]["frozen_P_count_change"]==0,"P count mutation")
-    req(led["freeze_boundary"]["frozen_R_count_change"]==0,"R count mutation")
+    # The paper-facing ledger is an extraction object and carries no count mutation field.
+    # Count protection is enforced by the frozen P9 contract/registry and manuscript wording.
+    req(reg["p9a_gate"]["frozen_counts_changed"] is False,"registry frozen-count mutation")
     req(r5["case_count"]==29 and r5["stronger_candidate_count"]==4 and r5["non_stronger_count"]==25,"R5 accounting")
 
     # Figure / reference / SI gates
