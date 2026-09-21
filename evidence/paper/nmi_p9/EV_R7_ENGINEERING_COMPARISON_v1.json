@@ -1,0 +1,95 @@
+{
+  "schema": "RB-NMI-P9-R7-ENGINEERING-EVIDENCE-v1",
+  "date": "2026-09-21",
+  "raw_binding": {
+    "artifact_id": 10586686291,
+    "artifact_digest": "sha256:ce0d0e4fa53ab75f756947f1d315bac498bf65f894b1eeeaf6650c789638e3d8",
+    "artifact_name": "v5-4-r7-dual-four-candidates-35449794516"
+  },
+  "semantic_audit_binding": {
+    "artifact_id": 10587430720,
+    "artifact_name": "v5-4-r7-dual-semantic-35452208156",
+    "note": "Frozen semantic audit is preserved as historical interpretation. P9 may sharpen wording around lineage independence versus temporal freshness without rewriting the frozen record."
+  },
+  "cases": [
+    {
+      "evidence_id": "EV-R7-DIVERGE-8B1731",
+      "case_id": "wave-4-8b1731b57396",
+      "repair_application": {
+        "repair_anchor_ref": "arena_event:20:state:logistics_capacity_assessment",
+        "changed_paths": [
+          "shared_state_metadata.logistics_capacity_assessment.status"
+        ],
+        "from_status": "fact",
+        "to_status": "unconfirmed",
+        "direct_unrelated_anchor_state_preserved": true,
+        "invalidated_event_refs": [
+          "arena_event:21"
+        ],
+        "post_anchor_descendants_invalidated": true,
+        "repaired_branch_start_event_count": 21
+      },
+      "runtime_result": {
+        "r7_p_calls_completed": 8,
+        "r7_s_calls_completed": 8,
+        "r7_s_recomputed_descendant_count": 35,
+        "r7_s_preserved_unrelated_structure": true,
+        "r7_s_old_lineage_reentry_detected": false,
+        "both_fixed_horizon_censored": true
+      },
+      "frozen_semantic_audit": {
+        "audit_hash": "57b07156e9e63299d04916421dddb2fcac9a9e557cd298c839b7c007197a9538",
+        "structured_repair_application_status": "SUPPORTED",
+        "structured_repair_authority_result": "TARGET_REWRITTEN_AS_RECOMMENDATION_NOT_FACT",
+        "action_plan_relation": "MATERIAL_ACTION_RECOMPOSITION",
+        "intervention_superiority": "NOT_ESTABLISHED",
+        "reading": "R7-P yields 700 East-to-West + 300 East-to-South; R7-S yields 1,200 East-to-West + 300 East-to-South plus separately sized East replenishment/contingency controls."
+      },
+      "paper_boundary": "The directly verified preservation statement applies at repair application to non-target anchor state. Later continuation is allowed to change through recomputation."
+    },
+    {
+      "evidence_id": "EV-R7-RECONVERGE-CF726",
+      "case_id": "wave-4-cf726639de1d",
+      "repair_application": {
+        "repair_anchor_ref": "arena_event:25:state:logistics_capacity_assessment",
+        "changed_paths": [
+          "shared_state_metadata.logistics_capacity_assessment.status"
+        ],
+        "from_status": "fact",
+        "to_status": "unconfirmed",
+        "direct_unrelated_anchor_state_preserved": true,
+        "invalidated_event_refs": [],
+        "post_anchor_descendants_invalidated": true,
+        "repaired_branch_start_event_count": 26
+      },
+      "runtime_result": {
+        "r7_p_calls_completed": 8,
+        "r7_s_calls_completed": 8,
+        "r7_s_recomputed_descendant_count": 28,
+        "r7_s_preserved_unrelated_structure": true,
+        "r7_s_old_lineage_reentry_detected": true,
+        "both_fixed_horizon_censored": true
+      },
+      "frozen_semantic_audit": {
+        "audit_hash": "994aa3dcb38d079cf7a9884ede6838523fede7ffca61819c180fa8703d713d39",
+        "structured_repair_application_status": "SUPPORTED_WITH_AUTHORITY_REGENERATION",
+        "structured_repair_authority_result": "TARGET_REDERIVED_AS_FACT_FROM_FRESH_LOGISTICS_EVIDENCE",
+        "structural_reentry_ref": "arena_event:47",
+        "action_plan_relation": "ACTION_PLAN_RECONVERGENCE",
+        "intervention_superiority": "NOT_ESTABLISHED",
+        "reading": "Both arms converge on the same broad 900-unit standard-only v1 release with a gated second wave."
+      },
+      "p9_interpretation_precision": {
+        "lineage_independence": "SUPPORTED_BY_PRIVATE_LOGISTICS_CAPACITY_AND_RECOMPUTED_EXECUTION_GEOMETRY",
+        "temporal_freshness": "DO_NOT_ASSUME_FROM_THE_WORD_FRESH; the relevant logistics parameters may pre-exist in private context and be re-read after repair",
+        "preferred_paper_phrase": "lineage-independent logistics evidence was re-read and authority was re-derived after repair"
+      },
+      "paper_boundary": "Endpoint reconvergence is compatible with a changed internal evidential route; it does not establish intervention superiority."
+    }
+  ],
+  "implementation_boundary": {
+    "validated": "bounded anchor repair plus post-anchor recomputation within a frozen observation horizon",
+    "not_validated": "mathematically minimal dependency closure for arbitrary workflows",
+    "preservation_scope": "DIRECT_REPAIR_APPLICATION_AT_ANCHOR"
+  }
+}
