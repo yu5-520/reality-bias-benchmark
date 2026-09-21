@@ -96,41 +96,17 @@ Directed transition counts must also be interpreted at the correct level. The cu
 
 ## Discussion
 
-### What the study establishes
+The main result of this study is not a new endpoint error category but an observable process layer between input and answer. In the frozen trajectories, the evidential or operational role of a semantic object could change while its surface content, the requested goal or even the final decision remained stable. The inventory case makes the information dimension explicit: the source value remained 1,520 and no new warehouse reconciliation appeared, yet its authority changed after several locally reasonable transformations. The Software Engineering case shows the analogous process dimension: the requested release decision remained the target while supporting concerns became materialized validation and ownership obligations. The R5–R6 contrast then shows why these changes cannot be understood from persistence alone. A challenged source may survive through functional descendants, or the same endpoint may be rebuilt from genuinely independent evidence.
 
-Lead with positive findings before limitations:
+The shared pool is important because it allows these semantic objects to become reusable system premises. That mechanism is not itself pathological. Shared-state reuse is a normal requirement of multi-Agent coordination, and a provisional value can legitimately support conditional planning. The risk appears when lineage-derived interpretation is mistaken for new evidential support, or when an internally generated supporting action acquires execution force beyond the task boundary. Dynamic C and P therefore describe permission changes rather than message transmission or Agent count. This distinction also explains why Functional Semantic Lineage is useful: uncertainty, constraint meaning and decision implication can migrate into descendants even when later Agents no longer repeat the original source.
 
-- Process Reality can change while the endpoint stays plausible;
-- shared pools allow semantic descendants to become reusable system premises;
-- uncertainty can remain at the source while descendants acquire stronger operational effect;
-- goal alignment can coexist with process-authorization expansion;
-- retrospective operations can reauthorize historical process reality;
-- semantic lineage can be localized and used as an engineering intervention unit;
-- endpoint equality can conceal changed evidential ancestry.
+The perturbation and repair experiments connect that descriptive mechanism to an engineering surface. R5 weakens one reader-visible authority once and exposes heterogeneous responses without rewriting the frozen shared state. R6 then distinguishes descendant inheritance from independent re-anchoring and makes the relevant lineage addressable. R7 shows that a stronger intervention can operate on that lineage rather than only on the source label. Two of four canonical structured-repair cases materially diverged and two reconverged after recomputation. Reconvergence is especially informative because it demonstrates that an unchanged endpoint does not imply an unchanged process: one case returned to the same broad 900-unit plan after eight reopened calls and 28 recomputed descendants, with authority re-derived from lineage-independent logistics evidence.
 
-### Measurement boundary
+These results also delimit what has been established. The 150-record inventory combines natural, intervention and repair evidence with different selection rules and cannot be read as a prevalence sample. Strict high-confidence Dynamic C evidence is concentrated rather than uniformly replicated across the four domains; the held-out natural cohort primarily supports P/R and broader functional-semantic continuation. The final trajectory-first semantic protocol was developed after the natural trajectories were frozen and remains a retrospective semantic audit. Its independent blinded replication is incomplete. An earlier cross-model review system showed substantial event-level disagreement, which is best treated as a warning that semantic operationalization is itself a measurement problem, particularly for P where necessary decomposition must be distinguished from self-generated obligation expansion.
 
-Concentrate reviewer dependence, retrospective rubric chronology and heterogeneous evidence geometry here.
+The engineering result is likewise bounded to the implemented control surface. The R7-S runtime verifies non-target preservation at direct anchor repair, then performs a bounded post-anchor invalidation, reopening and recomputation. It does not establish a mathematically minimal dependency closure for arbitrary workflow graphs, nor does the four-case comparison establish universal superiority over persistent reader-surface correction. These boundaries do not reduce the observable result: the same semantic object can be located across source, descendant, challenge and repair, and the resulting internal changes can be audited rather than inferred from the final answer.
 
-Historical reviewer disagreement is presented as a measurement-system warning from an older semantic framework, not as current R8 inter-rater reliability.
-
-### Engineering boundary
-
-State exact R7 implementation scope.
-
-### Development outlook
-
-Evidence-derived engineering direction:
-
-process-integrity monitor -> semantic-lineage scout -> localized repair agent.
-
-Application examples:
-
-- AI coding: correct requested change with unnecessarily expanding read/search/action surface;
-- enterprise agents: lineage-derived business assumptions becoming operational premises;
-- RAG/database/workflow interfaces: content preserved but semantic authority changes across systems.
-
-Inter-system claims remain outlook until explicitly tested.
+That property suggests a broader systems direction. A process-integrity layer could separate three functions: a lightweight monitor that detects suspicious permission transitions, a lineage scout that localizes the source and functional descendants, and a repair operator that acts only on the addressed process object before observing re-entry. In AI coding, for example, a requested code change can remain correct while the system progressively treats additional file reads, dependency checks or side tasks as mandatory; the concern is not merely token cost but the enlargement of the process surface and the new context it introduces. Similar questions can arise wherever Agents, retrieval systems, databases, tools or services exchange reusable state. We have not tested those settings here, but the present evidence identifies a concrete question for them: not only whether the final output is correct, but **what information, obligations and historical process states became authorized to shape it, and how that authorization changed over time**.
 
 ## Methods
 
