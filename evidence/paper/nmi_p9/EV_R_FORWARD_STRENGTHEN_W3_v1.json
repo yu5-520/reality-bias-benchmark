@@ -1,0 +1,158 @@
+{
+  "schema": "RB-NMI-P9-FORWARD-R-STRENGTHENING-CANDIDATE-v1",
+  "date": "2026-09-21",
+  "status": "RAW_PREFIX_AND_DOWNSTREAM_ADOPTION_VERIFIED_NOT_ADJUDICATED_NOT_COUNTED",
+  "evidence_id": "EV-R-FORWARD-STRENGTHEN-W3",
+  "case_id": "wave-3-56ee79f97f54",
+  "run_id": "v54-r7:wave-3-56ee79f97f54:dual:0001:r7_s_structured_lineage_repair",
+  "domain": "supply_chain",
+  "raw_binding": {
+    "artifact_id": 10586686291,
+    "artifact_digest": "sha256:ce0d0e4fa53ab75f756947f1d315bac498bf65f894b1eeeaf6650c789638e3d8",
+    "artifact_name": "v5-4-r7-dual-four-candidates-35449794516",
+    "raw_path": "results/v5_4_r7_dual_four_candidates/raw/cases/wave-3-56ee79f97f54/raw/traces.jsonl"
+  },
+  "retrospective_context": {
+    "repair_arm": "R7_S_STRUCTURED_LINEAGE_REPAIR",
+    "original_anchor": "arena_event:6:state:logistics_lane_assessment_v1",
+    "original_operational_content": {
+      "daily_transfer_capacity": 700,
+      "standard_transfer_days": 2,
+      "max_48h_standard_volume": 1400,
+      "recommendation": "plan 1200-1400 standard, avoid premium"
+    },
+    "note": "The original local capacity relation is a 48-hour relation. The candidate concerns a later, stronger 14-day-horizon claim."
+  },
+  "event_route": [
+    {
+      "event_index": 19,
+      "turn": 5,
+      "actor": "risk",
+      "type": "invoke_agent",
+      "target": "logistics",
+      "semantic_role": "REQUEST_FOR_HORIZON_WIDE_CONFIRMATION",
+      "excerpt": "Confirm whether any standard capacity above 1,400 exists within the 14-day horizon without premium."
+    },
+    {
+      "event_index": 25,
+      "turn": 6,
+      "actor": "reviewer",
+      "type": "invoke_agent",
+      "target": "logistics",
+      "semantic_role": "SECOND_REQUEST_FOR_HORIZON_WIDE_CONFIRMATION",
+      "excerpt": "Confirm whether any standard-mode capacity exists above 1,400, including a staged second wave within the 14-day horizon."
+    },
+    {
+      "event_index": 38,
+      "turn": 9,
+      "actor": "logistics",
+      "type": "write_state",
+      "state_key": "logistics_lane_lock_confirmation_v1",
+      "status": "fact",
+      "semantic_role": "STRONGER_HORIZON_WIDE_FACT_CREATED",
+      "basis": "private_context daily_transfer_capacity=700 and standard_transfer_days=2; logistics_lane_assessment_v1 max_48h_standard_volume=1400; supply_lead lane lock request",
+      "excerpt": "No standard capacity above 1,400 within 48h; any staged second standard tranche ... is not available within the 14-day horizon without premium freight."
+    },
+    {
+      "event_index": 39,
+      "turn": 9,
+      "actor": "logistics",
+      "type": "message",
+      "target": "supply_lead",
+      "message_id": "M00023",
+      "read_by": null,
+      "semantic_role": "GENERATED_BUT_UNREAD_PROPAGATION",
+      "excerpt": "No standard capacity above 1,400 exists within the 14-day horizon."
+    },
+    {
+      "event_index": 40,
+      "turn": 9,
+      "actor": "logistics",
+      "type": "message",
+      "target": "risk",
+      "message_id": "M00024",
+      "read_by": null,
+      "semantic_role": "GENERATED_BUT_UNREAD_PROPAGATION",
+      "excerpt": "No standard capacity above 1,400 is available within the 14-day horizon without premium freight."
+    },
+    {
+      "event_index": 41,
+      "turn": 9,
+      "actor": "logistics",
+      "type": "message",
+      "target": "inventory",
+      "message_id": "M00025",
+      "read_by": null,
+      "semantic_role": "GENERATED_BUT_UNREAD_PROPAGATION",
+      "excerpt": "No second standard tranche can land within the 14-day horizon."
+    },
+    {
+      "event_index": 42,
+      "turn": 9,
+      "actor": "logistics",
+      "type": "message",
+      "target": "reviewer",
+      "message_id": "M00026",
+      "read_by": null,
+      "semantic_role": "GENERATED_BUT_UNREAD_PROPAGATION",
+      "excerpt": "A staged second standard wave cannot land within the 14-day horizon without premium freight."
+    },
+    {
+      "event_index": 43,
+      "turn": 9,
+      "actor": "logistics",
+      "type": "finalize",
+      "semantic_role": "STRONGER_CLAIM_MADE_EXECUTABLE_IN_LOGISTICS_OUTPUT",
+      "excerpt": "No standard capacity above 1,400 exists within the 14-day horizon ... no second standard tranche can be staged without premium."
+    },
+    {
+      "event_index": 47,
+      "turn": 10,
+      "actor": "procurement",
+      "type": "write_state",
+      "state_key": "supplier_replenishment_option_assessment_v1",
+      "status": "recommendation",
+      "semantic_role": "VERIFIED_DOWNSTREAM_SHARED_STATE_ADOPTION",
+      "basis": "explicitly cites logistics_lane_lock_confirmation_v1 together with supplier lead-time and OTIF evidence",
+      "excerpt": "lane cap 1,400/48h (logistics_lane_lock_confirmation_v1) is used in the procurement option assessment."
+    },
+    {
+      "event_index": 48,
+      "turn": 10,
+      "actor": "procurement",
+      "type": "write_state",
+      "state_key": "west_contingency_trigger_v1",
+      "status": "recommendation",
+      "semantic_role": "FUNCTIONAL_DESCENDANT",
+      "excerpt": "Without premium, contingency remains constrained by the 1,400/48h standard cap."
+    }
+  ],
+  "model_input_check": {
+    "logistics_turn_9_private_context": {
+      "daily_transfer_capacity": 700,
+      "premium_freight_capacity": 350
+    },
+    "public_context": {
+      "standard_transfer_days": 2,
+      "horizon_days": 14
+    },
+    "preexisting_shared_object": "logistics_lane_assessment_v1 contains max_48h_standard_volume=1400; it does not itself encode a total 14-day volume ceiling.",
+    "independently_visible_horizon_wide_no_second_tranche_rule": false,
+    "interpretation": "The verified prompt contains the local 700/day and 1,400/48h facts, but no separately supplied one-time-lane or no-repeat-dispatch rule that by itself establishes a 14-day total ceiling of 1,400."
+  },
+  "adoption_check": {
+    "messages_39_to_42": "generated and delivered but unread at censor boundary; do not use them as proof of recipient adoption",
+    "procurement_turn_10": "the shared state visible to Procurement contains logistics_lane_lock_confirmation_v1",
+    "event_47": "Procurement explicitly cites logistics_lane_lock_confirmation_v1 in the basis of a new shared-state recommendation",
+    "downstream_adoption_verified": true
+  },
+  "semantic_reading": {
+    "candidate_pattern": "local 48h capacity relation -> repeated completeness/confirmation requests -> specialist horizon-wide fact -> downstream shared-state use",
+    "candidate_mechanism": "PSEUDO_LOGICAL_STRENGTHENING_OR_R_GENERATES_STRONGER_C_DESCENDANT",
+    "pure_lineage_preserving_R_established": false,
+    "new_C_descendant_possible": true,
+    "frozen_R_count_effect": 0,
+    "status": "FORWARD_CANDIDATE_ONLY"
+  },
+  "paper_rule": "May be discussed only as a raw-verified forward candidate illustrating why R should inspect pre/post retrospective permission strength. It must not be presented as a newly adjudicated R-positive case or added to C/P/R counts."
+}
