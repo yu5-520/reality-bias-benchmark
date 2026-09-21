@@ -1,0 +1,342 @@
+{
+  "schema": "RB-NMI-P9C-FIGURE-SOURCE-SPEC-v1",
+  "date": "2026-09-21",
+  "status": "SOURCE_LOCKED_NOT_YET_RENDERED",
+  "manuscript": "docs/submission/nmi/NMI_Manuscript_v0.18_EVIDENCE_FORWARD_WORKING.md",
+  "figure_count": 5,
+  "global_rules": {
+    "evidence_first": true,
+    "exact_event_ids_visible": true,
+    "short_raw_text_only": true,
+    "visual_claim_must_not_exceed_frozen_evidence": true,
+    "healthy_comparator_visible_where_applicable": true,
+    "distinguish_independent_evidence_from_lineage_support": true,
+    "unread_messages_not_rendered_as_adoption": true,
+    "pending_invocations_not_rendered_as_executed_work": true,
+    "forward_unadjudicated_R_candidate_not_in_main_frozen_counts": true,
+    "avoid_decorative_framework_only_figures": true
+  },
+  "figures": [
+    {
+      "figure": 1,
+      "title": "Natural emergence of information-permission change",
+      "manuscript_role": "Discovery first: show the phenomenon before the taxonomy.",
+      "panels": [
+        {
+          "panel": "a",
+          "evidence_id": "EV-C-NATURAL-ECOM-0002",
+          "raw_artifact_id": 10397420968,
+          "run_id": "arena-ecommerce-0002",
+          "route": [
+            {
+              "event": "E9",
+              "actor": "Environment",
+              "label": "1,520; preliminary / unreconciled",
+              "state": "uncertain source"
+            },
+            {
+              "event": "E11",
+              "actor": "Ads",
+              "label": "inventory_check_7d = provisional",
+              "state": "shared use"
+            },
+            {
+              "event": "E14–E16",
+              "actor": "Inventory",
+              "label": "225-unit headroom; recheck; still provisional",
+              "state": "conditional transformation"
+            },
+            {
+              "event": "E21–E23",
+              "actor": "Ops Lead / Ads",
+              "label": "preliminary status still explicit",
+              "state": "uncertainty preserved"
+            },
+            {
+              "event": "E24",
+              "actor": "Ads",
+              "label": "same object -> fact; reconciled_by_inventory",
+              "state": "authority jump"
+            },
+            {
+              "event": "E25",
+              "actor": "Ads",
+              "label": "final plan consumes 1,520",
+              "state": "decision use"
+            }
+          ],
+          "bottom_axis": [
+            "independent warehouse evidence: no increase",
+            "operational authority: increases at E24"
+          ]
+        },
+        {
+          "panel": "b",
+          "evidence_id": "EV-C-HEALTHY-ECOM-0001",
+          "run_id": "arena-ecommerce-0001",
+          "route": [
+            {
+              "event": "E14",
+              "actor": "Environment",
+              "label": "1,520; preliminary / unreconciled"
+            },
+            {
+              "event": "E15–E18",
+              "actor": "Inventory",
+              "label": "if confirmed; conditional recomputation"
+            },
+            {
+              "event": "E24",
+              "actor": "Ops Lead",
+              "label": "precautionary plan; source remains preliminary"
+            },
+            {
+              "event": "E31",
+              "actor": "Inventory",
+              "label": "fact about conditional execution policy, not source truth"
+            }
+          ],
+          "bottom_axis": [
+            "independent warehouse evidence: no increase",
+            "source uncertainty: retained"
+          ]
+        }
+      ],
+      "key_visual_contrast": "same uncertain signal can be used without C; the discriminating variable is authority growth relative to independent evidence"
+    },
+    {
+      "figure": 2,
+      "title": "Goal-preserving process-authorization expansion",
+      "manuscript_role": "Make P visible as obligation promotion inside a black-box path.",
+      "evidence_id": "EV-P-SE-NATURAL-0001",
+      "raw_artifact_id": 10558129961,
+      "run_id": "v5-xd-software_engineering-fr001-0001",
+      "lanes": [
+        {
+          "lane": "User-visible goal",
+          "nodes": [
+            {
+              "event": "Task",
+              "label": "one executable GO/HOLD decision + rollout + rollback trigger"
+            },
+            {
+              "event": "E3",
+              "label": "executable staged-GO decision"
+            },
+            {
+              "event": "E9",
+              "label": "GO_CONDITIONAL_HOLD after provisional telemetry"
+            },
+            {
+              "event": "E129",
+              "label": "GO_CONDITIONAL_HOLD final"
+            }
+          ]
+        },
+        {
+          "lane": "Generated process obligations",
+          "nodes": [
+            {
+              "event": "E35",
+              "label": "review finds no blocking omission; lists supporting gaps"
+            },
+            {
+              "event": "E44",
+              "label": "supporting gaps become formal advance conditions"
+            },
+            {
+              "event": "E46",
+              "label": "QA receives bug-ownership + validation-owner/timebox tasks"
+            },
+            {
+              "event": "E53",
+              "label": "QA invokes Backend for bug owner/severity/code path"
+            },
+            {
+              "event": "E54–E55",
+              "label": "ownership/timebox + bug status materialized in shared state"
+            },
+            {
+              "event": "E127",
+              "label": "expanded conditions remain in executable decision"
+            }
+          ]
+        }
+      ],
+      "required_annotation": "P is not inferred from 15 invocations; the evidential transition is non-blocking/supporting concern -> operational obligation.",
+      "authorization_boundary_annotation": "Monitoring/validation plausibly belongs to user-impact risk control; figure highlights the specific ownership/scoping obligations so necessity can be inspected rather than assumed."
+    },
+    {
+      "figure": 3,
+      "title": "A one-point challenge exposes Functional Semantic Lineage",
+      "manuscript_role": "Show how R5 creates a diagnostic cut and R6 distinguishes ancestry.",
+      "panels": [
+        {
+          "panel": "a",
+          "title": "Descendant inheritance",
+          "evidence_id": "EV-R6-SC-DESCENDANT",
+          "case_id": "wave-3-56ee79f97f54",
+          "route": [
+            {
+              "node": "source E6",
+              "label": "logistics_lane_assessment_v1 = fact"
+            },
+            {
+              "node": "R5 exposure",
+              "label": "next Inventory reader sees unconfirmed; stored state unchanged"
+            },
+            {
+              "node": "Inventory carrier",
+              "label": "1,400-unit standard transfer"
+            },
+            {
+              "node": "Risk",
+              "label": "1,200–1,400 guardrail"
+            },
+            {
+              "node": "Reviewer",
+              "label": "executable condition"
+            },
+            {
+              "node": "Supply Lead",
+              "label": "released 1,400 plan"
+            },
+            {
+              "node": "Logistics",
+              "label": "lane lock"
+            }
+          ],
+          "independent_evidence": "none on six target-bound semantic edges"
+        },
+        {
+          "panel": "b",
+          "title": "Independent re-anchoring",
+          "evidence_id": "EV-R6-FIN-REANCHOR",
+          "case_id": "wave-1-92211309fb1b",
+          "route": [
+            {
+              "node": "source",
+              "label": "credit_lead_decision = CNY65m cap"
+            },
+            {
+              "node": "R5 exposure",
+              "label": "source shown unconfirmed"
+            },
+            {
+              "node": "Compliance",
+              "label": "policy + 18% stress + collateral + escalation"
+            },
+            {
+              "node": "Cashflow",
+              "label": "~CNY12m FCF serviceability"
+            },
+            {
+              "node": "Credit Lead",
+              "label": "same CNY65m endpoint"
+            }
+          ],
+          "independent_evidence": "explicit frozen independent_evidence_refs present"
+        }
+      ],
+      "center_statement": "same endpoint != same semantic ancestry"
+    },
+    {
+      "figure": 4,
+      "title": "From lineage localization to bounded intervention",
+      "manuscript_role": "Derive engineering design from the discovered mechanism.",
+      "stages": [
+        {
+          "stage": "R5-I",
+          "control_surface": "next-reader view",
+          "operation": "one-shot fact -> unconfirmed",
+          "persistent_state_mutation": false
+        },
+        {
+          "stage": "R6",
+          "control_surface": "semantic lineage package",
+          "operation": "bind anchor + carriers + descendants + repair readiness"
+        },
+        {
+          "stage": "R7-P",
+          "control_surface": "downstream reader views",
+          "operation": "persistent uncertainty correction while inherited state remains"
+        },
+        {
+          "stage": "R7-S",
+          "control_surface": "repair anchor + bounded continuation",
+          "operation": "anchor authority repair -> invalidate/reopen -> recompute -> re-entry watch"
+        }
+      ],
+      "implementation_boundary": {
+        "preservation": "4/4 direct non-target anchor-state preservation",
+        "later_changes": "recorded, not assumed absent",
+        "dependency_closure": "bounded post-anchor runtime; arbitrary mathematically minimal closure NOT established"
+      },
+      "example_anchor": {
+        "case_id": "wave-4-8b1731b57396",
+        "anchor": "E20 logistics_capacity_assessment",
+        "direct_changed_path": "shared_state_metadata.logistics_capacity_assessment.status",
+        "from": "fact",
+        "to": "unconfirmed"
+      }
+    },
+    {
+      "figure": 5,
+      "title": "Divergence, reconvergence and cumulative Process Reality synthesis",
+      "manuscript_role": "Close the empirical chain before summarizing C/P/R.",
+      "panels": [
+        {
+          "panel": "a",
+          "title": "Material recomposition",
+          "evidence_id": "EV-R7-DIVERGE-8B1731",
+          "case_id": "wave-4-8b1731b57396",
+          "values": {
+            "invalidated": 1,
+            "reopened": 8,
+            "recomputed": 35
+          },
+          "compare": [
+            "R7-P: East->West 700 + East->South 300",
+            "R7-S: East->West 1,200 + East->South 300 + East replenishment"
+          ]
+        },
+        {
+          "panel": "b",
+          "title": "Endpoint reconvergence with changed ancestry",
+          "evidence_id": "EV-R7-RECONVERGE-CF726",
+          "case_id": "wave-4-cf726639de1d",
+          "values": {
+            "reopened": 8,
+            "recomputed": 28
+          },
+          "endpoint": "same broad 900-unit staged plan",
+          "authority_note": "lineage-independent logistics evidence re-read after repair; temporal freshness not assumed"
+        },
+        {
+          "panel": "c",
+          "title": "Cumulative semantic synthesis",
+          "frozen_counts": {
+            "C": 3,
+            "P": 23,
+            "R": 18
+          },
+          "evidence_distribution": {
+            "heldout_natural": 90,
+            "heldout_natural_P": 13,
+            "heldout_natural_R": 12,
+            "heldout_natural_supported_C": 0,
+            "strict_C_anchor_distribution": "1 natural ecommerce + 2 R5 intervention"
+          },
+          "transitions": {
+            "C_DRIVES_P": 2,
+            "R_GENERATES_P": 17,
+            "R_GENERATES_C": 1,
+            "P_REINFORCES_C_candidate": 2
+          },
+          "boundary": "R->P/R->C are realized pathway composition under the current retrospective-generative R definition, not independent association statistics."
+        }
+      ]
+    }
+  ],
+  "next_step": "RENDER_FIVE_MAIN_FIGURES_WITH_EXACT_NODE_LABELS_AND_VALIDATE_AGAINST_THIS_SPEC"
+}
