@@ -171,7 +171,7 @@ pdfs=[OUT/'NMI_Manuscript_Yeyu_Zheng_EVIDENCE_ACCOUNTING.pdf',OUT/'NMI_Supplemen
 for p in pdfs:
     if not p.exists(): raise SystemExit(f'missing PDF {p}')
 files=[outputs['manuscript'],pdfs[0],outputs['supplement'],pdfs[1],outputs['cover'],pdfs[2]]+[p for _,p in FIGS]
-manifest={'schema':'RB-NMI-P9D-EVIDENCE-ACCOUNTING-EXPORT-MANIFEST-v1','date':'2026-09-21','status':'BUILT_PENDING_VISUAL_QA','peer_review_mode':'STANDARD_SINGLE_ANONYMIZED','author':'Yeyu Zheng','affiliation':'Independent Researcher, Jiangxi, China','corresponding_email':'zhengyeyu520@gmail.com','source_manuscript':str(MANUSCRIPT.relative_to(ROOT)),'source_supplement':str(SUPPLEMENT.relative_to(ROOT)),'figure_source_spec':'configs/nmi_p9d_figure_source_spec_v1.json','frozen_counts':{'C':3,'P':23,'R':18},'files':[{'name':p.relative_to(OUT).as_posix(),'bytes':p.stat().st_size,'sha256':sha256(p)} for p in files]}
+manifest={'schema':'RB-NMI-P9D-EVIDENCE-ACCOUNTING-EXPORT-MANIFEST-v1','date':'2026-09-21','status':'BUILT_PENDING_VISUAL_QA','peer_review_mode':'STANDARD_SINGLE_ANONYMIZED','author':'Yeyu Zheng','affiliation':'Independent Researcher, Jiangxi, China','corresponding_email':'zhengyeyu520@gmail.com','source_manuscript':str(MANUSCRIPT.relative_to(ROOT)),'source_supplement':str(SUPPLEMENT.relative_to(ROOT)),'figure_source_spec':'configs/nmi_p9c_figure_source_spec_v1.json','frozen_counts':{'C':3,'P':23,'R':18},'files':[{'name':p.relative_to(OUT).as_posix(),'bytes':p.stat().st_size,'sha256':sha256(p)} for p in files]}
 mp=OUT/'submission_manifest.json'; mp.write_text(json.dumps(manifest,indent=2)+'\n')
 zp=OUT/'NMI_P9D_Submission_Package_Yeyu_Zheng_EVIDENCE_ACCOUNTING.zip'
 with zipfile.ZipFile(zp,'w',zipfile.ZIP_DEFLATED) as z:
