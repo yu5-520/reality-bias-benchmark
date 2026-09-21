@@ -4,9 +4,6 @@
 Independent Researcher, Jiangxi, China  
 Correspondence: zhengyeyu520@gmail.com
 
-> P9 working manuscript. Evidence-forward rewrite workspace.  
-> Baseline manuscript remains frozen at `NMI_Manuscript_v0.17_PUBLIC_RAW.md`.  
-> No frozen result count is changed in this working file unless an append-only evidence review is separately frozen.
 
 ## Abstract
 
