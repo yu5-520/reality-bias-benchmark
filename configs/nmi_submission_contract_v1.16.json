@@ -1,7 +1,7 @@
 {
   "schema": "RB-NMI-SUBMISSION-CONTRACT-v1.16",
   "date": "2026-09-21",
-  "status": "NMI_P8_REVALIDATION_COMPLETE_AWAITING_HUMAN_METADATA",
+  "status": "NMI_P8_AUTOMATED_PREFLIGHT_COMPLETE_WAITING_HUMAN_METADATA",
   "predecessor": "RB-NMI-SUBMISSION-CONTRACT-v1.15",
   "target_journal": "Nature Machine Intelligence",
   "target_content_type": "Article",
@@ -17,7 +17,7 @@
   "p8": {
     "live_requirement_revalidation": "PASS",
     "cover_letter": "docs/submission/nmi/NMI_Cover_Letter_v0.3.md",
-    "supplement": "docs/submission/nmi/NMI_Supplementary_Information_v0.2.md",
+    "supplement": "docs/submission/nmi/NMI_Supplementary_Information_v0.3.md",
     "metadata_template": "configs/nmi_p8_portal_metadata_template_v1.json",
     "final_export_status": "BLOCKED_ON_VERIFIED_HUMAN_METADATA",
     "portal_ready": false,
@@ -30,7 +30,9 @@
       "competing_interests_declaration",
       "related_manuscripts_disclosure",
       "prior_nmi_editor_discussion_disclosure"
-    ]
+    ],
+    "figure_inventory": "docs/submission/nmi/NMI_P8_Figure_Asset_Inventory_v1.md",
+    "unmaterialized_supplementary_figure_promises_removed": true
   },
   "scientific_freeze": {
     "theory_expansion": false,
@@ -40,5 +42,5 @@
     "new_semantic_adjudication": false,
     "raw_evidence_mutation": false
   },
-  "next_action": "P8_FINAL_EXPORT_AFTER_VERIFIED_HUMAN_METADATA"
+  "next_action": "NMI_P8H_METADATA_BIND_AND_FINAL_EXPORT"
 }
