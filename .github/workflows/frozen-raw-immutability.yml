@@ -1,0 +1,40 @@
+name: Frozen Raw Evidence Immutability
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'evidence/frozen_raw/**'
+      - 'configs/frozen_raw_public_release_registry_v1.json'
+      - 'scripts/validate_frozen_raw_immutability.py'
+      - '.github/workflows/frozen-raw-immutability.yml'
+  pull_request:
+    paths:
+      - 'evidence/frozen_raw/**'
+      - 'configs/frozen_raw_public_release_registry_v1.json'
+      - 'scripts/validate_frozen_raw_immutability.py'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Resolve immutable baseline
+        id: base
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "sha=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Validate frozen raw evidence
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/validate_frozen_raw_immutability.py --base "${{ steps.base.outputs.sha }}"
