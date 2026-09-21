@@ -1236,3 +1236,28 @@ Canonical files:
 - `docs/submission/nmi/NMI_P4_Reviewer_Attack_Status_v0.5.md`
 - `configs/nmi_submission_contract_v1.7.json`
 - `theory/change_notes/CN-R-083_nmi_p4_r5_causal_boundary_attack.md`
+
+
+## NMI-P6 Reproducibility and Release Freeze
+
+P6 is complete.
+
+The malformed historical 141-record R8 gzip remains immutable for auditability, while the verified canonical recovery is appended at:
+
+`results/r8_trajectory_first_second_audit_recovered_v0_2/trajectory_second_audit_records.jsonl.gz`
+
+Recovery identity:
+
+- compressed SHA-256: `d8e51328f23ff6619fef5dce37f5768de319d16c3be0e7b478d27c7b614d9957`;
+- uncompressed SHA-256: `f4b1ee053d47fb3fe5b681831acd37469549af0f741660b81e28fb0df54f3e61`;
+- records: 141.
+
+Submission state:
+
+`NMI_P6_COMPLETE_HANDOFF_TO_P7`
+
+Next gate:
+
+`NMI_P7_FINAL_EDITORIAL_AND_FORMAT_COMPLIANCE`.
+
+No new subject/provider/evaluator execution or semantic adjudication was used for P6.
