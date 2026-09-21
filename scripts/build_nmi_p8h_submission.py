@@ -41,7 +41,13 @@ import cairosvg
 pngs = []
 for label, svg in FIGS:
     png = TMP / (svg.stem + ".png")
-    cairosvg.svg2png(url=str(svg), write_to=str(png), output_width=2200)
+    # P5 SVGs are human-readable vector assets. Sanitize any bare ampersand
+    # before strict XML parsing without mutating the frozen repository source.
+    raw = svg.read_text(encoding="utf-8")
+    raw = re.sub(r"&(?!#?[A-Za-z0-9]+;)", "&amp;", raw)
+    sanitized = TMP / (svg.stem + ".sanitized.svg")
+    sanitized.write_text(raw, encoding="utf-8")
+    cairosvg.svg2png(url=str(sanitized), write_to=str(png), output_width=2200)
     pngs.append((label, png))
 
 # Insert each materialized main figure immediately after its legend.
