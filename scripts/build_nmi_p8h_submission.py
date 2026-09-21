@@ -174,16 +174,16 @@ manifest = {
 manifest_path = OUT / "submission_manifest.json"
 manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
-# Zip only final deliverables, not temp material.
-zip_base = OUT / "NMI_P8H_Submission_Package_Yeyu_Zheng"
-if (zip_base.with_suffix(".zip")).exists():
-    (zip_base.with_suffix(".zip")).unlink()
-shutil.make_archive(
-    str(zip_base),
-    "zip",
-    root_dir=OUT,
-    base_dir=".",
-)
+# Zip only final deliverables, not temp material and never the ZIP itself.
+import zipfile
+zip_path = OUT / "NMI_P8H_Submission_Package_Yeyu_Zheng.zip"
+if zip_path.exists():
+    zip_path.unlink()
+zip_members = files + [manifest_path]
+with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+    for member in zip_members:
+        arcname = member.relative_to(OUT).as_posix()
+        zf.write(member, arcname=arcname)
 print("NMI_P8H_EXPORT=PASS")
 print(manifest_path)
-print(zip_base.with_suffix(".zip"))
+print(zip_path)
