@@ -130,59 +130,77 @@ Inter-system claims remain outlook until explicitly tested.
 
 ## Methods
 
-### Experimental programme and chronology
+### Experimental programme and evidence geometry
 
-[EVIDENCE: existing frozen protocol files]
+The study began with natural e-commerce trajectories and then used a held-out natural cohort of 30 Finance, 30 Supply Chain and 30 Software Engineering trajectories under a common arena runtime. Natural trajectories were frozen before the later trajectory-first semantic protocol was finalized. Subsequent stages used selected frozen cases for one-point authority challenge (R5), passive lineage reconstruction (R6) and bounded control/repair experiments (R7). R8 then re-read the frozen evidence as complete semantic trajectories.
 
-### Runtime and model configuration
+The final semantic inventory contains 150 heterogeneous records: 90 held-out natural R2–R4 trajectories, 29 canonical R5 continuations, 22 historical/current R7 trajectories, and nine e-commerce discovery-history trajectories. The 141-record held-out/mechanism audit and the separate nine-record e-commerce discovery reaudit are preserved independently and combine to 150. Because these blocks have different selection rules and scientific roles, the combined inventory is not a prevalence denominator.
 
-Must state:
+Historical subject evidence was append-only. Later theory revisions, structural derivations and semantic audits consumed frozen trajectories rather than replacing them with newly generated runs designed to fit the final interpretation. Failed prefixes, healthy comparators, development traces and active-censored trajectories were retained.
 
-- provider;
-- requested/returned model alias;
-- repository expected version;
-- no stronger exact provider version identifier if unavailable;
-- thinking;
-- temperature;
-- max tokens;
-- timeout/retries;
-- max turns;
-- max invocations;
-- pending-message budget;
-- late-event policy;
-- termination policy.
+### Arena runtime and subject-model configuration
 
-### Frozen evidence and append-only policy
+The held-out first round used the same fixed-environment/free-routing arena across Finance, Supply Chain and Software Engineering. The runtime allowed up to 32 turns, 64 total invocations and 128 pending messages. A late event could enter once after the first finalized state, and execution continued until quiescence or an external budget boundary. The Agent prompt protocol supplied minimal identity/responsibility plus a uniform structured-action interface rather than domain-specific CPR instructions.
 
-### Shared Process-Reality Layer and recorded process objects
+Subject calls used the repository DeepSeek configuration: provider `deepseek`, API alias `deepseek-flash`, thinking disabled, temperature 0.7 and a 4,096-token output cap. Transport timeout was 60 s with at most two transport retries; two bounded JSON-format retries were permitted after earlier malformed-output failures and were fully recorded. The repository configuration names the expected model version as `DeepSeek-V4.1-Flash`; the provider responses returned the model alias `deepseek-flash` rather than a more specific immutable version identifier. Canonical active R5 and R7 continuations inherited the same provider/model configuration. R6 introduced no subject-model call.
+
+### Recorded process state and the shared process-reality layer
+
+The runtime recorded chronological actions, messages and delivery/read state, invocations, shared-state versions and metadata, model-call inputs/outputs, final-state revisions, remaining queues, pending invocations, termination and usage information. Shared state was treated analytically as a **shared process-reality layer** because later Agents could directly consume an existing object without independently re-establishing its source evidence.
+
+For each paper exemplar we therefore distinguished the source proposition from its semantic descendants. A descendant could preserve or transform factual content, uncertainty, provenance, constraint meaning, causal implication, decision implication or action implication. A message being sent was not treated as adoption; recipient read state, shared-state use, explicit basis references or downstream operational dependence were used where available.
 
 ### Trajectory-first semantic reconstruction
 
-### Dynamic C adjudication
+The canonical semantic unit was a Dynamic Semantic Episode embedded in a complete realized trajectory. Review proceeded in a fixed order: chronological reconstruction; semantic-event reconstruction; Functional Semantic Lineage; original goal/authorization/realized-process/final-result alignment; retrospective and censor timeline; C/P/R adjudication; coupling; unresolved evidence; and claim boundary. Structural events were locators rather than semantic verdicts, and a verdict without prior trajectory reconstruction was invalid under the audit contract.
 
-### Dynamic P adjudication
+**Dynamic C** was supported when a semantic lineage gained greater epistemic or operational permission than its independent evidential support justified. Independent evidence was separated from lineage-derived semantic support; multiple Agent-produced descendants of one root did not become independent confirmation merely because they came from different roles.
 
-Explicit four-object comparison:
+**Dynamic P** compared four objects: the original goal, the supported or authorized process boundary, the realized process scope and the final result/actual changes. Extra calls were insufficient. P required an additional process requirement to gain operational force beyond the supported boundary—for example through invocation, queueing, shared-state materialization, reopening or result-side modification. Necessary decomposition, role-authorized work and directly justified evidence seeking were explicit counter-explanations.
 
-original_goal / authorized_boundary / realized_process_scope / final_result_and_actual_changes.
+The frozen **Dynamic R** adjudication used a retrospective-generative criterion: a valid review, reopen, recomputation or repair boundary re-opened the process and the continuation produced a new C or P effect. Reopen, repeated state or persistence alone were insufficient. The broader theoretical interpretation considered in the Discussion also allows retrospective reactivation or strengthening of an existing C/P lineage, but such forward candidates are not added to the frozen R count without a separate append-only adjudication.
 
-### Dynamic R adjudication
+### Retrospective audit chronology and reviewer dependence
 
-Separate current frozen retrospective-generative rule from broader forward lineage-strengthening interpretation.
+The final trajectory-first semantic protocol was developed after the natural subject trajectories had been generated and frozen. It was therefore used as a retrospective mechanism audit rather than a preregistered prevalence classifier. The complete 90-trajectory held-out natural cohort was reviewed rather than only trajectories selected by earlier structural high-risk rules. Legacy window-first reviews remained immutable.
 
-### R5 one-point authority challenge
+The trajectory-first semantic work used a non-blind model reviewer under explicit reconstruction and evidence-binding contracts; repository audit records identify the reviewer as GPT-5.6-Sol where reviewer metadata was recorded. Independent blinded replication of the final R8 labels is not complete. An earlier semantic-review system was subjected to a cross-model blind comparison and showed substantial event-level label disagreement; we retain that result as evidence of measurement sensitivity rather than treating it as inter-rater validation of the final R8 protocol.
 
-### R6 functional semantic ancestry
+### Structural localization
 
-### R7 bounded lineage intervention
+Structural scouting indexed candidate sources, shared-state objects, reads, invocations, revisions and retrospective boundaries without assigning semantic C/P/R labels. In retrospective calibration against the final full-trajectory review of the same 90 held-out natural trajectories, the narrow B2 union selector captured 10 of 13 trajectories later supported for P and/or R (76.9%). P-specific capture was 4/13 and R-specific capture 9/12. A broader evidence-preservation proxy retained relevant post-late-event material for all 13. These values describe the frozen selector and cohort only; they are not prevalence or universal detector-recall estimates.
 
-### Censoring
+### One-point authority challenge
 
-### Reviewer chronology and measurement reliability
+Canonical R5 selected 29 already-realized cases. In each, exactly one relevant next reader received a reduced-authority view of a target state, typically `fact -> unconfirmed`. The persistent historical source state was not rewritten and the reduced status was not repeatedly reinjected. This design preserves the realized history while creating a bounded cut through the active semantic lineage.
+
+The canonical geometry is not an average-treatment-effect estimator: there was no newly sampled matched control and no claim of unique downstream causality. The directly controlled fact is the next-reader authority exposure. All 29 cases showed downstream semantic adoption and persistence under the frozen mechanism audit, but only four were classified as stronger case-level System Inertia candidates; 25 were explained by heterogeneous normal inheritance, boundary preservation or independent re-anchoring. R5 is therefore interpreted as a response/dependence probe.
+
+### Functional Semantic Lineage and System Inertia
+
+R6 introduced no provider run. It reconstructed the source, local response, semantic carrier, downstream read/use, decision/action dependence, post-stimulus persistence, candidate affected continuation and intervention surface from frozen natural/R5 evidence.
+
+We distinguished **propositional lineage**, which follows direct or paraphrastic continuation, from **Functional Semantic Lineage**, which follows preserved operational meaning even when wording changes. System Inertia was not equated with persistence. A challenged source followed by an independent policy/tool/data reconstruction was a healthy re-anchor even when the endpoint remained identical; a transformed descendant that continued to carry the challenged source relation supported a stronger source-specific persistence structure.
+
+### Bounded lineage-addressed intervention
+
+Four stronger R6 candidates passed a frozen lineage-completeness gate and entered R7. Two control surfaces were compared. R7-P persistently corrected the downstream read view while leaving inherited shared state intact. R7-S directly revised the selected anchor authority and continued from a repaired internal lineage.
+
+The implemented R7-S runtime changed the target anchor state, verified non-target state preservation at direct repair application, removed or invalidated the bounded post-anchor materialization selected by the frozen runtime, reopened dependent calls and recomputed a fixed continuation. It also recorded later state changes and exact old-authority re-entry. This establishes a bounded, addressable repair implementation; it does not establish a mathematically minimal semantic dependency closure for arbitrary workflow graphs. The four cases were evaluated descriptively and do not establish universal superiority of one repair surface.
+
+### Censoring and evidence use
+
+Trajectories were classified as natural complete, control-boundary complete, externally censored active process or failure terminated. Work remaining in the queue, pending invocations or unread messages at a turn/budget cap prevented negative-tail inference. Positive prefix evidence remained usable, but an unread message was not counted as recipient adoption and a pending invocation was not described as executed work.
 
 ### Subject-model and external-validity boundary
 
+The formal subject evidence is intentionally model-controlled rather than model-diverse. Holding the subject-model surface fixed across held-out domains reduces one source of experimental variation but does not establish invariance across model families, providers, reasoning modes, context windows, memory systems or communication topologies. Cross-model reviewer diversity is a measurement-reliability question and is not subject-model replication.
+
+The three held-out domains vary task semantics while retaining a common broad multi-agent runtime. They do not constitute independently governed system-to-system replication. Claims about Human-to-AI, database-to-workflow, service-to-service or future model-native protocol settings are therefore treated as development hypotheses.
+
 ### AI systems and human responsibility
+
+Large language models served as experimental subjects and as semantic reviewers under explicit frozen-evidence contracts. Reviewer outputs could not modify subject trajectories. LLM assistance was also used during research engineering and manuscript organization. Scientific interpretations, evidence boundaries, manuscript wording and submission decisions remain the responsibility of the human author; model outputs are not treated as authorship or as self-validating scientific verdicts.
 
 ## Data availability
 
