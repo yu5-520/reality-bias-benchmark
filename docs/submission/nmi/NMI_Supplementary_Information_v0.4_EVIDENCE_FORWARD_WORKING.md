@@ -171,12 +171,12 @@ R7-P corrects downstream read views while inherited shared state remains. R7-S c
 
 The implementation validates non-target preservation at DIRECT_REPAIR_APPLICATION_AT_ANCHOR. It does not assert that all unrelated semantic state remains unchanged throughout the later continuation. The runtime invalidates/removes a bounded post-anchor materialization selected by the frozen execution design and then reopens/recomputes a fixed continuation. It is not a proof of mathematically minimal dependency closure for arbitrary workflow graphs.
 
-| Case | Domain | Direct refs invalidated | R7-S calls reopened | Descendants recomputed | Final authority / re-entry | Main comparison |
-| --- | --- | ---: | ---: | ---: | --- | --- |
-| wave-3-56ee79f97f54 | Supply Chain | 1 | 8 | 43 | unconfirmed / no exact old-authority re-entry in frozen summary | parameter divergence |
-| wave-4-8b1731b57396 | Supply Chain | 1 | 8 | 35 | recommendation / no re-entry | material action recomposition |
-| wave-4-cf726639de1d | Supply Chain | 0 | 8 | 28 | fact / exact key-status re-entry | broad endpoint reconvergence |
-| wave-6-7c7e526e4d91 | Software Engineering | 1 | 8 | 29 | recommendation / no re-entry | compatible decision reconvergence |
+| Case | Domain | R7-S recomputation | Final authority / re-entry | Main comparison |
+| --- | --- | --- | --- | --- |
+| wave-3-56ee79f97f54 | Supply Chain | 1 invalidated; 8 reopened; 43 recomputed | unconfirmed; no exact old-authority re-entry in frozen summary | parameter divergence |
+| wave-4-8b1731b57396 | Supply Chain | 1 invalidated; 8 reopened; 35 recomputed | recommendation; no re-entry | material action recomposition |
+| wave-4-cf726639de1d | Supply Chain | 0 invalidated; 8 reopened; 28 recomputed | fact; exact key/status re-entry | broad endpoint reconvergence |
+| wave-6-7c7e526e4d91 | Software Engineering | 1 invalidated; 8 reopened; 29 recomputed | recommendation; no re-entry | compatible decision reconvergence |
 
 Compatible/non-target anchor state was preserved in 4/4 direct repair applications. Two cases materially diverged and two reconverged. These descriptive cases do not establish universal R7-S superiority.
 
