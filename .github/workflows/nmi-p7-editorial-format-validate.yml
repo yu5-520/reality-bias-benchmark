@@ -1,0 +1,25 @@
+name: NMI P7 Editorial Format Validate
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.14.md'
+      - 'docs/submission/nmi/NMI_Cover_Letter_v0.2.md'
+      - 'docs/submission/nmi/NMI_Supplementary_Information_v0.2.md'
+      - 'docs/submission/nmi/NMI_P7_Manual_Submission_Fields_v1.md'
+      - 'docs/submission/nmi/NMI_P7_Editorial_Format_Checklist_v1.md'
+      - 'docs/submission/nmi/NMI_P7_Final_Status_v1.md'
+      - 'configs/nmi_submission_contract_v1.15.json'
+      - 'manifests/nmi_p7_editorial_format_2026-09-21_v1.json'
+      - 'scripts/validate_nmi_p7_v1.py'
+      - 'theory/change_notes/CN-R-091_nmi_p7_editorial_format_compliance.md'
+      - '.github/workflows/nmi-p7-editorial-format-validate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python scripts/validate_nmi_p7_v1.py
