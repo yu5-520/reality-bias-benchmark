@@ -1,0 +1,22 @@
+name: NMI P8H1 Public Release Validate
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.16_PUBLIC.md'
+      - 'docs/submission/nmi/NMI_P8H_1_Public_Repository_Release_Sync_v1.md'
+      - 'docs/submission/nmi/NMI_P8H_1_Final_Status_v1.md'
+      - 'configs/nmi_p8_portal_metadata_template_v1.json'
+      - 'configs/nmi_submission_contract_v1.18.json'
+      - 'manifests/nmi_p8h1_public_release_final_export_2026-09-21_v1.json'
+      - 'scripts/validate_nmi_p8h1_public_release_v1.py'
+      - '.github/workflows/nmi-p8h1-public-release-validate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python scripts/validate_nmi_p8h1_public_release_v1.py
