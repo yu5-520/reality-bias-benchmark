@@ -1,0 +1,22 @@
+name: NMI P9D Evidence Accounting Validate
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.19_EVIDENCE_ACCOUNTING_WORKING.md'
+      - 'docs/submission/nmi/NMI_Supplementary_Information_v0.5_EVIDENCE_ACCOUNTING_WORKING.md'
+      - 'evidence/paper/nmi_p9/EV_EVIDENCE_ACCOUNTING_FUNNEL_v1.json'
+      - 'configs/nmi_p9d_evidence_accounting_contract_v1.json'
+      - 'scripts/validate_nmi_p9d_evidence_accounting_v1.py'
+      - '.github/workflows/nmi-p9d-evidence-accounting-validate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python scripts/validate_nmi_p9d_evidence_accounting_v1.py

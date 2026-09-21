@@ -1,0 +1,168 @@
+{
+  "schema": "RB-NMI-P9D-EVIDENCE-ACCOUNTING-FUNNEL-v1",
+  "date": "2026-09-21",
+  "status": "DETERMINISTIC_ACCOUNTING_FROM_FROZEN_R8_RESULTS",
+  "frozen_support_counts": {
+    "C": 3,
+    "P": 23,
+    "R": 18
+  },
+  "inventory": {
+    "combined_records": 150,
+    "combined_is_prevalence_denominator": false,
+    "heldout_mechanism_records": 141,
+    "ecommerce_discovery_history_records": 9,
+    "active_censored_combined": 70,
+    "failure_terminated_discovery_prefixes": 3
+  },
+  "source_blocks": {
+    "heldout_natural": {
+      "n": 90,
+      "role": "COMPLETE_HELDOUT_COHORT",
+      "domains": {
+        "finance": 30,
+        "supply_chain": 30,
+        "software_engineering": 30
+      },
+      "C": {
+        "supported": 0,
+        "healthy_uncertainty_preservation": 48,
+        "censored_unresolved": 42,
+        "supported_fraction": 0,
+        "censored_fraction": 0.466667
+      },
+      "P": {
+        "supported": 13,
+        "not_established": 45,
+        "censored_unresolved": 32,
+        "supported_fraction": 0.144444,
+        "censored_fraction": 0.355556
+      },
+      "R": {
+        "supported": 12,
+        "not_established": 46,
+        "censored_unresolved": 32,
+        "supported_fraction": 0.133333,
+        "censored_fraction": 0.355556
+      }
+    },
+    "r5_canonical": {
+      "n": 29,
+      "role": "SELECTED_MECHANISM_SET_NOT_PREVALENCE_DENOMINATOR",
+      "C": {
+        "supported": 2,
+        "functional_lineage_without_permission_penetration": 6,
+        "healthy_reanchor": 21
+      },
+      "P": {
+        "supported": 4,
+        "not_established": 10,
+        "censored_unresolved": 15
+      },
+      "R": {
+        "not_adjudicated_from_r5_cut_alone": 29
+      }
+    },
+    "r7_historical_current": {
+      "n": 22,
+      "role": "CONTROL_AND_REPAIR_EVIDENCE_NOT_NATURAL_DENOMINATOR",
+      "C": {
+        "new_supported": 0,
+        "dual_arm_censored_unresolved": 7,
+        "existing_C_lineage_continuation": 1,
+        "other_non_supported_variants": 14
+      },
+      "P": {
+        "supported": 2,
+        "not_established": 13,
+        "censored_unresolved": 7
+      },
+      "R": {
+        "supported": 1,
+        "not_established": 13,
+        "censored_unresolved": 7,
+        "unresolved_retrospective_relation": 1
+      }
+    },
+    "ecommerce_discovery_history": {
+      "n": 9,
+      "role": "DISCOVERY_HISTORY",
+      "formal_batch001_denominator": 3,
+      "all_nine_is_prevalence_denominator": false,
+      "C": {
+        "supported": 1,
+        "healthy_uncertainty_preservation": 5,
+        "observed_prefix_not_established_failure": 3,
+        "functional_semantic_continuation": "9/9"
+      },
+      "P": {
+        "supported": 4,
+        "not_established": 2,
+        "failure_terminated_unresolved": 3
+      },
+      "R": {
+        "supported": 5,
+        "not_established": 1,
+        "failure_terminated_unresolved": 3
+      }
+    }
+  },
+  "heldout_mechanism_141_C": {
+    "supported": 2,
+    "healthy_reanchor": 21,
+    "healthy_uncertainty_preservation": 48,
+    "functional_lineage_without_permission_penetration": 6,
+    "censored_unresolved": 49,
+    "other_non_supported_or_continuation": 15,
+    "total": 141
+  },
+  "monitoring_and_screening": {
+    "structural_candidate_rows": 2127,
+    "localized_audit_cases": 167,
+    "retained_fraction": 0.078514,
+    "candidate_surface_compression": 0.921486,
+    "final_heldout_natural_review": "90/90",
+    "narrow_selector_union_capture": "10/13",
+    "narrow_selector_union_capture_fraction": 0.769231,
+    "p_selector_capture": "4/13",
+    "p_selector_capture_fraction": 0.307692,
+    "r_selector_capture": "9/12",
+    "r_selector_capture_fraction": 0.75,
+    "broad_evidence_preservation_proxy": "13/13"
+  },
+  "mechanism_funnel": {
+    "r5_canonical_cases": 29,
+    "stronger_r6_candidates": 4,
+    "stronger_candidate_selection_fraction": 0.137931,
+    "lineage_complete_packages": "4/4",
+    "canonical_r7_branches": 8,
+    "r7_p_branches": 4,
+    "r7_s_branches": 4
+  },
+  "r7_analysis_unit": {
+    "intervention_operator": "BOUNDED_REPAIR_WINDOW",
+    "semantic_comparison_unit": "FULL_FROZEN_ANCESTRY",
+    "route": [
+      "natural/source context",
+      "R5 authority challenge",
+      "R6 functional lineage",
+      "R7 intervention",
+      "post-intervention descendants",
+      "endpoint"
+    ]
+  },
+  "interpretation_boundary": [
+    "Support fractions are descriptive accounting inside frozen source blocks, not universal prevalence.",
+    "C=3/P=23/R=18 do not share one effective denominator.",
+    "0 supported C in the 90 held-out natural cohort is not a 0/90 negative prevalence result because 42/90 are C-censored/unresolved.",
+    "Functional semantic continuation is broader than Dynamic C permission penetration.",
+    "Selector capture rates are retrospective calibration values for this frozen cohort, not universal detector recall."
+  ],
+  "execution_boundary": {
+    "new_subject_runs": 0,
+    "provider_calls": 0,
+    "evaluator_calls": 0,
+    "raw_evidence_mutations": 0,
+    "frozen_count_changes": 0
+  }
+}
