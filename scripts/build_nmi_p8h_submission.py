@@ -45,6 +45,34 @@ for label, svg in FIGS:
     # before strict XML parsing without mutating the frozen repository source.
     raw = svg.read_text(encoding="utf-8")
     raw = re.sub(r"&(?!#?[A-Za-z0-9]+;)", "&amp;", raw)
+    # Export-only visual repair: keep frozen source SVGs unchanged while producing
+    # a clean submission rendering for two long text annotations.
+    lt, gt = chr(60), chr(62)
+    if svg.name == "Fig3_Functional_Semantic_Lineage.svg":
+        old = "Different agents do not turn descendants of one source into independent evidence."
+        new = (
+            "Different agents do not turn descendants of one source"
+            + lt + 'tspan x="970" dy="30"' + gt
+            + "into independent evidence."
+            + lt + "/tspan" + gt
+        )
+        raw = raw.replace(old, new)
+    if svg.name == "Fig5_Lineage_Level_Repair.svg":
+        old_a = "1 invalidated ref; 8 reopened calls; 35 recomputed descendants"
+        new_a = (
+            "1 invalidated ref; 8 reopened calls;"
+            + lt + 'tspan x="112" dy="28"' + gt
+            + "35 recomputed descendants"
+            + lt + "/tspan" + gt
+        )
+        old_b = "8 reopened calls; 28 recomputed descendants; same broad endpoint"
+        new_b = (
+            "8 reopened calls; 28 recomputed descendants;"
+            + lt + 'tspan x="592" dy="28"' + gt
+            + "same broad endpoint"
+            + lt + "/tspan" + gt
+        )
+        raw = raw.replace(old_a, new_a).replace(old_b, new_b)
     sanitized = TMP / (svg.stem + ".sanitized.svg")
     sanitized.write_text(raw, encoding="utf-8")
     cairosvg.svg2png(url=str(sanitized), write_to=str(png), output_width=2200)
@@ -151,7 +179,8 @@ for p in pdfs:
 figout = OUT / "figures"
 figout.mkdir(exist_ok=True)
 for _, svg in FIGS:
-    shutil.copy2(svg, figout / svg.name)
+    sanitized = TMP / (svg.stem + ".sanitized.svg")
+    shutil.copy2(sanitized, figout / svg.name)
 
 files = [
     outputs["manuscript_docx"], pdfs[0],
