@@ -1317,3 +1317,39 @@ Next gate: `NMI_P8H_METADATA_BIND_AND_FINAL_EXPORT`.
 No author identity, affiliation, correspondence data, competing-interest declaration or archive identifier is inferred from repository/account data.
 
 No experiment, semantic adjudication, evidence mutation or theory expansion was used for P8 revalidation.
+
+
+## NMI-P8H.1 Public Repository Release Sync
+
+The research repository is now public and the final submission package has been synchronized to that release state.
+
+Public repository:
+
+`https://github.com/yu5-520/reality-bias-benchmark`
+
+Final manuscript source:
+
+- `docs/submission/nmi/NMI_Manuscript_v0.16_PUBLIC.md`
+
+Release-sync changes:
+
+- Data Availability points directly to the public repository;
+- Code Availability points directly to the public repository;
+- obsolete private / controlled-review-access wording is removed;
+- no immutable archive DOI is claimed until a real archival release exists.
+
+Final re-export workflow:
+
+`35564932403` — **SUCCESS**
+
+DOCX and PDF visual QA both passed.
+
+Submission state:
+
+`NMI_P8H_1_PUBLIC_RELEASE_SYNC_COMPLETE_PORTAL_READY`
+
+Next action:
+
+`NMI_PORTAL_UPLOAD`.
+
+No experiment, theory expansion, semantic adjudication or raw-evidence mutation was used for the release sync.
