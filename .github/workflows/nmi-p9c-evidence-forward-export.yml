@@ -1,0 +1,49 @@
+name: NMI P9C Evidence Forward Export
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_Manuscript_v0.18_EVIDENCE_FORWARD_WORKING.md'
+      - 'docs/submission/nmi/NMI_Supplementary_Information_v0.4_EVIDENCE_FORWARD_WORKING.md'
+      - 'docs/submission/nmi/NMI_Cover_Letter_v0.4_FINAL.md'
+      - 'configs/nmi_p9c_figure_source_spec_v1.json'
+      - 'scripts/build_nmi_p9c_submission.py'
+      - '.github/workflows/nmi-p9c-evidence-forward-export.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install document toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc libreoffice
+          python -m pip install --upgrade pip
+          python -m pip install python-docx matplotlib
+      - name: Validate manuscript source
+        run: python scripts/validate_nmi_p9b_manuscript_v1.py
+      - name: Build evidence-forward submission package
+        run: python scripts/build_nmi_p9c_submission.py
+      - name: Upload P9C package
+        uses: actions/upload-artifact@v4
+        with:
+          name: nmi-p9c-evidence-forward-submission
+          path: |
+            dist/nmi_p9c/NMI_Manuscript_Yeyu_Zheng_EVIDENCE_FORWARD.docx
+            dist/nmi_p9c/NMI_Manuscript_Yeyu_Zheng_EVIDENCE_FORWARD.pdf
+            dist/nmi_p9c/NMI_Supplementary_Information_EVIDENCE_FORWARD.docx
+            dist/nmi_p9c/NMI_Supplementary_Information_EVIDENCE_FORWARD.pdf
+            dist/nmi_p9c/NMI_Cover_Letter_Yeyu_Zheng_FINAL.docx
+            dist/nmi_p9c/NMI_Cover_Letter_Yeyu_Zheng_FINAL.pdf
+            dist/nmi_p9c/figures/*.svg
+            dist/nmi_p9c/submission_manifest.json
+            dist/nmi_p9c/NMI_P9C_Submission_Package_Yeyu_Zheng_EVIDENCE_FORWARD.zip
+          if-no-files-found: error
+          retention-days: 30
