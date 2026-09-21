@@ -1,0 +1,24 @@
+name: NMI P9C Final Validate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'configs/nmi_submission_contract_v1.20.json'
+      - 'manifests/nmi_p9c_evidence_forward_final_export_2026-09-21_v1.json'
+      - 'docs/submission/nmi/NMI_P9C_Final_Status_v1.md'
+      - 'scripts/validate_nmi_p9c_final_v1.py'
+      - '.github/workflows/nmi-p9c-final-validate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python scripts/validate_nmi_p9c_final_v1.py
