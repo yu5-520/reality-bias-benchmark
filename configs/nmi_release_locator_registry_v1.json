@@ -1,0 +1,135 @@
+{
+  "schema": "RB-NMI-P6-RELEASE-LOCATOR-REGISTRY-v1",
+  "date": "2026-09-21",
+  "status": "FROZEN_SUBMISSION_LOCATOR_REGISTRY",
+  "rule": "Major manuscript claims route to frozen reports/summaries and, where applicable, canonical per-trajectory records. Repository locators do not expand claim scope.",
+  "canonical_r8_records": {
+    "historical_defective_path": "results/r8_trajectory_first_second_audit_v0_1/trajectory_second_audit_records.jsonl.gz",
+    "historical_git_blob": "2f0b3690c19394425221e0c4a6f75d79ac34464e",
+    "canonical_recovered_path": "results/r8_trajectory_first_second_audit_recovered_v0_2/trajectory_second_audit_records.jsonl.gz",
+    "canonical_git_blob": "bdab2569753a7734c84ce4f203551cbbbafa566c",
+    "compressed_sha256": "d8e51328f23ff6619fef5dce37f5768de319d16c3be0e7b478d27c7b614d9957",
+    "uncompressed_sha256": "f4b1ee053d47fb3fe5b681831acd37469549af0f741660b81e28fb0df54f3e61",
+    "records": 141
+  },
+  "shared_sources": {
+    "r8_canonical_report": "docs/reports/2026-09-20/R8_Trajectory_First_Dynamic_CPR_Semantic_Closure_Report_v1.md",
+    "r8_combined_summary": "results/r8_trajectory_first_second_audit_combined_v0_2/summary.json",
+    "ecommerce_records": "results/r8_ecommerce_discovery_trajectory_first_reaudit_v0_1/trajectory_audit_records.jsonl.gz",
+    "r5_r7_engineering_report": "docs/reports/2026-09-20/R5-R7_Process_Integrity_Engineering_Synthesis_Report_v1.md",
+    "claim_map": "docs/submission/nmi/NMI_P2_Claim_Evidence_Map_v1.md"
+  },
+  "claims": [
+    {
+      "id": "MC1",
+      "role": "endpoint stability does not establish process-reality integrity",
+      "representative": [
+        "v5-xd-software_engineering-fr001-0001",
+        "wave-4-cf726639de1d"
+      ],
+      "routes": [
+        "r8_canonical_report",
+        "r8_combined_summary",
+        "r5_r7_engineering_report"
+      ]
+    },
+    {
+      "id": "MC2-C",
+      "role": "information permission can migrate through transformed descendants",
+      "representative": [
+        "ec-discovery::formal_batch001::2::arena-ecommerce-0002",
+        "wave-3-56ee79f97f54",
+        "wave-4-cf726639de1d"
+      ],
+      "routes": [
+        "ecommerce_records",
+        "canonical_r8_records",
+        "r8_canonical_report"
+      ]
+    },
+    {
+      "id": "MC2-P",
+      "role": "collaboration/execution permission can expand relative to original goal",
+      "representative": [
+        "v5-xd-software_engineering-fr001-0001"
+      ],
+      "routes": [
+        "canonical_r8_records",
+        "r8_combined_summary",
+        "r8_canonical_report"
+      ]
+    },
+    {
+      "id": "MC2-R",
+      "role": "retrospective operations can generate new C/P",
+      "representative": [
+        "arena-ecommerce-0001",
+        "r7:prospective-ecommerce-natural-0001:triad:0001:c3_alr"
+      ],
+      "routes": [
+        "ecommerce_records",
+        "canonical_r8_records",
+        "r8_canonical_report"
+      ]
+    },
+    {
+      "id": "MC2-COUPLING",
+      "role": "supported directional C/P/R coupling",
+      "representative": [
+        "wave-4-cf726639de1d",
+        "r7:prospective-ecommerce-natural-0001:triad:0001:c3_alr",
+        "ec-discovery::formal_batch001::2::arena-ecommerce-0002"
+      ],
+      "routes": [
+        "canonical_r8_records",
+        "ecommerce_records",
+        "r8_combined_summary"
+      ]
+    },
+    {
+      "id": "MC3",
+      "role": "functional semantic influence can persist after lexical carrier change",
+      "routes": [
+        "r8_canonical_report",
+        "canonical_r8_records",
+        "ecommerce_records"
+      ]
+    },
+    {
+      "id": "MC4-MC5",
+      "role": "bounded authority withdrawal localizes downstream dependence while persistence is not automatically System Inertia",
+      "routes": [
+        "r5_r7_engineering_report",
+        "canonical_r8_records"
+      ]
+    },
+    {
+      "id": "MC6-MC8",
+      "role": "lineage-addressed repair can selectively recompute affected descendants while preserving compatible state",
+      "representative": [
+        "wave-4-8b1731b57396",
+        "wave-4-cf726639de1d"
+      ],
+      "routes": [
+        "r5_r7_engineering_report",
+        "canonical_r8_records"
+      ]
+    },
+    {
+      "id": "MC9",
+      "role": "later semantic synthesis consumed frozen trajectories rather than replacing stochastic realizations",
+      "routes": [
+        "claim_map",
+        "r8_canonical_report",
+        "canonical_r8_records"
+      ]
+    }
+  ],
+  "boundaries": {
+    "combined_150_is_prevalence_denominator": false,
+    "cross_model_robustness_established": false,
+    "preregistered_r8_confirmation": false,
+    "universal_repair_superiority": false,
+    "inter_system_empirical_generalization": false
+  }
+}
