@@ -26,7 +26,7 @@ The forward wave-3 retrospective-strengthening candidate remains uncounted and u
 ## Manuscript limits
 
 - Abstract: **145 words**
-- Main text before Methods: **3,386 words**
+- Main text before Methods: **3,389 words**
 - Main figures: **5**
 - References: **12**
 
