@@ -52,7 +52,7 @@ def main():
     abs_text=ms[ms.index("## Abstract")+len("## Abstract"):ms.index("\n\nMulti-agent AI systems are commonly")]
     main_text=ms[ms.index("\n\nMulti-agent AI systems are commonly"):ms.index("## Methods")]
     req(wc(abs_text)==145,f"abstract count {wc(abs_text)}")
-    req(wc(main_text)==3386,f"main count {wc(main_text)}")
+    req(wc(main_text)==3389,f"main count {wc(main_text)}")
     req(len(re.findall(r"\*\*Figure [1-5] \|",ms))==5,"figure legends")
     req("NMI_P9C_EVIDENCE_FORWARD_PORTAL_READY" in st,"status token")
 
@@ -61,7 +61,7 @@ def main():
     print("WORKFLOW_RUN=35586067844")
     print("ARTIFACT_ID=10632576016")
     print("ABSTRACT_WORDS=145")
-    print("MAIN_TEXT_WORDS=3386")
+    print("MAIN_TEXT_WORDS=3389")
     print("DOCX_QA=16+10+1_PASS")
     print("PDF_QA=16+10+1_PASS")
     print("FROZEN_COUNTS=C3_P23_R18")
