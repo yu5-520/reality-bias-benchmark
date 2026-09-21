@@ -1,0 +1,27 @@
+name: NMI P6 Reproducibility Validate
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'results/r8_trajectory_first_second_audit_recovered_v0_2/trajectory_second_audit_records.jsonl.gz'
+      - 'results/r8_trajectory_first_second_audit_v0_1/trajectory_second_audit_records.jsonl.gz'
+      - 'manifests/r8_trajectory_first_second_audit_repository_freeze_2026-09-20_v0_2.json'
+      - 'docs/submission/nmi/NMI_Manuscript_v0.13.md'
+      - 'docs/submission/nmi/NMI_P6_R8_Integrity_Recovery_v1.md'
+      - 'docs/submission/nmi/NMI_P6_Data_Code_Availability_v1.md'
+      - 'docs/submission/nmi/NMI_P6_Final_Status_v1.md'
+      - 'configs/nmi_release_locator_registry_v1.json'
+      - 'configs/nmi_submission_contract_v1.14.json'
+      - 'manifests/nmi_p6_reproducibility_release_2026-09-21_v1.json'
+      - 'scripts/validate_nmi_p6_v1.py'
+      - 'theory/change_notes/CN-R-090_nmi_p6_reproducibility_release_freeze.md'
+      - '.github/workflows/nmi-p6-reproducibility-validate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python scripts/validate_nmi_p6_v1.py
