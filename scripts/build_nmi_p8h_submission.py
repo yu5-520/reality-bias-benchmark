@@ -126,6 +126,13 @@ def add_page_field(paragraph):
 
 def polish(path: Path) -> None:
     doc = Document(str(path))
+    # Pandoc may emit a standalone image-caption paragraph from the image label.
+    # The manuscript already contains the full journal figure legend, so remove
+    # only exact duplicate short labels such as "Figure 1".
+    for p in list(doc.paragraphs):
+        if p.text.strip() in {f"Figure {i}" for i in range(1, 6)}:
+            parent = p._element.getparent()
+            parent.remove(p._element)
     for sec in doc.sections:
         sec.top_margin = Inches(0.8)
         sec.bottom_margin = Inches(0.8)
