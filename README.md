@@ -1261,3 +1261,33 @@ Next gate:
 `NMI_P7_FINAL_EDITORIAL_AND_FORMAT_COMPLIANCE`.
 
 No new subject/provider/evaluator execution or semantic adjudication was used for P6.
+
+
+## NMI-P7 Editorial and Format Compliance
+
+P7 is complete.
+
+Submission-facing package:
+
+- `docs/submission/nmi/NMI_Manuscript_v0.14.md`
+- `docs/submission/nmi/NMI_Cover_Letter_v0.2.md`
+- `docs/submission/nmi/NMI_Supplementary_Information_v0.2.md`
+
+Current editorial counts:
+
+- abstract: 147 / 150 words;
+- main text before Methods: 2,942 / 3,500 words;
+- main figures: 5 / 6;
+- references: 12.
+
+Repository-internal status metadata has been removed from the clean manuscript. Author identity, affiliation, correspondence, declarations and any real public archive identifier remain human-supplied P8 fields and are not guessed.
+
+Submission state:
+
+`NMI_P7_COMPLETE_HANDOFF_TO_P8`
+
+Next gate:
+
+`NMI_P8_PRE_SUBMISSION_REVALIDATION_AND_EXPORT`.
+
+No new subject/provider/evaluator execution, semantic adjudication or evidence mutation was used for P7.
