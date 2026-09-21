@@ -4,6 +4,34 @@ Research repository for the Reality Bias program and first-paper **Process Reali
 
 Historical evidence remains append-only. Forward methods are versioned rather than silently rewriting frozen evidence or preregistration.
 
+## Public frozen raw evidence
+
+Completed raw subject evidence is public and downloadable. Runtime working directories remain ignored only to prevent accidental mutation before a freeze gate.
+
+Public release:
+
+`https://github.com/yu5-520/reality-bias-benchmark/releases/tag/frozen-raw-evidence-v1`
+
+Repository access catalog:
+
+- `evidence/frozen_raw/README.md`
+- `evidence/frozen_raw/release_manifest_v1.json`
+- `evidence/frozen_raw/SHA256SUMS_v1.txt`
+- `evidence/frozen_raw/catalog_v1/`
+
+Current public frozen-raw release: **24 byte-preserved evidence archives** covering discovery history, the held-out natural R2-R4 cohort, canonical R5 batches, R7 raw runs and earlier R2-R6/R5MID/R6D mechanism evidence.
+
+Core evidence rule:
+
+`frozen = public readable/downloadable + SHA-256 locked + append-only versioning`
+
+not:
+
+`frozen = hidden`
+
+The original historical Actions artifact IDs and digests remain in the source registries. Publication verifies downloaded bytes against those frozen digests before exposing them as release assets. Existing release assets are not overwritten; a correction must create a new version.
+
+
 ## Current forward layer
 
 The current forward methodological layer is **Process Reality v5.4**.
