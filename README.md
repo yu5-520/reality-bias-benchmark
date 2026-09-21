@@ -1291,3 +1291,25 @@ Next gate:
 `NMI_P8_PRE_SUBMISSION_REVALIDATION_AND_EXPORT`.
 
 No new subject/provider/evaluator execution, semantic adjudication or evidence mutation was used for P7.
+
+
+## NMI-P8 Pre-Submission Revalidation
+
+P8 live journal-rule revalidation is complete.
+
+The current Nature Machine Intelligence Article limits remain compatible with the frozen manuscript:
+
+- abstract: 147 / 150 words;
+- main text before Methods: 2,942 / 3,500 words;
+- main figures: 5 / 6;
+- references: 12.
+
+Current submission state:
+
+`NMI_P8_REVALIDATION_COMPLETE_AWAITING_HUMAN_METADATA`
+
+Final portal-ready export is intentionally blocked until the author supplies verified submission metadata and selects standard vs double-anonymized peer review.
+
+No author identity, affiliation, correspondence data, competing-interest declaration or archive identifier is inferred from repository/account data.
+
+No experiment, semantic adjudication, evidence mutation or theory expansion was used for P8 revalidation.
