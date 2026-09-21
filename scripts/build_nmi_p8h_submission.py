@@ -13,7 +13,7 @@ TMP = OUT / "_tmp"
 OUT.mkdir(parents=True, exist_ok=True)
 TMP.mkdir(parents=True, exist_ok=True)
 
-MANUSCRIPT = ROOT / "docs/submission/nmi/NMI_Manuscript_v0.15_STANDARD.md"
+MANUSCRIPT = ROOT / "docs/submission/nmi/NMI_Manuscript_v0.16_PUBLIC.md"
 SUPPLEMENT = ROOT / "docs/submission/nmi/NMI_Supplementary_Information_v0.3.md"
 COVER = ROOT / "docs/submission/nmi/NMI_Cover_Letter_v0.4_FINAL.md"
 FIGDIR = ROOT / "docs/submission/nmi/figures/p5"
