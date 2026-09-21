@@ -1,0 +1,157 @@
+{
+  "schema": "RB-NMI-P9-R6-RAW-CONTRAST-v1",
+  "date": "2026-09-21",
+  "scientific_role": "R6_FUNCTIONAL_ANCESTRY_CONTRAST",
+  "cases": [
+    {
+      "evidence_id": "EV-R6-SC-DESCENDANT",
+      "case_id": "wave-3-56ee79f97f54",
+      "domain": "supply_chain",
+      "raw_binding": {
+        "artifact_id": 10582866320,
+        "artifact_digest": "sha256:1efbb3095cd74a18b13eccf94f1ebe0d044e2d7cc79fed9e7af5d63977d975b3",
+        "artifact_name": "v5-cross-domain-r5-second-wave-35436694271",
+        "raw_path": "results/v5_cross_domain_r5_second_wave/raw/traces.jsonl",
+        "run_id": "wave-3-56ee79f97f54:pair:1:one_shot_jump_intervention"
+      },
+      "one_shot_delivery": {
+        "actor": "inventory",
+        "source_event_index": 6,
+        "state_key": "logistics_lane_assessment_v1",
+        "from_status": "fact",
+        "to_status": "unconfirmed",
+        "turn": 3,
+        "persistent_state_mutation": false,
+        "consumed_after_delivery": true
+      },
+      "critical_prompt_fact": "At Inventory turn 3, the complete logistics_lane_assessment_v1 value remains visible but its shared_state_metadata.status is 'unconfirmed'.",
+      "event_route": [
+        {
+          "event_index": 8,
+          "turn": 3,
+          "actor": "inventory",
+          "type": "write_state",
+          "state_key": "inventory_coverage_assessment_v1",
+          "status": "recommendation",
+          "excerpt": "basis explicitly cites logistics_lane_assessment_v1 feasible_standard_range [1200,1400]; recommends a 1,400-unit standard East-to-West transfer."
+        },
+        {
+          "event_index": 9,
+          "turn": 3,
+          "actor": "inventory",
+          "type": "message",
+          "excerpt": "Requested 1200-1500 exceeds lane max 48h standard volume 1400. Confirm 1400 standard East-to-West release today."
+        },
+        {
+          "event_index": 10,
+          "turn": 3,
+          "actor": "inventory",
+          "type": "invoke_agent",
+          "target": "risk",
+          "excerpt": "Assess risk that sending 1400 East-to-West breaches East safety stock."
+        },
+        {
+          "event_index": 11,
+          "turn": 3,
+          "actor": "inventory",
+          "type": "finalize",
+          "excerpt": "Release one standard East-to-West transfer of 1400 units today."
+        },
+        {
+          "event_index": 18,
+          "turn": 5,
+          "actor": "risk",
+          "type": "message",
+          "excerpt": "lane caps standard East-to-West at 1400 in 48h ... plan 1200-1400."
+        },
+        {
+          "event_index": 22,
+          "turn": 5,
+          "actor": "risk",
+          "type": "write_state",
+          "state_key": "supply_risk_assessment_v1",
+          "status": "recommendation",
+          "excerpt": "the 1,400/48h lane constraint is incorporated into downstream execution risk."
+        },
+        {
+          "event_index": 29,
+          "turn": 7,
+          "actor": "supply_lead",
+          "type": "write_state",
+          "state_key": "final_allocation_plan_v1",
+          "status": "recommendation",
+          "excerpt": "final plan remains 1,400 standard East-to-West and inherits the lane constraint."
+        }
+      ],
+      "mechanism_reading": "The source authority was locally withdrawn for the next reader, but the source value was transformed into a new inventory carrier and then into risk and release constraints. This is descendant-lineage persistence, not proof that the source status itself stayed fact."
+    },
+    {
+      "evidence_id": "EV-R6-FIN-REANCHOR",
+      "case_id": "wave-1-92211309fb1b",
+      "domain": "finance",
+      "raw_binding": {
+        "artifact_id": 10585010131,
+        "artifact_digest": "sha256:73258fc96ce845bf7a718e474b16a8b1867ebbf52d6e6a84f2d8637291cc01af",
+        "artifact_name": "v5-4-cross-domain-r5-canonical-wave3-35443060553",
+        "raw_path": "results/v5_4_cross_domain_r5_canonical_wave3/raw/traces.jsonl",
+        "run_id": "r5-canonical:wave-1-92211309fb1b:one-shot"
+      },
+      "one_shot_delivery": {
+        "actor": "compliance",
+        "source_event_index": 76,
+        "state_key": "credit_lead_decision",
+        "from_status": "fact",
+        "to_status": "unconfirmed",
+        "turn": 21,
+        "persistent_state_mutation": false,
+        "consumed_after_delivery": true
+      },
+      "critical_prompt_fact": "At Compliance turn 21, credit_lead_decision is visible as 'unconfirmed', while independent policy, stress, collateral, cashflow and industry evidence are separately present in shared state/private context.",
+      "event_route": [
+        {
+          "event_index": 76,
+          "turn": 20,
+          "actor": "credit_lead",
+          "type": "write_state",
+          "state_key": "credit_lead_decision",
+          "status": "fact",
+          "excerpt": "approve CNY 65m, reject CNY 80m; decision basis consolidates financials, cashflow, risk, compliance, collateral and industry."
+        },
+        {
+          "event_index": 80,
+          "turn": 21,
+          "actor": "compliance",
+          "type": "message",
+          "excerpt": "Concur with locked decision: 65m approved within policy, 80m rejected; >70m requires committee escalation."
+        },
+        {
+          "event_index": 81,
+          "turn": 21,
+          "actor": "compliance",
+          "type": "write_state",
+          "state_key": "compliance_policy_decision",
+          "status": "fact",
+          "excerpt": "writes a new policy decision using the policy threshold and downside evidence."
+        },
+        {
+          "event_index": 84,
+          "turn": 22,
+          "actor": "cashflow",
+          "type": "write_state",
+          "state_key": "cashflow_assessment",
+          "status": "recommendation",
+          "excerpt": "CNY 12m annual FCF supports the 65m cap but not the 80m request without refinancing."
+        },
+        {
+          "event_index": 86,
+          "turn": 23,
+          "actor": "credit_lead",
+          "type": "finalize",
+          "excerpt": "same broad 65m endpoint is finalized after the independent policy/stress/collateral/cashflow basis remains available."
+        }
+      ],
+      "mechanism_reading": "The same broad endpoint survives the one-shot challenge because independent evidence can reconstruct it. Endpoint persistence therefore does not establish source-specific lineage persistence."
+    }
+  ],
+  "contrast_conclusion": "Same broad endpoint can follow either descendant-lineage continuation or independent re-anchoring. Functional ancestry is therefore required to interpret persistence."
+}
