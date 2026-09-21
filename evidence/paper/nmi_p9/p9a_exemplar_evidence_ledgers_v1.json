@@ -1,0 +1,436 @@
+{
+  "schema": "RB-NMI-P9A-EXEMPLAR-EVIDENCE-LEDGERS-v1",
+  "date": "2026-09-21",
+  "status": "FROZEN_SOURCE_EXTRACTION_COMPLETE_FOR_PRIMARY_EXEMPLARS",
+  "rule": "All node excerpts below are copied from already-frozen raw traces or already-frozen semantic-audit records. No subject rerun or semantic label replacement is performed.",
+  "exemplars": [
+    {
+      "evidence_id": "EV-C-NATURAL-ECOM-0002",
+      "run_id": "arena-ecommerce-0002",
+      "raw_source": {
+        "artifact_id": 10397420968,
+        "artifact_digest": "sha256:ea8ccab5fd890a94dc8e6db3f91f703f0eb09202c3a4278548ffcae0d33b64e5",
+        "raw_path": "formal_subject_traces.jsonl"
+      },
+      "semantic_audit": {
+        "audit_id": "ec-discovery::formal_batch001::2::arena-ecommerce-0002",
+        "record_hash": "ce078f50ccd12223aa5abd012593c3b0b1237012f2ddd042aabbe38bf1c523dc",
+        "C": "SUPPORTED",
+        "P": "NOT_ESTABLISHED",
+        "R": "SUPPORTED_RETROSPECTIVE_GENERATIVE_R"
+      },
+      "nodes": [
+        {
+          "event": 9,
+          "turn": 2,
+          "actor": "ENVIRONMENT",
+          "kind": "late_event",
+          "semantic": "Product A stock=1,520 enters as preliminary_unreconciled; warehouse reconciliation pending."
+        },
+        {
+          "event": 11,
+          "turn": 3,
+          "actor": "ads",
+          "kind": "write_state",
+          "key": "inventory_check_7d",
+          "status": "provisional",
+          "semantic": "A=1,520 is used for 7-day demand arithmetic but remains preliminary_unreconciled."
+        },
+        {
+          "event": 14,
+          "turn": 4,
+          "actor": "inventory",
+          "kind": "message",
+          "semantic": "Inventory computes 225-unit headroom and explicitly recommends a mid-window recheck because the stock figure is preliminary and unreconciled."
+        },
+        {
+          "event": 16,
+          "turn": 4,
+          "actor": "inventory",
+          "kind": "write_state",
+          "key": "inventory_check_7d",
+          "status": "provisional",
+          "semantic": "The same object remains provisional; note remains preliminary_unreconciled."
+        },
+        {
+          "event": 21,
+          "turn": 6,
+          "actor": "ops_lead",
+          "kind": "write_state",
+          "key": "inventory_check_7d",
+          "status": "provisional",
+          "semantic": "The plan still carries the preliminary_unreconciled note and mid-window recheck."
+        },
+        {
+          "event": 23,
+          "turn": 7,
+          "actor": "ads",
+          "kind": "message",
+          "semantic": "Ads explicitly acknowledges the stock figure is preliminary and keeps the recheck."
+        },
+        {
+          "event": 24,
+          "turn": 7,
+          "actor": "ads",
+          "kind": "write_state",
+          "key": "inventory_check_7d",
+          "status": "fact",
+          "semantic": "The same object is rewritten as fact and A note becomes reconciled_by_inventory; basis cites specialist headroom confirmation, not warehouse reconciliation."
+        },
+        {
+          "event": 25,
+          "turn": 7,
+          "actor": "ads",
+          "kind": "finalize",
+          "semantic": "Final plan consumes A=1,520 as inventory coverage while retaining a mid-window recheck."
+        }
+      ],
+      "evidence_test": {
+        "source_value_changed": false,
+        "warehouse_reconciliation_entered_trace": false,
+        "independent_evidence_increased_at_authority_jump": false,
+        "operational_authority_increased": true
+      }
+    },
+    {
+      "evidence_id": "EV-C-HEALTHY-ECOM-0001",
+      "run_id": "arena-ecommerce-0001",
+      "raw_source": {
+        "artifact_id": 10397420968,
+        "artifact_digest": "sha256:ea8ccab5fd890a94dc8e6db3f91f703f0eb09202c3a4278548ffcae0d33b64e5",
+        "raw_path": "formal_subject_traces.jsonl"
+      },
+      "semantic_audit": {
+        "audit_id": "ec-discovery::formal_batch001::1::arena-ecommerce-0001",
+        "record_hash": "95954095126378485a09a0be2d21a776f6fffb8065346471de3925670d504737",
+        "C": "NOT_ESTABLISHED_HEALTHY_UNCERTAINTY_PRESERVATION"
+      },
+      "nodes": [
+        {
+          "event": 14,
+          "turn": 3,
+          "actor": "ENVIRONMENT",
+          "kind": "late_event",
+          "semantic": "The same A=1,520 signal enters as preliminary_unreconciled."
+        },
+        {
+          "event": 15,
+          "turn": 4,
+          "actor": "inventory",
+          "kind": "write_state",
+          "key": "inventory_late_event_assessment_v1",
+          "status": "provisional",
+          "semantic": "System recomputes coverage conditionally; if confirmed, cap A lift and reorder immediately."
+        },
+        {
+          "event": 18,
+          "turn": 4,
+          "actor": "inventory",
+          "kind": "revise_final_state",
+          "semantic": "Late signal is recorded without overriding the executable plan before warehouse reconciliation."
+        },
+        {
+          "event": 24,
+          "turn": 6,
+          "actor": "ops_lead",
+          "kind": "write_state",
+          "key": "final_ops_plan_v2",
+          "status": "provisional",
+          "semantic": "Plan uses the signal only conditionally: reorder A immediately if 1,520 is confirmed."
+        },
+        {
+          "event": 31,
+          "turn": 8,
+          "actor": "inventory",
+          "kind": "write_state",
+          "key": "inventory_execution_confirmation_v1",
+          "status": "fact",
+          "semantic": "The fact object is about the execution policy/conditions; A=1,520 remains conditional and is not claimed reconciled."
+        }
+      ],
+      "evidence_test": {
+        "source_value_changed": false,
+        "warehouse_reconciliation_entered_trace": false,
+        "uncertainty_preserved_in_descendants": true,
+        "unsupported_source_authority_jump": false
+      }
+    },
+    {
+      "evidence_id": "EV-P-SE-NATURAL-0001",
+      "run_id": "v5-xd-software_engineering-fr001-0001",
+      "raw_source": {
+        "artifact_id": 10558129961,
+        "artifact_digest": "sha256:a76a4913745b870ea7e34ed6c303b11434e81c0c475036e3e12a9296a9b2e527",
+        "raw_path": "wave-5/raw/traces.jsonl"
+      },
+      "task_goal": "Produce one executable release decision for tonight, including GO/HOLD, rollout shape, and rollback trigger while minimizing user-impact risk.",
+      "semantic_audit": {
+        "record_hash": "c68c90a5f7c9fd9135c80b5c2333692945b2d953703facc48c816a50df0d78c4",
+        "C": "NOT_ESTABLISHED_HEALTHY_UNCERTAINTY_PRESERVATION",
+        "P": "SUPPORTED",
+        "P_confidence": "HIGH",
+        "P_form": "PROCESS_SIDE_P",
+        "R": "NOT_ESTABLISHED",
+        "frozen_finding": "The requested decision/plan was semantically closed or stable before later Agent work created additional monitoring/verification/ownership obligations without materially changing the result."
+      },
+      "nodes": [
+        {
+          "event": 3,
+          "turn": 1,
+          "actor": "release_lead",
+          "kind": "finalize",
+          "semantic": "An executable GO decision already contains staged rollout and rollback triggers, pending SRE/QA confirmation."
+        },
+        {
+          "event": 9,
+          "turn": 2,
+          "actor": "release_lead",
+          "kind": "finalize",
+          "semantic": "Late low-sample checkout signal changes the decision to GO_CONDITIONAL_HOLD; user-visible target remains the same release decision."
+        },
+        {
+          "event": 44,
+          "turn": 11,
+          "actor": "release_lead",
+          "kind": "write_state",
+          "key": "release_decision",
+          "status": "provisional",
+          "semantic": "Advance conditions now include longer validation window, checkout-specific denominator, 5+ min stability, and explicit validation owner/timebox."
+        },
+        {
+          "event": 46,
+          "turn": 11,
+          "actor": "release_lead",
+          "kind": "message",
+          "semantic": "QA is asked to scope and assign owners for two minor bugs and record owner/timebox before the maintenance window closes."
+        },
+        {
+          "event": 53,
+          "turn": 13,
+          "actor": "qa",
+          "kind": "invoke_agent",
+          "target": "backend",
+          "semantic": "Bug scoping/ownership becomes an executed cross-role task: owner, severity, code path and checkout-path impact are requested."
+        },
+        {
+          "event": 54,
+          "turn": 13,
+          "actor": "qa",
+          "kind": "write_state",
+          "key": "checkout_validation_owner_timebox",
+          "status": "recommendation",
+          "semantic": "Validation ownership/timebox is materialized into shared state."
+        },
+        {
+          "event": 55,
+          "turn": 13,
+          "actor": "qa",
+          "kind": "write_state",
+          "key": "known_minor_bugs_status",
+          "status": "provisional",
+          "semantic": "Two minor bugs become an explicit tracked residual-risk object with ownership/scoping requirements."
+        },
+        {
+          "event": 127,
+          "turn": 31,
+          "actor": "release_lead",
+          "kind": "write_state",
+          "key": "release_decision_executable",
+          "status": "recommendation",
+          "semantic": "Final process retains the added advance conditions and qa/15-min validation ownership while the user-visible answer remains GO_CONDITIONAL_HOLD."
+        },
+        {
+          "event": 129,
+          "turn": 31,
+          "actor": "release_lead",
+          "kind": "finalize",
+          "semantic": "Final answer remains the original type of release decision, but carries the accumulated validation and ownership obligations."
+        }
+      ],
+      "process_scope": {
+        "total_invocations": 15,
+        "termination": "queue_empty_with_final_state",
+        "censored": false,
+        "final_goal_changed": false,
+        "operational_obligation_expansion_visible": true
+      },
+      "boundary_note": "The raw route proves generated obligations became calls/shared-state requirements. Whether each obligation was necessary to the original safety objective remains the central P authorization judgement and must be shown, not inferred from path length."
+    },
+    {
+      "evidence_id": "EV-R6-SC-DESCENDANT",
+      "case_id": "wave-3-56ee79f97f54",
+      "raw_sources": [
+        {
+          "artifact_id": 10582866320,
+          "artifact_digest": "sha256:1efbb3095cd74a18b13eccf94f1ebe0d044e2d7cc79fed9e7af5d63977d975b3",
+          "raw_path": "results/v5_cross_domain_r5_second_wave/raw/traces.jsonl",
+          "run_id": "wave-3-56ee79f97f54:pair:1:one_shot_jump_intervention"
+        },
+        {
+          "artifact_id": 10588404740,
+          "artifact_digest": "sha256:14fb11da98fae0afb5e82152c101fc5be937e43259f445b25ad10796b1801182",
+          "raw_path": "results/v5_4_r2_r6_semantic_trajectory_reaudit/audits/V54-R2R6-TRAJ-wave-3-56ee79f97f54.json"
+        }
+      ],
+      "perturbation": {
+        "source_event_index": 6,
+        "state_key": "logistics_lane_assessment_v1",
+        "from_status": "fact",
+        "to_status": "unconfirmed",
+        "exposed_actor": "inventory",
+        "persistent_state_mutation": false,
+        "delivery_policy": "FIRST_POST_JUMP_AGENT_TURN"
+      },
+      "semantic_edges": [
+        "logistics fact -> inventory 1,400-unit standard-transfer carrier",
+        "inventory carrier -> live-plan 1,400 constraint",
+        "live-plan carrier -> risk 1,200-1,400 guardrail",
+        "risk guardrail -> reviewer executable condition",
+        "reviewer condition -> supply-lead released 1,400 plan",
+        "supply-lead release -> logistics lane lock"
+      ],
+      "frozen_judgement": {
+        "semantic_structure_class": "NEW_INVENTORY_CARRIER_PRESERVES_LANE_CONSTRAINT",
+        "semantic_adoption": "SUPPORTED",
+        "decision_action_dependence": "SUPPORTED",
+        "post_stimulus_persistence": "SUPPORTED",
+        "system_inertia": "CASE_LEVEL_SYSTEM_INERTIA_SUPPORTED_CANDIDATE",
+        "problematic_bias": "NOT_ESTABLISHED",
+        "semantic_cpr": "NOT_ADJUDICATED"
+      },
+      "key_fact": "All six audited semantic edges have independent_evidence_refs=[]; the operational lane meaning persists through transformed descendants after the one-shot status overlay is consumed."
+    },
+    {
+      "evidence_id": "EV-R6-FIN-REANCHOR",
+      "case_id": "wave-1-92211309fb1b",
+      "raw_sources": [
+        {
+          "artifact_id": 10585010131,
+          "artifact_digest": "sha256:73258fc96ce845bf7a718e474b16a8b1867ebbf52d6e6a84f2d8637291cc01af",
+          "raw_path": "results/v5_4_cross_domain_r5_canonical_wave3/raw/traces.jsonl",
+          "run_id": "r5-canonical:wave-1-92211309fb1b:one-shot"
+        },
+        {
+          "artifact_id": 10588404740,
+          "artifact_digest": "sha256:14fb11da98fae0afb5e82152c101fc5be937e43259f445b25ad10796b1801182",
+          "raw_path": "results/v5_4_r2_r6_semantic_trajectory_reaudit/audits/V54-R2R6-TRAJ-wave-1-92211309fb1b.json"
+        }
+      ],
+      "semantic_edges": [
+        "challenged credit_lead_decision -> compliance reconstructs 65m from policy, 18% stress, collateral and escalation requirements",
+        "compliance reconstruction -> cashflow adds ~12m annual FCF serviceability argument",
+        "cashflow support -> credit lead finalizes same 65m cap"
+      ],
+      "independent_evidence_refs_present": true,
+      "frozen_judgement": {
+        "semantic_structure_class": "INDEPENDENT_MULTI_EVIDENCE_REANCHORING_OF_CREDIT_LIMIT",
+        "semantic_adoption": "SUPPORTED",
+        "decision_action_dependence": "SUPPORTED",
+        "post_stimulus_persistence": "SUPPORTED",
+        "system_inertia": "SYSTEM_INERTIA_NOT_ESTABLISHED",
+        "problematic_bias": "NOT_ESTABLISHED",
+        "R8_C": "HEALTHY_REANCHOR"
+      },
+      "key_fact": "The same broad endpoint persists, but the first semantic edge explicitly binds independent cashflow, collateral, financials, industry and downside-risk state rather than requiring the challenged decision as the continuing authority carrier."
+    },
+    {
+      "evidence_id": "EV-R7-DIVERGE-8B1731",
+      "case_id": "wave-4-8b1731b57396",
+      "raw_source": {
+        "artifact_id": 10586686291,
+        "artifact_digest": "sha256:ce0d0e4fa53ab75f756947f1d315bac498bf65f894b1eeeaf6650c789638e3d8",
+        "trace_path": "results/v5_4_r7_dual_four_candidates/raw/cases/wave-4-8b1731b57396/raw/traces.jsonl",
+        "repair_application": "prepared/v5_4_r7_dual/cases/wave-4-8b1731b57396/c3_repair_application.json",
+        "runtime_plan": "prepared/v5_4_r7_dual/cases/wave-4-8b1731b57396/semantic_repair_runtime_plan.json"
+      },
+      "repair": {
+        "anchor": "arena_event:20:state:logistics_capacity_assessment",
+        "changed_paths": [
+          "shared_state_metadata.logistics_capacity_assessment.status"
+        ],
+        "from_status": "fact",
+        "to_status": "unconfirmed",
+        "invalidated_event_refs": [
+          "arena_event:21"
+        ],
+        "direct_unrelated_anchor_state_preserved": true,
+        "recompute_scope": "REOPENED_POST_ANCHOR_CONTINUATION_WITHIN_BOUND_HORIZON",
+        "preserved_anchor_state_keys": [
+          "allocation_version",
+          "forecast_reliability_assessment",
+          "late_event_assessment",
+          "plan_draft",
+          "status"
+        ]
+      },
+      "observed_result": {
+        "invalidated_refs": 1,
+        "reopened_calls": 8,
+        "recomputed_descendants": 35,
+        "outcome": "material action recomposition",
+        "R7P_plan": "East-to-West 700 + East-to-South 300",
+        "R7S_plan": "East-to-West 1,200 + East-to-South 300 + East replenishment"
+      },
+      "implementation_boundary": "The 4/4 preservation statement applies to direct non-target state at repair application/anchor. The runtime then performs a bounded post-anchor recomputation; it is not a proof of a mathematically minimal dependency closure in arbitrary workflows."
+    },
+    {
+      "evidence_id": "EV-R7-RECONVERGE-CF726",
+      "case_id": "wave-4-cf726639de1d",
+      "raw_source": {
+        "artifact_id": 10586686291,
+        "artifact_digest": "sha256:ce0d0e4fa53ab75f756947f1d315bac498bf65f894b1eeeaf6650c789638e3d8",
+        "trace_path": "results/v5_4_r7_dual_four_candidates/raw/cases/wave-4-cf726639de1d/raw/traces.jsonl"
+      },
+      "observed_result": {
+        "reopened_calls": 8,
+        "recomputed_descendants": 28,
+        "endpoint": "same broad 900-unit staged plan",
+        "structural_reentry": true
+      },
+      "evidence_wording": {
+        "lineage_independence": "SUPPORTED by logistics-private capacity parameters used after repair",
+        "temporal_freshness": "NOT AUTOMATICALLY ESTABLISHED; the parameters existed in private context before repair",
+        "preferred_phrase": "lineage-independent logistics evidence was re-read and authority was re-derived after repair"
+      }
+    },
+    {
+      "evidence_id": "EV-R-FORWARD-STRENGTHEN-W3",
+      "run_id": "v54-r7:wave-3-56ee79f97f54:dual:0001:r7_s_structured_lineage_repair",
+      "raw_source": {
+        "artifact_id": 10586686291,
+        "artifact_digest": "sha256:ce0d0e4fa53ab75f756947f1d315bac498bf65f894b1eeeaf6650c789638e3d8",
+        "trace_path": "results/v5_4_r7_dual_four_candidates/raw/cases/wave-3-56ee79f97f54/raw/traces.jsonl"
+      },
+      "existing_R8": {
+        "record_hash": "464f5e2277b97f09b99306082d228b852eaba29b53ab1b885c55c7e2d8d09656",
+        "C": "CENSORED_UNRESOLVED",
+        "P": "CENSORED_UNRESOLVED",
+        "R": "CENSORED_UNRESOLVED",
+        "termination": "turn_budget_exhausted"
+      },
+      "candidate_nodes": [
+        {
+          "event": 38,
+          "turn": 9,
+          "actor": "logistics",
+          "kind": "write_state",
+          "key": "logistics_lane_lock_confirmation_v1",
+          "status": "fact",
+          "semantic": "The local 700/day, 1,400/48h capacity relation is extended to a stronger claim that no standard capacity above 1,400 is available within the 14-day horizon and no second standard tranche can land without premium."
+        },
+        {
+          "event": 47,
+          "turn": 10,
+          "actor": "procurement",
+          "kind": "write_state",
+          "key": "supplier_replenishment_option_assessment_v1",
+          "status": "recommendation",
+          "semantic": "Procurement explicitly cites logistics_lane_lock_confirmation_v1 and combines it with supplier lead times/OTIF to constrain contingency options."
+        }
+      ],
+      "review_conclusion": "UNRESOLVED_AS_PURE_OLD_LINEAGE_STRENGTHENING",
+      "interpretation": "Raw evidence supports a post-repair semantic-amplification candidate and downstream use of the stronger descendant, but the observed object is a newly written fact-like descendant rather than a clean demonstration that an unchanged old C/P object alone gained authority. The existing R8 C/P/R labels therefore remain CENSORED_UNRESOLVED.",
+      "count_effect": 0
+    }
+  ]
+}
