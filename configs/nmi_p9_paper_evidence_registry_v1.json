@@ -1,0 +1,292 @@
+{
+  "schema": "RB-NMI-P9-PAPER-EVIDENCE-REGISTRY-v1",
+  "date": "2026-09-21",
+  "status": "ACTIVE_SEED_REGISTRY",
+  "rule": "Paper-facing evidence is extracted from frozen raw traces first; reports and R8 adjudications are secondary navigation and interpretation layers.",
+  "required_fields": [
+    "evidence_id",
+    "scientific_role",
+    "run_id",
+    "domain",
+    "raw_artifact_id",
+    "raw_path",
+    "event_refs",
+    "source_state",
+    "semantic_before",
+    "semantic_after",
+    "permission_delta",
+    "independent_evidence_status",
+    "lineage_support_status",
+    "downstream_adoption",
+    "operational_consequence",
+    "audit_locator",
+    "paper_destination",
+    "verification_status"
+  ],
+  "entries": [
+    {
+      "evidence_id": "EV-C-NATURAL-ECOM-0002",
+      "scientific_role": "NATURAL_DYNAMIC_C_POSITIVE",
+      "run_id": "arena-ecommerce-0002",
+      "domain": "ecommerce",
+      "raw_artifact_id": 10397420968,
+      "raw_path": "formal_subject_traces.jsonl",
+      "event_refs": [
+        9,
+        11,
+        16,
+        21,
+        23,
+        24,
+        25
+      ],
+      "source_state": "Product A stock=1,520; preliminary_unreconciled; warehouse reconciliation pending",
+      "semantic_before": "The value may be used conditionally for planning but remains unreconciled.",
+      "semantic_after": "The same inventory object is rewritten as fact with note reconciled_by_inventory and is consumed by the final plan.",
+      "permission_delta": "epistemic/operational authority increases while the value remains unchanged",
+      "independent_evidence_status": "NO_NEW_WAREHOUSE_RECONCILIATION_VISIBLE_IN_VERIFIED_EVENT_CHAIN",
+      "lineage_support_status": "SPECIALIST_CALCULATION_AND_PLAN_USE_ACCUMULATE_AROUND_SAME_ROOT",
+      "downstream_adoption": "Event 25 final plan consumes inventory_check_7d after Event 24 fact write.",
+      "operational_consequence": "Inventory headroom and plan executability are treated as settled enough to ship the plan.",
+      "audit_locator": "ec-discovery::formal_batch001::2::arena-ecommerce-0002",
+      "paper_destination": [
+        "Figure 1 positive path",
+        "Results 1 natural emergence",
+        "SI exemplar ledger"
+      ],
+      "verification_status": "RAW_EVENT_CHAIN_VERIFIED"
+    },
+    {
+      "evidence_id": "EV-C-HEALTHY-ECOM-0001",
+      "scientific_role": "HEALTHY_UNCERTAINTY_PRESERVING_COMPARATOR",
+      "run_id": "arena-ecommerce-0001",
+      "domain": "ecommerce",
+      "raw_artifact_id": 10397420968,
+      "raw_path": "formal_subject_traces.jsonl",
+      "event_refs": [
+        14,
+        15,
+        16,
+        18,
+        24,
+        26,
+        29,
+        31,
+        32,
+        33
+      ],
+      "source_state": "Product A stock=1,520; preliminary_unreconciled.",
+      "semantic_before": "Late stock signal is explicitly uncertain.",
+      "semantic_after": "Planning uses conditional if-confirmed branches and keeps the unreconciled qualifier attached through the final plan.",
+      "permission_delta": "NO_UNSUPPORTED_AUTHORITY_PROMOTION_IN_VERIFIED_ROUTE",
+      "independent_evidence_status": "NO_WAREHOUSE_CONFIRMATION_ADDED",
+      "lineage_support_status": "CONDITIONAL_DESCENDANTS_PRESERVE_UNCERTAINTY",
+      "downstream_adoption": "Final plan uses the 1,520 scenario conditionally and preserves if-confirmed language.",
+      "operational_consequence": "The system adapts guardrails without laundering the signal into a confirmed fact.",
+      "audit_locator": "e-commerce formal discovery healthy comparator route",
+      "paper_destination": [
+        "Figure 1 healthy path",
+        "Results 1 comparator",
+        "SI exemplar ledger"
+      ],
+      "verification_status": "RAW_EVENT_CHAIN_VERIFIED"
+    },
+    {
+      "evidence_id": "EV-P-SE-NATURAL-0001",
+      "scientific_role": "NATURAL_DYNAMIC_P_EXEMPLAR",
+      "run_id": "v5-xd-software_engineering-fr001-0001",
+      "domain": "software_engineering",
+      "raw_artifact_id": 10558129961,
+      "raw_path": "wave-5/raw/traces.jsonl",
+      "task_source": "arena/domains/software_engineering.json",
+      "original_goal": "Produce one executable release decision for tonight, including GO/HOLD, rollout shape, and rollback trigger while minimizing user-impact risk.",
+      "event_refs": [
+        0,
+        1,
+        3,
+        4,
+        14,
+        15,
+        16,
+        17,
+        18,
+        25,
+        26,
+        44,
+        45,
+        46,
+        127,
+        128,
+        129
+      ],
+      "source_state": "A release decision is repeatedly available as GO_CONDITIONAL_HOLD.",
+      "semantic_before": "Validate the provisional checkout signal and provide the executable release decision.",
+      "semantic_after": "The process accumulates longer-window validation, checkout-specific denominator, reviewer checks, bug scoping/ownership, explicit validation owner and timebox, and repeated gating obligations.",
+      "permission_delta": "system-generated supporting requirements become operational advance conditions and cross-role obligations while the user-visible target remains a release decision",
+      "independent_evidence_status": "MIXED; some validation requests seek independent telemetry, while ownership/reviewer/completeness obligations require authorization-level review",
+      "lineage_support_status": "MULTIPLE_ROLES_REUSE_AND_STABILIZE_GENERATED_ADVANCE_CONDITIONS",
+      "downstream_adoption": "Advance conditions are repeatedly written into shared state and the final release decision.",
+      "operational_consequence": "The final answer remains a release decision, but the realized process scope and required preconditions expand.",
+      "audit_locator": "R8 trajectory-first held-out natural P-supported set; exact per-trajectory record to bind during P9A",
+      "paper_destination": [
+        "Figure 2",
+        "Results 2 goal-preserving process expansion",
+        "SI P boundary table"
+      ],
+      "verification_status": "RAW_ROUTE_VERIFIED_SEMANTIC_BOUNDARY_RECHECK_REQUIRED"
+    },
+    {
+      "evidence_id": "EV-R6-SC-DESCENDANT",
+      "scientific_role": "R6_DESCENDANT_LINEAGE_POSITIVE_CONTRAST",
+      "run_id": "wave-3-56ee79f97f54",
+      "domain": "supply_chain",
+      "raw_artifact_id": 10558968954,
+      "raw_path": "wave-3/raw/traces.jsonl",
+      "event_refs": [
+        "source logistics_lane_assessment_v1",
+        "R5 one-shot reader exposure",
+        "inventory descendant carrier",
+        "risk guardrail",
+        "release constraint"
+      ],
+      "source_state": "logistics lane fact supports 1,200-1,400 standard and >1,400 premium requirement",
+      "semantic_before": "Source authority is challenged once.",
+      "semantic_after": "A new inventory carrier operationalizes the same lane constraint and downstream risk/review/release continue from the descendant.",
+      "permission_delta": "source wording/authority is no longer the only carrier; functional constraint persists through semantic descendants",
+      "independent_evidence_status": "NO_EQUIVALENT_NEW_INDEPENDENT_LANE_EVIDENCE_IDENTIFIED_IN_R6_REPORT_ROUTE",
+      "lineage_support_status": "DESCENDANT_INHERITANCE",
+      "downstream_adoption": "inventory -> risk -> reviewer -> supply_lead/logistics route",
+      "operational_consequence": "1,400 standard lane constraint remains decision-effective after the direct one-shot stimulus is gone.",
+      "audit_locator": "docs/reports/2026-09-20/R6_System_Inertia_Identification_Report_v1.md",
+      "paper_destination": [
+        "Figure 3 positive lineage path",
+        "Results 4 mechanism discovery",
+        "SI R6 route ledger"
+      ],
+      "verification_status": "REPORT_BOUND_RAW_ROUTE_EXTRACTION_REQUIRED"
+    },
+    {
+      "evidence_id": "EV-R6-FIN-REANCHOR",
+      "scientific_role": "R6_INDEPENDENT_REANCHOR_NEGATIVE_CONTRAST",
+      "run_id": "wave-1-92211309fb1b",
+      "domain": "finance",
+      "raw_artifact_id": 10558039019,
+      "raw_path": "wave-1/raw/traces.jsonl",
+      "event_refs": [
+        19,
+        20,
+        21,
+        22
+      ],
+      "source_state": "credit_lead_decision fact: approve CNY 65m, reject CNY 80m",
+      "semantic_before": "The source decision is challenged once.",
+      "semantic_after": "Compliance and cashflow independently rebuild the CNY 65m cap from policy, stress, collateral and serviceability evidence.",
+      "permission_delta": "same broad endpoint is re-established without requiring the challenged source as continuing authority",
+      "independent_evidence_status": "INDEPENDENT_MULTI_EVIDENCE_REANCHOR",
+      "lineage_support_status": "SOURCE_SPECIFIC_INERTIA_NOT_ESTABLISHED",
+      "downstream_adoption": "credit_lead finalizes the same cap after new evidence bases are read.",
+      "operational_consequence": "Endpoint persistence is separated from descendant-lineage persistence.",
+      "audit_locator": "docs/reports/2026-09-20/R6_System_Inertia_Identification_Report_v1.md",
+      "paper_destination": [
+        "Figure 3 healthy re-anchor path",
+        "Results 4 mechanism discovery",
+        "SI R6 route ledger"
+      ],
+      "verification_status": "REPORT_BOUND_RAW_ROUTE_EXTRACTION_REQUIRED"
+    },
+    {
+      "evidence_id": "EV-R7-DIVERGE-8B1731",
+      "scientific_role": "R7S_MATERIAL_RECOMPOSITION",
+      "run_id": "v54-r7:wave-4-8b1731b57396:dual:0001:r7_s_structured_lineage_repair",
+      "domain": "supply_chain",
+      "raw_artifact_id": 10586686291,
+      "raw_path": "results/v5_4_r7_dual_four_candidates/raw/cases/wave-4-8b1731b57396/raw/traces.jsonl",
+      "event_refs": [
+        "repair anchor event 20",
+        "1 reference invalidated",
+        "8 calls reopened",
+        "35 descendants recomputed"
+      ],
+      "source_state": "target logistics_capacity_assessment authority is repaired",
+      "semantic_before": "Inherited lineage supports the pre-repair executable plan.",
+      "semantic_after": "Bounded repair and recomputation materially recompose the plan.",
+      "permission_delta": "internal lineage changes and produces a materially different downstream action structure",
+      "independent_evidence_status": "CASE_SPECIFIC_REVIEW_REQUIRED",
+      "lineage_support_status": "STRUCTURED_LINEAGE_REPAIR",
+      "downstream_adoption": "reopened dependent recipients recompute from repaired lineage",
+      "operational_consequence": "plan changes materially after bounded repair",
+      "audit_locator": "docs/reports/2026-09-20/R5-R7_Process_Integrity_Engineering_Synthesis_Report_v1.md",
+      "paper_destination": [
+        "Figure 5 divergence case",
+        "Results 6 comparison",
+        "SI R7 matrix"
+      ],
+      "verification_status": "ENGINEERING_SUMMARY_BOUND_RAW_PATH_VERIFIED"
+    },
+    {
+      "evidence_id": "EV-R7-RECONVERGE-CF726",
+      "scientific_role": "R7S_RECONVERGENCE_WITH_REDERIVED_AUTHORITY",
+      "run_id": "v54-r7:wave-4-cf726639de1d:dual:0001:r7_s_structured_lineage_repair",
+      "domain": "supply_chain",
+      "raw_artifact_id": 10586686291,
+      "raw_path": "results/v5_4_r7_dual_four_candidates/raw/cases/wave-4-cf726639de1d/raw/traces.jsonl",
+      "event_refs": [
+        "8 calls reopened",
+        "28 descendants recomputed",
+        "structural fact re-entry"
+      ],
+      "source_state": "target lineage is repaired and recomputed",
+      "semantic_before": "pre-repair process reaches a staged plan",
+      "semantic_after": "post-repair process reconverges to the same broad 900-unit plan after recomputation",
+      "permission_delta": "endpoint equality coexists with changed internal ancestry",
+      "independent_evidence_status": "LINEAGE_INDEPENDENCE_SUPPORTED; TEMPORAL_FRESHNESS_MUST_BE_STATED_SEPARATELY",
+      "lineage_support_status": "AUTHORITY_REDERIVATION_AFTER_REPAIR",
+      "downstream_adoption": "recomputed route reuses independently sourced logistics parameters",
+      "operational_consequence": "same broad endpoint is rebuilt from a different internal route",
+      "audit_locator": "docs/reports/2026-09-20/R5-R7_Process_Integrity_Engineering_Synthesis_Report_v1.md",
+      "paper_destination": [
+        "Figure 5 reconvergence case",
+        "Results 6 comparison",
+        "SI R7 matrix"
+      ],
+      "verification_status": "ENGINEERING_SUMMARY_BOUND_RAW_PATH_VERIFIED"
+    },
+    {
+      "evidence_id": "EV-R-FORWARD-STRENGTHEN-W3",
+      "scientific_role": "FORWARD_R_LINEAGE_STRENGTHENING_CANDIDATE_NOT_IN_FROZEN_COUNT",
+      "run_id": "v54-r7:wave-3-56ee79f97f54:dual:0001:r7_s_structured_lineage_repair",
+      "domain": "supply_chain",
+      "raw_artifact_id": 10586686291,
+      "raw_path": "results/v5_4_r7_dual_four_candidates/raw/cases/wave-3-56ee79f97f54/raw/traces.jsonl",
+      "event_refs": [
+        6,
+        19,
+        25,
+        38,
+        47
+      ],
+      "source_state": "Event 6 logistics_lane_assessment_v1: 700/day, max 1,400 standard in 48h.",
+      "semantic_before": "The bounded lane-cap fact is the original logistics object.",
+      "semantic_after": "Events 19/25 request stronger horizon-wide confirmation; Event 38 writes logistics_lane_lock_confirmation_v1 as fact and states no standard capacity above 1,400 within the 14-day horizon; Event 47 procurement cites that new fact.",
+      "permission_delta": "candidate retrospective semantic amplification from a local 48h capacity constraint to a stronger horizon-wide operational constraint",
+      "independent_evidence_status": "CURRENT_VERIFIED_INPUT_SHOWS_700_PER_DAY_AND_2_DAY_TRANSIT; ADDITIONAL_HORIZON_WIDE_LIMIT_REQUIRES_FULL_PREFIX_CHECK",
+      "lineage_support_status": "CANDIDATE_PSEUDO_LOGICAL_STRENGTHENING",
+      "downstream_adoption": "Event 47 explicitly cites logistics_lane_lock_confirmation_v1; Events 39-42 are generated messages but unread status must be checked before claiming adoption.",
+      "operational_consequence": "stronger constraint enters procurement reasoning",
+      "audit_locator": "FORWARD_P9_REVIEW_ONLY",
+      "paper_destination": [
+        "candidate for R semantic discussion only after full prefix review"
+      ],
+      "verification_status": "RAW_CANDIDATE_VERIFIED_NOT_ADJUDICATED_NOT_COUNTED"
+    }
+  ],
+  "freeze_boundary": {
+    "new_subject_runs": 0,
+    "provider_calls": 0,
+    "evaluator_calls": 0,
+    "raw_mutations": 0,
+    "frozen_C_count_change": 0,
+    "frozen_P_count_change": 0,
+    "frozen_R_count_change": 0
+  }
+}
