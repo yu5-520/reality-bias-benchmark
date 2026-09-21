@@ -1,0 +1,27 @@
+name: NMI P9 Evidence Forward Rewrite Validate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/submission/nmi/NMI_P9_Evidence_Forward_Rewrite_Plan_v1.md'
+      - 'configs/nmi_p9_evidence_forward_rewrite_contract_v1.json'
+      - 'configs/nmi_p9_paper_evidence_registry_v1.json'
+      - 'configs/nmi_p9_figure_evidence_plan_v1.json'
+      - 'docs/submission/nmi/NMI_Manuscript_v0.18_EVIDENCE_FORWARD_WORKING.md'
+      - 'docs/submission/nmi/NMI_Supplementary_Information_v0.4_EVIDENCE_FORWARD_WORKING.md'
+      - 'scripts/validate_nmi_p9_evidence_forward_rewrite_v1.py'
+      - '.github/workflows/nmi-p9-evidence-forward-rewrite-validate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python scripts/validate_nmi_p9_evidence_forward_rewrite_v1.py
