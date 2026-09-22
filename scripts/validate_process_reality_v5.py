@@ -214,7 +214,17 @@ def main() -> None:
         "old_lineage_reentry_detected",
         "preserved_unrelated_structure",
     ])
+    # Root README is a public scientific entry point, not the historical R-series
+    # method-status ledger. Validate the stable public structure here and keep
+    # the R-series wording in the archived research-development snapshot.
     require_tokens("README.md", [
+        "What is Process Reality?",
+        "Study structure — not R-series chronology",
+        "historical R labels are research-development coordinates, not a strict sequential experimental pipeline.",
+        "Functional Semantic Lineage",
+        "Open Research Protocol",
+    ])
+    require_tokens("docs/research_history/README_R_SERIES_LEGACY_2026-09-22.md", [
         "Process Reality v5.4",
         "Semantic Lineage Closure",
         "LINEAGE_GAP",
