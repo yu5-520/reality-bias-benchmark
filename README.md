@@ -4,6 +4,27 @@ Research repository for the Reality Bias program and first-paper **Process Reali
 
 Historical evidence remains append-only. Forward methods are versioned rather than silently rewriting frozen evidence or preregistration.
 
+
+## Open research
+
+This repository is maintained as open research infrastructure.
+
+**Open for use. Clear in provenance. Responsible in evolution.**
+
+Replication, independent validation, criticism, modification, extension, and new implementations are welcome. Open publication does not erase the historical provenance, authorship, or priority of the research framework, experimental architecture, concepts, protocols, or evidence organization.
+
+Research governance:
+
+- [Open Research Protocol](OPEN_RESEARCH_PROTOCOL.md)
+- [Licence scope](LICENSES.md)
+- [Citation metadata](CITATION.cff)
+- [Contributing](CONTRIBUTING.md)
+- [Research ecosystem](ECOSYSTEM.md)
+- [Third-party notices](THIRD_PARTY_NOTICES.md)
+
+The repository does not impose a blanket non-commercial restriction. Where this work materially informs scholarly research, appropriate citation is encouraged as normal academic practice. High-quality downstream work may be linked back from the research ecosystem map.
+
+
 ## Public frozen raw evidence
 
 Completed raw subject evidence is public and downloadable. Runtime working directories remain ignored only to prevent accidental mutation before a freeze gate.
