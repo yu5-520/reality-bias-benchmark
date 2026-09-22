@@ -220,7 +220,7 @@ def main() -> None:
     require_tokens("README.md", [
         "What is Process Reality?",
         "Study structure — not R-series chronology",
-        "Historical R labels are research-development coordinates, not a strict sequential experimental pipeline.",
+        "historical R labels are research-development coordinates, not a strict sequential experimental pipeline.",
         "Functional Semantic Lineage",
         "Open Research Protocol",
     ])
