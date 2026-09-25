@@ -169,23 +169,38 @@
       }
     },
     "X5": {
-      "collection_state": "PENDING_NATIVE_RUNNER",
+      "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
       "environment_id": "x5-rag-baf19cd",
       "execution_owner": "Frozen software-engineering host plus frozen RAG retrieval mechanism",
       "host_attachment": "RAG attaches at the retrieval/context boundary of the software-engineering multi-agent host; retrieval behavior is not rewritten into a communication framework.",
       "implementation_sha256": "baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4",
       "launch": {
-        "argv_template": null,
-        "state": "PENDING_NATIVE_ENTRYPOINT"
+        "state": "VERIFIED_NATIVE_ENTRYPOINT",
+        "argv_template": [
+          "python",
+          "-m",
+          "stage2.native_v7.x5_rag.runner",
+          "--checkout",
+          "{checkout}",
+          "--task-file",
+          "{task_file}",
+          "--roles-file",
+          "{roles_file}",
+          "--subject-file",
+          "{subject_file}",
+          "--observer-root",
+          "{observer_root}/rag_native"
+        ]
       },
       "name": "RAG",
       "observer": {
         "may_mutate_execution": false,
         "mode": "external",
         "native_surfaces": [
-          "retrieval query bytes",
-          "retrieval result bytes",
-          "provider I/O",
+          "post-return immutable copy of the stage2.retrieval.retrieve query serialization",
+          "post-return immutable copy of ranked retrieval hits with frozen source hashes",
+          "model-visible retrieved_context exposure",
+          "process stdout/stderr/exit",
           "checkout effects"
         ]
       },
@@ -194,7 +209,26 @@
       "source_repo": "stage2/retrieval.py",
       "upstream_mode": "in_repo_reference",
       "integration_kind": "retrieval_capability",
-      "background_substrate_id": "software_engineering_host_v1"
+      "background_substrate_id": "software_engineering_host_v1",
+      "verification": {
+        "state": "NON_STUDY_NATIVE_SMOKE_PASS",
+        "workflow": ".github/workflows/stage2-native-v7-x5.yml",
+        "verified_code_commit": "c8db6e1b3188de7b05e6bfb521aa2a148aa9596e",
+        "workflow_run_id": 36131773869,
+        "subject_ready": false,
+        "task": "T3",
+        "turns": 1,
+        "stop_reason": "finalized",
+        "retrieval_calls": 1,
+        "hit_count": 3,
+        "hit_paths": [
+          "README.md",
+          "versions/after.json",
+          "checkout_app/checkout.py"
+        ],
+        "observer_files": 3,
+        "checkout_sha256": "15200a4ce5b6a09127f25371b55d9b4ae3b1f2071af78c3a7f37b6fcad8303e2"
+      }
     },
     "X6": {
       "collection_state": "PENDING_NATIVE_RUNNER",
@@ -261,7 +295,7 @@
     "tasks": "stage2/tasks.json",
     "host_policy": "X1-X2 use their native multi-agent framework, X3 uses native A2A communication, and X4-X7 may share the explicitly registered software-engineering background host because those X conditions operate at tool/retrieval/memory/context layers; monitoring is not part of that host."
   },
-  "status": "X1_X4_NATIVE_RUNNERS_VERIFIED_SUBJECT_PENDING_CAPABILITY_HOST_FROZEN_X2_X3_X5_X7_RUNNERS_PENDING",
+  "status": "X1_X4_X5_NATIVE_RUNNERS_VERIFIED_SUBJECT_PENDING_CAPABILITY_HOST_FROZEN_X2_X3_X6_X7_RUNNERS_PENDING",
   "forbidden_global_normalization": [
     "requiring every X to execute through one common runtime adapter",
     "requiring X1-X3 to use the baseline role-mailbox communication substrate",
