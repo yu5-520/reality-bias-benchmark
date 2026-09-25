@@ -18,9 +18,19 @@ def blockers(runtime_manifest, captures_root):
     if not runtime.get("code_commit") or not runtime.get("roles_sha256") == planned["files_sha256"]["stage2/roles.json"]:
         errors.append("code or roles binding missing")
     bindings = runtime.get("probes", {})
+    targets = json.loads((BASE / "runtime_bindings.json").read_text())["probes"]
     for probe in json.loads((BASE / "versions.json").read_text())["probes"]:
         pid = probe["id"]
         bind = bindings.get(pid, {})
+        frozen_target = targets.get(pid, {})
+        target_blocked = frozen_target.get("state") == "ENGINEERING_BLOCKED"
+        runtime_blocked = bind.get("engineering_status") == "ENGINEERING_BLOCKED"
+        if target_blocked or runtime_blocked:
+            if not (target_blocked and runtime_blocked):
+                errors.append(f"{pid}: engineering-block state differs from frozen target")
+            if not bind.get("block_reason") or bind.get("block_reason") != frozen_target.get("block_reason"):
+                errors.append(f"{pid}: engineering-block reason missing or differs from frozen target")
+            continue
         if not bind.get("installed_version") or not bind.get("native_hook"):
             errors.append(f"{pid}: installed implementation/native hook unbound")
             continue
@@ -55,7 +65,11 @@ def main():
     errors = blockers(args.runtime_manifest, args.captures_root)
     if errors:
         raise SystemExit("SUBJECT_GATE=CLOSED\n" + "\n".join(errors))
-    print("SUBJECT_GATE=OPEN; native evidence verified, scientific audit still pending")
+    runtime = json.loads(Path(args.runtime_manifest).read_text())
+    blocked = sorted(pid for pid, bind in runtime.get("probes", {}).items()
+                     if bind.get("engineering_status") == "ENGINEERING_BLOCKED")
+    suffix = f"; engineering_blocked={','.join(blocked)}" if blocked else ""
+    print("SUBJECT_GATE=OPEN_FOR_NONBLOCKED_PROBES; native evidence verified, scientific audit still pending" + suffix)
 
 
 if __name__ == "__main__":
