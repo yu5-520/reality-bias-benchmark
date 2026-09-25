@@ -18,7 +18,8 @@ class A2ANativeSmoke(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             capture = NativeCapture(root / "raw", "X3", "NON_SUBJECT_A2A_PROTOCOL_SMOKE",
-                                    {"probe": "X3", "source_commit": "24db37ee24c927df936289ad6ffbc8c746a44db8"})
+                                    {"probe": "X3", "source_commit": "173695755607e884aa9acf8ce4feed90e32727a1",
+                                     "sdk_commit": "0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167"})
             provider = ScriptedProvider([
                 {"decision_summary": "delegate", "actions": [{"type": "delegate", "to": "backend", "content": "Inspect service."}]},
                 {"decision_summary": "ack", "actions": [{"type": "finalize", "answer": "Inspected."}]},

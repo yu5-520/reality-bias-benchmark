@@ -25,7 +25,7 @@ class RAGContext:
         query = task["user_request"]
         row = self.capture.capture(event_id=f"rag-query-{self.sequence}", operation="retrieve",
                                    phase="emitted", native_locator=f"stage2.retrieval:query:{self.sequence}",
-                                   hook_id="stage2.retrieval.retrieve", raw=canonical_bytes({"query": query, "limit": self.limit}),
+                                   hook_id="rag.native.retrieve", raw=canonical_bytes({"query": query, "limit": self.limit}),
                                    actor=role, source_id=f"task:{task['id']}", carrier_id=f"rag-query:{self.sequence}",
                                    carrier_type="retrieval-query", parent_ids=cause)
         hits = retrieve(self.index_root, query, self.limit)
@@ -33,7 +33,7 @@ class RAGContext:
             raise ValueError("retrieval corpus differs from frozen fixture")
         returned = self.capture.capture(event_id=f"rag-result-{self.sequence}", operation="retrieve",
                                         phase="returned", native_locator=f"stage2.retrieval:result:{self.sequence}",
-                                        hook_id="stage2.retrieval.retrieve", raw=canonical_bytes(hits), actor=role,
+                                        hook_id="rag.native.retrieve", raw=canonical_bytes(hits), actor=role,
                                         source_id=f"task:{task['id']}", carrier_id=f"rag-result:{self.sequence}",
                                         carrier_type="retrieved-document-snippets", parent_ids=(row["event_id"],))
         payload = json.loads(messages[-1]["content"])

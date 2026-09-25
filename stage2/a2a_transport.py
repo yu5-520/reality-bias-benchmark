@@ -79,7 +79,7 @@ class A2AProtocolTransport:
         carrier = f"a2a:{native_message.message_id}"
         sent = self.capture.capture(event_id=f"a2a-task-{self.serial}", operation="remote_task",
                                     phase="emitted", native_locator=f"a2a:message/send:{native_message.message_id}",
-                                    hook_id="a2a_sdk.v1.0.0.Client.send_message",
+                                    hook_id="a2a.native.task_artifact",
                                     raw=request.SerializeToString(), actor=sender, target=target,
                                     source_id=cause, carrier_id=carrier, carrier_type="a2a-remote-task",
                                     parent_ids=(cause,))
@@ -96,7 +96,7 @@ class A2AProtocolTransport:
         raw = wrapper.SerializeToString()
         artifact = self.capture.capture(event_id=f"a2a-artifact-{self.serial}", operation="artifact_return",
                                         phase="returned", native_locator=f"a2a:task:{final.id}:artifact",
-                                        hook_id="a2a_sdk.v1.0.0.Task.artifacts", raw=raw, actor=target,
+                                        hook_id="a2a.native.task_artifact", raw=raw, actor=target,
                                         target=sender, source_id=cause, carrier_id=f"a2a-artifact:{final.id}",
                                         carrier_type="a2a-remote-artifact", parent_ids=(sent["event_id"],))
         returned = "\n".join(part.text for part in final.artifacts[-1].parts if hasattr(part, "text"))
@@ -104,7 +104,7 @@ class A2AProtocolTransport:
             raise RuntimeError("remote artifact changed the delegated message")
         received = self.capture.capture(event_id=f"a2a-recv-{self.serial}", operation="receive_message",
                                         phase="delivered", native_locator=f"a2a:task:{final.id}:read",
-                                        hook_id="a2a_sdk.v1.0.0.Task.artifacts", raw=returned.encode(),
+                                        hook_id="a2a.native.task_artifact", raw=returned.encode(),
                                         actor=target, target=sender, source_id=cause,
                                         carrier_id=artifact["carrier_id"], carrier_type="a2a-remote-artifact",
                                         parent_ids=(artifact["event_id"],))

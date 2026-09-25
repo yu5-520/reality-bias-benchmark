@@ -304,57 +304,11 @@ def smoke_x5(root, code_commit):
     _finish(cap, cfg["hook_id"], "retrieve-result")
 
 
-def smoke_x7(root, code_commit):
-    from llmlingua import PromptCompressor
-
-    cfg = _targets()["X7"]
-    bind = _binding("X7", code_commit=code_commit)
-    cap = NativeCapture(root, "X7", "X7-native-smoke", bind)
-    model = "microsoft/llmlingua-2-bert-base-multilingual-cased-meetingbank"
-    context = [
-        "The checkout service uses the current checkout_app server route. "
-        "The old compatibility route is retained only as historical context and should not drive execution."
-    ]
-    cap.capture(
-        event_id="compress-input",
-        operation="compress",
-        phase="emitted",
-        native_locator="PromptCompressor.compress_prompt:input",
-        hook_id=cfg["hook_id"],
-        raw=_bytes({"model": model, "context": context, "rate": 0.6}),
-        actor="llmlingua:compressor",
-        carrier_id="llmlingua:raw-context",
-        source_id="smoke:user",
-        status="success",
-    )
-    compressor = PromptCompressor(model_name=model, device_map="cpu", use_llmlingua2=True)
-    result = compressor.compress_prompt(context, rate=0.6)
-    compressed = result.get("compressed_prompt")
-    if not compressed:
-        raise RuntimeError("LongLLMLingua native compression returned empty output")
-    cap.capture(
-        event_id="compress-output",
-        operation="compress",
-        phase="returned",
-        native_locator="PromptCompressor.compress_prompt:return",
-        hook_id=cfg["hook_id"],
-        raw=_bytes(result),
-        actor="llmlingua:compressor",
-        target="llmlingua:consumer",
-        carrier_id="llmlingua:compressed-context",
-        source_id="llmlingua:raw-context",
-        parent_ids=("compress-input",),
-        status="success",
-    )
-    _finish(cap, cfg["hook_id"], "compress-output")
-
-
 def _installed_version(probe):
     package = {
         "X1": "autogen-core",
         "X3": "a2a-sdk",
         "X4": "mcp",
-        "X7": "llmlingua",
     }.get(probe)
     if package:
         return importlib.metadata.version(package)
@@ -371,8 +325,9 @@ def main():
     p.add_argument("--out-root", required=True)
     p.add_argument("--code-commit", required=True)
     args = p.parse_args()
-    if args.probe in {"X2", "X6"}:
-        reason = _targets()[args.probe].get("block_reason", "frozen engineering block")
+    forward_blocks = json.loads((BASE / "eligibility.json").read_text())["engineering_blocks"]
+    if args.probe in {"X2", "X6"} | set(forward_blocks):
+        reason = forward_blocks.get(args.probe) or _targets()[args.probe].get("block_reason", "frozen engineering block")
         raise SystemExit(f"{args.probe} is ENGINEERING_BLOCKED; native smoke intentionally not emulated: {reason}")
     root = Path(args.out_root) / args.probe
     root.mkdir(parents=True, exist_ok=True)
@@ -384,8 +339,6 @@ def main():
         asyncio.run(smoke_x4(root, args.code_commit))
     elif args.probe == "X5":
         smoke_x5(root, args.code_commit)
-    elif args.probe == "X7":
-        smoke_x7(root, args.code_commit)
     count = check_capture(root)
     cfg = _targets()[args.probe]
     report = {

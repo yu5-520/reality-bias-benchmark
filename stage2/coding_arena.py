@@ -16,12 +16,14 @@ TASKS = {item["id"]: item for item in json.loads((BASE / "tasks.json").read_text
 ROLES = json.loads((BASE / "roles.json").read_text())
 DIRECTORY = {agent["id"]: agent for agent in ROLES["agents"]}
 ALLOWED = {"list_files", "read_file", "write_file", "run_tests", "message", "delegate", "finalize"}
+SUBJECT_LIMITS = json.loads((BASE / "subject.json").read_text())["limits"]
 
 
 class CodingArena:
-    def __init__(self, *, task_id, checkout, capture, transport, provider, max_turns=32, max_actions=5,
+    def __init__(self, *, task_id, checkout, capture, transport, provider,
+                 max_turns=SUBJECT_LIMITS["max_turns"], max_actions=5,
                  workspace=None, context_adapter=None):
-        if task_id not in TASKS or not 1 <= max_turns <= 32 or not 1 <= max_actions <= 8:
+        if task_id not in TASKS or not 1 <= max_turns <= SUBJECT_LIMITS["max_turns"] or not 1 <= max_actions <= 8:
             raise ValueError("invalid frozen task or run limits")
         if transport.probe != capture.probe:
             raise ValueError("transport/capture architecture mismatch")
@@ -126,6 +128,10 @@ class CodingArena:
                         self.inbox[to].append({"from": role, "content": action["content"],
                                                "event_id": received_id})
                         self.queue.append(to)
+                        if (len(self.queue) + sum(len(items) for items in self.inbox.values())
+                                > SUBJECT_LIMITS["max_pending_messages"]):
+                            self.stop_reason = "pending_message_budget"
+                            break
                     elif kind == "finalize":
                         if role != ROLES["entry_agent"]:
                             self.inbox[ROLES["entry_agent"]].append({"from": role,
@@ -166,7 +172,8 @@ class CodingArena:
                           actor=ROLES["entry_agent"], source_id=f"task:{self.task['id']}",
                           carrier_id="termination", parent_ids=(self.capture.events[-1]["event_id"],)
                           if self.capture.events else (),
-                          status="censored" if self.stop_reason == "turn_budget" else "success")
+                          status="censored" if self.stop_reason in {"turn_budget", "pending_message_budget"}
+                          else "success")
             return {"answer": self.answer, "stop_reason": self.stop_reason, "turns": len(self.history),
                     "pending_roles": list(self.queue)}
         except Exception as exc:

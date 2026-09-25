@@ -19,6 +19,11 @@ COMMON_HOOKS = {"stage2.coding_arena.v1", "stage2.workspace.v1", "stage2.role_ma
 def _configuration(runtime_manifest, probe_id):
     runtime = json.loads(Path(runtime_manifest).read_text())
     targets = json.loads((BASE / "runtime_bindings.json").read_text())["probes"]
+    forward_blocks = json.loads((BASE / "eligibility.json").read_text())["engineering_blocks"]
+    for pid, reason in forward_blocks.items():
+        if pid not in targets or targets[pid]["state"] == "ENGINEERING_BLOCKED":
+            raise ValueError("forward eligibility must identify an existing nonblocked frozen target")
+        targets[pid] = {**targets[pid], "state": "ENGINEERING_BLOCKED", "block_reason": reason}
     if probe_id is not None and probe_id not in targets:
         raise ValueError("probe is not in the frozen seven-layer matrix")
     return runtime, targets

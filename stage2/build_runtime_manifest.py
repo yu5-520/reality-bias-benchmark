@@ -16,13 +16,14 @@ def main():
     smoke=Path(a.smoke_root)
     subject=json.loads((BASE/"subject.json").read_text())
     targets=json.loads((BASE/"runtime_bindings.json").read_text())["probes"]
+    forward_blocks=json.loads((BASE/"eligibility.json").read_text())["engineering_blocks"]
     planned=artifact()
     probes={}
     for pid,target in targets.items():
-        if target.get("state")=="ENGINEERING_BLOCKED":
+        if target.get("state")=="ENGINEERING_BLOCKED" or pid in forward_blocks:
             probes[pid]={
                 "engineering_status":"ENGINEERING_BLOCKED",
-                "block_reason":target["block_reason"],
+                "block_reason":forward_blocks.get(pid,target.get("block_reason")),
             }
             continue
         report=json.loads((smoke/pid/"smoke_report.json").read_text())

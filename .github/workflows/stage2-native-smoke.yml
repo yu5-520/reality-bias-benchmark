@@ -8,8 +8,12 @@ on:
       - 'stage2/runtime_bindings.json'
       - 'stage2/subject.json'
       - 'stage2/evidence.py'
+      - 'stage2/eligibility.json'
+      - 'stage2/target_coding_smoke.py'
+      - 'stage2/verify_target_coding.py'
       - 'stage2/tests/**'
       - 'docs/R_Plan_v6.4.md'
+      - 'docs/R_Plan_v6.6.md'
       - '.github/workflows/stage2-native-smoke.yml'
   pull_request:
     paths:
@@ -19,8 +23,12 @@ on:
       - 'stage2/runtime_bindings.json'
       - 'stage2/subject.json'
       - 'stage2/evidence.py'
+      - 'stage2/eligibility.json'
+      - 'stage2/target_coding_smoke.py'
+      - 'stage2/verify_target_coding.py'
       - 'stage2/tests/**'
       - 'docs/R_Plan_v6.4.md'
+      - 'docs/R_Plan_v6.6.md'
       - '.github/workflows/stage2-native-smoke.yml'
 
 jobs:
@@ -36,8 +44,6 @@ jobs:
           - probe: X4
             python: '3.11'
           - probe: X5
-            python: '3.11'
-          - probe: X7
             python: '3.11'
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -62,7 +68,7 @@ jobs:
             X3)
               git clone -q https://github.com/a2aproject/a2a-python upstream
               git -C upstream checkout -q 0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167
-              pip install -q -e ./upstream
+              pip install -q -e './upstream[http-server]' 'uvicorn>=0.35.0'
               git clone -q https://github.com/a2aproject/A2A protocol
               git -C protocol checkout -q 173695755607e884aa9acf8ce4feed90e32727a1
               ;;
@@ -75,11 +81,6 @@ jobs:
               git -C protocol checkout -q 5f5440bb26a62e2cf3440b92da5a667efa03b267
               ;;
             X5) ;;
-            X7)
-              git clone -q https://github.com/microsoft/LLMLingua upstream
-              git -C upstream checkout -q 5a4c78ae18ab17a98cf997e8259354e546081d64
-              pip install -q -e ./upstream
-              ;;
           esac
       - name: Execute non-study native smoke
         shell: bash
@@ -101,6 +102,23 @@ jobs:
           path: stage2_smoke/${{ matrix.probe }}
           retention-days: 30
           if-no-files-found: error
+      - name: Execute target-bound scripted coding smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          CODE_SHA="$(git rev-parse HEAD)"
+          if [ "${{ matrix.probe }}" = X4 ]; then
+            PYTHONPATH="$GITHUB_WORKSPACE" upstream/.venv/bin/python -m stage2.target_coding_smoke --probe X4 --upstream upstream --out-root stage2_coding --code-commit "$CODE_SHA"
+          else
+            python -m stage2.target_coding_smoke --probe "${{ matrix.probe }}" --upstream upstream --out-root stage2_coding --code-commit "$CODE_SHA"
+          fi
+      - name: Upload target-bound coding evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-target-coding-${{ matrix.probe }}-${{ github.run_id }}
+          path: stage2_coding/${{ matrix.probe }}
+          retention-days: 30
+          if-no-files-found: error
 
   gate:
     needs: native-smoke
@@ -118,6 +136,11 @@ jobs:
           pattern: stage2-native-smoke-*-${{ github.run_id }}
           path: stage2_smoke
           merge-multiple: false
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: stage2-target-coding-*-${{ github.run_id }}
+          path: stage2_coding
+          merge-multiple: false
       - name: Normalize downloaded smoke tree
         shell: bash
         run: |
@@ -130,6 +153,9 @@ jobs:
           done
           rm -rf stage2_smoke
           mv normalized stage2_smoke
+      - name: Verify target coding evidence separately from subject gate
+        shell: bash
+        run: python -m stage2.verify_target_coding --artifact-root stage2_coding --code-commit "$(git rev-parse HEAD)"
       - name: Build and verify fail-closed runtime manifest
         shell: bash
         run: |

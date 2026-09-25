@@ -122,7 +122,7 @@ class AutoGenTransport:
         delivered = self.capture.capture(
             event_id=f"autogen-recv-{self.index}", operation="receive_message", phase="delivered",
             native_locator=f"autogen_core.RoutedAgent:{target}:{msg.carrier_id}",
-            hook_id="autogen_core.RoutedAgent.message_handler",
+            hook_id="autogen.native.agentchat",
             raw=raw, actor=target, target=msg.sender, source_id=msg.cause,
             carrier_id=msg.carrier_id, carrier_type="autogen-core-message",
             parent_ids=(f"autogen-send-{self.index}",))
@@ -134,7 +134,7 @@ class AutoGenTransport:
         raw = canonical_bytes(asdict(message))
         self.capture.capture(event_id=f"autogen-send-{self.index}", operation=operation,
                              phase="emitted", native_locator=f"autogen_core.AgentRuntime.send_message:{target}",
-                             hook_id="autogen_core.AgentRuntime.send_message", raw=raw, actor=sender,
+                             hook_id="autogen.native.agentchat", raw=raw, actor=sender,
                              target=target, source_id=cause, carrier_id=message.carrier_id,
                              carrier_type="autogen-core-message", parent_ids=(cause,))
         received_id = await self.runtime.send_message(message, self.AgentId(target, "default"),

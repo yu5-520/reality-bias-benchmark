@@ -14,10 +14,10 @@ PROBES = {
     "X1": {"send_message", "receive_message", "delegate", "handoff"},
     "X2": {"send_message", "receive_message", "shared_state", "delegate", "handoff"},
     "X3": {"send_message", "receive_message", "remote_task", "artifact_return"},
-    "X4": {"send_message", "receive_message", "tool_call", "resource_read"},
-    "X5": {"send_message", "receive_message", "retrieve"},
-    "X6": {"send_message", "receive_message", "memory_write", "memory_retrieve"},
-    "X7": {"send_message", "receive_message", "compress"},
+    "X4": {"send_message", "receive_message", "delegate", "handoff", "tool_call", "resource_read"},
+    "X5": {"send_message", "receive_message", "delegate", "handoff", "retrieve"},
+    "X6": {"send_message", "receive_message", "delegate", "handoff", "memory_write", "memory_retrieve"},
+    "X7": {"send_message", "receive_message", "delegate", "handoff", "compress"},
 }
 COMMON = {"file_list", "file_read", "file_change", "test_run", "model_input", "model_output", "termination"}
 PHASES = frozenset({"emitted", "delivered", "exposed", "executed", "returned", "failed"})

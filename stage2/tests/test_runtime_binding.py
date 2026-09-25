@@ -31,5 +31,21 @@ class RuntimeBindingTests(unittest.TestCase):
         for p in b["probes"].values():
             self.assertNotIn("NATIVE_SMOKE_PASS",p.values())
 
+    def test_x7_variant_mismatch_is_forward_blocked(self):
+        from stage2.preflight import _configuration
+        import tempfile
+        import subprocess
+        with tempfile.TemporaryDirectory() as directory:
+            manifest = Path(directory) / "runtime.json"
+            manifest.write_text("{}")
+            _, targets = _configuration(manifest, "X7")
+            self.assertEqual(targets["X7"]["state"], "ENGINEERING_BLOCKED")
+            self.assertIn("use_llmlingua2=True", targets["X7"]["block_reason"])
+            result = subprocess.run([__import__("sys").executable, "-m", "stage2.native_smoke",
+                                     "--probe", "X7", "--out-root", directory,
+                                     "--code-commit", "f" * 40], capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("NATIVE_VARIANT_MISMATCH", result.stderr)
+
 if __name__=="__main__":
     unittest.main()

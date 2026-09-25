@@ -63,7 +63,7 @@ class CodingRuntimeSmoke(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             capture = NativeCapture(root / "raw", "X1", "NON_SUBJECT_AUTOGEN_SMOKE",
-                                    {"probe": "X1", "source_commit": "83afbf5857aac683340d4c692194e548b1e8edda"})
+                                    {"probe": "X1", "source_commit": "027ecf0a379bcc1d09956d46d12d44a3ad9cee14"})
             provider = ScriptedProvider([
                 {"decision_summary": "delegate", "actions": [{"type": "delegate", "to": "backend", "content": "Inspect service."}]},
                 {"decision_summary": "report", "actions": [{"type": "finalize", "answer": "Service inspected."}]},
