@@ -39,12 +39,13 @@ def artifact():
         ROOT / "docs/R_Plan_v7.1.md",
     ]
     return {
-        "schema": "stage2-native-v7-matrix-v1",
+        "schema": "stage2-native-v7-matrix-v2",
         "predecessor": "docs/R_Plan_v7.1.md",
         "architecture": "heterogeneous-native-execution_external-observation",
         "natural_trajectories_collected": 0,
         "execution_gate": "CLOSED_UNTIL_CELL_X_SUBJECT_READY",
-        "forbidden_shared_runtime": registry["forbidden_execution_dependencies"],
+        "forbidden_global_normalization": registry["forbidden_global_normalization"],
+        "background_substrates": registry["background_substrates"],
         "fixture_tree": {
             "path": "stage2/fixtures/project",
             "files": fixture_count,
