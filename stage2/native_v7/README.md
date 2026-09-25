@@ -1,6 +1,6 @@
 # Stage-II v7: native execution / external observation
 
-This directory is the active forward Stage-II architecture. All seven X conditions have verified native entrypoints; X1–X5 now cite the frozen common subject receipt, while X6/X7 remain asset-pending. Natural collection remains 0/21.
+This directory is the active forward Stage-II architecture. All seven X conditions have verified native entrypoints; X1–X5 cite the frozen common subject receipt, while X6/X7 remain asset-pending. The first natural X1–T1 attempt is archived separately under `stage2/natural_v7/X1-T1`.
 
 The v6.x scaffold proved that the seven targets could be pinned and recorded, but it normalized heterogeneous systems through a shared `CodingArena`/transport/context contract. v7 removes that assumption: X1/X2 use their native multi-agent runtimes, X3 uses native A2A communication, and X4–X7 attach only at their native capability boundaries to the frozen de-instrumented software-engineering host.
 
@@ -23,4 +23,4 @@ python -m stage2.native_v7.freeze
 python -m unittest discover -s stage2/native_v7/tests -v
 ```
 
-Stage-II natural trajectory count remains **0 / 21**; consult `docs/R_Plan_v7.11.md` for receipt provenance and per-X readiness.
+The frozen architecture matrix records the prerecording baseline of **0 / 21**. The current raw collection count is **1 / 21**; consult `docs/R_Plan_v7.12.md` and the separate archive manifest for provenance and status.
