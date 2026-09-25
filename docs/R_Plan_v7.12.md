@@ -1,0 +1,9 @@
+# Stage-II v7.12: first natural cell, raw freeze
+
+X1–T1 was executed once on the pinned main commit `9601c86fbae85453dd84a70ef66af02f452b5b7f` through the one-time authorization issue [#172](https://github.com/yu5-520/reality-bias-benchmark/issues/172). The bridge claimed a fixed authorization tag; the collection workflow then claimed a second fixed execution tag before cell reservation. Run [36156138393](https://github.com/yu5-520/reality-bias-benchmark/actions/runs/36156138393) succeeded. Do not rerun this cell for any reason, including an unsatisfactory result.
+
+The original attempt, including task, final checkout, native AutoGen event bytes, process boundary outputs, inventories and seal, is preserved at `stage2/natural_v7/X1-T1/first_attempt.tar.gz`. Its SHA-256 and source artifact digest are recorded in the adjacent `manifest.json`; `python -m stage2.natural_v7.verify_archive` verifies nested hashes and the receipt binding. The seal reports 102 native events and status `RECORDED_PENDING_POSTHOC_AUDIT`. No semantic classification or local contrast is included in this raw freeze.
+
+The scientific denominator is now **1 recorded natural attempt / 21 planned cells**, with 20 cells unattempted. X1–X5 were subject-ready at execution; X6/X7 remain asset-pending. `stage2/native_v7/matrix.json` is the frozen prerecording architecture artifact and still encodes zero trajectories; do not regenerate it or edit execution snapshot files to make that static baseline match current collection progress. Use the separate natural archive manifest for observed progress.
+
+Next, carry out post-hoc structural and semantic audit of the preserved X1–T1 evidence against the frozen source→carrier→transformation→downstream→consequence contract. A maximum of four bounded local contrasts may follow the raw freeze. Other natural cells require their own single-use claim and preservation path; X6/X7 also require real study asset manifests before any reservation.

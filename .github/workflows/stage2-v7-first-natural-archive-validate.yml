@@ -1,0 +1,24 @@
+name: Stage-II v7 First Natural Raw Archive Validate
+
+on:
+  push:
+    paths:
+      - 'stage2/natural_v7/**'
+      - '.github/workflows/stage2-v7-first-natural-archive-validate.yml'
+  pull_request:
+    paths:
+      - 'stage2/natural_v7/**'
+      - '.github/workflows/stage2-v7-first-natural-archive-validate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-raw-archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m stage2.natural_v7.verify_archive
