@@ -1,0 +1,171 @@
+name: Stage-II v7 X1-T1 First Natural Cell
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_execution_sha:
+        description: Exact main SHA pinned by the one-time issue bridge
+        required: true
+        type: string
+      authorization_issue:
+        description: Issue number carrying the exact one-time authorization
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  issues: read
+
+concurrency:
+  group: stage2-v7-natural-x1-t1
+  cancel-in-progress: false
+
+jobs:
+  first-natural-cell:
+    runs-on: ubuntu-latest
+    timeout-minutes: 175
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: '${{ github.sha }}'
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify pinned one-time authorization and frozen collection gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTH_ISSUE: ${{ inputs.authorization_issue }}
+          EXPECTED_SHA: ${{ inputs.expected_execution_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_SHA" = "$EXPECTED_SHA"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$GITHUB_REF" = refs/tags/stage2-natural-x1-t1-authorization
+          python - <<'PY'
+          import json, os, re, subprocess
+          issue = os.environ['AUTH_ISSUE']
+          if not re.fullmatch(r'[1-9][0-9]*', issue):
+              raise SystemExit('invalid authorization issue number')
+          raw = subprocess.check_output([
+              'gh', 'api', f"repos/{os.environ['GITHUB_REPOSITORY']}/issues/{issue}",
+          ], text=True)
+          data = json.loads(raw)
+          expected_body = '\n'.join([
+              'cell=X1-T1',
+              'control_plane=CHAT_AUTHORIZATION_BRIDGE_STAGE2_FIRST_NATURAL_v1',
+              f"expected_main_sha={os.environ['GITHUB_SHA']}",
+              'max_natural_trajectories=1',
+              'preserve_failed_attempt=true',
+          ])
+          if data['user']['login'] != 'yu5-520' or data['title'] != 'STAGE2 X1-T1 FIRST NATURAL AUTHORIZATION':
+              raise SystemExit('authorization issue identity mismatch')
+          if data['body'].strip() != expected_body:
+              raise SystemExit('authorization body mismatch')
+          print('PASS: exact one-time X1-T1 authorization')
+          PY
+          python -m stage2.native_v7.freeze
+          python -m unittest discover -s stage2/native_v7/tests -v
+          python - <<'PY'
+          from stage2.native_v7.collect import validate_request
+          validate_request('X1', 'T1')
+          print('PASS: X1-T1 collection is subject-ready')
+          PY
+
+      - name: Install pinned native AutoGen source before reserving cell
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/microsoft/autogen upstream
+          git -C upstream checkout -q 027ecf0a379bcc1d09956d46d12d44a3ad9cee14
+          test "$(git -C upstream rev-parse HEAD)" = 027ecf0a379bcc1d09956d46d12d44a3ad9cee14
+          pip install -q \
+            ./upstream/python/packages/autogen-core \
+            ./upstream/python/packages/autogen-agentchat \
+            './upstream/python/packages/autogen-ext[openai]'
+          python -c 'from autogen_agentchat.teams import Swarm; from autogen_ext.models.openai import OpenAIChatCompletionClient'
+
+      - name: Irrevocably claim X1-T1 before any possible reservation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f ref=refs/tags/stage2-natural-x1-t1-execution-claimed \
+            -f "sha=$GITHUB_SHA" >/dev/null
+          echo 'PASS: unique X1-T1 execution claim created; retries must fail'
+
+      - name: Execute and seal exactly one X1-T1 natural attempt
+        id: collect
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          AUTH_ISSUE: ${{ inputs.authorization_issue }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p /tmp/stage2_first_natural
+          printf '%s\n' "$GITHUB_SHA" > /tmp/stage2_first_natural/execution_sha.txt
+          printf '%s\n' "$AUTH_ISSUE" > /tmp/stage2_first_natural/authorization_issue.txt
+          export PYTHONPATH="$GITHUB_WORKSPACE${PYTHONPATH:+:$PYTHONPATH}"
+          timeout --signal=TERM --kill-after=30s 150m \
+            python -m stage2.native_v7.collect \
+              --probe X1 --task T1 --out-root /tmp/stage2_first_natural \
+              > /tmp/stage2_first_natural/collect_stdout.txt \
+              2> /tmp/stage2_first_natural/collect_stderr.txt
+          code=$?
+          printf '%s\n' "$code" > /tmp/stage2_first_natural/collect_exit_code.txt
+          echo "collect_exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Package attempt and hash inventory before judging outcome
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/stage2_first_natural
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root = Path('/tmp/stage2_first_natural')
+          files = {
+              str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in sorted(root.rglob('*')) if p.is_file() and p.name != 'archive_inventory.json'
+          }
+          (root / 'archive_inventory.json').write_text(json.dumps(files, indent=2, sort_keys=True) + '\n')
+          PY
+          tar -czf /tmp/stage2-v7-first-natural-${{ github.run_id }}.tar.gz -C /tmp/stage2_first_natural .
+          sha256sum /tmp/stage2-v7-first-natural-${{ github.run_id }}.tar.gz \
+            > /tmp/stage2-v7-first-natural-${{ github.run_id }}.tar.gz.sha256
+
+      - name: Upload immutable first-attempt evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-v7-first-natural-x1-t1-${{ github.run_id }}
+          path: |
+            /tmp/stage2-v7-first-natural-${{ github.run_id }}.tar.gz
+            /tmp/stage2-v7-first-natural-${{ github.run_id }}.tar.gz.sha256
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Report frozen outcome after preservation
+        if: always()
+        env:
+          COLLECT_CODE: ${{ steps.collect.outputs.collect_exit_code }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$COLLECT_CODE" = 0
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('/tmp/stage2_first_natural/X1-T1')
+          seal = json.loads((root / 'seal.json').read_text())
+          assert seal['cell'] == 'X1-T1'
+          assert seal['returncode'] == 0
+          assert seal['status'] == 'RECORDED_PENDING_POSTHOC_AUDIT'
+          print('PASS: X1-T1 recorded once and pending post-hoc audit')
+          PY
