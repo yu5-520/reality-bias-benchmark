@@ -62,11 +62,22 @@ def verify_receipt(registry, readiness):
         "scientific_task_used": False,
         "natural_cell_reserved": False,
         "registry_mutated": False,
-        "natural_trajectories_after_handshake": 0,
         "promotion_required": "REVIEWED_REGISTRY_COMMIT",
     }
     if any(receipt.get(key) != value for key, value in required.items()):
         raise ValueError("common receipt is not a successful non-scientific handshake")
+    before_count = receipt.get("natural_trajectories_before_handshake")
+    after_count = receipt.get("natural_trajectories_after_handshake")
+    if (
+        not isinstance(before_count, int)
+        or isinstance(before_count, bool)
+        or before_count < 0
+        or not isinstance(after_count, int)
+        or isinstance(after_count, bool)
+        or after_count < 0
+        or before_count != after_count
+    ):
+        raise ValueError("provider handshake must not change the natural evidence count")
     if not GIT_SHA.fullmatch(str(receipt.get("execution_code_sha", ""))):
         raise ValueError("common receipt lacks an exact execution commit")
     if not receipt.get("observed_response_model") or not SHA256.fullmatch(

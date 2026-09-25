@@ -17,6 +17,8 @@ import tempfile
 from collections import deque
 from pathlib import Path
 
+from stage2.native_v7.action_contract import apply_model_visible_action_contract
+
 BASE = Path(__file__).resolve().parents[1]
 TASKS = {row["id"]: row for row in json.loads((BASE / "tasks.json").read_text())["tasks"]}
 ROLES = json.loads((BASE / "roles.json").read_text())
@@ -158,6 +160,12 @@ class SoftwareEngineeringHost:
             },
             "remaining_turns": self.max_turns - len(self.history),
         }
+        system, content, _ = apply_model_visible_action_contract(
+            system,
+            content,
+            task_id=self.task["id"],
+            max_actions=self.max_actions,
+        )
         return [
             {"role": "system", "content": system},
             {"role": "user", "content": json.dumps(content, ensure_ascii=False)},

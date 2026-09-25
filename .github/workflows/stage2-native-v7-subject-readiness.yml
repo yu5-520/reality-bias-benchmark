@@ -117,6 +117,8 @@ jobs:
           assert p['scientific_task_used'] is False
           assert p['natural_cell_reserved'] is False
           assert p['registry_mutated'] is False
-          assert p['natural_trajectories_after_handshake']==0
+          assert isinstance(p['natural_trajectories_before_handshake'], int)
+          assert p['natural_trajectories_before_handshake'] >= 0
+          assert p['natural_trajectories_after_handshake'] == p['natural_trajectories_before_handshake']
           print('PASS: common provider handshake recorded; registry remains closed')
           PY

@@ -29,6 +29,14 @@ def sha256(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def _natural_attempt_count():
+    total = 0
+    for path in sorted((STAGE2 / "natural_v7").glob("*/manifest.json")):
+        manifest = json.loads(path.read_text())
+        total += int(manifest.get("natural_attempts_for_cell", 0))
+    return total
+
+
 def _write_json(path, payload):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -135,7 +143,7 @@ def build_preflight(
         "asset_blockers": blockers,
         "handshake_max_completion_tokens": HANDSHAKE_MAX_COMPLETION_TOKENS,
         "promotion_rule": gate["promotion_rule"],
-        "natural_trajectories_before_handshake": 0,
+        "natural_trajectories_before_handshake": _natural_attempt_count(),
     }
     return payload
 
@@ -168,6 +176,9 @@ def execute_handshake(*, preflight_path, out_path):
         raise ValueError("readiness preflight does not enforce one provider call")
     if preflight.get("scientific_task_used") is not False:
         raise ValueError("readiness preflight attempted to use a scientific task")
+    current_natural_attempts = _natural_attempt_count()
+    if current_natural_attempts != int(preflight.get("natural_trajectories_before_handshake", -1)):
+        raise RuntimeError("natural evidence count changed after readiness preflight")
     if not os.environ.get("DEEPSEEK_API_KEY"):
         raise RuntimeError("DEEPSEEK_API_KEY is required for the manual readiness handshake")
     workflow_run_id = int(os.environ.get("GITHUB_RUN_ID", "0"))
@@ -236,7 +247,8 @@ def execute_handshake(*, preflight_path, out_path):
             "scientific_task_used": False,
             "natural_cell_reserved": False,
             "registry_mutated": False,
-            "natural_trajectories_after_handshake": 0,
+            "natural_trajectories_before_handshake": current_natural_attempts,
+            "natural_trajectories_after_handshake": _natural_attempt_count(),
             "subject_config_sha256": preflight["subject_config_sha256"],
             "model_config_sha256": preflight["model_config_sha256"],
             "execution_snapshot": preflight["execution_snapshot"],
@@ -248,6 +260,8 @@ def execute_handshake(*, preflight_path, out_path):
             "remaining_asset_blockers": preflight["asset_blockers"],
             "promotion_required": "REVIEWED_REGISTRY_COMMIT",
         }
+        if receipt["natural_trajectories_after_handshake"] != current_natural_attempts:
+            raise RuntimeError("natural evidence count changed during provider handshake")
         _write_json(out_path, receipt)
         return receipt
     except Exception as exc:
