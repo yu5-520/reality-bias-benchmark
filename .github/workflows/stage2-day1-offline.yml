@@ -1,0 +1,27 @@
+name: Stage-II Day-1 offline conformance
+on:
+  push:
+    paths:
+      - 'stage2/**'
+      - 'docs/R_Plan_v6.2.md'
+      - '.github/workflows/stage2-day1-offline.yml'
+  pull_request:
+    paths:
+      - 'stage2/**'
+      - 'docs/R_Plan_v6.2.md'
+      - '.github/workflows/stage2-day1-offline.yml'
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m stage2.freeze
+      - run: python -m unittest discover -s tests
+        working-directory: stage2/fixtures/project
+      - run: python -m unittest discover -s stage2/tests
+      - run: python scripts/validate_frozen_raw_immutability.py --base ${{ github.event.pull_request.base.sha || github.event.before }}
