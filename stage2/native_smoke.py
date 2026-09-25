@@ -294,13 +294,35 @@ def _x6(binding: dict, cap: NativeCapture) -> None:
 
 
 def _x7(binding: dict, cap: NativeCapture) -> None:
+    from llmlingua import PromptCompressor
+
     binding["installed_version"] = _package_version("llmlingua")
     if not binding.get("checkpoint") or not binding.get("checkpoint_revision"):
-        raise EngineeringBlocked(
-            "LLMLingua package imports, but compressor checkpoint revision is not frozen; "
-            "do not download a floating model during the scientific gate"
-        )
-    raise EngineeringBlocked("checkpoint-bound LongLLMLingua smoke is not implemented")
+        raise EngineeringBlocked("LongLLMLingua checkpoint and immutable revision are required")
+    prompt = (
+        "The current checkout server is the active path. "
+        "The old compatibility path should not silently remain authoritative."
+    )
+    cap.capture(
+        event_id="x7-input", operation="compress", phase="emitted",
+        native_locator="llmlingua.PromptCompressor.compress_prompt:input",
+        hook_id=binding["native_hook"], raw=prompt.encode("utf-8"),
+        actor="release_lead", target="prompt-compressor", carrier_id="llmlingua-prompt-1",
+        source_id="stage2-smoke-source",
+    )
+    compressor = PromptCompressor(
+        model_name=binding["checkpoint"],
+        device_map="cpu",
+        model_config={"revision": binding["checkpoint_revision"]},
+    )
+    result = compressor.compress_prompt(prompt, rate=0.7)
+    cap.capture(
+        event_id="x7-output", operation="compress", phase="returned",
+        native_locator="llmlingua.PromptCompressor.compress_prompt:return",
+        hook_id=binding["native_hook"], raw=_native_bytes(result),
+        actor="prompt-compressor", target="release_lead", carrier_id="llmlingua-prompt-2",
+        source_id="llmlingua-prompt-1", parent_ids=("x7-input",), status="success",
+    )
 
 
 async def _run_probe(probe: str, lock: dict, outdir: Path) -> dict:
