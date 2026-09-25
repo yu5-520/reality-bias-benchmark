@@ -1,8 +1,15 @@
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
 from stage2.native_v7.collect import validate_request
 from stage2.native_v7.freeze import artifact
+from stage2.native_v7.observer import PassiveEventObserver, verify_observer
 from stage2.native_v7.policy import load_registry, validate_registry
+
+
+ROOT = Path(__file__).resolve().parents[3]
 
 
 class NativeV7Architecture(unittest.TestCase):
@@ -20,12 +27,12 @@ class NativeV7Architecture(unittest.TestCase):
     def test_probe_specs_contain_no_v6_shared_execution_contract(self):
         registry = load_registry()
         for pid, spec in registry["probes"].items():
-            raw = __import__("json").dumps(spec, sort_keys=True)
+            raw = json.dumps(spec, sort_keys=True)
             for marker in ("CodingArena", "RoleMailboxTransport", "context_adapter", "available_actions"):
                 with self.subTest(probe=pid, marker=marker):
                     self.assertNotIn(marker, raw)
 
-    def test_all_cells_closed_before_native_runners_exist(self):
+    def test_all_cells_closed_before_verified_native_runners(self):
         matrix = artifact()
         self.assertEqual(len(matrix["cells"]), 21)
         self.assertEqual({row["subject_trajectory_count"] for row in matrix["cells"]}, {0})
@@ -47,6 +54,20 @@ class NativeV7Architecture(unittest.TestCase):
         registry["probes"]["X1"]["collection_state"] = "RUNNER_VERIFIED"
         with self.assertRaisesRegex(ValueError, "verified runner lacks"):
             validate_registry(registry)
+
+    def test_x1_candidate_source_does_not_import_v6_execution_scaffold(self):
+        raw = (ROOT / "stage2/native_v7/x1_autogen/runner.py").read_text()
+        for marker in ("stage2.coding_arena", "RoleMailboxTransport", "context_adapter"):
+            self.assertNotIn(marker, raw)
+
+    def test_passive_event_observer_returns_identical_bytes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            observer = PassiveEventObserver(Path(directory) / "observer", probe="X1")
+            raw = b'{"native":"event"}'
+            returned = observer.observe(raw, surface="unit-test")
+            self.assertIs(returned, raw)
+            observer.seal()
+            self.assertGreaterEqual(verify_observer(observer.root), 2)
 
 
 if __name__ == "__main__":
