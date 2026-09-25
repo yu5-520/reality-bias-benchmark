@@ -37,34 +37,12 @@ jobs:
           git clone -q https://github.com/FoundationAgents/MetaGPT upstream
           git -C upstream checkout -q 11cdf466d042aece04fc6cfd13b28e1a70341b1f
           test "$(git -C upstream rev-parse HEAD)" = 11cdf466d042aece04fc6cfd13b28e1a70341b1f
-      - name: Install exact MetaGPT runtime
+      - name: Install frozen MetaGPT runtime
         shell: bash
         run: |
           set -euo pipefail
           python -m pip install -q --upgrade pip
-          grep -v '^lancedb==0.4.0          python - <<'PY'
-          from importlib.metadata import version
-          assert version("metagpt") == "1.0.0", version("metagpt")
-          PY
-      - name: Run X2 native MetaGPT Environment smoke
-        shell: bash
-        env:
-          PYTHONPATH: '${{ github.workspace }}'
-        run: |
-          set -euo pipefail
-          python -m stage2.native_v7.x2_metagpt.smoke --out-root stage2_x2_smoke
-      - name: Verify existing v7 architecture remains frozen
-        run: |
-          python -m stage2.native_v7.freeze
-          python -m unittest stage2.native_v7.tests.test_architecture -v
-      - name: Upload non-study X2 MetaGPT smoke evidence
-        uses: actions/upload-artifact@v4
-        with:
-          name: stage2-v7-x2-metagpt-smoke-${{ github.run_id }}
-          path: stage2_x2_smoke
-          retention-days: 30
-          if-no-files-found: error
- upstream/requirements.txt > /tmp/metagpt-requirements-stage2.txt
+          grep -v '^lancedb==0.4.0$' upstream/requirements.txt > /tmp/metagpt-requirements-stage2.txt
           python -m pip install -q -r /tmp/metagpt-requirements-stage2.txt
           python -m pip install -q --no-deps -e upstream
           python - <<'PY'
