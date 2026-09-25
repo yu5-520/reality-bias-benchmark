@@ -70,19 +70,46 @@ class NativeV7Architecture(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
             validate_request("X1", "T1")
 
-    def test_other_cells_remain_closed_before_native_runners_exist(self):
+    def test_x4_runner_is_verified_but_subject_gate_remains_closed(self):
+        registry = load_registry()
+        x4 = registry["probes"]["X4"]
+        self.assertEqual(x4["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x4["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
+        self.assertEqual(x4["background_substrate_id"], "software_engineering_host_v1")
+        self.assertEqual(x4["verification"]["state"], "NON_STUDY_NATIVE_SMOKE_PASS")
+        self.assertEqual(x4["verification"]["mcp_calls"], 4)
+        self.assertFalse(x4["verification"]["subject_ready"])
+        with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
+            validate_request("X4", "T1")
+
+    def test_remaining_cells_stay_closed_before_native_runners_exist(self):
         matrix = artifact()
         self.assertEqual(len(matrix["cells"]), 21)
         self.assertEqual({row["subject_trajectory_count"] for row in matrix["cells"]}, {0})
-        x1 = {row["status"] for row in matrix["cells"] if row["probe"] == "X1"}
-        rest = {row["status"] for row in matrix["cells"] if row["probe"] != "X1"}
-        self.assertEqual(x1, {"NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING"})
+        verified = {
+            row["probe"]: row["status"]
+            for row in matrix["cells"]
+            if row["probe"] in {"X1", "X4"}
+        }
+        self.assertEqual(set(verified.values()), {"NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING"})
+        rest = {
+            row["status"]
+            for row in matrix["cells"]
+            if row["probe"] not in {"X1", "X4"}
+        }
         self.assertEqual(rest, {"PENDING_NATIVE_RUNNER"})
-        for probe in (f"X{i}" for i in range(2, 8)):
+        for probe in ("X2", "X3", "X5", "X6", "X7"):
             with self.subTest(probe=probe), self.assertRaisesRegex(
                 ValueError, "native runner is not verified"
             ):
                 validate_request(probe, "T1")
+
+    def test_x4_runner_uses_frozen_host_and_not_historical_mcp_adapter(self):
+        raw = (ROOT / "stage2/native_v7/x4_mcp/runner.py").read_text()
+        self.assertIn("SoftwareEngineeringHost", raw)
+        self.assertIn("MCPCheckoutProxy", raw)
+        for marker in ("stage2.mcp_workspace", "CodingArena", "RoleMailboxTransport"):
+            self.assertNotIn(marker, raw)
 
     def test_pending_runner_cannot_smuggle_launch_command(self):
         registry = load_registry()
