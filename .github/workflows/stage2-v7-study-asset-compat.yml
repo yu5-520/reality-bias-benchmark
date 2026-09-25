@@ -1,0 +1,83 @@
+name: Stage-II v7 Real Asset Compatibility
+
+on:
+  push:
+    paths:
+      - 'stage2/native_v7/study/**'
+      - 'stage2/study_assets/validate.py'
+      - '.github/workflows/stage2-v7-study-asset-compat.yml'
+  pull_request:
+    paths:
+      - 'stage2/native_v7/study/**'
+      - 'stage2/study_assets/validate.py'
+      - '.github/workflows/stage2-v7-study-asset-compat.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  x6-real-embedding:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install X6 pinned dependency stack
+        run: |
+          set -euo pipefail
+          python -m pip install -q --upgrade pip
+          python -m pip install -q 'torch==2.0.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q 'numpy==1.24.4' 'pydantic==1.10.13' 'huggingface-hub==0.14.1' 'tokenizers==0.13.3' 'transformers==4.28.0' 'faiss-cpu==1.7.4' 'scipy==1.10.1' 'scikit-learn==1.3.2' 'nltk==3.9.1' 'Pillow==10.4.0' 'unstructured==0.6.10' 'langchain==0.0.146'
+          python -m pip install -q --no-deps 'sentence-transformers==2.2.2'
+      - name: Verify frozen model hash and load real embeddings on CPU
+        env:
+          TOKENIZERS_PARALLELISM: 'false'
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/stage2-x6-study
+          python -m stage2.study_assets.validate --probe X6 --out-root /tmp/stage2-x6-study
+          HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python - <<'PY'
+          from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+          model = HuggingFaceEmbeddings(model_name='/tmp/stage2-x6-study/checkpoint', model_kwargs={'device':'cpu'})
+          vector = model.embed_query('Neutral memory retrieval compatibility check.')
+          assert len(vector) == 384
+          print('PASS: frozen X6 real embedding checkpoint loaded and queried')
+          PY
+
+  x7-real-compressor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install X7 pinned package and CPU stack
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/microsoft/LLMLingua upstream
+          git -C upstream checkout -q 5a4c78ae18ab17a98cf997e8259354e546081d64
+          test "$(git -C upstream rev-parse HEAD)" = 5a4c78ae18ab17a98cf997e8259354e546081d64
+          python -m pip install -q --upgrade pip
+          python -m pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q 'transformers==4.44.2' 'accelerate>=0.33,<1' tiktoken nltk numpy tokenizers safetensors
+          python -m pip install -q --no-deps -e upstream
+      - name: Verify frozen model hash and run real compression on neutral text
+        env:
+          TOKENIZERS_PARALLELISM: 'false'
+          HF_HUB_OFFLINE: '1'
+          TRANSFORMERS_OFFLINE: '1'
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/stage2-x7-study
+          HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 python -m stage2.study_assets.validate --probe X7 --out-root /tmp/stage2-x7-study
+          python - <<'PY'
+          from stage2.native_v7.x7_longllmlingua.context import checkpoint_hashes, FrozenLongLLMLinguaContext
+          checkpoint = '/tmp/stage2-x7-study/checkpoint'
+          context = FrozenLongLLMLinguaContext(checkpoint=checkpoint, expected_hashes=checkpoint_hashes(checkpoint))
+          result = context.compressor.compress_prompt(context=['A short neutral context about a bookstore and a reader. The reader selected a book and then left the store.'], question='What happened?', rate=0.5, rank_method='longllmlingua')
+          assert isinstance(result.get('compressed_prompt'), str)
+          print('PASS: pinned X7 real pretrained checkpoint loaded and compressed')
+          PY
