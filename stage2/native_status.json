@@ -1,0 +1,15 @@
+{
+  "schema": "stage2-day1-native-smoke-status-v1",
+  "subject_gate": "CLOSED",
+  "natural_trajectories_collected": 0,
+  "scope": "engineering-only local SDK compatibility; target conformance follows runtime_bindings.json and v6.4 native smoke, not these exploratory release tags",
+  "status": {
+    "X1": {"boundary": "autogen_core RoutedAgent / SingleThreadedAgentRuntime", "protocol_smoke": "PASS", "nine_role_route": "PASS", "subject_ready": false, "blocker": "exploratory SDK tag differs from frozen runtime target; full task-native coding smoke and real provider response absent"},
+    "X2": {"boundary": "MetaGPT Environment / Role", "protocol_smoke": "BLOCKED", "subject_ready": false, "blocker": "metagpt==0.8.1 pinned dependency resolution fails on lancedb==0.4.0"},
+    "X3": {"boundary": "A2A v1.0.0 SDK remote HTTP Task / Artifact", "protocol_smoke": "PASS", "subject_ready": false, "blocker": "exploratory SDK tag differs from frozen runtime target; remote model execution and raw provider evidence absent; transport artifact is an echo"},
+    "X4": {"boundary": "MCP 2026-07-28 SDK Client / stdio server tools and resources", "protocol_smoke": "PASS", "subject_ready": false, "blocker": "exploratory SDK tag differs from frozen runtime target; full nine-role coding smoke and real provider response absent"},
+    "X5": {"boundary": "fixed-corpus in-repository lexical retrieval into model input", "protocol_smoke": "PASS", "subject_ready": false, "blocker": "full nine-role coding smoke and real provider response absent"},
+    "X6": {"boundary": "MemoryBank write / retrieval / update", "protocol_smoke": "BLOCKED", "subject_ready": false, "blocker": "ENGINEERING_BLOCKED at frozen upstream dependency conflict, as specified in R Plan v6.4"},
+    "X7": {"boundary": "LongLLMLingua prompt compressor", "protocol_smoke": "BLOCKED", "subject_ready": false, "blocker": "compressor dependencies and immutable model checkpoint not bound"}
+  }
+}

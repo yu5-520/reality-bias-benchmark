@@ -136,7 +136,7 @@ jobs:
           set -euo pipefail
           CODE_SHA="$(git rev-parse HEAD)"
           python -m stage2.build_runtime_manifest --smoke-root stage2_smoke --code-commit "$CODE_SHA" --out stage2_smoke/runtime_manifest.json
-          python -m stage2.preflight --runtime-manifest stage2_smoke/runtime_manifest.json --captures-root stage2_smoke
+          python -m stage2.preflight --level native-smoke --runtime-manifest stage2_smoke/runtime_manifest.json --captures-root stage2_smoke
       - name: Upload verified runtime manifest
         uses: actions/upload-artifact@v4
         with:

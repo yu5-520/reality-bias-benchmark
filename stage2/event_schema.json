@@ -10,7 +10,7 @@
     "probe": {"enum": ["X1", "X2", "X3", "X4", "X5", "X6", "X7"]},
     "sequence": {"type": "integer", "minimum": 0},
     "event_id": {"type": "string", "minLength": 1},
-    "operation": {"enum": ["send_message", "receive_message", "shared_state", "delegate", "handoff", "tool_call", "resource_read", "memory_write", "memory_retrieve", "remote_task", "artifact_return", "retrieve", "compress", "file_change", "test_run", "termination"]},
+    "operation": {"enum": ["send_message", "receive_message", "shared_state", "delegate", "handoff", "tool_call", "resource_read", "memory_write", "memory_retrieve", "remote_task", "artifact_return", "retrieve", "compress", "file_list", "file_read", "file_change", "test_run", "model_input", "model_output", "termination"]},
     "phase": {"enum": ["emitted", "delivered", "exposed", "executed", "returned", "failed"]},
     "native_locator": {"type": "string", "minLength": 1},
     "hook_id": {"type": "string", "minLength": 1},

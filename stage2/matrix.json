@@ -191,11 +191,18 @@
       "task": "T3"
     }
   ],
-  "execution_gate": "CLOSED_UNTIL_NATIVE_BINDING_AND_MODEL_LIMITS",
+  "execution_gate": "CLOSED_UNTIL_TARGET_MATCHING_FULL_CODING_SMOKE",
   "files_sha256": {
     "docs/R_Plan_v6.2.md": "3a1880bca1eaedd993f23d4580c6e5927e2758557db7a5ea8b86418c4c0f32be",
-    "stage2/event_schema.json": "d1e6959e03fcb395a4b577f9514ce490dc0ce2b6d694836a416d414a7953ef4e",
-    "stage2/evidence.py": "7a74fb384befbcdd2d026bec7093026b9ed3a684b916dd50b255f8cbe3c7c3ad",
+    "docs/R_Plan_v6.3.md": "1a752a3dda95f302c14fcc5f2a316d9abc8f5b117a7b17ff1cd99b2de2869e2d",
+    "docs/R_Plan_v6.4.md": "18739f5f32bbc890628ffd77cddfad003d0c3c1790c0953a17c92c8c9ea312a0",
+    "docs/R_Plan_v6.5.md": "2ae2cb478ba405c6f4d52605abb5bbd479406b0341ee9d579337c4e3684f9cef",
+    "stage2/a2a_remote_service.py": "9db7a1d48ee51244d88188140421b57bb5f9357fbf5f3c9b0210a70ed1e44419",
+    "stage2/a2a_transport.py": "7bb1eb1981090823290c156af64295f2d96e45980e4731594c5394870642f1be",
+    "stage2/build_runtime_manifest.py": "aa3b261d3af4af3e00b5e6456259793070849b8980bed961c2e314bfc6fc9599",
+    "stage2/coding_arena.py": "b803d807af2a7fba0b5f617a16ac782cfcfd47b3804d6288254bd4b653371141",
+    "stage2/event_schema.json": "b7fefc6307bfe99fdc99449ef86ee0c88710e80debe92c6a9b977243367000f6",
+    "stage2/evidence.py": "afdc629c442b25bae74faef127918cfcad296c5a969e00b05de8010719fda358",
     "stage2/fixtures/project/README.md": "11fe60236b048a9794f3441196c886f2ba9c52cf0bfd3dff95975a908aa99f12",
     "stage2/fixtures/project/checkout_app/__init__.py": "e841164491c4e3eeedd963948f81818610dff8a08058792eeb99c559b31719c8",
     "stage2/fixtures/project/checkout_app/checkout.py": "ad9b7786ee90545cbfd55c63c8e738b4af468d953ef134c95c3f25e16aa4e1a2",
@@ -208,19 +215,43 @@
     "stage2/fixtures/project/versions/before/server.py": "c18b186ec348b26ed30cffffd04d688f3661f4abc18260a851f307bad09e6e56",
     "stage2/fixtures/project/web/app.js": "ea71ea811176430b89c4075881c3381cac04be21b3aeeb105d7ce12e5821f8c3",
     "stage2/fixtures/project/web/index.html": "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd",
+    "stage2/longllmlingua_context.py": "678f737ea565085eee8596296c023ee2f0680fc43f66f7f1891490aa453dfff7",
+    "stage2/mcp_checkout_server.py": "d30e9b85ea5a0113a586d802e50b8750198e6bfae0868cd74b674d0717616fbd",
+    "stage2/mcp_workspace.py": "bb361d2d33ef429342b92fefdb5665b99ad1c9e771b92e85a87bd822e29d2550",
+    "stage2/metagpt_transport.py": "eaf4a34f9c4e26cfc8cea00ae82a798c1f62a4351f1fda100521b7225a1be8b5",
+    "stage2/native_smoke.py": "151038fe111f9b0a5bbb9c91960d5704dfffb0109405d752a57fe913077cfe7c",
+    "stage2/native_status.json": "977fb59890eba7379d9d3e457d8d7fb5b763e928fc1e9e01efd37adac57415ea",
+    "stage2/preflight.py": "df75ac4694bf1ed4d4985a532b0f468fab89a5a74dac522574524229853fe770",
+    "stage2/rag_context.py": "372959ef305f5f98b393ccf7079f6edbef8a63adef9359ac50f93c31d7ea8f32",
     "stage2/retrieval.py": "baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4",
     "stage2/roles.json": "8a7845c97df430d17b57747d4becdc18ebdde81625b53e82a3d371417fc6eb15",
+    "stage2/runtime_bindings.json": "a2b99968ffe1a2fe855fbf29bc7b0518a2e31793399ee3abb65afe24d49ef050",
+    "stage2/runtime_packages.json": "90fa97d140f4e8b326232bf9e7444f1dda82d3aa6776a587981420e95585d840",
+    "stage2/subject.json": "b0858d05e539b851f75d615ceb7738c34400a422190a685796df1811e4a7cd3b",
     "stage2/tasks.json": "81997dd53acae570ae37d14d26229ef479a10ae9fcdae57b9f837b574490d15b",
-    "stage2/versions.json": "78c7b6029bd575545f981cc3c2470522054ca06f76cd80e6316b07788dc3737d"
+    "stage2/transports.py": "c83b93a85f72aa00f106a83b54d34f8219fc2072d8af676515d1259cace215d8",
+    "stage2/versions.json": "78c7b6029bd575545f981cc3c2470522054ca06f76cd80e6316b07788dc3737d",
+    "stage2/workspace.py": "6c3c9bf184160fb939cbd197414024880bff36bdde338bb0f67214cc537cc8c3"
   },
   "predecessors": [
     "docs/R_Plan_v6.0.md",
     "docs/R_Plan_v6.1.md",
-    "docs/R_Plan_v6.2.md"
+    "docs/R_Plan_v6.2.md",
+    "docs/R_Plan_v6.3.md",
+    "docs/R_Plan_v6.4.md",
+    "docs/R_Plan_v6.5.md"
   ],
   "runtime_code_sha": null,
   "schema": "stage2-first-group-v1",
-  "subject_limits": null,
-  "subject_model": null,
-  "subject_provider": null
+  "subject_limits": {
+    "automatic_paid_evaluator": false,
+    "max_pending_messages": 128,
+    "max_total_model_invocations": 64,
+    "max_turns": 32,
+    "one_natural_trajectory_per_cell": true,
+    "transport_max_retries": 2,
+    "transport_timeout_seconds": 60
+  },
+  "subject_model": "deepseek-flash",
+  "subject_provider": "deepseek"
 }

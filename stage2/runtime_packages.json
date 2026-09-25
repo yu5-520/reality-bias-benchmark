@@ -1,0 +1,14 @@
+{
+  "schema": "stage2-native-runtime-binding-v1",
+  "date_utc": "2026-09-25",
+  "interpretation": "ENGINEERING-ONLY SDK releases for preliminary compatibility checks. X1/X3/X4 release commits differ from the exact experimental SDK/source targets frozen in runtime_bindings.json; no release listed here authorizes a subject trajectory. Wheel download does not prove a working model condition.",
+  "packages": {
+    "X1": {"distribution": "autogen-agentchat==0.7.5; autogen-core==0.7.5", "agentchat_wheel_sha256": "d19ca8ec26cb15e071a56c4269140aea2bf3c718bdc7e06f6677af9a905815ba", "sdk_source": "https://github.com/microsoft/autogen", "sdk_ref": "python-v0.7.5", "sdk_source_commit": "83afbf5857aac683340d4c692194e548b1e8edda", "isolation": "separate environment: autogen-core requires protobuf 5.29.x; A2A v1.0.0 smoke requires protobuf 6.33.6"},
+    "X2": {"distribution": "metagpt==0.8.1", "wheel_sha256": "998acbbda3a3accbee57dd34dd32436269ee0a4ba7ada091d7546f44015634a0", "sdk_ref": "v0.8.1", "sdk_source_commit": "c036574507e7616c02512e7c8ad88dd847783afa", "dependency_blocker": "metagpt==0.8.1 requires lancedb==0.4.0, which did not resolve in the available index; no native nine-role MetaGPT smoke passed"},
+    "X3": {"distribution": "a2a-sdk==1.0.0", "wheel_sha256": "2644420b127bfdc19ca698fb07415de5b753b175ae94f659452dc5314f316515", "sdk_source": "https://github.com/a2aproject/a2a-python", "sdk_ref": "v1.0.0", "sdk_source_commit": "24db37ee24c927df936289ad6ffbc8c746a44db8", "smoke_dependencies": "protobuf==6.33.6; grpcio==1.84.0"},
+    "X4": {"distribution": "mcp==2.2.0", "wheel_sha256": "bde982589473a060ae145e3406e9a5333fe538c97229ba841f5a7f92be004f81", "sdk_source": "https://github.com/modelcontextprotocol/python-sdk", "sdk_ref": "v2.2.0", "sdk_source_commit": "9972c21aa42054fb1450c5fc614761ed11847ec6"},
+    "X5": {"distribution": "stage2/retrieval.py", "implementation_sha256": "baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4", "corpus": "stage2/fixtures/project files indexed by retrieval.INDEX_PATHS", "query_policy": "frozen user request per role turn; lexical overlap, score descending, path ascending, top 3"},
+    "X6": {"distribution": "source-only MemoryBank-SiliconFriend", "reference_commit": "cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9", "dependency_blocker": "upstream MemoryForgetterLoader imports old LangChain, FAISS and embeddings; persistence, embedding checkpoint and retrieval policy not yet bound"},
+    "X7": {"distribution": "llmlingua==0.2.2", "wheel_sha256": "da55137efe0db78063b3395396efe8a0dcfe4ae5a09aea0d503c34b7bf1d800c", "sdk_ref": "v0.2.2", "sdk_source_commit": "a411a3fa61df74411157b2512b592d5357bd8f17", "dependency_blocker": "torch/transformers and LongLLMLingua compressor checkpoint and weights not installed or bound"}
+  }
+}
