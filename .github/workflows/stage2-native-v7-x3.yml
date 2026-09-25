@@ -1,0 +1,61 @@
+name: Stage-II v7 X3 A2A native role services
+
+on:
+  push:
+    paths:
+      - 'stage2/native_v7/x3_a2a/**'
+      - 'stage2/tasks.json'
+      - 'stage2/roles.json'
+      - 'stage2/subject.json'
+      - 'stage2/fixtures/project/**'
+      - '.github/workflows/stage2-native-v7-x3.yml'
+  pull_request:
+    paths:
+      - 'stage2/native_v7/x3_a2a/**'
+      - 'stage2/tasks.json'
+      - 'stage2/roles.json'
+      - 'stage2/subject.json'
+      - 'stage2/fixtures/project/**'
+      - '.github/workflows/stage2-native-v7-x3.yml'
+
+jobs:
+  x3-a2a-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: '${{ github.event.pull_request.head.sha || github.sha }}'
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Bind exact frozen A2A protocol and SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/a2aproject/a2a-python upstream
+          git -C upstream checkout -q 0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167
+          test "$(git -C upstream rev-parse HEAD)" = 0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167
+          python -m pip install -q -e './upstream[http-server]' 'uvicorn>=0.35.0'
+          git clone -q https://github.com/a2aproject/A2A protocol
+          git -C protocol checkout -q 173695755607e884aa9acf8ce4feed90e32727a1
+          test "$(git -C protocol rev-parse HEAD)" = 173695755607e884aa9acf8ce4feed90e32727a1
+      - name: Run X3 nine-role native A2A smoke
+        shell: bash
+        env:
+          PYTHONPATH: '${{ github.workspace }}'
+        run: |
+          set -euo pipefail
+          python -m stage2.native_v7.x3_a2a.smoke --out-root stage2_x3_smoke
+      - name: Verify existing v7 architecture remains frozen
+        run: |
+          python -m stage2.native_v7.freeze
+          python -m unittest stage2.native_v7.tests.test_architecture -v
+      - name: Upload non-study X3 A2A smoke evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-v7-x3-a2a-smoke-${{ github.run_id }}
+          path: stage2_x3_smoke
+          retention-days: 30
+          if-no-files-found: error
