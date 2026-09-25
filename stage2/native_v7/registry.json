@@ -262,22 +262,41 @@
       }
     },
     "X6": {
-      "collection_state": "PENDING_NATIVE_RUNNER",
+      "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
       "environment_id": "x6-memorybank-cf61c41",
       "execution_owner": "Frozen software-engineering host plus official MemoryBank mechanism",
       "host_attachment": "MemoryBank attaches at its native memory write/retrieve boundary in its own compatible environment while the software-engineering host retains role execution.",
       "launch": {
-        "argv_template": null,
-        "state": "PENDING_NATIVE_ENTRYPOINT"
+        "state": "VERIFIED_NATIVE_ENTRYPOINT",
+        "argv_template": [
+          "python",
+          "-m",
+          "stage2.native_v7.x6_memorybank.runner",
+          "--checkout",
+          "{checkout}",
+          "--task-file",
+          "{task_file}",
+          "--roles-file",
+          "{roles_file}",
+          "--subject-file",
+          "{subject_file}",
+          "--observer-root",
+          "{observer_root}/memorybank_native",
+          "--memory-root",
+          "{cell_root}/memorybank_state"
+        ]
       },
       "name": "MemoryBank",
       "observer": {
         "may_mutate_execution": false,
         "mode": "external",
         "native_surfaces": [
-          "memory write/read bytes",
-          "retrieval state",
-          "provider I/O",
+          "post-return immutable copy of MemoryBank search query bytes",
+          "post-return immutable copy of MemoryBank recall result bytes",
+          "pre/post recall memory-file bytes copied after upstream search returns",
+          "post-rebuild memory-file bytes after upstream memory write/index update",
+          "model-visible memorybank_recall exposure",
+          "process stdout/stderr/exit",
           "checkout effects"
         ]
       },
@@ -286,7 +305,33 @@
       "source_repo": "zhongwanjun/MemoryBank-SiliconFriend",
       "upstream_mode": "official_source",
       "integration_kind": "memory_capability",
-      "background_substrate_id": "software_engineering_host_v1"
+      "background_substrate_id": "software_engineering_host_v1",
+      "study_embedding": {
+        "state": "PENDING_FROZEN_MANIFEST",
+        "source_commit": "cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9",
+        "upstream_env": "STAGE2_X6_UPSTREAM",
+        "embedding_env": "STAGE2_X6_EMBEDDING_MODEL",
+        "manifest_env": "STAGE2_X6_EMBEDDING_MANIFEST",
+        "rule": "A local embedding checkpoint and exact file-hash manifest must be frozen before SUBJECT_READY; the tiny engineering embedding used by smoke tests is never authorized for natural collection."
+      },
+      "verification": {
+        "state": "NON_STUDY_NATIVE_SMOKE_PASS",
+        "workflow": ".github/workflows/stage2-native-v7-x6.yml",
+        "verified_code_commit": "81de62483236f8a74cd09b40668ee1f025b5a7ce",
+        "workflow_run_id": 36137509369,
+        "subject_ready": false,
+        "study_embedding_ready": false,
+        "task": "T2",
+        "turns": 2,
+        "stop_reason": "finalized",
+        "memorybank_writes": 2,
+        "memorybank_retrieval_calls": 1,
+        "memorybank_recalled_items": 1,
+        "reinforced_strength": 2,
+        "observer_files": 6,
+        "synthetic_embedding_files": 6,
+        "checkout_sha256": "15200a4ce5b6a09127f25371b55d9b4ae3b1f2071af78c3a7f37b6fcad8303e2"
+      }
     },
     "X7": {
       "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
@@ -366,7 +411,7 @@
     "tasks": "stage2/tasks.json",
     "host_policy": "X1-X2 use their native multi-agent framework, X3 uses native A2A communication, and X4-X7 may share the explicitly registered software-engineering background host because those X conditions operate at tool/retrieval/memory/context layers; monitoring is not part of that host."
   },
-  "status": "X1_X3_X4_X5_X7_NATIVE_RUNNERS_VERIFIED_SUBJECT_PENDING_CAPABILITY_HOST_FROZEN_X2_X6_RUNNERS_PENDING",
+  "status": "X1_X3_X4_X5_X6_X7_NATIVE_RUNNERS_VERIFIED_SUBJECT_PENDING_CAPABILITY_HOST_FROZEN_X2_RUNNER_PENDING",
   "forbidden_global_normalization": [
     "requiring every X to execute through one common runtime adapter",
     "requiring X1-X3 to use the baseline role-mailbox communication substrate",
