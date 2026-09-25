@@ -21,6 +21,7 @@ FORBIDDEN_KEYS = {
     "shared_mailbox",
     "transport_contract",
 }
+RUNNER_STATES = {"NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING", "SUBJECT_READY"}
 
 
 def load_registry(path=None):
@@ -42,8 +43,10 @@ def validate_registry(data):
             raise ValueError(f"{pid}: shared execution adapter key is forbidden")
         if spec.get("runtime_scope") != "independent":
             raise ValueError(f"{pid}: runtime must be independently frozen")
-        if spec.get("execution_owner") != "framework_or_native_mechanism":
-            raise ValueError(f"{pid}: framework/native mechanism must own execution")
+        if not spec.get("execution_owner"):
+            raise ValueError(f"{pid}: execution owner must be explicit")
+        if not spec.get("integration_kind"):
+            raise ValueError(f"{pid}: integration kind must be explicit")
         observer = spec.get("observer", {})
         if observer.get("mode") != "external" or observer.get("may_mutate_execution") is not False:
             raise ValueError(f"{pid}: observer must be external and non-mutating")
@@ -51,14 +54,23 @@ def validate_registry(data):
         if not env or env in envs:
             raise ValueError(f"{pid}: environment_id must be unique")
         envs.add(env)
+
         launch = spec.get("launch", {})
         state = spec.get("collection_state")
-        if state == "RUNNER_VERIFIED":
+        if state in RUNNER_STATES:
             argv = launch.get("argv_template")
-            if launch.get("state") != "VERIFIED_NATIVE_ENTRYPOINT" or not isinstance(argv, list) or not argv:
+            if (
+                launch.get("state") != "VERIFIED_NATIVE_ENTRYPOINT"
+                or not isinstance(argv, list)
+                or not argv
+            ):
                 raise ValueError(f"{pid}: verified runner lacks a native entrypoint")
-        elif launch.get("argv_template") is not None:
-            raise ValueError(f"{pid}: pending runner must not expose an executable collection command")
+        elif state == "PENDING_NATIVE_RUNNER":
+            if launch.get("argv_template") is not None:
+                raise ValueError(f"{pid}: pending runner must not expose an executable collection command")
+        else:
+            raise ValueError(f"{pid}: unrecognized collection state: {state}")
+
         raw_spec = json.dumps(spec, sort_keys=True)
         for marker in FORBIDDEN_TEXT:
             if marker in raw_spec:
