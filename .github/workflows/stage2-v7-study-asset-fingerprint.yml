@@ -1,0 +1,39 @@
+name: Stage-II v7 Real Study Asset Fingerprint
+
+on:
+  push:
+    paths:
+      - '.github/workflows/stage2-v7-study-asset-fingerprint.yml'
+      - 'stage2/study_assets/prepare.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fingerprint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    strategy:
+      fail-fast: false
+      matrix:
+        probe: [X6, X7]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fetch exact public pretrained checkpoint and fingerprint every local file
+        run: |
+          set -euo pipefail
+          python -m pip install -q 'huggingface-hub>=0.24,<1'
+          mkdir -p /tmp/stage2-study-${{ matrix.probe }}
+          python -m stage2.study_assets.prepare \
+            --probe ${{ matrix.probe }} --out-root /tmp/stage2-study-${{ matrix.probe }}
+      - name: Upload only the prospective source and hash manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-study-${{ matrix.probe }}-manifest-${{ github.run_id }}
+          path: /tmp/stage2-study-${{ matrix.probe }}/study_manifest.json
+          retention-days: 90
+          if-no-files-found: error
