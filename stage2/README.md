@@ -12,17 +12,19 @@ acceptance rubric or a list of permitted file edits. Each cell gets an isolated
 copy of the checkout and a separate raw evidence directory.
 
 `versions.json` locks six upstream reference commits (two protocol tags separately)
-and the in-repo X5 retrieval code SHA-256. `runtime_packages.json` pins checked
-distribution versions separately. `native_status.json` reports which **non-subject**
-framework/protocol smoke checks passed and which remain blocked. All seven subject
-runtimes, model, provider, budgets and complete native hooks remain unbound. `python -m stage2.freeze`
+and the in-repo X5 retrieval code SHA-256. `runtime_bindings.json` and `subject.json`
+freeze the experimental implementation targets and DeepSeek subject profile.
+`runtime_packages.json` and `native_status.json` report **engineering-only**
+SDK compatibility smokes; X1/X3/X4 release commits in these files differ from
+the frozen experimental targets. No full subject-ready native coding trace or
+subject credential is present. `python -m stage2.freeze`
 verifies fixture/task/role/version hashes. `python -m unittest discover -s stage2/tests`
 tests the offline interface only. A synthetic test frame never satisfies native
-probe conformance. `python -m stage2.preflight --runtime-manifest <path> --captures-root <path> --probe X1`
-gates an individual fixed probe; omit `--probe` for the whole seven-layer group.
-Both paths fail closed without a bound subject provider/model/limits and full
-native code-changing smoke. A blocked probe never makes a passing probe change
-the frozen matrix denominator.
+probe conformance. `python -m stage2.preflight --level native-smoke --runtime-manifest <path> --captures-root <path>`
+validates the v6.4 engineering smoke without opening subject collection. Omit
+`--level native-smoke` for the stricter natural-run gate; `--probe X1` checks one
+fixed probe. A blocked probe never makes a passing probe change the frozen
+matrix denominator.
 
 ## Native hook contract
 
@@ -50,6 +52,6 @@ recording. `AutoGenTransport`, `A2AProtocolTransport`, `MCPWorkspace`, and
 returns an artifact without remote model execution; it does not pass subject
 preflight. `MetaGPTTransport` and `LongLLMLinguaContext` require exact native
 dependencies and a frozen local compressor checkpoint respectively. X6 remains
-blocked until the upstream MemoryBank runtime can be bound to a fixed
-embedding/persistence policy. See `native_status.json` before interpreting a
+frozen as `ENGINEERING_BLOCKED` at the upstream dependency conflict. See
+`native_status.json` and R Plan v6.5 before interpreting a
 passing offline test as subject readiness.

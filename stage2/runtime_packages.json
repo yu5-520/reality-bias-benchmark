@@ -1,7 +1,7 @@
 {
   "schema": "stage2-native-runtime-binding-v1",
   "date_utc": "2026-09-25",
-  "interpretation": "SDK source releases are distinct from the fixed literature/specification reference commits in versions.json. Wheel download does not prove a working model condition.",
+  "interpretation": "ENGINEERING-ONLY SDK releases for preliminary compatibility checks. X1/X3/X4 release commits differ from the exact experimental SDK/source targets frozen in runtime_bindings.json; no release listed here authorizes a subject trajectory. Wheel download does not prove a working model condition.",
   "packages": {
     "X1": {"distribution": "autogen-agentchat==0.7.5; autogen-core==0.7.5", "agentchat_wheel_sha256": "d19ca8ec26cb15e071a56c4269140aea2bf3c718bdc7e06f6677af9a905815ba", "sdk_source": "https://github.com/microsoft/autogen", "sdk_ref": "python-v0.7.5", "sdk_source_commit": "83afbf5857aac683340d4c692194e548b1e8edda", "isolation": "separate environment: autogen-core requires protobuf 5.29.x; A2A v1.0.0 smoke requires protobuf 6.33.6"},
     "X2": {"distribution": "metagpt==0.8.1", "wheel_sha256": "998acbbda3a3accbee57dd34dd32436269ee0a4ba7ada091d7546f44015634a0", "sdk_ref": "v0.8.1", "sdk_source_commit": "c036574507e7616c02512e7c8ad88dd847783afa", "dependency_blocker": "metagpt==0.8.1 requires lancedb==0.4.0, which did not resolve in the available index; no native nine-role MetaGPT smoke passed"},

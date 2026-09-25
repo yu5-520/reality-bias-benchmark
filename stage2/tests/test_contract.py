@@ -10,7 +10,7 @@ from urllib.request import urlopen
 from stage2.evidence import NativeCapture, check_capture, PROBES
 from stage2.freeze import BASE, artifact, hash_file
 from stage2.retrieval import retrieve
-from stage2.preflight import blockers
+from stage2.preflight import blockers, native_smoke_blockers
 from stage2.longllmlingua_context import checkpoint_hashes
 
 
@@ -74,15 +74,41 @@ class ProspectiveGate(unittest.TestCase):
             manifest = Path(directory) / "runtime.json"
             manifest.write_text("{}")
             errors = blockers(manifest, directory)
-            self.assertIn("provider/model/limits unbound", errors)
-            self.assertTrue(any("X1: installed implementation/native hooks unbound" in error for error in errors))
-            self.assertFalse(any("X2: installed implementation/native hooks unbound" in error
+            self.assertIn("frozen subject provider/model/limits mismatch", errors)
+            self.assertTrue(any("X1: installed implementation/native hook unbound" in error for error in errors))
+            self.assertFalse(any("X2: installed implementation/native hook unbound" in error
                                  for error in blockers(manifest, directory, probe_id="X1")))
 
     def test_compression_does_not_accept_missing_checkpoint(self):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaises(FileNotFoundError):
                 checkpoint_hashes(Path(directory) / "missing")
+
+    def test_native_boundary_smoke_cannot_open_subject_gate(self):
+        from stage2.native_smoke import smoke_x5
+        code_commit = "f" * 40
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            smoke_x5(root / "X5", code_commit)
+            subject = json.loads((BASE / "subject.json").read_text())
+            targets = json.loads((BASE / "runtime_bindings.json").read_text())["probes"]
+            manifest = {
+                "code_commit": code_commit,
+                "matrix_sha256": hash_file(BASE / "matrix.json"),
+                "roles_sha256": artifact()["files_sha256"]["stage2/roles.json"],
+                "subject_provider": subject["provider"], "subject_model": subject["model_alias"],
+                "expected_model_version": subject["expected_model_version"],
+                "subject_limits": subject["limits"], "probes": {pid: {} for pid in targets},
+            }
+            manifest["probes"]["X5"] = {
+                "source_commit": code_commit, "installed_version": "in-repo",
+                "native_hook": targets["X5"]["hook_id"],
+                "implementation_sha256": targets["X5"]["implementation_sha256"],
+            }
+            path = root / "manifest.json"
+            path.write_text(json.dumps(manifest))
+            self.assertEqual(native_smoke_blockers(path, root, "X5"), [])
+            self.assertTrue(any("full coding smoke" in item for item in blockers(path, root, "X5")))
 
     def test_prior_and_current_version_are_executable(self):
         root = BASE / "fixtures/project"

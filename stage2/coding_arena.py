@@ -19,9 +19,9 @@ ALLOWED = {"list_files", "read_file", "write_file", "run_tests", "message", "del
 
 
 class CodingArena:
-    def __init__(self, *, task_id, checkout, capture, transport, provider, max_turns=30, max_actions=5,
+    def __init__(self, *, task_id, checkout, capture, transport, provider, max_turns=32, max_actions=5,
                  workspace=None, context_adapter=None):
-        if task_id not in TASKS or not 1 <= max_turns <= 100 or not 1 <= max_actions <= 8:
+        if task_id not in TASKS or not 1 <= max_turns <= 32 or not 1 <= max_actions <= 8:
             raise ValueError("invalid frozen task or run limits")
         if transport.probe != capture.probe:
             raise ValueError("transport/capture architecture mismatch")

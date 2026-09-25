@@ -1,14 +1,33 @@
-# Stage-II Day-1 native-boundary checkpoint — R Plan v6.3
+# Stage-II runtime binding lock — R Plan v6.3
 
-Date: 2026-09-25. Status: **FORWARD / ENGINEERING CHECKPOINT / SUBJECT GATE CLOSED**.
-Predecessors: v6.0–v6.2 are intact. The prospective first group is still 7 × 3 × 1 = 21; the same T1–T3, nine roles and single fixture remain fixed. Historical Stage-I raw and Stage-II subject evidence remain untouched. No R5 is added.
+Date: 2026-09-25. Status: **RUNTIME TARGET / SUBJECT PROFILE LOCK; NATIVE SMOKE STILL REQUIRED**.
 
-`stage2/runtime_packages.json` supplements reference anchors with distribution/package versions and SDK source tags. The spec tag is not the SDK tag. `stage2/native_status.json` states the result of the **non-subject**, offline scripted protocol smokes for each frozen probe. These states are engineering observations only, not Process Reality results and not the Stage-II natural run denominator. The 21 matrix cells stay pending until independently bound and passed; a failed probe then becomes `ENGINEERING_BLOCKED` rather than being replaced.
+This prospective clarification advances Day 1 without creating subject evidence. It preserves v6.0-v6.2, the 21-cell geometry, T1-T3 prompts, nine software-engineering roles and all frozen Stage-I evidence.
 
-The native CI smokes run in separate pinned environments: AutoGen core 0.7.5 requires protobuf 5.29.x, while the tested A2A SDK path requires protobuf 6.33.6. No cross-SDK import in a single interpreter is assumed, and a script provider cannot pass the subject preflight. Raw blobs and common event lines are flushed to disk before a capture is acknowledged.
+## Subject profile
 
-The common nine-role coding runner operates on a fresh hash-verified copy of the fixed checkout. It captures real model inputs and outputs (scripted provider in these smokes), file reads/changes/tests, individual messages, raw native SDK objects or server responses and a terminal status. X1 uses AutoGen native agent dispatch, X3 a separate A2A HTTP task/artifact service, X4 an independent MCP stdio tool/resource server, and X5 frozen-corpus retrieval entering the model prompt. X4–X7 share a small local role mailbox **underneath** the tested information boundary. Structural exposure still has no semantic C/P/R label.
+Stage II reuses the existing Software Engineering arena subject profile rather than silently changing the model while changing system layer:
 
-Critical limitations: X3's current remote artifact only acknowledges/echoes the delegation; remote **model** input/output is not yet present, so no architecture-conditioned remote authority result can be claimed. X2's pinned MetaGPT 0.8.1 dependency `lancedb==0.4.0` did not resolve in the available index. X6 has no pinned upstream memory embedding/runtime policy; X7 has no installed auxiliary compressor and immutable weight checkpoint. No subject provider credential, model identity or spend limits were supplied to this session. `stage2.preflight` therefore remains closed for every natural cell, including those with a successful boundary smoke.
+- provider: DeepSeek;
+- model alias: `deepseek-flash`, expected `DeepSeek-V4.1-Flash`;
+- thinking disabled; temperature 0.7; maximum 4096 output tokens per model call;
+- maximum 32 turns, 64 model invocations and 128 pending messages per natural trajectory;
+- transport timeout 60 s with at most two transport attempts;
+- no automatic paid evaluator;
+- exactly one natural trajectory per passed X1-X7 × T1-T3 cell.
 
-Next engineering action is to resolve the blocked native dependencies without changing the seven preselected anchors, bind remote model execution and full raw evidence for X3, and run a code-completing non-subject smoke through each native path. Only then freeze the model/provider/budget and adapter/version/code commitments and launch Day 2 once per passed cell. R6 passive semantic audit and any eligible R7 local repair still happen only after natural raw freeze, with the v6.1 four-continuation ceiling.
+The machine-readable binding is `stage2/subject.json`.
+
+## Runtime targets
+
+`stage2/runtime_bindings.json` freezes the exact implementation target for every probe. X3 and X4 bind protocol identity separately from their official Python SDK identity. The remaining source commits are inherited from v6.2. X5 remains the in-repository retrieval implementation with its frozen SHA-256.
+
+## Gate semantics
+
+A successful install/import/symbol probe means only **runtime surface ready**. It is not a native evidence smoke and cannot open the 21-cell subject gate.
+
+The next gate still requires, for each probe: actual native capture through the frozen hook; original boundary bytes and native locator; a completed non-study smoke sequence ending in termination; evidence-chain validation; and a runtime manifest binding installed version, implementation identity, hook, subject profile and repository code SHA.
+
+If a probe cannot expose its real boundary, it becomes `ENGINEERING_BLOCKED`; no framework substitution or Common-Pool alias is allowed.
+
+No paid subject call, new R5, R6 intervention or R7 repair is authorized by this file.
