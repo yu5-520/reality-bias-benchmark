@@ -22,9 +22,9 @@ The smoke inputs are engineering fixtures only and never enter the Stage-II scie
 
 ## Frozen block handling
 
-X2 MetaGPT remains `ENGINEERING_BLOCKED` because the pinned upstream commit requires `lancedb==0.4.0`, which is unavailable on the pinned CI package index/runtime. The block is retained as evidence of an engineering/observability limit. No dependency version, framework or communication implementation is substituted to make the cell pass.
+X2 MetaGPT remains `ENGINEERING_BLOCKED` because the pinned upstream commit requires `lancedb==0.4.0`, which is unavailable on the pinned CI package index/runtime. X6 MemoryBank is also `ENGINEERING_BLOCKED`: its pinned source simultaneously requires `llama-index==0.5.23.post1` and `langchain==0.0.146`, and the pinned Python 3.10 resolver reports those exact upstream requirements as mutually conflicting. These blocks are retained as engineering/observability limits. No dependency version, framework or communication implementation is substituted to make either condition pass.
 
-A frozen engineering block does not prevent other preregistered probes from completing their native gates. The runtime manifest must carry the same block state and exact block reason. The three X2 cells remain visible in the planned denominator as engineering-blocked and receive zero subject trajectories.
+A frozen engineering block does not prevent other preregistered probes from completing their native gates. The runtime manifest must carry the same block state and exact block reason. The three X2 cells and three X6 cells remain visible in the planned denominator as engineering-blocked and receive zero subject trajectories.
 
 ## Native smoke surfaces
 
@@ -32,7 +32,6 @@ A frozen engineering block does not prevent other preregistered probes from comp
 - X3 A2A: actual official v1.0 Python SDK REST transport request/response plumbing using an in-memory HTTP transport; no bare protobuf deserialization is accepted.
 - X4 MCP: actual 2026-07-28 SDK `Client` to `MCPServer` in-memory protocol negotiation and tool call.
 - X5 RAG: the frozen repository retrieval implementation executes against the frozen checkout fixture.
-- X6 MemoryBank: the pinned repository's native memory write and memory-document reconstruction functions execute on an isolated local memory file.
 - X7 LongLLMLingua: the pinned compressor executes `PromptCompressor.compress_prompt` on CPU with the official LLMLingua-2 small checkpoint.
 
 The in-memory transports in X3/X4 are engineering smoke transports only. They exercise the real native client/runtime APIs without introducing a network service as a new experimental variable.
