@@ -1,0 +1,218 @@
+name: Stage-II v7 T1 X6-X7 Natural Batch
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_execution_sha:
+        description: Exact main SHA pinned by the one-time issue bridge
+        required: true
+        type: string
+      authorization_issue:
+        description: Issue number carrying the exact one-time authorization
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-v7-natural-t1-x6-x7
+  cancel-in-progress: false
+
+jobs:
+  t1-x6-x7-cells:
+    runs-on: ubuntu-latest
+    timeout-minutes: 210
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        include:
+          - {probe: X6, python: "3.10"}
+          - {probe: X7, python: "3.11"}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: '${{ github.sha }}'
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Verify pinned one-time authorization and frozen collection gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTH_ISSUE: ${{ inputs.authorization_issue }}
+          EXPECTED_SHA: ${{ inputs.expected_execution_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_SHA" = "$EXPECTED_SHA"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$GITHUB_REF" = refs/tags/stage2-natural-t1-x6-x7-authorization
+          python - <<'PY'
+          import json, os, re, subprocess
+          issue = os.environ['AUTH_ISSUE']
+          if not re.fullmatch(r'[1-9][0-9]*', issue):
+              raise SystemExit('invalid authorization issue number')
+          raw = subprocess.check_output([
+              'gh', 'api', f"repos/{os.environ['GITHUB_REPOSITORY']}/issues/{issue}",
+          ], text=True)
+          data = json.loads(raw)
+          expected_body = '\n'.join([
+              'cells=X6-T1,X7-T1',
+              'control_plane=CHAT_AUTHORIZATION_BRIDGE_STAGE2_T1_X6_X7_v1',
+              f"expected_main_sha={os.environ['GITHUB_SHA']}",
+              'max_natural_trajectories=2',
+              'preserve_failed_attempt=true',
+          ])
+          if data['user']['login'] != 'yu5-520' or data['title'] != 'STAGE2 T1 X6-X7 NATURAL BATCH AUTHORIZATION':
+              raise SystemExit('authorization issue identity mismatch')
+          if data['body'].strip() != expected_body:
+              raise SystemExit('authorization body mismatch')
+          print('PASS: exact one-time ${{ matrix.probe }}-T1 authorization')
+          PY
+          python -m stage2.native_v7.freeze
+          python -m unittest discover -s stage2/native_v7/tests -v
+          python - <<'PY'
+          from stage2.native_v7.collect import validate_request
+          validate_request('${{ matrix.probe }}', 'T1')
+          print('PASS: ${{ matrix.probe }}-T1 collection is subject-ready')
+          PY
+
+      - name: Bind and install exact X6 MemoryBank environment
+        if: matrix.probe == 'X6'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/zhongwanjun/MemoryBank-SiliconFriend upstream
+          git -C upstream checkout -q cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
+          test "$(git -C upstream rev-parse HEAD)" = cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
+          python -m pip install -q --upgrade pip
+          python -m pip install -q 'torch==2.0.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q 'numpy==1.24.4' 'pydantic==1.10.13' 'huggingface-hub==0.14.1' 'tokenizers==0.13.3' 'transformers==4.28.0' 'faiss-cpu==1.7.4' 'scipy==1.10.1' 'scikit-learn==1.3.2' 'nltk==3.9.1' 'Pillow==10.4.0' 'unstructured==0.6.10' 'langchain==0.0.146'
+          python -m pip install -q --no-deps 'sentence-transformers==2.2.2'
+          rm -rf /tmp/stage2-x6-study
+          python -m stage2.study_assets.validate --probe X6 --out-root /tmp/stage2-x6-study
+
+      - name: Bind and install exact X7 LongLLMLingua environment
+        if: matrix.probe == 'X7'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/microsoft/LLMLingua upstream
+          git -C upstream checkout -q 5a4c78ae18ab17a98cf997e8259354e546081d64
+          test "$(git -C upstream rev-parse HEAD)" = 5a4c78ae18ab17a98cf997e8259354e546081d64
+          python -m pip install -q --upgrade pip
+          python -m pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q 'transformers==4.44.2' 'accelerate>=0.33,<1' tiktoken nltk numpy tokenizers safetensors
+          python -m pip install -q --no-deps -e upstream
+          python - <<'PY'
+          import llmlingua
+          assert llmlingua.__version__ == '0.2.2', llmlingua.__version__
+          PY
+          rm -rf /tmp/stage2-x7-study
+          python -m stage2.study_assets.validate --probe X7 --out-root /tmp/stage2-x7-study
+
+      - name: Irrevocably claim ${{ matrix.probe }}-T1 before reservation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f ref=refs/tags/stage2-natural-${{ matrix.probe }}-t1-execution-claimed \
+            -f "sha=$GITHUB_SHA" >/dev/null
+          echo "PASS: unique ${{ matrix.probe }}-T1 execution claim created; retries must fail"
+
+      - name: Execute and seal exactly one ${{ matrix.probe }}-T1 natural attempt
+        id: collect
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          AUTH_ISSUE: ${{ inputs.authorization_issue }}
+          STAGE2_X6_UPSTREAM: ${{ github.workspace }}/upstream
+          STAGE2_X6_EMBEDDING_MODEL: /tmp/stage2-x6-study/checkpoint
+          STAGE2_X7_CHECKPOINT: /tmp/stage2-x7-study/checkpoint
+          TOKENIZERS_PARALLELISM: 'false'
+          HF_HUB_OFFLINE: '1'
+          TRANSFORMERS_OFFLINE: '1'
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p /tmp/stage2_t1_x6_x7
+          printf '%s\n' "$GITHUB_SHA" > /tmp/stage2_t1_x6_x7/execution_sha.txt
+          printf '%s\n' "$AUTH_ISSUE" > /tmp/stage2_t1_x6_x7/authorization_issue.txt
+          export PYTHONPATH="$GITHUB_WORKSPACE${PYTHONPATH:+:$PYTHONPATH}"
+          timeout --signal=TERM --kill-after=30s 180m \
+            python -m stage2.native_v7.collect \
+              --probe ${{ matrix.probe }} --task T1 --out-root /tmp/stage2_t1_x6_x7 \
+              > /tmp/stage2_t1_x6_x7/collect_stdout.txt \
+              2> /tmp/stage2_t1_x6_x7/collect_stderr.txt
+          code=$?
+          printf '%s\n' "$code" > /tmp/stage2_t1_x6_x7/collect_exit_code.txt
+          echo "collect_exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Package attempt and hash inventory before judging outcome
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/stage2_t1_x6_x7
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root = Path('/tmp/stage2_t1_x6_x7')
+          files = {
+              str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in sorted(root.rglob('*')) if p.is_file() and p.name != 'archive_inventory.json'
+          }
+          (root / 'archive_inventory.json').write_text(json.dumps(files, indent=2, sort_keys=True) + '\n')
+          PY
+          tar -czf /tmp/stage2-v7-${{ matrix.probe }}-t1-${{ github.run_id }}.tar.gz -C /tmp/stage2_t1_x6_x7 .
+          sha256sum /tmp/stage2-v7-${{ matrix.probe }}-t1-${{ github.run_id }}.tar.gz \
+            > /tmp/stage2-v7-${{ matrix.probe }}-t1-${{ github.run_id }}.tar.gz.sha256
+
+      - name: Upload immutable single-attempt evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-v7-${{ matrix.probe }}-t1-${{ github.run_id }}
+          path: |
+            /tmp/stage2-v7-${{ matrix.probe }}-t1-${{ github.run_id }}.tar.gz
+            /tmp/stage2-v7-${{ matrix.probe }}-t1-${{ github.run_id }}.tar.gz.sha256
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Record preserved outcome on authorization issue
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTH_ISSUE: ${{ inputs.authorization_issue }}
+          COLLECT_CODE: ${{ steps.collect.outputs.collect_exit_code }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" \
+            --body "${{ matrix.probe }}-T1 preserved in workflow run $GITHUB_RUN_ID. collect_exit_code=${COLLECT_CODE:-missing}. Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+
+      - name: Report frozen outcome after preservation
+        if: always()
+        env:
+          COLLECT_CODE: ${{ steps.collect.outputs.collect_exit_code }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$COLLECT_CODE" = 0
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('/tmp/stage2_t1_x6_x7/${{ matrix.probe }}-T1')
+          seal = json.loads((root / 'seal.json').read_text())
+          assert seal['cell'] == '${{ matrix.probe }}-T1'
+          assert seal['returncode'] == 0
+          assert seal['status'] == 'RECORDED_PENDING_POSTHOC_AUDIT'
+          print('PASS: ${{ matrix.probe }}-T1 recorded once and pending post-hoc audit')
+          PY
