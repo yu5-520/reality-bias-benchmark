@@ -1,0 +1,73 @@
+name: Stage-II v7 Action Contract v2 Subject Readiness Bridge
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-v7-v2-subject-readiness-bridge
+  cancel-in-progress: false
+
+jobs:
+  dispatch-v2-readiness:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'STAGE2 V2 SUBJECT READINESS AUTHORIZATION'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      AUTH_ISSUE: ${{ github.event.issue.number }}
+      AUTH_TAG: stage2-v2-subject-readiness-authorization
+
+    steps:
+      - name: Verify exact one-call v2 revalidation authorization
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/main
+          python - <<'PY'
+          import os
+          expected = '\n'.join([
+              'epoch=ACTION_CONTRACT_V2_T2_T3',
+              'authorization_phrase=CALL_REAL_STAGE2_SUBJECT_READINESS_API',
+              'max_subject_calls=1',
+              'spending_ceiling_usd=0.01',
+              'natural_task=false',
+              f"expected_main_sha={os.environ['GITHUB_SHA']}",
+          ])
+          if os.environ['AUTH_BODY'].strip() != expected:
+              raise SystemExit('v2 readiness authorization differs from exact one-call contract')
+          print('PASS: exact v2 subject-readiness authorization')
+          PY
+
+      - name: Claim unique v2 readiness tag and dispatch one handshake
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f "ref=refs/tags/$AUTH_TAG" -f "sha=$GITHUB_SHA" >/dev/null
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/stage2-native-v7-subject-readiness.yml/dispatches" \
+            -X POST -f "ref=$AUTH_TAG" \
+            -f "inputs[expected_execution_sha]=$GITHUB_SHA" \
+            -f "inputs[authorization_phrase]=CALL_REAL_STAGE2_SUBJECT_READINESS_API" \
+            -f "inputs[max_subject_calls]=1" \
+            -f "inputs[spending_ceiling_usd]=0.01" >/dev/null
+          echo "PASS: dispatched exactly one v2 readiness handshake at $GITHUB_SHA"
+
+      - name: Record dispatch and close authorization
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" \
+            --body "Action Contract v2 subject revalidation dispatched once at $GITHUB_SHA. This is a non-scientific provider handshake only; it does not execute T1-T3 or reserve a natural cell."
+          gh issue close "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
