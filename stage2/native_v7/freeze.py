@@ -1,6 +1,7 @@
 """Freeze the Stage-II v7 registration/observation architecture."""
 import hashlib
 import json
+import difflib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -73,6 +74,11 @@ def main():
     if args.write:
         target.write_text(expected)
     elif target.read_text() != expected:
+        actual = target.read_text()
+        print("".join(difflib.unified_diff(
+            actual.splitlines(True), expected.splitlines(True),
+            fromfile="checked-in matrix.json", tofile="derived artifact",
+        )))
         raise SystemExit("FAIL: Stage-II v7 matrix differs from frozen native registry/inputs")
     print("PASS: Stage-II v7 has 21 unopened cells; native execution gate remains closed")
 
