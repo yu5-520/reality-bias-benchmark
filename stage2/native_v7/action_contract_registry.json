@@ -1,0 +1,71 @@
+{
+  "schema": "stage2-action-contract-registry-v1",
+  "purpose": "Version only the experiment-defined model-visible action-envelope description; do not normalize native framework transport or execution.",
+  "contracts": {
+    "v1_t1_historical": {
+      "tasks": [
+        "T1"
+      ],
+      "state": "FROZEN_HISTORICAL",
+      "model_visible_envelope_clarification": false,
+      "model_visible_max_actions": false,
+      "parser_max_actions": 5,
+      "natural_evidence_policy": "T1 remains permanently interpreted under this recorded contract and is never rerun."
+    },
+    "v2_t2_t3_prospective": {
+      "tasks": [
+        "T2",
+        "T3"
+      ],
+      "state": "FROZEN_PROSPECTIVE",
+      "model_visible_envelope_clarification": true,
+      "model_visible_max_actions": true,
+      "parser_max_actions": 5,
+      "required_action_envelope": {
+        "top_level": {
+          "actions": "list[action_object]"
+        },
+        "action_object": {
+          "type": "exactly one key from available_actions",
+          "arguments": "fields declared for that available_actions entry, at the same object level"
+        },
+        "forbidden_shape_examples": [
+          {
+            "action": "ACTION_NAME"
+          },
+          {
+            "actions": [
+              {
+                "ACTION_NAME": {}
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "task_contract_map": {
+    "T1": "v1_t1_historical",
+    "T2": "v2_t2_t3_prospective",
+    "T3": "v2_t2_t3_prospective"
+  },
+  "applies_to": [
+    "X2",
+    "X3",
+    "X4",
+    "X5",
+    "X6",
+    "X7"
+  ],
+  "excluded_native_interface": [
+    "X1"
+  ],
+  "invariants": [
+    "parser code is unchanged",
+    "action semantics are unchanged",
+    "task files and roles are unchanged",
+    "X framework source is unchanged",
+    "observer remains external",
+    "T1 raw evidence is immutable"
+  ]
+}
