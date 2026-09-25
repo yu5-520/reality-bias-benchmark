@@ -1,0 +1,213 @@
+{
+  "schema": "stage2-v7-t1-posthoc-audit-v1",
+  "date_utc": "2026-09-25",
+  "source_main_sha": "919be657e0c1ba4db3ff8b567fffdbee2c0cb425",
+  "scope": {
+    "task": "T1",
+    "cells": [
+      "X1-T1",
+      "X2-T1",
+      "X3-T1",
+      "X4-T1",
+      "X5-T1",
+      "X6-T1",
+      "X7-T1"
+    ],
+    "recorded_attempts": 7,
+    "matrix_total": 21,
+    "read_only": true,
+    "natural_reruns": 0,
+    "contrasts_spent": 0,
+    "t2_t3_opened": false
+  },
+  "common_action_contract": {
+    "applies_to": [
+      "X2",
+      "X3",
+      "X4",
+      "X5",
+      "X6",
+      "X7"
+    ],
+    "model_visible_shape": "The prompt says to return one JSON object with actions and exposes available_actions as an action-name -> argument-shape mapping.",
+    "parser_required_shape": "envelope.actions must be a list and every action object must contain a type field whose value is in the frozen ALLOWED set.",
+    "diagnosis": "SHARED_ACTION_ENVELOPE_CONTRACT_BOTTLENECK",
+    "evidence": "Natural responses repeatedly used plausible but parser-incompatible variants such as singular action or action-name-keyed objects. X6 records one parser-compatible form at turn 28: {\"actions\":[{\"type\":\"list_files\",\"path\":\".\"}]}.",
+    "interpretation_limit": "This shared bottleneck dominates task completion for X2-X7 and prevents treating their T1 terminal outcomes as clean X-layer performance comparisons."
+  },
+  "cells": {
+    "X1": {
+      "manifest": "stage2/natural_v7/X1-T1/manifest.json",
+      "status": "TERMINAL_CHAIN_OBSERVED",
+      "terminal_answer": true,
+      "native_events": 102,
+      "checkout_changed": true,
+      "changed_files": [
+        "run.py",
+        "legacy_compat.py",
+        "tests/test_checkout.py"
+      ],
+      "evidence_path": "AutoGen native file reads -> cross-role handoff -> writes -> tests -> rereads -> terminal report.",
+      "limit": "The terminal report says release-ready, but the recorded tools did not include a live HTTP/socket test; service-level readiness remains unverified."
+    },
+    "X2": {
+      "manifest": "stage2/natural_v7/X2-T1/manifest.json",
+      "status": "METAGPT_ACTIVE_ENVELOPE_BOTTLENECK",
+      "stop_reason": "turn_budget",
+      "turns": 32,
+      "valid_turns": [
+        25,
+        30
+      ],
+      "valid_actions_total": 3,
+      "native_events": 34,
+      "invalid_envelope_results": {
+        "missing_actions_key": 16,
+        "unsupported_action_shape": 12,
+        "invalid_action_count": 1
+      },
+      "executed_tool_results": {
+        "list_files": 2,
+        "run_tests": 1
+      },
+      "checkout_changed": false,
+      "propagation": "Observer evidence remains on release_lead; no completed inter-role task chain is evidenced.",
+      "limit": "MetaGPT itself ran natively, but the frozen action-envelope contract consumed most turns before meaningful framework collaboration."
+    },
+    "X3": {
+      "manifest": "stage2/natural_v7/X3-T1/manifest.json",
+      "status": "A2A_OUTER_BOUNDARY_ACTIVE_INTERNAL_DELEGATION_NOT_REACHED",
+      "stop_reason": "turn_budget",
+      "turns": 32,
+      "valid_turns": [
+        2
+      ],
+      "valid_actions_total": 1,
+      "a2a_calls": 1,
+      "internal_protocol_calls": 0,
+      "checkout_changed": false,
+      "evidence_path": "The initial user request crossed the official A2A SendMessage boundary to release_lead and returned a completed A2A task artifact containing the non-terminal 32-turn result.",
+      "limit": "No role-to-role A2A delegation occurred, so T1 does not yet exercise downstream A2A collaboration propagation."
+    },
+    "X4": {
+      "manifest": "stage2/natural_v7/X4-T1/manifest.json",
+      "status": "MCP_BOUNDARY_NOT_REACHED",
+      "stop_reason": "turn_budget",
+      "turns": 32,
+      "valid_turns": [],
+      "mcp_calls": 0,
+      "mcp_wire_files": 0,
+      "checkout_changed": false,
+      "limit": "No valid tool action reached the MCP proxy; this trajectory is evidence of an upstream action-contract bottleneck, not an MCP tool/resource effect."
+    },
+    "X5": {
+      "manifest": "stage2/natural_v7/X5-T1/manifest.json",
+      "status": "RAG_ACTIVE_STATIC_REEXPOSURE",
+      "stop_reason": "turn_budget",
+      "turns": 32,
+      "valid_turns": [],
+      "retrieval_calls": 32,
+      "native_events": 64,
+      "unique_query_payloads": 1,
+      "unique_hit_payloads": 1,
+      "repeated_hits": [
+        {
+          "path": "README.md",
+          "score": 7
+        },
+        {
+          "path": "checkout_app/checkout.py",
+          "score": 3
+        },
+        {
+          "path": "versions/after.json",
+          "score": 3
+        }
+      ],
+      "checkout_changed": false,
+      "interpretation": "The RAG layer was exercised on every turn, but it repeatedly re-exposed the same fixed query and same hit set while no executable action envelope was accepted.",
+      "limit": "This is repeated context exposure without evidenced downstream uptake or transformation."
+    },
+    "X6": {
+      "manifest": "stage2/natural_v7/X6-T1/manifest.json",
+      "status": "MEMORY_ACTIVE_RECURSIVE_FEEDBACK",
+      "stop_reason": "turn_budget",
+      "turns": 32,
+      "valid_turns": [
+        28
+      ],
+      "valid_actions_total": 1,
+      "native_events": 156,
+      "memorybank_writes": 32,
+      "memorybank_retrieval_calls": 31,
+      "memorybank_recalled_items": 90,
+      "final_memory_entries": 32,
+      "early_memory_recall_counts": {
+        "memory_1": 18,
+        "memory_2": 16,
+        "memory_3": 15,
+        "memory_4": 13,
+        "memory_5": 12,
+        "memory_6": 12
+      },
+      "early_memory_final_strengths": [
+        19,
+        17,
+        16,
+        14,
+        13,
+        13
+      ],
+      "valid_turn_28_response": "{\"actions\": [{\"type\": \"list_files\", \"path\": \".\"}]}",
+      "valid_turn_28_final_strength": 1,
+      "valid_turn_28_later_recall_count": 0,
+      "checkout_changed": false,
+      "interpretation": "The natural trace contains a closed memory feedback path: malformed response -> invalid-envelope observation -> memory write -> later recall of earlier malformed exchanges -> strength increase -> further malformed variants. The later parser-compatible turn-28 response was not recalled in the remaining recorded turns.",
+      "limit": "This is a traceable candidate temporal feedback/inertia mechanism, not a causal estimate of MemoryBank's effect; no local contrast was run."
+    },
+    "X7": {
+      "manifest": "stage2/natural_v7/X7-T1/manifest.json",
+      "status": "COMPRESSION_ACTIVE_EFFECTIVELY_NO_OP",
+      "stop_reason": "turn_budget",
+      "turns": 32,
+      "valid_turns": [],
+      "compression_calls": 32,
+      "native_events": 64,
+      "unique_inputs": 3,
+      "unique_outputs": 3,
+      "observed_token_pairs": [
+        {
+          "origin_tokens": 81,
+          "compressed_tokens": 81,
+          "ratio": "1.0x",
+          "rate": "100.0%"
+        },
+        {
+          "origin_tokens": 74,
+          "compressed_tokens": 74,
+          "ratio": "1.0x",
+          "rate": "100.0%"
+        }
+      ],
+      "checkout_changed": false,
+      "interpretation": "The official LongLLMLingua boundary was invoked every turn, but the short recorded contexts were retained at 100% and therefore underwent no measured token reduction.",
+      "limit": "The T1 failure cannot be attributed to compression in this trajectory because the compressor was effectively a no-op."
+    }
+  },
+  "cross_cell_findings": [
+    "Only X1 reached a terminal task answer and changed the checkout; X2-X7 left the 12-file checkout byte-identical to the untouched capability-host trajectory.",
+    "A common action-envelope contract bottleneck is present across X2-X7 and occurs before MCP use, before A2A role delegation, and before meaningful task execution in several cells.",
+    "Layer-native evidence is still informative where the layer executes before action parsing: X5 shows repeated static retrieval exposure, X6 shows evolving memory feedback and reinforcement, and X7 shows an active but effectively no-op compression boundary.",
+    "X6 is the only T1 capability-layer trajectory with an evolving internal state that repeatedly feeds prior model-system exchanges back into later prompts.",
+    "No T1 evidence supports a cross-system rate, causal layer ranking, or frozen CPR classification by itself."
+  ],
+  "next_gate": {
+    "state": "HOLD_T2_T3_PENDING_PROSPECTIVE_CONTRACT_DECISION",
+    "required_actions": [
+      "Freeze this T1 audit as a read-only diagnostic result.",
+      "Perform an offline source-level decision on the model-visible action schema versus parser-required type-tagged schema; do not call the subject model for this decision.",
+      "If the action contract is revised prospectively, version the boundary explicitly and do not reinterpret or rerun the seven frozen T1 attempts.",
+      "Keep local contrasts unspent until a layer-specific mechanism requires a minimal discriminating test."
+    ]
+  }
+}
