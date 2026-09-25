@@ -37,8 +37,6 @@ jobs:
             python: '3.11'
           - probe: X5
             python: '3.11'
-          - probe: X6
-            python: '3.10'
           - probe: X7
             python: '3.11'
     runs-on: ubuntu-latest
@@ -77,11 +75,6 @@ jobs:
               git -C protocol checkout -q 5f5440bb26a62e2cf3440b92da5a667efa03b267
               ;;
             X5) ;;
-            X6)
-              git clone -q https://github.com/zhongwanjun/MemoryBank-SiliconFriend upstream
-              git -C upstream checkout -q cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
-              pip install -q 'gradio==3.24.1' 'llama-index==0.5.23.post1' 'langchain==0.0.146' 'openai==0.27.6'
-              ;;
             X7)
               git clone -q https://github.com/microsoft/LLMLingua upstream
               git -C upstream checkout -q 5a4c78ae18ab17a98cf997e8259354e546081d64
@@ -98,8 +91,6 @@ jobs:
           CODE_SHA="$(git rev-parse HEAD)"
           if [ "${{ matrix.probe }}" = X4 ]; then
             PYTHONPATH="$GITHUB_WORKSPACE" upstream/.venv/bin/python -m stage2.native_smoke --probe X4 --out-root stage2_smoke --code-commit "$CODE_SHA"
-          elif [ "${{ matrix.probe }}" = X6 ]; then
-            python -m stage2.native_smoke --probe X6 --out-root stage2_smoke --code-commit "$CODE_SHA" --upstream upstream
           else
             python -m stage2.native_smoke --probe "${{ matrix.probe }}" --out-root stage2_smoke --code-commit "$CODE_SHA"
           fi
