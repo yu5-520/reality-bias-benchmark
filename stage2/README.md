@@ -28,3 +28,5 @@ R_Plan_v7.24 freezes the complete one-shot T2 row. Natural collection is now 14 
 `docs/R_Plan_v7.25.md` freezes the read-only T2 seven-cell semantic/process audit. Natural collection remains **14 / 21**; no T2 cell is rerun and no new contrast is spent. T3 is now the next admissible natural row, while the final two contrast slots remain reserved until the complete T3 audit.
 
 `docs/R_Plan_v7.26.md` predeclares the terminal one-shot T3 X1–X7 natural row. It uses the existing frozen contract map, preserves every claimed first attempt without rerun, and leaves the final two contrast slots untouched until the complete 21-cell audit.
+
+R_Plan_v7.27 freezes the terminal one-shot T3 row. Natural collection is now complete at 21 / 21 (T1 7/7 + T2 7/7 + T3 7/7). No natural cell may be rerun. T3 read-only audit and the full cross-task/cross-layer audit are next; contrast accounting remains 2/4.

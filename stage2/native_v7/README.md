@@ -30,3 +30,5 @@ R_Plan_v7.24 freezes the complete one-shot T2 row. Natural collection is now 14 
 The T2 seven-cell read-only audit is frozen in `stage2/natural_v7/T2_posthoc_audit.{json,md}` and summarized by `docs/R_Plan_v7.25.md`. The Action Contract v2 gate is considered crossed; T3 is the next admissible one-shot row. Natural collection remains 14/21 and contrast accounting remains 2/4.
 
 T3 is predeclared as the terminal one-shot natural row by `docs/R_Plan_v7.26.md`, using `stage2-v7-t3-natural-row.yml` behind its exact issue bridge. No contrast is spent before this row; after it is frozen, the full 21-cell read-only audit is required before choosing either remaining contrast.
+
+R_Plan_v7.27 freezes the terminal one-shot T3 row. Natural collection is now complete at 21 / 21 (T1 7/7 + T2 7/7 + T3 7/7). No natural cell may be rerun. T3 read-only audit and the full cross-task/cross-layer audit are next; contrast accounting remains 2/4.
