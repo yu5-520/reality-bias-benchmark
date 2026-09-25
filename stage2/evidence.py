@@ -41,8 +41,10 @@ class NativeCapture:
     def __init__(self, root, probe, run_id, binding):
         if probe not in PROBES:
             raise ValueError("unknown frozen probe")
-        if binding.get("probe") != probe or not binding.get("source_commit"):
-            raise ValueError("native implementation binding is required")
+        if binding.get("probe") != probe or not (
+            binding.get("source_commit") or binding.get("implementation_sha256")
+        ):
+            raise ValueError("native implementation source commit or implementation hash is required")
         self.root = Path(root)
         self.probe = probe
         self.run_id = run_id

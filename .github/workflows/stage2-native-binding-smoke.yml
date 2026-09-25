@@ -1,0 +1,172 @@
+name: Stage-II native binding smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'stage2/**'
+      - 'docs/R_Plan_v6.3.md'
+      - '.github/workflows/stage2-native-binding-smoke.yml'
+  pull_request:
+    paths:
+      - 'stage2/**'
+      - 'docs/R_Plan_v6.3.md'
+      - '.github/workflows/stage2-native-binding-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        probe: [X1, X2, X3, X4, X5, X6, X7]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install exact native dependency
+        id: install
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          case "${{ matrix.probe }}" in
+            X1)
+              python -m pip install \
+                "git+https://github.com/microsoft/autogen.git@027ecf0a379bcc1d09956d46d12d44a3ad9cee14#subdirectory=python/packages/autogen-core"
+              ;;
+            X2)
+              python -m pip install --no-deps \
+                "git+https://github.com/FoundationAgents/MetaGPT.git@11cdf466d042aece04fc6cfd13b28e1a70341b1f"
+              python -m pip install \
+                "numpy~=1.26.4" "pandas==2.1.1" "pydantic>=2.5.3" \
+                "loguru==0.6.0" "aiofiles==23.2.1" "aiohttp==3.8.6" \
+                "chardet" "requests" "Pillow" "tenacity==8.2.3" \
+                "playwright>=1.26" "PyYAML==6.0.1" "typing-inspect==0.8.0" \
+                "python_docx==0.8.11" "tiktoken==0.7.0" "anthropic==0.47.2" \
+                "scikit_learn==1.3.2"
+              mkdir -p "$HOME/.metagpt"
+              cat > "$HOME/.metagpt/config2.yaml" <<'YAML'
+              llm:
+                api_type: openai
+                model: stage2-no-call
+                base_url: http://127.0.0.1:9/v1
+                api_key: sk-stage2-no-call
+              YAML
+              ;;
+            X3)
+              python -m pip install \
+                "git+https://github.com/a2aproject/a2a-python.git@0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167" \
+                "starlette" "sse-starlette"
+              ;;
+            X4)
+              mkdir -p _stage2_upstream
+              git clone https://github.com/modelcontextprotocol/python-sdk.git _stage2_upstream/mcp-python-sdk
+              git -C _stage2_upstream/mcp-python-sdk checkout f1b6589088534632fef92238ee9750951e3c0185
+              test "$(git -C _stage2_upstream/mcp-python-sdk rev-parse HEAD)" = "f1b6589088534632fef92238ee9750951e3c0185"
+              python -m pip install ./_stage2_upstream/mcp-python-sdk/src/mcp-types
+              python -m pip install ./_stage2_upstream/mcp-python-sdk
+              ;;
+            X5)
+              true
+              ;;
+            X6)
+              mkdir -p _stage2_upstream
+              git clone https://github.com/zhongwanjun/MemoryBank-SiliconFriend.git _stage2_upstream/MemoryBank
+              git -C _stage2_upstream/MemoryBank checkout cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
+              test "$(git -C _stage2_upstream/MemoryBank rev-parse HEAD)" = "cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9"
+              ;;
+            X7)
+              python -m pip install \
+                "git+https://github.com/microsoft/LLMLingua.git@5a4c78ae18ab17a98cf997e8259354e546081d64"
+              ;;
+          esac
+
+      - name: Exercise native boundary or freeze blocker
+        if: always()
+        env:
+          STAGE2_INSTALL_OUTCOME: ${{ steps.install.outcome }}
+          STAGE2_X6_SOURCE: ${{ github.workspace }}/_stage2_upstream/MemoryBank
+        run: |
+          python -m stage2.native_smoke \
+            --probe "${{ matrix.probe }}" \
+            --outdir results/stage2_native_smoke
+
+      - name: Preserve native smoke receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-native-smoke-${{ matrix.probe }}-${{ github.run_id }}
+          path: results/stage2_native_smoke/${{ matrix.probe }}
+          retention-days: 90
+          if-no-files-found: error
+
+  aggregate:
+    needs: native-smoke
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: stage2-native-smoke-*-${{ github.run_id }}
+          path: results/stage2_native_all
+          merge-multiple: false
+      - name: Normalize the seven artifact roots by probe ID
+        run: |
+          python - <<'PY'
+          import json, shutil
+          from pathlib import Path
+          root=Path("results/stage2_native_all")
+          normalized=Path("results/stage2_native_normalized")
+          normalized.mkdir(parents=True, exist_ok=True)
+          seen=set()
+          for status_path in root.rglob("status.json"):
+              row=json.loads(status_path.read_text())
+              probe=row["probe"]
+              if probe in seen:
+                  raise SystemExit(f"duplicate smoke artifact for {probe}")
+              seen.add(probe)
+              shutil.copytree(status_path.parent, normalized/probe, dirs_exist_ok=False)
+          if seen != {f"X{i}" for i in range(1,8)}:
+              raise SystemExit(f"incomplete smoke set: {sorted(seen)}")
+          PY
+
+      - name: Verify seven receipts and native evidence for passed probes
+        run: |
+          python -m stage2.collect_native_smokes \
+            --root results/stage2_native_normalized \
+            --out results/stage2_native_gate_summary.json
+
+      - name: Build exact engineering runtime manifest
+        run: |
+          python -m stage2.build_runtime_manifest \
+            --summary results/stage2_native_gate_summary.json \
+            --code-commit "$GITHUB_SHA" \
+            --out results/stage2_runtime_manifest.json
+
+      - name: Pass all probes through the same evidence gate
+        run: |
+          python -m stage2.preflight \
+            --runtime-manifest results/stage2_runtime_manifest.json \
+            --captures-root results/stage2_native_normalized
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-native-gate-summary-${{ github.run_id }}
+          path: |
+            results/stage2_native_gate_summary.json
+            results/stage2_runtime_manifest.json
+          retention-days: 90
+          if-no-files-found: error
