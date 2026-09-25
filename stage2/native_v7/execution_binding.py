@@ -32,7 +32,6 @@ PROBE_FILES = {
     "X2": (
         "stage2/native_v7/x2_metagpt/checkout.py",
         "stage2/native_v7/x2_metagpt/runner.py",
-        "stage2/native_v7/x2_metagpt/metagpt_root/config/config2.yaml",
     ),
     "X3": (
         "stage2/native_v7/x3_a2a/checkout.py",
