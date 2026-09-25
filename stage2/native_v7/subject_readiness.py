@@ -90,6 +90,8 @@ def build_preflight(
         raise ValueError("Stage-II readiness permits exactly one provider call")
     if not 0 < spending_ceiling <= float(gate["max_spending_ceiling_usd"]):
         raise ValueError("readiness spending ceiling exceeds frozen policy")
+    if gate.get("state") == "COMMON_PROVIDER_HANDSHAKE_RECORDED":
+        raise ValueError("common provider handshake is already recorded; a second paid readiness call is forbidden")
 
     subject, model, model_path = _load_subject_binding()
     states = {pid: spec["collection_state"] for pid, spec in registry["probes"].items()}
