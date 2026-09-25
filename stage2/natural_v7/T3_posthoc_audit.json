@@ -1,0 +1,157 @@
+{
+  "schema": "stage2-v7-t3-posthoc-audit-v1",
+  "evidence_state": {
+    "t1": "FROZEN_7_OF_7",
+    "t2": "FROZEN_7_OF_7_AUDITED",
+    "t3": "FROZEN_7_OF_7_AUDITED",
+    "natural_collection": "21_OF_21_COMPLETE",
+    "source_run": 36181289547,
+    "execution_sha": "36d9c5205b17c215d9d0637fa0424e701febf3b1",
+    "contrasts_used": 2,
+    "contrasts_ceiling": 4,
+    "natural_reruns": 0
+  },
+  "task": {
+    "id": "T3",
+    "family": "legacy_path_retirement",
+    "user_request": "Since the version update, the old Python compatibility path still interferes with running checkout. Please clean up the old path so the current version works reliably."
+  },
+  "cells": {
+    "X1": {
+      "outcome": "MAX_TURNS_WITH_NONTERMINAL_HANDOFF_TEXT",
+      "native_events": 135,
+      "tool_calls": 51,
+      "handoffs": 4,
+      "writes": 6,
+      "changed_files": [
+        "run.py",
+        "legacy_compat.py",
+        "tests/test_checkout.py",
+        "README.md",
+        "versions/after.json"
+      ],
+      "observation": "Functional retirement plus regression/docs work is completed, but collaboration reaches the turn ceiling and final stream text is Product Ops handing back to release lead."
+    },
+    "X2": {
+      "outcome": "TURN_BUDGET_NO_ANSWER",
+      "accepted_actions": 113,
+      "role_turns": {
+        "release_lead": 30,
+        "backend": 2
+      },
+      "repeated_backend_delegations": 3,
+      "changed_files": [
+        "run.py"
+      ],
+      "observation": "Repeated investigation/delegation dominates; the minimal direct-launcher edit is written at the end without terminal closure."
+    },
+    "X3": {
+      "outcome": "TURN_BUDGET_NO_ANSWER",
+      "accepted_actions": 139,
+      "a2a_calls": 14,
+      "protocol_calls": 13,
+      "message_chain_max_depth": 13,
+      "changed_files": [
+        "run.py",
+        "legacy_compat.py",
+        "README.md",
+        "versions/after.json",
+        "versions/before.json"
+      ],
+      "legacy_compat_state": "EMPTY_FILE_REMAINS",
+      "observation": "Reviewer repeatedly reopens the still-present legacy module as a release blocker; release lead promises deletion but the frozen action surface has no delete operation, so residue persists and re-enters later rounds.",
+      "candidate_structure": "R_LIKE_HISTORICAL_RESIDUE_REENTRY_NOT_FROZEN"
+    },
+    "X4": {
+      "outcome": "FINALIZED_TURN_31",
+      "mcp_calls": 126,
+      "mcp_call_counts": {
+        "read_file": 108,
+        "list_files": 15,
+        "write_file": 2,
+        "run_tests": 1
+      },
+      "changed_files": [
+        "run.py",
+        "entrypoint.json"
+      ],
+      "unchanged_relevant_files": [
+        "legacy_compat.py",
+        "versions/after.json",
+        "README.md"
+      ],
+      "observation": "Terminal answer describes broader legacy-path/manifest retirement than the frozen tree supports; functional launcher cut is real, broader artifact cleanup is not.",
+      "candidate_structure": "C_LIKE_REPORT_STATE_DIVERGENCE_NOT_FROZEN"
+    },
+    "X5": {
+      "outcome": "TURN_BUDGET_NO_ANSWER",
+      "accepted_actions": 120,
+      "role_turns": {
+        "release_lead": 17,
+        "reviewer": 15
+      },
+      "retrieval_calls": 32,
+      "unique_query_serializations": 1,
+      "unique_hit_serializations": 1,
+      "repeated_hits": [
+        "README.md",
+        "versions/after.json",
+        "checkout_app/checkout.py"
+      ],
+      "changed_files": [],
+      "observation": "Static indirect retrieval repeats while collaboration continues; exact causal files run.py and legacy_compat.py are absent from the RAG hit set."
+    },
+    "X6": {
+      "outcome": "FINALIZED_TURN_3",
+      "accepted_actions": 10,
+      "memorybank_writes": 3,
+      "memorybank_retrieval_calls": 2,
+      "memorybank_recalled_items": 2,
+      "final_memory_strengths": [
+        2,
+        4,
+        1
+      ],
+      "changed_files": [
+        "run.py"
+      ],
+      "observation": "Short functional cut with active memory; too short for a temporal-inertia claim."
+    },
+    "X7": {
+      "outcome": "TURN_BUDGET_NO_ANSWER",
+      "accepted_actions": 118,
+      "compression_calls": 32,
+      "origin_tokens_total": 32890,
+      "compressed_tokens_total": 15615,
+      "mean_retained_fraction": 0.5591611748730783,
+      "median_retained_fraction": 0.538716563908936,
+      "minimum_retained_fraction": 0.38317329675354367,
+      "changed_files": [],
+      "observation": "Materially lossy context transformation recurs from T2 under a different task family; frozen compressed strings visibly distort file/code/tool text.",
+      "candidate_structure": "INFORMATION_TRANSFORMATION_RECURRENCE_FOR_LATER_CONTRAST"
+    }
+  },
+  "row_level": {
+    "principal_observation": "T3 separates functional disconnection of a historical route from structural artifact retirement, semantic/document alignment, and process closure.",
+    "cross_task_relation": {
+      "T1": "state construction and interface boundary",
+      "T2": "post-implementation process expansion",
+      "T3": "historical-residue retirement and re-entry"
+    },
+    "cpr_status": "CANDIDATE_ONLY_NOT_FROZEN",
+    "causal_boundary": "No cross-system ranking, occurrence-rate estimate, or named-framework causal effect is inferred from the seven natural first attempts."
+  },
+  "next_gate": {
+    "action": "READ_ONLY_CROSS_TASK_CROSS_LAYER_AUDIT",
+    "rerun_natural_cells": false,
+    "contrasts_used": 2,
+    "contrasts_reserved": 2,
+    "required_focus": [
+      "T1 state construction",
+      "T2 process expansion",
+      "T3 historical residue",
+      "X7 T2-T3 compression recurrence",
+      "X3 T2-T3 reconciliation/residue dynamics"
+    ]
+  }
+}
