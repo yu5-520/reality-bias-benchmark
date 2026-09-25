@@ -1,26 +1,53 @@
 {
-  "schema": "stage2-v7-contrast-raw-archive-v1",
-  "contrast": "C1",
-  "source_workflow_run_id": 36171896640,
-  "source_workflow_run_url": "https://github.com/yu5-520/reality-bias-benchmark/actions/runs/36171896640",
-  "source_execution_sha": "a9232f3edab765588ae2e336fe7be8bf7bbd5ae1",
-  "authorization_issue": 195,
   "artifact_id": 10880226606,
   "artifact_name": "stage2-v7-c1-action-contract-36171896640",
   "artifact_zip_sha256": "73e8c5e4f0dca2d56d108ec6eccb6529c845f24681cddc901045b8e57801ce48",
-  "tar_sha256": "8a0b2e7c45ceb3eb4f744d51dd2361c1ae4914c4deb7176a3bda34ab6bc588f2",
+  "authorization_issue": 195,
+  "changed_factor": "MODEL_VISIBLE_ACTION_SCHEMA_CLARIFICATION_ONLY",
+  "contrast": "C1",
+  "contrast_attempts": 1,
+  "contrast_budget_after": "1/4",
+  "interpretation": {
+    "causal_limit": "This is one predeclared local contrast. It supports the local gate diagnosis but is not an occurrence-rate estimate or a cross-system causal ranking.",
+    "discrimination": "POSITIVE_FOR_ACTION_SCHEMA_GATE",
+    "residual_bottleneck": "All remaining rejected C1 turns used parser-compatible type-tagged actions but supplied 6-12 actions, exceeding the unchanged max_actions=5 limit that was still not model-visible.",
+    "statement": "Explicitly stating the existing type-tagged action serialization crossed the natural X4-T1 envelope gate: accepted turns rose from 0/32 to 19/32 and the official MCP boundary was reached 35 times.",
+    "task_completion_limit": "C1 still ended at the 32-turn budget with no terminal answer and no checkout change; therefore schema clarification alone did not establish task completion."
+  },
   "natural_parent": "X4-T1",
   "natural_parent_tar_sha256": "a41f68bae1321060d1edc420f03c311d7dc1a48f38da87e9f033453b13531aac",
-  "changed_factor": "MODEL_VISIBLE_ACTION_SCHEMA_CLARIFICATION_ONLY",
-  "contrast_attempts": 1,
   "natural_reruns": 0,
-  "contrast_budget_after": "1/4",
+  "raw_archive_path": "stage2/contrasts_v7/C1/first_attempt.tar.gz",
   "result": {
-    "stop_reason": "turn_budget",
     "answer": null,
+    "checkout_changed_files": [],
+    "executed_actions": {
+      "delegate": 3,
+      "list_files": 16,
+      "read_file": 14,
+      "run_tests": 5
+    },
+    "invalid_action_counts": [
+      11,
+      9,
+      11,
+      11,
+      11,
+      11,
+      6,
+      11,
+      11,
+      11,
+      8,
+      9,
+      12
+    ],
+    "invalid_turn_count": 13,
+    "mcp_calls": 35,
+    "remaining_invalid_reason": "ALL_13_INVALID_TURNS_EXCEEDED_FROZEN_MAX_ACTIONS_5",
+    "stop_reason": "turn_budget",
     "turns": 32,
     "valid_turn_count": 19,
-    "invalid_turn_count": 13,
     "valid_turns": [
       1,
       2,
@@ -41,38 +68,12 @@
       27,
       28,
       31
-    ],
-    "executed_actions": {
-      "list_files": 16,
-      "delegate": 3,
-      "read_file": 14,
-      "run_tests": 5
-    },
-    "mcp_calls": 35,
-    "checkout_changed_files": [],
-    "remaining_invalid_reason": "ALL_13_INVALID_TURNS_EXCEEDED_FROZEN_MAX_ACTIONS_5",
-    "invalid_action_counts": [
-      11,
-      9,
-      11,
-      11,
-      11,
-      11,
-      6,
-      11,
-      11,
-      11,
-      8,
-      9,
-      12
     ]
   },
-  "interpretation": {
-    "discrimination": "POSITIVE_FOR_ACTION_SCHEMA_GATE",
-    "statement": "Explicitly stating the existing type-tagged action serialization crossed the natural X4-T1 envelope gate: accepted turns rose from 0/32 to 19/32 and the official MCP boundary was reached 35 times.",
-    "residual_bottleneck": "All remaining rejected C1 turns used parser-compatible type-tagged actions but supplied 6-12 actions, exceeding the unchanged max_actions=5 limit that was still not model-visible.",
-    "task_completion_limit": "C1 still ended at the 32-turn budget with no terminal answer and no checkout change; therefore schema clarification alone did not establish task completion.",
-    "causal_limit": "This is one predeclared local contrast. It supports the local gate diagnosis but is not an occurrence-rate estimate or a cross-system causal ranking."
-  },
-  "status": "RECORDED_PENDING_REVIEW_MERGE"
+  "schema": "stage2-v7-contrast-raw-archive-v1",
+  "source_execution_sha": "a9232f3edab765588ae2e336fe7be8bf7bbd5ae1",
+  "source_workflow_run_id": 36171896640,
+  "source_workflow_run_url": "https://github.com/yu5-520/reality-bias-benchmark/actions/runs/36171896640",
+  "status": "FROZEN_RAW_ARCHIVE",
+  "tar_sha256": "8a0b2e7c45ceb3eb4f744d51dd2361c1ae4914c4deb7176a3bda34ab6bc588f2"
 }
