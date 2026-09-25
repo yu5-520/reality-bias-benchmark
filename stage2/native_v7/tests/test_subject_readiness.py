@@ -1,7 +1,12 @@
 import copy
+import json
+import tempfile
 import unittest
+from pathlib import Path
+from unittest.mock import patch
 
 from stage2.native_v7.policy import load_registry, validate_registry
+from stage2.native_v7.readiness_evidence import digest, execution_snapshot, verify_receipt, verify_study_manifest
 from stage2.native_v7.subject_readiness import build_preflight
 
 
@@ -17,6 +22,8 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
             spending_ceiling=0.01,
         )
         self.assertEqual(payload["status"], "READY_FOR_ONE_COMMON_PROVIDER_HANDSHAKE")
+        self.assertEqual(payload["execution_snapshot"], execution_snapshot())
+        self.assertNotIn("stage2/native_v7/registry.json", payload["execution_snapshot"]["files_sha256"])
         self.assertEqual(payload["max_provider_calls"], 1)
         self.assertFalse(payload["automatic_paid_evaluator"])
         self.assertFalse(payload["scientific_task_used"])
@@ -92,6 +99,66 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
                 }
                 with self.assertRaisesRegex(ValueError, "frozen study"):
                     validate_registry(mutated)
+
+    def test_receipt_must_exist_and_match_execution_bytes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "stage2").mkdir()
+            (root / "arena/config").mkdir(parents=True)
+            (root / "stage2/subject.json").write_text("frozen subject")
+            (root / "arena/config/model_deepseek_v0.2.json").write_text("frozen model")
+            snapshot = {"files_sha256": {}, "fixture_tree_sha256": "f" * 64}
+            receipt = {
+                "schema": "stage2-subject-readiness-receipt-v1",
+                "status": "COMMON_PROVIDER_HANDSHAKE_RECORDED_NOT_SUBJECT_READY",
+                "provider": "deepseek", "provider_call_count": 1,
+                "automatic_paid_evaluator": False, "scientific_task_used": False,
+                "natural_cell_reserved": False, "registry_mutated": False,
+                "natural_trajectories_after_handshake": 0,
+                "promotion_required": "REVIEWED_REGISTRY_COMMIT",
+                "execution_code_sha": "a" * 40, "workflow_run_id": 12,
+                "observed_response_model": "provider-reported-model",
+                "raw_response_sha256": "b" * 64,
+                "subject_config_sha256": digest(root / "stage2/subject.json"),
+                "model_config_sha256": digest(root / "arena/config/model_deepseek_v0.2.json"),
+                "execution_snapshot": snapshot,
+            }
+            path = root / "receipt.json"
+            path.write_text(json.dumps(receipt))
+            registry = {"subject_readiness_gate": {
+                "state": "COMMON_PROVIDER_HANDSHAKE_RECORDED",
+                "receipt_path": "receipt.json", "receipt_sha256": digest(path),
+            }}
+            readiness = {key: receipt[key] for key in (
+                "execution_code_sha", "workflow_run_id", "subject_config_sha256", "model_config_sha256"
+            )}
+            readiness["common_receipt_sha256"] = digest(path)
+            with patch("stage2.native_v7.readiness_evidence.ROOT", root), patch(
+                "stage2.native_v7.readiness_evidence.execution_snapshot", return_value=snapshot
+            ):
+                verify_receipt(registry, readiness)
+                (root / "stage2/subject.json").write_text("changed subject")
+                with self.assertRaisesRegex(ValueError, "subject binding changed"):
+                    verify_receipt(registry, readiness)
+                (root / "stage2/subject.json").write_text("frozen subject")
+                path.write_text(json.dumps({**receipt, "provider_call_count": 2}))
+                with self.assertRaisesRegex(ValueError, "frozen file"):
+                    verify_receipt(registry, readiness)
+
+    def test_x6_smoke_manifest_cannot_be_promoted_by_state_only(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            manifest = root / "study.json"
+            manifest.write_text(json.dumps({
+                "schema": "stage2-x6-embedding-manifest-v1",
+                "purpose": "NON_STUDY_ENGINEERING_SMOKE_ONLY",
+                "files_sha256": {"model.bin": "a" * 64},
+            }))
+            spec = {"study_embedding": {"state": "FROZEN_MANIFEST_VERIFIED",
+                       "manifest_path": "study.json", "manifest_sha256": digest(manifest)}}
+            with patch("stage2.native_v7.readiness_evidence.ROOT", root):
+                with self.assertRaisesRegex(ValueError, "engineering smoke asset"):
+                    verify_study_manifest("X6", spec)
 
 
 if __name__ == "__main__":

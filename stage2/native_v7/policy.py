@@ -4,6 +4,7 @@ The checks guard the experimental boundary. They do not adapt an X runtime.
 """
 import json
 from pathlib import Path
+from .readiness_evidence import verify_receipt, verify_study_manifest
 
 BASE = Path(__file__).resolve().parent
 PROBES = {f"X{i}" for i in range(1, 8)}
@@ -112,10 +113,9 @@ def validate_registry(data):
                 ):
                     if not readiness.get(key):
                         raise ValueError(f"{pid}: readiness evidence lacks {key}")
-                if pid == "X6" and spec.get("study_embedding", {}).get("state") != "FROZEN_MANIFEST_VERIFIED":
-                    raise ValueError("X6: SUBJECT_READY requires frozen study embedding manifest")
-                if pid == "X7" and spec.get("study_checkpoint", {}).get("state") != "FROZEN_MANIFEST_VERIFIED":
-                    raise ValueError("X7: SUBJECT_READY requires frozen study checkpoint manifest")
+                if pid in {"X6", "X7"}:
+                    verify_study_manifest(pid, spec)
+                verify_receipt(data, readiness)
         elif state == "PENDING_NATIVE_RUNNER":
             if launch.get("argv_template") is not None:
                 raise ValueError(f"{pid}: pending runner must not expose an executable collection command")
