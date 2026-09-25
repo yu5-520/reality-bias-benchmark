@@ -4,12 +4,75 @@
   "status": "ENGINEERING_SMOKE_AUTHORIZED_NO_SUBJECT_CALLS",
   "rule": "A failed native gate is ENGINEERING_BLOCKED; no framework substitution, no Common-Pool alias, no paid model call.",
   "probes": [
-    {"id":"X1","name":"AutoGen","source":"https://github.com/microsoft/autogen","source_commit":"027ecf0a379bcc1d09956d46d12d44a3ad9cee14","package":"autogen-core","native_hook":"autogen_core.SingleThreadedAgentRuntime.send_message","protocol_version":null},
-    {"id":"X2","name":"MetaGPT","source":"https://github.com/FoundationAgents/MetaGPT","source_commit":"11cdf466d042aece04fc6cfd13b28e1a70341b1f","package":"metagpt","native_hook":"metagpt.memory.Memory.add/get","protocol_version":null},
-    {"id":"X3","name":"A2A","source":"https://github.com/a2aproject/A2A","source_commit":"173695755607e884aa9acf8ce4feed90e32727a1","protocol_version":"1.0.0","sdk_source":"https://github.com/a2aproject/a2a-python","sdk_source_commit":"0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167","package":"a2a-sdk","native_hook":"a2a.client.BaseClient.send_message"},
-    {"id":"X4","name":"MCP","source":"https://github.com/modelcontextprotocol/modelcontextprotocol","source_commit":"5f5440bb26a62e2cf3440b92da5a667efa03b267","protocol_version":"2026-07-28","sdk_source":"https://github.com/modelcontextprotocol/python-sdk","sdk_source_commit":"f1b6589088534632fef92238ee9750951e3c0185","package":"mcp","native_hook":"mcp.client.Client.call_tool/read_resource"},
-    {"id":"X5","name":"RAG","source":"stage2/retrieval.py","source_commit":null,"implementation_sha256":"baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4","package":"in-repo","native_hook":"stage2.retrieval.retrieve","protocol_version":null},
-    {"id":"X6","name":"MemoryBank","source":"https://github.com/zhongwanjun/MemoryBank-SiliconFriend","source_commit":"cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9","package":"source-checkout","native_hook":"MemoryBank.memory_write/memory_retrieve","protocol_version":null},
-    {"id":"X7","name":"LongLLMLingua","source":"https://github.com/microsoft/LLMLingua","source_commit":"5a4c78ae18ab17a98cf997e8259354e546081d64","package":"llmlingua","native_hook":"llmlingua.PromptCompressor.compress_prompt","protocol_version":null,"checkpoint":"lgaalves/gpt2-dolly","checkpoint_revision":null}
+    {
+      "id": "X1",
+      "name": "AutoGen",
+      "source": "https://github.com/microsoft/autogen",
+      "source_commit": "027ecf0a379bcc1d09956d46d12d44a3ad9cee14",
+      "package": "autogen-core",
+      "native_hook": "autogen_core.SingleThreadedAgentRuntime.send_message",
+      "protocol_version": null
+    },
+    {
+      "id": "X2",
+      "name": "MetaGPT",
+      "source": "https://github.com/FoundationAgents/MetaGPT",
+      "source_commit": "11cdf466d042aece04fc6cfd13b28e1a70341b1f",
+      "package": "metagpt",
+      "native_hook": "metagpt.memory.Memory.add/get",
+      "protocol_version": null
+    },
+    {
+      "id": "X3",
+      "name": "A2A",
+      "source": "https://github.com/a2aproject/A2A",
+      "source_commit": "173695755607e884aa9acf8ce4feed90e32727a1",
+      "protocol_version": "1.0.0",
+      "sdk_source": "https://github.com/a2aproject/a2a-python",
+      "sdk_source_commit": "0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167",
+      "package": "a2a-sdk",
+      "native_hook": "a2a.client.BaseClient.send_message"
+    },
+    {
+      "id": "X4",
+      "name": "MCP",
+      "source": "https://github.com/modelcontextprotocol/modelcontextprotocol",
+      "source_commit": "5f5440bb26a62e2cf3440b92da5a667efa03b267",
+      "protocol_version": "2026-07-28",
+      "sdk_source": "https://github.com/modelcontextprotocol/python-sdk",
+      "sdk_source_commit": "f1b6589088534632fef92238ee9750951e3c0185",
+      "package": "mcp",
+      "native_hook": "mcp.client.Client.call_tool/read_resource"
+    },
+    {
+      "id": "X5",
+      "name": "RAG",
+      "source": "stage2/retrieval.py",
+      "source_commit": null,
+      "implementation_sha256": "baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4",
+      "package": "in-repo",
+      "native_hook": "stage2.retrieval.retrieve",
+      "protocol_version": null
+    },
+    {
+      "id": "X6",
+      "name": "MemoryBank",
+      "source": "https://github.com/zhongwanjun/MemoryBank-SiliconFriend",
+      "source_commit": "cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9",
+      "package": "source-checkout",
+      "native_hook": "MemoryBank.memory_write/memory_retrieve",
+      "protocol_version": null
+    },
+    {
+      "id": "X7",
+      "name": "LongLLMLingua",
+      "source": "https://github.com/microsoft/LLMLingua",
+      "source_commit": "5a4c78ae18ab17a98cf997e8259354e546081d64",
+      "package": "llmlingua",
+      "native_hook": "llmlingua.PromptCompressor.compress_prompt",
+      "protocol_version": null,
+      "checkpoint": "lgaalves/gpt2-dolly",
+      "checkpoint_revision": "268164679a9ba2065fddbaa8fb594583def16ba1"
+    }
   ]
 }
