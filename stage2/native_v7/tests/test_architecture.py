@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from stage2.native_v7.collect import validate_request
+from stage2.native_v7.execution_binding import execution_surface_digest
 from stage2.native_v7.freeze import artifact
 from stage2.native_v7.observer import PassiveEventObserver, verify_observer
 from stage2.native_v7.policy import load_registry, validate_registry
@@ -243,6 +244,23 @@ class NativeV7Architecture(unittest.TestCase):
         self.assertIn('rank_method="longllmlingua"', context)
         for marker in ("stage2.longllmlingua_context", "CodingArena", "RoleMailboxTransport"):
             self.assertNotIn(marker, runner + context)
+
+    def test_execution_surface_ignores_control_state_but_binds_execution_refs(self):
+        registry = load_registry()
+        baseline = execution_surface_digest("X1", registry=registry)
+        registry["probes"]["X1"]["collection_state"] = "SUBJECT_READY"
+        registry["probes"]["X1"]["subject_readiness"] = {
+            "state": "VERIFIED",
+            "execution_code_sha": "0" * 40,
+            "common_receipt_sha256": "1" * 64,
+            "execution_surface_sha256": baseline,
+            "subject_config_sha256": "2" * 64,
+            "model_config_sha256": "3" * 64,
+            "workflow_run_id": 1,
+        }
+        self.assertEqual(baseline, execution_surface_digest("X1", registry=registry))
+        registry["probes"]["X1"]["source_commit"] = "f" * 40
+        self.assertNotEqual(baseline, execution_surface_digest("X1", registry=registry))
 
     def test_pending_runner_cannot_smuggle_launch_command(self):
         registry = load_registry()
