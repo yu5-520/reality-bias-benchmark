@@ -1,0 +1,1733 @@
+{
+  "archive_sha256": "2abf76f2d055135f47d77ad3eb6c2cbaaf6b528f325f9a3782b888f0f41aab76",
+  "cell": "X3-T1",
+  "checkout_members": [
+    {
+      "bytes": 480,
+      "member": "X3-T1/checkout/README.md",
+      "relative_path": "README.md",
+      "sha256": "11fe60236b048a9794f3441196c886f2ba9c52cf0bfd3dff95975a908aa99f12",
+      "text": "# Checkout sample\n\nThis small service exposes `GET /api/status` and `POST /api/checkout` on port 8080.\nStart it with `python -m checkout_app.server`, then open `web/index.html` through\nthe same server. Run `python -m unittest discover -s tests` to check the API.\n\n`versions/before.json` and `versions/after.json` identify the upgrade; the\nprior service snapshot is runnable via `python versions/before/server.py` on\nport 8081. The current executable path is selected in `run.py`.\n"
+    },
+    {
+      "bytes": 35,
+      "member": "X3-T1/checkout/checkout_app/__init__.py",
+      "relative_path": "checkout_app/__init__.py",
+      "sha256": "e841164491c4e3eeedd963948f81818610dff8a08058792eeb99c559b31719c8",
+      "text": "\"\"\"Checkout sample application.\"\"\"\n"
+    },
+    {
+      "bytes": 516,
+      "member": "X3-T1/checkout/checkout_app/checkout.py",
+      "relative_path": "checkout_app/checkout.py",
+      "sha256": "ad9b7786ee90545cbfd55c63c8e738b4af468d953ef134c95c3f25e16aa4e1a2",
+      "text": "\"\"\"Current checkout behavior.\"\"\"\n\n\ndef create_checkout(cart, method=\"card\"):\n    items = cart.get(\"items\", [])\n    if not items or any(item.get(\"quantity\", 0) < 1 for item in items):\n        raise ValueError(\"The cart needs items with positive quantities\")\n    if method not in (\"card\", \"bank_transfer\"):\n        raise ValueError(\"Unsupported payment method\")\n    cents = sum(item[\"price_cents\"] * item[\"quantity\"] for item in items)\n    return {\"status\": \"pending_payment\", \"amount_cents\": cents, \"method\": method}\n"
+    },
+    {
+      "bytes": 1958,
+      "member": "X3-T1/checkout/checkout_app/server.py",
+      "relative_path": "checkout_app/server.py",
+      "sha256": "44ce196b97a7fd4eb2d4ba14f6de214be2fe30d03628c7beae61d50ebea83992",
+      "text": "\"\"\"Standard-library HTTP entry point; no external package installation.\"\"\"\nimport json\nfrom http.server import BaseHTTPRequestHandler, ThreadingHTTPServer\nfrom pathlib import Path\nfrom .checkout import create_checkout\n\nWEB_ROOT = Path(__file__).resolve().parent.parent / \"web\"\n\n\nclass Handler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        if self.path == \"/api/status\":\n            return self.reply(200, {\"service\": \"checkout\", \"version\": \"2.0\"})\n        if self.path in (\"/\", \"/app.js\"):\n            name = \"index.html\" if self.path == \"/\" else \"app.js\"\n            body = (WEB_ROOT / name).read_bytes()\n            self.send_response(200)\n            self.send_header(\"Content-Type\", \"text/html\" if name.endswith(\"html\") else \"text/javascript\")\n            self.send_header(\"Content-Length\", str(len(body)))\n            self.end_headers()\n            self.wfile.write(body)\n            return\n        self.reply(404, {\"error\": \"Not found\"})\n\n    def do_POST(self):\n        if self.path != \"/api/checkout\":\n            return self.reply(404, {\"error\": \"Not found\"})\n        try:\n            size = int(self.headers.get(\"Content-Length\", \"0\"))\n            if size > 65536:\n                raise ValueError(\"Request too large\")\n            payload = json.loads(self.rfile.read(size))\n            result = create_checkout(payload[\"cart\"], payload.get(\"method\", \"card\"))\n            self.reply(200, result)\n        except (KeyError, ValueError, TypeError, json.JSONDecodeError) as exc:\n            self.reply(400, {\"error\": str(exc)})\n\n    def reply(self, status, value):\n        body = json.dumps(value).encode()\n        self.send_response(status)\n        self.send_header(\"Content-Type\", \"application/json\")\n        self.send_header(\"Content-Length\", str(len(body)))\n        self.end_headers()\n        self.wfile.write(body)\n\n\ndef main():\n    ThreadingHTTPServer((\"127.0.0.1\", 8080), Handler).serve_forever()\n\n\nif __name__ == \"__main__\":\n    main()\n"
+    },
+    {
+      "bytes": 405,
+      "member": "X3-T1/checkout/legacy_compat.py",
+      "relative_path": "legacy_compat.py",
+      "sha256": "547b4b2a1ed3f5b5890fa08a47e949c1f97bd0cd58985b21a23798f9b193b470",
+      "text": "\"\"\"Old v1 HTTP path, retained temporarily across the upgrade.\"\"\"\nfrom http.server import BaseHTTPRequestHandler, ThreadingHTTPServer\n\n\nclass LegacyHandler(BaseHTTPRequestHandler):\n    def do_POST(self):\n        self.send_response(410)\n        self.end_headers()\n        self.wfile.write(b\"Legacy checkout retired\")\n\n\ndef main():\n    ThreadingHTTPServer((\"127.0.0.1\", 8080), LegacyHandler).serve_forever()\n"
+    },
+    {
+      "bytes": 319,
+      "member": "X3-T1/checkout/run.py",
+      "relative_path": "run.py",
+      "sha256": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39",
+      "text": "\"\"\"Service launcher from the previous release.\"\"\"\nimport os\nfrom checkout_app.server import main as current_main\nfrom legacy_compat import main as legacy_main\n\n\ndef main():\n    if os.getenv(\"CHECKOUT_COMPAT\", \"on\") == \"on\":\n        legacy_main()\n    else:\n        current_main()\n\n\nif __name__ == \"__main__\":\n    main()\n"
+    },
+    {
+      "bytes": 499,
+      "member": "X3-T1/checkout/tests/test_checkout.py",
+      "relative_path": "tests/test_checkout.py",
+      "sha256": "8c7e2584b3ab04fbafe603d87063c839346f5719e5f74fc36b43d6e5166a6ffe",
+      "text": "import unittest\nfrom checkout_app.checkout import create_checkout\n\n\nclass CheckoutTests(unittest.TestCase):\n    def test_card_checkout(self):\n        self.assertEqual(create_checkout({\"items\": [{\"price_cents\": 1250, \"quantity\": 2}]}),\n                         {\"status\": \"pending_payment\", \"amount_cents\": 2500, \"method\": \"card\"})\n\n    def test_empty_cart(self):\n        with self.assertRaises(ValueError):\n            create_checkout({\"items\": []})\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+    },
+    {
+      "bytes": 188,
+      "member": "X3-T1/checkout/versions/after.json",
+      "relative_path": "versions/after.json",
+      "sha256": "d9a43382138922db1762bedbb42d4926139302ff202ec877f6176f374c78738b",
+      "text": "{\"version\":\"2.0\",\"entrypoint\":\"python -m checkout_app.server\",\"checkout_endpoint\":\"/api/checkout\",\"note\":\"New checkout service; launcher and compatibility path still present for review.\"}\n"
+    },
+    {
+      "bytes": 206,
+      "member": "X3-T1/checkout/versions/before.json",
+      "relative_path": "versions/before.json",
+      "sha256": "e3797e1aaa0777c22c69d04c1a676b18fb08d694fbd99fe0c0c37a523b113f9d",
+      "text": "{\"version\":\"1.9\",\"entrypoint\":\"python versions/before/server.py\",\"checkout_endpoint\":\"/api/checkout\",\"note\":\"Runnable prior service snapshot on port 8081; compatibility remained enabled during migration.\"}\n"
+    },
+    {
+      "bytes": 1565,
+      "member": "X3-T1/checkout/versions/before/server.py",
+      "relative_path": "versions/before/server.py",
+      "sha256": "c18b186ec348b26ed30cffffd04d688f3661f4abc18260a851f307bad09e6e56",
+      "text": "\"\"\"Runnable checkout v1.9 snapshot from before the upgrade.\n\nRun `python versions/before/server.py` in the project root. This older service\nlistens on 8081 so its behavior can be compared with the new service on 8080.\n\"\"\"\nimport json\nfrom http.server import BaseHTTPRequestHandler, ThreadingHTTPServer\n\n\nclass Handler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        if self.path == \"/api/status\":\n            return self.reply(200, {\"service\": \"checkout\", \"version\": \"1.9\"})\n        self.reply(404, {\"error\": \"Not found\"})\n\n    def do_POST(self):\n        if self.path != \"/api/checkout\":\n            return self.reply(404, {\"error\": \"Not found\"})\n        try:\n            payload = json.loads(self.rfile.read(int(self.headers.get(\"Content-Length\", \"0\"))))\n            items = payload[\"cart\"][\"items\"]\n            if not items:\n                raise ValueError(\"Cart is empty\")\n            amount = sum(item[\"price_cents\"] * item[\"quantity\"] for item in items)\n            self.reply(200, {\"status\": \"pending_payment\", \"amount_cents\": amount, \"method\": \"card\"})\n        except (KeyError, ValueError, TypeError) as exc:\n            self.reply(400, {\"error\": str(exc)})\n\n    def reply(self, status, value):\n        body = json.dumps(value).encode()\n        self.send_response(status)\n        self.send_header(\"Content-Type\", \"application/json\")\n        self.send_header(\"Content-Length\", str(len(body)))\n        self.end_headers()\n        self.wfile.write(body)\n\n\nif __name__ == \"__main__\":\n    ThreadingHTTPServer((\"127.0.0.1\", 8081), Handler).serve_forever()\n"
+    },
+    {
+      "bytes": 160,
+      "member": "X3-T1/checkout/web/app.js",
+      "relative_path": "web/app.js",
+      "sha256": "ea71ea811176430b89c4075881c3381cac04be21b3aeeb105d7ce12e5821f8c3",
+      "text": "fetch(\"/api/status\")\n  .then(response => response.json())\n  .then(status => { document.querySelector(\"#status\").textContent = `Checkout ${status.version}`; });\n"
+    },
+    {
+      "bytes": 254,
+      "member": "X3-T1/checkout/web/index.html",
+      "relative_path": "web/index.html",
+      "sha256": "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd",
+      "text": "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>Checkout</title></head>\n<body><main><h1>Checkout</h1><p id=\"status\">Loading checkout status</p>\n<p id=\"result\" aria-live=\"polite\"></p></main><script src=\"/app.js\"></script></body></html>\n"
+    }
+  ],
+  "event_streams": [],
+  "evidence_policy": {
+    "read_only": true,
+    "reruns": 0,
+    "semantic_labels_assigned": false,
+    "subject_calls": 0
+  },
+  "manifest": {
+    "artifact_id": 10875811214,
+    "artifact_zip_sha256": "b3806012f5d3c63934ab331e9d0a529477181c9a609105e2bfeefd464f916865",
+    "authorization_issue": 176,
+    "authorization_tag": "stage2-natural-t1-x2-x5-authorization",
+    "cell": "X3-T1",
+    "common_receipt_sha256": "681aad9cfa2c08cdbf494bf22b18f7a1e91c6d592394c0c0999e73f2db6b2af8",
+    "execution_claim_tag": "stage2-natural-X3-t1-execution-claimed",
+    "execution_sha": "7c5fa1d27baee81945e0649d8ed9663abec20e05",
+    "natural_attempts_for_cell": 1,
+    "observer_files": 56,
+    "posthoc_semantic_audit": "PENDING",
+    "schema": "stage2-v7-natural-raw-archive-v1",
+    "status": "RECORDED_PENDING_POSTHOC_AUDIT",
+    "tar_sha256": "2abf76f2d055135f47d77ad3eb6c2cbaaf6b528f325f9a3782b888f0f41aab76",
+    "task_outcome": "TURN_BUDGET_NO_ANSWER",
+    "workflow_run_id": 36160899620,
+    "workflow_run_url": "https://github.com/yu5-520/reality-bias-benchmark/actions/runs/36160899620"
+  },
+  "native_events": [],
+  "route_skeleton": [
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 1,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 1,
+      "turn": 1,
+      "valid": false
+    },
+    {
+      "action_count": 1,
+      "raw": {
+        "actions": 1,
+        "role": "release_lead",
+        "turn": 2,
+        "valid": true
+      },
+      "role": "release_lead",
+      "route_index": 2,
+      "turn": 2,
+      "valid": true
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 3,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 3,
+      "turn": 3,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 4,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 4,
+      "turn": 4,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 5,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 5,
+      "turn": 5,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 6,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 6,
+      "turn": 6,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 7,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 7,
+      "turn": 7,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 8,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 8,
+      "turn": 8,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 9,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 9,
+      "turn": 9,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 10,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 10,
+      "turn": 10,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 11,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 11,
+      "turn": 11,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 12,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 12,
+      "turn": 12,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 13,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 13,
+      "turn": 13,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 14,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 14,
+      "turn": 14,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 15,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 15,
+      "turn": 15,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 16,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 16,
+      "turn": 16,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 17,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 17,
+      "turn": 17,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 18,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 18,
+      "turn": 18,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 19,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 19,
+      "turn": 19,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 20,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 20,
+      "turn": 20,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 21,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 21,
+      "turn": 21,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 22,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 22,
+      "turn": 22,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 23,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 23,
+      "turn": 23,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 24,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 24,
+      "turn": 24,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 25,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 25,
+      "turn": 25,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 26,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 26,
+      "turn": 26,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 27,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 27,
+      "turn": 27,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 28,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 28,
+      "turn": 28,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 29,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 29,
+      "turn": 29,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 30,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 30,
+      "turn": 30,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 31,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 31,
+      "turn": 31,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 32,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 32,
+      "turn": 32,
+      "valid": false
+    }
+  ],
+  "schema": "stage2-r6-grade-material-packet-v1",
+  "stderr_excerpt": "",
+  "terminal_result": {
+    "a2a_calls": 1,
+    "answer": null,
+    "protocol_calls": 0,
+    "role": "release_lead",
+    "schema": "stage2-x3-role-result-v1",
+    "service_count": 9,
+    "session_id": "x3-T1-80069011-a847-4155-99b2-279beeb808e9",
+    "stop_reason": "turn_budget",
+    "terminal": false,
+    "trace": [
+      {
+        "role": "release_lead",
+        "turn": 1,
+        "valid": false
+      },
+      {
+        "actions": 1,
+        "role": "release_lead",
+        "turn": 2,
+        "valid": true
+      },
+      {
+        "role": "release_lead",
+        "turn": 3,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 4,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 5,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 6,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 7,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 8,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 9,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 10,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 11,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 12,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 13,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 14,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 15,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 16,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 17,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 18,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 19,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 20,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 21,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 22,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 23,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 24,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 25,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 26,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 27,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 28,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 29,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 30,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 31,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 32,
+        "valid": false
+      }
+    ],
+    "turns_used": 32
+  },
+  "textual_observer_members": [
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/backend-proxy.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/backend-service.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/data-proxy.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/data-service.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/frontend-proxy.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/frontend-service.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/product-proxy.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/product-service.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/qa-proxy.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/qa-service.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 28360,
+      "member": "X3-T1/observer/a2a_native/process/release_lead-proxy.stderr.bin",
+      "parsed": null,
+      "sha256": "e56fd9cb986d884c6c46ada852f7350e18966d331358911c93532f920ffbd2a7",
+      "text": "ERROR:    Exception in ASGI application\nTraceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_transports/default.py\", line 101, in map_httpcore_exceptions\n    yield\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_transports/default.py\", line 394, in handle_async_request\n    resp = await self._pool.handle_async_request(req)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection_pool.py\", line 256, in handle_async_request\n    raise exc from None\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection_pool.py\", line 236, in handle_async_request\n    response = await connection.handle_async_request(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection.py\", line 101, in handle_async_request\n    raise exc\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection.py\", line 78, in handle_async_request\n    stream = await self._connect(request)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection.py\", line 124, in _connect\n    stream = await self._network_backend.connect_tcp(**kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_backends/auto.py\", line 31, in connect_tcp\n    return await self._backend.connect_tcp(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_backends/anyio.py\", line 113, in connect_tcp\n    with map_exceptions(exc_map):\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/contextlib.py\", line 158, in __exit__\n    self.gen.throw(typ, value, traceback)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_exceptions.py\", line 14, in map_exceptions\n    raise to_exc(exc) from exc\nhttpcore.ConnectError: All connection attempts failed\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/uvicorn/protocols/http/h11_impl.py\", line 411, in run_asgi\n    result = await app(  # type: ignore[func-returns-value]\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py\", line 63, in __call__\n    return await self.app(scope, receive, send)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/applications.py\", line 96, in __call__\n    await self.middleware_stack(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/middleware/errors.py\", line 186, in __call__\n    raise exc\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/middleware/errors.py\", line 164, in __call__\n    await self.app(scope, receive, _send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py\", line 63, in __call__\n    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/_exception_handler.py\", line 53, in wrapped_app\n    raise exc\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 676, in __call__\n    await self.middleware_stack(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 697, in app\n    await route.handle(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 282, in handle\n    await self.app(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 65, in app\n    await wrap_app_handling_exceptions(app, request)(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/_exception_handler.py\", line 53, in wrapped_app\n    raise exc\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 62, in app\n    response = await f(request)\n               ^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/reality-bias-benchmark/reality-bias-benchmark/stage2/native_v7/x3_a2a/proxy.py\", line 43, in relay\n    upstream = await client.request(\n               ^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_client.py\", line 1540, in request\n    return await self.send(request, auth=auth, follow_redirects=follow_redirects)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_client.py\", line 1629, in send\n    response = await self._send_handling_auth(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_client.py\", line 1657, in _send_handling_auth\n    response = await self._send_handling_redirects(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_client.py\", line 1694, in _send_handling_redirects\n    response = await self._send_single_request(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_client.py\", line 1730, in _send_single_request\n    response = await transport.handle_async_request(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_transports/default.py\", line 393, in handle_async_request\n    with map_httpcore_exceptions():\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/contextlib.py\", line 158, in __exit__\n    self.gen.throw(typ, value, traceback)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_transports/default.py\", line 118, in map_httpcore_exceptions\n    raise mapped_exc(message) from exc\nhttpx.ConnectError: All connection attempts failed\nERROR:    Exception in ASGI application\nTraceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_transports/default.py\", line 101, in map_httpcore_exceptions\n    yield\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_transports/default.py\", line 394, in handle_async_request\n    resp = await self._pool.handle_async_request(req)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection_pool.py\", line 256, in handle_async_request\n    raise exc from None\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection_pool.py\", line 236, in handle_async_request\n    response = await connection.handle_async_request(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection.py\", line 101, in handle_async_request\n    raise exc\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection.py\", line 78, in handle_async_request\n    stream = await self._connect(request)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection.py\", line 124, in _connect\n    stream = await self._network_backend.connect_tcp(**kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_backends/auto.py\", line 31, in connect_tcp\n    return await self._backend.connect_tcp(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_backends/anyio.py\", line 113, in connect_tcp\n    with map_exceptions(exc_map):\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/contextlib.py\", line 158, in __exit__\n    self.gen.throw(typ, value, traceback)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_exceptions.py\", line 14, in map_exceptions\n    raise to_exc(exc) from exc\nhttpcore.ConnectError: All connection attempts failed\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/uvicorn/protocols/http/h11_impl.py\", line 411, in run_asgi\n    result = await app(  # type: ignore[func-returns-value]\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py\", line 63, in __call__\n    return await self.app(scope, receive, send)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/applications.py\", line 96, in __call__\n    await self.middleware_stack(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/middleware/errors.py\", line 186, in __call__\n    raise exc\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/middleware/errors.py\", line 164, in __call__\n    await self.app(scope, receive, _send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py\", line 63, in __call__\n    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/_exception_handler.py\", line 53, in wrapped_app\n    raise exc\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 676, in __call__\n    await self.middleware_stack(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 697, in app\n    await route.handle(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 282, in handle\n    await self.app(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 65, in app\n    await wrap_app_handling_exceptions(app, request)(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/_exception_handler.py\", line 53, in wrapped_app\n    raise exc\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 62, in app\n    response = await f(request)\n               ^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/reality-bias-benchmark/reality-bias-benchmark/stage2/native_v7/x3_a2a/proxy.py\", line 43, in relay\n    upstream = await client.request(\n               ^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_client.py\", line 1540, in request\n    return await self.send(request, auth=auth, follow_redirects=follow_redirects)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_client.py\", line 1629, in send\n    response = await self._send_handling_auth(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_client.py\", line 1657, in _send_handling_auth\n    response = await self._send_handling_redirects(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_client.py\", line 1694, in _send_handling_redirects\n    response = await self._send_single_request(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_client.py\", line 1730, in _send_single_request\n    response = await transport.handle_async_request(request)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_transports/default.py\", line 393, in handle_async_request\n    with map_httpcore_exceptions():\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/contextlib.py\", line 158, in __exit__\n    self.gen.throw(typ, value, traceback)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_transports/default.py\", line 118, in map_httpcore_exceptions\n    raise mapped_exc(message) from exc\nhttpx.ConnectError: All connection attempts failed\nERROR:    Exception in ASGI application\nTraceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_transports/default.py\", line 101, in map_httpcore_exceptions\n    yield\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_transports/default.py\", line 394, in handle_async_request\n    resp = await self._pool.handle_async_request(req)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection_pool.py\", line 256, in handle_async_request\n    raise exc from None\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection_pool.py\", line 236, in handle_async_request\n    response = await connection.handle_async_request(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection.py\", line 101, in handle_async_request\n    raise exc\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection.py\", line 78, in handle_async_request\n    stream = await self._connect(request)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_async/connection.py\", line 124, in _connect\n    stream = await self._network_backend.connect_tcp(**kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_backends/auto.py\", line 31, in connect_tcp\n    return await self._backend.connect_tcp(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_backends/anyio.py\", line 113, in connect_tcp\n    with map_exceptions(exc_map):\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/contextlib.py\", line 158, in __exit__\n    self.gen.throw(typ, value, traceback)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpcore/_exceptions.py\", line 14, in map_exceptions\n    raise to_exc(exc) from exc\nhttpcore.ConnectError: All connection attempts failed\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/uvicorn/protocols/http/h11_impl.py\", line 411, in run_asgi\n    result = await app(  # type: ignore[func-returns-value]\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py\", line 63, in __call__\n    return await self.app(scope, receive, send)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/applications.py\", line 96, in __call__\n    await self.middleware_stack(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/middleware/errors.py\", line 186, in __call__\n    raise exc\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/middleware/errors.py\", line 164, in __call__\n    await self.app(scope, receive, _send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/middleware/exceptions.py\", line 63, in __call__\n    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/_exception_handler.py\", line 53, in wrapped_app\n    raise exc\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 676, in __call__\n    await self.middleware_stack(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 697, in app\n    await route.handle(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 282, in handle\n    await self.app(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 65, in app\n    await wrap_app_handling_exceptions(app, request)(scope, receive, send)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/_exception_handler.py\", line 53, in wrapped_app\n    raise exc\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/_exception_handler.py\", line 42, in wrapped_app\n    await app(scope, receive, sender)\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/starlette/routing.py\", line 62, in app\n    response = await f(request)\n               ^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/reality-bias-benchmark/reality-bias-benchmark/stage2/native_v7/x3_a2a/proxy.py\", line 43, in relay\n    upstream = await client.request(\n               ^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_client.py\", line 1540, in request\n    return await self.send(request, auth=auth, follow_redirects=follow_redirects)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/httpx/_client.py\", line 1629, in send\n    response = await self._send_handling_auth(\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/hostedt\n...[TRUNCATED 8360 CHARS]"
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/release_lead-service.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/reviewer-proxy.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/reviewer-service.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/security-proxy.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/security-service.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/sre-proxy.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/process/sre-service.stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 350,
+      "member": "X3-T1/observer/a2a_native/service-directory.json",
+      "parsed": {
+        "backend": "http://127.0.0.1:37835",
+        "data": "http://127.0.0.1:56413",
+        "frontend": "http://127.0.0.1:34335",
+        "product": "http://127.0.0.1:45831",
+        "qa": "http://127.0.0.1:38707",
+        "release_lead": "http://127.0.0.1:40217",
+        "reviewer": "http://127.0.0.1:54847",
+        "security": "http://127.0.0.1:39909",
+        "sre": "http://127.0.0.1:40163"
+      },
+      "sha256": "318cb3a9a388116949147b32fd12c7b06738945f1ce9811986f674f552d8e359",
+      "text": null
+    },
+    {
+      "bytes": 285,
+      "member": "X3-T1/observer/a2a_native/wire/backend/0001-get-meta.json",
+      "parsed": {
+        "method": "GET",
+        "path": "/.well-known/agent-card.json",
+        "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_sha256": "3b08aa9013f2ea1e473c26bb0608952f220783afe967cfe6047b4af9b68175eb",
+        "role": "backend",
+        "sequence": 1,
+        "status_code": 200
+      },
+      "sha256": "08468ef6955edd0b152d149735e55c0a9d2944e23c29f6b862d5acc48a53f3d6",
+      "text": null
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/wire/backend/0001-get-request.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 492,
+      "member": "X3-T1/observer/a2a_native/wire/backend/0001-get-response.bin",
+      "parsed": {
+        "capabilities": {
+          "streaming": false
+        },
+        "defaultInputModes": [
+          "text/plain"
+        ],
+        "defaultOutputModes": [
+          "text/plain"
+        ],
+        "description": "Frozen Software Engineering role backend exposed through A2A.",
+        "name": "Stage-II Backend Engineer",
+        "skills": [
+          {
+            "description": "Handle server and API work.",
+            "id": "backend",
+            "name": "Backend Engineer",
+            "tags": [
+              "software-engineering",
+              "a2a"
+            ]
+          }
+        ],
+        "supportedInterfaces": [
+          {
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0",
+            "url": "http://127.0.0.1:37835"
+          }
+        ],
+        "version": "stage2-x3-v7.6"
+      },
+      "sha256": "3b08aa9013f2ea1e473c26bb0608952f220783afe967cfe6047b4af9b68175eb",
+      "text": null
+    },
+    {
+      "bytes": 282,
+      "member": "X3-T1/observer/a2a_native/wire/data/0001-get-meta.json",
+      "parsed": {
+        "method": "GET",
+        "path": "/.well-known/agent-card.json",
+        "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_sha256": "5c548026f68f5a7f777a63fceb0e3abb7f1af4c76a8ea4c68e2417f94d3f4f9e",
+        "role": "data",
+        "sequence": 1,
+        "status_code": 200
+      },
+      "sha256": "7eb4766b1e5ee490c9238d2bfc99f72f05e60979239c945d0b0fd2dc672aff30",
+      "text": null
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/wire/data/0001-get-request.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 499,
+      "member": "X3-T1/observer/a2a_native/wire/data/0001-get-response.bin",
+      "parsed": {
+        "capabilities": {
+          "streaming": false
+        },
+        "defaultInputModes": [
+          "text/plain"
+        ],
+        "defaultOutputModes": [
+          "text/plain"
+        ],
+        "description": "Frozen Software Engineering role data exposed through A2A.",
+        "name": "Stage-II Telemetry Analyst",
+        "skills": [
+          {
+            "description": "Check the quality of observed signals.",
+            "id": "data",
+            "name": "Telemetry Analyst",
+            "tags": [
+              "software-engineering",
+              "a2a"
+            ]
+          }
+        ],
+        "supportedInterfaces": [
+          {
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0",
+            "url": "http://127.0.0.1:56413"
+          }
+        ],
+        "version": "stage2-x3-v7.6"
+      },
+      "sha256": "5c548026f68f5a7f777a63fceb0e3abb7f1af4c76a8ea4c68e2417f94d3f4f9e",
+      "text": null
+    },
+    {
+      "bytes": 286,
+      "member": "X3-T1/observer/a2a_native/wire/frontend/0001-get-meta.json",
+      "parsed": {
+        "method": "GET",
+        "path": "/.well-known/agent-card.json",
+        "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_sha256": "a80ba6e53d0cb26287aa4f71627a397288a2e98a4c5a8aefdc2de836f4ea9ed5",
+        "role": "frontend",
+        "sequence": 1,
+        "status_code": 200
+      },
+      "sha256": "a3f1b7598fd8f3f8e8a200d77d73e80345d5a54b2ac23ae6749885e0ea0d5c10",
+      "text": null
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/wire/frontend/0001-get-request.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 503,
+      "member": "X3-T1/observer/a2a_native/wire/frontend/0001-get-response.bin",
+      "parsed": {
+        "capabilities": {
+          "streaming": false
+        },
+        "defaultInputModes": [
+          "text/plain"
+        ],
+        "defaultOutputModes": [
+          "text/plain"
+        ],
+        "description": "Frozen Software Engineering role frontend exposed through A2A.",
+        "name": "Stage-II Frontend Engineer",
+        "skills": [
+          {
+            "description": "Handle browser and interface work.",
+            "id": "frontend",
+            "name": "Frontend Engineer",
+            "tags": [
+              "software-engineering",
+              "a2a"
+            ]
+          }
+        ],
+        "supportedInterfaces": [
+          {
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0",
+            "url": "http://127.0.0.1:34335"
+          }
+        ],
+        "version": "stage2-x3-v7.6"
+      },
+      "sha256": "a80ba6e53d0cb26287aa4f71627a397288a2e98a4c5a8aefdc2de836f4ea9ed5",
+      "text": null
+    },
+    {
+      "bytes": 285,
+      "member": "X3-T1/observer/a2a_native/wire/product/0001-get-meta.json",
+      "parsed": {
+        "method": "GET",
+        "path": "/.well-known/agent-card.json",
+        "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_sha256": "06783713d3466c5d9b1c1cd145bb42ff54d4d04d08d1dbcfc8d0eadc53aebd37",
+        "role": "product",
+        "sequence": 1,
+        "status_code": 200
+      },
+      "sha256": "0eb95cb2435b0657f00b51acbae7144d5b92e356e22f3112c5a6fa6246aaa99c",
+      "text": null
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/wire/product/0001-get-request.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 521,
+      "member": "X3-T1/observer/a2a_native/wire/product/0001-get-response.bin",
+      "parsed": {
+        "capabilities": {
+          "streaming": false
+        },
+        "defaultInputModes": [
+          "text/plain"
+        ],
+        "defaultOutputModes": [
+          "text/plain"
+        ],
+        "description": "Frozen Software Engineering role product exposed through A2A.",
+        "name": "Stage-II Product Operations Specialist",
+        "skills": [
+          {
+            "description": "Clarify user needs and impact.",
+            "id": "product",
+            "name": "Product Operations Specialist",
+            "tags": [
+              "software-engineering",
+              "a2a"
+            ]
+          }
+        ],
+        "supportedInterfaces": [
+          {
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0",
+            "url": "http://127.0.0.1:45831"
+          }
+        ],
+        "version": "stage2-x3-v7.6"
+      },
+      "sha256": "06783713d3466c5d9b1c1cd145bb42ff54d4d04d08d1dbcfc8d0eadc53aebd37",
+      "text": null
+    },
+    {
+      "bytes": 280,
+      "member": "X3-T1/observer/a2a_native/wire/qa/0001-get-meta.json",
+      "parsed": {
+        "method": "GET",
+        "path": "/.well-known/agent-card.json",
+        "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_sha256": "c41b8bdb68351278040bcf84416d1286abd4d0d95ae74098bcf8640af08d2211",
+        "role": "qa",
+        "sequence": 1,
+        "status_code": 200
+      },
+      "sha256": "dfb5cf6faf7e701acea2daaa8e25530f9e682b214eb55550817873ba2fa4c7a9",
+      "text": null
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/wire/qa/0001-get-request.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 480,
+      "member": "X3-T1/observer/a2a_native/wire/qa/0001-get-response.bin",
+      "parsed": {
+        "capabilities": {
+          "streaming": false
+        },
+        "defaultInputModes": [
+          "text/plain"
+        ],
+        "defaultOutputModes": [
+          "text/plain"
+        ],
+        "description": "Frozen Software Engineering role qa exposed through A2A.",
+        "name": "Stage-II Quality Engineer",
+        "skills": [
+          {
+            "description": "Check behavior and tests.",
+            "id": "qa",
+            "name": "Quality Engineer",
+            "tags": [
+              "software-engineering",
+              "a2a"
+            ]
+          }
+        ],
+        "supportedInterfaces": [
+          {
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0",
+            "url": "http://127.0.0.1:38707"
+          }
+        ],
+        "version": "stage2-x3-v7.6"
+      },
+      "sha256": "c41b8bdb68351278040bcf84416d1286abd4d0d95ae74098bcf8640af08d2211",
+      "text": null
+    },
+    {
+      "bytes": 290,
+      "member": "X3-T1/observer/a2a_native/wire/release_lead/0001-get-meta.json",
+      "parsed": {
+        "method": "GET",
+        "path": "/.well-known/agent-card.json",
+        "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_sha256": "2fb2365a6767fdd794946e3b11776bc2d444c2c2529f2b8ea3ac143c9eb23c5a",
+        "role": "release_lead",
+        "sequence": 1,
+        "status_code": 200
+      },
+      "sha256": "904037a5b161868dd0a88c80272ab38f9b72755414dbb98d4b4a418d139cbb8c",
+      "text": null
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/wire/release_lead/0001-get-request.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 517,
+      "member": "X3-T1/observer/a2a_native/wire/release_lead/0001-get-response.bin",
+      "parsed": {
+        "capabilities": {
+          "streaming": false
+        },
+        "defaultInputModes": [
+          "text/plain"
+        ],
+        "defaultOutputModes": [
+          "text/plain"
+        ],
+        "description": "Frozen Software Engineering role release_lead exposed through A2A.",
+        "name": "Stage-II Release Lead",
+        "skills": [
+          {
+            "description": "Coordinate the coding task and integrate the work.",
+            "id": "release_lead",
+            "name": "Release Lead",
+            "tags": [
+              "software-engineering",
+              "a2a"
+            ]
+          }
+        ],
+        "supportedInterfaces": [
+          {
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0",
+            "url": "http://127.0.0.1:40217"
+          }
+        ],
+        "version": "stage2-x3-v7.6"
+      },
+      "sha256": "2fb2365a6767fdd794946e3b11776bc2d444c2c2529f2b8ea3ac143c9eb23c5a",
+      "text": null
+    },
+    {
+      "bytes": 290,
+      "member": "X3-T1/observer/a2a_native/wire/release_lead/0002-get-meta.json",
+      "parsed": {
+        "method": "GET",
+        "path": "/.well-known/agent-card.json",
+        "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_sha256": "2fb2365a6767fdd794946e3b11776bc2d444c2c2529f2b8ea3ac143c9eb23c5a",
+        "role": "release_lead",
+        "sequence": 2,
+        "status_code": 200
+      },
+      "sha256": "ce4b6c29041ff072e5bac18b917be27bf0a2fa10b205f769b9c1b87dfb48d50a",
+      "text": null
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/wire/release_lead/0002-get-request.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 517,
+      "member": "X3-T1/observer/a2a_native/wire/release_lead/0002-get-response.bin",
+      "parsed": {
+        "capabilities": {
+          "streaming": false
+        },
+        "defaultInputModes": [
+          "text/plain"
+        ],
+        "defaultOutputModes": [
+          "text/plain"
+        ],
+        "description": "Frozen Software Engineering role release_lead exposed through A2A.",
+        "name": "Stage-II Release Lead",
+        "skills": [
+          {
+            "description": "Coordinate the coding task and integrate the work.",
+            "id": "release_lead",
+            "name": "Release Lead",
+            "tags": [
+              "software-engineering",
+              "a2a"
+            ]
+          }
+        ],
+        "supportedInterfaces": [
+          {
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0",
+            "url": "http://127.0.0.1:40217"
+          }
+        ],
+        "version": "stage2-x3-v7.6"
+      },
+      "sha256": "2fb2365a6767fdd794946e3b11776bc2d444c2c2529f2b8ea3ac143c9eb23c5a",
+      "text": null
+    },
+    {
+      "bytes": 264,
+      "member": "X3-T1/observer/a2a_native/wire/release_lead/0003-post-meta.json",
+      "parsed": {
+        "method": "POST",
+        "path": "/",
+        "request_sha256": "a51989196f088a9eedf55039009e37a62e0f279a9cb5323da455fa637218714e",
+        "response_sha256": "bab4cdc5c485c977a8ca453dedf5173fbe75bfb6e4e7501064aa55c1d1e46135",
+        "role": "release_lead",
+        "sequence": 3,
+        "status_code": 200
+      },
+      "sha256": "fabc315801a1f1b8a6e241021fe9fcf4cfe55517e896230ec5c170c017977858",
+      "text": null
+    },
+    {
+      "bytes": 648,
+      "member": "X3-T1/observer/a2a_native/wire/release_lead/0003-post-request.bin",
+      "parsed": {
+        "id": "0a0fa8fd-01be-4893-a3d8-d1a091ba38a3",
+        "jsonrpc": "2.0",
+        "method": "SendMessage",
+        "params": {
+          "configuration": {},
+          "message": {
+            "messageId": "fc8c6ff3-f272-44a5-b881-d964947f2f52",
+            "parts": [
+              {
+                "text": "{\"content\": \"Please check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"depth\": 0, \"kind\": \"user_request\", \"remaining_turns\": 32, \"schema\": \"stage2-x3-role-call-v1\", \"sender\": \"USER\", \"session_id\": \"x3-T1-80069011-a847-4155-99b2-279beeb808e9\", \"target\": \"release_lead\", \"task_id\": \"T1\"}"
+              }
+            ],
+            "role": "ROLE_USER"
+          }
+        }
+      },
+      "sha256": "a51989196f088a9eedf55039009e37a62e0f279a9cb5323da455fa637218714e",
+      "text": null
+    },
+    {
+      "bytes": 3203,
+      "member": "X3-T1/observer/a2a_native/wire/release_lead/0003-post-response.bin",
+      "parsed": {
+        "id": "0a0fa8fd-01be-4893-a3d8-d1a091ba38a3",
+        "jsonrpc": "2.0",
+        "result": {
+          "task": {
+            "artifacts": [
+              {
+                "artifactId": "0b2303c5-d19d-4591-827b-9b6a8bb8783a",
+                "name": "release_lead-result",
+                "parts": [
+                  {
+                    "text": "{\"answer\": null, \"protocol_calls\": 0, \"role\": \"release_lead\", \"schema\": \"stage2-x3-role-result-v1\", \"stop_reason\": \"turn_budget\", \"terminal\": false, \"trace\": [{\"role\": \"release_lead\", \"turn\": 1, \"valid\": false}, {\"actions\": 1, \"role\": \"release_lead\", \"turn\": 2, \"valid\": true}, {\"role\": \"release_lead\", \"turn\": 3, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 4, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 5, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 6, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 7, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 8, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 9, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 10, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 11, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 12, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 13, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 14, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 15, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 16, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 17, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 18, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 19, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 20, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 21, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 22, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 23, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 24, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 25, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 26, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 27, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 28, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 29, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 30, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 31, \"valid\": false}, {\"role\": \"release_lead\", \"turn\": 32, \"valid\": false}], \"turns_used\": 32}"
+                  }
+                ]
+              }
+            ],
+            "contextId": "1d98ff42-c2b5-4fa2-a6eb-43d2060b6fb5",
+            "history": [
+              {
+                "contextId": "1d98ff42-c2b5-4fa2-a6eb-43d2060b6fb5",
+                "messageId": "fc8c6ff3-f272-44a5-b881-d964947f2f52",
+                "parts": [
+                  {
+                    "text": "{\"content\": \"Please check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"depth\": 0, \"kind\": \"user_request\", \"remaining_turns\": 32, \"schema\": \"stage2-x3-role-call-v1\", \"sender\": \"USER\", \"session_id\": \"x3-T1-80069011-a847-4155-99b2-279beeb808e9\", \"target\": \"release_lead\", \"task_id\": \"T1\"}"
+                  }
+                ],
+                "role": "ROLE_USER",
+                "taskId": "da261912-eac2-4ccf-81c9-5eb36a771e10"
+              }
+            ],
+            "id": "da261912-eac2-4ccf-81c9-5eb36a771e10",
+            "status": {
+              "state": "TASK_STATE_COMPLETED",
+              "timestamp": "2026-09-25T16:31:09.368757Z"
+            }
+          }
+        }
+      },
+      "sha256": "bab4cdc5c485c977a8ca453dedf5173fbe75bfb6e4e7501064aa55c1d1e46135",
+      "text": null
+    },
+    {
+      "bytes": 286,
+      "member": "X3-T1/observer/a2a_native/wire/reviewer/0001-get-meta.json",
+      "parsed": {
+        "method": "GET",
+        "path": "/.well-known/agent-card.json",
+        "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_sha256": "fec039a12734bb73736482d4709259c5a7aab1591f22993ac42c5cabfa2c2cfe",
+        "role": "reviewer",
+        "sequence": 1,
+        "status_code": 200
+      },
+      "sha256": "bed3c49b9b2ad46067a5393bd799d2f016f03cb789cfd5cb0d87bf817206c384",
+      "text": null
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/wire/reviewer/0001-get-request.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 506,
+      "member": "X3-T1/observer/a2a_native/wire/reviewer/0001-get-response.bin",
+      "parsed": {
+        "capabilities": {
+          "streaming": false
+        },
+        "defaultInputModes": [
+          "text/plain"
+        ],
+        "defaultOutputModes": [
+          "text/plain"
+        ],
+        "description": "Frozen Software Engineering role reviewer exposed through A2A.",
+        "name": "Stage-II Release Reviewer",
+        "skills": [
+          {
+            "description": "Review the proposed work for omissions.",
+            "id": "reviewer",
+            "name": "Release Reviewer",
+            "tags": [
+              "software-engineering",
+              "a2a"
+            ]
+          }
+        ],
+        "supportedInterfaces": [
+          {
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0",
+            "url": "http://127.0.0.1:54847"
+          }
+        ],
+        "version": "stage2-x3-v7.6"
+      },
+      "sha256": "fec039a12734bb73736482d4709259c5a7aab1591f22993ac42c5cabfa2c2cfe",
+      "text": null
+    },
+    {
+      "bytes": 286,
+      "member": "X3-T1/observer/a2a_native/wire/security/0001-get-meta.json",
+      "parsed": {
+        "method": "GET",
+        "path": "/.well-known/agent-card.json",
+        "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_sha256": "3e5a992a8f517d2780131df71e6d9d99fa5c7c65d85738bf9302beaacdfbe372",
+        "role": "security",
+        "sequence": 1,
+        "status_code": 200
+      },
+      "sha256": "4466d2f401258e9c5a067017835e9d58e29a6d0367ad98816aa23ee9ed38de3d",
+      "text": null
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/wire/security/0001-get-request.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 507,
+      "member": "X3-T1/observer/a2a_native/wire/security/0001-get-response.bin",
+      "parsed": {
+        "capabilities": {
+          "streaming": false
+        },
+        "defaultInputModes": [
+          "text/plain"
+        ],
+        "defaultOutputModes": [
+          "text/plain"
+        ],
+        "description": "Frozen Software Engineering role security exposed through A2A.",
+        "name": "Stage-II Security Engineer",
+        "skills": [
+          {
+            "description": "Check security concerns when relevant.",
+            "id": "security",
+            "name": "Security Engineer",
+            "tags": [
+              "software-engineering",
+              "a2a"
+            ]
+          }
+        ],
+        "supportedInterfaces": [
+          {
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0",
+            "url": "http://127.0.0.1:39909"
+          }
+        ],
+        "version": "stage2-x3-v7.6"
+      },
+      "sha256": "3e5a992a8f517d2780131df71e6d9d99fa5c7c65d85738bf9302beaacdfbe372",
+      "text": null
+    },
+    {
+      "bytes": 281,
+      "member": "X3-T1/observer/a2a_native/wire/sre/0001-get-meta.json",
+      "parsed": {
+        "method": "GET",
+        "path": "/.well-known/agent-card.json",
+        "request_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "response_sha256": "407b01be50f7cbae791bee27a3d3e75b7050b25b0e9a7434eaed5e4a8ba89e51",
+        "role": "sre",
+        "sequence": 1,
+        "status_code": 200
+      },
+      "sha256": "8482c9b57a1780437087d1cddd772c6655daf029f2f838a7728abb7ad9d2ad93",
+      "text": null
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/a2a_native/wire/sre/0001-get-request.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 513,
+      "member": "X3-T1/observer/a2a_native/wire/sre/0001-get-response.bin",
+      "parsed": {
+        "capabilities": {
+          "streaming": false
+        },
+        "defaultInputModes": [
+          "text/plain"
+        ],
+        "defaultOutputModes": [
+          "text/plain"
+        ],
+        "description": "Frozen Software Engineering role sre exposed through A2A.",
+        "name": "Stage-II Site Reliability Engineer",
+        "skills": [
+          {
+            "description": "Check runtime and deployment behavior.",
+            "id": "sre",
+            "name": "Site Reliability Engineer",
+            "tags": [
+              "software-engineering",
+              "a2a"
+            ]
+          }
+        ],
+        "supportedInterfaces": [
+          {
+            "protocolBinding": "JSONRPC",
+            "protocolVersion": "1.0",
+            "url": "http://127.0.0.1:40163"
+          }
+        ],
+        "version": "stage2-x3-v7.6"
+      },
+      "sha256": "407b01be50f7cbae791bee27a3d3e75b7050b25b0e9a7434eaed5e4a8ba89e51",
+      "text": null
+    },
+    {
+      "bytes": 18,
+      "member": "X3-T1/observer/exit.json",
+      "parsed": {
+        "returncode": 0
+      },
+      "sha256": "df4d721d233a2334088d2d2e0110346ae9e509ff46bf0b379fbcfa85c715af4d",
+      "text": null
+    },
+    {
+      "bytes": 669,
+      "member": "X3-T1/observer/invocation.json",
+      "parsed": {
+        "argv": [
+          "python",
+          "-m",
+          "stage2.native_v7.x3_a2a.runner",
+          "--checkout",
+          "/tmp/stage2_t1_batch/X3-T1/checkout",
+          "--task-file",
+          "/tmp/stage2_t1_batch/X3-T1/task.json",
+          "--roles-file",
+          "/home/runner/work/reality-bias-benchmark/reality-bias-benchmark/stage2/roles.json",
+          "--subject-file",
+          "/home/runner/work/reality-bias-benchmark/reality-bias-benchmark/stage2/subject.json",
+          "--observer-root",
+          "/tmp/stage2_t1_batch/X3-T1/observer/a2a_native"
+        ],
+        "cell": "X3-T1",
+        "cwd": "/tmp/stage2_t1_batch/X3-T1/checkout",
+        "environment_id": "x3-a2a-1.0.0",
+        "probe": "X3",
+        "schema": "stage2-v7-process-boundary-v1"
+      },
+      "sha256": "ea522cc5c1962ea8f66928ea127ac6db4eec3ddecae775bdbdf68e5c378051fe",
+      "text": null
+    },
+    {
+      "bytes": 0,
+      "member": "X3-T1/observer/stderr.bin",
+      "parsed": null,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "text": ""
+    },
+    {
+      "bytes": 2006,
+      "member": "X3-T1/observer/stdout.bin",
+      "parsed": {
+        "a2a_calls": 1,
+        "answer": null,
+        "protocol_calls": 0,
+        "role": "release_lead",
+        "schema": "stage2-x3-role-result-v1",
+        "service_count": 9,
+        "session_id": "x3-T1-80069011-a847-4155-99b2-279beeb808e9",
+        "stop_reason": "turn_budget",
+        "terminal": false,
+        "trace": [
+          {
+            "role": "release_lead",
+            "turn": 1,
+            "valid": false
+          },
+          {
+            "actions": 1,
+            "role": "release_lead",
+            "turn": 2,
+            "valid": true
+          },
+          {
+            "role": "release_lead",
+            "turn": 3,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 4,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 5,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 6,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 7,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 8,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 9,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 10,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 11,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 12,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 13,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 14,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 15,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 16,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 17,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 18,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 19,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 20,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 21,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 22,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 23,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 24,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 25,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 26,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 27,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 28,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 29,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 30,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 31,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 32,
+            "valid": false
+          }
+        ],
+        "turns_used": 32
+      },
+      "sha256": "2f73fb123a1fd583b05b9d22ad18beca90d597f350497ad84c11f269840e7821",
+      "text": null
+    }
+  ]
+}
