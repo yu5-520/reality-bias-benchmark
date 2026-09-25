@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/reality-bias/stage2_subject_readiness_receipt_v1.schema.json",
+  "title": "Stage-II Common Subject Readiness Receipt v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "status",
+    "execution_code_sha",
+    "provider",
+    "requested_model_alias",
+    "expected_model_version",
+    "provider_call_count",
+    "automatic_paid_evaluator",
+    "scientific_task_used",
+    "natural_cell_reserved",
+    "registry_mutated",
+    "subject_config_sha256",
+    "model_config_sha256",
+    "preflight_sha256",
+    "raw_response_sha256",
+    "promotion_required"
+  ],
+  "properties": {
+    "schema": {"const": "stage2-subject-readiness-receipt-v1"},
+    "status": {"const": "COMMON_PROVIDER_HANDSHAKE_RECORDED_NOT_SUBJECT_READY"},
+    "execution_code_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "provider": {"const": "deepseek"},
+    "provider_call_count": {"const": 1},
+    "automatic_paid_evaluator": {"const": false},
+    "scientific_task_used": {"const": false},
+    "natural_cell_reserved": {"const": false},
+    "registry_mutated": {"const": false},
+    "natural_trajectories_after_handshake": {"const": 0},
+    "promotion_required": {"const": "REVIEWED_REGISTRY_COMMIT"}
+  }
+}

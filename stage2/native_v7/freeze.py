@@ -33,6 +33,7 @@ def artifact():
         BASE / "policy.py",
         BASE / "observer.py",
         BASE / "collect.py",
+        BASE / "subject_readiness.py",
         BASE / "software_host_v1.py",
         BASE / "software_host_smoke.py",
         BASE / "x1_autogen/__init__.py",
@@ -66,11 +67,12 @@ def artifact():
         BASE / "x7_longllmlingua/context.py",
         BASE / "x7_longllmlingua/runner.py",
         BASE / "x7_longllmlingua/smoke.py",
-        ROOT / "docs/R_Plan_v7.8.md",
+        ROOT / "docs/R_Plan_v7.9.md",
+        ROOT / "schemas/stage2_subject_readiness_receipt_v1.schema.json",
     ]
     return {
-        "schema": "stage2-native-v7-matrix-v9",
-        "predecessor": "docs/R_Plan_v7.8.md",
+        "schema": "stage2-native-v7-matrix-v10",
+        "predecessor": "docs/R_Plan_v7.9.md",
         "architecture": "heterogeneous-native-execution_external-observation",
         "natural_trajectories_collected": 0,
         "execution_gate": "CLOSED_UNTIL_CELL_X_SUBJECT_READY",
