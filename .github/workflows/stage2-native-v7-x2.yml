@@ -44,6 +44,7 @@ jobs:
           python -m pip install -q --upgrade pip
           grep -v '^lancedb==0.4.0$' upstream/requirements.txt > /tmp/metagpt-requirements-stage2.txt
           python -m pip install -q -r /tmp/metagpt-requirements-stage2.txt
+          python -m pip install -q 'pyarrow==14.0.2'
           # The frozen MetaGPT dependency graph leaves pyarrow implicit while
           # pandas imports it if a partial namespace package is present.
           python -m pip install -q 'pyarrow==14.0.2'
