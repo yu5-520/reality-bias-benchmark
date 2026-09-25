@@ -86,7 +86,7 @@ jobs:
           from stage2.native_v7.action_contract import contract_id_for_task
           from stage2.native_v7.collect import validate_request
           probe='${{ matrix.probe }}'
-          assert contract_id_for_task('T3') == 'v2_t3_t3_prospective'
+          assert contract_id_for_task('T3') == 'v2_t2_t3_prospective'
           validate_request(probe,'T3')
           print(f'PASS: {probe}-T3 is subject-ready under the frozen task contract map')
           PY
