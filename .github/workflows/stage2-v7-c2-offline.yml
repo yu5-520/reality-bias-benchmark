@@ -1,0 +1,47 @@
+name: Stage-II v7 C2 Offline Preflight
+
+on:
+  push:
+    paths:
+      - 'stage2/contrasts_v7/c2_action_count_x4.py'
+      - '.github/workflows/stage2-v7-c2-action-count.yml'
+      - '.github/workflows/stage2-v7-c2-offline.yml'
+      - 'docs/R_Plan_v7.19.md'
+  pull_request:
+    paths:
+      - 'stage2/contrasts_v7/c2_action_count_x4.py'
+      - '.github/workflows/stage2-v7-c2-action-count.yml'
+      - '.github/workflows/stage2-v7-c2-offline.yml'
+      - 'docs/R_Plan_v7.19.md'
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify one-factor C2 boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile stage2/contrasts_v7/c2_action_count_x4.py
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          raw=Path('stage2/contrasts_v7/C1/first_attempt.tar.gz').read_bytes()
+          assert hashlib.sha256(raw).hexdigest() == '8a0b2e7c45ceb3eb4f744d51dd2361c1ae4914c4deb7176a3bda34ab6bc588f2'
+          source=Path('stage2/contrasts_v7/c2_action_count_x4.py').read_text()
+          assert 'ClarifiedActionSchemaHost' in source
+          assert 'MODEL_VISIBLE_MAX_ACTIONS_5_ONLY_RELATIVE_TO_C1' in source
+          assert 'max_actions_per_turn' in source
+          assert 'max_turns=int(subject["limits"]["max_turns"])' in source
+          print('PASS: C2 adds only model-visible action-count information on top of C1')
+          PY
+          python -m stage2.native_v7.freeze
+          python -m stage2.natural_v7.verify_archive
