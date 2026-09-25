@@ -104,6 +104,12 @@ class OfficialMemoryBankContext:
             model_kwargs={"device": "cpu"},
         )
 
+    def _memory_user(self, role):
+        # Upstream MemoryBank parses memory_id with "_" separators and therefore
+        # requires a user key without underscores. Keep the frozen role id outside
+        # MemoryBank and use a reversible hyphenated storage key only at this boundary.
+        return role.replace("_", "-")
+
     def _memory_file(self, role):
         return self.memory_root / f"{role}.json"
 
@@ -113,8 +119,9 @@ class OfficialMemoryBankContext:
     def _ensure_memory_file(self, role):
         path = self._memory_file(role)
         if not path.exists():
+            memory_user = self._memory_user(role)
             payload = {
-                role: {
+                memory_user: {
                     "name": role,
                     "summary": {},
                     "personality": {},
@@ -143,7 +150,7 @@ class OfficialMemoryBankContext:
         vs_path, loaded = retriever.init_memory_vector_store(
             filepath=str(memory_file),
             vs_path=str(index_root),
-            user_name=role,
+            user_name=self._memory_user(role),
             cur_date=FROZEN_MEMORY_DATE,
         )
         if vs_path is None or str(memory_file) not in loaded:
@@ -201,7 +208,7 @@ class OfficialMemoryBankContext:
             raise ValueError("MemoryBank requires a nonempty model response")
         memory_file = self._ensure_memory_file(role)
         payload = json.loads(memory_file.read_text())
-        role_memory = payload[role]
+        role_memory = payload[self._memory_user(role)]
         history = role_memory.setdefault("history", {})
         day = history.setdefault(FROZEN_MEMORY_DATE, [])
         day.append({"query": query, "response": content})

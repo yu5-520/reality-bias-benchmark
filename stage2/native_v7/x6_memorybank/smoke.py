@@ -151,7 +151,7 @@ async def smoke(destination, upstream_root):
     if not second_prompt["memorybank_recall"]["memories"]:
         raise RuntimeError("X6 second role turn did not expose retrieved MemoryBank content")
 
-    role_memory = json.loads((memory_root / "release_lead.json").read_text())["release_lead"]
+    role_memory = json.loads((memory_root / "release_lead.json").read_text())["release-lead"]
     day = role_memory["history"]["2026-09-25"]
     if len(day) != 2:
         raise RuntimeError("X6 persistent role memory does not contain both model turns")
