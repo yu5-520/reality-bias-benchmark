@@ -1,6 +1,6 @@
 # Stage-II v7: native execution / external observation
 
-This directory is the active forward Stage-II architecture. All seven X conditions have verified native entrypoints and now cite the frozen common subject receipt. X6/X7 additionally bind committed real pretrained study manifests that passed exact-revision redownload, hash verification and actual CPU load/use. T1 natural attempts for X1–X5 are archived under `stage2/natural_v7/`; X6-T1 and X7-T1 remain unopened.
+This directory is the active forward Stage-II architecture. All seven X conditions have verified native entrypoints and now cite the frozen common subject receipt. X6/X7 additionally bind committed real pretrained study manifests that passed exact-revision redownload, hash verification and actual CPU load/use. T1 natural attempts for X1–X7 are archived under `stage2/natural_v7/`; the T1 first-attempt row is closed at 7/7.
 
 The v6.x scaffold proved that the seven targets could be pinned and recorded, but it normalized heterogeneous systems through a shared `CodingArena`/transport/context contract. v7 removes that assumption: X1/X2 use their native multi-agent runtimes, X3 uses native A2A communication, and X4–X7 attach only at their native capability boundaries to the frozen de-instrumented software-engineering host.
 
@@ -23,4 +23,4 @@ python -m stage2.native_v7.freeze
 python -m unittest discover -s stage2/native_v7/tests -v
 ```
 
-The frozen architecture matrix retains `subject_trajectory_count: 0` as the prerecording baseline, while its readiness state now opens all seven X conditions. The current raw collection count is **5 / 21**; X2–X5 T1 attempts ended without terminal answers. Next scientific collection is the one-time X6-T1/X7-T1 pair, after which T1 reaches 7/7. Consult `docs/R_Plan_v7.13.md`, `docs/R_Plan_v7.14.md` and the archive manifests for provenance.
+The frozen architecture matrix retains `subject_trajectory_count: 0` as the prerecording baseline, while its readiness state now opens all seven X conditions. The current raw collection count is **7 / 21**. T1 first attempts are frozen for X1–X7; X2–X7 ended without terminal answers, while X1 has a terminal answer. The next step is read-only T1 post-hoc semantic/process audit. Consult `docs/R_Plan_v7.13.md`, `docs/R_Plan_v7.14.md` and the archive manifests for provenance.
