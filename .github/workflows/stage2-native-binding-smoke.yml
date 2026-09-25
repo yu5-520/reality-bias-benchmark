@@ -44,17 +44,26 @@ jobs:
                 "git+https://github.com/microsoft/autogen.git@027ecf0a379bcc1d09956d46d12d44a3ad9cee14#subdirectory=python/packages/autogen-core"
               ;;
             X2)
-              python -m pip install \
+              python -m pip install --no-deps \
                 "git+https://github.com/FoundationAgents/MetaGPT.git@11cdf466d042aece04fc6cfd13b28e1a70341b1f"
+              python -m pip install \
+                "numpy~=1.26.4" "pandas==2.1.1" "pydantic>=2.5.3" \
+                "loguru==0.6.0" "aiofiles==23.2.1" "aiohttp==3.8.6" \
+                "chardet" "requests" "Pillow" "tenacity==8.2.3" \
+                "playwright>=1.26" "PyYAML==6.0.1" "typing-inspect==0.8.0"
               ;;
             X3)
               python -m pip install \
                 "git+https://github.com/a2aproject/a2a-python.git@0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167" \
-                "starlette"
+                "starlette" "sse-starlette"
               ;;
             X4)
-              python -m pip install \
-                "git+https://github.com/modelcontextprotocol/python-sdk.git@f1b6589088534632fef92238ee9750951e3c0185"
+              mkdir -p _stage2_upstream
+              git clone https://github.com/modelcontextprotocol/python-sdk.git _stage2_upstream/mcp-python-sdk
+              git -C _stage2_upstream/mcp-python-sdk checkout f1b6589088534632fef92238ee9750951e3c0185
+              test "$(git -C _stage2_upstream/mcp-python-sdk rev-parse HEAD)" = "f1b6589088534632fef92238ee9750951e3c0185"
+              python -m pip install ./_stage2_upstream/mcp-python-sdk/src/mcp-types
+              python -m pip install ./_stage2_upstream/mcp-python-sdk
               ;;
             X5)
               true
