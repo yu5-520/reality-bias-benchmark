@@ -76,14 +76,14 @@ def _binding(lock: dict, probe: str) -> dict:
 
 
 async def _x1(binding: dict, cap: NativeCapture) -> None:
-    from autogen_core import AgentId, MessageContext, RoutedAgent, SingleThreadedAgentRuntime, message_handler
+    from autogen_core import AgentId, RoutedAgent, SingleThreadedAgentRuntime, message_handler
 
     class Echo(RoutedAgent):
         def __init__(self) -> None:
             super().__init__("Stage-II deterministic native smoke")
 
         @message_handler
-        async def handle(self, message: AutoGenPing, ctx: MessageContext) -> AutoGenPong:
+        async def handle(self, message: AutoGenPing, ctx: Any) -> AutoGenPong:
             return AutoGenPong(content="echo:" + message.content)
 
     binding["installed_version"] = _package_version("autogen-core")
