@@ -16,9 +16,15 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
     def pending_registry(self):
         registry = copy.deepcopy(load_registry())
         registry["subject_readiness_gate"]["state"] = "IMPLEMENTED_NO_LIVE_RECEIPT"
-        for pid in ("X1", "X2", "X3", "X4", "X5"):
+        for pid in ("X1", "X2", "X3", "X4", "X5", "X6", "X7"):
             registry["probes"][pid]["collection_state"] = "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING"
             registry["probes"][pid].pop("subject_readiness", None)
+        registry["probes"]["X6"]["study_embedding"]["state"] = "PENDING_FROZEN_MANIFEST"
+        registry["probes"]["X6"]["study_embedding"].pop("manifest_path", None)
+        registry["probes"]["X6"]["study_embedding"].pop("manifest_sha256", None)
+        registry["probes"]["X7"]["study_checkpoint"]["state"] = "PENDING_FROZEN_MANIFEST"
+        registry["probes"]["X7"]["study_checkpoint"].pop("manifest_path", None)
+        registry["probes"]["X7"]["study_checkpoint"].pop("manifest_sha256", None)
         return registry
 
     def test_preflight_is_one_common_non_scientific_handshake(self):
@@ -109,15 +115,10 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
         for probe in ("X6", "X7"):
             with self.subTest(probe=probe):
                 mutated = copy.deepcopy(registry)
-                mutated["probes"][probe]["collection_state"] = "SUBJECT_READY"
-                mutated["probes"][probe]["subject_readiness"] = {
-                    "state": "VERIFIED",
-                    "execution_code_sha": self.SHA,
-                    "common_receipt_sha256": "r",
-                    "subject_config_sha256": "s",
-                    "model_config_sha256": "m",
-                    "workflow_run_id": 1,
-                }
+                key = "study_embedding" if probe == "X6" else "study_checkpoint"
+                mutated["probes"][probe][key]["state"] = "PENDING_FROZEN_MANIFEST"
+                mutated["probes"][probe][key].pop("manifest_path", None)
+                mutated["probes"][probe][key].pop("manifest_sha256", None)
                 with self.assertRaisesRegex(ValueError, "frozen study"):
                     validate_registry(mutated)
 
