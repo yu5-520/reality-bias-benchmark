@@ -1,0 +1,23 @@
+{
+  "schema": "stage2-subject-lock-v1",
+  "date_utc": "2026-09-25",
+  "status": "BOUND_NOT_AUTHORIZED",
+  "provider": "deepseek",
+  "config_path": "configs/models/deepseek_r2_confirmatory_v1.3.json",
+  "model_alias": "deepseek-flash",
+  "expected_model_version": "DeepSeek-V4.1-Flash",
+  "thinking": "disabled",
+  "temperature": 0.2,
+  "max_output_tokens_per_call": 1200,
+  "limits": {
+    "max_provider_calls_per_trajectory": 18,
+    "planned_natural_trajectories": 21,
+    "max_provider_calls_first_group": 378,
+    "identical_prompt_retries_for_scientific_result": 0,
+    "r7_local_continuations_total_max": 4
+  },
+  "provider_execution_authorized": false,
+  "evaluator_execution_authorized": false,
+  "required_authorization_phrase": "CALL_REAL_STAGE2_FIRST_GROUP_API",
+  "note": "This lock binds the common subject model across X1-X7 but does not launch or authorize any paid subject/evaluator call. ENGINEERING_BLOCKED cells remain in the denominator and are not replaced or rerun."
+}
