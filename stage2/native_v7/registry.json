@@ -110,23 +110,37 @@
       "background_substrate_id": null
     },
     "X4": {
-      "collection_state": "PENDING_NATIVE_RUNNER",
+      "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
       "environment_id": "x4-mcp-2026-07-28",
       "execution_owner": "Frozen software-engineering host plus official MCP client/server protocol",
       "host_attachment": "MCP attaches at its native tool/resource boundary to the software-engineering multi-agent host; MCP is not treated as the host scheduler.",
       "launch": {
-        "argv_template": null,
-        "state": "PENDING_NATIVE_ENTRYPOINT"
+        "state": "VERIFIED_NATIVE_ENTRYPOINT",
+        "argv_template": [
+          "python",
+          "-m",
+          "stage2.native_v7.x4_mcp.runner",
+          "--checkout",
+          "{checkout}",
+          "--task-file",
+          "{task_file}",
+          "--roles-file",
+          "{roles_file}",
+          "--subject-file",
+          "{subject_file}",
+          "--observer-root",
+          "{observer_root}/mcp_wire"
+        ]
       },
       "name": "MCP",
       "observer": {
         "may_mutate_execution": false,
         "mode": "external",
         "native_surfaces": [
-          "MCP protocol frames",
-          "tool requests/results",
-          "resource requests/results",
-          "provider I/O",
+          "exact MCP stdio client-to-server JSON-RPC bytes copied by a transparent relay",
+          "exact MCP stdio server-to-client JSON-RPC bytes copied by a transparent relay",
+          "official ClientSession discovery and tool calls",
+          "process stdout/stderr/exit",
           "checkout effects"
         ]
       },
@@ -138,7 +152,21 @@
       "source_repo": "modelcontextprotocol/modelcontextprotocol",
       "upstream_mode": "official_source",
       "integration_kind": "tool_resource_protocol",
-      "background_substrate_id": "software_engineering_host_v1"
+      "background_substrate_id": "software_engineering_host_v1",
+      "verification": {
+        "state": "NON_STUDY_NATIVE_SMOKE_PASS",
+        "workflow": ".github/workflows/stage2-native-v7-x4.yml",
+        "verified_code_commit": "7db8159c22c1616f2cb45c8fb230b7ea88e2369a",
+        "workflow_run_id": 36130515655,
+        "subject_ready": false,
+        "task": "T2",
+        "turns": 7,
+        "stop_reason": "finalized",
+        "mcp_calls": 4,
+        "client_to_server_captures": 4,
+        "server_to_client_captures": 4,
+        "checkout_sha256": "b0a9d3ec7846f204bbe72062aa062358a9174d7bd66fb1908aa43c4c15087ba3"
+      }
     },
     "X5": {
       "collection_state": "PENDING_NATIVE_RUNNER",
@@ -233,7 +261,7 @@
     "tasks": "stage2/tasks.json",
     "host_policy": "X1-X2 use their native multi-agent framework, X3 uses native A2A communication, and X4-X7 may share the explicitly registered software-engineering background host because those X conditions operate at tool/retrieval/memory/context layers; monitoring is not part of that host."
   },
-  "status": "X1_NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING_CAPABILITY_HOST_FROZEN_X2_X7_RUNNERS_PENDING",
+  "status": "X1_X4_NATIVE_RUNNERS_VERIFIED_SUBJECT_PENDING_CAPABILITY_HOST_FROZEN_X2_X3_X5_X7_RUNNERS_PENDING",
   "forbidden_global_normalization": [
     "requiring every X to execute through one common runtime adapter",
     "requiring X1-X3 to use the baseline role-mailbox communication substrate",
