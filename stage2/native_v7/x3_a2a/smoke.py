@@ -129,8 +129,8 @@ async def smoke(destination):
         )
     request_bytes = b"".join(path.read_bytes() for path in post_requests)
     response_bytes = b"".join(path.read_bytes() for path in post_responses)
-    if b"message/send" not in request_bytes or b"task" not in response_bytes:
-        raise RuntimeError("captured A2A JSON-RPC bodies do not contain native task/message traffic")
+    if b"SendMessage" not in request_bytes or b"task" not in response_bytes:
+        raise RuntimeError("captured A2A v1.0 JSON-RPC bodies do not contain native SendMessage/task traffic")
 
     cards = sorted((observer_root / "wire").rglob("*-get-response.bin"))
     if len(cards) < 9:
