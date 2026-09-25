@@ -59,21 +59,20 @@ class NativeV7Architecture(unittest.TestCase):
             with self.subTest(marker=marker):
                 self.assertNotIn(marker, raw)
 
-    def test_x1_runner_is_verified_but_subject_gate_remains_closed(self):
+    def test_x1_runner_and_subject_receipt_are_verified(self):
         registry = load_registry()
         x1 = registry["probes"]["X1"]
-        self.assertEqual(x1["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x1["collection_state"], "SUBJECT_READY")
         self.assertEqual(x1["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
         self.assertTrue(x1["launch"]["argv_template"])
         self.assertEqual(x1["verification"]["state"], "NON_STUDY_NATIVE_SMOKE_PASS")
         self.assertFalse(x1["verification"]["subject_ready"])
-        with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
-            validate_request("X1", "T1")
+        self.assertEqual(validate_request("X1", "T1")[1]["environment_id"], x1["environment_id"])
 
-    def test_x2_runner_is_verified_but_subject_gate_remains_closed(self):
+    def test_x2_runner_and_subject_receipt_are_verified(self):
         registry = load_registry()
         x2 = registry["probes"]["X2"]
-        self.assertEqual(x2["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x2["collection_state"], "SUBJECT_READY")
         self.assertEqual(x2["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
         self.assertIsNone(x2["background_substrate_id"])
         self.assertEqual(x2["source_commit"], "11cdf466d042aece04fc6cfd13b28e1a70341b1f")
@@ -83,13 +82,12 @@ class NativeV7Architecture(unittest.TestCase):
         self.assertEqual(x2["verification"]["metagpt_rounds"], 7)
         self.assertEqual(x2["verification"]["environment_messages"], 6)
         self.assertFalse(x2["verification"]["subject_ready"])
-        with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
-            validate_request("X2", "T1")
+        self.assertEqual(validate_request("X2", "T1")[1]["environment_id"], x2["environment_id"])
 
-    def test_x3_runner_is_verified_but_subject_gate_remains_closed(self):
+    def test_x3_runner_and_subject_receipt_are_verified(self):
         registry = load_registry()
         x3 = registry["probes"]["X3"]
-        self.assertEqual(x3["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x3["collection_state"], "SUBJECT_READY")
         self.assertEqual(x3["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
         self.assertIsNone(x3["background_substrate_id"])
         self.assertEqual(x3["protocol_version"], "1.0.0")
@@ -97,33 +95,30 @@ class NativeV7Architecture(unittest.TestCase):
         self.assertEqual(x3["verification"]["service_count"], 9)
         self.assertEqual(x3["verification"]["a2a_calls"], 3)
         self.assertFalse(x3["verification"]["subject_ready"])
-        with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
-            validate_request("X3", "T1")
+        self.assertEqual(validate_request("X3", "T1")[1]["environment_id"], x3["environment_id"])
 
-    def test_x4_runner_is_verified_but_subject_gate_remains_closed(self):
+    def test_x4_runner_and_subject_receipt_are_verified(self):
         registry = load_registry()
         x4 = registry["probes"]["X4"]
-        self.assertEqual(x4["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x4["collection_state"], "SUBJECT_READY")
         self.assertEqual(x4["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
         self.assertEqual(x4["background_substrate_id"], "software_engineering_host_v1")
         self.assertEqual(x4["verification"]["state"], "NON_STUDY_NATIVE_SMOKE_PASS")
         self.assertEqual(x4["verification"]["mcp_calls"], 4)
         self.assertFalse(x4["verification"]["subject_ready"])
-        with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
-            validate_request("X4", "T1")
+        self.assertEqual(validate_request("X4", "T1")[1]["environment_id"], x4["environment_id"])
 
-    def test_x5_runner_is_verified_but_subject_gate_remains_closed(self):
+    def test_x5_runner_and_subject_receipt_are_verified(self):
         registry = load_registry()
         x5 = registry["probes"]["X5"]
-        self.assertEqual(x5["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x5["collection_state"], "SUBJECT_READY")
         self.assertEqual(x5["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
         self.assertEqual(x5["background_substrate_id"], "software_engineering_host_v1")
         self.assertEqual(x5["implementation_sha256"], "baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4")
         self.assertEqual(x5["verification"]["state"], "NON_STUDY_NATIVE_SMOKE_PASS")
         self.assertEqual(x5["verification"]["retrieval_calls"], 1)
         self.assertFalse(x5["verification"]["subject_ready"])
-        with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
-            validate_request("X5", "T1")
+        self.assertEqual(validate_request("X5", "T1")[1]["environment_id"], x5["environment_id"])
 
     def test_x6_runner_is_verified_but_study_embedding_and_subject_gate_remain_closed(self):
         registry = load_registry()
@@ -157,7 +152,7 @@ class NativeV7Architecture(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
             validate_request("X7", "T1")
 
-    def test_all_native_runners_verified_but_all_subject_gates_remain_closed(self):
+    def test_subject_ready_is_per_probe_and_natural_count_remains_zero(self):
         matrix = artifact()
         self.assertEqual(len(matrix["cells"]), 21)
         self.assertEqual({row["subject_trajectory_count"] for row in matrix["cells"]}, {0})
@@ -165,11 +160,9 @@ class NativeV7Architecture(unittest.TestCase):
             {row["probe"] for row in matrix["cells"]},
             {f"X{i}" for i in range(1, 8)},
         )
-        self.assertEqual(
-            {row["status"] for row in matrix["cells"]},
-            {"NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING"},
-        )
-        for probe in (f"X{i}" for i in range(1, 8)):
+        self.assertEqual({row["status"] for row in matrix["cells"] if row["probe"] in {"X1", "X2", "X3", "X4", "X5"}}, {"SUBJECT_READY"})
+        self.assertEqual({row["status"] for row in matrix["cells"] if row["probe"] in {"X6", "X7"}}, {"NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING"})
+        for probe in ("X6", "X7"):
             with self.subTest(probe=probe), self.assertRaisesRegex(
                 ValueError, "subject readiness is pending"
             ):
