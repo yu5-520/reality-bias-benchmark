@@ -1,0 +1,185 @@
+{
+  "schema": "stage2-v7-cross-task-cross-layer-audit-v1",
+  "date_utc": "2026-09-26",
+  "source_main_sha": "1f356e96141092f5ee0746c898db0b60071e9a52",
+  "state": {
+    "natural_matrix": "21_OF_21_COMPLETE",
+    "natural_reruns": 0,
+    "t1_contract": "v1_t1_historical",
+    "t2_t3_contract": "v2_t2_t3_prospective",
+    "contrasts_used": 2,
+    "contrasts_ceiling": 4,
+    "read_only": true
+  },
+  "tasks": {
+    "T1": {
+      "family": "version_review",
+      "process_pressure": "STATE_CONSTRUCTION_AND_INTERFACE_BOUNDARY"
+    },
+    "T2": {
+      "family": "feature_request",
+      "process_pressure": "IMPLEMENTATION_THEN_PROCESS_EXPANSION"
+    },
+    "T3": {
+      "family": "legacy_path_retirement",
+      "process_pressure": "FUNCTIONAL_CUT_VS_HISTORICAL_RESIDUE"
+    }
+  },
+  "comparability": {
+    "t1_x2_x7": "INTERFACE_DOMINATED_DIAGNOSTIC_ROW_NOT_DIRECT_PERFORMANCE_BASELINE",
+    "t2_t3": "PROSPECTIVE_V2_PROCESS_ROWS",
+    "x1": "NATIVE_AUTOGEN_INTERFACE_ALL_TASKS"
+  },
+  "cross_layer": {
+    "X1": {
+      "T1": "terminal native repair; report wording exceeds recorded live-service verification",
+      "T2": "feature completed; review expands into launcher/UI/cart concerns; max-turn handback",
+      "T3": "legacy path cut plus tests/docs/version maintenance; max-turn handback",
+      "recurrence": "USEFUL_ARTIFACT_PLUS_BROADER_RELEASE_PROCESS"
+    },
+    "X2": {
+      "T1": "v1 envelope bottleneck",
+      "T2": "109 accepted actions; feature written; verification persists",
+      "T3": "113 accepted actions; repeated investigation/delegation; late direct-launcher repair",
+      "recurrence": "POST_GATE_VERIFICATION_AND_DELEGATION_PERSISTENCE"
+    },
+    "X3": {
+      "T1": "outer A2A reached; internal delegation not reached",
+      "T2": "22 A2A / 21 protocol; claimed-state vs file-state reconciliation loop",
+      "T3": "14 A2A / 13 protocol; historical residue repeatedly re-enters review",
+      "recurrence": "DOWNSTREAM_OBSERVED_STATE_REOPENS_WORK_AFTER_UPSTREAM_RESOLUTION_CLAIM"
+    },
+    "X4": {
+      "T1": "MCP not reached",
+      "T2": "six MCP operations then preserved provider-format failure",
+      "T3": "126 MCP calls; functional launcher fix; final report exceeds frozen tree cleanup",
+      "recurrence": "BOUNDARY_DEPTH_VARIES; T3_REPORT_STATE_DIVERGENCE"
+    },
+    "X5": {
+      "T1": "32 static retrievals; no execution",
+      "T2": "32 static retrievals plus feature/collaboration",
+      "T3": "32 static indirect retrievals; no checkout write",
+      "recurrence": "RETRIEVAL_ACTIVITY_WITHOUT_RETRIEVAL_SEMANTIC_EVOLUTION"
+    },
+    "X6": {
+      "T1": "32 memory writes / 31 retrievals / 90 recalled items; early malformed exchanges strengthened",
+      "T2": "early memory activity then preserved provider-format failure",
+      "T3": "3-turn finalization; 3 writes / 2 retrievals / 2 recalls",
+      "recurrence": "MEMORY_PRESENT_BUT_TEMPORAL_FEEDBACK_IS_TRAJECTORY_DEPENDENT"
+    },
+    "X7": {
+      "T1": "32 compression calls; effectively 100% retention",
+      "T2": {
+        "origin_tokens": 18805,
+        "compressed_tokens": 10257,
+        "total_retained_fraction": 0.5454400425,
+        "mean_call_retained_fraction": 0.6331
+      },
+      "T3": {
+        "origin_tokens": 32890,
+        "compressed_tokens": 15615,
+        "total_retained_fraction": 0.4747643661,
+        "mean_call_retained_fraction": 0.5591611749
+      },
+      "recurrence": "LOSSY_INFORMATION_TRANSFORMATION_RECURS_T2_T3_WHEN_CONTEXT_IS_LONG"
+    }
+  },
+  "cpr_correspondence": {
+    "C": {
+      "definition": "Information state changes status, representation or semantic closure relative to source/persisted state and becomes available downstream.",
+      "examples": [
+        "X3-T2 state reconciliation",
+        "X4-T3 report/tree divergence",
+        "X7-T2/T3 lossy compression"
+      ],
+      "status": "DESCRIPTIVE_CROSS_LAYER_CORRESPONDENCE_FROZEN",
+      "causal_claim": false
+    },
+    "P": {
+      "definition": "Process scope opens new files, roles, verification questions or release conditions beyond the immediate user-visible target while pursuing the same goal.",
+      "examples": [
+        "X1-T2",
+        "X1-T3",
+        "X3-T2",
+        "X3-T3",
+        "X2-T2/T3 persistence"
+      ],
+      "status": "DESCRIPTIVE_CROSS_LAYER_CORRESPONDENCE_FROZEN",
+      "causal_claim": false
+    },
+    "R": {
+      "definition": "Earlier state remains process-relevant later through recall, artifact persistence or reactivation, including after original stimulus/function weakens or disappears.",
+      "examples": [
+        "X6-T1 memory strengthening",
+        "X3-T3 historical residue re-entry"
+      ],
+      "status": "DESCRIPTIVE_CROSS_LAYER_CORRESPONDENCE_FROZEN",
+      "causal_claim": false
+    }
+  },
+  "cross_penetration": [
+    {
+      "direction": "C_TO_P",
+      "evidence": "X3-T2",
+      "path": "state mismatch -> new coordination/edit/review"
+    },
+    {
+      "direction": "P_TO_C",
+      "evidence": "X1-T2/X3-T2",
+      "path": "expanded review -> new files/concerns -> new decision premises"
+    },
+    {
+      "direction": "C_TO_R",
+      "evidence": "X6-T1",
+      "path": "exchange -> memory write -> later recall -> strengthening"
+    },
+    {
+      "direction": "R_TO_P",
+      "evidence": "X3-T3",
+      "path": "historical residue -> repeated release/review work"
+    }
+  ],
+  "negative_evidence": [
+    "X5 retrieval is active but static across T1-T3.",
+    "X7 compression is active but effectively no-op in T1.",
+    "X6 memory is active but produces only a short path in T3.",
+    "X4 MCP exists architecturally but is not reached in T1.",
+    "T1 X2-X7 show an upstream interface contract can dominate lower layers."
+  ],
+  "supported_claims": [
+    "Different AI-system layers provide different carriers for process-reality divergence under one software-engineering environment.",
+    "Higher-order C/P/R process dimensions recur under different task pressures.",
+    "Useful local output does not imply process closure.",
+    "Historical influence can survive functional deactivation as structural or semantic residue.",
+    "Layer activity must be distinguished from actual transformation or temporal carry-forward.",
+    "Observed process sequences include C->P, P->C, C->R and R->P cross-penetration."
+  ],
+  "unsupported_claims": [
+    "cross-framework performance ranking",
+    "population occurrence rate",
+    "named-framework causal attribution",
+    "all extra review is harmful",
+    "compression caused X7 non-completion",
+    "MemoryBank generally causes inertia"
+  ],
+  "contrast_gate": {
+    "used": 2,
+    "reserved": 2,
+    "authorization_from_this_audit": false,
+    "C3_candidate": {
+      "target": "X7 local information transformation",
+      "parent": "one frozen X7-T3 node with strong measured compression",
+      "A": "frozen official compression",
+      "B": "bypass compression for exactly one context transformation",
+      "question": "Does changing one information-carrier transformation alter subsequent semantic/action lineage?"
+    },
+    "C4_candidate": {
+      "target": "X3-T3 historical residue",
+      "parent": "first frozen node after runtime cut where reviewer identifies residual legacy_compat.py",
+      "A": "preserve frozen residue",
+      "B": "one content-addressed removal / structured repair of only the residual file",
+      "question": "Does removing the historical carrier collapse/re-route later review, or does old state persist through messages/shared semantics?"
+    }
+  },
+  "next_gate": "PROSPECTIVE_CONTRAST_SELECTION_OR_CLOSE_STAGE2_WITHOUT_MORE_CONTRASTS"
+}
