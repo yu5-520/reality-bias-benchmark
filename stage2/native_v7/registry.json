@@ -1,0 +1,206 @@
+{
+  "forbidden_execution_dependencies": [
+    "stage2.coding_arena.CodingArena",
+    "stage2.transports.RoleMailboxTransport",
+    "shared action JSON grammar",
+    "shared transport interface",
+    "shared context_adapter interface"
+  ],
+  "freeze_date_utc": "2026-09-25",
+  "probes": {
+    "X1": {
+      "collection_state": "PENDING_NATIVE_RUNNER",
+      "environment_id": "x1-autogen-027ecf0",
+      "execution_owner": "framework_or_native_mechanism",
+      "host_attachment": "frozen task/roles/subject/checkout only",
+      "launch": {
+        "argv_template": null,
+        "state": "PENDING_NATIVE_ENTRYPOINT"
+      },
+      "name": "AutoGen",
+      "observer": {
+        "may_mutate_execution": false,
+        "mode": "external",
+        "native_surfaces": [
+          "autogen_core runtime delivery",
+          "agent lifecycle",
+          "provider I/O",
+          "checkout effects"
+        ]
+      },
+      "runtime_scope": "independent",
+      "source_commit": "027ecf0a379bcc1d09956d46d12d44a3ad9cee14",
+      "source_repo": "microsoft/autogen",
+      "upstream_mode": "official_source"
+    },
+    "X2": {
+      "collection_state": "PENDING_NATIVE_RUNNER",
+      "environment_id": "x2-metagpt-11cdf46",
+      "execution_owner": "framework_or_native_mechanism",
+      "host_attachment": "frozen task/roles/subject/checkout only",
+      "launch": {
+        "argv_template": null,
+        "state": "PENDING_NATIVE_ENTRYPOINT"
+      },
+      "name": "MetaGPT",
+      "observer": {
+        "may_mutate_execution": false,
+        "mode": "external",
+        "native_surfaces": [
+          "Environment message/history",
+          "Role message buffer",
+          "provider I/O",
+          "checkout effects"
+        ]
+      },
+      "runtime_scope": "independent",
+      "source_commit": "11cdf466d042aece04fc6cfd13b28e1a70341b1f",
+      "source_repo": "FoundationAgents/MetaGPT",
+      "upstream_mode": "official_source"
+    },
+    "X3": {
+      "collection_state": "PENDING_NATIVE_RUNNER",
+      "environment_id": "x3-a2a-1.0.0",
+      "execution_owner": "framework_or_native_mechanism",
+      "host_attachment": "frozen task/roles/subject/checkout only",
+      "launch": {
+        "argv_template": null,
+        "state": "PENDING_NATIVE_ENTRYPOINT"
+      },
+      "name": "A2A",
+      "observer": {
+        "may_mutate_execution": false,
+        "mode": "external",
+        "native_surfaces": [
+          "A2A request/response bytes",
+          "task state",
+          "artifact bytes",
+          "remote provider I/O",
+          "checkout effects"
+        ]
+      },
+      "protocol_version": "1.0.0",
+      "runtime_scope": "independent",
+      "sdk_commit": "0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167",
+      "sdk_repo": "a2aproject/a2a-python",
+      "source_commit": "173695755607e884aa9acf8ce4feed90e32727a1",
+      "source_repo": "a2aproject/A2A",
+      "upstream_mode": "official_source"
+    },
+    "X4": {
+      "collection_state": "PENDING_NATIVE_RUNNER",
+      "environment_id": "x4-mcp-2026-07-28",
+      "execution_owner": "framework_or_native_mechanism",
+      "host_attachment": "frozen task/roles/subject/checkout only",
+      "launch": {
+        "argv_template": null,
+        "state": "PENDING_NATIVE_ENTRYPOINT"
+      },
+      "name": "MCP",
+      "observer": {
+        "may_mutate_execution": false,
+        "mode": "external",
+        "native_surfaces": [
+          "MCP protocol frames",
+          "tool requests/results",
+          "resource requests/results",
+          "provider I/O",
+          "checkout effects"
+        ]
+      },
+      "protocol_version": "2026-07-28",
+      "runtime_scope": "independent",
+      "sdk_commit": "f1b6589088534632fef92238ee9750951e3c0185",
+      "sdk_repo": "modelcontextprotocol/python-sdk",
+      "source_commit": "5f5440bb26a62e2cf3440b92da5a667efa03b267",
+      "source_repo": "modelcontextprotocol/modelcontextprotocol",
+      "upstream_mode": "official_source"
+    },
+    "X5": {
+      "collection_state": "PENDING_NATIVE_RUNNER",
+      "environment_id": "x5-rag-baf19cd",
+      "execution_owner": "framework_or_native_mechanism",
+      "host_attachment": "frozen task/roles/subject/checkout only",
+      "implementation_sha256": "baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4",
+      "launch": {
+        "argv_template": null,
+        "state": "PENDING_NATIVE_ENTRYPOINT"
+      },
+      "name": "RAG",
+      "observer": {
+        "may_mutate_execution": false,
+        "mode": "external",
+        "native_surfaces": [
+          "retrieval query bytes",
+          "retrieval result bytes",
+          "provider I/O",
+          "checkout effects"
+        ]
+      },
+      "runtime_scope": "independent",
+      "source_commit": "baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4",
+      "source_repo": "stage2/retrieval.py",
+      "upstream_mode": "in_repo_reference"
+    },
+    "X6": {
+      "collection_state": "PENDING_NATIVE_RUNNER",
+      "environment_id": "x6-memorybank-cf61c41",
+      "execution_owner": "framework_or_native_mechanism",
+      "host_attachment": "frozen task/roles/subject/checkout only",
+      "launch": {
+        "argv_template": null,
+        "state": "PENDING_NATIVE_ENTRYPOINT"
+      },
+      "name": "MemoryBank",
+      "observer": {
+        "may_mutate_execution": false,
+        "mode": "external",
+        "native_surfaces": [
+          "memory write/read bytes",
+          "retrieval state",
+          "provider I/O",
+          "checkout effects"
+        ]
+      },
+      "runtime_scope": "independent",
+      "source_commit": "cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9",
+      "source_repo": "zhongwanjun/MemoryBank-SiliconFriend",
+      "upstream_mode": "official_source"
+    },
+    "X7": {
+      "collection_state": "PENDING_NATIVE_RUNNER",
+      "environment_id": "x7-longllmlingua-5a4c78a",
+      "execution_owner": "framework_or_native_mechanism",
+      "host_attachment": "frozen task/roles/subject/checkout only",
+      "launch": {
+        "argv_template": null,
+        "state": "PENDING_NATIVE_ENTRYPOINT"
+      },
+      "name": "LongLLMLingua",
+      "observer": {
+        "may_mutate_execution": false,
+        "mode": "external",
+        "native_surfaces": [
+          "compressor input bytes",
+          "compressor output bytes",
+          "provider I/O",
+          "checkout effects"
+        ]
+      },
+      "runtime_scope": "independent",
+      "source_commit": "5a4c78ae18ab17a98cf997e8259354e546081d64",
+      "source_repo": "microsoft/LLMLingua",
+      "upstream_mode": "official_source"
+    }
+  },
+  "schema": "stage2-native-execution-registry-v1",
+  "scientific_inputs": {
+    "checkout": "stage2/fixtures/project",
+    "comparison_policy": "normalize evidence only after observation",
+    "role_roster_policy": "same frozen roles; framework-native scheduling",
+    "roles": "stage2/roles.json",
+    "subject": "stage2/subject.json",
+    "tasks": "stage2/tasks.json"
+  },
+  "status": "ARCHITECTURE_REBASED_ALL_NATIVE_RUNNERS_PENDING"
+}
