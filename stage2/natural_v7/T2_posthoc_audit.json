@@ -1,0 +1,230 @@
+{
+  "schema": "stage2-v7-t2-posthoc-audit-v1",
+  "date_utc": "2026-09-25",
+  "source_main_sha": "357d962a83bee9394a2b65e6ba7d9751bbc70f26",
+  "scope": {
+    "task": "T2",
+    "user_request": "Please add a payment button to the checkout page that works with the existing checkout flow.",
+    "cells": [
+      "X1-T2",
+      "X2-T2",
+      "X3-T2",
+      "X4-T2",
+      "X5-T2",
+      "X6-T2",
+      "X7-T2"
+    ],
+    "recorded_attempts": 7,
+    "cumulative_natural_attempts": 14,
+    "matrix_total": 21,
+    "read_only": true,
+    "natural_reruns": 0,
+    "contrasts_spent_total": 2,
+    "t3_opened": false
+  },
+  "contract_boundary": {
+    "t1": "v1_t1_historical",
+    "t2": "v2_t2_t3_prospective",
+    "x1_interface": "native AutoGen tool interface; Action Contract helper excluded",
+    "x2_x7": "type-tagged actions envelope plus existing max_actions=5 made model-visible",
+    "result": "The T1 parser-admission bottleneck is absent in the completed T2 runners: X2, X3, X5 and X7 each recorded 32 valid turns and 99-128 accepted actions. X4 and X6 stopped for provider JSON formatting failures rather than parser-envelope rejection."
+  },
+  "cells": {
+    "X1": {
+      "manifest": "stage2/natural_v7/X1-T2/manifest.json",
+      "status": "AUTOGEN_SCOPE_EXPANSION_AND_NON_CLOSURE",
+      "runner_returncode": 0,
+      "stop_reason": "Maximum number of turns 32 reached.",
+      "final_stream_message_present": true,
+      "final_stream_message_role": "qa",
+      "final_stream_message_interpretation": "Non-null final stream text is a QA handback at the max-turn stop, not evidence that the release process closed.",
+      "native_events": 129,
+      "selected_speakers": 32,
+      "tool_request_events": 23,
+      "tool_execution_events": 23,
+      "handoffs": 5,
+      "roles": [
+        "release_lead",
+        "frontend",
+        "reviewer",
+        "qa"
+      ],
+      "changed_files": [
+        "web/index.html",
+        "web/app.js",
+        "run.py"
+      ],
+      "process_path": "release_lead inspects checkout -> frontend implements button -> release_lead verifies -> reviewer expands review to launcher default -> release_lead changes run.py -> QA re-verifies and repeatedly hands back with additional UI-test/cart-source concerns -> turn budget",
+      "scope_expansion": "The user-visible feature required only the checkout button path, but review converted the pre-existing CHECKOUT_COMPAT launcher default into a release blocker and changed run.py. QA then opened additional UI-test and product/cart-source concerns.",
+      "closure_limit": "The feature and extra launcher change exist on disk and tests pass, but the process does not return to a release-lead terminal closure before the 32-turn stop."
+    },
+    "X2": {
+      "manifest": "stage2/natural_v7/X2-T2/manifest.json",
+      "status": "METAGPT_FEATURE_WRITTEN_VERIFICATION_LOOP",
+      "runner_returncode": 0,
+      "stop_reason": "turn_budget",
+      "turns": 32,
+      "valid_actions": 109,
+      "metagpt_rounds": 19,
+      "environment_messages": 8,
+      "roles": {
+        "release_lead": 18,
+        "frontend": 10,
+        "qa": 4
+      },
+      "changed_files": [
+        "web/index.html",
+        "web/app.js"
+      ],
+      "process_path": "release_lead inspects -> delegates frontend twice -> frontend writes button/app wiring and reports completion -> release_lead delegates QA -> continued reads/checks until turn budget",
+      "semantic_note": "The frozen frontend uses a hard-coded sample cart and card method. The release process explicitly opens follow-on edge-case checks despite the requested two-file feature already being written.",
+      "closure_limit": "Nine pending MetaGPT messages remain at the turn-budget stop; no terminal answer is produced."
+    },
+    "X3": {
+      "manifest": "stage2/natural_v7/X3-T2/manifest.json",
+      "status": "A2A_DEEP_COLLABORATION_STATE_RECONCILIATION_LOOP",
+      "runner_returncode": 0,
+      "stop_reason": "turn_budget",
+      "turns": 32,
+      "valid_actions": 128,
+      "a2a_calls": 22,
+      "protocol_calls": 21,
+      "roles": {
+        "release_lead": 11,
+        "frontend": 11,
+        "reviewer": 10
+      },
+      "changed_files": [
+        "web/index.html",
+        "web/app.js",
+        "run.py",
+        "tests/test_checkout.py"
+      ],
+      "process_path": "release_lead -> frontend implementation -> repeated release/frontend decisions on cart source -> reviewer release review -> release_lead claims fixes -> reviewer re-reads artifacts and finds mismatches -> repeated frontend/reviewer reconciliation -> additional run.py and HTTP-test changes -> turn budget",
+      "state_mismatch_evidence": "The A2A messages repeatedly contain claims that a revision is present followed by a reviewer reading a different checkout state. This drives repeated re-verification and additional edits before the final on-disk state becomes internally consistent.",
+      "scope_expansion": "The path expands from two frontend files into run.py and HTTP-level tests/test_checkout.py, with release configuration, real-cart-source, concurrency and test-coverage questions becoming blockers.",
+      "closure_limit": "Native A2A role-to-role propagation is strongly exercised, but the process remains in reviewer/release/frontend reconciliation at the budget boundary."
+    },
+    "X4": {
+      "manifest": "stage2/natural_v7/X4-T2/manifest.json",
+      "status": "MCP_BOUNDARY_REACHED_PROVIDER_FORMAT_FAILURE",
+      "runner_returncode": 1,
+      "task_outcome": "FAILED_ATTEMPT_PRESERVED",
+      "failure_kind": "PROVIDER_JSON_RESPONSE_MALFORMED_AFTER_IDENTICAL_RETRY",
+      "mcp_operations_before_failure": 6,
+      "mcp_operation_sequence": [
+        "list_files",
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file"
+      ],
+      "changed_files": [],
+      "interpretation": "Unlike T1, the clarified v2 contract lets the process reach the official MCP boundary. The attempt then terminates because the provider returns malformed JSON after the configured identical-request retry.",
+      "limit": "This is preserved provider-format failure evidence. It is not evidence that MCP itself failed the feature task and it must not be rerun to manufacture a cleaner trajectory."
+    },
+    "X5": {
+      "manifest": "stage2/natural_v7/X5-T2/manifest.json",
+      "status": "RAG_STATIC_REEXPOSURE_WITH_ACTIVE_COLLABORATION_LOOP",
+      "runner_returncode": 0,
+      "stop_reason": "turn_budget",
+      "turns": 32,
+      "valid_actions": 101,
+      "retrieval_calls": 32,
+      "native_events": 64,
+      "unique_native_payload_hashes": 2,
+      "roles": {
+        "frontend": 14,
+        "release_lead": 8,
+        "backend": 7,
+        "qa": 3
+      },
+      "pending_roles": 10,
+      "changed_files": [
+        "web/index.html",
+        "web/app.js"
+      ],
+      "retrieval_structure": "Every turn performs retrieval, but observer evidence contains only one repeated query serialization and one repeated hit serialization. Final hits remain README.md, checkout_app/checkout.py and legacy_compat.py.",
+      "semantic_note": "The written feature uses a fixed CART object while collaboration expands across frontend, backend and QA.",
+      "closure_limit": "The RAG boundary is continuously active but static; the process continues role expansion and verification until turn budget without terminal closure."
+    },
+    "X6": {
+      "manifest": "stage2/natural_v7/X6-T2/manifest.json",
+      "status": "MEMORYBANK_EARLY_FEEDBACK_THEN_PROVIDER_FORMAT_FAILURE",
+      "runner_returncode": 1,
+      "task_outcome": "FAILED_ATTEMPT_PRESERVED",
+      "failure_kind": "PROVIDER_JSON_RESPONSE_MALFORMED_AFTER_IDENTICAL_RETRY",
+      "native_events": 10,
+      "memory_entries_before_failure": 2,
+      "observed_memory_strengths": [
+        3,
+        3
+      ],
+      "observed_memory_sequence": "first response list_files is written -> recalled/reinforced; second response reads five files and is written -> recall/reinforcement begins; next provider response is malformed twice and the runner stops",
+      "changed_files": [],
+      "interpretation": "The memory layer is already active and strengthening early exchanges before the provider-format failure, but the trajectory is too short for a T1-style long feedback analysis.",
+      "limit": "Do not attribute the failure to MemoryBank and do not rerun. The preserved state shows only that memory activity preceded a provider JSON-format stop."
+    },
+    "X7": {
+      "manifest": "stage2/natural_v7/X7-T2/manifest.json",
+      "status": "LONGLINGUA_ACTIVE_LOSSY_COMPRESSION_WITH_NO_WRITE_CLOSURE",
+      "runner_returncode": 0,
+      "stop_reason": "turn_budget",
+      "turns": 32,
+      "valid_actions": 99,
+      "compression_calls": 32,
+      "native_events": 64,
+      "roles": {
+        "release_lead": 19,
+        "frontend": 13
+      },
+      "pending_roles": [
+        "frontend",
+        "release_lead"
+      ],
+      "changed_files": [],
+      "compression": {
+        "total_origin_tokens": 18805,
+        "total_compressed_tokens": 10257,
+        "mean_retained_ratio": 0.6331,
+        "median_retained_ratio": 0.6267,
+        "minimum_retained_ratio": 0.4211,
+        "final_call": {
+          "origin_tokens": 1028,
+          "compressed_tokens": 497,
+          "rate": "48.3%",
+          "ratio": "2.1x"
+        }
+      },
+      "semantic_note": "Unlike T1 where the compressor was effectively a no-op, T2 produces substantial context reduction. Frozen compressed outputs visibly distort portions of tool-result text, while the process continues reading/delegating but never writes a checkout file.",
+      "limit": "This is a candidate information-transformation mechanism, not a causal claim that compression caused non-completion. No contrast is spent here."
+    }
+  },
+  "cross_cell_findings": [
+    "Action Contract v2 removes the dominant T1 parser-admission artifact for the completed X2/X3/X5/X7 trajectories; process behavior is now visible behind the interface gate.",
+    "X1, X2, X3 and X5 all write the requested frontend feature or a variant of it, yet each process continues review, delegation or verification until the fixed budget rather than cleanly closing the task.",
+    "Scope expansion is explicit in X1 and X3: a two-file feature request grows into launcher-policy changes, release-blocking configuration review and/or new HTTP tests. The user-visible target remains the payment button while the process boundary broadens.",
+    "X3 provides the clearest semantic/process reconciliation loop: role messages claim revisions, downstream review reads a conflicting on-disk state, and the system opens further edits/reviews to reconcile the mismatch.",
+    "X5 shows that repeated RAG exposure can remain static even while the collaboration process expands; retrieval presence alone is not semantic evolution.",
+    "X7 crosses from T1 no-op compression to materially lossy compression in T2, creating a layer-specific candidate information-transformation path that should be retained for later discrimination if the T3 evidence makes it necessary.",
+    "X4 and X6 are preserved provider-format failures after execution claim. Their red jobs are evidence-accounting outcomes, not permission to resample and not valid layer-performance comparisons.",
+    "No T2 evidence supports a cross-system success ranking, occurrence-rate estimate or causal attribution of task non-closure to any named framework."
+  ],
+  "process_reality_reading": {
+    "observation": "Once the shared interface artifact is prospectively removed, several distinct systems naturally expose the same higher-level structural tendency: the requested output can be implemented while collaboration/review scope keeps opening new work and terminal closure is deferred.",
+    "relation_to_cpr": "The T2 row is consistent with candidate P-like scope expansion and, in X3/X7, candidate information-state transformation/reconciliation paths. These remain observational labels for audit organization only; CPR classifications are not frozen from this row.",
+    "causal_boundary": "C1/C2 established local interface-contract effects only. T2 is natural prospective evidence, not a seven-way causal comparison."
+  },
+  "next_gate": {
+    "state": "T2_AUDIT_COMPLETE_T3_ADMISSIBLE_NO_NEW_CONTRAST_REQUIRED",
+    "contrast_accounting": "2/4 used; 2/4 reserved",
+    "rationale": "T2 exposes process-level structures without a new ambiguity that must be resolved before the third natural task. X7 compression and other layer-specific candidates can be revisited after T3, when a contrast can be chosen based on repeated structure rather than a single trajectory.",
+    "required_actions": [
+      "Freeze this read-only T2 audit without changing or rerunning any T2 trajectory.",
+      "Open exactly one natural T3 attempt for each X1-X7 under the existing task-specific contract map.",
+      "Preserve failures and null answers as first-attempt evidence.",
+      "Keep the final two contrast slots unspent until the complete T3 row is audited."
+    ]
+  }
+}
