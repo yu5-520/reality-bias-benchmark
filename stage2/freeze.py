@@ -19,7 +19,7 @@ def artifact():
     tasks = json.loads((BASE / "tasks.json").read_text())
     subject = json.loads((BASE / "subject.json").read_text())
     return {
-        "schema": "stage2-first-group-v1", "predecessors": [f"docs/R_Plan_v6.{index}.md" for index in range(8)],
+        "schema": "stage2-first-group-v1", "predecessors": [f"docs/R_Plan_v6.{index}.md" for index in range(9)],
         "files_sha256": {**hashes, **{str(p.relative_to(ROOT)): hash_file(p) for p in
             (BASE / "roles.json", BASE / "tasks.json", BASE / "versions.json",
              BASE / "runtime_bindings.json", BASE / "subject.json", BASE / "eligibility.json",
@@ -29,10 +29,11 @@ def artifact():
              BASE / "longllmlingua_context.py", BASE / "a2a_transport.py",
              BASE / "a2a_remote_service.py", BASE / "mcp_checkout_server.py", BASE / "mcp_workspace.py",
              BASE / "preflight.py", BASE / "native_smoke.py", BASE / "build_runtime_manifest.py",
-             BASE / "target_coding_smoke.py", BASE / "verify_target_coding.py",
+             BASE / "target_coding_smoke.py", BASE / "verify_target_coding.py", BASE / "collect_natural.py",
              ROOT / "docs/R_Plan_v6.2.md", ROOT / "docs/R_Plan_v6.3.md",
              ROOT / "docs/R_Plan_v6.4.md", ROOT / "docs/R_Plan_v6.5.md",
-             ROOT / "docs/R_Plan_v6.6.md", ROOT / "docs/R_Plan_v6.7.md")}},
+             ROOT / "docs/R_Plan_v6.6.md", ROOT / "docs/R_Plan_v6.7.md",
+             ROOT / "docs/R_Plan_v6.8.md")}},
         "cells": [{"cell": f"{probe['id']}-{task['id']}", "probe": probe["id"], "task": task["id"],
                    "starting_fixture": "stage2/fixtures/project", "status": "PENDING_ENGINEERING_GATE",
                    "raw_destination": f"stage2_raw/{probe['id']}-{task['id']}/", "subject_trajectory_count": 0}

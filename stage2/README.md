@@ -59,3 +59,11 @@ frozen as `ENGINEERING_BLOCKED` at the upstream dependency conflict. X7's
 previous smoke used LLMLingua-2 and is blocked prospectively in R Plan v6.6.
 Never interpret a
 passing offline test as subject readiness.
+
+`collect_natural.py` is the one-shot X1/X3/X4/X5 subject entrance introduced
+in v6.8. It refuses missing full-coding subject readiness for the exact code
+commit, missing frozen DeepSeek credentials, blocked architectures and any
+occupied cell. After an admitted attempt it seals the raw evidence and checkout
+even on failure; `verify_seal` checks the local inventory and native event chain.
+The seal must be preserved in durable storage before R6 audit. This entrance
+has not collected any of the 21 prospective natural trajectories.
