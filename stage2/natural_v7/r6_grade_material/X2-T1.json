@@ -1,0 +1,1880 @@
+{
+  "archive_sha256": "a577bad7c4e5dd6fabdca915dd6844f5bfa0e6bb8693e862baf778a1e4f10fbd",
+  "cell": "X2-T1",
+  "checkout_members": [
+    {
+      "bytes": 480,
+      "member": "X2-T1/checkout/README.md",
+      "relative_path": "README.md",
+      "sha256": "11fe60236b048a9794f3441196c886f2ba9c52cf0bfd3dff95975a908aa99f12",
+      "text": "# Checkout sample\n\nThis small service exposes `GET /api/status` and `POST /api/checkout` on port 8080.\nStart it with `python -m checkout_app.server`, then open `web/index.html` through\nthe same server. Run `python -m unittest discover -s tests` to check the API.\n\n`versions/before.json` and `versions/after.json` identify the upgrade; the\nprior service snapshot is runnable via `python versions/before/server.py` on\nport 8081. The current executable path is selected in `run.py`.\n"
+    },
+    {
+      "bytes": 35,
+      "member": "X2-T1/checkout/checkout_app/__init__.py",
+      "relative_path": "checkout_app/__init__.py",
+      "sha256": "e841164491c4e3eeedd963948f81818610dff8a08058792eeb99c559b31719c8",
+      "text": "\"\"\"Checkout sample application.\"\"\"\n"
+    },
+    {
+      "bytes": 193,
+      "member": "X2-T1/checkout/checkout_app/__pycache__/__init__.cpython-310.pyc",
+      "relative_path": "checkout_app/__pycache__/__init__.cpython-310.pyc",
+      "sha256": "8c8e22a9ef8b75692e81394ef78f528b35ea201b3b14436d1eb61f4c02d3292e",
+      "text": null
+    },
+    {
+      "bytes": 910,
+      "member": "X2-T1/checkout/checkout_app/__pycache__/checkout.cpython-310.pyc",
+      "relative_path": "checkout_app/__pycache__/checkout.cpython-310.pyc",
+      "sha256": "82ac3465cf4e4aafa094d967a75a7c7c9b3273374a594f02071b4eac418c5dbf",
+      "text": null
+    },
+    {
+      "bytes": 516,
+      "member": "X2-T1/checkout/checkout_app/checkout.py",
+      "relative_path": "checkout_app/checkout.py",
+      "sha256": "ad9b7786ee90545cbfd55c63c8e738b4af468d953ef134c95c3f25e16aa4e1a2",
+      "text": "\"\"\"Current checkout behavior.\"\"\"\n\n\ndef create_checkout(cart, method=\"card\"):\n    items = cart.get(\"items\", [])\n    if not items or any(item.get(\"quantity\", 0) < 1 for item in items):\n        raise ValueError(\"The cart needs items with positive quantities\")\n    if method not in (\"card\", \"bank_transfer\"):\n        raise ValueError(\"Unsupported payment method\")\n    cents = sum(item[\"price_cents\"] * item[\"quantity\"] for item in items)\n    return {\"status\": \"pending_payment\", \"amount_cents\": cents, \"method\": method}\n"
+    },
+    {
+      "bytes": 1958,
+      "member": "X2-T1/checkout/checkout_app/server.py",
+      "relative_path": "checkout_app/server.py",
+      "sha256": "44ce196b97a7fd4eb2d4ba14f6de214be2fe30d03628c7beae61d50ebea83992",
+      "text": "\"\"\"Standard-library HTTP entry point; no external package installation.\"\"\"\nimport json\nfrom http.server import BaseHTTPRequestHandler, ThreadingHTTPServer\nfrom pathlib import Path\nfrom .checkout import create_checkout\n\nWEB_ROOT = Path(__file__).resolve().parent.parent / \"web\"\n\n\nclass Handler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        if self.path == \"/api/status\":\n            return self.reply(200, {\"service\": \"checkout\", \"version\": \"2.0\"})\n        if self.path in (\"/\", \"/app.js\"):\n            name = \"index.html\" if self.path == \"/\" else \"app.js\"\n            body = (WEB_ROOT / name).read_bytes()\n            self.send_response(200)\n            self.send_header(\"Content-Type\", \"text/html\" if name.endswith(\"html\") else \"text/javascript\")\n            self.send_header(\"Content-Length\", str(len(body)))\n            self.end_headers()\n            self.wfile.write(body)\n            return\n        self.reply(404, {\"error\": \"Not found\"})\n\n    def do_POST(self):\n        if self.path != \"/api/checkout\":\n            return self.reply(404, {\"error\": \"Not found\"})\n        try:\n            size = int(self.headers.get(\"Content-Length\", \"0\"))\n            if size > 65536:\n                raise ValueError(\"Request too large\")\n            payload = json.loads(self.rfile.read(size))\n            result = create_checkout(payload[\"cart\"], payload.get(\"method\", \"card\"))\n            self.reply(200, result)\n        except (KeyError, ValueError, TypeError, json.JSONDecodeError) as exc:\n            self.reply(400, {\"error\": str(exc)})\n\n    def reply(self, status, value):\n        body = json.dumps(value).encode()\n        self.send_response(status)\n        self.send_header(\"Content-Type\", \"application/json\")\n        self.send_header(\"Content-Length\", str(len(body)))\n        self.end_headers()\n        self.wfile.write(body)\n\n\ndef main():\n    ThreadingHTTPServer((\"127.0.0.1\", 8080), Handler).serve_forever()\n\n\nif __name__ == \"__main__\":\n    main()\n"
+    },
+    {
+      "bytes": 405,
+      "member": "X2-T1/checkout/legacy_compat.py",
+      "relative_path": "legacy_compat.py",
+      "sha256": "547b4b2a1ed3f5b5890fa08a47e949c1f97bd0cd58985b21a23798f9b193b470",
+      "text": "\"\"\"Old v1 HTTP path, retained temporarily across the upgrade.\"\"\"\nfrom http.server import BaseHTTPRequestHandler, ThreadingHTTPServer\n\n\nclass LegacyHandler(BaseHTTPRequestHandler):\n    def do_POST(self):\n        self.send_response(410)\n        self.end_headers()\n        self.wfile.write(b\"Legacy checkout retired\")\n\n\ndef main():\n    ThreadingHTTPServer((\"127.0.0.1\", 8080), LegacyHandler).serve_forever()\n"
+    },
+    {
+      "bytes": 319,
+      "member": "X2-T1/checkout/run.py",
+      "relative_path": "run.py",
+      "sha256": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39",
+      "text": "\"\"\"Service launcher from the previous release.\"\"\"\nimport os\nfrom checkout_app.server import main as current_main\nfrom legacy_compat import main as legacy_main\n\n\ndef main():\n    if os.getenv(\"CHECKOUT_COMPAT\", \"on\") == \"on\":\n        legacy_main()\n    else:\n        current_main()\n\n\nif __name__ == \"__main__\":\n    main()\n"
+    },
+    {
+      "bytes": 984,
+      "member": "X2-T1/checkout/tests/__pycache__/test_checkout.cpython-310.pyc",
+      "relative_path": "tests/__pycache__/test_checkout.cpython-310.pyc",
+      "sha256": "62bbf4ab4efe69b910fbb7b18537729edba15f0e5e3024b461d5e99d070a4110",
+      "text": null
+    },
+    {
+      "bytes": 499,
+      "member": "X2-T1/checkout/tests/test_checkout.py",
+      "relative_path": "tests/test_checkout.py",
+      "sha256": "8c7e2584b3ab04fbafe603d87063c839346f5719e5f74fc36b43d6e5166a6ffe",
+      "text": "import unittest\nfrom checkout_app.checkout import create_checkout\n\n\nclass CheckoutTests(unittest.TestCase):\n    def test_card_checkout(self):\n        self.assertEqual(create_checkout({\"items\": [{\"price_cents\": 1250, \"quantity\": 2}]}),\n                         {\"status\": \"pending_payment\", \"amount_cents\": 2500, \"method\": \"card\"})\n\n    def test_empty_cart(self):\n        with self.assertRaises(ValueError):\n            create_checkout({\"items\": []})\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+    },
+    {
+      "bytes": 188,
+      "member": "X2-T1/checkout/versions/after.json",
+      "relative_path": "versions/after.json",
+      "sha256": "d9a43382138922db1762bedbb42d4926139302ff202ec877f6176f374c78738b",
+      "text": "{\"version\":\"2.0\",\"entrypoint\":\"python -m checkout_app.server\",\"checkout_endpoint\":\"/api/checkout\",\"note\":\"New checkout service; launcher and compatibility path still present for review.\"}\n"
+    },
+    {
+      "bytes": 206,
+      "member": "X2-T1/checkout/versions/before.json",
+      "relative_path": "versions/before.json",
+      "sha256": "e3797e1aaa0777c22c69d04c1a676b18fb08d694fbd99fe0c0c37a523b113f9d",
+      "text": "{\"version\":\"1.9\",\"entrypoint\":\"python versions/before/server.py\",\"checkout_endpoint\":\"/api/checkout\",\"note\":\"Runnable prior service snapshot on port 8081; compatibility remained enabled during migration.\"}\n"
+    },
+    {
+      "bytes": 1565,
+      "member": "X2-T1/checkout/versions/before/server.py",
+      "relative_path": "versions/before/server.py",
+      "sha256": "c18b186ec348b26ed30cffffd04d688f3661f4abc18260a851f307bad09e6e56",
+      "text": "\"\"\"Runnable checkout v1.9 snapshot from before the upgrade.\n\nRun `python versions/before/server.py` in the project root. This older service\nlistens on 8081 so its behavior can be compared with the new service on 8080.\n\"\"\"\nimport json\nfrom http.server import BaseHTTPRequestHandler, ThreadingHTTPServer\n\n\nclass Handler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        if self.path == \"/api/status\":\n            return self.reply(200, {\"service\": \"checkout\", \"version\": \"1.9\"})\n        self.reply(404, {\"error\": \"Not found\"})\n\n    def do_POST(self):\n        if self.path != \"/api/checkout\":\n            return self.reply(404, {\"error\": \"Not found\"})\n        try:\n            payload = json.loads(self.rfile.read(int(self.headers.get(\"Content-Length\", \"0\"))))\n            items = payload[\"cart\"][\"items\"]\n            if not items:\n                raise ValueError(\"Cart is empty\")\n            amount = sum(item[\"price_cents\"] * item[\"quantity\"] for item in items)\n            self.reply(200, {\"status\": \"pending_payment\", \"amount_cents\": amount, \"method\": \"card\"})\n        except (KeyError, ValueError, TypeError) as exc:\n            self.reply(400, {\"error\": str(exc)})\n\n    def reply(self, status, value):\n        body = json.dumps(value).encode()\n        self.send_response(status)\n        self.send_header(\"Content-Type\", \"application/json\")\n        self.send_header(\"Content-Length\", str(len(body)))\n        self.end_headers()\n        self.wfile.write(body)\n\n\nif __name__ == \"__main__\":\n    ThreadingHTTPServer((\"127.0.0.1\", 8081), Handler).serve_forever()\n"
+    },
+    {
+      "bytes": 160,
+      "member": "X2-T1/checkout/web/app.js",
+      "relative_path": "web/app.js",
+      "sha256": "ea71ea811176430b89c4075881c3381cac04be21b3aeeb105d7ce12e5821f8c3",
+      "text": "fetch(\"/api/status\")\n  .then(response => response.json())\n  .then(status => { document.querySelector(\"#status\").textContent = `Checkout ${status.version}`; });\n"
+    },
+    {
+      "bytes": 254,
+      "member": "X2-T1/checkout/web/index.html",
+      "relative_path": "web/index.html",
+      "sha256": "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd",
+      "text": "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>Checkout</title></head>\n<body><main><h1>Checkout</h1><p id=\"status\">Loading checkout status</p>\n<p id=\"result\" aria-live=\"polite\"></p></main><script src=\"/app.js\"></script></body></html>\n"
+    }
+  ],
+  "event_streams": [
+    {
+      "events": 34,
+      "member": "X2-T1/observer/metagpt_native/events.jsonl"
+    }
+  ],
+  "evidence_policy": {
+    "read_only": true,
+    "reruns": 0,
+    "semantic_labels_assigned": false,
+    "subject_calls": 0
+  },
+  "manifest": {
+    "artifact_id": 10876255071,
+    "artifact_zip_sha256": "d6dc60641e01fd860de54b199541bef165769b6f7b897cf11cf6d0a57de8e17f",
+    "authorization_issue": 176,
+    "authorization_tag": "stage2-natural-t1-x2-x5-authorization",
+    "cell": "X2-T1",
+    "common_receipt_sha256": "681aad9cfa2c08cdbf494bf22b18f7a1e91c6d592394c0c0999e73f2db6b2af8",
+    "execution_claim_tag": "stage2-natural-X2-t1-execution-claimed",
+    "execution_sha": "7c5fa1d27baee81945e0649d8ed9663abec20e05",
+    "natural_attempts_for_cell": 1,
+    "observer_files": 38,
+    "posthoc_semantic_audit": "PENDING",
+    "schema": "stage2-v7-natural-raw-archive-v1",
+    "status": "RECORDED_PENDING_POSTHOC_AUDIT",
+    "tar_sha256": "a577bad7c4e5dd6fabdca915dd6844f5bfa0e6bb8693e862baf778a1e4f10fbd",
+    "task_outcome": "TURN_BUDGET_NO_ANSWER",
+    "workflow_run_id": 36160899620,
+    "workflow_run_url": "https://github.com/yu5-520/reality-bias-benchmark/actions/runs/36160899620"
+  },
+  "native_events": [
+    {
+      "line": 1,
+      "parsed": {
+        "cause_by": "metagpt.actions.add_requirement.UserRequirement",
+        "content": "Please check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "id": "b1c0835f8e40429da3932cdd241b9f92",
+        "instruct_content": null,
+        "metadata": {
+          "kind": "user_request"
+        },
+        "role": "user",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "USER"
+      },
+      "preview": {
+        "content": "Please check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "role": "user"
+      },
+      "raw_bytes": 401,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/826ea21c43c63a755168cac2f352c01f617a963c39a89643b0862acc820cc0d4",
+      "raw_sha256": "826ea21c43c63a755168cac2f352c01f617a963c39a89643b0862acc820cc0d4",
+      "sequence": 0,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Environment.history.post_round_copy"
+    },
+    {
+      "line": 2,
+      "parsed": {
+        "cause_by": "metagpt.actions.add_requirement.UserRequirement",
+        "content": "Please check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "id": "b1c0835f8e40429da3932cdd241b9f92",
+        "instruct_content": null,
+        "metadata": {
+          "kind": "user_request"
+        },
+        "role": "user",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "USER"
+      },
+      "preview": {
+        "content": "Please check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "role": "user"
+      },
+      "raw_bytes": 401,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/826ea21c43c63a755168cac2f352c01f617a963c39a89643b0862acc820cc0d4",
+      "raw_sha256": "826ea21c43c63a755168cac2f352c01f617a963c39a89643b0862acc820cc0d4",
+      "sequence": 1,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 3,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: unsupported action",
+        "id": "ec186e13d362429ba38d4f504019f2fe",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: unsupported action",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 298,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/c2487f4200e5d77668a3e65bb8e4ee7071958578fd57ef4ecda885c024174383",
+      "raw_sha256": "c2487f4200e5d77668a3e65bb8e4ee7071958578fd57ef4ecda885c024174383",
+      "sequence": 2,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 4,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "ba1c597ed554400baa896a8e3e5443ba",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/7c09c92657437a88fd352339fcf2dc2cfe3f54769108e098749e1409d2e1f5f9",
+      "raw_sha256": "7c09c92657437a88fd352339fcf2dc2cfe3f54769108e098749e1409d2e1f5f9",
+      "sequence": 3,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 5,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: unsupported action",
+        "id": "df44a75fd370497889d9e099f31e4238",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: unsupported action",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 298,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/3d859a5f4b0267ceb90bdead94546f8afc6dd8f75db2e739eb290fa2d9178d3a",
+      "raw_sha256": "3d859a5f4b0267ceb90bdead94546f8afc6dd8f75db2e739eb290fa2d9178d3a",
+      "sequence": 4,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 6,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "b4d1d84b27fe47d6b8b2fa10a0303dbd",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/f6157d8161c57569646715f3e84a20e1bf7de21b14338beedd86fbe07f44d958",
+      "raw_sha256": "f6157d8161c57569646715f3e84a20e1bf7de21b14338beedd86fbe07f44d958",
+      "sequence": 5,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 7,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: unsupported action",
+        "id": "12737dac1c7d4a66bae01b873664c138",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: unsupported action",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 298,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/1a4381158fd499cd162122173eeb25865950de10f024f8485e8690ab6b7247b1",
+      "raw_sha256": "1a4381158fd499cd162122173eeb25865950de10f024f8485e8690ab6b7247b1",
+      "sequence": 6,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 8,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "1db15082a8264f0babfde31cb8e16a51",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/0a5380b777135dae3c749f99b8098ae433b828bfb2c9f24427edc482cd530579",
+      "raw_sha256": "0a5380b777135dae3c749f99b8098ae433b828bfb2c9f24427edc482cd530579",
+      "sequence": 7,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 9,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "a8c901c69d634c2b8b5dfdda7ad1f4dd",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/bc37abf689ee7c7516b994c90a7110cb8eb100c1f7da1613ef32a0034a67b9e6",
+      "raw_sha256": "bc37abf689ee7c7516b994c90a7110cb8eb100c1f7da1613ef32a0034a67b9e6",
+      "sequence": 8,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 10,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: unsupported action",
+        "id": "b1fb5d76d25948bebac046df468d1f23",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: unsupported action",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 298,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/8a61a20e634d7f26a6dce192bc2d60058370e6beea32db84ceac52a999948082",
+      "raw_sha256": "8a61a20e634d7f26a6dce192bc2d60058370e6beea32db84ceac52a999948082",
+      "sequence": 9,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 11,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: unsupported action",
+        "id": "dd9c09072e894461beed0774711a662f",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: unsupported action",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 298,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/52bbaedb3f746f39d65f49a50fa9cafd57122c4068886f16296a28499e014553",
+      "raw_sha256": "52bbaedb3f746f39d65f49a50fa9cafd57122c4068886f16296a28499e014553",
+      "sequence": 10,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 12,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "31a01c60cffc4b2b8841f5c1b4da784f",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/5a0744c3fc0c99544253008aa19be44a88a29f7987f54b3e974d3977fe77284a",
+      "raw_sha256": "5a0744c3fc0c99544253008aa19be44a88a29f7987f54b3e974d3977fe77284a",
+      "sequence": 11,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 13,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "2e5819d4698049a3b0c94db87333b01e",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/d13b28c08df7a13499c6500a1dfc5a71b8fb61797f58c484232eba04a25f0420",
+      "raw_sha256": "d13b28c08df7a13499c6500a1dfc5a71b8fb61797f58c484232eba04a25f0420",
+      "sequence": 12,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 14,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: unsupported action",
+        "id": "fbe9a3ce6c484eb1a03ee96e2e70de4d",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: unsupported action",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 298,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/3cf2ab3d800ecebd65f151e578025398fbb53c9a2c82b794cf64465eb70b2604",
+      "raw_sha256": "3cf2ab3d800ecebd65f151e578025398fbb53c9a2c82b794cf64465eb70b2604",
+      "sequence": 13,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 15,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "12b9e0e559484130a14a1a6fca268da2",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/5274df57c98ad1d87945468eca26cde8aa7a51a255451914447041a5a11d019c",
+      "raw_sha256": "5274df57c98ad1d87945468eca26cde8aa7a51a255451914447041a5a11d019c",
+      "sequence": 14,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 16,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: unsupported action",
+        "id": "b88b50ae30c54b6ea57f1d22a637267b",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: unsupported action",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 298,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/cc5a9e3b0198334678bf9d3ae3ba111e616d2719bf78917f31a68dd2b8df8f50",
+      "raw_sha256": "cc5a9e3b0198334678bf9d3ae3ba111e616d2719bf78917f31a68dd2b8df8f50",
+      "sequence": 15,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 17,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: unsupported action",
+        "id": "d8d6c01ef1d64780af3cd5ad966afb24",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: unsupported action",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 298,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/d4fcbdbcec31439ae26bd534fe777d3c7555523bfedb207ca1247b5337f3f761",
+      "raw_sha256": "d4fcbdbcec31439ae26bd534fe777d3c7555523bfedb207ca1247b5337f3f761",
+      "sequence": 16,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 18,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "25944401a73c46149add153705e69663",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/fe2b84b420456a3552ede2f5207968ae3fab7563ec94cba9f0bc5d3e6c07ccd2",
+      "raw_sha256": "fe2b84b420456a3552ede2f5207968ae3fab7563ec94cba9f0bc5d3e6c07ccd2",
+      "sequence": 17,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 19,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "f4f4ffa35d9c4eef8c33718a04fefc67",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/b173d04d022bd1b15f529a84823a16756f04d2deffaf6c76cd6f0b3fbf584191",
+      "raw_sha256": "b173d04d022bd1b15f529a84823a16756f04d2deffaf6c76cd6f0b3fbf584191",
+      "sequence": 18,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 20,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: unsupported action",
+        "id": "7f9bdb2f719648df9732549b3cb5f0cc",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: unsupported action",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 298,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/8b52dee294ecab2d5b7f14fa4413d8fdcdb034b397f873f71301305b178c86bd",
+      "raw_sha256": "8b52dee294ecab2d5b7f14fa4413d8fdcdb034b397f873f71301305b178c86bd",
+      "sequence": 19,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 21,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: unsupported action",
+        "id": "dd17acb170064f28b37622a9ee50b3ad",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: unsupported action",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 298,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/1807368a18a3b029077600a31c1209039ed5f68a779d6132784dded9ac63f301",
+      "raw_sha256": "1807368a18a3b029077600a31c1209039ed5f68a779d6132784dded9ac63f301",
+      "sequence": 20,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 22,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "0759f9926c644404a446329dc573c761",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/2fd6569dc1a162a666374877c95bf9069244c63e78810cc90de609447ddf735b",
+      "raw_sha256": "2fd6569dc1a162a666374877c95bf9069244c63e78810cc90de609447ddf735b",
+      "sequence": 21,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 23,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "1cc66448dd7b42bbbda0660551e348e0",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/6467d89b3292a2d27e12abfefc33289dac9b5524ac1a1c1c24b8d95f8ac15e57",
+      "raw_sha256": "6467d89b3292a2d27e12abfefc33289dac9b5524ac1a1c1c24b8d95f8ac15e57",
+      "sequence": 22,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 24,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: unsupported action",
+        "id": "2736d967ecba4e1ab86cf6c7301a4bb6",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: unsupported action",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 298,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/2435f9fec0cf87c3b7379e19a0852f9696a757445e1400f7328f0f96ba4b9d30",
+      "raw_sha256": "2435f9fec0cf87c3b7379e19a0852f9696a757445e1400f7328f0f96ba4b9d30",
+      "sequence": 23,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 25,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "a0ab93a6d53e4eb8a2866639d975968e",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/c6c0a2b66365d6501f36dea72177e92b36517eb40f2b47f18bde2291ca6ac8a6",
+      "raw_sha256": "c6c0a2b66365d6501f36dea72177e92b36517eb40f2b47f18bde2291ca6ac8a6",
+      "sequence": 24,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 26,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "1fae24c253bb43068c431d1ec20e4ad4",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/6732fce872c8fe55eb23c9564cb0c48130fa67587f47c4e104260776b7ec7785",
+      "raw_sha256": "6732fce872c8fe55eb23c9564cb0c48130fa67587f47c4e104260776b7ec7785",
+      "sequence": 25,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 27,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "[\"README.md\", \"checkout_app/__init__.py\", \"checkout_app/checkout.py\", \"checkout_app/server.py\", \"legacy_compat.py\", \"run.py\", \"tests/test_checkout.py\", \"versions/after.json\", \"versions/before.json\", \"versions/before/server.py\", \"web/app.js\", \"web/index.html\"]",
+        "id": "9e8cfc0d9a044485b0c4fbea7466c2a3",
+        "instruct_content": null,
+        "metadata": {
+          "action": "list_files",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "[\"README.md\", \"checkout_app/__init__.py\", \"checkout_app/checkout.py\", \"checkout_app/server.py\", \"legacy_compat.py\", \"run.py\", \"tests/test_checkout.py\", \"versions/after.json\", \"versions/before.json\", \"versions/before/server.py\", \"web/app.js\", \"web/index.html\"]",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 539,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/593993a03b76b81110c10d15e5afe56d2b6f138afa03b1067c6c79a0505541e6",
+      "raw_sha256": "593993a03b76b81110c10d15e5afe56d2b6f138afa03b1067c6c79a0505541e6",
+      "sequence": 26,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 28,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: invalid action count",
+        "id": "f87f82e40a524532bf89e57159b062aa",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: invalid action count",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 300,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/3aa0f9b7cd9d2475cfe4bea955b4a5fe3ea70703b41b071fc1a22b334b39f7ca",
+      "raw_sha256": "3aa0f9b7cd9d2475cfe4bea955b4a5fe3ea70703b41b071fc1a22b334b39f7ca",
+      "sequence": 27,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 29,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "6d65c9bc92f047d9bff16f25b73c27ef",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/d6b7680a5d741f653a3e1c6e3a676b44fe34a4d5663431b7f6eb9f7dc2c5168e",
+      "raw_sha256": "d6b7680a5d741f653a3e1c6e3a676b44fe34a4d5663431b7f6eb9f7dc2c5168e",
+      "sequence": 28,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 30,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "84cc5bac31a44a649881cc336adfc312",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/69c5329f3a47de5fd14dec06a37a5f1cceaaeeac7bb4b3e1a59c3ce79941bc1c",
+      "raw_sha256": "69c5329f3a47de5fd14dec06a37a5f1cceaaeeac7bb4b3e1a59c3ce79941bc1c",
+      "sequence": 29,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 31,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: 'actions'",
+        "id": "e0dbfe7305634840bbf5f973f852464a",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: 'actions'",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 289,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/49652fba13d9118d8cc4ac23abacbe6540ac4b788859276ea19bbe716d5fdbfe",
+      "raw_sha256": "49652fba13d9118d8cc4ac23abacbe6540ac4b788859276ea19bbe716d5fdbfe",
+      "sequence": 30,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 32,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "[\"README.md\", \"checkout_app/__init__.py\", \"checkout_app/checkout.py\", \"checkout_app/server.py\", \"legacy_compat.py\", \"run.py\", \"tests/test_checkout.py\", \"versions/after.json\", \"versions/before.json\", \"versions/before/server.py\", \"web/app.js\", \"web/index.html\"]",
+        "id": "c3a6ee2ba5914bd5b47bc8dee8d31f9f",
+        "instruct_content": null,
+        "metadata": {
+          "action": "list_files",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "[\"README.md\", \"checkout_app/__init__.py\", \"checkout_app/checkout.py\", \"checkout_app/server.py\", \"legacy_compat.py\", \"run.py\", \"tests/test_checkout.py\", \"versions/after.json\", \"versions/before.json\", \"versions/before/server.py\", \"web/app.js\", \"web/index.html\"]",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 539,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/cf7fee2f46338e48357e8f179056b2f6a6ce0c5eeea8973d46bf6bca05271892",
+      "raw_sha256": "cf7fee2f46338e48357e8f179056b2f6a6ce0c5eeea8973d46bf6bca05271892",
+      "sequence": 31,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 33,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "{\"command\": [\"-m\", \"unittest\", \"discover\", \"-s\", \"tests\", \"-v\"], \"returncode\": 0, \"stderr\": \"test_card_checkout (test_checkout.CheckoutTests) ... ok\\ntest_empty_cart (test_checkout.CheckoutTests) ... ok\\n\\n----------------------------------------------------------------------\\nRan 2 tests in 0.000s\\n\\nOK\\n\", \"stdout\": \"\"}",
+        "id": "ac32f501d5374668bbd0a467eef2c0b4",
+        "instruct_content": null,
+        "metadata": {
+          "action": "run_tests",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "{\"command\": [\"-m\", \"unittest\", \"discover\", \"-s\", \"tests\", \"-v\"], \"returncode\": 0, \"stderr\": \"test_card_checkout (test_checkout.CheckoutTests) ... ok\\ntest_empty_cart (test_checkout.CheckoutTests) ... ok\\n\\n----------------------------------------------------------------------\\nRan 2 tests in 0.000s\\n\\nOK\\n\", \"stdout\": \"\"}",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 609,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/e7af1859b70d6319d1876ac84468091ea1cd03683036aa9b3f8e70942bbbe466",
+      "raw_sha256": "e7af1859b70d6319d1876ac84468091ea1cd03683036aa9b3f8e70942bbbe466",
+      "sequence": 32,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    },
+    {
+      "line": 34,
+      "parsed": {
+        "cause_by": "stage2.native_v7.x2_metagpt.turn",
+        "content": "Invalid envelope: unsupported action",
+        "id": "684c469db9254879967031e0d4b8b921",
+        "instruct_content": null,
+        "metadata": {
+          "action": "invalid_envelope",
+          "kind": "tool_result"
+        },
+        "role": "Release Lead",
+        "send_to": [
+          "release_lead"
+        ],
+        "sent_from": "release_lead"
+      },
+      "preview": {
+        "content": "Invalid envelope: unsupported action",
+        "role": "Release Lead"
+      },
+      "raw_bytes": 298,
+      "raw_member": "X2-T1/observer/metagpt_native/raw/69ef24beaa537c59df1fe7a4bb1c8e8d13f826cbd7e27f7f1d37fdd5af3d75b0",
+      "raw_sha256": "69ef24beaa537c59df1fe7a4bb1c8e8d13f826cbd7e27f7f1d37fdd5af3d75b0",
+      "sequence": 33,
+      "stream": "X2-T1/observer/metagpt_native/events.jsonl",
+      "surface": "metagpt.Role.memory.release_lead.post_round_copy"
+    }
+  ],
+  "route_skeleton": [
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 1,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 1,
+      "turn": 1,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 2,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 2,
+      "turn": 2,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 3,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 3,
+      "turn": 3,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 4,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 4,
+      "turn": 4,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 5,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 5,
+      "turn": 5,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 6,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 6,
+      "turn": 6,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 7,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 7,
+      "turn": 7,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 8,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 8,
+      "turn": 8,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 9,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 9,
+      "turn": 9,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 10,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 10,
+      "turn": 10,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 11,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 11,
+      "turn": 11,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 12,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 12,
+      "turn": 12,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 13,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 13,
+      "turn": 13,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 14,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 14,
+      "turn": 14,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 15,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 15,
+      "turn": 15,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 16,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 16,
+      "turn": 16,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 17,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 17,
+      "turn": 17,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 18,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 18,
+      "turn": 18,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 19,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 19,
+      "turn": 19,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 20,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 20,
+      "turn": 20,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 21,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 21,
+      "turn": 21,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 22,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 22,
+      "turn": 22,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 23,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 23,
+      "turn": 23,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 24,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 24,
+      "turn": 24,
+      "valid": false
+    },
+    {
+      "action_count": 1,
+      "raw": {
+        "actions": 1,
+        "role": "release_lead",
+        "turn": 25,
+        "valid": true
+      },
+      "role": "release_lead",
+      "route_index": 25,
+      "turn": 25,
+      "valid": true
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 26,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 26,
+      "turn": 26,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 27,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 27,
+      "turn": 27,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 28,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 28,
+      "turn": 28,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 29,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 29,
+      "turn": 29,
+      "valid": false
+    },
+    {
+      "action_count": 2,
+      "raw": {
+        "actions": 2,
+        "role": "release_lead",
+        "turn": 30,
+        "valid": true
+      },
+      "role": "release_lead",
+      "route_index": 30,
+      "turn": 30,
+      "valid": true
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 31,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 31,
+      "turn": 31,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 32,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 32,
+      "turn": 32,
+      "valid": false
+    }
+  ],
+  "schema": "stage2-r6-grade-material-packet-v1",
+  "stderr_excerpt": "2026-09-25 16:29:08.313 | INFO     | metagpt.const:get_metagpt_package_root:15 - Package root set to /home/runner/work/reality-bias-benchmark/reality-bias-benchmark/upstream\n2026-09-25 16:29:08.313 | INFO     | metagpt.const:get_metagpt_package_root:15 - Package root set to /home/runner/work/reality-bias-benchmark/reality-bias-benchmark/upstream\n/opt/hostedtoolcache/Python/3.10.21/x64/lib/python3.10/site-packages/google/api_core/_python_version_support.py:273: FutureWarning: You are using a Python version (3.10.21) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.api_core past that date.\n  warnings.warn(message, FutureWarning)\n/opt/hostedtoolcache/Python/3.10.21/x64/lib/python3.10/site-packages/google/auth/transport/grpc.py:43: FutureWarning: grpcio < 1.83.0 does not support Post-Quantum Cryptography (PQC). Support for non-PQC environments is deprecated. In April 2027, google-auth will raise its minimum requirements to enforce grpcio >= 1.83.0. For more details on Google Cloud's post-quantum security migration, visit: https://cloud.google.com/security/resources/post-quantum-cryptography\n  warnings.warn(\n",
+  "terminal_result": {
+    "answer": null,
+    "environment_messages": 1,
+    "history": [
+      {
+        "role": "release_lead",
+        "turn": 1,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 2,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 3,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 4,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 5,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 6,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 7,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 8,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 9,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 10,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 11,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 12,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 13,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 14,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 15,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 16,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 17,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 18,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 19,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 20,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 21,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 22,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 23,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 24,
+        "valid": false
+      },
+      {
+        "actions": 1,
+        "role": "release_lead",
+        "turn": 25,
+        "valid": true
+      },
+      {
+        "role": "release_lead",
+        "turn": 26,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 27,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 28,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 29,
+        "valid": false
+      },
+      {
+        "actions": 2,
+        "role": "release_lead",
+        "turn": 30,
+        "valid": true
+      },
+      {
+        "role": "release_lead",
+        "turn": 31,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 32,
+        "valid": false
+      }
+    ],
+    "metagpt_rounds": 32,
+    "pending_messages": 1,
+    "stop_reason": "turn_budget",
+    "turns": 32
+  },
+  "textual_observer_members": [
+    {
+      "bytes": 18,
+      "member": "X2-T1/observer/exit.json",
+      "parsed": {
+        "returncode": 0
+      },
+      "sha256": "df4d721d233a2334088d2d2e0110346ae9e509ff46bf0b379fbcfa85c715af4d",
+      "text": null
+    },
+    {
+      "bytes": 683,
+      "member": "X2-T1/observer/invocation.json",
+      "parsed": {
+        "argv": [
+          "python",
+          "-m",
+          "stage2.native_v7.x2_metagpt.runner",
+          "--checkout",
+          "/tmp/stage2_t1_batch/X2-T1/checkout",
+          "--task-file",
+          "/tmp/stage2_t1_batch/X2-T1/task.json",
+          "--roles-file",
+          "/home/runner/work/reality-bias-benchmark/reality-bias-benchmark/stage2/roles.json",
+          "--subject-file",
+          "/home/runner/work/reality-bias-benchmark/reality-bias-benchmark/stage2/subject.json",
+          "--observer-root",
+          "/tmp/stage2_t1_batch/X2-T1/observer/metagpt_native"
+        ],
+        "cell": "X2-T1",
+        "cwd": "/tmp/stage2_t1_batch/X2-T1/checkout",
+        "environment_id": "x2-metagpt-11cdf46",
+        "probe": "X2",
+        "schema": "stage2-v7-process-boundary-v1"
+      },
+      "sha256": "dd7f21e2e5a6277b3e62b354a78934957ab6fc24255582b26979ee2ed24b1c5d",
+      "text": null
+    },
+    {
+      "bytes": 1298,
+      "member": "X2-T1/observer/stderr.bin",
+      "parsed": null,
+      "sha256": "44375557bee75c37b5c9126ed3ddf4c4bf8313105a272a8d6911645b4571a964",
+      "text": "2026-09-25 16:29:08.313 | INFO     | metagpt.const:get_metagpt_package_root:15 - Package root set to /home/runner/work/reality-bias-benchmark/reality-bias-benchmark/upstream\n2026-09-25 16:29:08.313 | INFO     | metagpt.const:get_metagpt_package_root:15 - Package root set to /home/runner/work/reality-bias-benchmark/reality-bias-benchmark/upstream\n/opt/hostedtoolcache/Python/3.10.21/x64/lib/python3.10/site-packages/google/api_core/_python_version_support.py:273: FutureWarning: You are using a Python version (3.10.21) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.api_core past that date.\n  warnings.warn(message, FutureWarning)\n/opt/hostedtoolcache/Python/3.10.21/x64/lib/python3.10/site-packages/google/auth/transport/grpc.py:43: FutureWarning: grpcio < 1.83.0 does not support Post-Quantum Cryptography (PQC). Support for non-PQC environments is deprecated. In April 2027, google-auth will raise its minimum requirements to enforce grpcio >= 1.83.0. For more details on Google Cloud's post-quantum security migration, visit: https://cloud.google.com/security/resources/post-quantum-cryptography\n  warnings.warn(\n"
+    },
+    {
+      "bytes": 1890,
+      "member": "X2-T1/observer/stdout.bin",
+      "parsed": {
+        "answer": null,
+        "environment_messages": 1,
+        "history": [
+          {
+            "role": "release_lead",
+            "turn": 1,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 2,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 3,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 4,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 5,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 6,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 7,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 8,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 9,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 10,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 11,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 12,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 13,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 14,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 15,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 16,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 17,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 18,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 19,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 20,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 21,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 22,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 23,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 24,
+            "valid": false
+          },
+          {
+            "actions": 1,
+            "role": "release_lead",
+            "turn": 25,
+            "valid": true
+          },
+          {
+            "role": "release_lead",
+            "turn": 26,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 27,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 28,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 29,
+            "valid": false
+          },
+          {
+            "actions": 2,
+            "role": "release_lead",
+            "turn": 30,
+            "valid": true
+          },
+          {
+            "role": "release_lead",
+            "turn": 31,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 32,
+            "valid": false
+          }
+        ],
+        "metagpt_rounds": 32,
+        "pending_messages": 1,
+        "stop_reason": "turn_budget",
+        "turns": 32
+      },
+      "sha256": "feb0ea1d4780aee8ac7185253a15b73055e7e2197eea8be56c3844fdcfb510c1",
+      "text": null
+    }
+  ]
+}

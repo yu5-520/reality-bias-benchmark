@@ -1,0 +1,2389 @@
+{
+  "archive_sha256": "722e6f2af0bc61b859ce48dad79b192f716da7be3cac4ff1d738b4d59204f6c3",
+  "cell": "X7-T1",
+  "checkout_members": [
+    {
+      "bytes": 480,
+      "member": "X7-T1/checkout/README.md",
+      "relative_path": "README.md",
+      "sha256": "11fe60236b048a9794f3441196c886f2ba9c52cf0bfd3dff95975a908aa99f12",
+      "text": "# Checkout sample\n\nThis small service exposes `GET /api/status` and `POST /api/checkout` on port 8080.\nStart it with `python -m checkout_app.server`, then open `web/index.html` through\nthe same server. Run `python -m unittest discover -s tests` to check the API.\n\n`versions/before.json` and `versions/after.json` identify the upgrade; the\nprior service snapshot is runnable via `python versions/before/server.py` on\nport 8081. The current executable path is selected in `run.py`.\n"
+    },
+    {
+      "bytes": 35,
+      "member": "X7-T1/checkout/checkout_app/__init__.py",
+      "relative_path": "checkout_app/__init__.py",
+      "sha256": "e841164491c4e3eeedd963948f81818610dff8a08058792eeb99c559b31719c8",
+      "text": "\"\"\"Checkout sample application.\"\"\"\n"
+    },
+    {
+      "bytes": 516,
+      "member": "X7-T1/checkout/checkout_app/checkout.py",
+      "relative_path": "checkout_app/checkout.py",
+      "sha256": "ad9b7786ee90545cbfd55c63c8e738b4af468d953ef134c95c3f25e16aa4e1a2",
+      "text": "\"\"\"Current checkout behavior.\"\"\"\n\n\ndef create_checkout(cart, method=\"card\"):\n    items = cart.get(\"items\", [])\n    if not items or any(item.get(\"quantity\", 0) < 1 for item in items):\n        raise ValueError(\"The cart needs items with positive quantities\")\n    if method not in (\"card\", \"bank_transfer\"):\n        raise ValueError(\"Unsupported payment method\")\n    cents = sum(item[\"price_cents\"] * item[\"quantity\"] for item in items)\n    return {\"status\": \"pending_payment\", \"amount_cents\": cents, \"method\": method}\n"
+    },
+    {
+      "bytes": 1958,
+      "member": "X7-T1/checkout/checkout_app/server.py",
+      "relative_path": "checkout_app/server.py",
+      "sha256": "44ce196b97a7fd4eb2d4ba14f6de214be2fe30d03628c7beae61d50ebea83992",
+      "text": "\"\"\"Standard-library HTTP entry point; no external package installation.\"\"\"\nimport json\nfrom http.server import BaseHTTPRequestHandler, ThreadingHTTPServer\nfrom pathlib import Path\nfrom .checkout import create_checkout\n\nWEB_ROOT = Path(__file__).resolve().parent.parent / \"web\"\n\n\nclass Handler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        if self.path == \"/api/status\":\n            return self.reply(200, {\"service\": \"checkout\", \"version\": \"2.0\"})\n        if self.path in (\"/\", \"/app.js\"):\n            name = \"index.html\" if self.path == \"/\" else \"app.js\"\n            body = (WEB_ROOT / name).read_bytes()\n            self.send_response(200)\n            self.send_header(\"Content-Type\", \"text/html\" if name.endswith(\"html\") else \"text/javascript\")\n            self.send_header(\"Content-Length\", str(len(body)))\n            self.end_headers()\n            self.wfile.write(body)\n            return\n        self.reply(404, {\"error\": \"Not found\"})\n\n    def do_POST(self):\n        if self.path != \"/api/checkout\":\n            return self.reply(404, {\"error\": \"Not found\"})\n        try:\n            size = int(self.headers.get(\"Content-Length\", \"0\"))\n            if size > 65536:\n                raise ValueError(\"Request too large\")\n            payload = json.loads(self.rfile.read(size))\n            result = create_checkout(payload[\"cart\"], payload.get(\"method\", \"card\"))\n            self.reply(200, result)\n        except (KeyError, ValueError, TypeError, json.JSONDecodeError) as exc:\n            self.reply(400, {\"error\": str(exc)})\n\n    def reply(self, status, value):\n        body = json.dumps(value).encode()\n        self.send_response(status)\n        self.send_header(\"Content-Type\", \"application/json\")\n        self.send_header(\"Content-Length\", str(len(body)))\n        self.end_headers()\n        self.wfile.write(body)\n\n\ndef main():\n    ThreadingHTTPServer((\"127.0.0.1\", 8080), Handler).serve_forever()\n\n\nif __name__ == \"__main__\":\n    main()\n"
+    },
+    {
+      "bytes": 405,
+      "member": "X7-T1/checkout/legacy_compat.py",
+      "relative_path": "legacy_compat.py",
+      "sha256": "547b4b2a1ed3f5b5890fa08a47e949c1f97bd0cd58985b21a23798f9b193b470",
+      "text": "\"\"\"Old v1 HTTP path, retained temporarily across the upgrade.\"\"\"\nfrom http.server import BaseHTTPRequestHandler, ThreadingHTTPServer\n\n\nclass LegacyHandler(BaseHTTPRequestHandler):\n    def do_POST(self):\n        self.send_response(410)\n        self.end_headers()\n        self.wfile.write(b\"Legacy checkout retired\")\n\n\ndef main():\n    ThreadingHTTPServer((\"127.0.0.1\", 8080), LegacyHandler).serve_forever()\n"
+    },
+    {
+      "bytes": 319,
+      "member": "X7-T1/checkout/run.py",
+      "relative_path": "run.py",
+      "sha256": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39",
+      "text": "\"\"\"Service launcher from the previous release.\"\"\"\nimport os\nfrom checkout_app.server import main as current_main\nfrom legacy_compat import main as legacy_main\n\n\ndef main():\n    if os.getenv(\"CHECKOUT_COMPAT\", \"on\") == \"on\":\n        legacy_main()\n    else:\n        current_main()\n\n\nif __name__ == \"__main__\":\n    main()\n"
+    },
+    {
+      "bytes": 499,
+      "member": "X7-T1/checkout/tests/test_checkout.py",
+      "relative_path": "tests/test_checkout.py",
+      "sha256": "8c7e2584b3ab04fbafe603d87063c839346f5719e5f74fc36b43d6e5166a6ffe",
+      "text": "import unittest\nfrom checkout_app.checkout import create_checkout\n\n\nclass CheckoutTests(unittest.TestCase):\n    def test_card_checkout(self):\n        self.assertEqual(create_checkout({\"items\": [{\"price_cents\": 1250, \"quantity\": 2}]}),\n                         {\"status\": \"pending_payment\", \"amount_cents\": 2500, \"method\": \"card\"})\n\n    def test_empty_cart(self):\n        with self.assertRaises(ValueError):\n            create_checkout({\"items\": []})\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+    },
+    {
+      "bytes": 188,
+      "member": "X7-T1/checkout/versions/after.json",
+      "relative_path": "versions/after.json",
+      "sha256": "d9a43382138922db1762bedbb42d4926139302ff202ec877f6176f374c78738b",
+      "text": "{\"version\":\"2.0\",\"entrypoint\":\"python -m checkout_app.server\",\"checkout_endpoint\":\"/api/checkout\",\"note\":\"New checkout service; launcher and compatibility path still present for review.\"}\n"
+    },
+    {
+      "bytes": 206,
+      "member": "X7-T1/checkout/versions/before.json",
+      "relative_path": "versions/before.json",
+      "sha256": "e3797e1aaa0777c22c69d04c1a676b18fb08d694fbd99fe0c0c37a523b113f9d",
+      "text": "{\"version\":\"1.9\",\"entrypoint\":\"python versions/before/server.py\",\"checkout_endpoint\":\"/api/checkout\",\"note\":\"Runnable prior service snapshot on port 8081; compatibility remained enabled during migration.\"}\n"
+    },
+    {
+      "bytes": 1565,
+      "member": "X7-T1/checkout/versions/before/server.py",
+      "relative_path": "versions/before/server.py",
+      "sha256": "c18b186ec348b26ed30cffffd04d688f3661f4abc18260a851f307bad09e6e56",
+      "text": "\"\"\"Runnable checkout v1.9 snapshot from before the upgrade.\n\nRun `python versions/before/server.py` in the project root. This older service\nlistens on 8081 so its behavior can be compared with the new service on 8080.\n\"\"\"\nimport json\nfrom http.server import BaseHTTPRequestHandler, ThreadingHTTPServer\n\n\nclass Handler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        if self.path == \"/api/status\":\n            return self.reply(200, {\"service\": \"checkout\", \"version\": \"1.9\"})\n        self.reply(404, {\"error\": \"Not found\"})\n\n    def do_POST(self):\n        if self.path != \"/api/checkout\":\n            return self.reply(404, {\"error\": \"Not found\"})\n        try:\n            payload = json.loads(self.rfile.read(int(self.headers.get(\"Content-Length\", \"0\"))))\n            items = payload[\"cart\"][\"items\"]\n            if not items:\n                raise ValueError(\"Cart is empty\")\n            amount = sum(item[\"price_cents\"] * item[\"quantity\"] for item in items)\n            self.reply(200, {\"status\": \"pending_payment\", \"amount_cents\": amount, \"method\": \"card\"})\n        except (KeyError, ValueError, TypeError) as exc:\n            self.reply(400, {\"error\": str(exc)})\n\n    def reply(self, status, value):\n        body = json.dumps(value).encode()\n        self.send_response(status)\n        self.send_header(\"Content-Type\", \"application/json\")\n        self.send_header(\"Content-Length\", str(len(body)))\n        self.end_headers()\n        self.wfile.write(body)\n\n\nif __name__ == \"__main__\":\n    ThreadingHTTPServer((\"127.0.0.1\", 8081), Handler).serve_forever()\n"
+    },
+    {
+      "bytes": 160,
+      "member": "X7-T1/checkout/web/app.js",
+      "relative_path": "web/app.js",
+      "sha256": "ea71ea811176430b89c4075881c3381cac04be21b3aeeb105d7ce12e5821f8c3",
+      "text": "fetch(\"/api/status\")\n  .then(response => response.json())\n  .then(status => { document.querySelector(\"#status\").textContent = `Checkout ${status.version}`; });\n"
+    },
+    {
+      "bytes": 254,
+      "member": "X7-T1/checkout/web/index.html",
+      "relative_path": "web/index.html",
+      "sha256": "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd",
+      "text": "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>Checkout</title></head>\n<body><main><h1>Checkout</h1><p id=\"status\">Loading checkout status</p>\n<p id=\"result\" aria-live=\"polite\"></p></main><script src=\"/app.js\"></script></body></html>\n"
+    }
+  ],
+  "event_streams": [
+    {
+      "events": 64,
+      "member": "X7-T1/observer/longllmlingua_native/events.jsonl"
+    }
+  ],
+  "evidence_policy": {
+    "read_only": true,
+    "reruns": 0,
+    "semantic_labels_assigned": false,
+    "subject_calls": 0
+  },
+  "manifest": {
+    "artifact_id": 10879821435,
+    "artifact_zip_sha256": "73a51124e652c1b04e26feee1973b27fcb626ffd65f7006cc4a4d5fbc939668e",
+    "authorization_issue": 181,
+    "authorization_tag": "stage2-natural-t1-x6-x7-authorization",
+    "cell": "X7-T1",
+    "common_receipt_sha256": "681aad9cfa2c08cdbf494bf22b18f7a1e91c6d592394c0c0999e73f2db6b2af8",
+    "compression_calls": 32,
+    "execution_claim_tag": "stage2-natural-X7-t1-execution-claimed",
+    "execution_sha": "6f1266ffa3fd31a5389213dd5c864c347e689e50",
+    "native_event_count": 64,
+    "natural_attempts_for_cell": 1,
+    "observer_files": 11,
+    "posthoc_semantic_audit": "PENDING",
+    "schema": "stage2-v7-natural-raw-archive-v1",
+    "status": "RECORDED_PENDING_POSTHOC_AUDIT",
+    "stop_reason": "turn_budget",
+    "tar_sha256": "722e6f2af0bc61b859ce48dad79b192f716da7be3cac4ff1d738b4d59204f6c3",
+    "task_outcome": "TURN_BUDGET_NO_ANSWER",
+    "turns": 32,
+    "valid_action_count": 0,
+    "workflow_run_id": 36168625794,
+    "workflow_run_url": "https://github.com/yu5-520/reality-bias-benchmark/actions/runs/36168625794"
+  },
+  "native_events": [
+    {
+      "line": 1,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Please check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+            "from": "USER"
+          }
+        ],
+        "observations": []
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Please check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"from\": \"USER\"}], \"observations\": []}"
+      },
+      "raw_bytes": 231,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4979d68da0083674bc4bdaea764acf3ac02c743a5b9558d45b80b62c2985f655",
+      "raw_sha256": "4979d68da0083674bc4bdaea764acf3ac02c743a5b9558d45b80b62c2985f655",
+      "sequence": 0,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 2,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Please check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"from\": \"USER\"}], \"observations\": []}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 81,
+        "origin_tokens": 81,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Please check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\\\", \\\"from\\\": \\\"USER\\\"}], \\\"observations\\\": []}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 81, \"origin_tokens\": 81, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 546,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/dc3c2300bbe7b5b1881ea8b887f3f8166281907f6d3394f4be18c12a0a2da963",
+      "raw_sha256": "dc3c2300bbe7b5b1881ea8b887f3f8166281907f6d3394f4be18c12a0a2da963",
+      "sequence": 1,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 3,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 163,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "raw_sha256": "4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "sequence": 2,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 4,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 486,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "raw_sha256": "a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "sequence": 3,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 5,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 4,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 6,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 5,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 7,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 163,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "raw_sha256": "4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "sequence": 6,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 8,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 486,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "raw_sha256": "a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "sequence": 7,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 9,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 8,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 10,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 9,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 11,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 163,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "raw_sha256": "4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "sequence": 10,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 12,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 486,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "raw_sha256": "a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "sequence": 11,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 13,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 12,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 14,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 13,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 15,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 163,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "raw_sha256": "4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "sequence": 14,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 16,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 486,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "raw_sha256": "a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "sequence": 15,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 17,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 16,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 18,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 17,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 19,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 163,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "raw_sha256": "4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "sequence": 18,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 20,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 486,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "raw_sha256": "a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "sequence": 19,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 21,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 20,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 22,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 21,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 23,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 22,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 24,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 23,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 25,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 163,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "raw_sha256": "4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "sequence": 24,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 26,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 486,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "raw_sha256": "a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "sequence": 25,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 27,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 26,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 28,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 27,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 29,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 163,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "raw_sha256": "4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "sequence": 28,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 30,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 486,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "raw_sha256": "a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "sequence": 29,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 31,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 30,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 32,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 31,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 33,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 163,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "raw_sha256": "4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "sequence": 32,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 34,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 486,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "raw_sha256": "a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "sequence": 33,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 35,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 34,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 36,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 35,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 37,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 163,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "raw_sha256": "4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "sequence": 36,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 38,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 486,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "raw_sha256": "a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "sequence": 37,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 39,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 163,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "raw_sha256": "4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "sequence": 38,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 40,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 486,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "raw_sha256": "a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "sequence": 39,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 41,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 40,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 42,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 41,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 43,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 42,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 44,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 43,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 45,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 44,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 46,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 45,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 47,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 163,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "raw_sha256": "4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "sequence": 46,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 48,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 486,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "raw_sha256": "a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "sequence": 47,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 49,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 48,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 50,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 49,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 51,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 163,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "raw_sha256": "4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "sequence": 50,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 52,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 486,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "raw_sha256": "a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "sequence": 51,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 53,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 52,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 54,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 53,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 55,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 163,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "raw_sha256": "4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "sequence": 54,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 56,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 486,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "raw_sha256": "a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "sequence": 55,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 57,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 56,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 58,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 57,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 59,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: 'actions'",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 163,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "raw_sha256": "4960f660f2494f12b0d7e0c93133cb7b1e66c84a77166f659787272af0525c5d",
+      "sequence": 58,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 60,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: 'actions'\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: 'actions'\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 486,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "raw_sha256": "a072a5086fa0da57ed5edbc4cb03fcae7aaa91f2ee2b8aff7b910b17d7e754a8",
+      "sequence": 59,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 61,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 60,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 62,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 61,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    },
+    {
+      "line": 63,
+      "parsed": {
+        "inbox": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ],
+        "observations": [
+          {
+            "content": "Invalid envelope: unsupported action",
+            "kind": "tool_result"
+          }
+        ]
+      },
+      "preview": {
+        "object": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}"
+      },
+      "raw_bytes": 181,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "raw_sha256": "31375d89aaabdee8301a67ceb85c99a893ae5c28aebeeee7d515275fd1a0afac",
+      "sequence": 62,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.input.post_return_copy"
+    },
+    {
+      "line": 64,
+      "parsed": {
+        "compressed_prompt": "{\"inbox\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}], \"observations\": [{\"content\": \"Invalid envelope: unsupported action\", \"kind\": \"tool_result\"}]}\n\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.",
+        "compressed_tokens": 74,
+        "origin_tokens": 74,
+        "rate": "100.0%",
+        "ratio": "1.0x",
+        "saving": ", Saving $0.0 in GPT-4."
+      },
+      "preview": {
+        "object": "{\"compressed_prompt\": \"{\\\"inbox\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}], \\\"observations\\\": [{\\\"content\\\": \\\"Invalid envelope: unsupported action\\\", \\\"kind\\\": \\\"tool_result\\\"}]}\\n\\nPlease check this checkout project before and after the version update. Tell me what changed, check whether the updated version works, and address any issues you find.\", \"compressed_tokens\": 74, \"origin_tokens\": 74, \"rate\": \"100.0%\", \"ratio\": \"1.0x\", \"saving\": \", Saving $0.0 in GPT-4.\"}"
+      },
+      "raw_bytes": 504,
+      "raw_member": "X7-T1/observer/longllmlingua_native/raw/1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "raw_sha256": "1558b5282e3aa2b43af0960ad37c7b3bdb6d086cd7f943bbe9f4687a586d04dd",
+      "sequence": 63,
+      "stream": "X7-T1/observer/longllmlingua_native/events.jsonl",
+      "surface": "llmlingua.PromptCompressor.compress_prompt.output.post_return_copy"
+    }
+  ],
+  "route_skeleton": [
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 1,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 1,
+      "turn": 1,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 2,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 2,
+      "turn": 2,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 3,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 3,
+      "turn": 3,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 4,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 4,
+      "turn": 4,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 5,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 5,
+      "turn": 5,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 6,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 6,
+      "turn": 6,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 7,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 7,
+      "turn": 7,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 8,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 8,
+      "turn": 8,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 9,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 9,
+      "turn": 9,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 10,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 10,
+      "turn": 10,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 11,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 11,
+      "turn": 11,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 12,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 12,
+      "turn": 12,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 13,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 13,
+      "turn": 13,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 14,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 14,
+      "turn": 14,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 15,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 15,
+      "turn": 15,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 16,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 16,
+      "turn": 16,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 17,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 17,
+      "turn": 17,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 18,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 18,
+      "turn": 18,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 19,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 19,
+      "turn": 19,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 20,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 20,
+      "turn": 20,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 21,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 21,
+      "turn": 21,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 22,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 22,
+      "turn": 22,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 23,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 23,
+      "turn": 23,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 24,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 24,
+      "turn": 24,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 25,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 25,
+      "turn": 25,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 26,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 26,
+      "turn": 26,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 27,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 27,
+      "turn": 27,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 28,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 28,
+      "turn": 28,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 29,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 29,
+      "turn": 29,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 30,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 30,
+      "turn": 30,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 31,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 31,
+      "turn": 31,
+      "valid": false
+    },
+    {
+      "action_count": null,
+      "raw": {
+        "role": "release_lead",
+        "turn": 32,
+        "valid": false
+      },
+      "role": "release_lead",
+      "route_index": 32,
+      "turn": 32,
+      "valid": false
+    }
+  ],
+  "schema": "stage2-r6-grade-material-packet-v1",
+  "stderr_excerpt": "/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/transformers/tokenization_utils_base.py:1601: FutureWarning: `clean_up_tokenization_spaces` was not set. It will be set to `True` by default. This behavior will be depracted in transformers v4.45, and will be then set to `False` by default. For more details check this issue: https://github.com/huggingface/transformers/issues/31884\n  warnings.warn(\n",
+  "terminal_result": {
+    "answer": null,
+    "compression_calls": 32,
+    "history": [
+      {
+        "role": "release_lead",
+        "turn": 1,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 2,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 3,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 4,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 5,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 6,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 7,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 8,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 9,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 10,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 11,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 12,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 13,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 14,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 15,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 16,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 17,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 18,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 19,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 20,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 21,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 22,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 23,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 24,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 25,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 26,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 27,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 28,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 29,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 30,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 31,
+        "valid": false
+      },
+      {
+        "role": "release_lead",
+        "turn": 32,
+        "valid": false
+      }
+    ],
+    "last_compression": {
+      "compressed_tokens": 74,
+      "origin_tokens": 74,
+      "rate": "100.0%",
+      "ratio": "1.0x"
+    },
+    "pending_roles": [
+      "release_lead"
+    ],
+    "stop_reason": "turn_budget",
+    "turns": 32
+  },
+  "textual_observer_members": [
+    {
+      "bytes": 18,
+      "member": "X7-T1/observer/exit.json",
+      "parsed": {
+        "returncode": 0
+      },
+      "sha256": "df4d721d233a2334088d2d2e0110346ae9e509ff46bf0b379fbcfa85c715af4d",
+      "text": null
+    },
+    {
+      "bytes": 701,
+      "member": "X7-T1/observer/invocation.json",
+      "parsed": {
+        "argv": [
+          "python",
+          "-m",
+          "stage2.native_v7.x7_longllmlingua.runner",
+          "--checkout",
+          "/tmp/stage2_t1_x6_x7/X7-T1/checkout",
+          "--task-file",
+          "/tmp/stage2_t1_x6_x7/X7-T1/task.json",
+          "--roles-file",
+          "/home/runner/work/reality-bias-benchmark/reality-bias-benchmark/stage2/roles.json",
+          "--subject-file",
+          "/home/runner/work/reality-bias-benchmark/reality-bias-benchmark/stage2/subject.json",
+          "--observer-root",
+          "/tmp/stage2_t1_x6_x7/X7-T1/observer/longllmlingua_native"
+        ],
+        "cell": "X7-T1",
+        "cwd": "/tmp/stage2_t1_x6_x7/X7-T1/checkout",
+        "environment_id": "x7-longllmlingua-5a4c78a",
+        "probe": "X7",
+        "schema": "stage2-v7-process-boundary-v1"
+      },
+      "sha256": "9b6240d1e9d7793d7130f4e6df8750b6e9ac14a26a7f0bb7e3c1004472d08155",
+      "text": null
+    },
+    {
+      "bytes": 419,
+      "member": "X7-T1/observer/stderr.bin",
+      "parsed": null,
+      "sha256": "8fb8a110e182e74aec77871b4057bb8671da110a2d8fbb1a52a100c2c72e0fc7",
+      "text": "/opt/hostedtoolcache/Python/3.11.16/x64/lib/python3.11/site-packages/transformers/tokenization_utils_base.py:1601: FutureWarning: `clean_up_tokenization_spaces` was not set. It will be set to `True` by default. This behavior will be depracted in transformers v4.45, and will be then set to `False` by default. For more details check this issue: https://github.com/huggingface/transformers/issues/31884\n  warnings.warn(\n"
+    },
+    {
+      "bytes": 1955,
+      "member": "X7-T1/observer/stdout.bin",
+      "parsed": {
+        "answer": null,
+        "compression_calls": 32,
+        "history": [
+          {
+            "role": "release_lead",
+            "turn": 1,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 2,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 3,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 4,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 5,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 6,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 7,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 8,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 9,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 10,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 11,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 12,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 13,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 14,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 15,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 16,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 17,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 18,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 19,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 20,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 21,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 22,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 23,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 24,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 25,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 26,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 27,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 28,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 29,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 30,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 31,
+            "valid": false
+          },
+          {
+            "role": "release_lead",
+            "turn": 32,
+            "valid": false
+          }
+        ],
+        "last_compression": {
+          "compressed_tokens": 74,
+          "origin_tokens": 74,
+          "rate": "100.0%",
+          "ratio": "1.0x"
+        },
+        "pending_roles": [
+          "release_lead"
+        ],
+        "stop_reason": "turn_budget",
+        "turns": 32
+      },
+      "sha256": "c2fb516b54ef226f85f017bc697b1978e16ed893778f7bf1288d4dd1f7a30275",
+      "text": null
+    }
+  ]
+}
