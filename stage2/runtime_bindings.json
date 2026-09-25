@@ -73,7 +73,8 @@
         "stage2.retrieval.retrieve"
       ],
       "hook_id": "rag.native.retrieve",
-      "state": "IMPLEMENTATION_LOCKED"
+      "state": "IMPLEMENTATION_LOCKED",
+      "retrieval_limit": 4
     },
     "X6": {
       "name": "MemoryBank",
@@ -98,7 +99,9 @@
         "llmlingua.PromptCompressor.compress_prompt"
       ],
       "hook_id": "llmlingua.native.compress",
-      "state": "TARGET_LOCKED"
+      "state": "TARGET_LOCKED",
+      "compression_model": "microsoft/llmlingua-2-bert-base-multilingual-cased-meetingbank",
+      "compression_rate": 0.6
     }
   }
 }
