@@ -1,11 +1,4 @@
 {
-  "forbidden_execution_dependencies": [
-    "stage2.coding_arena.CodingArena",
-    "stage2.transports.RoleMailboxTransport",
-    "shared action JSON grammar",
-    "shared transport interface",
-    "shared context_adapter interface"
-  ],
   "freeze_date_utc": "2026-09-25",
   "probes": {
     "X1": {
@@ -55,7 +48,8 @@
         "runner_sha256": "c268cfff575cf23efaf18600078c907aad006bc9bcd3912e64d6202ff9e22e89",
         "smoke_sha256": "22859a88c78fbd273bbe472494b647e24b926dc442cf451f936cb11e8a391cc4",
         "subject_ready": false
-      }
+      },
+      "background_substrate_id": null
     },
     "X2": {
       "collection_state": "PENDING_NATIVE_RUNNER",
@@ -81,7 +75,8 @@
       "source_commit": "11cdf466d042aece04fc6cfd13b28e1a70341b1f",
       "source_repo": "FoundationAgents/MetaGPT",
       "upstream_mode": "official_source",
-      "integration_kind": "native_multiagent_framework"
+      "integration_kind": "native_multiagent_framework",
+      "background_substrate_id": null
     },
     "X3": {
       "collection_state": "PENDING_NATIVE_RUNNER",
@@ -111,7 +106,8 @@
       "source_commit": "173695755607e884aa9acf8ce4feed90e32727a1",
       "source_repo": "a2aproject/A2A",
       "upstream_mode": "official_source",
-      "integration_kind": "interagent_protocol"
+      "integration_kind": "interagent_protocol",
+      "background_substrate_id": null
     },
     "X4": {
       "collection_state": "PENDING_NATIVE_RUNNER",
@@ -141,7 +137,8 @@
       "source_commit": "5f5440bb26a62e2cf3440b92da5a667efa03b267",
       "source_repo": "modelcontextprotocol/modelcontextprotocol",
       "upstream_mode": "official_source",
-      "integration_kind": "tool_resource_protocol"
+      "integration_kind": "tool_resource_protocol",
+      "background_substrate_id": "software_engineering_host_v1"
     },
     "X5": {
       "collection_state": "PENDING_NATIVE_RUNNER",
@@ -168,7 +165,8 @@
       "source_commit": "baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4",
       "source_repo": "stage2/retrieval.py",
       "upstream_mode": "in_repo_reference",
-      "integration_kind": "retrieval_capability"
+      "integration_kind": "retrieval_capability",
+      "background_substrate_id": "software_engineering_host_v1"
     },
     "X6": {
       "collection_state": "PENDING_NATIVE_RUNNER",
@@ -194,7 +192,8 @@
       "source_commit": "cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9",
       "source_repo": "zhongwanjun/MemoryBank-SiliconFriend",
       "upstream_mode": "official_source",
-      "integration_kind": "memory_capability"
+      "integration_kind": "memory_capability",
+      "background_substrate_id": "software_engineering_host_v1"
     },
     "X7": {
       "collection_state": "PENDING_NATIVE_RUNNER",
@@ -220,10 +219,11 @@
       "source_commit": "5a4c78ae18ab17a98cf997e8259354e546081d64",
       "source_repo": "microsoft/LLMLingua",
       "upstream_mode": "official_source",
-      "integration_kind": "context_compression_capability"
+      "integration_kind": "context_compression_capability",
+      "background_substrate_id": "software_engineering_host_v1"
     }
   },
-  "schema": "stage2-native-execution-registry-v1",
+  "schema": "stage2-native-execution-registry-v2",
   "scientific_inputs": {
     "checkout": "stage2/fixtures/project",
     "comparison_policy": "normalize evidence only after observation",
@@ -231,7 +231,28 @@
     "roles": "stage2/roles.json",
     "subject": "stage2/subject.json",
     "tasks": "stage2/tasks.json",
-    "host_policy": "probe-specific host-side integration is allowed only to connect a frozen X at its natural boundary; no experiment-wide runtime adapter contract"
+    "host_policy": "X1-X2 use their native multi-agent framework, X3 uses native A2A communication, and X4-X7 may share the explicitly registered software-engineering background host because those X conditions operate at tool/retrieval/memory/context layers; monitoring is not part of that host."
   },
-  "status": "X1_NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING_X2_X7_RUNNERS_PENDING"
+  "status": "X1_NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING_X4_X7_BACKGROUND_HOST_DECLARED_X2_X7_RUNNERS_PENDING",
+  "forbidden_global_normalization": [
+    "requiring every X to execute through one common runtime adapter",
+    "requiring X1-X3 to use the baseline role-mailbox communication substrate",
+    "modifying a frozen upstream X implementation merely to satisfy an experiment host API",
+    "using the post-observation evidence schema as a pre-execution action or message contract"
+  ],
+  "background_substrates": {
+    "software_engineering_host_v1": {
+      "applies_to": [
+        "X4",
+        "X5",
+        "X6",
+        "X7"
+      ],
+      "status": "PENDING_DEINSTRUMENTED_HOST_FREEZE",
+      "role_environment": "frozen nine-role software-engineering environment",
+      "execution_semantics_source": "historical stage2.coding_arena.CodingArena",
+      "communication_semantics_source": "historical stage2.transports.RoleMailboxTransport",
+      "rule": "The capability-layer X does not own scheduling or inter-agent transport. The common host substrate must be explicitly registered and frozen, and its formal v7 implementation must remove monitor responsibilities from execution before natural collection."
+    }
+  }
 }
