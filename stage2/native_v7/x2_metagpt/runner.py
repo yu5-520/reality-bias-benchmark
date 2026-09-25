@@ -34,6 +34,7 @@ _METAGPT_BOOTSTRAP_HOME = Path(tempfile.mkdtemp(prefix="stage2-x2-metagpt-home-"
 os.environ["HOME"] = str(_METAGPT_BOOTSTRAP_HOME)
 
 from arena.providers import DeepSeekArenaProvider
+from stage2.native_v7.action_contract import apply_model_visible_action_contract
 from stage2.native_v7.observer import PassiveEventObserver, native_bytes
 from stage2.native_v7.x2_metagpt.checkout import MetaGPTCheckout
 
@@ -171,6 +172,12 @@ class Stage2MetaRole(Role):
             },
             "remaining_turns": self.stage2_runtime.max_turns - turn + 1,
         }
+        system, content, _ = apply_model_visible_action_contract(
+            system,
+            content,
+            task_id=self.stage2_runtime.task["id"],
+            max_actions=5,
+        )
         return [
             {"role": "system", "content": system},
             {"role": "user", "content": json.dumps(content, ensure_ascii=False)},
