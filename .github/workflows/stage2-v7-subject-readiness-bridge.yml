@@ -1,0 +1,135 @@
+name: Stage-II v7 Subject Readiness One-Time Bridge
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-subject-readiness-bridge-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  dispatch-common-handshake:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'STAGE2 COMMON SUBJECT READINESS AUTHORIZATION'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      EXPECTED_PHRASE: CALL_REAL_STAGE2_SUBJECT_READINESS_API
+      WORKFLOW_FILE: stage2-native-v7-subject-readiness.yml
+
+    steps:
+      - name: Verify exact one-time authorization against the main event SHA
+        id: auth
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, re
+
+          rows = {}
+          for raw in os.environ['AUTH_BODY'].splitlines():
+              line = raw.strip()
+              if not line:
+                  continue
+              if '=' not in line:
+                  raise SystemExit('invalid authorization line')
+              key, value = line.split('=', 1)
+              if key in rows:
+                  raise SystemExit('duplicate authorization key')
+              rows[key] = value
+          if set(rows) != {
+              'authorization_phrase', 'authorization_id', 'control_plane',
+              'expected_main_sha', 'max_subject_calls', 'spending_ceiling_usd',
+          }:
+              raise SystemExit('authorization fields differ from frozen bridge contract')
+          if rows['authorization_phrase'] != os.environ['EXPECTED_PHRASE']:
+              raise SystemExit('authorization phrase mismatch')
+          if rows['control_plane'] != 'CHAT_AUTHORIZATION_BRIDGE_STAGE2_COMMON_READINESS_v1':
+              raise SystemExit('control-plane identifier mismatch')
+          if rows['expected_main_sha'] != os.environ['GITHUB_SHA']:
+              raise SystemExit('authorized main SHA differs from event SHA')
+          if rows['max_subject_calls'] != '1' or rows['spending_ceiling_usd'] != '0.01':
+              raise SystemExit('subject calls or spending ceiling differ from frozen bridge')
+          authorization_id = rows['authorization_id']
+          if not re.fullmatch(r'[A-Za-z0-9._-]{8,80}', authorization_id):
+              raise SystemExit('invalid authorization ID')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'authorization_id={authorization_id}\n')
+          print('PASS: one-time common readiness authorized on exact main SHA')
+          PY
+
+      - name: Pin commit once and dispatch the existing fail-closed readiness workflow
+        id: dispatch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          AUTHORIZATION_ID: ${{ steps.auth.outputs.authorization_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, urllib.error, urllib.request
+
+          repository = os.environ['GITHUB_REPOSITORY']
+          execution_sha = os.environ['GITHUB_SHA']
+          tag = f"stage2-readiness-auth-{os.environ['AUTHORIZATION_ID']}"
+          api = f'https://api.github.com/repos/{repository}'
+          headers = {
+              'Accept': 'application/vnd.github+json',
+              'Authorization': f"Bearer {os.environ['GITHUB_TOKEN']}",
+              'X-GitHub-Api-Version': '2026-03-10',
+              'User-Agent': 'stage2-one-time-readiness-bridge',
+          }
+
+          def request(method, path, payload):
+              data = json.dumps(payload).encode('utf-8')
+              req = urllib.request.Request(api + path, data=data, headers=headers, method=method)
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as response:
+                      raw = response.read().decode('utf-8')
+                      return response.status, json.loads(raw) if raw else {}
+              except urllib.error.HTTPError as error:
+                  detail = error.read().decode('utf-8', errors='replace')
+                  raise SystemExit(f'GitHub API {method} {path}: HTTP {error.code}: {detail}')
+
+          # A duplicate authorization ID cannot create the same tag again.
+          request('POST', '/git/refs', {'ref': f'refs/tags/{tag}', 'sha': execution_sha})
+          status, result = request('POST',
+              f"/actions/workflows/{os.environ['WORKFLOW_FILE']}/dispatches", {
+                  'ref': tag,
+                  'inputs': {
+                      'expected_execution_sha': execution_sha,
+                      'authorization_phrase': os.environ['EXPECTED_PHRASE'],
+                      'max_subject_calls': '1',
+                      'spending_ceiling_usd': '0.01',
+                  },
+                  'return_run_details': True,
+              })
+          if status not in (200, 204):
+              raise SystemExit(f'unexpected workflow dispatch status: {status}')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'authorization_tag={tag}\n')
+              output.write(f"workflow_run_id={result.get('workflow_run_id', '')}\n")
+              output.write(f"workflow_run_url={result.get('html_url', '')}\n")
+          print(f'PASS: common readiness dispatched once at {execution_sha} using {tag}')
+          PY
+
+      - name: Preserve dispatch result on the authorization issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTH_TAG: ${{ steps.dispatch.outputs.authorization_tag }}
+          RUN_ID: ${{ steps.dispatch.outputs.workflow_run_id }}
+          RUN_URL: ${{ steps.dispatch.outputs.workflow_run_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          body="Stage-II common subject readiness was dispatched once.\n\nPinned ref: ${AUTH_TAG}\nExecution SHA: ${GITHUB_SHA}\nRun ID: ${RUN_ID:-not-returned}\nRun URL: ${RUN_URL:-dispatch-accepted}\n\nOne provider call, USD 0.01 ceiling, no T1–T3 task, no cell reservation, no paid evaluator. A successful receipt does not promote any X."
+          gh issue comment "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --body "$body"
+          gh issue close "${{ github.event.issue.number }}" --repo "$GITHUB_REPOSITORY" --reason completed
