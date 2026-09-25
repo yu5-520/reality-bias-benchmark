@@ -1,0 +1,90 @@
+name: Stage-II native runtime target conformance
+on:
+  push:
+    paths:
+      - 'stage2/runtime_bindings.json'
+      - 'stage2/subject.json'
+      - 'stage2/runtime_probe.py'
+      - 'stage2/tests/test_runtime_binding.py'
+      - 'docs/R_Plan_v6.3.md'
+      - '.github/workflows/stage2-native-binding.yml'
+  pull_request:
+    paths:
+      - 'stage2/runtime_bindings.json'
+      - 'stage2/subject.json'
+      - 'stage2/runtime_probe.py'
+      - 'stage2/tests/test_runtime_binding.py'
+      - 'docs/R_Plan_v6.3.md'
+      - '.github/workflows/stage2-native-binding.yml'
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: python -m unittest stage2.tests.test_runtime_binding -v
+
+  runtime-surface:
+    needs: contract
+    strategy:
+      fail-fast: false
+      matrix:
+        probe: [X1, X2, X3, X4, X5, X6, X7]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Bind frozen upstream
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "${{ matrix.probe }}" in
+            X1)
+              git clone -q https://github.com/microsoft/autogen upstream
+              git -C upstream checkout -q 027ecf0a379bcc1d09956d46d12d44a3ad9cee14
+              pip install -q ./upstream/python/packages/autogen-core ./upstream/python/packages/autogen-agentchat
+              ;;
+            X2)
+              git clone -q https://github.com/FoundationAgents/MetaGPT upstream
+              git -C upstream checkout -q 11cdf466d042aece04fc6cfd13b28e1a70341b1f
+              pip install -q -e ./upstream
+              ;;
+            X3)
+              git clone -q https://github.com/a2aproject/a2a-python upstream
+              git -C upstream checkout -q 0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167
+              pip install -q -e ./upstream
+              git clone -q https://github.com/a2aproject/A2A protocol
+              git -C protocol checkout -q 173695755607e884aa9acf8ce4feed90e32727a1
+              ;;
+            X4)
+              git clone -q https://github.com/modelcontextprotocol/python-sdk upstream
+              git -C upstream checkout -q f1b6589088534632fef92238ee9750951e3c0185
+              pip install -q -e ./upstream
+              git clone -q https://github.com/modelcontextprotocol/modelcontextprotocol protocol
+              git -C protocol checkout -q 5f5440bb26a62e2cf3440b92da5a667efa03b267
+              ;;
+            X5) ;;
+            X6)
+              git clone -q https://github.com/zhongwanjun/MemoryBank-SiliconFriend upstream
+              git -C upstream checkout -q cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
+              ;;
+            X7)
+              git clone -q https://github.com/microsoft/LLMLingua upstream
+              git -C upstream checkout -q 5a4c78ae18ab17a98cf997e8259354e546081d64
+              pip install -q -e ./upstream
+              ;;
+          esac
+      - name: Verify runtime surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ matrix.probe }}" = X5 ]; then
+            python -m stage2.runtime_probe --probe X5
+          elif [ "${{ matrix.probe }}" = X3 ] || [ "${{ matrix.probe }}" = X4 ]; then
+            python -m stage2.runtime_probe --probe "${{ matrix.probe }}" --upstream upstream --protocol-root protocol
+          else
+            python -m stage2.runtime_probe --probe "${{ matrix.probe }}" --upstream upstream
+          fi
