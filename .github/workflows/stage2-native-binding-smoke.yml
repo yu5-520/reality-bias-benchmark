@@ -1,6 +1,12 @@
 name: Stage-II native binding smoke
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'stage2/**'
+      - 'docs/R_Plan_v6.3.md'
+      - '.github/workflows/stage2-native-binding-smoke.yml'
   pull_request:
     paths:
       - 'stage2/**'
@@ -98,14 +104,50 @@ jobs:
           pattern: stage2-native-smoke-*-${{ github.run_id }}
           path: results/stage2_native_all
           merge-multiple: false
+      - name: Normalize the seven artifact roots by probe ID
+        run: |
+          python - <<'PY'
+          import json, shutil
+          from pathlib import Path
+          root=Path("results/stage2_native_all")
+          normalized=Path("results/stage2_native_normalized")
+          normalized.mkdir(parents=True, exist_ok=True)
+          seen=set()
+          for status_path in root.rglob("status.json"):
+              row=json.loads(status_path.read_text())
+              probe=row["probe"]
+              if probe in seen:
+                  raise SystemExit(f"duplicate smoke artifact for {probe}")
+              seen.add(probe)
+              shutil.copytree(status_path.parent, normalized/probe, dirs_exist_ok=False)
+          if seen != {f"X{i}" for i in range(1,8)}:
+              raise SystemExit(f"incomplete smoke set: {sorted(seen)}")
+          PY
+
       - name: Verify seven receipts and native evidence for passed probes
         run: |
           python -m stage2.collect_native_smokes \
-            --root results/stage2_native_all \
+            --root results/stage2_native_normalized \
             --out results/stage2_native_gate_summary.json
+
+      - name: Build exact engineering runtime manifest
+        run: |
+          python -m stage2.build_runtime_manifest \
+            --summary results/stage2_native_gate_summary.json \
+            --code-commit "$GITHUB_SHA" \
+            --out results/stage2_runtime_manifest.json
+
+      - name: Pass all probes through the same evidence gate
+        run: |
+          python -m stage2.preflight \
+            --runtime-manifest results/stage2_runtime_manifest.json \
+            --captures-root results/stage2_native_normalized
+
       - uses: actions/upload-artifact@v4
         with:
           name: stage2-native-gate-summary-${{ github.run_id }}
-          path: results/stage2_native_gate_summary.json
+          path: |
+            results/stage2_native_gate_summary.json
+            results/stage2_runtime_manifest.json
           retention-days: 90
           if-no-files-found: error
