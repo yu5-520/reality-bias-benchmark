@@ -1,0 +1,160 @@
+name: Stage-II v7 Action Contract v2 Readiness Promotion Prep
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: read
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-v7-v2-readiness-promotion-prep
+  cancel-in-progress: false
+
+jobs:
+  prepare-promotion:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'STAGE2 V2 READINESS PROMOTION PREP AUTHORIZATION'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      AUTH_ISSUE: ${{ github.event.issue.number }}
+      SOURCE_RUN: '36176860170'
+      SOURCE_EXECUTION_SHA: '129b35500613c9db70818ee947a4b45ba6fd0b05'
+      ARTIFACT_ID: '10881724647'
+      ARTIFACT_NAME: stage2-v7-subject-readiness-36176860170
+      ARTIFACT_DIGEST: 'sha256:5cb7ac2b9fe977f58d493c5fb543d710ede1a85288ebe2e94b807bca13540c1b'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify exact promotion-prep authorization
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/main
+          python - <<'PY'
+          import os
+          expected='\n'.join([
+              'epoch=ACTION_CONTRACT_V2_T2_T3',
+              'source_run=36176860170',
+              'artifact_id=10881724647',
+              'operation=PREPARE_REVIEWED_REGISTRY_PROMOTION_ONLY',
+              'natural_collection=false',
+              f"expected_main_sha={os.environ['GITHUB_SHA']}",
+          ])
+          if os.environ['AUTH_BODY'].strip() != expected:
+              raise SystemExit('v2 promotion-prep authorization mismatch')
+          PY
+
+      - name: Verify exact readiness artifact and extract receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN" > /tmp/run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID" > /tmp/artifact.json
+          python - <<'PY'
+          import json, os
+          run=json.load(open('/tmp/run.json'))
+          art=json.load(open('/tmp/artifact.json'))
+          assert run['head_sha'] == os.environ['SOURCE_EXECUTION_SHA']
+          assert run['conclusion'] == 'success'
+          assert art['name'] == os.environ['ARTIFACT_NAME']
+          assert art['digest'] == os.environ['ARTIFACT_DIGEST']
+          assert art['workflow_run']['id'] == int(os.environ['SOURCE_RUN'])
+          assert art['workflow_run']['head_sha'] == os.environ['SOURCE_EXECUTION_SHA']
+          print('PASS: exact v2 readiness run and artifact verified')
+          PY
+          mkdir -p /tmp/readiness /tmp/readiness_extract
+          gh run download "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --name "$ARTIFACT_NAME" --dir /tmp/readiness
+          tarfile=$(find /tmp/readiness -maxdepth 1 -name '*.tar.gz' -print -quit)
+          digestfile=$(find /tmp/readiness -maxdepth 1 -name '*.tar.gz.sha256' -print -quit)
+          observed=$(sha256sum "$tarfile" | awk '{print $1}')
+          declared=$(awk '{print $1}' "$digestfile")
+          test "$observed" = "$declared"
+          tar -xzf "$tarfile" -C /tmp/readiness_extract
+          test -f /tmp/readiness_extract/receipt.json
+
+      - name: Validate receipt and prepare reviewed promotion files
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+
+          receipt_path=Path('/tmp/readiness_extract/receipt.json')
+          receipt=json.loads(receipt_path.read_text())
+          assert receipt['status'] == 'COMMON_PROVIDER_HANDSHAKE_RECORDED_NOT_SUBJECT_READY'
+          assert receipt['execution_code_sha'] == os.environ['SOURCE_EXECUTION_SHA']
+          assert receipt['workflow_run_id'] == int(os.environ['SOURCE_RUN'])
+          assert receipt['provider_call_count'] == 1
+          assert receipt['automatic_paid_evaluator'] is False
+          assert receipt['scientific_task_used'] is False
+          assert receipt['natural_cell_reserved'] is False
+          assert receipt['registry_mutated'] is False
+          assert receipt['natural_trajectories_before_handshake'] == 7
+          assert receipt['natural_trajectories_after_handshake'] == 7
+          assert receipt['remaining_asset_blockers'] == {}
+          assert receipt['eligible_probes_after_common_handshake'] == [
+              'X1','X2','X3','X4','X5','X6','X7'
+          ]
+
+          destination=Path('stage2/native_v7/readiness/receipt_v2.json')
+          destination.write_bytes(receipt_path.read_bytes())
+          receipt_sha=hashlib.sha256(destination.read_bytes()).hexdigest()
+
+          registry_path=Path('stage2/native_v7/registry.json')
+          registry=json.loads(registry_path.read_text())
+          gate=registry['subject_readiness_gate']
+          assert gate['state'] == 'IMPLEMENTED_NO_LIVE_RECEIPT'
+          assert gate['readiness_epoch'] == 'ACTION_CONTRACT_V2_T2_T3'
+          gate['state']='COMMON_PROVIDER_HANDSHAKE_RECORDED'
+          gate['receipt_path']='stage2/native_v7/readiness/receipt_v2.json'
+          gate['receipt_sha256']=receipt_sha
+          gate['workflow_run_id']=receipt['workflow_run_id']
+
+          readiness={
+              'execution_code_sha': receipt['execution_code_sha'],
+              'subject_config_sha256': receipt['subject_config_sha256'],
+              'model_config_sha256': receipt['model_config_sha256'],
+              'workflow_run_id': receipt['workflow_run_id'],
+              'state': 'VERIFIED',
+              'common_receipt_sha256': receipt_sha,
+          }
+          for pid in sorted(registry['probes']):
+              spec=registry['probes'][pid]
+              assert spec['collection_state'] == 'NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING'
+              spec['collection_state']='SUBJECT_READY'
+              spec['subject_readiness']=readiness.copy()
+          registry['status']='ACTION_CONTRACT_V2_SUBJECT_READY'
+          registry_path.write_text(json.dumps(registry,ensure_ascii=False,indent=2)+'\n')
+          print('receipt_v2_sha256='+receipt_sha)
+          PY
+          python -m stage2.native_v7.freeze --write
+          python -m stage2.native_v7.freeze
+
+      - name: Push exact promotion preparation to review branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="work/stage2-v2-readiness-promotion-$GITHUB_RUN_ID"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add stage2/native_v7/readiness/receipt_v2.json stage2/native_v7/registry.json stage2/native_v7/matrix.json
+          git commit -m "Stage II: prepare v2 subject readiness promotion"
+          git push origin "$branch"
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" \
+            --body "Exact v2 readiness receipt and registry/matrix promotion were prepared on $branch. No natural task was executed; review is still required before merge."
+          gh issue close "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
