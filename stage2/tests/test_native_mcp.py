@@ -16,7 +16,8 @@ class MCPNativeSmoke(unittest.TestCase):
 
         async def smoke(root):
             capture = NativeCapture(root / "raw", "X4", "NON_SUBJECT_MCP_SMOKE",
-                                    {"probe": "X4", "source_commit": "9972c21aa42054fb1450c5fc614761ed11847ec6"})
+                                    {"probe": "X4", "source_commit": "5f5440bb26a62e2cf3440b92da5a667efa03b267",
+                                     "sdk_commit": "f1b6589088534632fef92238ee9750951e3c0185"})
             checkout = new_workspace(root / "checkout")
             workspace = MCPWorkspace(checkout, capture)
             await workspace.open()

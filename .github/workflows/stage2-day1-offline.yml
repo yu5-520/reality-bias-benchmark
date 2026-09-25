@@ -6,6 +6,7 @@ on:
       - 'docs/R_Plan_v6.2.md'
       - 'docs/R_Plan_v6.3.md'
       - 'docs/R_Plan_v6.5.md'
+      - 'docs/R_Plan_v6.6.md'
       - '.github/workflows/stage2-day1-offline.yml'
   pull_request:
     paths:
@@ -13,6 +14,7 @@ on:
       - 'docs/R_Plan_v6.2.md'
       - 'docs/R_Plan_v6.3.md'
       - 'docs/R_Plan_v6.5.md'
+      - 'docs/R_Plan_v6.6.md'
       - '.github/workflows/stage2-day1-offline.yml'
 jobs:
   check:
@@ -29,23 +31,3 @@ jobs:
         working-directory: stage2/fixtures/project
       - run: python -m unittest discover -s stage2/tests
       - run: python scripts/validate_frozen_raw_immutability.py --base ${{ github.event.pull_request.base.sha || github.event.before }}
-  autogen-native-smoke:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install pinned AutoGen SDK (non-subject smoke only)
-        run: python -m pip install autogen-agentchat==0.7.5
-      - run: python -m unittest stage2.tests.test_coding_runtime -v
-  remote-and-resource-native-smoke:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install pinned A2A and MCP SDKs (non-subject smoke only)
-        run: python -m pip install a2a-sdk==1.0.0 mcp==2.2.0 grpcio==1.84.0 protobuf==6.33.6
-      - run: python -m unittest discover -s stage2/tests -v

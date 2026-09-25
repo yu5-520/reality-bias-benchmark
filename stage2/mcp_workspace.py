@@ -39,7 +39,7 @@ class MCPWorkspace(CodeWorkspace):
         self.serial += 1
         row = self.capture.capture(
             event_id=f"mcp-{self.serial}", operation=operation, phase=phase,
-            native_locator=f"mcp:{suffix}", hook_id="mcp.Client.v2.2.0",
+            native_locator=f"mcp:{suffix}", hook_id="mcp.native.tool_resource",
             raw=raw, actor=actor, source_id=source, carrier_id=f"mcp:{suffix}:{self.serial}",
             carrier_type="mcp-resource" if operation == "resource_read" else "mcp-tool",
             parent_ids=parents, status=status)

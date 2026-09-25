@@ -45,7 +45,7 @@ class LongLLMLinguaContext:
         self.count += 1
         before = self.capture.capture(event_id=f"compress-input-{self.count}", operation="compress",
                                       phase="emitted", native_locator=f"llmlingua:compress_prompt:{self.count}",
-                                      hook_id="llmlingua.PromptCompressor.compress_prompt", raw=context.encode(),
+                                      hook_id="llmlingua.native.compress", raw=context.encode(),
                                       actor=role, source_id=f"task:{task['id']}", carrier_id=f"input-context:{self.count}",
                                       carrier_type="long-context", parent_ids=cause)
         result = self.compressor.compress_prompt(context=[context], question=task["user_request"],
@@ -55,7 +55,7 @@ class LongLLMLinguaContext:
         compressed = result["compressed_prompt"]
         after = self.capture.capture(event_id=f"compress-output-{self.count}", operation="compress",
                                      phase="returned", native_locator=f"llmlingua:compress_result:{self.count}",
-                                     hook_id="llmlingua.PromptCompressor.compress_prompt",
+                                     hook_id="llmlingua.native.compress",
                                      raw=canonical_bytes(result), actor=role,
                                      source_id=f"task:{task['id']}", carrier_id=f"compressed-context:{self.count}",
                                      carrier_type="longllmlingua-output", parent_ids=(before["event_id"],))

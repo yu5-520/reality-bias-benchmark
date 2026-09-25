@@ -14,10 +14,11 @@ copy of the checkout and a separate raw evidence directory.
 `versions.json` locks six upstream reference commits (two protocol tags separately)
 and the in-repo X5 retrieval code SHA-256. `runtime_bindings.json` and `subject.json`
 freeze the experimental implementation targets and DeepSeek subject profile.
-`runtime_packages.json` and `native_status.json` report **engineering-only**
-SDK compatibility smokes; X1/X3/X4 release commits in these files differ from
-the frozen experimental targets. No full subject-ready native coding trace or
-subject credential is present. `python -m stage2.freeze`
+`eligibility.json` records the forward X7 variant mismatch; X2/X6 remain blocked
+in the v6.4 target locks. The earlier exploratory SDK release status files have
+been retired. X1/X3/X4 now run scripted coding smokes against their exact frozen
+upstream commits, and X5 runs against the in-repository implementation.
+No subject-ready native coding trace or subject credential is present. `python -m stage2.freeze`
 verifies fixture/task/role/version hashes. `python -m unittest discover -s stage2/tests`
 tests the offline interface only. A synthetic test frame never satisfies native
 probe conformance. `python -m stage2.preflight --level native-smoke --runtime-manifest <path> --captures-root <path>`
@@ -47,11 +48,12 @@ An unsuccessful or non-observable probe is recorded as `ENGINEERING_BLOCKED`
 at execution freeze; it is not secretly rerun or swapped.
 
 `coding_arena.py` provides file operations and common model input/output
-recording. `AutoGenTransport`, `A2AProtocolTransport`, `MCPWorkspace`, and
-`RAGContext` have executable non-subject smoke paths. The A2A service currently
+recording. `target_coding_smoke.py` and `verify_target_coding.py` exercise and
+verify exact-target, non-subject code-changing traces in CI. The A2A service currently
 returns an artifact without remote model execution; it does not pass subject
 preflight. `MetaGPTTransport` and `LongLLMLinguaContext` require exact native
 dependencies and a frozen local compressor checkpoint respectively. X6 remains
-frozen as `ENGINEERING_BLOCKED` at the upstream dependency conflict. See
-`native_status.json` and R Plan v6.5 before interpreting a
+frozen as `ENGINEERING_BLOCKED` at the upstream dependency conflict. X7's
+previous smoke used LLMLingua-2 and is blocked prospectively in R Plan v6.6.
+Never interpret a
 passing offline test as subject readiness.
