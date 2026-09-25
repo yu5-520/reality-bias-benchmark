@@ -50,7 +50,8 @@ jobs:
             X2)
               git clone -q https://github.com/FoundationAgents/MetaGPT upstream
               git -C upstream checkout -q 11cdf466d042aece04fc6cfd13b28e1a70341b1f
-              pip install -q -e ./upstream
+              test "$(git -C upstream rev-parse HEAD)" = 11cdf466d042aece04fc6cfd13b28e1a70341b1f
+              echo "ENGINEERING_BLOCKED: upstream requires lancedb==0.4.0, unavailable on the pinned CI runtime; no substitution performed"
               ;;
             X3)
               git clone -q https://github.com/a2aproject/a2a-python upstream
@@ -62,7 +63,8 @@ jobs:
             X4)
               git clone -q https://github.com/modelcontextprotocol/python-sdk upstream
               git -C upstream checkout -q f1b6589088534632fef92238ee9750951e3c0185
-              pip install -q -e ./upstream
+              pip install -q uv
+              (cd upstream && uv sync --frozen --no-default-groups)
               git clone -q https://github.com/modelcontextprotocol/modelcontextprotocol protocol
               git -C protocol checkout -q 5f5440bb26a62e2cf3440b92da5a667efa03b267
               ;;
@@ -81,10 +83,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ "${{ matrix.probe }}" = X5 ]; then
+          if [ "${{ matrix.probe }}" = X2 ]; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          b=json.loads(Path("stage2/runtime_bindings.json").read_text())
+          assert b["probes"]["X2"]["state"]=="ENGINEERING_BLOCKED"
+          print("X2 ENGINEERING_BLOCKED recorded; no substitution performed")
+          PY
+          elif [ "${{ matrix.probe }}" = X4 ]; then
+            PYTHONPATH="$GITHUB_WORKSPACE" upstream/.venv/bin/python -m stage2.runtime_probe --probe X4 --upstream upstream --protocol-root protocol
+          elif [ "${{ matrix.probe }}" = X5 ]; then
             python -m stage2.runtime_probe --probe X5
-          elif [ "${{ matrix.probe }}" = X3 ] || [ "${{ matrix.probe }}" = X4 ]; then
-            python -m stage2.runtime_probe --probe "${{ matrix.probe }}" --upstream upstream --protocol-root protocol
+          elif [ "${{ matrix.probe }}" = X3 ]; then
+            python -m stage2.runtime_probe --probe X3 --upstream upstream --protocol-root protocol
           else
             python -m stage2.runtime_probe --probe "${{ matrix.probe }}" --upstream upstream
           fi
