@@ -54,7 +54,14 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
         )
 
     def test_pending_v2_registry_keeps_all_real_study_assets_eligible(self):
-        registry = load_registry()
+        registry = copy.deepcopy(load_registry())
+        registry["subject_readiness_gate"]["state"] = "IMPLEMENTED_NO_LIVE_RECEIPT"
+        registry["subject_readiness_gate"].pop("receipt_path", None)
+        registry["subject_readiness_gate"].pop("receipt_sha256", None)
+        registry["subject_readiness_gate"].pop("workflow_run_id", None)
+        for pid in ("X1", "X2", "X3", "X4", "X5", "X6", "X7"):
+            registry["probes"][pid]["collection_state"] = "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING"
+            registry["probes"][pid].pop("subject_readiness", None)
         with patch("stage2.native_v7.subject_readiness.load_registry", return_value=registry):
             payload = build_preflight(
                 expected_execution_sha=self.SHA,
@@ -69,6 +76,20 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
         )
         self.assertEqual(payload["asset_blockers"], {})
         self.assertEqual(payload["natural_trajectories_before_handshake"], 7)
+
+    def test_active_v2_receipt_matches_current_execution_snapshot(self):
+        registry = load_registry()
+        gate = registry["subject_readiness_gate"]
+        self.assertEqual(gate["state"], "COMMON_PROVIDER_HANDSHAKE_RECORDED")
+        self.assertEqual(gate["readiness_epoch"], "ACTION_CONTRACT_V2_T2_T3")
+        self.assertEqual(gate["workflow_run_id"], 36176860170)
+        self.assertEqual(
+            gate["receipt_path"],
+            "stage2/native_v7/readiness/receipt_v2.json",
+        )
+        for probe in ("X1", "X2", "X3", "X4", "X5", "X6", "X7"):
+            self.assertEqual(registry["probes"][probe]["collection_state"], "SUBJECT_READY")
+            verify_receipt(registry, registry["probes"][probe]["subject_readiness"])
 
     def test_preflight_rejects_nonexact_authorization(self):
         with self.assertRaisesRegex(ValueError, "authorization phrase"):
