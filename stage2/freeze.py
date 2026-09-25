@@ -18,10 +18,15 @@ def artifact():
     versions = json.loads((BASE / "versions.json").read_text())
     tasks = json.loads((BASE / "tasks.json").read_text())
     return {
-        "schema": "stage2-first-group-v1", "predecessors": ["docs/R_Plan_v6.0.md", "docs/R_Plan_v6.1.md", "docs/R_Plan_v6.2.md"],
+        "schema": "stage2-first-group-v1", "predecessors": ["docs/R_Plan_v6.0.md", "docs/R_Plan_v6.1.md", "docs/R_Plan_v6.2.md", "docs/R_Plan_v6.3.md"],
         "files_sha256": {**hashes, **{str(p.relative_to(ROOT)): hash_file(p) for p in
-            (BASE / "roles.json", BASE / "tasks.json", BASE / "versions.json", BASE / "event_schema.json", BASE / "evidence.py",
-             BASE / "retrieval.py", ROOT / "docs/R_Plan_v6.2.md")}},
+            (BASE / "roles.json", BASE / "tasks.json", BASE / "versions.json",
+             BASE / "runtime_packages.json", BASE / "native_status.json", BASE / "event_schema.json",
+             BASE / "evidence.py", BASE / "retrieval.py", BASE / "workspace.py", BASE / "coding_arena.py",
+             BASE / "transports.py", BASE / "metagpt_transport.py", BASE / "rag_context.py",
+             BASE / "longllmlingua_context.py", BASE / "a2a_transport.py",
+             BASE / "a2a_remote_service.py", BASE / "mcp_checkout_server.py", BASE / "mcp_workspace.py",
+             BASE / "preflight.py", ROOT / "docs/R_Plan_v6.2.md", ROOT / "docs/R_Plan_v6.3.md")}},
         "cells": [{"cell": f"{probe['id']}-{task['id']}", "probe": probe["id"], "task": task["id"],
                    "starting_fixture": "stage2/fixtures/project", "status": "PENDING_ENGINEERING_GATE",
                    "raw_destination": f"stage2_raw/{probe['id']}-{task['id']}/", "subject_trajectory_count": 0}

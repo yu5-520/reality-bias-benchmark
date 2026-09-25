@@ -1,13 +1,14 @@
 """Native-boundary capture contract. No structural event makes a semantic claim."""
 import hashlib
 import json
+import os
 from pathlib import Path
 
 OPERATIONS = frozenset({
     "send_message", "receive_message", "shared_state", "delegate", "handoff",
     "tool_call", "resource_read", "memory_write", "memory_retrieve",
     "remote_task", "artifact_return", "retrieve", "compress",
-    "file_change", "test_run", "termination",
+    "file_list", "file_read", "file_change", "test_run", "model_input", "model_output", "termination",
 })
 PROBES = {
     "X1": {"send_message", "receive_message", "delegate", "handoff"},
@@ -18,7 +19,7 @@ PROBES = {
     "X6": {"send_message", "receive_message", "memory_write", "memory_retrieve"},
     "X7": {"send_message", "receive_message", "compress"},
 }
-COMMON = {"file_change", "test_run", "termination"}
+COMMON = {"file_list", "file_read", "file_change", "test_run", "model_input", "model_output", "termination"}
 PHASES = frozenset({"emitted", "delivered", "exposed", "executed", "returned", "failed"})
 
 
@@ -44,6 +45,8 @@ class NativeCapture:
         if binding.get("probe") != probe or not binding.get("source_commit"):
             raise ValueError("native implementation binding is required")
         self.root = Path(root)
+        if self.root.exists() and any(self.root.iterdir()):
+            raise FileExistsError("evidence destination already contains a trajectory")
         self.probe = probe
         self.run_id = run_id
         self.binding = binding
@@ -75,6 +78,8 @@ class NativeCapture:
         else:
             with raw_path.open("xb") as stream:
                 stream.write(raw)
+                stream.flush()
+                os.fsync(stream.fileno())
         event = {
             "schema": "stage2-native-event-v1", "run_id": self.run_id,
             "probe": self.probe, "sequence": len(self.events), "event_id": event_id,
@@ -92,6 +97,7 @@ class NativeCapture:
         with (self.root / "events.jsonl").open("ab") as stream:
             stream.write(canonical_bytes(event) + b"\n")
             stream.flush()
+            os.fsync(stream.fileno())
         self.events.append(event)
         self.ids.add(event_id)
         return event

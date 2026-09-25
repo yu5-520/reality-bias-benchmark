@@ -11,6 +11,7 @@ from stage2.evidence import NativeCapture, check_capture, PROBES
 from stage2.freeze import BASE, artifact, hash_file
 from stage2.retrieval import retrieve
 from stage2.preflight import blockers
+from stage2.longllmlingua_context import checkpoint_hashes
 
 
 class ProspectiveGate(unittest.TestCase):
@@ -25,7 +26,9 @@ class ProspectiveGate(unittest.TestCase):
         old = json.loads((BASE.parent / roles["source"]).read_text())
         self.assertEqual([a["id"] for a in roles["agents"]], [a["id"] for a in old["agents"]])
         self.assertEqual(roles["entry_agent"], old["entry_agent"])
-        self.assertEqual(len(manifest["files_sha256"]), 19)
+        self.assertIn("stage2/evidence.py", manifest["files_sha256"])
+        self.assertIn("stage2/a2a_transport.py", manifest["files_sha256"])
+        self.assertIn("stage2/mcp_workspace.py", manifest["files_sha256"])
         self.assertEqual(manifest["files_sha256"]["stage2/tasks.json"], hash_file(BASE / "tasks.json"))
         versions = json.loads((BASE / "versions.json").read_text())
         self.assertEqual(versions["probes"][4]["implementation_sha256"], hash_file(BASE / "retrieval.py"))
@@ -43,6 +46,9 @@ class ProspectiveGate(unittest.TestCase):
                              native_locator="mock:1", hook_id="offline-contract-smoke", raw=b"stopped",
                              actor="release_lead", carrier_id="carrier-2", source_id="task:T1", parent_ids=("e1",), status="success")
                 self.assertEqual(check_capture(directory), 2)
+                with self.assertRaises(FileExistsError):
+                    NativeCapture(directory, probe, "ACCIDENTAL_RERUN",
+                                  {"probe": probe, "source_commit": "synthetic-smoke"})
                 with self.assertRaises(ValueError):
                     sink.capture(event_id="e3", operation="nonexistent", phase="executed",
                                  native_locator="mock:2", hook_id="mock", raw=b"x",
@@ -69,7 +75,14 @@ class ProspectiveGate(unittest.TestCase):
             manifest.write_text("{}")
             errors = blockers(manifest, directory)
             self.assertIn("provider/model/limits unbound", errors)
-            self.assertTrue(any("X1: installed implementation/native hook unbound" in error for error in errors))
+            self.assertTrue(any("X1: installed implementation/native hooks unbound" in error for error in errors))
+            self.assertFalse(any("X2: installed implementation/native hooks unbound" in error
+                                 for error in blockers(manifest, directory, probe_id="X1")))
+
+    def test_compression_does_not_accept_missing_checkpoint(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaises(FileNotFoundError):
+                checkpoint_hashes(Path(directory) / "missing")
 
     def test_prior_and_current_version_are_executable(self):
         root = BASE / "fixtures/project"

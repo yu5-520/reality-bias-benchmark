@@ -1,0 +1,14 @@
+{
+  "schema": "stage2-day1-native-smoke-status-v1",
+  "subject_gate": "CLOSED",
+  "natural_trajectories_collected": 0,
+  "status": {
+    "X1": {"boundary": "autogen_core RoutedAgent / SingleThreadedAgentRuntime", "protocol_smoke": "PASS", "nine_role_route": "PASS", "subject_ready": false, "blocker": "subject provider/model/limits and full task-native smoke unbound"},
+    "X2": {"boundary": "MetaGPT Environment / Role", "protocol_smoke": "BLOCKED", "subject_ready": false, "blocker": "metagpt==0.8.1 pinned dependency resolution fails on lancedb==0.4.0"},
+    "X3": {"boundary": "A2A v1.0.0 SDK remote HTTP Task / Artifact", "protocol_smoke": "PASS", "subject_ready": false, "blocker": "remote model execution and its raw provider evidence not yet implemented or bound; transport artifact is an echo in the smoke"},
+    "X4": {"boundary": "MCP 2026-07-28 SDK Client / stdio server tools and resources", "protocol_smoke": "PASS", "subject_ready": false, "blocker": "subject provider/model/limits and full nine-role task-native smoke unbound"},
+    "X5": {"boundary": "fixed-corpus in-repository lexical retrieval into model input", "protocol_smoke": "PASS", "subject_ready": false, "blocker": "subject provider/model/limits and full nine-role task-native smoke unbound"},
+    "X6": {"boundary": "MemoryBank write / retrieval / update", "protocol_smoke": "BLOCKED", "subject_ready": false, "blocker": "upstream legacy memory dependencies and embedding/persistence policy not bound"},
+    "X7": {"boundary": "LongLLMLingua prompt compressor", "protocol_smoke": "BLOCKED", "subject_ready": false, "blocker": "compressor dependencies and immutable model checkpoint not bound"}
+  }
+}

@@ -12,12 +12,17 @@ acceptance rubric or a list of permitted file edits. Each cell gets an isolated
 copy of the checkout and a separate raw evidence directory.
 
 `versions.json` locks six upstream reference commits (two protocol tags separately)
-and the in-repo X5 retrieval code SHA-256. The seven native runtimes, subject
-model, provider, budgets and native hooks remain unbound. `python -m stage2.freeze`
+and the in-repo X5 retrieval code SHA-256. `runtime_packages.json` pins checked
+distribution versions separately. `native_status.json` reports which **non-subject**
+framework/protocol smoke checks passed and which remain blocked. All seven subject
+runtimes, model, provider, budgets and complete native hooks remain unbound. `python -m stage2.freeze`
 verifies fixture/task/role/version hashes. `python -m unittest discover -s stage2/tests`
 tests the offline interface only. A synthetic test frame never satisfies native
-probe conformance. `stage2.preflight` fails closed until a runtime manifest and
-genuine native smoke traces exist for every probe.
+probe conformance. `python -m stage2.preflight --runtime-manifest <path> --captures-root <path> --probe X1`
+gates an individual fixed probe; omit `--probe` for the whole seven-layer group.
+Both paths fail closed without a bound subject provider/model/limits and full
+native code-changing smoke. A blocked probe never makes a passing probe change
+the frozen matrix denominator.
 
 ## Native hook contract
 
@@ -38,3 +43,13 @@ downstream read/use → consequence, including null or healthy paths. R7 may
 package and test only eligible local repairs, within the four-continuation cap.
 An unsuccessful or non-observable probe is recorded as `ENGINEERING_BLOCKED`
 at execution freeze; it is not secretly rerun or swapped.
+
+`coding_arena.py` provides file operations and common model input/output
+recording. `AutoGenTransport`, `A2AProtocolTransport`, `MCPWorkspace`, and
+`RAGContext` have executable non-subject smoke paths. The A2A service currently
+returns an artifact without remote model execution; it does not pass subject
+preflight. `MetaGPTTransport` and `LongLLMLinguaContext` require exact native
+dependencies and a frozen local compressor checkpoint respectively. X6 remains
+blocked until the upstream MemoryBank runtime can be bound to a fixed
+embedding/persistence policy. See `native_status.json` before interpreting a
+passing offline test as subject readiness.
