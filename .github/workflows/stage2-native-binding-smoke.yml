@@ -53,6 +53,14 @@ jobs:
                 "playwright>=1.26" "PyYAML==6.0.1" "typing-inspect==0.8.0" \
                 "python_docx==0.8.11" "tiktoken==0.7.0" "anthropic==0.47.2" \
                 "scikit_learn==1.3.2"
+              mkdir -p "$HOME/.metagpt"
+              cat > "$HOME/.metagpt/config2.yaml" <<'YAML'
+              llm:
+                api_type: openai
+                model: stage2-no-call
+                base_url: http://127.0.0.1:9/v1
+                api_key: sk-stage2-no-call
+              YAML
               ;;
             X3)
               python -m pip install \
