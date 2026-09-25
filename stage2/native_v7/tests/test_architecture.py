@@ -70,6 +70,20 @@ class NativeV7Architecture(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
             validate_request("X1", "T1")
 
+    def test_x3_runner_is_verified_but_subject_gate_remains_closed(self):
+        registry = load_registry()
+        x3 = registry["probes"]["X3"]
+        self.assertEqual(x3["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x3["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
+        self.assertIsNone(x3["background_substrate_id"])
+        self.assertEqual(x3["protocol_version"], "1.0.0")
+        self.assertEqual(x3["verification"]["state"], "NON_STUDY_NATIVE_SMOKE_PASS")
+        self.assertEqual(x3["verification"]["service_count"], 9)
+        self.assertEqual(x3["verification"]["a2a_calls"], 3)
+        self.assertFalse(x3["verification"]["subject_ready"])
+        with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
+            validate_request("X3", "T1")
+
     def test_x4_runner_is_verified_but_subject_gate_remains_closed(self):
         registry = load_registry()
         x4 = registry["probes"]["X4"]
@@ -117,20 +131,38 @@ class NativeV7Architecture(unittest.TestCase):
         verified = {
             row["probe"]: row["status"]
             for row in matrix["cells"]
-            if row["probe"] in {"X1", "X4", "X5", "X7"}
+            if row["probe"] in {"X1", "X3", "X4", "X5", "X7"}
         }
         self.assertEqual(set(verified.values()), {"NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING"})
         rest = {
             row["status"]
             for row in matrix["cells"]
-            if row["probe"] not in {"X1", "X4", "X5", "X7"}
+            if row["probe"] not in {"X1", "X3", "X4", "X5", "X7"}
         }
         self.assertEqual(rest, {"PENDING_NATIVE_RUNNER"})
-        for probe in ("X2", "X3", "X6"):
+        for probe in ("X2", "X6"):
             with self.subTest(probe=probe), self.assertRaisesRegex(
                 ValueError, "native runner is not verified"
             ):
                 validate_request(probe, "T1")
+
+    def test_x3_runner_uses_native_role_services_not_baseline_mailbox(self):
+        runner = (ROOT / "stage2/native_v7/x3_a2a/runner.py").read_text()
+        service = (ROOT / "stage2/native_v7/x3_a2a/service.py").read_text()
+        proxy = (ROOT / "stage2/native_v7/x3_a2a/proxy.py").read_text()
+        self.assertIn("create_client", runner)
+        self.assertIn("create_client", service)
+        self.assertIn("DefaultRequestHandler", service)
+        self.assertIn("create_jsonrpc_routes", service)
+        self.assertIn("SendMessageRequest", service)
+        self.assertIn("Transparent HTTP-body relay", proxy)
+        for marker in (
+            "stage2.a2a_transport",
+            "stage2.coding_arena",
+            "CodingArena",
+            "RoleMailboxTransport",
+        ):
+            self.assertNotIn(marker, runner + service)
 
     def test_x4_runner_uses_frozen_host_and_not_historical_mcp_adapter(self):
         raw = (ROOT / "stage2/native_v7/x4_mcp/runner.py").read_text()
