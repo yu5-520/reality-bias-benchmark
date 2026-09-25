@@ -13,7 +13,7 @@ The frozen scientific conditions remain T1–T3, the nine Software Engineering r
 - monitoring is external and non-mutating;
 - common evidence representation is created after observation, not used to dictate execution.
 
-`docs/R_Plan_v7.1.md` is the active implementation plan. X1 AutoGen now has a probe-specific native-runner candidate and non-study observer smoke under `stage2/native_v7/x1_autogen/`. The registry remains the authority for whether that runner has actually passed its gate. No runner implementation alone opens a natural cell.
+`docs/R_Plan_v7.1.md` is the active implementation plan. X1 AutoGen now has a verified probe-specific native runner and passive observer smoke under `stage2/native_v7/x1_autogen/`. Its registry state is `NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING`: the engineering runner is accepted, but **no natural cell is open** until a separate real-provider readiness check is bound to the exact execution commit.
 
 ## Historical v6.x scaffold
 
