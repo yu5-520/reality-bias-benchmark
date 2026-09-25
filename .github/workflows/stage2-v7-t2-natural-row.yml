@@ -1,0 +1,284 @@
+name: Stage-II v7 T2 Seven-System Natural Row
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_execution_sha:
+        description: Exact main SHA pinned by the one-time row authorization
+        required: true
+        type: string
+      authorization_issue:
+        description: Issue number carrying the exact seven-cell authorization
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-v7-natural-t2-row
+  cancel-in-progress: false
+
+jobs:
+  t2-natural-cells:
+    runs-on: ubuntu-latest
+    timeout-minutes: 210
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        include:
+          - {probe: X1, python: "3.11"}
+          - {probe: X2, python: "3.10"}
+          - {probe: X3, python: "3.11"}
+          - {probe: X4, python: "3.11"}
+          - {probe: X5, python: "3.11"}
+          - {probe: X6, python: "3.10"}
+          - {probe: X7, python: "3.11"}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: '${{ github.sha }}'
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Verify exact row authorization, v2 contract and collection gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTH_ISSUE: ${{ inputs.authorization_issue }}
+          EXPECTED_SHA: ${{ inputs.expected_execution_sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_SHA" = "$EXPECTED_SHA"
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$GITHUB_REF" = refs/tags/stage2-natural-t2-row-authorization
+          python - <<'PY'
+          import json, os, re, subprocess
+          issue=os.environ['AUTH_ISSUE']
+          if not re.fullmatch(r'[1-9][0-9]*', issue):
+              raise SystemExit('invalid authorization issue number')
+          data=json.loads(subprocess.check_output([
+              'gh','api',f"repos/{os.environ['GITHUB_REPOSITORY']}/issues/{issue}"
+          ], text=True))
+          expected='\n'.join([
+              'cells=X1-T2,X2-T2,X3-T2,X4-T2,X5-T2,X6-T2,X7-T2',
+              'control_plane=CHAT_AUTHORIZATION_BRIDGE_STAGE2_T2_ROW_v1',
+              f"expected_main_sha={os.environ['GITHUB_SHA']}",
+              'max_natural_trajectories=7',
+              'preserve_failed_attempt=true',
+              't3_open=false',
+          ])
+          if data['user']['login'] != 'yu5-520' or data['title'] != 'STAGE2 T2 NATURAL ROW AUTHORIZATION':
+              raise SystemExit('authorization issue identity mismatch')
+          if data['body'].strip() != expected:
+              raise SystemExit('authorization body mismatch')
+          print('PASS: exact seven-cell T2 row authorization')
+          PY
+          python -m stage2.native_v7.freeze
+          python -m unittest discover -s stage2/native_v7/tests -v
+          python - <<'PY'
+          from stage2.native_v7.action_contract import contract_id_for_task
+          from stage2.native_v7.collect import validate_request
+          probe='${{ matrix.probe }}'
+          assert contract_id_for_task('T2') == 'v2_t2_t3_prospective'
+          validate_request(probe,'T2')
+          print(f'PASS: {probe}-T2 is subject-ready under the frozen task contract map')
+          PY
+
+      - name: Bind exact X1 AutoGen environment
+        if: matrix.probe == 'X1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/microsoft/autogen upstream
+          git -C upstream checkout -q 027ecf0a379bcc1d09956d46d12d44a3ad9cee14
+          test "$(git -C upstream rev-parse HEAD)" = 027ecf0a379bcc1d09956d46d12d44a3ad9cee14
+          pip install -q             ./upstream/python/packages/autogen-core             ./upstream/python/packages/autogen-agentchat             './upstream/python/packages/autogen-ext[openai]'
+          python -c 'from autogen_agentchat.teams import Swarm; from autogen_ext.models.openai import OpenAIChatCompletionClient'
+
+      - name: Bind exact X2 MetaGPT environment
+        if: matrix.probe == 'X2'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/FoundationAgents/MetaGPT upstream
+          git -C upstream checkout -q 11cdf466d042aece04fc6cfd13b28e1a70341b1f
+          test "$(git -C upstream rev-parse HEAD)" = 11cdf466d042aece04fc6cfd13b28e1a70341b1f
+          python -m pip install -q --upgrade pip
+          grep -v '^lancedb==0.4.0$' upstream/requirements.txt > /tmp/metagpt-requirements-stage2.txt
+          python -m pip install -q -r /tmp/metagpt-requirements-stage2.txt
+          python -m pip install -q 'pyarrow==14.0.2'
+          python -m pip install -q --no-deps -e upstream
+          python -c 'from importlib.metadata import version; assert version("metagpt") == "1.0.0"'
+
+      - name: Bind exact X3 A2A protocol and SDK
+        if: matrix.probe == 'X3'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/a2aproject/a2a-python upstream
+          git -C upstream checkout -q 0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167
+          test "$(git -C upstream rev-parse HEAD)" = 0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167
+          python -m pip install -q -e './upstream[http-server]' 'uvicorn>=0.35.0'
+          git clone -q https://github.com/a2aproject/A2A protocol
+          git -C protocol checkout -q 173695755607e884aa9acf8ce4feed90e32727a1
+          test "$(git -C protocol rev-parse HEAD)" = 173695755607e884aa9acf8ce4feed90e32727a1
+
+      - name: Bind exact X4 MCP protocol and SDK
+        if: matrix.probe == 'X4'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/modelcontextprotocol/python-sdk upstream
+          git -C upstream checkout -q f1b6589088534632fef92238ee9750951e3c0185
+          test "$(git -C upstream rev-parse HEAD)" = f1b6589088534632fef92238ee9750951e3c0185
+          git clone -q https://github.com/modelcontextprotocol/modelcontextprotocol protocol
+          git -C protocol checkout -q 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          test "$(git -C protocol rev-parse HEAD)" = 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          python -m pip install -q uv
+          (cd upstream && uv sync --frozen --no-default-groups)
+          test -x upstream/.venv/bin/python
+
+      - name: Verify frozen X5 RAG source
+        if: matrix.probe == 'X5'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum stage2/retrieval.py | awk '{print $1}')" = baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4
+
+      - name: Bind exact X6 MemoryBank environment and real study embedding
+        if: matrix.probe == 'X6'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/zhongwanjun/MemoryBank-SiliconFriend upstream
+          git -C upstream checkout -q cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
+          test "$(git -C upstream rev-parse HEAD)" = cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
+          python -m pip install -q --upgrade pip
+          python -m pip install -q 'torch==2.0.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q 'numpy==1.24.4' 'pydantic==1.10.13' 'huggingface-hub==0.14.1' 'tokenizers==0.13.3' 'transformers==4.28.0' 'faiss-cpu==1.7.4' 'scipy==1.10.1' 'scikit-learn==1.3.2' 'nltk==3.9.1' 'Pillow==10.4.0' 'unstructured==0.6.10' 'langchain==0.0.146'
+          python -m pip install -q --no-deps 'sentence-transformers==2.2.2'
+          rm -rf /tmp/stage2-x6-study
+          python -m stage2.study_assets.validate --probe X6 --out-root /tmp/stage2-x6-study
+
+      - name: Bind exact X7 LongLLMLingua environment and real study checkpoint
+        if: matrix.probe == 'X7'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/microsoft/LLMLingua upstream
+          git -C upstream checkout -q 5a4c78ae18ab17a98cf997e8259354e546081d64
+          test "$(git -C upstream rev-parse HEAD)" = 5a4c78ae18ab17a98cf997e8259354e546081d64
+          python -m pip install -q --upgrade pip
+          python -m pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q 'transformers==4.44.2' 'accelerate>=0.33,<1' tiktoken nltk numpy tokenizers safetensors
+          python -m pip install -q --no-deps -e upstream
+          python - <<'PY'
+          import llmlingua
+          assert llmlingua.__version__ == '0.2.2', llmlingua.__version__
+          PY
+          rm -rf /tmp/stage2-x7-study
+          python -m stage2.study_assets.validate --probe X7 --out-root /tmp/stage2-x7-study
+
+      - name: Irrevocably claim ${{ matrix.probe }}-T2 before reservation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/git/refs"             -f ref=refs/tags/stage2-natural-${{ matrix.probe }}-t2-execution-claimed             -f "sha=$GITHUB_SHA" >/dev/null
+          echo "PASS: unique ${{ matrix.probe }}-T2 execution claim created; retries must fail"
+
+      - name: Execute and seal exactly one ${{ matrix.probe }}-T2 natural attempt
+        id: collect
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          AUTH_ISSUE: ${{ inputs.authorization_issue }}
+          STAGE2_X6_UPSTREAM: ${{ github.workspace }}/upstream
+          STAGE2_X6_EMBEDDING_MODEL: /tmp/stage2-x6-study/checkpoint
+          STAGE2_X7_CHECKPOINT: /tmp/stage2-x7-study/checkpoint
+          TOKENIZERS_PARALLELISM: 'false'
+          HF_HUB_OFFLINE: '1'
+          TRANSFORMERS_OFFLINE: '1'
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p /tmp/stage2_t2_row
+          printf '%s\n' "$GITHUB_SHA" > /tmp/stage2_t2_row/execution_sha.txt
+          printf '%s\n' "$AUTH_ISSUE" > /tmp/stage2_t2_row/authorization_issue.txt
+          export PYTHONPATH="$GITHUB_WORKSPACE${PYTHONPATH:+:$PYTHONPATH}"
+          if [ "${{ matrix.probe }}" = X4 ]; then
+            export PATH="$GITHUB_WORKSPACE/upstream/.venv/bin:$PATH"
+          fi
+          timeout --signal=TERM --kill-after=30s 180m             python -m stage2.native_v7.collect               --probe ${{ matrix.probe }} --task T2 --out-root /tmp/stage2_t2_row               > /tmp/stage2_t2_row/collect_stdout.txt               2> /tmp/stage2_t2_row/collect_stderr.txt
+          code=$?
+          printf '%s\n' "$code" > /tmp/stage2_t2_row/collect_exit_code.txt
+          echo "collect_exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Package attempt and hash inventory before judging outcome
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/stage2_t2_row
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root=Path('/tmp/stage2_t2_row')
+          files={
+              str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in sorted(root.rglob('*'))
+              if p.is_file() and p.name != 'archive_inventory.json'
+          }
+          (root/'archive_inventory.json').write_text(json.dumps(files,indent=2,sort_keys=True)+'\n')
+          PY
+          tar -czf /tmp/stage2-v7-${{ matrix.probe }}-t2-${{ github.run_id }}.tar.gz -C /tmp/stage2_t2_row .
+          sha256sum /tmp/stage2-v7-${{ matrix.probe }}-t2-${{ github.run_id }}.tar.gz             > /tmp/stage2-v7-${{ matrix.probe }}-t2-${{ github.run_id }}.tar.gz.sha256
+
+      - name: Upload immutable single-attempt evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-v7-${{ matrix.probe }}-t2-${{ github.run_id }}
+          path: |
+            /tmp/stage2-v7-${{ matrix.probe }}-t2-${{ github.run_id }}.tar.gz
+            /tmp/stage2-v7-${{ matrix.probe }}-t2-${{ github.run_id }}.tar.gz.sha256
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Record preserved cell outcome on authorization issue
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTH_ISSUE: ${{ inputs.authorization_issue }}
+          COLLECT_CODE: ${{ steps.collect.outputs.collect_exit_code }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY"             --body "${{ matrix.probe }}-T2 preserved in workflow run $GITHUB_RUN_ID. collect_exit_code=${COLLECT_CODE:-missing}. No retry is permitted after a claimed attempt. Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+
+      - name: Report frozen outcome after preservation
+        if: always()
+        env:
+          COLLECT_CODE: ${{ steps.collect.outputs.collect_exit_code }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$COLLECT_CODE" = 0
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('/tmp/stage2_t2_row/${{ matrix.probe }}-T2')
+          seal=json.loads((root/'seal.json').read_text())
+          assert seal['cell'] == '${{ matrix.probe }}-T2'
+          assert seal['returncode'] == 0
+          assert seal['status'] == 'RECORDED_PENDING_POSTHOC_AUDIT'
+          print('PASS: ${{ matrix.probe }}-T2 recorded once and pending post-hoc audit')
+          PY
