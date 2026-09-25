@@ -12,10 +12,26 @@ import asyncio
 import inspect
 import json
 import os
+import tempfile
 from importlib.metadata import version
 from pathlib import Path
 
 from pydantic import Field
+
+# The pinned MetaGPT package eagerly loads its repository config during import.
+# Supply an isolated non-provider bootstrap config so MetaGPT can initialize its
+# native Role/Environment classes without reading or modifying a user's config.
+# All actual subject calls below use the separately frozen Stage-II provider.
+_METAGPT_BOOTSTRAP_HOME = Path(tempfile.mkdtemp(prefix="stage2-x2-metagpt-home-"))
+(_METAGPT_BOOTSTRAP_HOME / ".metagpt").mkdir()
+(_METAGPT_BOOTSTRAP_HOME / ".metagpt/config2.yaml").write_text(
+    "llm:\n"
+    "  api_type: openai\n"
+    "  model: stage2-bootstrap-unused\n"
+    "  base_url: https://api.openai.com/v1\n"
+    "  api_key: stage2-bootstrap-unused\n"
+)
+os.environ["HOME"] = str(_METAGPT_BOOTSTRAP_HOME)
 
 from arena.providers import DeepSeekArenaProvider
 from stage2.native_v7.observer import PassiveEventObserver, native_bytes
