@@ -8,11 +8,8 @@ import argparse
 import asyncio
 import importlib.metadata
 import json
-import os
-import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from types import SimpleNamespace
 
 from .evidence import NativeCapture, check_capture
 
@@ -307,68 +304,6 @@ def smoke_x5(root, code_commit):
     _finish(cap, cfg["hook_id"], "retrieve-result")
 
 
-def smoke_x6(root, code_commit, upstream):
-    os.environ.setdefault("OPENAI_API_KEY", "stage2-smoke-no-provider-call")
-    sys.path.insert(0, str(Path(upstream).resolve()))
-    from utils.memory_utils import save_local_memory
-    from memory_bank.build_memory_index import generate_memory_docs
-
-    cfg = _targets()["X6"]
-    bind = _binding("X6", code_commit=code_commit)
-    cap = NativeCapture(root, "X6", "X6-native-smoke", bind)
-    store = Path(root) / "memory-store"
-    args = SimpleNamespace(memory_basic_dir=str(store), memory_file="memory.json")
-    memory = {}
-    conversation = [["remember the current checkout route", "the current route is checkout_app.server"]]
-    cap.capture(
-        event_id="memory-write-request",
-        operation="memory_write",
-        phase="emitted",
-        native_locator="utils.memory_utils.save_local_memory:input",
-        hook_id=cfg["hook_id"],
-        raw=_bytes(conversation),
-        actor="memorybank:writer",
-        carrier_id="memorybank:conversation",
-        source_id="smoke:user",
-        status="success",
-    )
-    saved = save_local_memory(memory, conversation, "smoke-user", args)
-    memory_path = store / "memory.json"
-    raw = memory_path.read_bytes()
-    cap.capture(
-        event_id="memory-written",
-        operation="memory_write",
-        phase="executed",
-        native_locator=str(memory_path),
-        hook_id=cfg["hook_id"],
-        raw=raw,
-        actor="memorybank:store",
-        carrier_id="memorybank:persistent-json",
-        source_id="memorybank:conversation",
-        parent_ids=("memory-write-request",),
-        status="success",
-    )
-    docs = generate_memory_docs(saved, "en")
-    rendered = "\n".join(str(x) for x in docs["smoke-user"])
-    if "checkout_app.server" not in rendered:
-        raise RuntimeError("MemoryBank native history re-entry failed")
-    cap.capture(
-        event_id="memory-retrieve",
-        operation="memory_retrieve",
-        phase="returned",
-        native_locator="memory_bank.build_memory_index.generate_memory_docs",
-        hook_id=cfg["hook_id"],
-        raw=rendered.encode("utf-8"),
-        actor="memorybank:index-input",
-        target="memorybank:consumer",
-        carrier_id="memorybank:history-doc",
-        source_id="memorybank:persistent-json",
-        parent_ids=("memory-written",),
-        status="success",
-    )
-    _finish(cap, cfg["hook_id"], "memory-retrieve")
-
-
 def smoke_x7(root, code_commit):
     from llmlingua import PromptCompressor
 
@@ -435,10 +370,10 @@ def main():
     p.add_argument("--probe", required=True, choices=[f"X{i}" for i in range(1, 8)])
     p.add_argument("--out-root", required=True)
     p.add_argument("--code-commit", required=True)
-    p.add_argument("--upstream")
     args = p.parse_args()
-    if args.probe == "X2":
-        raise SystemExit("X2 is ENGINEERING_BLOCKED; native smoke intentionally not emulated")
+    if args.probe in {"X2", "X6"}:
+        reason = _targets()[args.probe].get("block_reason", "frozen engineering block")
+        raise SystemExit(f"{args.probe} is ENGINEERING_BLOCKED; native smoke intentionally not emulated: {reason}")
     root = Path(args.out_root) / args.probe
     root.mkdir(parents=True, exist_ok=True)
     if args.probe == "X1":
@@ -449,10 +384,6 @@ def main():
         asyncio.run(smoke_x4(root, args.code_commit))
     elif args.probe == "X5":
         smoke_x5(root, args.code_commit)
-    elif args.probe == "X6":
-        if not args.upstream:
-            raise SystemExit("X6 requires --upstream")
-        smoke_x6(root, args.code_commit, args.upstream)
     elif args.probe == "X7":
         smoke_x7(root, args.code_commit)
     count = check_capture(root)
