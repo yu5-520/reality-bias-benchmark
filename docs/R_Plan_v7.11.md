@@ -1,0 +1,13 @@
+# Stage-II common subject receipt and independent X promotion — R Plan v7.11
+
+Date: 2026-09-25. Status: **COMMON HANDSHAKE RECORDED; X1–X5 SUBJECT_READY; X6/X7 ASSET_PENDING; NATURAL TRAJECTORIES 0/21**.
+
+This is an operational checkpoint after v7.10. No task, role, checkout, subject configuration, native runner, external observer or collection policy changed after the common handshake. The receipt's execution snapshot still binds their exact bytes. The promotion commit changes only the registry, derived matrix, tests, documentation and archived readiness evidence.
+
+The one-time authorization bridge was triggered by [issue #169](https://github.com/yu5-520/reality-bias-benchmark/issues/169) on main execution commit `85823f58c7c8a504540617570242ac09d8b76a20`. The existing fail-closed readiness workflow [run 36154377883](https://github.com/yu5-520/reality-bias-benchmark/actions/runs/36154377883) completed successfully. Its archived artifact ID is `10873172893`, with ZIP SHA-256 `bd3da48c90a9d8bddd76d0926cc32f02db2b369c88137bf2141601df8244f7de`. The receipt, original provider JSON, preflight and execution SHA are preserved in `stage2/native_v7/readiness/`; `archive_manifest.json` records their hashes.
+
+The single provider response reported the requested alias `deepseek-flash`, with 31 prompt tokens, 2 completion tokens and estimated peak cost USD 0.0000117 against the USD 0.01 ceiling. The response does not independently attest that the underlying provider model version is `DeepSeek-V4.1-Flash`; that version remains the frozen expected version from the subject configuration. This readiness evidence establishes connectivity and binding at the observable interface, not a version-level provider attestation or a scientific trajectory.
+
+X1–X5 cite the exact common receipt and are independently `SUBJECT_READY`. X6's real study embedding and X7's real compressor checkpoint remain without frozen manifests, so their six cells stay `NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING`. No X6/X7 smoke asset is promoted. All 21 cells retain `subject_trajectory_count: 0`. The legacy `freeze.py` success banner still says “21 unopened cells”; the derived matrix and registry are authoritative for the mixed readiness states, and changing the frozen utility after the handshake would invalidate its execution snapshot.
+
+The next scientific action is to predeclare the first cell, reserve it once, capture raw evidence and seal it before inspection. Do not repeat a cell to obtain a preferred result. Keep any attempt after reservation, including failure, as part of the denominator; post-hoc semantic audit and bounded local contrasts follow raw freeze.

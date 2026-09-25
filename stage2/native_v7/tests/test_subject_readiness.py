@@ -13,14 +13,23 @@ from stage2.native_v7.subject_readiness import build_preflight
 class Stage2SubjectReadinessGate(unittest.TestCase):
     SHA = "a" * 40
 
+    def pending_registry(self):
+        registry = copy.deepcopy(load_registry())
+        registry["subject_readiness_gate"]["state"] = "IMPLEMENTED_NO_LIVE_RECEIPT"
+        for pid in ("X1", "X2", "X3", "X4", "X5"):
+            registry["probes"][pid]["collection_state"] = "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING"
+            registry["probes"][pid].pop("subject_readiness", None)
+        return registry
+
     def test_preflight_is_one_common_non_scientific_handshake(self):
-        payload = build_preflight(
+        with patch("stage2.native_v7.subject_readiness.load_registry", return_value=self.pending_registry()):
+            payload = build_preflight(
             expected_execution_sha=self.SHA,
             actual_execution_sha=self.SHA,
             authorization_phrase="CALL_REAL_STAGE2_SUBJECT_READINESS_API",
             max_subject_calls=1,
             spending_ceiling=0.01,
-        )
+            )
         self.assertEqual(payload["status"], "READY_FOR_ONE_COMMON_PROVIDER_HANDSHAKE")
         self.assertEqual(payload["execution_snapshot"], execution_snapshot())
         self.assertNotIn("stage2/native_v7/registry.json", payload["execution_snapshot"]["files_sha256"])
@@ -59,26 +68,38 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
             )
 
     def test_preflight_rejects_extra_calls_or_large_budget(self):
-        with self.assertRaisesRegex(ValueError, "exactly one provider call"):
-            build_preflight(
+        with patch("stage2.native_v7.subject_readiness.load_registry", return_value=self.pending_registry()):
+            with self.assertRaisesRegex(ValueError, "exactly one provider call"):
+                build_preflight(
                 expected_execution_sha=self.SHA,
                 actual_execution_sha=self.SHA,
                 authorization_phrase="CALL_REAL_STAGE2_SUBJECT_READINESS_API",
                 max_subject_calls=2,
                 spending_ceiling=0.01,
-            )
-        with self.assertRaisesRegex(ValueError, "spending ceiling"):
-            build_preflight(
+                )
+            with self.assertRaisesRegex(ValueError, "spending ceiling"):
+                build_preflight(
                 expected_execution_sha=self.SHA,
                 actual_execution_sha=self.SHA,
                 authorization_phrase="CALL_REAL_STAGE2_SUBJECT_READINESS_API",
                 max_subject_calls=1,
                 spending_ceiling=0.06,
+                )
+
+    def test_recorded_common_handshake_cannot_be_repeated(self):
+        with self.assertRaisesRegex(ValueError, "already been recorded"):
+            build_preflight(
+                expected_execution_sha=self.SHA,
+                actual_execution_sha=self.SHA,
+                authorization_phrase="CALL_REAL_STAGE2_SUBJECT_READINESS_API",
+                max_subject_calls=1,
+                spending_ceiling=0.01,
             )
 
     def test_subject_ready_cannot_be_asserted_from_runner_smoke_alone(self):
         registry = load_registry()
         mutated = copy.deepcopy(registry)
+        mutated["probes"]["X1"].pop("subject_readiness")
         mutated["probes"]["X1"]["collection_state"] = "SUBJECT_READY"
         with self.assertRaisesRegex(ValueError, "frozen readiness evidence"):
             validate_registry(mutated)
