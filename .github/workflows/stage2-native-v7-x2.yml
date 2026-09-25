@@ -4,6 +4,11 @@ on:
   push:
     paths:
       - 'stage2/native_v7/x2_metagpt/**'
+      - 'stage2/native_v7/registry.json'
+      - 'stage2/native_v7/freeze.py'
+      - 'stage2/native_v7/matrix.json'
+      - 'stage2/native_v7/tests/**'
+      - 'docs/R_Plan_v7.8.md'
       - 'stage2/tasks.json'
       - 'stage2/roles.json'
       - 'stage2/subject.json'
@@ -12,6 +17,11 @@ on:
   pull_request:
     paths:
       - 'stage2/native_v7/x2_metagpt/**'
+      - 'stage2/native_v7/registry.json'
+      - 'stage2/native_v7/freeze.py'
+      - 'stage2/native_v7/matrix.json'
+      - 'stage2/native_v7/tests/**'
+      - 'docs/R_Plan_v7.8.md'
       - 'stage2/tasks.json'
       - 'stage2/roles.json'
       - 'stage2/subject.json'
@@ -44,7 +54,6 @@ jobs:
           python -m pip install -q --upgrade pip
           grep -v '^lancedb==0.4.0$' upstream/requirements.txt > /tmp/metagpt-requirements-stage2.txt
           python -m pip install -q -r /tmp/metagpt-requirements-stage2.txt
-          python -m pip install -q 'pyarrow==14.0.2'
           # The frozen MetaGPT dependency graph leaves pyarrow implicit while
           # pandas imports it if a partial namespace package is present.
           python -m pip install -q 'pyarrow==14.0.2'

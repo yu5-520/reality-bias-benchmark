@@ -70,6 +70,22 @@ class NativeV7Architecture(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
             validate_request("X1", "T1")
 
+    def test_x2_runner_is_verified_but_subject_gate_remains_closed(self):
+        registry = load_registry()
+        x2 = registry["probes"]["X2"]
+        self.assertEqual(x2["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x2["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
+        self.assertIsNone(x2["background_substrate_id"])
+        self.assertEqual(x2["source_commit"], "11cdf466d042aece04fc6cfd13b28e1a70341b1f")
+        self.assertEqual(x2["package_version"], "1.0.0")
+        self.assertEqual(x2["verification"]["state"], "NON_STUDY_NATIVE_SMOKE_PASS")
+        self.assertEqual(x2["verification"]["turns"], 7)
+        self.assertEqual(x2["verification"]["metagpt_rounds"], 7)
+        self.assertEqual(x2["verification"]["environment_messages"], 6)
+        self.assertFalse(x2["verification"]["subject_ready"])
+        with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
+            validate_request("X2", "T1")
+
     def test_x3_runner_is_verified_but_subject_gate_remains_closed(self):
         registry = load_registry()
         x3 = registry["probes"]["X3"]
@@ -141,27 +157,38 @@ class NativeV7Architecture(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
             validate_request("X7", "T1")
 
-    def test_remaining_cells_stay_closed_before_native_runners_exist(self):
+    def test_all_native_runners_verified_but_all_subject_gates_remain_closed(self):
         matrix = artifact()
         self.assertEqual(len(matrix["cells"]), 21)
         self.assertEqual({row["subject_trajectory_count"] for row in matrix["cells"]}, {0})
-        verified = {
-            row["probe"]: row["status"]
-            for row in matrix["cells"]
-            if row["probe"] in {"X1", "X3", "X4", "X5", "X6", "X7"}
-        }
-        self.assertEqual(set(verified.values()), {"NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING"})
-        rest = {
-            row["status"]
-            for row in matrix["cells"]
-            if row["probe"] not in {"X1", "X3", "X4", "X5", "X6", "X7"}
-        }
-        self.assertEqual(rest, {"PENDING_NATIVE_RUNNER"})
-        for probe in ("X2",):
+        self.assertEqual(
+            {row["probe"] for row in matrix["cells"]},
+            {f"X{i}" for i in range(1, 8)},
+        )
+        self.assertEqual(
+            {row["status"] for row in matrix["cells"]},
+            {"NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING"},
+        )
+        for probe in (f"X{i}" for i in range(1, 8)):
             with self.subTest(probe=probe), self.assertRaisesRegex(
-                ValueError, "native runner is not verified"
+                ValueError, "subject readiness is pending"
             ):
                 validate_request(probe, "T1")
+
+    def test_x2_runner_uses_native_metagpt_environment_not_stage2_mailbox(self):
+        raw = (ROOT / "stage2/native_v7/x2_metagpt/runner.py").read_text()
+        self.assertIn("from metagpt.environment import Environment", raw)
+        self.assertIn("class Stage2MetaRole(Role)", raw)
+        self.assertIn("env.run(k=1)", raw)
+        self.assertIn("env.publish_message(initial)", raw)
+        for marker in (
+            "stage2.metagpt_transport",
+            "from stage2.coding_arena",
+            "import stage2.coding_arena",
+            "RoleMailboxTransport",
+            "SoftwareEngineeringHost",
+        ):
+            self.assertNotIn(marker, raw)
 
     def test_x3_runner_uses_native_role_services_not_baseline_mailbox(self):
         runner = (ROOT / "stage2/native_v7/x3_a2a/runner.py").read_text()
@@ -219,7 +246,11 @@ class NativeV7Architecture(unittest.TestCase):
 
     def test_pending_runner_cannot_smuggle_launch_command(self):
         registry = load_registry()
-        registry["probes"]["X2"]["launch"]["argv_template"] = ["python", "anything.py"]
+        registry["probes"]["X2"]["collection_state"] = "PENDING_NATIVE_RUNNER"
+        registry["probes"]["X2"]["launch"] = {
+            "state": "PENDING_NATIVE_ENTRYPOINT",
+            "argv_template": ["python", "anything.py"],
+        }
         with self.assertRaisesRegex(ValueError, "pending runner"):
             validate_registry(registry)
 
