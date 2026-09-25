@@ -22,3 +22,5 @@ Do not invoke `stage2.collect_natural` for new Stage-II evidence. The active lau
 
 
 `docs/R_Plan_v7.21.md` freezes the task-versioned action-contract boundary. Subject revalidation and reviewed promotion are complete. T2 is the next unopened natural row; T3 stays closed until T2 is preserved and read-only audited.
+
+`docs/R_Plan_v7.23.md` predeclares the one-shot T2 X1–X7 natural row. The row is not opened until the bridge is merged and one exact issue authorization pins all seven cells to the same main SHA. T3 remains closed.
