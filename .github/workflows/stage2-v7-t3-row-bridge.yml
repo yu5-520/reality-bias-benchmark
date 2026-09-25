@@ -1,0 +1,66 @@
+name: Stage-II v7 T3 Seven-System One-Time Bridge
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-v7-t3-row-bridge
+  cancel-in-progress: false
+
+jobs:
+  dispatch-t3-row:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'STAGE2 T3 NATURAL ROW AUTHORIZATION'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      AUTH_ISSUE: ${{ github.event.issue.number }}
+      AUTH_TAG: stage2-natural-t3-row-authorization
+
+    steps:
+      - name: Verify exact seven-cell authorization on main
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/main
+          python - <<'PY'
+          import os
+          expected='\n'.join([
+              'cells=X1-T3,X2-T3,X3-T3,X4-T3,X5-T3,X6-T3,X7-T3',
+              'control_plane=CHAT_AUTHORIZATION_BRIDGE_STAGE2_T3_ROW_v1',
+              f"expected_main_sha={os.environ['GITHUB_SHA']}",
+              'max_natural_trajectories=7',
+              'preserve_failed_attempt=true',
+              'terminal_natural_row=true',
+          ])
+          if os.environ['AUTH_BODY'].strip() != expected:
+              raise SystemExit('authorization differs from exact seven-cell T3 row contract')
+          print('PASS: one seven-cell T3 row authorized on exact main SHA')
+          PY
+
+      - name: Claim row authorization tag and dispatch exactly once
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/git/refs"             -f "ref=refs/tags/$AUTH_TAG" -f "sha=$GITHUB_SHA" >/dev/null
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/stage2-v7-t3-natural-row.yml/dispatches"             -X POST -f "ref=$AUTH_TAG"             -f "inputs[expected_execution_sha]=$GITHUB_SHA"             -f "inputs[authorization_issue]=$AUTH_ISSUE" >/dev/null
+          echo "PASS: dispatched exactly one T3 row at $GITHUB_SHA"
+
+      - name: Record dispatch and close authorization
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY"             --body "T3 seven-system natural row dispatched once. Pinned tag: $AUTH_TAG. Execution SHA: $GITHUB_SHA. Every claimed cell, including a failed/no-answer attempt, is preserved and must not be repeated. T3 is the terminal natural row."
+          gh issue close "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
