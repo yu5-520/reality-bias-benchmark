@@ -79,23 +79,38 @@
       "background_substrate_id": null
     },
     "X3": {
-      "collection_state": "PENDING_NATIVE_RUNNER",
+      "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
       "environment_id": "x3-a2a-1.0.0",
-      "execution_owner": "A2A native task/message/artifact protocol",
-      "host_attachment": "Frozen software-engineering roles are exposed as A2A-native agents/services; host glue may start services but must not rewrite the A2A protocol.",
+      "execution_owner": "Nine frozen Software Engineering role services communicating through official A2A v1.0 JSON-RPC tasks/artifacts",
+      "host_attachment": "Each frozen role is its own A2A-native service. The launcher starts services and submits only the initial user task; role-to-role delegation is issued by role services through the official A2A SDK. No baseline mailbox scheduler is inherited.",
       "launch": {
-        "argv_template": null,
-        "state": "PENDING_NATIVE_ENTRYPOINT"
+        "state": "VERIFIED_NATIVE_ENTRYPOINT",
+        "argv_template": [
+          "python",
+          "-m",
+          "stage2.native_v7.x3_a2a.runner",
+          "--checkout",
+          "{checkout}",
+          "--task-file",
+          "{task_file}",
+          "--roles-file",
+          "{roles_file}",
+          "--subject-file",
+          "{subject_file}",
+          "--observer-root",
+          "{observer_root}/a2a_native"
+        ]
       },
       "name": "A2A",
       "observer": {
         "may_mutate_execution": false,
         "mode": "external",
         "native_surfaces": [
-          "A2A request/response bytes",
-          "task state",
-          "artifact bytes",
-          "remote provider I/O",
+          "byte-identical Agent Card response bodies copied by transparent per-role HTTP relays",
+          "byte-identical A2A v1.0 JSON-RPC SendMessage request bodies copied by transparent relays",
+          "byte-identical A2A task/artifact response bodies copied by transparent relays",
+          "role-service and relay process stderr",
+          "outer process stdout/stderr/exit",
           "checkout effects"
         ]
       },
@@ -107,7 +122,23 @@
       "source_repo": "a2aproject/A2A",
       "upstream_mode": "official_source",
       "integration_kind": "interagent_protocol",
-      "background_substrate_id": null
+      "background_substrate_id": null,
+      "verification": {
+        "state": "NON_STUDY_NATIVE_SMOKE_PASS",
+        "workflow": ".github/workflows/stage2-native-v7-x3.yml",
+        "verified_code_commit": "ba8b71cd7450007751432df3a54d6e3c62db96b6",
+        "workflow_run_id": 36134380842,
+        "subject_ready": false,
+        "task": "T2",
+        "turns": 7,
+        "stop_reason": "finalized",
+        "service_count": 9,
+        "a2a_calls": 3,
+        "jsonrpc_request_captures": 3,
+        "jsonrpc_response_captures": 3,
+        "agent_card_captures": 12,
+        "checkout_sha256": "15200a4ce5b6a09127f25371b55d9b4ae3b1f2071af78c3a7f37b6fcad8303e2"
+      }
     },
     "X4": {
       "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
@@ -335,7 +366,7 @@
     "tasks": "stage2/tasks.json",
     "host_policy": "X1-X2 use their native multi-agent framework, X3 uses native A2A communication, and X4-X7 may share the explicitly registered software-engineering background host because those X conditions operate at tool/retrieval/memory/context layers; monitoring is not part of that host."
   },
-  "status": "X1_X4_X5_X7_NATIVE_RUNNERS_VERIFIED_SUBJECT_PENDING_CAPABILITY_HOST_FROZEN_X2_X3_X6_RUNNERS_PENDING",
+  "status": "X1_X3_X4_X5_X7_NATIVE_RUNNERS_VERIFIED_SUBJECT_PENDING_CAPABILITY_HOST_FROZEN_X2_X6_RUNNERS_PENDING",
   "forbidden_global_normalization": [
     "requiring every X to execute through one common runtime adapter",
     "requiring X1-X3 to use the baseline role-mailbox communication substrate",
