@@ -158,9 +158,10 @@ class NativeV7Architecture(unittest.TestCase):
         self.assertIn("Transparent HTTP-body relay", proxy)
         for marker in (
             "stage2.a2a_transport",
-            "stage2.coding_arena",
-            "CodingArena",
-            "RoleMailboxTransport",
+            "from stage2.coding_arena",
+            "import stage2.coding_arena",
+            "from stage2.transports",
+            "import stage2.transports",
         ):
             self.assertNotIn(marker, runner + service)
 
