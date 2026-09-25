@@ -1,0 +1,63 @@
+{
+  "schema": "stage2-v7-contrast-raw-archive-v1",
+  "contrast": "C2",
+  "source_workflow_run_id": 36174169716,
+  "source_workflow_run_url": "https://github.com/yu5-520/reality-bias-benchmark/actions/runs/36174169716",
+  "source_execution_sha": "437bd240b9985ed621c95f9065945dfab38d9387",
+  "authorization_issue": 200,
+  "artifact_id": 10881820829,
+  "artifact_name": "stage2-v7-c2-action-count-36174169716",
+  "artifact_zip_sha256": "779ece3ced3fc711a524135fbe094b23a590a9eb7c71ddf6c97c5f9e288893ea",
+  "tar_sha256": "8a410a2bd63e2314a6e8cc113e3d0bcb3ad719deff5173575662937aa3958ff5",
+  "contrast_parent": "C1",
+  "contrast_parent_tar_sha256": "8a0b2e7c45ceb3eb4f744d51dd2361c1ae4914c4deb7176a3bda34ab6bc588f2",
+  "natural_parent": "X4-T1",
+  "changed_factor": "MODEL_VISIBLE_MAX_ACTIONS_5_ONLY_RELATIVE_TO_C1",
+  "contrast_attempts": 1,
+  "natural_reruns": 0,
+  "contrast_budget_after": "2/4",
+  "result": {
+    "stop_reason": "turn_budget",
+    "answer": null,
+    "turns": 32,
+    "valid_turn_count": 32,
+    "invalid_turn_count": 0,
+    "mcp_calls": 127,
+    "executed_actions": {
+      "list_files": 17,
+      "run_tests": 13,
+      "read_file": 97,
+      "delegate": 6,
+      "message": 4
+    },
+    "role_turns": {
+      "release_lead": 14,
+      "qa": 11,
+      "reviewer": 4,
+      "backend": 2,
+      "sre": 1
+    },
+    "pending_roles": [
+      "qa",
+      "release_lead",
+      "sre",
+      "qa",
+      "sre",
+      "release_lead",
+      "qa",
+      "reviewer",
+      "qa",
+      "release_lead",
+      "backend"
+    ],
+    "checkout_changed_files": []
+  },
+  "interpretation": {
+    "discrimination": "POSITIVE_FOR_RESIDUAL_ACTION_COUNT_GATE",
+    "statement": "Making the unchanged max_actions=5 limit model-visible removed the residual C1 rejection mode: all 32 turns were accepted and the official MCP boundary was reached 127 times.",
+    "remaining_process": "With both parser constraints visible, the trajectory still exhausted all 32 turns without finalize or write_file. It repeatedly listed/read files, ran tests, delegated to additional roles and accumulated pending work.",
+    "task_completion_limit": "C2 did not produce a terminal answer and left the checkout unchanged, so interface-contract repair is sufficient for parser admission but not for process closure.",
+    "causal_limit": "C2 is one contrast-on-contrast trajectory. It isolates the local contract gate but does not estimate occurrence rates or rank systems."
+  },
+  "status": "RECORDED_PENDING_REVIEW_MERGE"
+}
