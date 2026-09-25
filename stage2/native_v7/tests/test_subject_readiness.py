@@ -64,10 +64,10 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
                 spending_ceiling=0.06,
             )
 
-    def test_subject_ready_cannot_be_asserted_from_runner_smoke_alone(self):
+    def test_subject_ready_cannot_exist_without_frozen_readiness_evidence(self):
         registry = load_registry()
         mutated = copy.deepcopy(registry)
-        mutated["probes"]["X1"]["collection_state"] = "SUBJECT_READY"
+        mutated["probes"]["X1"].pop("subject_readiness", None)
         with self.assertRaisesRegex(ValueError, "frozen readiness evidence"):
             validate_registry(mutated)
 
