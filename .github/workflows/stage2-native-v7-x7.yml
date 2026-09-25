@@ -1,0 +1,72 @@
+name: Stage-II v7 X7 LongLLMLingua native context
+
+on:
+  push:
+    paths:
+      - 'stage2/native_v7/x7_longllmlingua/**'
+      - 'stage2/native_v7/software_host_v1.py'
+      - 'stage2/tasks.json'
+      - 'stage2/roles.json'
+      - 'stage2/subject.json'
+      - 'stage2/fixtures/project/**'
+      - '.github/workflows/stage2-native-v7-x7.yml'
+  pull_request:
+    paths:
+      - 'stage2/native_v7/x7_longllmlingua/**'
+      - 'stage2/native_v7/software_host_v1.py'
+      - 'stage2/tasks.json'
+      - 'stage2/roles.json'
+      - 'stage2/subject.json'
+      - 'stage2/fixtures/project/**'
+      - '.github/workflows/stage2-native-v7-x7.yml'
+
+jobs:
+  x7-longllmlingua-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: '${{ github.event.pull_request.head.sha || github.sha }}'
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Bind exact frozen LLMLingua source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/microsoft/LLMLingua upstream
+          git -C upstream checkout -q 5a4c78ae18ab17a98cf997e8259354e546081d64
+          test "$(git -C upstream rev-parse HEAD)" = 5a4c78ae18ab17a98cf997e8259354e546081d64
+      - name: Install CPU native compression environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -q --upgrade pip
+          python -m pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q 'transformers==4.44.2' 'accelerate>=0.33,<1' tiktoken nltk numpy tokenizers safetensors
+          python -m pip install -q --no-deps -e upstream
+          python - <<'PY'
+          import llmlingua
+          assert llmlingua.__version__ == "0.2.2", llmlingua.__version__
+          PY
+      - name: Run X7 official LongLLMLingua boundary smoke
+        shell: bash
+        env:
+          PYTHONPATH: '${{ github.workspace }}'
+          TOKENIZERS_PARALLELISM: 'false'
+        run: |
+          set -euo pipefail
+          python -m stage2.native_v7.x7_longllmlingua.smoke --out-root stage2_x7_smoke
+      - name: Verify existing v7 architecture remains frozen
+        run: |
+          python -m stage2.native_v7.freeze
+          python -m unittest stage2.native_v7.tests.test_architecture -v
+      - name: Upload non-study X7 smoke evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-v7-x7-longllmlingua-smoke-${{ github.run_id }}
+          path: stage2_x7_smoke
+          retention-days: 30
+          if-no-files-found: error
