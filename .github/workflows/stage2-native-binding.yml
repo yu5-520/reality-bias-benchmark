@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'stage2/runtime_bindings.json'
+      - 'stage2/eligibility.json'
       - 'stage2/subject.json'
       - 'stage2/runtime_probe.py'
       - 'stage2/tests/test_runtime_binding.py'
@@ -11,6 +12,7 @@ on:
   pull_request:
     paths:
       - 'stage2/runtime_bindings.json'
+      - 'stage2/eligibility.json'
       - 'stage2/subject.json'
       - 'stage2/runtime_probe.py'
       - 'stage2/tests/test_runtime_binding.py'
@@ -74,9 +76,7 @@ jobs:
               git -C upstream checkout -q cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
               ;;
             X7)
-              git clone -q https://github.com/microsoft/LLMLingua upstream
-              git -C upstream checkout -q 5a4c78ae18ab17a98cf997e8259354e546081d64
-              pip install -q -e ./upstream
+              echo "ENGINEERING_BLOCKED: v6.4 used LLMLingua-2 instead of frozen LongLLMLingua; v6.6 requires the correct frozen checkpoint"
               ;;
           esac
       - name: Verify runtime surface
@@ -90,6 +90,14 @@ jobs:
           b=json.loads(Path("stage2/runtime_bindings.json").read_text())
           assert b["probes"]["X2"]["state"]=="ENGINEERING_BLOCKED"
           print("X2 ENGINEERING_BLOCKED recorded; no substitution performed")
+          PY
+          elif [ "${{ matrix.probe }}" = X7 ]; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          b=json.loads(Path("stage2/eligibility.json").read_text())
+          assert b["engineering_blocks"]["X7"].startswith("NATIVE_VARIANT_MISMATCH:")
+          print("X7 ENGINEERING_BLOCKED recorded; LLMLingua-2 is not accepted as LongLLMLingua")
           PY
           elif [ "${{ matrix.probe }}" = X4 ]; then
             PYTHONPATH="$GITHUB_WORKSPACE" upstream/.venv/bin/python -m stage2.runtime_probe --probe X4 --upstream upstream --protocol-root protocol
