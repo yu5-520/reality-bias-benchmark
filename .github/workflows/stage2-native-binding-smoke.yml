@@ -1,0 +1,111 @@
+name: Stage-II native binding smoke
+
+on:
+  pull_request:
+    paths:
+      - 'stage2/**'
+      - 'docs/R_Plan_v6.3.md'
+      - '.github/workflows/stage2-native-binding-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        probe: [X1, X2, X3, X4, X5, X6, X7]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install exact native dependency
+        id: install
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          case "${{ matrix.probe }}" in
+            X1)
+              python -m pip install \
+                "git+https://github.com/microsoft/autogen.git@027ecf0a379bcc1d09956d46d12d44a3ad9cee14#subdirectory=python/packages/autogen-core"
+              ;;
+            X2)
+              python -m pip install \
+                "git+https://github.com/FoundationAgents/MetaGPT.git@11cdf466d042aece04fc6cfd13b28e1a70341b1f"
+              ;;
+            X3)
+              python -m pip install \
+                "git+https://github.com/a2aproject/a2a-python.git@0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167" \
+                "starlette"
+              ;;
+            X4)
+              python -m pip install \
+                "git+https://github.com/modelcontextprotocol/python-sdk.git@f1b6589088534632fef92238ee9750951e3c0185"
+              ;;
+            X5)
+              true
+              ;;
+            X6)
+              mkdir -p _stage2_upstream
+              git clone https://github.com/zhongwanjun/MemoryBank-SiliconFriend.git _stage2_upstream/MemoryBank
+              git -C _stage2_upstream/MemoryBank checkout cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
+              test "$(git -C _stage2_upstream/MemoryBank rev-parse HEAD)" = "cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9"
+              ;;
+            X7)
+              python -m pip install --no-deps \
+                "git+https://github.com/microsoft/LLMLingua.git@5a4c78ae18ab17a98cf997e8259354e546081d64"
+              ;;
+          esac
+
+      - name: Exercise native boundary or freeze blocker
+        if: always()
+        env:
+          STAGE2_INSTALL_OUTCOME: ${{ steps.install.outcome }}
+          STAGE2_X6_SOURCE: ${{ github.workspace }}/_stage2_upstream/MemoryBank
+        run: |
+          python -m stage2.native_smoke \
+            --probe "${{ matrix.probe }}" \
+            --outdir results/stage2_native_smoke
+
+      - name: Preserve native smoke receipt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-native-smoke-${{ matrix.probe }}-${{ github.run_id }}
+          path: results/stage2_native_smoke/${{ matrix.probe }}
+          retention-days: 90
+          if-no-files-found: error
+
+  aggregate:
+    needs: native-smoke
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: stage2-native-smoke-*-${{ github.run_id }}
+          path: results/stage2_native_all
+          merge-multiple: false
+      - name: Verify seven receipts and native evidence for passed probes
+        run: |
+          python -m stage2.collect_native_smokes \
+            --root results/stage2_native_all \
+            --out results/stage2_native_gate_summary.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-native-gate-summary-${{ github.run_id }}
+          path: results/stage2_native_gate_summary.json
+          retention-days: 90
+          if-no-files-found: error
