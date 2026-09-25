@@ -8,12 +8,12 @@ The frozen scientific conditions remain T1–T3, the nine Software Engineering r
 
 - X systems are registered and version-frozen, not forced through one runtime interface.
 - X1/X2 keep their native multi-agent framework semantics; X3 keeps native A2A communication.
-- X4–X7 are capability-layer conditions and may share the explicitly registered software-engineering background host because those X systems do not own scheduling or inter-agent transport.
-- that background host is never implicit: the registry names its execution and communication semantics and keeps it blocked until monitor responsibilities are removed from the execution path.
+- X4–X7 are capability-layer conditions and share the explicitly registered `software_engineering_host_v1` background role substrate because those X systems do not own scheduling or inter-agent transport.
+- `software_engineering_host_v1` is now frozen as a de-instrumented host: historical queue/mailbox/action semantics are preserved while monitor/audit IDs are removed from the execution path and model-visible context.
 - monitoring is external and non-mutating.
 - common evidence representation is created after observation, not used to dictate execution.
 
-`docs/R_Plan_v7.1.md` is the active implementation plan. X1 AutoGen has a verified probe-specific native runner and passive observer smoke under `stage2/native_v7/x1_autogen/`. Its registry state is `NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING`: the engineering runner is accepted, but **no natural cell is open** until a separate real-provider readiness check is bound to the exact execution commit.
+`docs/R_Plan_v7.2.md` is the active implementation checkpoint. X1 AutoGen remains `NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING`. X4–X7 now have a frozen background host but their probe-specific native capability attachments are still pending. **No natural cell is open.**
 
 ## Historical v6.x scaffold
 
