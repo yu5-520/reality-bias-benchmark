@@ -1,0 +1,158 @@
+name: Stage-II v7 Contrast C2 Action Count
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-v7-contrast-c2-action-count
+  cancel-in-progress: false
+
+jobs:
+  c2-x4-action-count:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'STAGE2 CONTRAST C2 ACTION COUNT AUTHORIZATION'
+    runs-on: ubuntu-latest
+    timeout-minutes: 190
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      AUTH_ISSUE: ${{ github.event.issue.number }}
+      CONTRAST_TAG: stage2-contrast-c2-action-count-claimed
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify exact C2 authorization and frozen C1 parent
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/main
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          expected='\n'.join([
+              'contrast=C2',
+              'contrast_parent=C1',
+              'natural_parent=X4-T1',
+              'change=MODEL_VISIBLE_MAX_ACTIONS_5_ONLY_RELATIVE_TO_C1',
+              'max_contrast_trajectories=1',
+              'expected_main_sha='+os.environ['GITHUB_SHA'],
+              'preserve_attempt=true',
+          ])
+          if os.environ['AUTH_BODY'].strip() != expected:
+              raise SystemExit('C2 authorization mismatch')
+          raw=Path('stage2/contrasts_v7/C1/first_attempt.tar.gz').read_bytes()
+          assert hashlib.sha256(raw).hexdigest() == '8a0b2e7c45ceb3eb4f744d51dd2361c1ae4914c4deb7176a3bda34ab6bc588f2'
+          manifest=json.loads(Path('stage2/contrasts_v7/C1/manifest.json').read_text())
+          assert manifest['status'] == 'FROZEN_RAW_ARCHIVE'
+          assert manifest['contrast_budget_after'] == '1/4'
+          assert manifest['result']['valid_turn_count'] == 19
+          assert manifest['result']['remaining_invalid_reason'] == 'ALL_13_INVALID_TURNS_EXCEEDED_FROZEN_MAX_ACTIONS_5'
+          print('PASS: exact frozen C1 parent verified')
+          PY
+
+      - name: Irrevocably claim C2 before any subject call
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f "ref=refs/tags/$CONTRAST_TAG" -f "sha=$GITHUB_SHA" >/dev/null
+          echo "PASS: C2 unique claim created"
+
+      - name: Bind exact frozen MCP protocol and SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/modelcontextprotocol/python-sdk upstream
+          git -C upstream checkout -q f1b6589088534632fef92238ee9750951e3c0185
+          test "$(git -C upstream rev-parse HEAD)" = f1b6589088534632fef92238ee9750951e3c0185
+          git clone -q https://github.com/modelcontextprotocol/modelcontextprotocol protocol
+          git -C protocol checkout -q 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          test "$(git -C protocol rev-parse HEAD)" = 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          python -m pip install -q uv
+          (cd upstream && uv sync --frozen --no-default-groups)
+          test -x upstream/.venv/bin/python
+
+      - name: Execute exactly one preserved C2 trajectory
+        id: contrast
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          TOKENIZERS_PARALLELISM: 'false'
+        shell: bash
+        run: |
+          set -uo pipefail
+          export PATH="$GITHUB_WORKSPACE/upstream/.venv/bin:$PATH"
+          export PYTHONPATH="$GITHUB_WORKSPACE${PYTHONPATH:+:$PYTHONPATH}"
+          timeout --signal=TERM --kill-after=30s 150m \
+            python -m stage2.contrasts_v7.c2_action_count_x4 \
+              --out-root /tmp/stage2_c2 \
+              > /tmp/stage2_c2_stdout.txt \
+              2> /tmp/stage2_c2_stderr.txt
+          code=$?
+          printf '%s\n' "$code" > /tmp/stage2_c2_exit_code.txt
+          echo "contrast_exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Freeze C2 artifact before interpretation
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/stage2_c2_bundle
+          if [ -d /tmp/stage2_c2 ]; then cp -a /tmp/stage2_c2 /tmp/stage2_c2_bundle/; fi
+          cp /tmp/stage2_c2_stdout.txt /tmp/stage2_c2_bundle/ || true
+          cp /tmp/stage2_c2_stderr.txt /tmp/stage2_c2_bundle/ || true
+          cp /tmp/stage2_c2_exit_code.txt /tmp/stage2_c2_bundle/ || true
+          printf '%s\n' "$GITHUB_SHA" > /tmp/stage2_c2_bundle/execution_sha.txt
+          printf '%s\n' "$AUTH_ISSUE" > /tmp/stage2_c2_bundle/authorization_issue.txt
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root=Path('/tmp/stage2_c2_bundle')
+          inv={
+              str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in sorted(root.rglob('*')) if p.is_file() and p.name != 'inventory.json'
+          }
+          (root/'inventory.json').write_text(json.dumps(inv,indent=2,sort_keys=True)+'\n')
+          PY
+          tar -czf /tmp/stage2-v7-c2-action-count-${{ github.run_id }}.tar.gz -C /tmp/stage2_c2_bundle .
+          sha256sum /tmp/stage2-v7-c2-action-count-${{ github.run_id }}.tar.gz \
+            > /tmp/stage2-v7-c2-action-count-${{ github.run_id }}.tar.gz.sha256
+
+      - name: Upload immutable C2 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-v7-c2-action-count-${{ github.run_id }}
+          path: |
+            /tmp/stage2-v7-c2-action-count-${{ github.run_id }}.tar.gz
+            /tmp/stage2-v7-c2-action-count-${{ github.run_id }}.tar.gz.sha256
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Report preserved C2 outcome
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CONTRAST_CODE: ${{ steps.contrast.outputs.contrast_exit_code }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" \
+            --body "C2 preserved in workflow run $GITHUB_RUN_ID. contrast_exit_code=${CONTRAST_CODE:-missing}. This is a contrast-on-contrast diagnostic, not a natural rerun. Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          gh issue close "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
+          test "$CONTRAST_CODE" = 0
