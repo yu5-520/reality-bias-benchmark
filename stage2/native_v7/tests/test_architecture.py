@@ -60,10 +60,10 @@ class NativeV7Architecture(unittest.TestCase):
             with self.subTest(marker=marker):
                 self.assertNotIn(marker, raw)
 
-    def test_x1_runner_is_verified_but_subject_gate_remains_closed(self):
+    def test_x1_runner_is_subject_ready_from_frozen_receipt(self):
         registry = load_registry()
         x1 = registry["probes"]["X1"]
-        self.assertEqual(x1["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x1["collection_state"], "SUBJECT_READY")
         self.assertEqual(x1["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
         self.assertTrue(x1["launch"]["argv_template"])
         self.assertEqual(x1["verification"]["state"], "NON_STUDY_NATIVE_SMOKE_PASS")
@@ -74,10 +74,10 @@ class NativeV7Architecture(unittest.TestCase):
         self.assertEqual(spec_out["collection_state"], "SUBJECT_READY")
         self.assertEqual(registry_out["probes"]["X1"]["environment_id"], x1["environment_id"])
 
-    def test_x2_runner_is_verified_but_subject_gate_remains_closed(self):
+    def test_x2_runner_is_subject_ready_from_frozen_receipt(self):
         registry = load_registry()
         x2 = registry["probes"]["X2"]
-        self.assertEqual(x2["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x2["collection_state"], "SUBJECT_READY")
         self.assertEqual(x2["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
         self.assertIsNone(x2["background_substrate_id"])
         self.assertEqual(x2["source_commit"], "11cdf466d042aece04fc6cfd13b28e1a70341b1f")
@@ -93,10 +93,10 @@ class NativeV7Architecture(unittest.TestCase):
         self.assertEqual(spec_out["collection_state"], "SUBJECT_READY")
         self.assertEqual(registry_out["probes"]["X2"]["environment_id"], x2["environment_id"])
 
-    def test_x3_runner_is_verified_but_subject_gate_remains_closed(self):
+    def test_x3_runner_is_subject_ready_from_frozen_receipt(self):
         registry = load_registry()
         x3 = registry["probes"]["X3"]
-        self.assertEqual(x3["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x3["collection_state"], "SUBJECT_READY")
         self.assertEqual(x3["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
         self.assertIsNone(x3["background_substrate_id"])
         self.assertEqual(x3["protocol_version"], "1.0.0")
@@ -110,10 +110,10 @@ class NativeV7Architecture(unittest.TestCase):
         self.assertEqual(spec_out["collection_state"], "SUBJECT_READY")
         self.assertEqual(registry_out["probes"]["X3"]["environment_id"], x3["environment_id"])
 
-    def test_x4_runner_is_verified_but_subject_gate_remains_closed(self):
+    def test_x4_runner_is_subject_ready_from_frozen_receipt(self):
         registry = load_registry()
         x4 = registry["probes"]["X4"]
-        self.assertEqual(x4["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x4["collection_state"], "SUBJECT_READY")
         self.assertEqual(x4["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
         self.assertEqual(x4["background_substrate_id"], "software_engineering_host_v1")
         self.assertEqual(x4["verification"]["state"], "NON_STUDY_NATIVE_SMOKE_PASS")
@@ -125,10 +125,10 @@ class NativeV7Architecture(unittest.TestCase):
         self.assertEqual(spec_out["collection_state"], "SUBJECT_READY")
         self.assertEqual(registry_out["probes"]["X4"]["environment_id"], x4["environment_id"])
 
-    def test_x5_runner_is_verified_but_subject_gate_remains_closed(self):
+    def test_x5_runner_is_subject_ready_from_frozen_receipt(self):
         registry = load_registry()
         x5 = registry["probes"]["X5"]
-        self.assertEqual(x5["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x5["collection_state"], "SUBJECT_READY")
         self.assertEqual(x5["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
         self.assertEqual(x5["background_substrate_id"], "software_engineering_host_v1")
         self.assertEqual(x5["implementation_sha256"], "baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4")
