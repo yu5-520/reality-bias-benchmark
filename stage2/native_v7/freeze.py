@@ -1,7 +1,7 @@
 """Freeze the Stage-II v7 registration/observation architecture."""
+import difflib
 import hashlib
 import json
-import difflib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -33,14 +33,17 @@ def artifact():
         BASE / "policy.py",
         BASE / "observer.py",
         BASE / "collect.py",
-        ROOT / "docs/R_Plan_v7.0.md",
+        BASE / "x1_autogen/__init__.py",
+        BASE / "x1_autogen/runner.py",
+        BASE / "x1_autogen/smoke.py",
+        ROOT / "docs/R_Plan_v7.1.md",
     ]
     return {
         "schema": "stage2-native-v7-matrix-v1",
-        "predecessor": "docs/R_Plan_v7.0.md",
+        "predecessor": "docs/R_Plan_v7.1.md",
         "architecture": "heterogeneous-native-execution_external-observation",
         "natural_trajectories_collected": 0,
-        "execution_gate": "CLOSED_UNTIL_EACH_X_NATIVE_RUNNER_VERIFIED",
+        "execution_gate": "CLOSED_UNTIL_CELL_X_SUBJECT_READY",
         "forbidden_shared_runtime": registry["forbidden_execution_dependencies"],
         "fixture_tree": {
             "path": "stage2/fixtures/project",
@@ -80,7 +83,7 @@ def main():
             fromfile="checked-in matrix.json", tofile="derived artifact",
         )))
         raise SystemExit("FAIL: Stage-II v7 matrix differs from frozen native registry/inputs")
-    print("PASS: Stage-II v7 has 21 unopened cells; native execution gate remains closed")
+    print("PASS: Stage-II v7 has 21 unopened cells; natural collection gate remains closed")
 
 
 if __name__ == "__main__":
