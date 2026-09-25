@@ -233,7 +233,7 @@
     "tasks": "stage2/tasks.json",
     "host_policy": "X1-X2 use their native multi-agent framework, X3 uses native A2A communication, and X4-X7 may share the explicitly registered software-engineering background host because those X conditions operate at tool/retrieval/memory/context layers; monitoring is not part of that host."
   },
-  "status": "X1_NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING_X4_X7_BACKGROUND_HOST_DECLARED_X2_X7_RUNNERS_PENDING",
+  "status": "X1_NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING_CAPABILITY_HOST_FROZEN_X2_X7_RUNNERS_PENDING",
   "forbidden_global_normalization": [
     "requiring every X to execute through one common runtime adapter",
     "requiring X1-X3 to use the baseline role-mailbox communication substrate",
@@ -248,11 +248,25 @@
         "X6",
         "X7"
       ],
-      "status": "PENDING_DEINSTRUMENTED_HOST_FREEZE",
+      "status": "FROZEN_DEINSTRUMENTED_HOST",
       "role_environment": "frozen nine-role software-engineering environment",
       "execution_semantics_source": "historical stage2.coding_arena.CodingArena",
       "communication_semantics_source": "historical stage2.transports.RoleMailboxTransport",
-      "rule": "The capability-layer X does not own scheduling or inter-agent transport. The common host substrate must be explicitly registered and frozen, and its formal v7 implementation must remove monitor responsibilities from execution before natural collection."
+      "rule": "The capability-layer X does not own scheduling or inter-agent transport. The common host substrate must be explicitly registered and frozen, and its formal v7 implementation must remove monitor responsibilities from execution before natural collection.",
+      "source_path": "stage2/native_v7/software_host_v1.py",
+      "smoke_path": "stage2/native_v7/software_host_smoke.py",
+      "verification": {
+        "state": "NON_STUDY_DEINSTRUMENTED_HOST_EQUIVALENCE_PASS",
+        "workflow": ".github/workflows/stage2-native-v7-host.yml",
+        "workflow_run_id": 36128409038,
+        "verified_code_commit": "450de572a90ffb729ee24bca1562ff62eebe770b",
+        "task": "T2",
+        "turns": 6,
+        "stop_reason": "finalized",
+        "checkout_sha256": "330c232646f9a53f309bfe4410eb35bcd7b5535955be51bc0b22fc6135e28520",
+        "historical_prompt_contains_audit_ids": true,
+        "deinstrumented_prompt_contains_audit_ids": false
+      }
     }
   }
 }
