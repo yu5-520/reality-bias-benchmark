@@ -44,11 +44,15 @@ def artifact():
         BASE / "x4_mcp/client_call.py",
         BASE / "x4_mcp/runner.py",
         BASE / "x4_mcp/smoke.py",
-        ROOT / "docs/R_Plan_v7.3.md",
+        BASE / "x5_rag/__init__.py",
+        BASE / "x5_rag/context.py",
+        BASE / "x5_rag/runner.py",
+        BASE / "x5_rag/smoke.py",
+        ROOT / "docs/R_Plan_v7.4.md",
     ]
     return {
-        "schema": "stage2-native-v7-matrix-v4",
-        "predecessor": "docs/R_Plan_v7.3.md",
+        "schema": "stage2-native-v7-matrix-v5",
+        "predecessor": "docs/R_Plan_v7.4.md",
         "architecture": "heterogeneous-native-execution_external-observation",
         "natural_trajectories_collected": 0,
         "execution_gate": "CLOSED_UNTIL_CELL_X_SUBJECT_READY",

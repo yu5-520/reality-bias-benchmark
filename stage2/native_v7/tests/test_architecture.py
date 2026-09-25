@@ -82,6 +82,19 @@ class NativeV7Architecture(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
             validate_request("X4", "T1")
 
+    def test_x5_runner_is_verified_but_subject_gate_remains_closed(self):
+        registry = load_registry()
+        x5 = registry["probes"]["X5"]
+        self.assertEqual(x5["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x5["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
+        self.assertEqual(x5["background_substrate_id"], "software_engineering_host_v1")
+        self.assertEqual(x5["implementation_sha256"], "baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4")
+        self.assertEqual(x5["verification"]["state"], "NON_STUDY_NATIVE_SMOKE_PASS")
+        self.assertEqual(x5["verification"]["retrieval_calls"], 1)
+        self.assertFalse(x5["verification"]["subject_ready"])
+        with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
+            validate_request("X5", "T1")
+
     def test_remaining_cells_stay_closed_before_native_runners_exist(self):
         matrix = artifact()
         self.assertEqual(len(matrix["cells"]), 21)
@@ -89,16 +102,16 @@ class NativeV7Architecture(unittest.TestCase):
         verified = {
             row["probe"]: row["status"]
             for row in matrix["cells"]
-            if row["probe"] in {"X1", "X4"}
+            if row["probe"] in {"X1", "X4", "X5"}
         }
         self.assertEqual(set(verified.values()), {"NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING"})
         rest = {
             row["status"]
             for row in matrix["cells"]
-            if row["probe"] not in {"X1", "X4"}
+            if row["probe"] not in {"X1", "X4", "X5"}
         }
         self.assertEqual(rest, {"PENDING_NATIVE_RUNNER"})
-        for probe in ("X2", "X3", "X5", "X6", "X7"):
+        for probe in ("X2", "X3", "X6", "X7"):
             with self.subTest(probe=probe), self.assertRaisesRegex(
                 ValueError, "native runner is not verified"
             ):
@@ -110,6 +123,15 @@ class NativeV7Architecture(unittest.TestCase):
         self.assertIn("MCPCheckoutProxy", raw)
         for marker in ("stage2.mcp_workspace", "CodingArena", "RoleMailboxTransport"):
             self.assertNotIn(marker, raw)
+
+    def test_x5_runner_attaches_only_at_retrieval_context_boundary(self):
+        runner = (ROOT / "stage2/native_v7/x5_rag/runner.py").read_text()
+        context = (ROOT / "stage2/native_v7/x5_rag/context.py").read_text()
+        self.assertIn("SoftwareEngineeringHost", runner)
+        self.assertIn("FrozenRAGContext", runner)
+        self.assertIn("stage2.retrieval", context)
+        for marker in ("stage2.rag_context", "CodingArena", "RoleMailboxTransport"):
+            self.assertNotIn(marker, runner + context)
 
     def test_pending_runner_cannot_smuggle_launch_command(self):
         registry = load_registry()
