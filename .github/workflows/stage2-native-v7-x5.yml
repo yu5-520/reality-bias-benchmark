@@ -1,0 +1,57 @@
+name: Stage-II v7 X5 RAG native context
+
+on:
+  push:
+    paths:
+      - 'stage2/native_v7/x5_rag/**'
+      - 'stage2/retrieval.py'
+      - 'stage2/native_v7/software_host_v1.py'
+      - 'stage2/tasks.json'
+      - 'stage2/roles.json'
+      - 'stage2/subject.json'
+      - 'stage2/fixtures/project/**'
+      - '.github/workflows/stage2-native-v7-x5.yml'
+  pull_request:
+    paths:
+      - 'stage2/native_v7/x5_rag/**'
+      - 'stage2/retrieval.py'
+      - 'stage2/native_v7/software_host_v1.py'
+      - 'stage2/tasks.json'
+      - 'stage2/roles.json'
+      - 'stage2/subject.json'
+      - 'stage2/fixtures/project/**'
+      - '.github/workflows/stage2-native-v7-x5.yml'
+
+jobs:
+  x5-rag-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: '${{ github.event.pull_request.head.sha || github.sha }}'
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify frozen retrieval implementation digest
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum stage2/retrieval.py | awk '{print $1}')" = baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4
+      - name: Run X5 frozen RAG context smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m stage2.native_v7.x5_rag.smoke --out-root stage2_x5_smoke
+      - name: Verify existing v7 architecture remains frozen
+        run: |
+          python -m stage2.native_v7.freeze
+          python -m unittest stage2.native_v7.tests.test_architecture -v
+      - name: Upload non-study X5 RAG smoke evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-v7-x5-rag-smoke-${{ github.run_id }}
+          path: stage2_x5_smoke
+          retention-days: 30
+          if-no-files-found: error
