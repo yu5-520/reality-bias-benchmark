@@ -11,6 +11,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
+from .execution_binding import execution_surface_digest
 from .observer import ExternalObserver, verify_observer
 from .policy import load_registry
 
@@ -43,6 +44,12 @@ def validate_request(probe, task, registry_path=None):
     launch = spec["launch"]
     if launch.get("state") != "VERIFIED_NATIVE_ENTRYPOINT":
         raise ValueError(f"{probe}: native entrypoint is not verified")
+    readiness = spec.get("subject_readiness") or {}
+    current_surface = execution_surface_digest(probe, registry=registry)
+    if readiness.get("execution_surface_sha256") != current_surface:
+        raise ValueError(
+            f"{probe}: current execution surface differs from the subject-readiness binding"
+        )
     return registry, spec
 
 
