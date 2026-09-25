@@ -17,15 +17,17 @@ class RuntimeBindingTests(unittest.TestCase):
     def test_all_seven_targets_locked(self):
         b=json.loads((BASE/"runtime_bindings.json").read_text())
         self.assertEqual(set(b["probes"]),{f"X{i}" for i in range(1,8)})
-        self.assertTrue(all(p["state"] in {"TARGET_LOCKED","IMPLEMENTATION_LOCKED"} for p in b["probes"].values()))
+        self.assertTrue(all(p["state"] in {"TARGET_LOCKED","IMPLEMENTATION_LOCKED","ENGINEERING_BLOCKED"} for p in b["probes"].values()))
         self.assertEqual(b["probes"]["X3"]["protocol_version"],"1.0.0")
         self.assertEqual(b["probes"]["X4"]["protocol_version"],"2026-07-28")
+        self.assertEqual(b["probes"]["X2"]["state"],"ENGINEERING_BLOCKED")
+        self.assertIn("lancedb==0.4.0",b["probes"]["X2"]["block_reason"])
         self.assertNotEqual(b["probes"]["X3"]["protocol_commit"],b["probes"]["X3"]["sdk_commit"])
         self.assertNotEqual(b["probes"]["X4"]["protocol_commit"],b["probes"]["X4"]["sdk_commit"])
 
     def test_target_lock_does_not_claim_native_smoke(self):
         b=json.loads((BASE/"runtime_bindings.json").read_text())
-        self.assertEqual(b["status"],"TARGETS_LOCKED_NATIVE_SMOKE_PENDING")
+        self.assertEqual(b["status"],"TARGETS_LOCKED_WITH_ENGINEERING_BLOCK_NATIVE_SMOKE_PENDING")
         for p in b["probes"].values():
             self.assertNotIn("NATIVE_SMOKE_PASS",p.values())
 
