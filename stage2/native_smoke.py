@@ -21,6 +21,16 @@ from .retrieval import retrieve
 BASE = Path(__file__).resolve().parent
 
 
+@dataclass
+class AutoGenPing:
+    content: str
+
+
+@dataclass
+class AutoGenPong:
+    content: str
+
+
 class EngineeringBlocked(RuntimeError):
     pass
 
@@ -68,27 +78,19 @@ def _binding(lock: dict, probe: str) -> dict:
 async def _x1(binding: dict, cap: NativeCapture) -> None:
     from autogen_core import AgentId, MessageContext, RoutedAgent, SingleThreadedAgentRuntime, message_handler
 
-    @dataclass
-    class Ping:
-        content: str
-
-    @dataclass
-    class Pong:
-        content: str
-
     class Echo(RoutedAgent):
         def __init__(self) -> None:
             super().__init__("Stage-II deterministic native smoke")
 
         @message_handler
-        async def handle(self, message: Ping, ctx: MessageContext) -> Pong:
-            return Pong(content="echo:" + message.content)
+        async def handle(self, message: AutoGenPing, ctx: MessageContext) -> AutoGenPong:
+            return AutoGenPong(content="echo:" + message.content)
 
     binding["installed_version"] = _package_version("autogen-core")
     runtime = SingleThreadedAgentRuntime()
     await Echo.register(runtime, "stage2_echo", Echo)
     runtime.start()
-    request = Ping("native-boundary")
+    request = AutoGenPing("native-boundary")
     cap.capture(
         event_id="x1-send", operation="send_message", phase="emitted",
         native_locator="autogen_core.SingleThreadedAgentRuntime.send_message",
@@ -113,7 +115,7 @@ def _x2(binding: dict, cap: NativeCapture) -> None:
 
     binding["installed_version"] = _package_version("metagpt")
     memory = Memory()
-    message = Message(content="stage2 native shared-state smoke", role="Release Lead")
+    message = Message(content="stage2 native shared-state smoke", role="Release Lead", cause_by="stage2-smoke", sent_from="release_lead")
     memory.add(message)
     cap.capture(
         event_id="x2-write", operation="shared_state", phase="executed",
