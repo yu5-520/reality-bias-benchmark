@@ -109,6 +109,23 @@ class NativeV7Architecture(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
             validate_request("X5", "T1")
 
+    def test_x6_runner_is_verified_but_study_embedding_and_subject_gate_remain_closed(self):
+        registry = load_registry()
+        x6 = registry["probes"]["X6"]
+        self.assertEqual(x6["collection_state"], "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING")
+        self.assertEqual(x6["launch"]["state"], "VERIFIED_NATIVE_ENTRYPOINT")
+        self.assertEqual(x6["background_substrate_id"], "software_engineering_host_v1")
+        self.assertEqual(x6["source_commit"], "cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9")
+        self.assertEqual(x6["verification"]["state"], "NON_STUDY_NATIVE_SMOKE_PASS")
+        self.assertEqual(x6["verification"]["memorybank_writes"], 2)
+        self.assertEqual(x6["verification"]["memorybank_retrieval_calls"], 1)
+        self.assertEqual(x6["verification"]["reinforced_strength"], 2)
+        self.assertFalse(x6["verification"]["subject_ready"])
+        self.assertFalse(x6["verification"]["study_embedding_ready"])
+        self.assertEqual(x6["study_embedding"]["state"], "PENDING_FROZEN_MANIFEST")
+        with self.assertRaisesRegex(ValueError, "subject readiness is pending"):
+            validate_request("X6", "T1")
+
     def test_x7_runner_is_verified_but_study_checkpoint_and_subject_gate_remain_closed(self):
         registry = load_registry()
         x7 = registry["probes"]["X7"]
@@ -131,16 +148,16 @@ class NativeV7Architecture(unittest.TestCase):
         verified = {
             row["probe"]: row["status"]
             for row in matrix["cells"]
-            if row["probe"] in {"X1", "X3", "X4", "X5", "X7"}
+            if row["probe"] in {"X1", "X3", "X4", "X5", "X6", "X7"}
         }
         self.assertEqual(set(verified.values()), {"NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING"})
         rest = {
             row["status"]
             for row in matrix["cells"]
-            if row["probe"] not in {"X1", "X3", "X4", "X5", "X7"}
+            if row["probe"] not in {"X1", "X3", "X4", "X5", "X6", "X7"}
         }
         self.assertEqual(rest, {"PENDING_NATIVE_RUNNER"})
-        for probe in ("X2", "X6"):
+        for probe in ("X2",):
             with self.subTest(probe=probe), self.assertRaisesRegex(
                 ValueError, "native runner is not verified"
             ):
@@ -179,6 +196,16 @@ class NativeV7Architecture(unittest.TestCase):
         self.assertIn("FrozenRAGContext", runner)
         self.assertIn("stage2.retrieval", context)
         for marker in ("stage2.rag_context", "CodingArena", "RoleMailboxTransport"):
+            self.assertNotIn(marker, runner + context)
+
+    def test_x6_runner_attaches_only_at_memory_boundary(self):
+        runner = (ROOT / "stage2/native_v7/x6_memorybank/runner.py").read_text()
+        context = (ROOT / "stage2/native_v7/x6_memorybank/context.py").read_text()
+        self.assertIn("SoftwareEngineeringHost", runner)
+        self.assertIn("LocalMemoryRetrieval", context)
+        self.assertIn("search_memory", context)
+        self.assertIn("init_memory_vector_store", context)
+        for marker in ("stage2.memorybank_context", "CodingArena", "RoleMailboxTransport"):
             self.assertNotIn(marker, runner + context)
 
     def test_x7_runner_attaches_only_at_context_compression_boundary(self):

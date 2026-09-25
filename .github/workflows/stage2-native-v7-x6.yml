@@ -1,0 +1,80 @@
+name: Stage-II v7 X6 MemoryBank native memory
+
+on:
+  push:
+    paths:
+      - 'stage2/native_v7/x6_memorybank/**'
+      - 'stage2/native_v7/software_host_v1.py'
+      - 'stage2/native_v7/registry.json'
+      - 'stage2/native_v7/freeze.py'
+      - 'stage2/native_v7/matrix.json'
+      - 'stage2/native_v7/tests/**'
+      - 'docs/R_Plan_v7.7.md'
+      - 'stage2/tasks.json'
+      - 'stage2/roles.json'
+      - 'stage2/subject.json'
+      - 'stage2/fixtures/project/**'
+      - '.github/workflows/stage2-native-v7-x6.yml'
+  pull_request:
+    paths:
+      - 'stage2/native_v7/x6_memorybank/**'
+      - 'stage2/native_v7/software_host_v1.py'
+      - 'stage2/native_v7/registry.json'
+      - 'stage2/native_v7/freeze.py'
+      - 'stage2/native_v7/matrix.json'
+      - 'stage2/native_v7/tests/**'
+      - 'docs/R_Plan_v7.7.md'
+      - 'stage2/tasks.json'
+      - 'stage2/roles.json'
+      - 'stage2/subject.json'
+      - 'stage2/fixtures/project/**'
+      - '.github/workflows/stage2-native-v7-x6.yml'
+
+jobs:
+  x6-memorybank-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: '${{ github.event.pull_request.head.sha || github.sha }}'
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Bind exact frozen MemoryBank source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/zhongwanjun/MemoryBank-SiliconFriend upstream
+          git -C upstream checkout -q cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
+          test "$(git -C upstream rev-parse HEAD)" = cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
+      - name: Install isolated upstream-compatible memory stack
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -q --upgrade pip
+          python -m pip install -q 'torch==2.0.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q 'numpy==1.24.4' 'pydantic==1.10.13' 'huggingface-hub==0.14.1' 'tokenizers==0.13.3' 'transformers==4.28.0' 'faiss-cpu==1.7.4' 'scipy==1.10.1' 'scikit-learn==1.3.2' 'nltk==3.9.1' 'Pillow==10.4.0' 'unstructured==0.6.10' 'langchain==0.0.146'
+          python -m pip install -q --no-deps 'sentence-transformers==2.2.2'
+      - name: Run X6 official MemoryBank boundary smoke
+        shell: bash
+        env:
+          PYTHONPATH: '${{ github.workspace }}'
+          TOKENIZERS_PARALLELISM: 'false'
+          HF_HUB_OFFLINE: '1'
+          TRANSFORMERS_OFFLINE: '1'
+        run: |
+          set -euo pipefail
+          python -m stage2.native_v7.x6_memorybank.smoke --out-root stage2_x6_smoke --upstream-root upstream
+      - name: Verify existing v7 architecture remains frozen
+        run: |
+          python -m stage2.native_v7.freeze
+          python -m unittest stage2.native_v7.tests.test_architecture -v
+      - name: Upload non-study X6 MemoryBank smoke evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-v7-x6-memorybank-smoke-${{ github.run_id }}
+          path: stage2_x6_smoke
+          retention-days: 30
+          if-no-files-found: error
