@@ -62,13 +62,14 @@ async def run_smoke(probe, destination, *, code_commit, upstream=None):
         {"type": "finalize", "answer": "Engineering boundary exercised."},
         {"type": "finalize", "answer": "Engineering smoke ended."},
     ]
-    provider = ScriptedProvider([{"actions": [action]} for action in actions])
+    local_actions = [actions[0], actions[-1]] if probe == "X3" else actions
+    provider = ScriptedProvider([{"actions": [action]} for action in local_actions])
     transport = AutoGenTransport(capture) if probe == "X1" else None
     workspace = None
     context = None
     if probe == "X3":
         from .a2a_transport import A2AProtocolTransport
-        transport = A2AProtocolTransport(capture)
+        transport = A2AProtocolTransport(capture, remote_mode="scripted", remote_actions=actions[1:-1])
     elif probe != "X1":
         transport = RoleMailboxTransport(capture)
     if probe == "X4":
@@ -80,7 +81,7 @@ async def run_smoke(probe, destination, *, code_commit, upstream=None):
                         workspace=workspace, context_adapter=context, provider=provider)
     result = await arena.run()
     if (result["stop_reason"] != "finalized" or result["turns"] != len(actions)
-            or provider.index != len(actions)):
+            or provider.index != len(local_actions)):
         raise RuntimeError("target-bound coding route did not finish its scripted steps")
     count = check_capture(destination / "evidence")
     operations = {event["operation"] for event in capture.events}
@@ -93,10 +94,14 @@ async def run_smoke(probe, destination, *, code_commit, upstream=None):
     required |= {"retrieve"} if probe == "X5" else set()
     if not required <= operations:
         raise RuntimeError(f"{probe}: native coding operation set incomplete: {required - operations}")
+    if probe == "X3" and len([row for row in capture.events if row["hook_id"] == "a2a.native.remote_model"
+                              and row["operation"] == "model_output"]) != len(actions) - 2:
+        raise RuntimeError("remote specialist model decisions were not executed across A2A")
     report = {"probe": probe, "status": "NON_STUDY_TARGET_CODING_SMOKE_PASS",
               "code_commit": code_commit, "target_sdk_commit": target.get("sdk_commit") or target.get("source_commit"),
               "events": count, "turns": result["turns"], "operations": sorted(operations),
-              "subject_ready": False, "provider": "SCRIPTED_ENGINEERING_ONLY"}
+              "subject_ready": False, "provider": "SCRIPTED_ENGINEERING_ONLY",
+              "remote_execution": "SCRIPTED_REMOTE_ONLY" if probe == "X3" else None}
     (destination / "report.json").write_text(json.dumps(report, sort_keys=True, indent=2) + "\n")
     return report
 

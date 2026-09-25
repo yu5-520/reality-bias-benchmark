@@ -95,11 +95,18 @@ class CodingArena:
                 before = self._capture(event_id=f"turn-{turn}-input", operation="model_input",
                                        raw=canonical_bytes(messages), actor=role, source_id=f"task:{self.task['id']}",
                                        carrier_id=f"prompt:{turn}", parent_ids=parent_ids, phase="exposed")
-                response = self.provider.complete_agent(messages, metadata={"role": role, "turn": turn})
+                if (role != ROLES["entry_agent"] and hasattr(self.transport, "complete_remote")
+                        and self.transport.remote_mode != "echo"):
+                    response, remote_parent = await self.transport.complete_remote(
+                        role=role, messages=messages, turn=turn, cause=before["event_id"])
+                    output_parents = (before["event_id"], remote_parent)
+                else:
+                    response = self.provider.complete_agent(messages, metadata={"role": role, "turn": turn})
+                    output_parents = (before["event_id"],)
                 raw_output = canonical_bytes(response)
                 output = self._capture(event_id=f"turn-{turn}-output", operation="model_output", raw=raw_output,
                                        actor=role, source_id=f"task:{self.task['id']}",
-                                       carrier_id=f"completion:{turn}", parent_ids=(before["event_id"],))
+                                       carrier_id=f"completion:{turn}", parent_ids=output_parents)
                 try:
                     envelope = json.loads(response["content"])
                     actions = envelope["actions"]

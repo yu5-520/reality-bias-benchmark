@@ -19,7 +19,7 @@ def artifact():
     tasks = json.loads((BASE / "tasks.json").read_text())
     subject = json.loads((BASE / "subject.json").read_text())
     return {
-        "schema": "stage2-first-group-v1", "predecessors": [f"docs/R_Plan_v6.{index}.md" for index in range(7)],
+        "schema": "stage2-first-group-v1", "predecessors": [f"docs/R_Plan_v6.{index}.md" for index in range(8)],
         "files_sha256": {**hashes, **{str(p.relative_to(ROOT)): hash_file(p) for p in
             (BASE / "roles.json", BASE / "tasks.json", BASE / "versions.json",
              BASE / "runtime_bindings.json", BASE / "subject.json", BASE / "eligibility.json",
@@ -32,7 +32,7 @@ def artifact():
              BASE / "target_coding_smoke.py", BASE / "verify_target_coding.py",
              ROOT / "docs/R_Plan_v6.2.md", ROOT / "docs/R_Plan_v6.3.md",
              ROOT / "docs/R_Plan_v6.4.md", ROOT / "docs/R_Plan_v6.5.md",
-             ROOT / "docs/R_Plan_v6.6.md")}},
+             ROOT / "docs/R_Plan_v6.6.md", ROOT / "docs/R_Plan_v6.7.md")}},
         "cells": [{"cell": f"{probe['id']}-{task['id']}", "probe": probe["id"], "task": task["id"],
                    "starting_fixture": "stage2/fixtures/project", "status": "PENDING_ENGINEERING_GATE",
                    "raw_destination": f"stage2_raw/{probe['id']}-{task['id']}/", "subject_trajectory_count": 0}
