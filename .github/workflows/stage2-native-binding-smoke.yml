@@ -76,7 +76,7 @@ jobs:
               test "$(git -C _stage2_upstream/MemoryBank rev-parse HEAD)" = "cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9"
               ;;
             X7)
-              python -m pip install --no-deps \
+              python -m pip install \
                 "git+https://github.com/microsoft/LLMLingua.git@5a4c78ae18ab17a98cf997e8259354e546081d64"
               ;;
           esac
