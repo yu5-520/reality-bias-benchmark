@@ -151,11 +151,11 @@
   ],
   "execution_gate": "CLOSED_UNTIL_CELL_X_SUBJECT_READY",
   "files_sha256": {
-    "docs/R_Plan_v7.1.md": "4ee7e851ec6a3dde00d582b5e738cee1ae64217bc543558a4a0e4a5ccf8c1952",
+    "docs/R_Plan_v7.1.md": "15ebb3b13cbf1c3f29b1923e8a13926f75911ac6bc36884fdba8963dce9c469e",
     "stage2/native_v7/collect.py": "0552b4262c4a5fa2d6e4c4ccd2b3b1e78827e38f8cffc0195c672223f86e4a06",
     "stage2/native_v7/observer.py": "3630c831bd504d6b5786539f7d8d79d94d27fb7fa5cfd9647533c2332ce838db",
-    "stage2/native_v7/policy.py": "54e252bc1c6128d33b66c6bc84aac350466f8edb3ef7e0979b667c1450610e71",
-    "stage2/native_v7/registry.json": "dade67e9bc8fc8f0de905b6fc594bef8c25549cbb8d75a40529ae97ee6e538ac",
+    "stage2/native_v7/policy.py": "bfad59ef5ac6b136051ef9e5f5af6947dcb18c06f293f8d978dc9b2a6a367b1b",
+    "stage2/native_v7/registry.json": "57bc98f6718aa7aa55c94decdf0b71b20d823a243fccb5b257b8d51b1895ce62",
     "stage2/native_v7/x1_autogen/__init__.py": "3f8246a2b8a91bd12d327a2e1a531591d7e3b3fd7f86bd2eb774b4044857b96f",
     "stage2/native_v7/x1_autogen/runner.py": "c268cfff575cf23efaf18600078c907aad006bc9bcd3912e64d6202ff9e22e89",
     "stage2/native_v7/x1_autogen/smoke.py": "22859a88c78fbd273bbe472494b647e24b926dc442cf451f936cb11e8a391cc4",
@@ -168,14 +168,28 @@
     "path": "stage2/fixtures/project",
     "sha256": "256193012d0ea1a266f4d81a1f61de77c932cec7962f07ed31539cf62d454ac2"
   },
-  "forbidden_shared_runtime": [
-    "stage2.coding_arena.CodingArena",
-    "stage2.transports.RoleMailboxTransport",
-    "shared action JSON grammar",
-    "shared transport interface",
-    "shared context_adapter interface"
-  ],
   "natural_trajectories_collected": 0,
   "predecessor": "docs/R_Plan_v7.1.md",
-  "schema": "stage2-native-v7-matrix-v1"
+  "schema": "stage2-native-v7-matrix-v2",
+  "background_substrates": {
+    "software_engineering_host_v1": {
+      "applies_to": [
+        "X4",
+        "X5",
+        "X6",
+        "X7"
+      ],
+      "communication_semantics_source": "historical stage2.transports.RoleMailboxTransport",
+      "execution_semantics_source": "historical stage2.coding_arena.CodingArena",
+      "role_environment": "frozen nine-role software-engineering environment",
+      "rule": "The capability-layer X does not own scheduling or inter-agent transport. The common host substrate must be explicitly registered and frozen, and its formal v7 implementation must remove monitor responsibilities from execution before natural collection.",
+      "status": "PENDING_DEINSTRUMENTED_HOST_FREEZE"
+    }
+  },
+  "forbidden_global_normalization": [
+    "requiring every X to execute through one common runtime adapter",
+    "requiring X1-X3 to use the baseline role-mailbox communication substrate",
+    "modifying a frozen upstream X implementation merely to satisfy an experiment host API",
+    "using the post-observation evidence schema as a pre-execution action or message contract"
+  ]
 }
