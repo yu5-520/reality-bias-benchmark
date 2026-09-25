@@ -7,12 +7,8 @@ from pathlib import Path
 
 BASE = Path(__file__).resolve().parent
 PROBES = {f"X{i}" for i in range(1, 8)}
-FORBIDDEN_TEXT = (
-    "CodingArena",
-    "RoleMailboxTransport",
-    "context_adapter",
-    "available_actions",
-)
+CAPABILITY_PROBES = {"X4", "X5", "X6", "X7"}
+NATIVE_COMMUNICATION_PROBES = {"X1", "X2", "X3"}
 FORBIDDEN_KEYS = {
     "adapter",
     "common_actions",
@@ -32,11 +28,19 @@ def load_registry(path=None):
 
 
 def validate_registry(data):
-    if data.get("schema") != "stage2-native-execution-registry-v1":
+    if data.get("schema") != "stage2-native-execution-registry-v2":
         raise ValueError("unexpected v7 registry schema")
     probes = data.get("probes", {})
     if set(probes) != PROBES:
         raise ValueError("v7 registry must contain exactly X1-X7")
+
+    substrates = data.get("background_substrates", {})
+    host = substrates.get("software_engineering_host_v1")
+    if not isinstance(host, dict) or set(host.get("applies_to", [])) != CAPABILITY_PROBES:
+        raise ValueError("capability-layer background host must be explicit for X4-X7")
+    if not isinstance(data.get("forbidden_global_normalization"), list):
+        raise ValueError("global-normalization prohibitions must be explicit")
+
     envs = set()
     for pid, spec in probes.items():
         if FORBIDDEN_KEYS & set(spec):
@@ -47,6 +51,14 @@ def validate_registry(data):
             raise ValueError(f"{pid}: execution owner must be explicit")
         if not spec.get("integration_kind"):
             raise ValueError(f"{pid}: integration kind must be explicit")
+
+        background = spec.get("background_substrate_id")
+        if pid in CAPABILITY_PROBES:
+            if background != "software_engineering_host_v1":
+                raise ValueError(f"{pid}: capability-layer background host must be declared")
+        elif pid in NATIVE_COMMUNICATION_PROBES and background is not None:
+            raise ValueError(f"{pid}: native communication condition must not inherit the baseline mailbox")
+
         observer = spec.get("observer", {})
         if observer.get("mode") != "external" or observer.get("may_mutate_execution") is not False:
             raise ValueError(f"{pid}: observer must be external and non-mutating")
@@ -58,6 +70,8 @@ def validate_registry(data):
         launch = spec.get("launch", {})
         state = spec.get("collection_state")
         if state in RUNNER_STATES:
+            if background and host.get("status") != "FROZEN_DEINSTRUMENTED_HOST":
+                raise ValueError(f"{pid}: capability runner cannot verify before background host is frozen")
             argv = launch.get("argv_template")
             if (
                 launch.get("state") != "VERIFIED_NATIVE_ENTRYPOINT"
@@ -70,9 +84,4 @@ def validate_registry(data):
                 raise ValueError(f"{pid}: pending runner must not expose an executable collection command")
         else:
             raise ValueError(f"{pid}: unrecognized collection state: {state}")
-
-        raw_spec = json.dumps(spec, sort_keys=True)
-        for marker in FORBIDDEN_TEXT:
-            if marker in raw_spec:
-                raise ValueError(f"{pid}: embeds forbidden shared runtime marker: {marker}")
     return True
