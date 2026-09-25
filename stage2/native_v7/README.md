@@ -23,4 +23,4 @@ python -m stage2.native_v7.freeze
 python -m unittest discover -s stage2/native_v7/tests -v
 ```
 
-The frozen architecture matrix retains `subject_trajectory_count: 0` as the prerecording baseline, while its readiness state now opens all seven X conditions. The current raw collection count is **7 / 21**. T1 first attempts are frozen for X1–X7; X2–X7 ended without terminal answers, while X1 has a terminal answer. The next step is read-only T1 post-hoc semantic/process audit. Consult `docs/R_Plan_v7.13.md`, `docs/R_Plan_v7.14.md` and the archive manifests for provenance.
+The frozen architecture matrix retains `subject_trajectory_count: 0` as the prerecording baseline, while its readiness state now opens all seven X conditions. The current raw collection count is **7 / 21**. T1 first attempts are frozen for X1–X7; X2–X7 ended without terminal answers, while X1 has a terminal answer. The seven-cell post-hoc audit is now frozen in `stage2/natural_v7/T1_posthoc_audit.{json,md}`. T2/T3 remain closed until the prospective action-contract decision in `docs/R_Plan_v7.16.md` is resolved. No contrast has been spent.
