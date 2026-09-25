@@ -1,0 +1,152 @@
+name: Stage-II v7 C1 Raw Freeze
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: read
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-v7-c1-raw-freeze
+  cancel-in-progress: false
+
+jobs:
+  freeze-c1:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'STAGE2 C1 RAW FREEZE AUTHORIZATION'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      AUTH_ISSUE: ${{ github.event.issue.number }}
+      SOURCE_RUN: '36171896640'
+      SOURCE_SHA: 'a9232f3edab765588ae2e336fe7be8bf7bbd5ae1'
+      ARTIFACT_ID: '10880226606'
+      ARTIFACT_NAME: stage2-v7-c1-action-contract-36171896640
+      ARTIFACT_DIGEST: 'sha256:73e8c5e4f0dca2d56d108ec6eccb6529c845f24681cddc901045b8e57801ce48'
+      TAR_SHA256: '8a0b2e7c45ceb3eb4f744d51dd2361c1ae4914c4deb7176a3bda34ab6bc588f2'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify exact archival authorization
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/main
+          python - <<'PY'
+          import os
+          expected='\n'.join([
+              'contrast=C1',
+              'source_run=36171896640',
+              'artifact_id=10880226606',
+              'operation=ARCHIVE_EXISTING_CONTRAST_ONLY',
+              'expected_main_sha='+os.environ['GITHUB_SHA'],
+              'rerun=false',
+          ])
+          if os.environ['AUTH_BODY'].strip() != expected:
+              raise SystemExit('C1 raw-freeze authorization mismatch')
+          PY
+
+      - name: Verify source run and artifact identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN" > /tmp/run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ARTIFACT_ID" > /tmp/artifact.json
+          python - <<'PY'
+          import json, os
+          run=json.load(open('/tmp/run.json'))
+          art=json.load(open('/tmp/artifact.json'))
+          assert run['head_sha'] == os.environ['SOURCE_SHA']
+          assert run['conclusion'] == 'success'
+          assert art['name'] == os.environ['ARTIFACT_NAME']
+          assert art['digest'] == os.environ['ARTIFACT_DIGEST']
+          assert art['workflow_run']['id'] == int(os.environ['SOURCE_RUN'])
+          assert art['workflow_run']['head_sha'] == os.environ['SOURCE_SHA']
+          print('PASS: exact C1 source run/artifact verified')
+          PY
+
+      - name: Download and verify immutable C1 bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/c1
+          gh run download "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --name "$ARTIFACT_NAME" --dir /tmp/c1
+          tarfile=$(find /tmp/c1 -maxdepth 1 -name '*.tar.gz' -print -quit)
+          observed=$(sha256sum "$tarfile" | awk '{print $1}')
+          test "$observed" = "$TAR_SHA256"
+          mkdir -p /tmp/c1_extract
+          tar -xzf "$tarfile" -C /tmp/c1_extract
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          d=json.loads(Path('/tmp/c1_extract/stage2_c1/result.json').read_text())
+          r=d['result']
+          assert d['changed_factor'] == 'MODEL_VISIBLE_ACTION_SCHEMA_CLARIFICATION_ONLY'
+          assert d['natural_parent'] == 'X4-T1'
+          assert d['mcp_calls'] == 35
+          assert r['stop_reason'] == 'turn_budget'
+          assert r['answer'] is None
+          assert r['turns'] == 32
+          assert sum(1 for row in r['history'] if row['valid']) == 19
+          assert sum(1 for row in r['history'] if not row['valid']) == 13
+          assert d['checkout_changed_files'] == []
+          responses={row['turn']: row for row in d['subject_responses']}
+          invalid_counts=[]
+          for row in r['history']:
+              if row['valid']:
+                  continue
+              payload=json.loads(responses[row['turn']]['content'])
+              actions=payload['actions']
+              assert all(isinstance(action,dict) and 'type' in action for action in actions)
+              invalid_counts.append(len(actions))
+          assert invalid_counts == [11,9,11,11,11,11,6,11,11,11,8,9,12]
+          assert all(n > 5 for n in invalid_counts)
+          print('PASS: C1 result matches frozen audit claims')
+          PY
+
+      - name: Freeze raw tar and seal manifest status
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p stage2/contrasts_v7/C1
+          cp /tmp/c1/*.tar.gz stage2/contrasts_v7/C1/first_attempt.tar.gz
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          p=Path('stage2/contrasts_v7/C1/manifest.json')
+          d=json.loads(p.read_text())
+          raw=Path('stage2/contrasts_v7/C1/first_attempt.tar.gz').read_bytes()
+          assert hashlib.sha256(raw).hexdigest() == d['tar_sha256']
+          d['status']='FROZEN_RAW_ARCHIVE'
+          d['raw_archive_path']='stage2/contrasts_v7/C1/first_attempt.tar.gz'
+          p.write_text(json.dumps(d,indent=2,sort_keys=True)+'\n')
+          PY
+
+      - name: Push archival commit without creating a new trajectory
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="work/stage2-c1-raw-freeze-$GITHUB_RUN_ID"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add stage2/contrasts_v7/C1/first_attempt.tar.gz stage2/contrasts_v7/C1/manifest.json
+          git commit -m "Stage II: freeze C1 raw contrast evidence"
+          git push origin "$branch"
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" \
+            --body "C1 raw artifact was hash-verified and pushed without a subject call or contrast rerun. Branch: $branch"
+          gh issue close "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed

@@ -12,7 +12,7 @@ The frozen scientific conditions remain T1–T3, the nine Software Engineering r
 - `software_engineering_host_v1` is frozen as a de-instrumented host: historical queue/mailbox/action semantics are preserved while monitor/audit IDs are removed from execution and model-visible context.
 - monitoring is external and non-mutating; common evidence representation is created only after observation.
 
-`docs/R_Plan_v7.16.md` records the completed seven-cell T1 semantic/process audit. **All seven X conditions are `SUBJECT_READY`; raw natural collection is 7/21, T1 is closed at 7/7, and T2/T3 remain closed behind the prospective action-contract decision gate.** No T1 cell is rerun and no local contrast has been spent.
+`docs/R_Plan_v7.16.md` records the completed seven-cell T1 semantic/process audit. **All seven X conditions are `SUBJECT_READY`; raw natural collection is 7/21 and T1 is closed at 7/7. C1 has now been recorded once and consumes 1/4 of the minimal contrast budget. T2/T3 remain closed while the residual action-count contract gate is resolved.** No T1 natural cell was rerun.
 
 ## Historical v6.x scaffold
 
