@@ -1,0 +1,24 @@
+name: Stage-II R6-Grade Semantic Audit Validate
+
+on:
+  pull_request:
+    paths:
+      - 'stage2/natural_v7/r6_grade_semantic_audit/**'
+      - 'stage2/natural_v7/r6_grade_material/**'
+      - 'configs/stage2_r6_grade_semantic_audit_rules_v1.json'
+      - 'scripts/validate_stage2_r6_grade_semantic_audit_v1.py'
+      - 'docs/R_Plan_v7.30.md'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-r6-grade-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify 21-cell R6-grade semantic audit
+        run: python scripts/validate_stage2_r6_grade_semantic_audit_v1.py
