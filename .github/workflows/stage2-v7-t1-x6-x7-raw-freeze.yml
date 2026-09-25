@@ -193,41 +193,6 @@ jobs:
               (root/'manifest.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
           PY
 
-      - name: Extend read-only archive verifier for noisy native stdout
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('stage2/natural_v7/verify_archive.py')
-          s=p.read_text()
-          old='''        if "task_outcome" in manifest:
-              result = json.loads(read(observer_root + "stdout.bin"))
-              assert result["stop_reason"] == "turn_budget"
-              assert result["answer"] is None
-              assert manifest["task_outcome"] == "TURN_BUDGET_NO_ANSWER"
-'''
-          new='''        if "task_outcome" in manifest:
-              raw_result = read(observer_root + "stdout.bin").decode("utf-8", errors="replace")
-              result = None
-              for line in reversed([row.strip() for row in raw_result.splitlines() if row.strip()]):
-                  try:
-                      candidate = json.loads(line)
-                  except json.JSONDecodeError:
-                      continue
-                  if isinstance(candidate, dict) and "stop_reason" in candidate:
-                      result = candidate
-                      break
-              assert result is not None
-              assert result["stop_reason"] == "turn_budget"
-              assert result["answer"] is None
-              assert manifest["task_outcome"] == "TURN_BUDGET_NO_ANSWER"
-'''
-          if old not in s:
-              raise SystemExit('expected verifier block not found')
-          p.write_text(s.replace(old,new))
-          PY
-
       - name: Record T1 7-of-7 checkpoint
         shell: bash
         run: |
@@ -247,9 +212,22 @@ jobs:
           from pathlib import Path
           for name in ('stage2/README.md','stage2/native_v7/README.md'):
               p=Path(name); s=p.read_text()
-              s=s.replace('5 / 21 recorded natural attempts', '7 / 21 recorded natural attempts')
-              s=s.replace('raw natural collection remains 5/21, with X6-T1 and X7-T1 still unopened until their one-time authorization.', 'raw natural collection is now 7/21 and the T1 first-attempt row is closed at 7/7; post-hoc audit is next.')
-              s=s.replace('The current raw collection count is **5 / 21**; X2–X5 T1 attempts ended without terminal answers. Next scientific collection is the one-time X6-T1/X7-T1 pair, after which T1 reaches 7/7.', 'The current raw collection count is **7 / 21**. T1 first attempts are frozen for X1–X7; X2–X7 ended without terminal answers, while X1 has a terminal answer. The next step is read-only T1 post-hoc semantic/process audit.')
+              s=s.replace(
+                  'Stage-II has **5 / 21 recorded natural attempts**: T1 has been attempted once for X1–X5.',
+                  'Stage-II has **7 / 21 recorded natural attempts**: T1 has now been attempted exactly once for X1–X7.'
+              )
+              s=s.replace(
+                  'raw natural collection remains 5/21, with X6-T1 and X7-T1 still unopened until their one-time authorization.',
+                  'raw natural collection is now 7/21 and the T1 first-attempt row is closed at 7/7; post-hoc audit is next.'
+              )
+              s=s.replace(
+                  'T1 natural attempts for X1–X5 are archived under `stage2/natural_v7/`; X6-T1 and X7-T1 remain unopened.',
+                  'T1 natural attempts for X1–X7 are archived under `stage2/natural_v7/`; the T1 first-attempt row is closed at 7/7.'
+              )
+              s=s.replace(
+                  'The current raw collection count is **5 / 21**; X2–X5 T1 attempts ended without terminal answers. Next scientific collection is the one-time X6-T1/X7-T1 pair, after which T1 reaches 7/7.',
+                  'The current raw collection count is **7 / 21**. T1 first attempts are frozen for X1–X7; X2–X7 ended without terminal answers, while X1 has a terminal answer. The next step is read-only T1 post-hoc semantic/process audit.'
+              )
               p.write_text(s)
           PY
 

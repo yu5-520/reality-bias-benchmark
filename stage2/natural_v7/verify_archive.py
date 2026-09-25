@@ -14,6 +14,24 @@ def digest(raw):
     return hashlib.sha256(raw).hexdigest()
 
 
+def _result_json(raw):
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        lines = raw.decode("utf-8", "replace").splitlines()
+        for line in reversed(lines):
+            line = line.strip()
+            if not line.startswith("{"):
+                continue
+            try:
+                payload = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(payload, dict) and "stop_reason" in payload:
+                return payload
+        raise ValueError("observer stdout contains no terminal result JSON")
+
+
 def verify_one(root):
     manifest = json.loads((root / "manifest.json").read_text())
     cell = manifest["cell"]
@@ -63,7 +81,7 @@ def verify_one(root):
         assert read("execution_sha.txt").decode().strip() == manifest["execution_sha"]
         assert int(read("authorization_issue.txt")) == manifest["authorization_issue"]
         if "task_outcome" in manifest:
-            result = json.loads(read(observer_root + "stdout.bin"))
+            result = _result_json(read(observer_root + "stdout.bin"))
             assert result["stop_reason"] == "turn_budget"
             assert result["answer"] is None
             assert manifest["task_outcome"] == "TURN_BUDGET_NO_ANSWER"
