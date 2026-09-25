@@ -1,0 +1,55 @@
+name: Stage-II v7 C1 Offline Preflight
+
+on:
+  push:
+    paths:
+      - 'stage2/contrasts_v7/**'
+      - '.github/workflows/stage2-v7-c1-action-contract.yml'
+      - '.github/workflows/stage2-v7-c1-offline.yml'
+      - 'docs/R_Plan_v7.17.md'
+  pull_request:
+    paths:
+      - 'stage2/contrasts_v7/**'
+      - '.github/workflows/stage2-v7-c1-action-contract.yml'
+      - '.github/workflows/stage2-v7-c1-offline.yml'
+      - 'docs/R_Plan_v7.17.md'
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify C1 is isolated from the frozen natural execution files
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile stage2/contrasts_v7/c1_action_contract_x4.py
+          python - <<'PY'
+          import ast, hashlib, json
+          from pathlib import Path
+
+          natural = Path('stage2/native_v7/software_host_v1.py')
+          matrix = json.loads(Path('stage2/native_v7/matrix.json').read_text())
+          observed = hashlib.sha256(natural.read_bytes()).hexdigest()
+          assert matrix['files_sha256']['stage2/native_v7/software_host_v1.py'] == observed
+
+          parent = Path('stage2/natural_v7/X4-T1/first_attempt.tar.gz')
+          assert hashlib.sha256(parent.read_bytes()).hexdigest() == 'a41f68bae1321060d1edc420f03c311d7dc1a48f38da87e9f033453b13531aac'
+
+          source = Path('stage2/contrasts_v7/c1_action_contract_x4.py').read_text()
+          tree = ast.parse(source)
+          assert 'MODEL_VISIBLE_ACTION_SCHEMA_CLARIFICATION_ONLY' in source
+          assert 'ClarifiedActionSchemaHost' in source
+          assert 'MCPCheckoutProxy' in source
+          assert 'max_turns=int(subject["limits"]["max_turns"])' in source
+          print('PASS: C1 is a separate contrast and natural execution hashes remain frozen')
+          PY
+          python -m stage2.native_v7.freeze
+          python -m stage2.natural_v7.verify_archive

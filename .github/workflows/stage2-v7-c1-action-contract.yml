@@ -1,0 +1,160 @@
+name: Stage-II v7 Contrast C1 Action Contract
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-v7-contrast-c1-action-contract
+  cancel-in-progress: false
+
+jobs:
+  c1-x4-action-contract:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'STAGE2 CONTRAST C1 ACTION CONTRACT AUTHORIZATION'
+    runs-on: ubuntu-latest
+    timeout-minutes: 190
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      AUTH_ISSUE: ${{ github.event.issue.number }}
+      CONTRAST_TAG: stage2-contrast-c1-action-contract-claimed
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify exact one-contrast authorization and frozen parent
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/main
+          python - <<'PY'
+          import json, os, tarfile
+          from pathlib import Path
+          expected = '\n'.join([
+              'contrast=C1',
+              'natural_parent=X4-T1',
+              'change=MODEL_VISIBLE_ACTION_SCHEMA_CLARIFICATION_ONLY',
+              'max_contrast_trajectories=1',
+              'expected_main_sha=' + os.environ['GITHUB_SHA'],
+              'preserve_attempt=true',
+          ])
+          if os.environ['AUTH_BODY'].strip() != expected:
+              raise SystemExit('C1 authorization differs from exact one-contrast contract')
+          manifest=json.loads(Path('stage2/natural_v7/X4-T1/manifest.json').read_text())
+          assert manifest['tar_sha256'] == 'a41f68bae1321060d1edc420f03c311d7dc1a48f38da87e9f033453b13531aac'
+          assert manifest['natural_attempts_for_cell'] == 1
+          assert manifest['task_outcome'] == 'TURN_BUDGET_NO_ANSWER'
+          with tarfile.open('stage2/natural_v7/X4-T1/first_attempt.tar.gz','r:gz') as ar:
+              raw=ar.extractfile('./X4-T1/observer/stdout.bin').read()
+          parent=json.loads(raw)
+          assert len(parent['history']) == 32
+          assert all(not row['valid'] for row in parent['history'])
+          assert parent['mcp_calls'] == 0
+          print('PASS: frozen X4-T1 parent has 32 invalid turns and zero MCP calls')
+          PY
+
+      - name: Irrevocably claim C1 before any subject call
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f "ref=refs/tags/$CONTRAST_TAG" -f "sha=$GITHUB_SHA" >/dev/null
+          echo "PASS: C1 unique claim created; retries must fail"
+
+      - name: Bind exact frozen MCP protocol and SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/modelcontextprotocol/python-sdk upstream
+          git -C upstream checkout -q f1b6589088534632fef92238ee9750951e3c0185
+          test "$(git -C upstream rev-parse HEAD)" = f1b6589088534632fef92238ee9750951e3c0185
+          git clone -q https://github.com/modelcontextprotocol/modelcontextprotocol protocol
+          git -C protocol checkout -q 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          test "$(git -C protocol rev-parse HEAD)" = 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          python -m pip install -q uv
+          (cd upstream && uv sync --frozen --no-default-groups)
+          test -x upstream/.venv/bin/python
+
+      - name: Execute exactly one preserved C1 trajectory
+        id: contrast
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          TOKENIZERS_PARALLELISM: 'false'
+        shell: bash
+        run: |
+          set -uo pipefail
+          export PATH="$GITHUB_WORKSPACE/upstream/.venv/bin:$PATH"
+          export PYTHONPATH="$GITHUB_WORKSPACE${PYTHONPATH:+:$PYTHONPATH}"
+          timeout --signal=TERM --kill-after=30s 150m \
+            python -m stage2.contrasts_v7.c1_action_contract_x4 \
+              --out-root /tmp/stage2_c1 \
+              > /tmp/stage2_c1_stdout.txt \
+              2> /tmp/stage2_c1_stderr.txt
+          code=$?
+          printf '%s\n' "$code" > /tmp/stage2_c1_exit_code.txt
+          echo "contrast_exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Freeze C1 artifact before interpretation
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/stage2_c1_bundle
+          if [ -d /tmp/stage2_c1 ]; then cp -a /tmp/stage2_c1 /tmp/stage2_c1_bundle/; fi
+          cp /tmp/stage2_c1_stdout.txt /tmp/stage2_c1_bundle/ || true
+          cp /tmp/stage2_c1_stderr.txt /tmp/stage2_c1_bundle/ || true
+          cp /tmp/stage2_c1_exit_code.txt /tmp/stage2_c1_bundle/ || true
+          printf '%s\n' "$GITHUB_SHA" > /tmp/stage2_c1_bundle/execution_sha.txt
+          printf '%s\n' "$AUTH_ISSUE" > /tmp/stage2_c1_bundle/authorization_issue.txt
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root=Path('/tmp/stage2_c1_bundle')
+          inv={
+              str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in sorted(root.rglob('*')) if p.is_file() and p.name != 'inventory.json'
+          }
+          (root/'inventory.json').write_text(json.dumps(inv,indent=2,sort_keys=True)+'\n')
+          PY
+          tar -czf /tmp/stage2-v7-c1-action-contract-${{ github.run_id }}.tar.gz -C /tmp/stage2_c1_bundle .
+          sha256sum /tmp/stage2-v7-c1-action-contract-${{ github.run_id }}.tar.gz \
+            > /tmp/stage2-v7-c1-action-contract-${{ github.run_id }}.tar.gz.sha256
+
+      - name: Upload immutable C1 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-v7-c1-action-contract-${{ github.run_id }}
+          path: |
+            /tmp/stage2-v7-c1-action-contract-${{ github.run_id }}.tar.gz
+            /tmp/stage2-v7-c1-action-contract-${{ github.run_id }}.tar.gz.sha256
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Report preserved C1 outcome
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CONTRAST_CODE: ${{ steps.contrast.outputs.contrast_exit_code }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          summary="C1 preserved in workflow run $GITHUB_RUN_ID. contrast_exit_code=${CONTRAST_CODE:-missing}. This is one explicit contrast, not a natural rerun. Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$summary"
+          gh issue close "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
+          test "$CONTRAST_CODE" = 0
