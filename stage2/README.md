@@ -12,7 +12,7 @@ The frozen scientific conditions remain T1–T3, the nine Software Engineering r
 - `software_engineering_host_v1` is frozen as a de-instrumented host: historical queue/mailbox/action semantics are preserved while monitor/audit IDs are removed from execution and model-visible context.
 - monitoring is external and non-mutating; common evidence representation is created only after observation.
 
-`docs/R_Plan_v7.16.md` records the completed seven-cell T1 semantic/process audit. **All seven X conditions are `SUBJECT_READY`; raw natural collection is 7/21 and T1 is closed at 7/7. C1 and C2 have now been recorded once each and consume 2/4 of the minimal contrast budget. The two model-visible parser-contract gates are locally closed. Prospective Action Contract v2 is now frozen for T2/T3 on the experiment-defined JSON-action surfaces, while T1 remains permanently on historical v1.** No T1 natural cell was rerun.
+`docs/R_Plan_v7.21.md` records the task-versioned contract boundary. **Raw natural collection remains 7/21 and T1 is closed at 7/7. C1 and C2 consume 2/4 of the minimal contrast budget. Prospective Action Contract v2 is frozen for T2/T3, but all seven X conditions are temporarily `NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING` because the execution snapshot changed.** The original provider receipt remains historical T1/v1 provenance; one new non-scientific v2 handshake and reviewed promotion are required before T2 can open. No T1 natural cell was rerun.
 
 ## Historical v6.x scaffold
 
@@ -21,4 +21,4 @@ The v6.x track established exact target/version locks, native-boundary engineeri
 Do not invoke `stage2.collect_natural` for new Stage-II evidence. The active launcher is `stage2.native_v7.collect`, and it fails closed unless the selected X is explicitly `SUBJECT_READY`.
 
 
-`docs/R_Plan_v7.21.md` freezes the task-versioned action-contract boundary. T2 is the next unopened natural row; T3 stays closed until T2 is preserved and read-only audited.
+`docs/R_Plan_v7.21.md` freezes the task-versioned action-contract boundary. Subject revalidation is the current gate; after reviewed promotion, T2 is the next natural row. T3 stays closed until T2 is preserved and read-only audited.
