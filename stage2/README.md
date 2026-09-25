@@ -24,3 +24,5 @@ Do not invoke `stage2.collect_natural` for new Stage-II evidence. The active lau
 `docs/R_Plan_v7.21.md` freezes the task-versioned action-contract boundary. Subject revalidation and reviewed promotion are complete. T2 is the next unopened natural row; T3 stays closed until T2 is preserved and read-only audited.
 
 R_Plan_v7.24 freezes the complete one-shot T2 row. Natural collection is now 14 / 21 (T1 7/7 + T2 7/7). X4-T2 and X6-T2 are preserved runner failures and must not be rerun. T2 read-only audit is next; T3 remains closed.
+
+`docs/R_Plan_v7.25.md` freezes the read-only T2 seven-cell semantic/process audit. Natural collection remains **14 / 21**; no T2 cell is rerun and no new contrast is spent. T3 is now the next admissible natural row, while the final two contrast slots remain reserved until the complete T3 audit.
