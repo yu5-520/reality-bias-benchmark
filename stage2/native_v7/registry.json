@@ -258,22 +258,37 @@
       "background_substrate_id": "software_engineering_host_v1"
     },
     "X7": {
-      "collection_state": "PENDING_NATIVE_RUNNER",
+      "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
       "environment_id": "x7-longllmlingua-5a4c78a",
       "execution_owner": "Frozen software-engineering host plus official LongLLMLingua compressor",
       "host_attachment": "LongLLMLingua attaches at its native context-compression boundary while the software-engineering host retains role execution.",
       "launch": {
-        "argv_template": null,
-        "state": "PENDING_NATIVE_ENTRYPOINT"
+        "state": "VERIFIED_NATIVE_ENTRYPOINT",
+        "argv_template": [
+          "python",
+          "-m",
+          "stage2.native_v7.x7_longllmlingua.runner",
+          "--checkout",
+          "{checkout}",
+          "--task-file",
+          "{task_file}",
+          "--roles-file",
+          "{roles_file}",
+          "--subject-file",
+          "{subject_file}",
+          "--observer-root",
+          "{observer_root}/longllmlingua_native"
+        ]
       },
       "name": "LongLLMLingua",
       "observer": {
         "may_mutate_execution": false,
         "mode": "external",
         "native_surfaces": [
-          "compressor input bytes",
-          "compressor output bytes",
-          "provider I/O",
+          "post-return immutable copy of compressor input bytes",
+          "post-return immutable copy of PromptCompressor result bytes",
+          "model-visible compressed historical context",
+          "process stdout/stderr/exit",
           "checkout effects"
         ]
       },
@@ -282,7 +297,32 @@
       "source_repo": "microsoft/LLMLingua",
       "upstream_mode": "official_source",
       "integration_kind": "context_compression_capability",
-      "background_substrate_id": "software_engineering_host_v1"
+      "background_substrate_id": "software_engineering_host_v1",
+      "study_checkpoint": {
+        "state": "PENDING_FROZEN_MANIFEST",
+        "package_version": "0.2.2",
+        "source_commit": "5a4c78ae18ab17a98cf997e8259354e546081d64",
+        "checkpoint_env": "STAGE2_X7_CHECKPOINT",
+        "manifest_env": "STAGE2_X7_CHECKPOINT_MANIFEST",
+        "rule": "A study checkpoint directory and exact file-hash manifest must be frozen before SUBJECT_READY; the engineering smoke checkpoint is never authorized for natural collection."
+      },
+      "verification": {
+        "state": "NON_STUDY_NATIVE_SMOKE_PASS",
+        "workflow": ".github/workflows/stage2-native-v7-x7.yml",
+        "verified_code_commit": "f73b11b1f7136917cd47052c88a296c7b5d9fae5",
+        "workflow_run_id": 36132656916,
+        "subject_ready": false,
+        "study_checkpoint_ready": false,
+        "task": "T3",
+        "turns": 1,
+        "stop_reason": "finalized",
+        "compression_calls": 1,
+        "origin_tokens": 79,
+        "compressed_tokens": 135,
+        "observer_files": 3,
+        "synthetic_checkpoint_files": 6,
+        "checkout_sha256": "15200a4ce5b6a09127f25371b55d9b4ae3b1f2071af78c3a7f37b6fcad8303e2"
+      }
     }
   },
   "schema": "stage2-native-execution-registry-v2",
@@ -295,7 +335,7 @@
     "tasks": "stage2/tasks.json",
     "host_policy": "X1-X2 use their native multi-agent framework, X3 uses native A2A communication, and X4-X7 may share the explicitly registered software-engineering background host because those X conditions operate at tool/retrieval/memory/context layers; monitoring is not part of that host."
   },
-  "status": "X1_X4_X5_NATIVE_RUNNERS_VERIFIED_SUBJECT_PENDING_CAPABILITY_HOST_FROZEN_X2_X3_X6_X7_RUNNERS_PENDING",
+  "status": "X1_X4_X5_X7_NATIVE_RUNNERS_VERIFIED_SUBJECT_PENDING_CAPABILITY_HOST_FROZEN_X2_X3_X6_RUNNERS_PENDING",
   "forbidden_global_normalization": [
     "requiring every X to execute through one common runtime adapter",
     "requiring X1-X3 to use the baseline role-mailbox communication substrate",
