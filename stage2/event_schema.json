@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Stage-II native-boundary evidence event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "run_id", "probe", "sequence", "event_id", "operation", "phase", "native_locator", "hook_id", "native_sha256", "raw_path", "actor", "target", "source_id", "carrier_id", "carrier_type", "parent_ids", "status", "binding", "semantic_assessment", "previous_hash", "record_hash"],
+  "properties": {
+    "schema": {"const": "stage2-native-event-v1"},
+    "run_id": {"type": "string", "minLength": 1},
+    "probe": {"enum": ["X1", "X2", "X3", "X4", "X5", "X6", "X7"]},
+    "sequence": {"type": "integer", "minimum": 0},
+    "event_id": {"type": "string", "minLength": 1},
+    "operation": {"enum": ["send_message", "receive_message", "shared_state", "delegate", "handoff", "tool_call", "resource_read", "memory_write", "memory_retrieve", "remote_task", "artifact_return", "retrieve", "compress", "file_change", "test_run", "termination"]},
+    "phase": {"enum": ["emitted", "delivered", "exposed", "executed", "returned", "failed"]},
+    "native_locator": {"type": "string", "minLength": 1},
+    "hook_id": {"type": "string", "minLength": 1},
+    "native_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "raw_path": {"type": "string", "minLength": 1},
+    "actor": {"type": "string", "minLength": 1},
+    "target": {"type": ["string", "null"]},
+    "source_id": {"type": "string", "minLength": 1},
+    "carrier_id": {"type": "string", "minLength": 1},
+    "carrier_type": {"type": ["string", "null"]},
+    "parent_ids": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "status": {"enum": [null, "success", "error", "censored", "blocked"]},
+    "binding": {"type": "object", "required": ["probe", "source_commit"], "properties": {"probe": {"type": "string"}, "source_commit": {"type": "string", "minLength": 1}}},
+    "semantic_assessment": {"const": "NOT_ADJUDICATED"},
+    "previous_hash": {"type": ["string", "null"]},
+    "record_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+  }
+}
