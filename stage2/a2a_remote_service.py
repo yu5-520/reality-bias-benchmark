@@ -1,10 +1,32 @@
-"""A2A v1.0.0 remote task/artifact boundary for non-subject protocol smoke.
-
-This service exercises a real A2A task and artifact. It deliberately does not
-claim that a subject-model decision was executed remotely until a provider is
-configured and its raw calls are recorded in the remote service.
-"""
+"""Separate A2A service for delegated messages and explicit remote decisions."""
+import asyncio
+import hashlib
+import json
 import os
+from pathlib import Path
+
+
+def _remote_provider():
+    mode = os.getenv("STAGE2_A2A_REMOTE_MODE", "echo")
+    if mode == "echo":
+        return mode, None
+    if mode == "scripted":
+        actions = json.loads(os.environ["STAGE2_A2A_SCRIPT"])
+        if not isinstance(actions, list) or not actions:
+            raise ValueError("nonempty non-study remote action script required")
+        return mode, iter(actions)
+    if mode == "subject":
+        if not os.environ.get("DEEPSEEK_API_KEY"):
+            raise RuntimeError("frozen remote subject key is unavailable")
+        from arena.providers import DeepSeekArenaProvider
+        root = Path(__file__).resolve().parent.parent
+        frozen = json.loads((root / "stage2/subject.json").read_text())
+        config = json.loads((root / frozen["source_config"]).read_text())
+        if (config["provider"] != frozen["provider"] or config["model_alias"] != frozen["model_alias"]
+                or config["subject"] != frozen["subject"]):
+            raise ValueError("remote model configuration differs from frozen subject")
+        return mode, DeepSeekArenaProvider(config)
+    raise ValueError("A2A remote execution mode is not frozen")
 
 
 def build_app(base_url):
@@ -17,6 +39,7 @@ def build_app(base_url):
                            TaskStatusUpdateEvent)
     from a2a.helpers import new_task_from_user_message, new_text_artifact
     from starlette.applications import Starlette
+    mode, provider = _remote_provider()
 
     class RemoteRoleExecutor(AgentExecutor):
         async def execute(self, context, event_queue):
@@ -26,9 +49,37 @@ def build_app(base_url):
                 task_id=context.task_id, context_id=context.context_id,
                 status=TaskStatus(state=TaskState.TASK_STATE_WORKING)))
             text = "\n".join(part.text for part in context.message.parts if part.HasField("text"))
+            parsed = json.loads(text)
+            if parsed.get("operation") == "model_inference":
+                if mode == "echo":
+                    raise ValueError("remote model execution was not enabled for this A2A service")
+                messages = parsed["messages"]
+                if not isinstance(messages, list) or not messages:
+                    raise ValueError("remote model received no frozen role prompt")
+                if mode == "scripted":
+                    try:
+                        action = next(provider)
+                    except StopIteration as exc:
+                        raise ValueError("non-study remote script exhausted") from exc
+                    response = {"content": json.dumps({"actions": [action]}, ensure_ascii=False),
+                                "response_id": f"remote-script-{context.task_id}",
+                                "model": "SCRIPTED_REMOTE_PREFLIGHT_ONLY", "usage": {}}
+                else:
+                    response = await asyncio.to_thread(provider.complete_agent, messages,
+                                                       {"role": parsed["target"],
+                                                        "turn": parsed["turn"]})
+                request_bytes = json.dumps(messages, sort_keys=True, ensure_ascii=False,
+                                           separators=(",", ":")).encode()
+                text = json.dumps({"schema": "stage2-a2a-remote-model-artifact-v1",
+                                   "remote_mode": mode, "role": parsed["target"],
+                                   "request_sha256": hashlib.sha256(request_bytes).hexdigest(),
+                                   "response": response}, ensure_ascii=False, sort_keys=True)
+                artifact_name = "remote_model_result"
+            else:
+                artifact_name = "delegated_message"
             await event_queue.enqueue_event(TaskArtifactUpdateEvent(
                 task_id=context.task_id, context_id=context.context_id,
-                artifact=new_text_artifact(name="delegated_message", text=text)))
+                artifact=new_text_artifact(name=artifact_name, text=text)))
             await event_queue.enqueue_event(TaskStatusUpdateEvent(
                 task_id=context.task_id, context_id=context.context_id,
                 status=TaskStatus(state=TaskState.TASK_STATE_COMPLETED)))

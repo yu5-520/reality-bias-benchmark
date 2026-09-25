@@ -45,9 +45,17 @@ def verify_artifacts(root, code_commit):
         operations = {row["operation"] for row in rows}
         if not {"model_input", "model_output", "file_change", "test_run", "termination"} <= operations:
             raise ValueError(f"{pid}: shared coding evidence incomplete")
-        if any(json.loads((evidence / row["raw_path"]).read_text()).get("model") != "SCRIPTED_PREFLIGHT_ONLY"
+        allowed_models = {"SCRIPTED_PREFLIGHT_ONLY", "SCRIPTED_REMOTE_PREFLIGHT_ONLY"} if pid == "X3" else {
+            "SCRIPTED_PREFLIGHT_ONLY"}
+        if any(json.loads((evidence / row["raw_path"]).read_text()).get("model") not in allowed_models
                for row in rows if row["operation"] == "model_output"):
             raise ValueError(f"{pid}: scripted smoke unexpectedly used a subject provider")
+        if pid == "X3":
+            remote = [row for row in rows if row["hook_id"] == "a2a.native.remote_model"]
+            if (report.get("remote_execution") != "SCRIPTED_REMOTE_ONLY" or
+                    sum(row["operation"] == "model_input" for row in remote) != 5 or
+                    sum(row["operation"] == "model_output" for row in remote) != 5):
+                raise ValueError("X3: actual remote role-model input/output evidence is missing")
         if any(row["operation"] == "test_run" and row["status"] != "success" for row in rows):
             raise ValueError(f"{pid}: checkout test did not pass")
         if not (artifact / "checkout/web/index.html").is_file():

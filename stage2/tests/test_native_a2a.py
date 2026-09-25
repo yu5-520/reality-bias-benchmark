@@ -4,6 +4,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from arena.providers import ScriptedProvider
 from stage2.coding_arena import CodingArena
@@ -13,6 +14,18 @@ from stage2.workspace import new_workspace
 
 @unittest.skipUnless(importlib.util.find_spec("a2a"), "pinned A2A SDK unavailable")
 class A2ANativeSmoke(unittest.TestCase):
+    def test_remote_subject_fails_closed_without_credential(self):
+        from stage2.a2a_transport import A2AProtocolTransport
+        with tempfile.TemporaryDirectory() as directory:
+            capture = NativeCapture(Path(directory) / "raw", "X3", "NON_SUBJECT_A2A_PROTOCOL_SMOKE",
+                                    {"probe": "X3", "source_commit": "173695755607e884aa9acf8ce4feed90e32727a1",
+                                     "sdk_commit": "0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167"})
+            transport = A2AProtocolTransport(capture, remote_mode="subject")
+            with patch.dict("os.environ", {"DEEPSEEK_API_KEY": ""}):
+                with self.assertRaisesRegex(RuntimeError, "requires the frozen DeepSeek credential"):
+                    asyncio.run(transport.open({}))
+            self.assertFalse(hasattr(transport, "process"))
+
     def test_http_remote_task_and_artifact(self):
         from stage2.a2a_transport import A2AProtocolTransport
         with tempfile.TemporaryDirectory() as directory:

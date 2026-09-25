@@ -146,8 +146,13 @@ def blockers(runtime_manifest, captures_root, probe_id=None):
             if any(json.loads((evidence_dir / row["raw_path"]).read_text()).get("model") != expected_version
                    for row in rows if row["operation"] == "model_output"):
                 raise ValueError("provider output differs from frozen subject version")
-            if pid == "X3" and not bind.get("remote_model_evidence"):
-                raise ValueError("A2A artifact lacks remote model input/output evidence")
+            if pid == "X3":
+                remote = [row for row in rows if row["hook_id"] == "a2a.native.remote_model"]
+                if (bind.get("remote_model_evidence") is not True
+                        or not {"model_input", "model_output"} <= {row["operation"] for row in remote}
+                        or any("provider_response" not in json.loads((evidence_dir / row["raw_path"]).read_text())
+                               for row in remote if row["operation"] == "model_output")):
+                    raise ValueError("A2A artifact lacks actual remote subject model input/output evidence")
             check_capture(evidence_dir)
         except (OSError, ValueError, KeyError, AssertionError) as exc:
             errors.append(f"{pid}: full coding evidence gate failed ({exc})")

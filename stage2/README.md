@@ -49,9 +49,11 @@ at execution freeze; it is not secretly rerun or swapped.
 
 `coding_arena.py` provides file operations and common model input/output
 recording. `target_coding_smoke.py` and `verify_target_coding.py` exercise and
-verify exact-target, non-subject code-changing traces in CI. The A2A service currently
-returns an artifact without remote model execution; it does not pass subject
-preflight. `MetaGPTTransport` and `LongLLMLinguaContext` require exact native
+verify exact-target, non-subject code-changing traces in CI. X3 now executes its
+scripted specialist decisions in the separate A2A process and records remote
+model input/output plus the returned artifact. Its subject mode requires the
+frozen DeepSeek credential and has not been executed. `MetaGPTTransport` and
+`LongLLMLinguaContext` require exact native
 dependencies and a frozen local compressor checkpoint respectively. X6 remains
 frozen as `ENGINEERING_BLOCKED` at the upstream dependency conflict. X7's
 previous smoke used LLMLingua-2 and is blocked prospectively in R Plan v6.6.
