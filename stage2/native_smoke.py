@@ -234,7 +234,7 @@ async def _x4(binding: dict, cap: NativeCapture) -> None:
     def legacy_resource() -> str:
         return "legacy compatibility path"
 
-    async with Client(server, mode="legacy") as client:
+    async with Client(server) as client:
         tool_input = {"path": "checkout_app/server.py"}
         cap.capture(
             event_id="x4-tool", operation="tool_call", phase="emitted",
