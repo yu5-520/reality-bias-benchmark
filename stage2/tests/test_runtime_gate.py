@@ -1,9 +1,12 @@
+import hashlib
 import json
 import tempfile
 import unittest
 from pathlib import Path
 
 from stage2.evidence import NativeCapture, check_capture
+from stage2.freeze import artifact
+from stage2.preflight import blockers
 
 BASE = Path(__file__).resolve().parents[1]
 
@@ -66,6 +69,33 @@ class RuntimeGateContractTests(unittest.TestCase):
             )
             self.assertEqual(check_capture(tmp), 2)
 
+
+    def test_explicit_engineering_blockers_can_close_cells_without_fake_smoke(self):
+        subject = json.loads((BASE / "subject_lock.json").read_text())
+        planned = artifact()
+        runtime = {
+            "runtime_lock_sha256": hashlib.sha256((BASE / "runtime_lock.json").read_bytes()).hexdigest(),
+            "subject_lock_sha256": hashlib.sha256((BASE / "subject_lock.json").read_bytes()).hexdigest(),
+            "matrix_sha256": hashlib.sha256((BASE / "matrix.json").read_bytes()).hexdigest(),
+            "subject_provider": subject["provider"],
+            "subject_model": subject["model_alias"],
+            "subject_limits": subject["limits"],
+            "code_commit": "test-code-sha",
+            "roles_sha256": planned["files_sha256"]["stage2/roles.json"],
+            "probes": {
+                f"X{i}": {
+                    "execution_status": "ENGINEERING_BLOCKED",
+                    "blocker_reason": "test blocker",
+                }
+                for i in range(1, 8)
+            },
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = Path(tmp) / "runtime.json"
+            captures = Path(tmp) / "captures"
+            captures.mkdir()
+            manifest.write_text(json.dumps(runtime))
+            self.assertEqual(blockers(manifest, captures), [])
 
 if __name__ == "__main__":
     unittest.main()
