@@ -14,6 +14,7 @@ def blockers(runtime_manifest, captures_root):
     runtime_lock_path = BASE / "runtime_lock.json"
     subject_lock_path = BASE / "subject_lock.json"
     runtime_lock = json.loads(runtime_lock_path.read_text())
+    subject_lock = json.loads(subject_lock_path.read_text())
     lock_by_probe = {row["id"]: row for row in runtime_lock["probes"]}
     expected_runtime_lock_hash = hashlib.sha256(runtime_lock_path.read_bytes()).hexdigest()
     expected_subject_lock_hash = hashlib.sha256(subject_lock_path.read_bytes()).hexdigest()
@@ -25,12 +26,26 @@ def blockers(runtime_manifest, captures_root):
         errors.append("matrix hash mismatch")
     if not runtime.get("subject_provider") or not runtime.get("subject_model") or not runtime.get("subject_limits"):
         errors.append("provider/model/limits unbound")
+    if runtime.get("subject_provider") != subject_lock.get("provider"):
+        errors.append("subject provider differs from frozen subject lock")
+    if runtime.get("subject_model") != subject_lock.get("model_alias"):
+        errors.append("subject model differs from frozen subject lock")
+    if runtime.get("subject_limits") != subject_lock.get("limits"):
+        errors.append("subject limits differ from frozen subject lock")
     if not runtime.get("code_commit") or not runtime.get("roles_sha256") == planned["files_sha256"]["stage2/roles.json"]:
         errors.append("code or roles binding missing")
     bindings = runtime.get("probes", {})
     for probe in json.loads((BASE / "versions.json").read_text())["probes"]:
         pid = probe["id"]
         bind = bindings.get(pid, {})
+        execution_status = bind.get("execution_status")
+        if execution_status == "ENGINEERING_BLOCKED":
+            if not bind.get("blocker_reason"):
+                errors.append(f"{pid}: engineering blocker reason missing")
+            continue
+        if execution_status != "NATIVE_SMOKE_PASS":
+            errors.append(f"{pid}: native engineering status unbound")
+            continue
         if not bind.get("installed_version") or not bind.get("native_hook"):
             errors.append(f"{pid}: installed implementation/native hook unbound")
             continue
@@ -84,7 +99,7 @@ def main():
     errors = blockers(args.runtime_manifest, args.captures_root)
     if errors:
         raise SystemExit("SUBJECT_GATE=CLOSED\n" + "\n".join(errors))
-    print("SUBJECT_GATE=OPEN; native evidence verified, scientific audit still pending")
+    print("ENGINEERING_GATE=OPEN; passed probes have native evidence, blocked probes are frozen; provider authorization remains separate")
 
 
 if __name__ == "__main__":
