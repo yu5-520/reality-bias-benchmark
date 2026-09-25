@@ -54,7 +54,14 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
         )
 
     def test_pending_v2_registry_keeps_all_real_study_assets_eligible(self):
-        registry = load_registry()
+        registry = copy.deepcopy(load_registry())
+        registry["subject_readiness_gate"]["state"] = "IMPLEMENTED_NO_LIVE_RECEIPT"
+        registry["subject_readiness_gate"].pop("receipt_path", None)
+        registry["subject_readiness_gate"].pop("receipt_sha256", None)
+        registry["subject_readiness_gate"].pop("workflow_run_id", None)
+        for pid in ("X1", "X2", "X3", "X4", "X5", "X6", "X7"):
+            registry["probes"][pid]["collection_state"] = "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING"
+            registry["probes"][pid].pop("subject_readiness", None)
         with patch("stage2.native_v7.subject_readiness.load_registry", return_value=registry):
             payload = build_preflight(
                 expected_execution_sha=self.SHA,
