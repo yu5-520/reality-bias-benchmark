@@ -17,6 +17,7 @@ from pathlib import Path
 
 from adapters.deepseek_chat import chat_completion, extract_content
 from stage2.native_v7.policy import READINESS_AUTHORIZATION, load_registry
+from stage2.native_v7.readiness_evidence import execution_snapshot
 
 ROOT = Path(__file__).resolve().parents[2]
 STAGE2 = ROOT / "stage2"
@@ -83,6 +84,8 @@ def build_preflight(
 
     registry = load_registry()
     gate = registry["subject_readiness_gate"]
+    if gate["state"] != "IMPLEMENTED_NO_LIVE_RECEIPT":
+        raise ValueError("common provider handshake has already been recorded")
     max_subject_calls = int(max_subject_calls)
     spending_ceiling = float(spending_ceiling)
     if max_subject_calls != gate["max_provider_calls"] or max_subject_calls != 1:
@@ -122,6 +125,7 @@ def build_preflight(
         "subject_config_sha256": sha256(SUBJECT_PATH),
         "model_config_path": str(model_path.relative_to(ROOT)),
         "model_config_sha256": sha256(model_path),
+        "execution_snapshot": execution_snapshot(),
         "provider": subject["provider"],
         "model_alias": subject["model_alias"],
         "expected_model_version": subject["expected_model_version"],
@@ -166,12 +170,17 @@ def execute_handshake(*, preflight_path, out_path):
         raise ValueError("readiness preflight attempted to use a scientific task")
     if not os.environ.get("DEEPSEEK_API_KEY"):
         raise RuntimeError("DEEPSEEK_API_KEY is required for the manual readiness handshake")
+    workflow_run_id = int(os.environ.get("GITHUB_RUN_ID", "0"))
+    if workflow_run_id <= 0:
+        raise RuntimeError("readiness handshake requires a recorded workflow run ID")
 
     subject, model_config, model_path = _load_subject_binding()
     if sha256(SUBJECT_PATH) != preflight["subject_config_sha256"]:
         raise RuntimeError("subject binding changed after readiness preflight")
     if sha256(model_path) != preflight["model_config_sha256"]:
         raise RuntimeError("model configuration changed after readiness preflight")
+    if execution_snapshot() != preflight["execution_snapshot"]:
+        raise RuntimeError("execution inputs changed after readiness preflight")
 
     call_config = copy.deepcopy(model_config)
     call_config["subject"]["max_tokens"] = HANDSHAKE_MAX_COMPLETION_TOKENS
@@ -212,6 +221,7 @@ def execute_handshake(*, preflight_path, out_path):
             "schema": "stage2-subject-readiness-receipt-v1",
             "status": "COMMON_PROVIDER_HANDSHAKE_RECORDED_NOT_SUBJECT_READY",
             "execution_code_sha": preflight["execution_code_sha"],
+            "workflow_run_id": workflow_run_id,
             "provider": subject["provider"],
             "requested_model_alias": subject["model_alias"],
             "expected_model_version": subject["expected_model_version"],
@@ -229,6 +239,7 @@ def execute_handshake(*, preflight_path, out_path):
             "natural_trajectories_after_handshake": 0,
             "subject_config_sha256": preflight["subject_config_sha256"],
             "model_config_sha256": preflight["model_config_sha256"],
+            "execution_snapshot": preflight["execution_snapshot"],
             "preflight_sha256": sha256(preflight_path),
             "raw_response_sha256": sha256(raw_path),
             "eligible_probes_after_common_handshake": preflight[

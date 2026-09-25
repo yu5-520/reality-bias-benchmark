@@ -13,6 +13,7 @@ from pathlib import Path
 
 from .observer import ExternalObserver, verify_observer
 from .policy import load_registry
+from .readiness_evidence import verify_study_manifest
 
 ROOT = Path(__file__).resolve().parents[2]
 STAGE2 = ROOT / "stage2"
@@ -48,6 +49,20 @@ def validate_request(probe, task, registry_path=None):
 
 def collect(*, probe, task, out_root, registry_path=None):
     registry, spec = validate_request(probe, task, registry_path)
+    asset_env = {}
+    if probe in {"X6", "X7"}:
+        manifest_path, hashes = verify_study_manifest(probe, spec)
+        if probe == "X6":
+            from .x6_memorybank.context import tree_hashes
+            checkpoint_env, manifest_env = "STAGE2_X6_EMBEDDING_MODEL", "STAGE2_X6_EMBEDDING_MANIFEST"
+            observed = tree_hashes(os.environ[checkpoint_env]) if os.environ.get(checkpoint_env) else None
+        else:
+            from .x7_longllmlingua.context import checkpoint_hashes
+            checkpoint_env, manifest_env = "STAGE2_X7_CHECKPOINT", "STAGE2_X7_CHECKPOINT_MANIFEST"
+            observed = checkpoint_hashes(os.environ[checkpoint_env]) if os.environ.get(checkpoint_env) else None
+        if observed != hashes:
+            raise ValueError(f"{probe}: actual study checkpoint differs from frozen manifest")
+        asset_env[manifest_env] = str(manifest_path)
     cell = f"{probe}-{task}"
     destination = Path(out_root) / cell
     destination.mkdir(parents=True, exist_ok=False)
@@ -70,6 +85,7 @@ def collect(*, probe, task, out_root, registry_path=None):
     observer.record_invocation(argv, checkout, spec["environment_id"])
 
     env = os.environ.copy()
+    env.update(asset_env)
     env["STAGE2_V7_PROBE"] = probe
     env["STAGE2_V7_CELL"] = cell
     env["STAGE2_V7_OBSERVER_ROOT"] = str(observer.root)
@@ -87,6 +103,8 @@ def collect(*, probe, task, out_root, registry_path=None):
         "registry_schema": registry["schema"],
         "environment_id": spec["environment_id"],
         "runner_state": spec["collection_state"],
+        "readiness_execution_code_sha": spec["subject_readiness"]["execution_code_sha"],
+        "common_receipt_sha256": spec["subject_readiness"]["common_receipt_sha256"],
         "returncode": completed.returncode,
         "observer_files": verify_observer(observer.root),
         "status": (

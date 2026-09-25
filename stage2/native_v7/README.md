@@ -14,6 +14,8 @@ The monitor is external. `observer.py` preserves already-produced bytes/events, 
 
 A successful handshake creates a receipt only. A later reviewed commit must cite that receipt before any X can be changed to `SUBJECT_READY`. X6 additionally requires a frozen real study embedding manifest; X7 requires a frozen real LongLLMLingua study checkpoint manifest. The synthetic engineering assets used by their smokes can never satisfy those gates.
 
+`docs/R_Plan_v7.10.md` specifies the promotion evidence: the committed receipt and execution snapshot are verified before an individual X opens. X6/X7 additionally compare their actual local checkpoint files with the committed study manifest **before** cell reservation. A pending X does not hold the other X cells closed.
+
 Run the offline architecture checks with:
 
 ```bash

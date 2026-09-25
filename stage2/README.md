@@ -12,7 +12,7 @@ The frozen scientific conditions remain T1–T3, the nine Software Engineering r
 - `software_engineering_host_v1` is frozen as a de-instrumented host: historical queue/mailbox/action semantics are preserved while monitor/audit IDs are removed from execution and model-visible context.
 - monitoring is external and non-mutating; common evidence representation is created only after observation.
 
-`docs/R_Plan_v7.9.md` is the active implementation checkpoint. **All seven native runners are verified, but all seven remain subject-pending and all 21 natural cells are closed.** The next gate is one manually authorized, non-scientific provider handshake for the common frozen DeepSeek subject binding. That handshake cannot open a cell or edit the registry; promotion to `SUBJECT_READY` requires a reviewed commit citing frozen readiness evidence. X6 and X7 additionally require real study asset manifests.
+`docs/R_Plan_v7.10.md` is the active forward-freeze checkpoint; v7.9 defines the one-call common provider handshake. **All seven native runners are verified, but all seven remain subject-pending and all 21 natural cells are closed.** The next gate is one manually authorized, non-scientific provider handshake for the common frozen DeepSeek subject binding. That handshake cannot open a cell or edit the registry; promotion to `SUBJECT_READY` requires a reviewed commit citing frozen readiness evidence. X6 and X7 additionally require real study asset manifests.
 
 ## Historical v6.x scaffold
 
