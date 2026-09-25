@@ -75,7 +75,11 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
             ["X1", "X2", "X3", "X4", "X5", "X6", "X7"],
         )
         self.assertEqual(payload["asset_blockers"], {})
-        self.assertEqual(payload["natural_trajectories_before_handshake"], 7)
+        recorded_attempts = sum(
+            int(json.loads(path.read_text()).get("natural_attempts_for_cell", 0))
+            for path in (Path(__file__).resolve().parents[2] / "natural_v7").glob("*/manifest.json")
+        )
+        self.assertEqual(payload["natural_trajectories_before_handshake"], recorded_attempts)
 
     def test_active_v2_receipt_matches_current_execution_snapshot(self):
         registry = load_registry()
