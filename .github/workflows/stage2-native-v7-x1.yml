@@ -1,0 +1,63 @@
+name: Stage-II v7 X1 AutoGen native runner
+
+on:
+  push:
+    paths:
+      - 'stage2/native_v7/**'
+      - 'stage2/tasks.json'
+      - 'stage2/roles.json'
+      - 'stage2/subject.json'
+      - 'stage2/fixtures/project/**'
+      - 'docs/R_Plan_v7.1.md'
+      - '.github/workflows/stage2-native-v7-x1.yml'
+  pull_request:
+    paths:
+      - 'stage2/native_v7/**'
+      - 'stage2/tasks.json'
+      - 'stage2/roles.json'
+      - 'stage2/subject.json'
+      - 'stage2/fixtures/project/**'
+      - 'docs/R_Plan_v7.1.md'
+      - '.github/workflows/stage2-native-v7-x1.yml'
+
+jobs:
+  x1-autogen-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: '${{ github.event.pull_request.head.sha || github.sha }}'
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Bind exact frozen AutoGen source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/microsoft/autogen upstream
+          git -C upstream checkout -q 027ecf0a379bcc1d09956d46d12d44a3ad9cee14
+          test "$(git -C upstream rev-parse HEAD)" = 027ecf0a379bcc1d09956d46d12d44a3ad9cee14
+          pip install -q \
+            ./upstream/python/packages/autogen-core \
+            ./upstream/python/packages/autogen-agentchat \
+            './upstream/python/packages/autogen-ext[openai]'
+      - name: Run X1 native runner and passive observer smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m stage2.native_v7.x1_autogen.smoke --out-root stage2_x1_smoke
+      - name: Verify v7 architecture freeze and contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m stage2.native_v7.freeze
+          python -m unittest stage2.native_v7.tests.test_architecture -v
+      - name: Upload non-study X1 smoke evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-v7-x1-native-smoke-${{ github.run_id }}
+          path: stage2_x1_smoke
+          retention-days: 30
+          if-no-files-found: error

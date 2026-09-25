@@ -1,43 +1,61 @@
 {
-  "forbidden_execution_dependencies": [
-    "stage2.coding_arena.CodingArena",
-    "stage2.transports.RoleMailboxTransport",
-    "shared action JSON grammar",
-    "shared transport interface",
-    "shared context_adapter interface"
-  ],
   "freeze_date_utc": "2026-09-25",
   "probes": {
     "X1": {
-      "collection_state": "PENDING_NATIVE_RUNNER",
+      "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
       "environment_id": "x1-autogen-027ecf0",
-      "execution_owner": "framework_or_native_mechanism",
-      "host_attachment": "frozen task/roles/subject/checkout only",
+      "execution_owner": "AutoGen AgentChat Swarm",
+      "host_attachment": "Frozen task/roles/subject/checkout are supplied to AutoGen-native agents; host glue exposes bounded checkout tools but does not replace AutoGen scheduling or handoff semantics.",
       "launch": {
-        "argv_template": null,
-        "state": "PENDING_NATIVE_ENTRYPOINT"
+        "state": "VERIFIED_NATIVE_ENTRYPOINT",
+        "argv_template": [
+          "python",
+          "-m",
+          "stage2.native_v7.x1_autogen.runner",
+          "--checkout",
+          "{checkout}",
+          "--task-file",
+          "{task_file}",
+          "--roles-file",
+          "{roles_file}",
+          "--subject-file",
+          "{subject_file}",
+          "--observer-root",
+          "{observer_root}/native"
+        ]
       },
       "name": "AutoGen",
       "observer": {
         "may_mutate_execution": false,
         "mode": "external",
         "native_surfaces": [
-          "autogen_core runtime delivery",
-          "agent lifecycle",
-          "provider I/O",
+          "autogen_agentchat.run_stream native events",
+          "AutoGen-native handoff/tool events exposed by the public team stream",
+          "process stdout/stderr/exit",
           "checkout effects"
         ]
       },
       "runtime_scope": "independent",
       "source_commit": "027ecf0a379bcc1d09956d46d12d44a3ad9cee14",
       "source_repo": "microsoft/autogen",
-      "upstream_mode": "official_source"
+      "upstream_mode": "official_source",
+      "integration_kind": "native_multiagent_framework",
+      "verification": {
+        "state": "NON_STUDY_NATIVE_SMOKE_PASS",
+        "workflow": ".github/workflows/stage2-native-v7-x1.yml",
+        "verified_code_commit": "c2365939e738b95ee24061020be227c48b03744a",
+        "workflow_run_id": 36127178838,
+        "runner_sha256": "c268cfff575cf23efaf18600078c907aad006bc9bcd3912e64d6202ff9e22e89",
+        "smoke_sha256": "22859a88c78fbd273bbe472494b647e24b926dc442cf451f936cb11e8a391cc4",
+        "subject_ready": false
+      },
+      "background_substrate_id": null
     },
     "X2": {
       "collection_state": "PENDING_NATIVE_RUNNER",
       "environment_id": "x2-metagpt-11cdf46",
-      "execution_owner": "framework_or_native_mechanism",
-      "host_attachment": "frozen task/roles/subject/checkout only",
+      "execution_owner": "MetaGPT Environment/Role runtime",
+      "host_attachment": "Frozen task/roles/subject/checkout are mapped into the official MetaGPT environment; host glue must not replace MetaGPT role/message scheduling.",
       "launch": {
         "argv_template": null,
         "state": "PENDING_NATIVE_ENTRYPOINT"
@@ -56,13 +74,15 @@
       "runtime_scope": "independent",
       "source_commit": "11cdf466d042aece04fc6cfd13b28e1a70341b1f",
       "source_repo": "FoundationAgents/MetaGPT",
-      "upstream_mode": "official_source"
+      "upstream_mode": "official_source",
+      "integration_kind": "native_multiagent_framework",
+      "background_substrate_id": null
     },
     "X3": {
       "collection_state": "PENDING_NATIVE_RUNNER",
       "environment_id": "x3-a2a-1.0.0",
-      "execution_owner": "framework_or_native_mechanism",
-      "host_attachment": "frozen task/roles/subject/checkout only",
+      "execution_owner": "A2A native task/message/artifact protocol",
+      "host_attachment": "Frozen software-engineering roles are exposed as A2A-native agents/services; host glue may start services but must not rewrite the A2A protocol.",
       "launch": {
         "argv_template": null,
         "state": "PENDING_NATIVE_ENTRYPOINT"
@@ -85,13 +105,15 @@
       "sdk_repo": "a2aproject/a2a-python",
       "source_commit": "173695755607e884aa9acf8ce4feed90e32727a1",
       "source_repo": "a2aproject/A2A",
-      "upstream_mode": "official_source"
+      "upstream_mode": "official_source",
+      "integration_kind": "interagent_protocol",
+      "background_substrate_id": null
     },
     "X4": {
       "collection_state": "PENDING_NATIVE_RUNNER",
       "environment_id": "x4-mcp-2026-07-28",
-      "execution_owner": "framework_or_native_mechanism",
-      "host_attachment": "frozen task/roles/subject/checkout only",
+      "execution_owner": "Frozen software-engineering host plus official MCP client/server protocol",
+      "host_attachment": "MCP attaches at its native tool/resource boundary to the software-engineering multi-agent host; MCP is not treated as the host scheduler.",
       "launch": {
         "argv_template": null,
         "state": "PENDING_NATIVE_ENTRYPOINT"
@@ -114,13 +136,15 @@
       "sdk_repo": "modelcontextprotocol/python-sdk",
       "source_commit": "5f5440bb26a62e2cf3440b92da5a667efa03b267",
       "source_repo": "modelcontextprotocol/modelcontextprotocol",
-      "upstream_mode": "official_source"
+      "upstream_mode": "official_source",
+      "integration_kind": "tool_resource_protocol",
+      "background_substrate_id": "software_engineering_host_v1"
     },
     "X5": {
       "collection_state": "PENDING_NATIVE_RUNNER",
       "environment_id": "x5-rag-baf19cd",
-      "execution_owner": "framework_or_native_mechanism",
-      "host_attachment": "frozen task/roles/subject/checkout only",
+      "execution_owner": "Frozen software-engineering host plus frozen RAG retrieval mechanism",
+      "host_attachment": "RAG attaches at the retrieval/context boundary of the software-engineering multi-agent host; retrieval behavior is not rewritten into a communication framework.",
       "implementation_sha256": "baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4",
       "launch": {
         "argv_template": null,
@@ -140,13 +164,15 @@
       "runtime_scope": "independent",
       "source_commit": "baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4",
       "source_repo": "stage2/retrieval.py",
-      "upstream_mode": "in_repo_reference"
+      "upstream_mode": "in_repo_reference",
+      "integration_kind": "retrieval_capability",
+      "background_substrate_id": "software_engineering_host_v1"
     },
     "X6": {
       "collection_state": "PENDING_NATIVE_RUNNER",
       "environment_id": "x6-memorybank-cf61c41",
-      "execution_owner": "framework_or_native_mechanism",
-      "host_attachment": "frozen task/roles/subject/checkout only",
+      "execution_owner": "Frozen software-engineering host plus official MemoryBank mechanism",
+      "host_attachment": "MemoryBank attaches at its native memory write/retrieve boundary in its own compatible environment while the software-engineering host retains role execution.",
       "launch": {
         "argv_template": null,
         "state": "PENDING_NATIVE_ENTRYPOINT"
@@ -165,13 +191,15 @@
       "runtime_scope": "independent",
       "source_commit": "cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9",
       "source_repo": "zhongwanjun/MemoryBank-SiliconFriend",
-      "upstream_mode": "official_source"
+      "upstream_mode": "official_source",
+      "integration_kind": "memory_capability",
+      "background_substrate_id": "software_engineering_host_v1"
     },
     "X7": {
       "collection_state": "PENDING_NATIVE_RUNNER",
       "environment_id": "x7-longllmlingua-5a4c78a",
-      "execution_owner": "framework_or_native_mechanism",
-      "host_attachment": "frozen task/roles/subject/checkout only",
+      "execution_owner": "Frozen software-engineering host plus official LongLLMLingua compressor",
+      "host_attachment": "LongLLMLingua attaches at its native context-compression boundary while the software-engineering host retains role execution.",
       "launch": {
         "argv_template": null,
         "state": "PENDING_NATIVE_ENTRYPOINT"
@@ -190,17 +218,41 @@
       "runtime_scope": "independent",
       "source_commit": "5a4c78ae18ab17a98cf997e8259354e546081d64",
       "source_repo": "microsoft/LLMLingua",
-      "upstream_mode": "official_source"
+      "upstream_mode": "official_source",
+      "integration_kind": "context_compression_capability",
+      "background_substrate_id": "software_engineering_host_v1"
     }
   },
-  "schema": "stage2-native-execution-registry-v1",
+  "schema": "stage2-native-execution-registry-v2",
   "scientific_inputs": {
     "checkout": "stage2/fixtures/project",
     "comparison_policy": "normalize evidence only after observation",
-    "role_roster_policy": "same frozen roles; framework-native scheduling",
+    "role_roster_policy": "same frozen roles; native framework scheduling for multi-agent framework X, baseline software-engineering host scheduling for capability-layer X",
     "roles": "stage2/roles.json",
     "subject": "stage2/subject.json",
-    "tasks": "stage2/tasks.json"
+    "tasks": "stage2/tasks.json",
+    "host_policy": "X1-X2 use their native multi-agent framework, X3 uses native A2A communication, and X4-X7 may share the explicitly registered software-engineering background host because those X conditions operate at tool/retrieval/memory/context layers; monitoring is not part of that host."
   },
-  "status": "ARCHITECTURE_REBASED_ALL_NATIVE_RUNNERS_PENDING"
+  "status": "X1_NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING_X4_X7_BACKGROUND_HOST_DECLARED_X2_X7_RUNNERS_PENDING",
+  "forbidden_global_normalization": [
+    "requiring every X to execute through one common runtime adapter",
+    "requiring X1-X3 to use the baseline role-mailbox communication substrate",
+    "modifying a frozen upstream X implementation merely to satisfy an experiment host API",
+    "using the post-observation evidence schema as a pre-execution action or message contract"
+  ],
+  "background_substrates": {
+    "software_engineering_host_v1": {
+      "applies_to": [
+        "X4",
+        "X5",
+        "X6",
+        "X7"
+      ],
+      "status": "PENDING_DEINSTRUMENTED_HOST_FREEZE",
+      "role_environment": "frozen nine-role software-engineering environment",
+      "execution_semantics_source": "historical stage2.coding_arena.CodingArena",
+      "communication_semantics_source": "historical stage2.transports.RoleMailboxTransport",
+      "rule": "The capability-layer X does not own scheduling or inter-agent transport. The common host substrate must be explicitly registered and frozen, and its formal v7 implementation must remove monitor responsibilities from execution before natural collection."
+    }
+  }
 }
