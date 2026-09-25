@@ -1,0 +1,23 @@
+{
+  "expected_model_version": "DeepSeek-V4.1-Flash",
+  "freeze_date_utc": "2026-09-25",
+  "limits": {
+    "automatic_paid_evaluator": false,
+    "max_pending_messages": 128,
+    "max_total_model_invocations": 64,
+    "max_turns": 32,
+    "one_natural_trajectory_per_cell": true,
+    "transport_max_retries": 2,
+    "transport_timeout_seconds": 60
+  },
+  "model_alias": "deepseek-flash",
+  "provider": "deepseek",
+  "rationale": "Reuse the frozen Stage-I Software Engineering subject profile and arena execution ceilings so Stage-II changes system layer rather than silently changing the subject model or execution budget.",
+  "schema": "stage2-subject-binding-v1",
+  "source_config": "arena/config/model_deepseek_v0.2.json",
+  "subject": {
+    "max_tokens": 4096,
+    "temperature": 0.7,
+    "thinking": "disabled"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "schema": "stage2-runtime-targets-v1",
+  "freeze_date_utc": "2026-09-25",
+  "status": "TARGETS_LOCKED_WITH_ENGINEERING_BLOCK_NATIVE_SMOKE_PENDING",
+  "probes": {
+    "X1": {
+      "name": "AutoGen",
+      "source_repo": "microsoft/autogen",
+      "source_commit": "027ecf0a379bcc1d09956d46d12d44a3ad9cee14",
+      "runtime_packages": [
+        "autogen-core",
+        "autogen-agentchat"
+      ],
+      "native_surface": [
+        "autogen_core",
+        "autogen_agentchat"
+      ],
+      "hook_id": "autogen.native.agentchat",
+      "state": "TARGET_LOCKED"
+    },
+    "X2": {
+      "name": "MetaGPT",
+      "source_repo": "FoundationAgents/MetaGPT",
+      "source_commit": "11cdf466d042aece04fc6cfd13b28e1a70341b1f",
+      "runtime_packages": [
+        "metagpt"
+      ],
+      "native_surface": [
+        "metagpt",
+        "metagpt.schema.Message"
+      ],
+      "hook_id": "metagpt.native.environment_message",
+      "state": "ENGINEERING_BLOCKED",
+      "block_reason": "UPSTREAM_DEPENDENCY_UNAVAILABLE: MetaGPT commit requires lancedb==0.4.0, which the current package index cannot install on the pinned CI runtime; no substitute dependency or framework is authorized."
+    },
+    "X3": {
+      "name": "A2A",
+      "protocol_repo": "a2aproject/A2A",
+      "protocol_commit": "173695755607e884aa9acf8ce4feed90e32727a1",
+      "protocol_version": "1.0.0",
+      "sdk_repo": "a2aproject/a2a-python",
+      "sdk_commit": "0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167",
+      "runtime_packages": [
+        "a2a-sdk"
+      ],
+      "native_surface": [
+        "a2a"
+      ],
+      "hook_id": "a2a.native.task_artifact",
+      "state": "TARGET_LOCKED"
+    },
+    "X4": {
+      "name": "MCP",
+      "protocol_repo": "modelcontextprotocol/modelcontextprotocol",
+      "protocol_commit": "5f5440bb26a62e2cf3440b92da5a667efa03b267",
+      "protocol_version": "2026-07-28",
+      "sdk_repo": "modelcontextprotocol/python-sdk",
+      "sdk_commit": "f1b6589088534632fef92238ee9750951e3c0185",
+      "runtime_packages": [
+        "mcp"
+      ],
+      "native_surface": [
+        "mcp"
+      ],
+      "hook_id": "mcp.native.tool_resource",
+      "state": "TARGET_LOCKED"
+    },
+    "X5": {
+      "name": "RAG",
+      "source_path": "stage2/retrieval.py",
+      "implementation_sha256": "baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4",
+      "native_surface": [
+        "stage2.retrieval.retrieve"
+      ],
+      "hook_id": "rag.native.retrieve",
+      "state": "IMPLEMENTATION_LOCKED"
+    },
+    "X6": {
+      "name": "MemoryBank",
+      "source_repo": "zhongwanjun/MemoryBank-SiliconFriend",
+      "source_commit": "cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9",
+      "required_paths": [
+        "memory_bank/memory_retrieval/local_doc_qa.py",
+        "utils/memory_utils.py"
+      ],
+      "hook_id": "memorybank.native.memory_io",
+      "state": "TARGET_LOCKED"
+    },
+    "X7": {
+      "name": "LongLLMLingua",
+      "source_repo": "microsoft/LLMLingua",
+      "source_commit": "5a4c78ae18ab17a98cf997e8259354e546081d64",
+      "runtime_packages": [
+        "llmlingua"
+      ],
+      "native_surface": [
+        "llmlingua.PromptCompressor.compress_prompt"
+      ],
+      "hook_id": "llmlingua.native.compress",
+      "state": "TARGET_LOCKED"
+    }
+  }
+}
