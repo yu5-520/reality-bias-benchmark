@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 
 from arena.providers import DeepSeekArenaProvider, ScriptedProvider
+from stage2.native_v7.action_contract import apply_model_visible_action_contract
 from stage2.native_v7.x3_a2a.checkout import A2ACheckout
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -119,6 +120,12 @@ class RoleRuntime:
             },
             "remaining_turns": remaining_turns,
         }
+        system, content, _ = apply_model_visible_action_contract(
+            system,
+            content,
+            task_id=task["id"],
+            max_actions=5,
+        )
         return [
             {"role": "system", "content": system},
             {"role": "user", "content": json.dumps(content, ensure_ascii=False)},
