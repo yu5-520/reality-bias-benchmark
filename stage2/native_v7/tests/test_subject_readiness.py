@@ -53,6 +53,23 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
             {"X6": "PENDING_FROZEN_MANIFEST", "X7": "PENDING_FROZEN_MANIFEST"},
         )
 
+    def test_pending_v2_registry_keeps_all_real_study_assets_eligible(self):
+        registry = load_registry()
+        with patch("stage2.native_v7.subject_readiness.load_registry", return_value=registry):
+            payload = build_preflight(
+                expected_execution_sha=self.SHA,
+                actual_execution_sha=self.SHA,
+                authorization_phrase="CALL_REAL_STAGE2_SUBJECT_READINESS_API",
+                max_subject_calls=1,
+                spending_ceiling=0.01,
+            )
+        self.assertEqual(
+            payload["eligible_after_common_handshake"],
+            ["X1", "X2", "X3", "X4", "X5", "X6", "X7"],
+        )
+        self.assertEqual(payload["asset_blockers"], {})
+        self.assertEqual(payload["natural_trajectories_before_handshake"], 7)
+
     def test_preflight_rejects_nonexact_authorization(self):
         with self.assertRaisesRegex(ValueError, "authorization phrase"):
             build_preflight(
@@ -93,19 +110,22 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
                 )
 
     def test_recorded_common_handshake_cannot_be_repeated(self):
-        with self.assertRaisesRegex(ValueError, "already been recorded"):
-            build_preflight(
-                expected_execution_sha=self.SHA,
-                actual_execution_sha=self.SHA,
-                authorization_phrase="CALL_REAL_STAGE2_SUBJECT_READINESS_API",
-                max_subject_calls=1,
-                spending_ceiling=0.01,
-            )
+        registry = self.pending_registry()
+        registry["subject_readiness_gate"]["state"] = "COMMON_PROVIDER_HANDSHAKE_RECORDED"
+        with patch("stage2.native_v7.subject_readiness.load_registry", return_value=registry):
+            with self.assertRaisesRegex(ValueError, "already been recorded"):
+                build_preflight(
+                    expected_execution_sha=self.SHA,
+                    actual_execution_sha=self.SHA,
+                    authorization_phrase="CALL_REAL_STAGE2_SUBJECT_READINESS_API",
+                    max_subject_calls=1,
+                    spending_ceiling=0.01,
+                )
 
     def test_subject_ready_cannot_be_asserted_from_runner_smoke_alone(self):
         registry = load_registry()
         mutated = copy.deepcopy(registry)
-        mutated["probes"]["X1"].pop("subject_readiness")
+        mutated["probes"]["X1"].pop("subject_readiness", None)
         mutated["probes"]["X1"]["collection_state"] = "SUBJECT_READY"
         with self.assertRaisesRegex(ValueError, "frozen readiness evidence"):
             validate_registry(mutated)
@@ -119,6 +139,10 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
                 mutated["probes"][probe][key]["state"] = "PENDING_FROZEN_MANIFEST"
                 mutated["probes"][probe][key].pop("manifest_path", None)
                 mutated["probes"][probe][key].pop("manifest_sha256", None)
+                mutated["probes"][probe]["collection_state"] = "SUBJECT_READY"
+                mutated["probes"][probe]["subject_readiness"] = copy.deepcopy(
+                    mutated["probes"][probe]["historical_subject_readiness_v1"]
+                )
                 with self.assertRaisesRegex(ValueError, "frozen study"):
                     validate_registry(mutated)
 
@@ -136,7 +160,8 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
                 "provider": "deepseek", "provider_call_count": 1,
                 "automatic_paid_evaluator": False, "scientific_task_used": False,
                 "natural_cell_reserved": False, "registry_mutated": False,
-                "natural_trajectories_after_handshake": 0,
+                "natural_trajectories_before_handshake": 7,
+                "natural_trajectories_after_handshake": 7,
                 "promotion_required": "REVIEWED_REGISTRY_COMMIT",
                 "execution_code_sha": "a" * 40, "workflow_run_id": 12,
                 "observed_response_model": "provider-reported-model",
