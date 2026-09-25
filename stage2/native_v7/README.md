@@ -1,28 +1,24 @@
 # Stage-II v7: native execution / external observation
 
-This directory is the active forward Stage-II architecture.
+This directory is the active forward Stage-II architecture. All seven X conditions now have verified native entrypoints; **none is yet authorized for natural collection**.
 
-The v6.x scaffold proved that the seven targets could be pinned, smoke-tested and
-recorded, but it also normalized heterogeneous systems through a shared
-`CodingArena`/transport/context contract. v7 removes that assumption before any
-natural Stage-II trajectory is collected.
+The v6.x scaffold proved that the seven targets could be pinned and recorded, but it normalized heterogeneous systems through a shared `CodingArena`/transport/context contract. v7 removes that assumption: X1/X2 use their native multi-agent runtimes, X3 uses native A2A communication, and X4–X7 attach only at their native capability boundaries to the frozen de-instrumented software-engineering host.
 
-`registry.json` is a registry, not an adapter interface. Each X receives an
-independent environment and will eventually receive its own verified native
-entrypoint. `collect.py` refuses to reserve a natural cell while a probe remains
-`PENDING_NATIVE_RUNNER`.
+`registry.json` is a registry, not an adapter interface. `collect.py` refuses every cell while its X remains `NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING`.
 
-The monitor is external. `observer.py` preserves process-boundary bytes and
-framework-specific observers may add native files beneath the observer root.
-Common semantic/structural indexing happens after the run. No observer is
-allowed to rewrite framework messages or control scheduling.
+The monitor is external. `observer.py` preserves already-produced bytes/events, while framework-specific observers add native evidence beneath the observer root. Common semantic/structural indexing happens after the run. No observer may rewrite framework messages or control scheduling.
+
+## Subject-readiness boundary
+
+`subject_readiness.py` implements the next fail-closed gate. It may perform **one** manually authorized, non-scientific provider handshake for the common frozen DeepSeek subject binding. It never executes T1–T3, reserves a cell, calls a paid evaluator, or edits `registry.json`.
+
+A successful handshake creates a receipt only. A later reviewed commit must cite that receipt before any X can be changed to `SUBJECT_READY`. X6 additionally requires a frozen real study embedding manifest; X7 requires a frozen real LongLLMLingua study checkpoint manifest. The synthetic engineering assets used by their smokes can never satisfy those gates.
 
 Run the offline architecture checks with:
 
 ```bash
 python -m stage2.native_v7.freeze
-python -m unittest stage2.native_v7.tests.test_architecture
+python -m unittest discover -s stage2/native_v7/tests -v
 ```
 
-Do not run a natural cell until the selected X has a verified native entrypoint
-and observer recorded in `registry.json`.
+Stage-II natural trajectory count remains **0 / 21**.

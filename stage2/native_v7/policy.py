@@ -18,6 +18,7 @@ FORBIDDEN_KEYS = {
     "transport_contract",
 }
 RUNNER_STATES = {"NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING", "SUBJECT_READY"}
+READINESS_AUTHORIZATION = "CALL_REAL_STAGE2_SUBJECT_READINESS_API"
 
 
 def load_registry(path=None):
@@ -40,6 +41,25 @@ def validate_registry(data):
         raise ValueError("capability-layer background host must be explicit for X4-X7")
     if not isinstance(data.get("forbidden_global_normalization"), list):
         raise ValueError("global-normalization prohibitions must be explicit")
+
+    readiness_gate = data.get("subject_readiness_gate")
+    if not isinstance(readiness_gate, dict):
+        raise ValueError("subject readiness gate must be explicit")
+    if readiness_gate.get("state") not in {
+        "IMPLEMENTED_NO_LIVE_RECEIPT",
+        "COMMON_PROVIDER_HANDSHAKE_RECORDED",
+    }:
+        raise ValueError("subject readiness gate has an invalid state")
+    if readiness_gate.get("authorization_phrase") != READINESS_AUTHORIZATION:
+        raise ValueError("subject readiness authorization phrase differs from frozen policy")
+    if readiness_gate.get("max_provider_calls") != 1:
+        raise ValueError("subject readiness must be a one-call provider handshake")
+    if readiness_gate.get("automatic_paid_evaluator") is not False:
+        raise ValueError("subject readiness must never call a paid evaluator")
+    if readiness_gate.get("natural_task_allowed") is not False:
+        raise ValueError("subject readiness must not execute T1-T3")
+    if readiness_gate.get("registry_mutation") != "REVIEWED_COMMIT_ONLY":
+        raise ValueError("subject readiness workflow must not auto-open collection")
 
     envs = set()
     for pid, spec in probes.items():
@@ -79,6 +99,23 @@ def validate_registry(data):
                 or not argv
             ):
                 raise ValueError(f"{pid}: verified runner lacks a native entrypoint")
+            if state == "SUBJECT_READY":
+                readiness = spec.get("subject_readiness")
+                if not isinstance(readiness, dict) or readiness.get("state") != "VERIFIED":
+                    raise ValueError(f"{pid}: SUBJECT_READY requires frozen readiness evidence")
+                for key in (
+                    "execution_code_sha",
+                    "common_receipt_sha256",
+                    "subject_config_sha256",
+                    "model_config_sha256",
+                    "workflow_run_id",
+                ):
+                    if not readiness.get(key):
+                        raise ValueError(f"{pid}: readiness evidence lacks {key}")
+                if pid == "X6" and spec.get("study_embedding", {}).get("state") != "FROZEN_MANIFEST_VERIFIED":
+                    raise ValueError("X6: SUBJECT_READY requires frozen study embedding manifest")
+                if pid == "X7" and spec.get("study_checkpoint", {}).get("state") != "FROZEN_MANIFEST_VERIFIED":
+                    raise ValueError("X7: SUBJECT_READY requires frozen study checkpoint manifest")
         elif state == "PENDING_NATIVE_RUNNER":
             if launch.get("argv_template") is not None:
                 raise ValueError(f"{pid}: pending runner must not expose an executable collection command")

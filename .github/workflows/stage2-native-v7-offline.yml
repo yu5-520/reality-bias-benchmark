@@ -8,7 +8,8 @@ on:
       - 'stage2/roles.json'
       - 'stage2/subject.json'
       - 'stage2/fixtures/project/**'
-      - 'docs/R_Plan_v7.0.md'
+      - 'docs/R_Plan_v7.9.md'
+      - 'schemas/stage2_subject_readiness_receipt_v1.schema.json'
       - '.github/workflows/stage2-native-v7-offline.yml'
   pull_request:
     paths:
@@ -17,7 +18,8 @@ on:
       - 'stage2/roles.json'
       - 'stage2/subject.json'
       - 'stage2/fixtures/project/**'
-      - 'docs/R_Plan_v7.0.md'
+      - 'docs/R_Plan_v7.9.md'
+      - 'schemas/stage2_subject_readiness_receipt_v1.schema.json'
       - '.github/workflows/stage2-native-v7-offline.yml'
 
 jobs:
@@ -29,4 +31,4 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m stage2.native_v7.freeze
-      - run: python -m unittest stage2.native_v7.tests.test_architecture
+      - run: python -m unittest discover -s stage2/native_v7/tests -v
