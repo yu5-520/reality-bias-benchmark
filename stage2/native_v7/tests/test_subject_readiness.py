@@ -30,6 +30,13 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
             payload["asset_blockers"],
             {"X6": "PENDING_FROZEN_MANIFEST", "X7": "PENDING_FROZEN_MANIFEST"},
         )
+        self.assertEqual(
+            set(payload["probe_execution_surface_sha256"]),
+            {"X1", "X2", "X3", "X4", "X5"},
+        )
+        self.assertTrue(
+            all(len(value) == 64 for value in payload["probe_execution_surface_sha256"].values())
+        )
 
     def test_preflight_rejects_nonexact_authorization(self):
         with self.assertRaisesRegex(ValueError, "authorization phrase"):
@@ -86,6 +93,7 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
                     "state": "VERIFIED",
                     "execution_code_sha": self.SHA,
                     "common_receipt_sha256": "r",
+                    "execution_surface_sha256": "e",
                     "subject_config_sha256": "s",
                     "model_config_sha256": "m",
                     "workflow_run_id": 1,
