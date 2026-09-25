@@ -102,8 +102,15 @@ async def smoke(destination):
         raise RuntimeError(f"unexpected MetaGPT native role schedule: {observed_roles!r}")
     if meta_result["metagpt_rounds"] != 7:
         raise RuntimeError(f"expected seven MetaGPT Environment rounds, got {meta_result['metagpt_rounds']}")
-    if meta_result["environment_messages"] < 8:
-        raise RuntimeError("MetaGPT Environment history did not preserve native message flow")
+    # MetaGPT's native Role.publish_message routes self-addressed tool feedback
+    # directly into that Role's msg_buffer rather than through Environment.history.
+    # The six cross-role/user/terminal messages belong in Environment.history; the
+    # two self tool-feedback messages are checked through Role memory below.
+    if meta_result["environment_messages"] != 6:
+        raise RuntimeError(
+            f"expected six MetaGPT Environment-routed messages, got "
+            f"{meta_result['environment_messages']}"
+        )
 
     second_prompt = json.loads(provider.prompts[1][-1]["content"])
     if not second_prompt["inbox"] or second_prompt["inbox"][0]["from"] != "release_lead":
