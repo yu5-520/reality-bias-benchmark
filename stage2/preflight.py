@@ -43,8 +43,13 @@ def blockers(runtime_manifest, captures_root):
             if not bind.get("blocker_reason"):
                 errors.append(f"{pid}: engineering blocker reason missing")
             continue
-        if execution_status != "NATIVE_SMOKE_PASS":
+        if execution_status is None:
+            if not bind.get("installed_version") or not bind.get("native_hook"):
+                errors.append(f"{pid}: installed implementation/native hook unbound")
             errors.append(f"{pid}: native engineering status unbound")
+            continue
+        if execution_status != "NATIVE_SMOKE_PASS":
+            errors.append(f"{pid}: invalid native engineering status {execution_status}")
             continue
         if not bind.get("installed_version") or not bind.get("native_hook"):
             errors.append(f"{pid}: installed implementation/native hook unbound")
