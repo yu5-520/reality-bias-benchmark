@@ -1,7 +1,8 @@
 """One-shot native collection launcher for Stage-II v7.
 
 This launcher does not import the v6 CodingArena or any shared transport. It
-reserves a cell only after a probe-specific native runner has been verified.
+reserves a cell only after a probe-specific native runner and real-provider
+subject-readiness gate have both been verified.
 """
 import argparse
 import json
@@ -29,8 +30,16 @@ def validate_request(probe, task, registry_path=None):
     spec = registry["probes"].get(probe)
     if spec is None:
         raise ValueError("probe is outside frozen X1-X7")
-    if spec["collection_state"] != "RUNNER_VERIFIED":
+    state = spec["collection_state"]
+    if state == "PENDING_NATIVE_RUNNER":
         raise ValueError(f"{probe}: native runner is not verified; natural collection remains closed")
+    if state == "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING":
+        raise ValueError(
+            f"{probe}: native runner is verified but real-provider subject readiness is pending; "
+            "natural collection remains closed"
+        )
+    if state != "SUBJECT_READY":
+        raise ValueError(f"{probe}: unrecognized collection state: {state}")
     launch = spec["launch"]
     if launch.get("state") != "VERIFIED_NATIVE_ENTRYPOINT":
         raise ValueError(f"{probe}: native entrypoint is not verified")
@@ -80,7 +89,11 @@ def collect(*, probe, task, out_root, registry_path=None):
         "runner_state": spec["collection_state"],
         "returncode": completed.returncode,
         "observer_files": verify_observer(observer.root),
-        "status": "RECORDED_PENDING_POSTHOC_AUDIT" if completed.returncode == 0 else "FAILED_ATTEMPT_PRESERVED",
+        "status": (
+            "RECORDED_PENDING_POSTHOC_AUDIT"
+            if completed.returncode == 0
+            else "FAILED_ATTEMPT_PRESERVED"
+        ),
     }
     (destination / "seal.json").write_text(
         json.dumps(seal, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
