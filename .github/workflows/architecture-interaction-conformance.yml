@@ -1,0 +1,44 @@
+name: Architecture Interaction Conformance (offline)
+
+on:
+  pull_request:
+    paths:
+      - 'arena/interaction_*.py'
+      - 'arena/tests/test_interaction_adapter.py'
+      - 'configs/architecture_conditioned_v1.json'
+      - 'docs/architecture_conditioned_process_reality_v1.md'
+      - 'schemas/interaction_event_v1.schema.json'
+      - 'schemas/architecture_profile_v1.schema.json'
+      - '.github/workflows/architecture-interaction-conformance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'arena/interaction_*.py'
+      - 'arena/tests/test_interaction_adapter.py'
+      - 'configs/architecture_conditioned_v1.json'
+      - 'docs/architecture_conditioned_process_reality_v1.md'
+      - 'schemas/interaction_event_v1.schema.json'
+      - 'schemas/architecture_profile_v1.schema.json'
+      - '.github/workflows/architecture-interaction-conformance.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate adapter contract and lineage exposure
+        run: python -m unittest arena.tests.test_interaction_adapter -v
+      - name: Verify frozen raw registry and append-only release catalog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            python scripts/validate_frozen_raw_immutability.py --base "${{ github.event.pull_request.base.sha }}"
+          else
+            python scripts/validate_frozen_raw_immutability.py --base "${{ github.event.before }}"
+          fi

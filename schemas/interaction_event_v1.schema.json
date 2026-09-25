@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-INTERACTION-EVENT-v1",
+  "title": "Architecture-neutral observed interaction event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "event_id", "event_hash", "run_id", "architecture_id", "adapter_version", "surface", "actor", "recipient", "turn", "native_ref", "raw_ref", "carrier_ref", "content_hash", "authority_status", "observation", "source_refs", "parent_event_ids"],
+  "properties": {
+    "schema": {"const": "RB-INTERACTION-EVENT-v1"},
+    "event_id": {"type": "string", "minLength": 1},
+    "event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "run_id": {"type": "string", "minLength": 1},
+    "architecture_id": {"type": "string", "minLength": 1},
+    "adapter_version": {"type": "string", "minLength": 1},
+    "surface": {"enum": ["send_message", "receive_message", "shared_state", "delegate", "handoff", "tool_call", "resource_read", "memory_write", "memory_retrieve", "remote_task", "artifact_return"]},
+    "actor": {"type": "string", "minLength": 1},
+    "recipient": {"type": ["string", "null"]},
+    "turn": {"type": ["integer", "null"], "minimum": 0},
+    "native_ref": {"type": "string", "minLength": 1},
+    "raw_ref": {"type": "string", "minLength": 1},
+    "carrier_ref": {"type": "string", "minLength": 1},
+    "content_hash": {"type": ["string", "null"]},
+    "authority_status": {"type": ["string", "null"]},
+    "observation": {"enum": ["PROPOSED", "RECORDED", "DELIVERED", "INPUT_EXPOSED", "EXECUTED", "FAILED", "UNAVAILABLE"]},
+    "source_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "parent_event_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  }
+}

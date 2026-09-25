@@ -2,6 +2,8 @@
 
 Open research repository for the **Reality Bias** programme and the first-paper **Process Reality** mechanism study in multi-agent AI systems.
 
+**Prospective second-study protocol (not new results):** [Architecture-conditioned Process Reality](docs/architecture_conditioned_process_reality_v1.md). It registers five interaction structures, two later extensions, a common observation adapter and separate pilot/formal gates. Historical frozen evidence remains the foundation layer; no new architecture subject run is implied by the protocol.
+
 > **Open for use. Clear in provenance. Responsible in evolution.**
 
 This repository is designed for replication, independent validation, criticism, extension, alternative implementation, and downstream research.

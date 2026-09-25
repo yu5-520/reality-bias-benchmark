@@ -1,5 +1,7 @@
 # Process Reality v5 Cross-Domain First-Round forward layer
 
+Prospective second-study interaction layer: `interaction_adapter.py` defines the 11-surface normalized event gateway and a read-only Common Pool trace projection. `interaction_conformance.py` checks raw-reference and native-boundary evidence. The forward protocol and architecture profile are under `../docs/architecture_conditioned_process_reality_v1.md`, `../configs/architecture_conditioned_v1.json` and `../schemas/architecture_profile_v1.schema.json`. These offline checks do **not** constitute a natural pilot, semantic adjudication, or provider authorization.
+
 The current next subject profile is **PR-FIRST-ROUND-CROSS-DOMAIN-001 / v0.2**.
 
 The ecommerce domain remains the historical **method-development / deep-reference case** and is not re-counted as prospective replication data.

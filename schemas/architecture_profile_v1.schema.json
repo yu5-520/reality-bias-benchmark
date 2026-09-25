@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-ARCHITECTURE-PROFILE-v1",
+  "title": "Trajectory-first, raw-backed semantic architecture profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "run_id", "architecture_id", "frozen_evidence_ref", "audit_status", "source_authority", "carrier_type", "authority_transition", "functional_descendants", "operational_dependence", "dynamic_cpr", "cross_penetration", "persistence_reentry", "repair_surface", "evidence_refs", "uncertainties"],
+  "properties": {
+    "schema": {"const": "RB-ARCHITECTURE-PROFILE-v1"},
+    "run_id": {"type": "string", "minLength": 1},
+    "architecture_id": {"type": "string", "minLength": 1},
+    "frozen_evidence_ref": {"type": "string", "minLength": 1},
+    "audit_status": {"enum": ["NOT_ADJUDICATED", "PARTIAL", "ADJUDICATED"]},
+    "source_authority": {"type": ["object", "null"]},
+    "carrier_type": {"type": ["string", "null"]},
+    "authority_transition": {"type": ["object", "null"]},
+    "functional_descendants": {"type": "array", "items": {"type": "object"}},
+    "operational_dependence": {"type": ["object", "null"]},
+    "dynamic_cpr": {"type": "object", "properties": {"C": {"enum": ["PRESENT", "ABSENT_IN_OBSERVED_WINDOW", "UNRESOLVED", "NOT_ADJUDICATED"]}, "P": {"enum": ["PRESENT", "ABSENT_IN_OBSERVED_WINDOW", "UNRESOLVED", "NOT_ADJUDICATED"]}, "R": {"enum": ["PRESENT", "ABSENT_IN_OBSERVED_WINDOW", "UNRESOLVED", "NOT_ADJUDICATED"]}}, "required": ["C", "P", "R"], "additionalProperties": false},
+    "cross_penetration": {"type": "array", "items": {"type": "object"}},
+    "persistence_reentry": {"type": ["object", "null"]},
+    "repair_surface": {"type": ["object", "null"]},
+    "evidence_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "uncertainties": {"type": "array", "items": {"type": "string"}}
+  }
+}
