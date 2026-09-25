@@ -1,0 +1,82 @@
+name: Stage-II v7 X2 MetaGPT native environment
+
+on:
+  push:
+    paths:
+      - 'stage2/native_v7/x2_metagpt/**'
+      - 'stage2/native_v7/registry.json'
+      - 'stage2/native_v7/freeze.py'
+      - 'stage2/native_v7/matrix.json'
+      - 'stage2/native_v7/tests/**'
+      - 'docs/R_Plan_v7.8.md'
+      - 'stage2/tasks.json'
+      - 'stage2/roles.json'
+      - 'stage2/subject.json'
+      - 'stage2/fixtures/project/**'
+      - '.github/workflows/stage2-native-v7-x2.yml'
+  pull_request:
+    paths:
+      - 'stage2/native_v7/x2_metagpt/**'
+      - 'stage2/native_v7/registry.json'
+      - 'stage2/native_v7/freeze.py'
+      - 'stage2/native_v7/matrix.json'
+      - 'stage2/native_v7/tests/**'
+      - 'docs/R_Plan_v7.8.md'
+      - 'stage2/tasks.json'
+      - 'stage2/roles.json'
+      - 'stage2/subject.json'
+      - 'stage2/fixtures/project/**'
+      - '.github/workflows/stage2-native-v7-x2.yml'
+
+jobs:
+  x2-metagpt-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: '${{ github.event.pull_request.head.sha || github.sha }}'
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Bind exact frozen MetaGPT source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/FoundationAgents/MetaGPT upstream
+          git -C upstream checkout -q 11cdf466d042aece04fc6cfd13b28e1a70341b1f
+          test "$(git -C upstream rev-parse HEAD)" = 11cdf466d042aece04fc6cfd13b28e1a70341b1f
+      - name: Install frozen MetaGPT runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -q --upgrade pip
+          grep -v '^lancedb==0.4.0$' upstream/requirements.txt > /tmp/metagpt-requirements-stage2.txt
+          python -m pip install -q -r /tmp/metagpt-requirements-stage2.txt
+          # The frozen MetaGPT dependency graph leaves pyarrow implicit while
+          # pandas imports it if a partial namespace package is present.
+          python -m pip install -q 'pyarrow==14.0.2'
+          python -m pip install -q --no-deps -e upstream
+          python - <<'PY'
+          from importlib.metadata import version
+          assert version("metagpt") == "1.0.0", version("metagpt")
+          PY
+      - name: Run X2 native MetaGPT Environment smoke
+        shell: bash
+        env:
+          PYTHONPATH: '${{ github.workspace }}'
+        run: |
+          set -euo pipefail
+          python -m stage2.native_v7.x2_metagpt.smoke --out-root stage2_x2_smoke
+      - name: Verify existing v7 architecture remains frozen
+        run: |
+          python -m stage2.native_v7.freeze
+          python -m unittest stage2.native_v7.tests.test_architecture -v
+      - name: Upload non-study X2 MetaGPT smoke evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-v7-x2-metagpt-smoke-${{ github.run_id }}
+          path: stage2_x2_smoke
+          retention-days: 30
+          if-no-files-found: error

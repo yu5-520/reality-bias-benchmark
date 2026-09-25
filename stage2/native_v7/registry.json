@@ -52,22 +52,36 @@
       "background_substrate_id": null
     },
     "X2": {
-      "collection_state": "PENDING_NATIVE_RUNNER",
+      "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
       "environment_id": "x2-metagpt-11cdf46",
       "execution_owner": "MetaGPT Environment/Role runtime",
-      "host_attachment": "Frozen task/roles/subject/checkout are mapped into the official MetaGPT environment; host glue must not replace MetaGPT role/message scheduling.",
+      "host_attachment": "Frozen task/roles/subject/checkout are mapped into the official MetaGPT Environment/Role runtime. Environment.run owns scheduling and Environment.publish_message/Role.msg_buffer own inter-role routing; the historical Stage-II mailbox/transport scaffold is not imported.",
       "launch": {
-        "argv_template": null,
-        "state": "PENDING_NATIVE_ENTRYPOINT"
+        "state": "VERIFIED_NATIVE_ENTRYPOINT",
+        "argv_template": [
+          "python",
+          "-m",
+          "stage2.native_v7.x2_metagpt.runner",
+          "--checkout",
+          "{checkout}",
+          "--task-file",
+          "{task_file}",
+          "--roles-file",
+          "{roles_file}",
+          "--subject-file",
+          "{subject_file}",
+          "--observer-root",
+          "{observer_root}/metagpt_native"
+        ]
       },
       "name": "MetaGPT",
       "observer": {
         "may_mutate_execution": false,
         "mode": "external",
         "native_surfaces": [
-          "Environment message/history",
-          "Role message buffer",
-          "provider I/O",
+          "post-round immutable copies of native MetaGPT Environment.history messages",
+          "post-round immutable copies of native MetaGPT Role memory messages",
+          "process stdout/stderr/exit",
           "checkout effects"
         ]
       },
@@ -76,7 +90,26 @@
       "source_repo": "FoundationAgents/MetaGPT",
       "upstream_mode": "official_source",
       "integration_kind": "native_multiagent_framework",
-      "background_substrate_id": null
+      "background_substrate_id": null,
+      "package_version": "1.0.0",
+      "bootstrap": {
+        "state": "FROZEN_NON_NETWORK_IMPORT_BOOTSTRAP",
+        "rule": "The pinned MetaGPT package eagerly loads a default LLM config at import. X2 creates an isolated temporary HOME containing a dummy non-network default only for framework initialization; every actual model turn is routed through the separately frozen Stage-II subject provider."
+      },
+      "verification": {
+        "state": "NON_STUDY_NATIVE_SMOKE_PASS",
+        "workflow": ".github/workflows/stage2-native-v7-x2.yml",
+        "verified_code_commit": "2491637e1b6e458a38c6aaeebb6332316843e751",
+        "workflow_run_id": 36140759337,
+        "subject_ready": false,
+        "task": "T2",
+        "turns": 7,
+        "metagpt_rounds": 7,
+        "environment_messages": 6,
+        "observer_files": 9,
+        "stop_reason": "finalized",
+        "checkout_sha256": "15200a4ce5b6a09127f25371b55d9b4ae3b1f2071af78c3a7f37b6fcad8303e2"
+      }
     },
     "X3": {
       "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
@@ -411,7 +444,7 @@
     "tasks": "stage2/tasks.json",
     "host_policy": "X1-X2 use their native multi-agent framework, X3 uses native A2A communication, and X4-X7 may share the explicitly registered software-engineering background host because those X conditions operate at tool/retrieval/memory/context layers; monitoring is not part of that host."
   },
-  "status": "X1_X3_X4_X5_X6_X7_NATIVE_RUNNERS_VERIFIED_SUBJECT_PENDING_CAPABILITY_HOST_FROZEN_X2_RUNNER_PENDING",
+  "status": "X1_X2_X3_X4_X5_X6_X7_NATIVE_RUNNERS_VERIFIED_SUBJECT_PENDING_CAPABILITY_HOST_FROZEN",
   "forbidden_global_normalization": [
     "requiring every X to execute through one common runtime adapter",
     "requiring X1-X3 to use the baseline role-mailbox communication substrate",
