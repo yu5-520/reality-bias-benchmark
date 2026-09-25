@@ -26,11 +26,17 @@ class NativeV7Architecture(unittest.TestCase):
             self.assertFalse(spec["observer"]["may_mutate_execution"])
             self.assertTrue(spec["integration_kind"])
 
-    def test_background_host_is_explicit_only_for_capability_layers(self):
+    def test_background_host_is_frozen_only_for_capability_layers(self):
         registry = load_registry()
         host = registry["background_substrates"]["software_engineering_host_v1"]
         self.assertEqual(set(host["applies_to"]), {"X4", "X5", "X6", "X7"})
-        self.assertEqual(host["status"], "PENDING_DEINSTRUMENTED_HOST_FREEZE")
+        self.assertEqual(host["status"], "FROZEN_DEINSTRUMENTED_HOST")
+        self.assertEqual(
+            host["verification"]["state"],
+            "NON_STUDY_DEINSTRUMENTED_HOST_EQUIVALENCE_PASS",
+        )
+        self.assertTrue(host["verification"]["historical_prompt_contains_audit_ids"])
+        self.assertFalse(host["verification"]["deinstrumented_prompt_contains_audit_ids"])
         for probe in ("X1", "X2", "X3"):
             self.assertIsNone(registry["probes"][probe]["background_substrate_id"])
         for probe in ("X4", "X5", "X6", "X7"):
@@ -38,6 +44,20 @@ class NativeV7Architecture(unittest.TestCase):
                 registry["probes"][probe]["background_substrate_id"],
                 "software_engineering_host_v1",
             )
+
+    def test_deinstrumented_host_source_contains_no_monitor_runtime(self):
+        raw = (ROOT / "stage2/native_v7/software_host_v1.py").read_text()
+        for marker in (
+            "NativeCapture",
+            "stage2.evidence",
+            "PassiveEventObserver",
+            "ExternalObserver",
+            "event_id",
+            "native_locator",
+            "hook_id",
+        ):
+            with self.subTest(marker=marker):
+                self.assertNotIn(marker, raw)
 
     def test_x1_runner_is_verified_but_subject_gate_remains_closed(self):
         registry = load_registry()
@@ -72,6 +92,9 @@ class NativeV7Architecture(unittest.TestCase):
 
     def test_capability_runner_cannot_verify_before_host_freeze(self):
         registry = load_registry()
+        registry["background_substrates"]["software_engineering_host_v1"]["status"] = (
+            "PENDING_DEINSTRUMENTED_HOST_FREEZE"
+        )
         registry["probes"]["X4"]["collection_state"] = "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING"
         registry["probes"]["X4"]["launch"] = {
             "state": "VERIFIED_NATIVE_ENTRYPOINT",

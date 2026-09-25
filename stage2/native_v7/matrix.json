@@ -12,7 +12,21 @@
       "execution_semantics_source": "historical stage2.coding_arena.CodingArena",
       "role_environment": "frozen nine-role software-engineering environment",
       "rule": "The capability-layer X does not own scheduling or inter-agent transport. The common host substrate must be explicitly registered and frozen, and its formal v7 implementation must remove monitor responsibilities from execution before natural collection.",
-      "status": "PENDING_DEINSTRUMENTED_HOST_FREEZE"
+      "smoke_path": "stage2/native_v7/software_host_smoke.py",
+      "source_path": "stage2/native_v7/software_host_v1.py",
+      "status": "FROZEN_DEINSTRUMENTED_HOST",
+      "verification": {
+        "checkout_sha256": "330c232646f9a53f309bfe4410eb35bcd7b5535955be51bc0b22fc6135e28520",
+        "deinstrumented_prompt_contains_audit_ids": false,
+        "historical_prompt_contains_audit_ids": true,
+        "state": "NON_STUDY_DEINSTRUMENTED_HOST_EQUIVALENCE_PASS",
+        "stop_reason": "finalized",
+        "task": "T2",
+        "turns": 6,
+        "verified_code_commit": "450de572a90ffb729ee24bca1562ff62eebe770b",
+        "workflow": ".github/workflows/stage2-native-v7-host.yml",
+        "workflow_run_id": 36128409038
+      }
     }
   },
   "cells": [
@@ -166,11 +180,13 @@
   ],
   "execution_gate": "CLOSED_UNTIL_CELL_X_SUBJECT_READY",
   "files_sha256": {
-    "docs/R_Plan_v7.1.md": "15ebb3b13cbf1c3f29b1923e8a13926f75911ac6bc36884fdba8963dce9c469e",
+    "docs/R_Plan_v7.2.md": "c36dad4abba5b0a887b1942d5d4fa99c887e06f86a32fb6247cf5fa49a830ef2",
     "stage2/native_v7/collect.py": "0552b4262c4a5fa2d6e4c4ccd2b3b1e78827e38f8cffc0195c672223f86e4a06",
     "stage2/native_v7/observer.py": "3630c831bd504d6b5786539f7d8d79d94d27fb7fa5cfd9647533c2332ce838db",
     "stage2/native_v7/policy.py": "bfad59ef5ac6b136051ef9e5f5af6947dcb18c06f293f8d978dc9b2a6a367b1b",
-    "stage2/native_v7/registry.json": "57bc98f6718aa7aa55c94decdf0b71b20d823a243fccb5b257b8d51b1895ce62",
+    "stage2/native_v7/registry.json": "fe2c111be8fa7ed65e5c3858ad5694e9f76767a751f36e2bf61372ad9220422c",
+    "stage2/native_v7/software_host_smoke.py": "4615e7abc545e7759cfcf6cc01e0885a06ec73ed6565af7f34378068eb2173e3",
+    "stage2/native_v7/software_host_v1.py": "730549b59ab0dcda9ff8b7055bd1f62cbec0c05383e97c068bb2cd121e7a1edf",
     "stage2/native_v7/x1_autogen/__init__.py": "3f8246a2b8a91bd12d327a2e1a531591d7e3b3fd7f86bd2eb774b4044857b96f",
     "stage2/native_v7/x1_autogen/runner.py": "c268cfff575cf23efaf18600078c907aad006bc9bcd3912e64d6202ff9e22e89",
     "stage2/native_v7/x1_autogen/smoke.py": "22859a88c78fbd273bbe472494b647e24b926dc442cf451f936cb11e8a391cc4",
@@ -190,6 +206,6 @@
     "using the post-observation evidence schema as a pre-execution action or message contract"
   ],
   "natural_trajectories_collected": 0,
-  "predecessor": "docs/R_Plan_v7.1.md",
-  "schema": "stage2-native-v7-matrix-v2"
+  "predecessor": "docs/R_Plan_v7.2.md",
+  "schema": "stage2-native-v7-matrix-v3"
 }
