@@ -1,0 +1,70 @@
+name: Stage-II v7 T1 X6-X7 One-Time Bridge
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-v7-t1-x6-x7-bridge
+  cancel-in-progress: false
+
+jobs:
+  dispatch-t1-x6-x7:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'STAGE2 T1 X6-X7 NATURAL BATCH AUTHORIZATION'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      AUTH_ISSUE: ${{ github.event.issue.number }}
+      AUTH_TAG: stage2-natural-t1-x6-x7-authorization
+
+    steps:
+      - name: Verify exact two-cell authorization on main
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/main
+          python - <<'PY'
+          import os
+          expected = '\n'.join([
+              'cells=X6-T1,X7-T1',
+              'control_plane=CHAT_AUTHORIZATION_BRIDGE_STAGE2_T1_X6_X7_v1',
+              f"expected_main_sha={os.environ['GITHUB_SHA']}",
+              'max_natural_trajectories=2',
+              'preserve_failed_attempt=true',
+          ])
+          if os.environ['AUTH_BODY'].strip() != expected:
+              raise SystemExit('authorization differs from two-cell contract or main event SHA')
+          print('PASS: one X6/X7 T1 batch authorized on exact main SHA')
+          PY
+
+      - name: Claim unique authorization tag and dispatch pinned workflow once
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f "ref=refs/tags/$AUTH_TAG" -f "sha=$GITHUB_SHA" >/dev/null
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/stage2-v7-t1-x6-x7-natural.yml/dispatches" \
+            -X POST -f "ref=$AUTH_TAG" \
+            -f "inputs[expected_execution_sha]=$GITHUB_SHA" \
+            -f "inputs[authorization_issue]=$AUTH_ISSUE" >/dev/null
+          echo "PASS: dispatched X6/X7 T1 once at $GITHUB_SHA"
+
+      - name: Record dispatch on issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" \
+            --body "X6/X7 T1 natural batch dispatched once. Pinned tag: $AUTH_TAG. Execution SHA: $GITHUB_SHA. Each reserved attempt, including failure, is preserved and must not be repeated."
+          gh issue close "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed

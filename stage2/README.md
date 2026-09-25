@@ -2,7 +2,7 @@
 
 **Active forward track: `stage2/native_v7/` — native heterogeneous execution + external observation.**
 
-Stage-II still has **zero natural trajectories**. The v6.x files in this directory are retained as historical engineering provenance only; they are not a universal v7 execution interface.
+Stage-II has **5 / 21 recorded natural attempts**: T1 has been attempted once for X1–X5. The v6.x files in this directory are retained as historical engineering provenance only; they are not a universal v7 execution interface.
 
 The frozen scientific conditions remain T1–T3, the nine Software Engineering roles, the checkout fixture, the DeepSeek subject profile, the seven X targets and one natural trajectory per cell. The active boundary is:
 
@@ -12,7 +12,7 @@ The frozen scientific conditions remain T1–T3, the nine Software Engineering r
 - `software_engineering_host_v1` is frozen as a de-instrumented host: historical queue/mailbox/action semantics are preserved while monitor/audit IDs are removed from execution and model-visible context.
 - monitoring is external and non-mutating; common evidence representation is created only after observation.
 
-`docs/R_Plan_v7.11.md` records the completed common provider handshake and independent X promotion. **X1–X5 are `SUBJECT_READY`; X6/X7 still require real study asset manifests. Natural trajectories remain 0/21.** The common handshake used one non-scientific provider call and did not reserve a cell. The registry and derived matrix carry the current per-X state.
+`docs/R_Plan_v7.14.md` records the X6/X7 real-asset promotion. **All seven X conditions are now `SUBJECT_READY`; raw natural collection remains 5/21, with X6-T1 and X7-T1 still unopened until their one-time authorization.** The common subject receipt is unchanged, and the X6/X7 promotion cites the committed pretrained manifests plus successful real-load compatibility run.
 
 ## Historical v6.x scaffold
 

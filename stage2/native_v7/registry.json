@@ -335,7 +335,7 @@
       }
     },
     "X6": {
-      "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
+      "collection_state": "SUBJECT_READY",
       "environment_id": "x6-memorybank-cf61c41",
       "execution_owner": "Frozen software-engineering host plus official MemoryBank mechanism",
       "host_attachment": "MemoryBank attaches at its native memory write/retrieve boundary in its own compatible environment while the software-engineering host retains role execution.",
@@ -380,20 +380,24 @@
       "integration_kind": "memory_capability",
       "background_substrate_id": "software_engineering_host_v1",
       "study_embedding": {
-        "state": "PENDING_FROZEN_MANIFEST",
+        "state": "FROZEN_MANIFEST_VERIFIED",
         "source_commit": "cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9",
         "upstream_env": "STAGE2_X6_UPSTREAM",
         "embedding_env": "STAGE2_X6_EMBEDDING_MODEL",
         "manifest_env": "STAGE2_X6_EMBEDDING_MANIFEST",
-        "rule": "A local embedding checkpoint and exact file-hash manifest must be frozen before SUBJECT_READY; the tiny engineering embedding used by smoke tests is never authorized for natural collection."
+        "rule": "A local embedding checkpoint and exact file-hash manifest must be frozen before SUBJECT_READY; the tiny engineering embedding used by smoke tests is never authorized for natural collection.",
+        "manifest_path": "stage2/native_v7/study/x6_embedding_manifest.json",
+        "manifest_sha256": "6f7540370b538036406bb621563e0ab98e8745122afe51369ab394c7f6f64f34",
+        "asset_fingerprint_workflow_run_id": 36163086812,
+        "compatibility_workflow_run_id": 36163966262
       },
       "verification": {
         "state": "NON_STUDY_NATIVE_SMOKE_PASS",
         "workflow": ".github/workflows/stage2-native-v7-x6.yml",
         "verified_code_commit": "81de62483236f8a74cd09b40668ee1f025b5a7ce",
         "workflow_run_id": 36137509369,
-        "subject_ready": false,
-        "study_embedding_ready": false,
+        "subject_ready": true,
+        "study_embedding_ready": true,
         "task": "T2",
         "turns": 2,
         "stop_reason": "finalized",
@@ -404,10 +408,18 @@
         "observer_files": 6,
         "synthetic_embedding_files": 6,
         "checkout_sha256": "15200a4ce5b6a09127f25371b55d9b4ae3b1f2071af78c3a7f37b6fcad8303e2"
+      },
+      "subject_readiness": {
+        "execution_code_sha": "85823f58c7c8a504540617570242ac09d8b76a20",
+        "subject_config_sha256": "b0858d05e539b851f75d615ceb7738c34400a422190a685796df1811e4a7cd3b",
+        "model_config_sha256": "fe7bbafda1c4c12b1d1f5dca963d1a45cbe503713aaa486fac09f569d1b5f8c5",
+        "workflow_run_id": 36154377883,
+        "state": "VERIFIED",
+        "common_receipt_sha256": "681aad9cfa2c08cdbf494bf22b18f7a1e91c6d592394c0c0999e73f2db6b2af8"
       }
     },
     "X7": {
-      "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
+      "collection_state": "SUBJECT_READY",
       "environment_id": "x7-longllmlingua-5a4c78a",
       "execution_owner": "Frozen software-engineering host plus official LongLLMLingua compressor",
       "host_attachment": "LongLLMLingua attaches at its native context-compression boundary while the software-engineering host retains role execution.",
@@ -448,20 +460,24 @@
       "integration_kind": "context_compression_capability",
       "background_substrate_id": "software_engineering_host_v1",
       "study_checkpoint": {
-        "state": "PENDING_FROZEN_MANIFEST",
+        "state": "FROZEN_MANIFEST_VERIFIED",
         "package_version": "0.2.2",
         "source_commit": "5a4c78ae18ab17a98cf997e8259354e546081d64",
         "checkpoint_env": "STAGE2_X7_CHECKPOINT",
         "manifest_env": "STAGE2_X7_CHECKPOINT_MANIFEST",
-        "rule": "A study checkpoint directory and exact file-hash manifest must be frozen before SUBJECT_READY; the engineering smoke checkpoint is never authorized for natural collection."
+        "rule": "A study checkpoint directory and exact file-hash manifest must be frozen before SUBJECT_READY; the engineering smoke checkpoint is never authorized for natural collection.",
+        "manifest_path": "stage2/native_v7/study/x7_checkpoint_manifest.json",
+        "manifest_sha256": "bc5cd236ca84a2b213f3a618ef37f7ab10f6716e1b1b134242c2350bd4883e66",
+        "asset_fingerprint_workflow_run_id": 36163086812,
+        "compatibility_workflow_run_id": 36163966262
       },
       "verification": {
         "state": "NON_STUDY_NATIVE_SMOKE_PASS",
         "workflow": ".github/workflows/stage2-native-v7-x7.yml",
         "verified_code_commit": "f73b11b1f7136917cd47052c88a296c7b5d9fae5",
         "workflow_run_id": 36132656916,
-        "subject_ready": false,
-        "study_checkpoint_ready": false,
+        "subject_ready": true,
+        "study_checkpoint_ready": true,
         "task": "T3",
         "turns": 1,
         "stop_reason": "finalized",
@@ -471,6 +487,14 @@
         "observer_files": 3,
         "synthetic_checkpoint_files": 6,
         "checkout_sha256": "15200a4ce5b6a09127f25371b55d9b4ae3b1f2071af78c3a7f37b6fcad8303e2"
+      },
+      "subject_readiness": {
+        "execution_code_sha": "85823f58c7c8a504540617570242ac09d8b76a20",
+        "subject_config_sha256": "b0858d05e539b851f75d615ceb7738c34400a422190a685796df1811e4a7cd3b",
+        "model_config_sha256": "fe7bbafda1c4c12b1d1f5dca963d1a45cbe503713aaa486fac09f569d1b5f8c5",
+        "workflow_run_id": 36154377883,
+        "state": "VERIFIED",
+        "common_receipt_sha256": "681aad9cfa2c08cdbf494bf22b18f7a1e91c6d592394c0c0999e73f2db6b2af8"
       }
     }
   },
@@ -484,7 +508,7 @@
     "tasks": "stage2/tasks.json",
     "host_policy": "X1-X2 use their native multi-agent framework, X3 uses native A2A communication, and X4-X7 may share the explicitly registered software-engineering background host because those X conditions operate at tool/retrieval/memory/context layers; monitoring is not part of that host."
   },
-  "status": "X1_TO_X5_SUBJECT_READY_X6_X7_ASSET_PENDING_ZERO_NATURAL_TRAJECTORIES",
+  "status": "X1_TO_X7_SUBJECT_READY",
   "forbidden_global_normalization": [
     "requiring every X to execute through one common runtime adapter",
     "requiring X1-X3 to use the baseline role-mailbox communication substrate",
