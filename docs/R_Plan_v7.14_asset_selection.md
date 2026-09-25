@@ -1,0 +1,7 @@
+# Stage-II v7.14: prospective X6/X7 study asset selection
+
+X6–T1 and X7–T1 remain unopened. Their earlier smokes used deliberately synthetic tiny checkpoints. For the formal asset gate, select public pretrained weights independent of the observed T1 answer quality: `sentence-transformers/all-MiniLM-L6-v2` for X6 MemoryBank retrieval, and `distilbert/distilgpt2` as a small pretrained autoregressive language model for X7 LongLLMLingua perplexity ranking on CPU. Neither is an LLMLingua-2 substitution. This selection is recorded **after** X1–X5 T1 outcomes were observed; that timing is a study limitation and cannot be hidden.
+
+The new offline workflow downloads each repository at one exact resolved commit, copies actual weight and configuration files into a local checkpoint and records every file SHA-256 in a candidate manifest. It runs no T1 task and no DeepSeek call. A separate reviewed promotion must verify manifest shape and actual loadability under the pinned X6/X7 package environments before `SUBJECT_READY`; the natural collector must compare downloaded bytes with the committed manifest before reserving a cell. Candidate files alone do not open X6 or X7.
+
+The repeated invalid action envelopes in X2–X5 T1 make a new paid T1 cell scientifically costly. No X6/X7 cell will run solely because a checkpoint download succeeded. The four null trajectories remain part of the recorded denominator and will not be rerun.
