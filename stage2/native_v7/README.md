@@ -23,4 +23,4 @@ python -m stage2.native_v7.freeze
 python -m unittest discover -s stage2/native_v7/tests -v
 ```
 
-The frozen architecture matrix records the prerecording baseline of **0 / 21**. The current raw collection count is **1 / 21**; consult `docs/R_Plan_v7.12.md` and the separate archive manifest for provenance and status.
+The frozen architecture matrix records the prerecording baseline of **0 / 21**. The current raw collection count is **5 / 21**; X2–X5 T1 attempts ended without terminal answers. Consult `docs/R_Plan_v7.13.md` and the separate archive manifests for provenance and outcome status.
