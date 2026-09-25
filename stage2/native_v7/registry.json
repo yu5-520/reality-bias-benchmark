@@ -2,7 +2,7 @@
   "freeze_date_utc": "2026-09-25",
   "probes": {
     "X1": {
-      "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
+      "collection_state": "SUBJECT_READY",
       "environment_id": "x1-autogen-027ecf0",
       "execution_owner": "AutoGen AgentChat Swarm",
       "host_attachment": "Frozen task/roles/subject/checkout are supplied to AutoGen-native agents; host glue exposes bounded checkout tools but does not replace AutoGen scheduling or handoff semantics.",
@@ -47,12 +47,29 @@
         "workflow_run_id": 36127178838,
         "runner_sha256": "c268cfff575cf23efaf18600078c907aad006bc9bcd3912e64d6202ff9e22e89",
         "smoke_sha256": "22859a88c78fbd273bbe472494b647e24b926dc442cf451f936cb11e8a391cc4",
-        "subject_ready": false
+        "subject_ready": true
       },
-      "background_substrate_id": null
+      "background_substrate_id": null,
+      "subject_readiness": {
+        "state": "VERIFIED",
+        "execution_code_sha": "57263f4b2913eab041c1737fdce62e1bd2ab5242",
+        "common_receipt_sha256": "93f06cb677b7da3997bcbf38a09cdd10fed650f2e05139e4ac82645a23228464",
+        "subject_config_sha256": "b0858d05e539b851f75d615ceb7738c34400a422190a685796df1811e4a7cd3b",
+        "model_config_sha256": "fe7bbafda1c4c12b1d1f5dca963d1a45cbe503713aaa486fac09f569d1b5f8c5",
+        "workflow_run_id": 36145131256,
+        "artifact_id": 10869108698,
+        "artifact_sha256": "c59c3673d89d4376808cfd3143d99a51376023815de4b5e65e134cc90a15e7d2",
+        "response_id": "ed5c0f7e-e934-4ed1-a4bd-7a6e1f886765",
+        "observed_response_model": "deepseek-flash",
+        "expected_model_version": "DeepSeek-V4.1-Flash",
+        "provider_call_count": 1,
+        "estimated_peak_cost_usd": 0.0000117,
+        "raw_response_sha256": "e43dbdbb54c5d5fba137ac5561be47e807047b8afbfd2b396b31f000c58f64c9",
+        "execution_surface_sha256": "2589dff9c6ff571ee8c0e19d67707935796cbb0faa3845024bf159e3a5c8756a"
+      }
     },
     "X2": {
-      "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
+      "collection_state": "SUBJECT_READY",
       "environment_id": "x2-metagpt-11cdf46",
       "execution_owner": "MetaGPT Environment/Role runtime",
       "host_attachment": "Frozen task/roles/subject/checkout are mapped into the official MetaGPT Environment/Role runtime. Environment.run owns scheduling and Environment.publish_message/Role.msg_buffer own inter-role routing; the historical Stage-II mailbox/transport scaffold is not imported.",
@@ -101,7 +118,7 @@
         "workflow": ".github/workflows/stage2-native-v7-x2.yml",
         "verified_code_commit": "2491637e1b6e458a38c6aaeebb6332316843e751",
         "workflow_run_id": 36140759337,
-        "subject_ready": false,
+        "subject_ready": true,
         "task": "T2",
         "turns": 7,
         "metagpt_rounds": 7,
@@ -109,10 +126,27 @@
         "observer_files": 9,
         "stop_reason": "finalized",
         "checkout_sha256": "15200a4ce5b6a09127f25371b55d9b4ae3b1f2071af78c3a7f37b6fcad8303e2"
+      },
+      "subject_readiness": {
+        "state": "VERIFIED",
+        "execution_code_sha": "57263f4b2913eab041c1737fdce62e1bd2ab5242",
+        "common_receipt_sha256": "93f06cb677b7da3997bcbf38a09cdd10fed650f2e05139e4ac82645a23228464",
+        "subject_config_sha256": "b0858d05e539b851f75d615ceb7738c34400a422190a685796df1811e4a7cd3b",
+        "model_config_sha256": "fe7bbafda1c4c12b1d1f5dca963d1a45cbe503713aaa486fac09f569d1b5f8c5",
+        "workflow_run_id": 36145131256,
+        "artifact_id": 10869108698,
+        "artifact_sha256": "c59c3673d89d4376808cfd3143d99a51376023815de4b5e65e134cc90a15e7d2",
+        "response_id": "ed5c0f7e-e934-4ed1-a4bd-7a6e1f886765",
+        "observed_response_model": "deepseek-flash",
+        "expected_model_version": "DeepSeek-V4.1-Flash",
+        "provider_call_count": 1,
+        "estimated_peak_cost_usd": 0.0000117,
+        "raw_response_sha256": "e43dbdbb54c5d5fba137ac5561be47e807047b8afbfd2b396b31f000c58f64c9",
+        "execution_surface_sha256": "3efecfe13e2cf3117a2e4734e91f255da5464d62d529ffa1c25bdc1bee63f5ce"
       }
     },
     "X3": {
-      "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
+      "collection_state": "SUBJECT_READY",
       "environment_id": "x3-a2a-1.0.0",
       "execution_owner": "Nine frozen Software Engineering role services communicating through official A2A v1.0 JSON-RPC tasks/artifacts",
       "host_attachment": "Each frozen role is its own A2A-native service. The launcher starts services and submits only the initial user task; role-to-role delegation is issued by role services through the official A2A SDK. No baseline mailbox scheduler is inherited.",
@@ -161,7 +195,7 @@
         "workflow": ".github/workflows/stage2-native-v7-x3.yml",
         "verified_code_commit": "ba8b71cd7450007751432df3a54d6e3c62db96b6",
         "workflow_run_id": 36134380842,
-        "subject_ready": false,
+        "subject_ready": true,
         "task": "T2",
         "turns": 7,
         "stop_reason": "finalized",
@@ -171,10 +205,27 @@
         "jsonrpc_response_captures": 3,
         "agent_card_captures": 12,
         "checkout_sha256": "15200a4ce5b6a09127f25371b55d9b4ae3b1f2071af78c3a7f37b6fcad8303e2"
+      },
+      "subject_readiness": {
+        "state": "VERIFIED",
+        "execution_code_sha": "57263f4b2913eab041c1737fdce62e1bd2ab5242",
+        "common_receipt_sha256": "93f06cb677b7da3997bcbf38a09cdd10fed650f2e05139e4ac82645a23228464",
+        "subject_config_sha256": "b0858d05e539b851f75d615ceb7738c34400a422190a685796df1811e4a7cd3b",
+        "model_config_sha256": "fe7bbafda1c4c12b1d1f5dca963d1a45cbe503713aaa486fac09f569d1b5f8c5",
+        "workflow_run_id": 36145131256,
+        "artifact_id": 10869108698,
+        "artifact_sha256": "c59c3673d89d4376808cfd3143d99a51376023815de4b5e65e134cc90a15e7d2",
+        "response_id": "ed5c0f7e-e934-4ed1-a4bd-7a6e1f886765",
+        "observed_response_model": "deepseek-flash",
+        "expected_model_version": "DeepSeek-V4.1-Flash",
+        "provider_call_count": 1,
+        "estimated_peak_cost_usd": 0.0000117,
+        "raw_response_sha256": "e43dbdbb54c5d5fba137ac5561be47e807047b8afbfd2b396b31f000c58f64c9",
+        "execution_surface_sha256": "4449e1c9093f01a75939409dbc55922d4a28f4cbccd7c9c3632677dc81a2fe85"
       }
     },
     "X4": {
-      "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
+      "collection_state": "SUBJECT_READY",
       "environment_id": "x4-mcp-2026-07-28",
       "execution_owner": "Frozen software-engineering host plus official MCP client/server protocol",
       "host_attachment": "MCP attaches at its native tool/resource boundary to the software-engineering multi-agent host; MCP is not treated as the host scheduler.",
@@ -222,7 +273,7 @@
         "workflow": ".github/workflows/stage2-native-v7-x4.yml",
         "verified_code_commit": "7db8159c22c1616f2cb45c8fb230b7ea88e2369a",
         "workflow_run_id": 36130515655,
-        "subject_ready": false,
+        "subject_ready": true,
         "task": "T2",
         "turns": 7,
         "stop_reason": "finalized",
@@ -230,10 +281,27 @@
         "client_to_server_captures": 4,
         "server_to_client_captures": 4,
         "checkout_sha256": "b0a9d3ec7846f204bbe72062aa062358a9174d7bd66fb1908aa43c4c15087ba3"
+      },
+      "subject_readiness": {
+        "state": "VERIFIED",
+        "execution_code_sha": "57263f4b2913eab041c1737fdce62e1bd2ab5242",
+        "common_receipt_sha256": "93f06cb677b7da3997bcbf38a09cdd10fed650f2e05139e4ac82645a23228464",
+        "subject_config_sha256": "b0858d05e539b851f75d615ceb7738c34400a422190a685796df1811e4a7cd3b",
+        "model_config_sha256": "fe7bbafda1c4c12b1d1f5dca963d1a45cbe503713aaa486fac09f569d1b5f8c5",
+        "workflow_run_id": 36145131256,
+        "artifact_id": 10869108698,
+        "artifact_sha256": "c59c3673d89d4376808cfd3143d99a51376023815de4b5e65e134cc90a15e7d2",
+        "response_id": "ed5c0f7e-e934-4ed1-a4bd-7a6e1f886765",
+        "observed_response_model": "deepseek-flash",
+        "expected_model_version": "DeepSeek-V4.1-Flash",
+        "provider_call_count": 1,
+        "estimated_peak_cost_usd": 0.0000117,
+        "raw_response_sha256": "e43dbdbb54c5d5fba137ac5561be47e807047b8afbfd2b396b31f000c58f64c9",
+        "execution_surface_sha256": "9f1c076a4aa4399d362fd2d32ae773b024f6e48174d79c9fd68ca09d85f605ff"
       }
     },
     "X5": {
-      "collection_state": "NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING",
+      "collection_state": "SUBJECT_READY",
       "environment_id": "x5-rag-baf19cd",
       "execution_owner": "Frozen software-engineering host plus frozen RAG retrieval mechanism",
       "host_attachment": "RAG attaches at the retrieval/context boundary of the software-engineering multi-agent host; retrieval behavior is not rewritten into a communication framework.",
@@ -279,7 +347,7 @@
         "workflow": ".github/workflows/stage2-native-v7-x5.yml",
         "verified_code_commit": "c8db6e1b3188de7b05e6bfb521aa2a148aa9596e",
         "workflow_run_id": 36131773869,
-        "subject_ready": false,
+        "subject_ready": true,
         "task": "T3",
         "turns": 1,
         "stop_reason": "finalized",
@@ -292,6 +360,23 @@
         ],
         "observer_files": 3,
         "checkout_sha256": "15200a4ce5b6a09127f25371b55d9b4ae3b1f2071af78c3a7f37b6fcad8303e2"
+      },
+      "subject_readiness": {
+        "state": "VERIFIED",
+        "execution_code_sha": "57263f4b2913eab041c1737fdce62e1bd2ab5242",
+        "common_receipt_sha256": "93f06cb677b7da3997bcbf38a09cdd10fed650f2e05139e4ac82645a23228464",
+        "subject_config_sha256": "b0858d05e539b851f75d615ceb7738c34400a422190a685796df1811e4a7cd3b",
+        "model_config_sha256": "fe7bbafda1c4c12b1d1f5dca963d1a45cbe503713aaa486fac09f569d1b5f8c5",
+        "workflow_run_id": 36145131256,
+        "artifact_id": 10869108698,
+        "artifact_sha256": "c59c3673d89d4376808cfd3143d99a51376023815de4b5e65e134cc90a15e7d2",
+        "response_id": "ed5c0f7e-e934-4ed1-a4bd-7a6e1f886765",
+        "observed_response_model": "deepseek-flash",
+        "expected_model_version": "DeepSeek-V4.1-Flash",
+        "provider_call_count": 1,
+        "estimated_peak_cost_usd": 0.0000117,
+        "raw_response_sha256": "e43dbdbb54c5d5fba137ac5561be47e807047b8afbfd2b396b31f000c58f64c9",
+        "execution_surface_sha256": "ec203a2b15d2632ca720636a50e07f31e0dbe30eae419c69c981e4852729c253"
       }
     },
     "X6": {
@@ -444,7 +529,7 @@
     "tasks": "stage2/tasks.json",
     "host_policy": "X1-X2 use their native multi-agent framework, X3 uses native A2A communication, and X4-X7 may share the explicitly registered software-engineering background host because those X conditions operate at tool/retrieval/memory/context layers; monitoring is not part of that host."
   },
-  "status": "X1_X2_X3_X4_X5_X6_X7_NATIVE_RUNNERS_VERIFIED_SUBJECT_PENDING_READINESS_LIVE_EXECUTION_PREPARED",
+  "status": "X1_X2_X3_X4_X5_SUBJECT_READY_X6_X7_STUDY_ASSET_PENDING_ZERO_NATURAL_TRAJECTORIES",
   "forbidden_global_normalization": [
     "requiring every X to execute through one common runtime adapter",
     "requiring X1-X3 to use the baseline role-mailbox communication substrate",
@@ -481,7 +566,7 @@
     }
   },
   "subject_readiness_gate": {
-    "state": "IMPLEMENTED_NO_LIVE_RECEIPT",
+    "state": "COMMON_PROVIDER_HANDSHAKE_RECORDED",
     "workflow": ".github/workflows/stage2-native-v7-subject-readiness.yml",
     "mode": "ONE_COMMON_NON_SCIENTIFIC_PROVIDER_HANDSHAKE",
     "authorization_phrase": "CALL_REAL_STAGE2_SUBJECT_READINESS_API",
@@ -496,6 +581,18 @@
       "X6": "study_embedding.state must be FROZEN_MANIFEST_VERIFIED",
       "X7": "study_checkpoint.state must be FROZEN_MANIFEST_VERIFIED"
     },
-    "execution_binding_policy": "Each promoted probe must cite the per-probe execution_surface_sha256 from the common readiness receipt. Natural collection recomputes that digest before cell reservation, so a metadata-only promotion commit cannot silently change executable science."
+    "execution_binding_policy": "Each promoted probe must cite the per-probe execution_surface_sha256 from the common readiness receipt. Natural collection recomputes that digest before cell reservation, so a metadata-only promotion commit cannot silently change executable science.",
+    "live_receipt": {
+      "workflow_run_id": 36145131256,
+      "execution_code_sha": "57263f4b2913eab041c1737fdce62e1bd2ab5242",
+      "receipt_sha256": "93f06cb677b7da3997bcbf38a09cdd10fed650f2e05139e4ac82645a23228464",
+      "artifact_id": 10869108698,
+      "artifact_sha256": "c59c3673d89d4376808cfd3143d99a51376023815de4b5e65e134cc90a15e7d2",
+      "observed_response_model": "deepseek-flash",
+      "expected_model_version": "DeepSeek-V4.1-Flash",
+      "provider_call_count": 1,
+      "estimated_peak_cost_usd": 0.0000117,
+      "natural_cell_reserved": false
+    }
   }
 }
