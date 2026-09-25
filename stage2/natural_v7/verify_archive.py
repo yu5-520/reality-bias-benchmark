@@ -74,17 +74,28 @@ def verify_one(root):
         seal = json.loads(read(f"{cell}/seal.json"))
         assert seal["cell"] == cell
         assert seal["status"] == manifest["status"]
-        assert seal["returncode"] == 0
+        expected_runner_returncode = int(manifest.get("runner_returncode", 0))
+        assert seal["returncode"] == expected_runner_returncode
         assert seal["observer_files"] == len(outer)
         assert seal["common_receipt_sha256"] == manifest["common_receipt_sha256"]
         assert read("collect_exit_code.txt").strip() == b"0"
         assert read("execution_sha.txt").decode().strip() == manifest["execution_sha"]
         assert int(read("authorization_issue.txt")) == manifest["authorization_issue"]
-        if "task_outcome" in manifest:
+        outcome = manifest.get("task_outcome")
+        if outcome == "TURN_BUDGET_NO_ANSWER":
             result = _result_json(read(observer_root + "stdout.bin"))
             assert result["stop_reason"] == "turn_budget"
             assert result["answer"] is None
-            assert manifest["task_outcome"] == "TURN_BUDGET_NO_ANSWER"
+            assert expected_runner_returncode == 0
+        elif outcome == "FAILED_ATTEMPT_PRESERVED":
+            assert expected_runner_returncode != 0
+            assert seal["status"] == "FAILED_ATTEMPT_PRESERVED"
+        elif outcome == "RECORDED_WITH_ANSWER":
+            result = _result_json(read(observer_root + "stdout.bin"))
+            assert result.get("answer") is not None
+            assert expected_runner_returncode == 0
+        elif outcome is not None:
+            assert outcome == "RECORDED_OTHER"
     return manifest
 
 
