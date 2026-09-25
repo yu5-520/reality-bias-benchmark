@@ -1,0 +1,64 @@
+name: Stage-II v7 X4 MCP native attachment
+
+on:
+  push:
+    paths:
+      - 'stage2/native_v7/x4_mcp/**'
+      - 'stage2/native_v7/software_host_v1.py'
+      - 'stage2/tasks.json'
+      - 'stage2/roles.json'
+      - 'stage2/subject.json'
+      - 'stage2/fixtures/project/**'
+      - '.github/workflows/stage2-native-v7-x4.yml'
+  pull_request:
+    paths:
+      - 'stage2/native_v7/x4_mcp/**'
+      - 'stage2/native_v7/software_host_v1.py'
+      - 'stage2/tasks.json'
+      - 'stage2/roles.json'
+      - 'stage2/subject.json'
+      - 'stage2/fixtures/project/**'
+      - '.github/workflows/stage2-native-v7-x4.yml'
+
+jobs:
+  x4-mcp-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: '${{ github.event.pull_request.head.sha || github.sha }}'
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Bind exact frozen MCP protocol and Python SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/modelcontextprotocol/python-sdk upstream
+          git -C upstream checkout -q f1b6589088534632fef92238ee9750951e3c0185
+          test "$(git -C upstream rev-parse HEAD)" = f1b6589088534632fef92238ee9750951e3c0185
+          git clone -q https://github.com/modelcontextprotocol/modelcontextprotocol protocol
+          git -C protocol checkout -q 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          test "$(git -C protocol rev-parse HEAD)" = 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          python -m pip install -q uv
+          (cd upstream && uv sync --frozen --no-default-groups)
+      - name: Run X4 official MCP stdio attachment smoke
+        shell: bash
+        env:
+          PYTHONPATH: '${{ github.workspace }}'
+        run: |
+          set -euo pipefail
+          upstream/.venv/bin/python -m stage2.native_v7.x4_mcp.smoke --out-root stage2_x4_smoke
+      - name: Verify existing v7 architecture remains frozen
+        run: |
+          python -m stage2.native_v7.freeze
+          python -m unittest stage2.native_v7.tests.test_architecture -v
+      - name: Upload non-study X4 MCP smoke evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-v7-x4-mcp-smoke-${{ github.run_id }}
+          path: stage2_x4_smoke
+          retention-days: 30
+          if-no-files-found: error
