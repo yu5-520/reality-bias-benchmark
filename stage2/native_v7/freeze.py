@@ -47,7 +47,6 @@ def artifact():
         BASE / "x2_metagpt/__init__.py",
         BASE / "x2_metagpt/checkout.py",
         BASE / "x2_metagpt/runner.py",
-        BASE / "x2_metagpt/metagpt_root/config/config2.yaml",
         BASE / "x2_metagpt/smoke.py",
         BASE / "x3_a2a/__init__.py",
         BASE / "x3_a2a/checkout.py",
