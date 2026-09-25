@@ -106,6 +106,7 @@ def validate_registry(data):
                 for key in (
                     "execution_code_sha",
                     "common_receipt_sha256",
+                    "execution_surface_sha256",
                     "subject_config_sha256",
                     "model_config_sha256",
                     "workflow_run_id",

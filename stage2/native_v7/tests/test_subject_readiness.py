@@ -8,28 +8,23 @@ from stage2.native_v7.subject_readiness import build_preflight
 class Stage2SubjectReadinessGate(unittest.TestCase):
     SHA = "a" * 40
 
-    def test_preflight_is_one_common_non_scientific_handshake(self):
-        payload = build_preflight(
-            expected_execution_sha=self.SHA,
-            actual_execution_sha=self.SHA,
-            authorization_phrase="CALL_REAL_STAGE2_SUBJECT_READINESS_API",
-            max_subject_calls=1,
-            spending_ceiling=0.01,
-        )
-        self.assertEqual(payload["status"], "READY_FOR_ONE_COMMON_PROVIDER_HANDSHAKE")
-        self.assertEqual(payload["max_provider_calls"], 1)
-        self.assertFalse(payload["automatic_paid_evaluator"])
-        self.assertFalse(payload["scientific_task_used"])
-        self.assertFalse(payload["natural_cell_reserved"])
-        self.assertFalse(payload["registry_mutation_allowed"])
+    def test_recorded_common_handshake_blocks_a_second_paid_preflight(self):
+        registry = load_registry()
+        gate = registry["subject_readiness_gate"]
+        self.assertEqual(gate["state"], "COMMON_PROVIDER_HANDSHAKE_RECORDED")
+        self.assertEqual(gate["live_receipt"]["workflow_run_id"], 36145131256)
         self.assertEqual(
-            payload["eligible_after_common_handshake"],
-            ["X1", "X2", "X3", "X4", "X5"],
+            gate["live_receipt"]["receipt_sha256"],
+            "93f06cb677b7da3997bcbf38a09cdd10fed650f2e05139e4ac82645a23228464",
         )
-        self.assertEqual(
-            payload["asset_blockers"],
-            {"X6": "PENDING_FROZEN_MANIFEST", "X7": "PENDING_FROZEN_MANIFEST"},
-        )
+        with self.assertRaisesRegex(ValueError, "second paid readiness call is forbidden"):
+            build_preflight(
+                expected_execution_sha=self.SHA,
+                actual_execution_sha=self.SHA,
+                authorization_phrase="CALL_REAL_STAGE2_SUBJECT_READINESS_API",
+                max_subject_calls=1,
+                spending_ceiling=0.01,
+            )
 
     def test_preflight_rejects_nonexact_authorization(self):
         with self.assertRaisesRegex(ValueError, "authorization phrase"):
@@ -69,10 +64,10 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
                 spending_ceiling=0.06,
             )
 
-    def test_subject_ready_cannot_be_asserted_from_runner_smoke_alone(self):
+    def test_subject_ready_cannot_exist_without_frozen_readiness_evidence(self):
         registry = load_registry()
         mutated = copy.deepcopy(registry)
-        mutated["probes"]["X1"]["collection_state"] = "SUBJECT_READY"
+        mutated["probes"]["X1"].pop("subject_readiness", None)
         with self.assertRaisesRegex(ValueError, "frozen readiness evidence"):
             validate_registry(mutated)
 
@@ -86,6 +81,7 @@ class Stage2SubjectReadinessGate(unittest.TestCase):
                     "state": "VERIFIED",
                     "execution_code_sha": self.SHA,
                     "common_receipt_sha256": "r",
+                    "execution_surface_sha256": "e",
                     "subject_config_sha256": "s",
                     "model_config_sha256": "m",
                     "workflow_run_id": 1,

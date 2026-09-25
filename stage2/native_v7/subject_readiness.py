@@ -16,6 +16,7 @@ import re
 from pathlib import Path
 
 from adapters.deepseek_chat import chat_completion, extract_content
+from stage2.native_v7.execution_binding import execution_surface_digest
 from stage2.native_v7.policy import READINESS_AUTHORIZATION, load_registry
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -89,6 +90,8 @@ def build_preflight(
         raise ValueError("Stage-II readiness permits exactly one provider call")
     if not 0 < spending_ceiling <= float(gate["max_spending_ceiling_usd"]):
         raise ValueError("readiness spending ceiling exceeds frozen policy")
+    if gate.get("state") == "COMMON_PROVIDER_HANDSHAKE_RECORDED":
+        raise ValueError("common provider handshake is already recorded; a second paid readiness call is forbidden")
 
     subject, model, model_path = _load_subject_binding()
     states = {pid: spec["collection_state"] for pid, spec in registry["probes"].items()}
@@ -105,6 +108,10 @@ def build_preflight(
         probe for probe in sorted(registry["probes"])
         if probe not in blockers and states[probe] != "SUBJECT_READY"
     ]
+    probe_execution_surface_sha256 = {
+        probe: execution_surface_digest(probe, registry=registry)
+        for probe in eligible_after_common_handshake
+    }
     payload = {
         "schema": "stage2-subject-readiness-preflight-v1",
         "status": "READY_FOR_ONE_COMMON_PROVIDER_HANDSHAKE",
@@ -128,6 +135,7 @@ def build_preflight(
         "subject_parameters": subject["subject"],
         "probe_states_before_handshake": states,
         "eligible_after_common_handshake": eligible_after_common_handshake,
+        "probe_execution_surface_sha256": probe_execution_surface_sha256,
         "asset_blockers": blockers,
         "handshake_max_completion_tokens": HANDSHAKE_MAX_COMPLETION_TOKENS,
         "promotion_rule": gate["promotion_rule"],
@@ -233,6 +241,9 @@ def execute_handshake(*, preflight_path, out_path):
             "raw_response_sha256": sha256(raw_path),
             "eligible_probes_after_common_handshake": preflight[
                 "eligible_after_common_handshake"
+            ],
+            "probe_execution_surface_sha256": preflight[
+                "probe_execution_surface_sha256"
             ],
             "remaining_asset_blockers": preflight["asset_blockers"],
             "promotion_required": "REVIEWED_REGISTRY_COMMIT",
