@@ -1,6 +1,6 @@
 # Stage-II v7.21: prospective Action Contract v2 for T2/T3
 
-Date: 2026-09-26. Status: **T1 NATURAL ROW 7/7 FROZEN UNDER HISTORICAL CONTRACT v1; C1+C2 FROZEN 2/4; T2/T3 PROSPECTIVELY GATED BY ACTION CONTRACT v2**.
+Date: 2026-09-26. Status: **T1 NATURAL ROW 7/7 FROZEN UNDER HISTORICAL CONTRACT v1; C1+C2 FROZEN 2/4; ACTION CONTRACT v2 FROZEN; SUBJECT REVALIDATION PENDING; T2/T3 CLOSED**.
 
 C1 and C2 closed the experiment-owned action-envelope ambiguity without changing any framework implementation. C1 made the already-existing type-tagged serialization visible and moved X4 from 0/32 parser-accepted turns to 19/32. C2 additionally made the already-existing `max_actions=5` parser limit visible and reached 32/32 parser-accepted turns. No further parser-tuning contrast is justified.
 
@@ -25,4 +25,4 @@ The native integrations remain heterogeneous: X2 MetaGPT retains MetaGPT Environ
 
 This creates a deliberate version boundary across task families. T1 terminal/task outcomes must not be pooled as though they were collected under v2. T1 remains useful as the natural discovery/calibration row and as evidence for the C1/C2 local diagnosis. T2/T3 are the prospective rows after the execution contract was made internally coherent.
 
-No natural trajectory is created by this checkpoint. Contrast accounting remains **2/4**. The next admissible scientific action is the one-shot **T2 row (X1–X7)** under the frozen task-specific contract map; after those seven attempts are preserved, perform read-only cross-cell audit before opening T3.
+No natural trajectory is created by this checkpoint. Contrast accounting remains **2/4**. Because v2 changes execution inputs that were covered by the earlier common provider receipt, all X conditions fail closed to `NATIVE_RUNNER_VERIFIED_SUBJECT_PENDING`. The original v1 receipt is preserved as historical T1 provenance. One new non-scientific, one-call provider handshake must be recorded on the exact merged v2 execution snapshot, followed by a reviewed registry promotion. Only then may the one-shot **T2 row (X1–X7)** open. After those seven attempts are preserved, perform read-only cross-cell audit before opening T3.
