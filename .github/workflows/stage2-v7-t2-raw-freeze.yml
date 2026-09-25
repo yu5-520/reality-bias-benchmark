@@ -1,0 +1,330 @@
+
+name: Stage-II v7 T2 Raw Freeze
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  actions: read
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: stage2-v7-t2-raw-freeze
+  cancel-in-progress: false
+
+jobs:
+  freeze-t2-row:
+    if: >-
+      github.event.issue.user.login == 'yu5-520' &&
+      github.event.issue.title == 'STAGE2 T2 RAW FREEZE AUTHORIZATION'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      AUTH_BODY: ${{ github.event.issue.body }}
+      AUTH_ISSUE: ${{ github.event.issue.number }}
+      SOURCE_RUN: '36177945998'
+      SOURCE_SHA: '04c66a5a9774610f057eda166cb37ab07db6058c'
+      X1_ARTIFACT_ID: '10883471077'
+      X2_ARTIFACT_ID: '10883396509'
+      X3_ARTIFACT_ID: '10882922462'
+      X4_ARTIFACT_ID: '10883202166'
+      X5_ARTIFACT_ID: '10883471964'
+      X6_ARTIFACT_ID: '10882967848'
+      X7_ARTIFACT_ID: '10883352943'
+      X1_ARTIFACT_DIGEST: 'sha256:404f23c18ca0d926bb966117f8c4126c87157dedbc604ecbde1bbe31620877b5'
+      X2_ARTIFACT_DIGEST: 'sha256:bf47c64a257e740a367df7ff164ee78d8186307cb805c1e7a1843ab8bac0ec1b'
+      X3_ARTIFACT_DIGEST: 'sha256:a7d3205781c486bfab55c80f60b9ecf6392a331462164b784ad12fe312a080c0'
+      X4_ARTIFACT_DIGEST: 'sha256:4bf8241ad362fe1ae408f78bc6eea71bb1c6424e212d8bd5c6d16db4a05da979'
+      X5_ARTIFACT_DIGEST: 'sha256:6f8d0dfe34d526ed75dd616450801cfab10b371efbf72e7e8305c5fe420a2be5'
+      X6_ARTIFACT_DIGEST: 'sha256:091725fccfd3d9f61e802a66c00ed981f2e98db1fa3b1eef9ab01148f571e7da'
+      X7_ARTIFACT_DIGEST: 'sha256:ae6d2b4827b4fd123f9fbf33832103d508deb7701c78036174ce42802870aa68'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify exact archival authorization and completed source row
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/main
+          python - <<'PY'
+          import os
+          expected='\n'.join([
+              'source_run=36177945998',
+              'source_execution_sha=04c66a5a9774610f057eda166cb37ab07db6058c',
+              'artifacts=10883471077,10883396509,10882922462,10883202166,10883471964,10882967848,10883352943',
+              'control_plane=CHAT_ARCHIVE_STAGE2_T2_ROW_v1',
+              f"expected_main_sha={os.environ['GITHUB_SHA']}",
+              'natural_reruns=0',
+              't3_open=false',
+          ])
+          if os.environ['AUTH_BODY'].strip() != expected:
+              raise SystemExit('T2 raw-freeze authorization differs from exact source contract')
+          PY
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN" > /tmp/source_run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN/jobs?per_page=100" > /tmp/source_jobs.json
+          python - <<'PY'
+          import json, os, re
+          run=json.load(open('/tmp/source_run.json'))
+          assert run['head_sha'] == os.environ['SOURCE_SHA']
+          assert run['head_branch'] == 'stage2-natural-t2-row-authorization'
+          assert run['status'] == 'completed'
+          assert run['conclusion'] == 'failure'
+          jobs=json.load(open('/tmp/source_jobs.json'))['jobs']
+          observed={}
+          for job in jobs:
+              m=re.fullmatch(r't2-natural-cells \((X[1-7]), [^)]+\)', job['name'])
+              if m:
+                  observed[m.group(1)]=job['conclusion']
+          assert observed == {
+              'X1':'success','X2':'success','X3':'success','X4':'failure',
+              'X5':'success','X6':'failure','X7':'success'
+          }, observed
+          print('PASS: exact completed T2 source row and preserved job outcomes verified')
+          PY
+
+      - name: Verify all seven artifact identities
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for probe in X1 X2 X3 X4 X5 X6 X7; do
+            id_var="${probe}_ARTIFACT_ID"
+            digest_var="${probe}_ARTIFACT_DIGEST"
+            id="${!id_var}"
+            expected_digest="${!digest_var}"
+            gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$id" > "/tmp/${probe}.artifact.json"
+            PROBE="$probe" EXPECTED_DIGEST="$expected_digest" python - <<'PY'
+          import json, os
+          probe=os.environ['PROBE']
+          data=json.load(open(f'/tmp/{probe}.artifact.json'))
+          expected_name=f"stage2-v7-{probe}-t2-36177945998"
+          assert data['name'] == expected_name
+          assert data['digest'] == os.environ['EXPECTED_DIGEST']
+          assert data['workflow_run']['id'] == 36177945998
+          assert data['workflow_run']['head_sha'] == '04c66a5a9774610f057eda166cb37ab07db6058c'
+          print('PASS', probe, data['id'], data['digest'])
+          PY
+          done
+
+      - name: Download exact artifacts and verify inner tar hashes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/t2raw
+          mkdir -p /tmp/t2raw
+          for probe in X1 X2 X3 X4 X5 X6 X7; do
+            mkdir -p "/tmp/t2raw/$probe"
+            gh run download "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY"               --name "stage2-v7-${probe}-t2-$SOURCE_RUN" --dir "/tmp/t2raw/$probe"
+          done
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          for probe in [f'X{i}' for i in range(1,8)]:
+              root=Path('/tmp/t2raw')/probe
+              tar=next(root.glob('*.tar.gz'))
+              declared=next(root.glob('*.tar.gz.sha256')).read_text().split()[0]
+              observed=hashlib.sha256(tar.read_bytes()).hexdigest()
+              assert observed == declared, (probe, observed, declared)
+              print(probe, observed)
+          PY
+
+      - name: Archive exact first attempts and generate raw manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          for probe in X1 X2 X3 X4 X5 X6 X7; do
+            mkdir -p "stage2/natural_v7/${probe}-T2"
+            cp /tmp/t2raw/${probe}/*.tar.gz "stage2/natural_v7/${probe}-T2/first_attempt.tar.gz"
+          done
+          python - <<'PY'
+          import hashlib, io, json, os, tarfile
+          from pathlib import Path
+
+          SOURCE_RUN=36177945998
+          SOURCE_SHA='04c66a5a9774610f057eda166cb37ab07db6058c'
+          base=Path('stage2/natural_v7')
+          artifact_meta={
+              'X1':(10883471077,'404f23c18ca0d926bb966117f8c4126c87157dedbc604ecbde1bbe31620877b5'),
+              'X2':(10883396509,'bf47c64a257e740a367df7ff164ee78d8186307cb805c1e7a1843ab8bac0ec1b'),
+              'X3':(10882922462,'a7d3205781c486bfab55c80f60b9ecf6392a331462164b784ad12fe312a080c0'),
+              'X4':(10883202166,'4bf8241ad362fe1ae408f78bc6eea71bb1c6424e212d8bd5c6d16db4a05da979'),
+              'X5':(10883471964,'6f8d0dfe34d526ed75dd616450801cfab10b371efbf72e7e8305c5fe420a2be5'),
+              'X6':(10882967848,'091725fccfd3d9f61e802a66c00ed981f2e98db1fa3b1eef9ab01148f571e7da'),
+              'X7':(10883352943,'ae6d2b4827b4fd123f9fbf33832103d508deb7701c78036174ce42802870aa68'),
+          }
+
+          def result_from(raw):
+              text=raw.decode('utf-8',errors='replace')
+              candidates=[]
+              try:
+                  obj=json.loads(text)
+                  if isinstance(obj,dict):
+                      candidates.append(obj)
+              except Exception:
+                  pass
+              for line in reversed([x.strip() for x in text.splitlines() if x.strip()]):
+                  if not line.startswith('{'):
+                      continue
+                  try:
+                      obj=json.loads(line)
+                  except Exception:
+                      continue
+                  if isinstance(obj,dict):
+                      candidates.append(obj)
+              for obj in candidates:
+                  if any(k in obj for k in ('stop_reason','answer','history','trace','compression_calls')):
+                      return obj
+              return None
+
+          for probe in [f'X{i}' for i in range(1,8)]:
+              cell=f'{probe}-T2'
+              root=base/cell
+              raw=(root/'first_attempt.tar.gz').read_bytes()
+              tar_sha=hashlib.sha256(raw).hexdigest()
+              with tarfile.open(fileobj=io.BytesIO(raw),mode='r:gz') as ar:
+                  members={m.name.removeprefix('./'):m for m in ar.getmembers() if m.isfile()}
+                  def read(name):
+                      return ar.extractfile(members[name]).read()
+                  seal=json.loads(read(f'{cell}/seal.json'))
+                  stdout=read(f'{cell}/observer/stdout.bin')
+                  stderr=read(f'{cell}/observer/stderr.bin').decode('utf-8',errors='replace')
+                  result=result_from(stdout)
+                  event_count=sum(
+                      len(read(name).splitlines())
+                      for name in members
+                      if name.startswith(f'{cell}/observer/') and name.endswith('/events.jsonl')
+                  )
+                  outer_inventory=json.loads(read(f'{cell}/observer/inventory.json'))
+                  collect_exit=int(read('collect_exit_code.txt').decode().strip())
+
+              rows=[]
+              if result:
+                  if isinstance(result.get('history'),list):
+                      rows=result['history']
+                  elif isinstance(result.get('trace'),list):
+                      rows=result['trace']
+              valid_actions=sum(int(row.get('actions',0)) for row in rows if row.get('valid') is True)
+              answer_present=bool(result is not None and result.get('answer') is not None)
+              if int(seal['returncode']) != 0:
+                  outcome='FAILED_ATTEMPT_PRESERVED'
+              elif result and result.get('stop_reason') == 'turn_budget' and result.get('answer') is None:
+                  outcome='TURN_BUDGET_NO_ANSWER'
+              elif answer_present:
+                  outcome='RECORDED_WITH_ANSWER'
+              else:
+                  outcome='RECORDED_OTHER'
+
+              failure_kind=None
+              if int(seal['returncode']) != 0:
+                  if 'JSON response remained malformed after 2 identical-request attempts' in stderr:
+                      failure_kind='PROVIDER_JSON_RESPONSE_MALFORMED_AFTER_IDENTICAL_RETRY'
+                  else:
+                      failure_kind='RUNNER_FAILURE_OTHER'
+
+              artifact_id,zip_digest=artifact_meta[probe]
+              manifest={
+                  'schema':'stage2-v7-natural-raw-archive-v2',
+                  'cell':cell,
+                  'artifact_id':artifact_id,
+                  'artifact_zip_sha256':zip_digest,
+                  'authorization_issue':212,
+                  'authorization_tag':'stage2-natural-t2-row-authorization',
+                  'execution_claim_tag':f'stage2-natural-{probe}-t2-execution-claimed',
+                  'execution_sha':SOURCE_SHA,
+                  'workflow_run_id':SOURCE_RUN,
+                  'workflow_run_url':f'https://github.com/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{SOURCE_RUN}',
+                  'natural_attempts_for_cell':1,
+                  'tar_sha256':tar_sha,
+                  'observer_files':int(seal['observer_files']),
+                  'native_event_count':event_count,
+                  'common_receipt_sha256':seal['common_receipt_sha256'],
+                  'runner_returncode':int(seal['returncode']),
+                  'collect_exit_code':collect_exit,
+                  'status':seal['status'],
+                  'posthoc_semantic_audit':'PENDING',
+                  'task_outcome':outcome,
+                  'answer_present':answer_present,
+                  'stop_reason':result.get('stop_reason') if result else None,
+                  'turns':result.get('turns',result.get('turns_used')) if result else None,
+                  'valid_action_count':valid_actions,
+              }
+              if failure_kind:
+                  manifest['failure_kind']=failure_kind
+              if result:
+                  for key in ('native_events','messages','metagpt_rounds','environment_messages',
+                              'a2a_calls','protocol_calls','retrieval_calls','compression_calls',
+                              'memorybank_writes','memorybank_retrieval_calls','memorybank_recalled_items'):
+                      if key in result:
+                          manifest[key]=result[key]
+              assert len(outer_inventory) == manifest['observer_files']
+              (root/'manifest.json').write_text(json.dumps(manifest,indent=2,sort_keys=True)+'\n')
+          PY
+
+      - name: Record T2 raw-freeze checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > docs/R_Plan_v7.24.md <<'EOF'
+          # Stage-II v7.24: T2 first-attempt row frozen 7/7
+
+          Date: 2026-09-26. Status: **T1 7/7 FROZEN; T2 7/7 FIRST ATTEMPTS FROZEN; TOTAL RAW NATURAL ATTEMPTS 14/21; C1+C2 2/4; T2 POST-HOC AUDIT NEXT; T3 CLOSED**.
+
+          The complete prospective T2 row has been collected exactly once per X condition from source run 36177945998 at execution SHA 04c66a5a9774610f057eda166cb37ab07db6058c. All seven artifacts are frozen under stage2/natural_v7/X1-T2 through X7-T2. No cell is rerun.
+
+          Five runners completed normally. X4 and X6 are also valid frozen first attempts, but their native runners returned 1 after the DeepSeek JSON response remained malformed after two identical-request attempts. Their outer collection command still returned 0 because the collector's responsibility is to preserve the failed attempt; the later reporting assertion intentionally made those two matrix jobs red rather than relabeling the runner failures as successful.
+
+          The source workflow therefore concludes failure by design while still containing seven immutable first-attempt artifacts. This is an evidence-accounting state, not permission to resample X4-T2 or X6-T2.
+
+          T2 was collected prospectively after Action Contract v2 removed the two T1 parser-admission omissions. X1 retains its native AutoGen interface; X2-X7 use the frozen prospective contract where applicable. Raw freezing does not classify CPR and consumes no additional contrast.
+
+          The next operation is a read-only seven-cell T2 semantic/process audit. It should compare scope growth, inter-role propagation, native layer activity, checkout consequences, process closure and the two preserved provider-format failures. T3 remains closed until that audit is frozen.
+          EOF
+          python - <<'PY'
+          from pathlib import Path
+          for name in ('stage2/README.md','stage2/native_v7/README.md'):
+              p=Path(name); s=p.read_text()
+              note='\nR_Plan_v7.24 freezes the complete one-shot T2 row. Natural collection is now 14 / 21 (T1 7/7 + T2 7/7). X4-T2 and X6-T2 are preserved runner failures and must not be rerun. T2 read-only audit is next; T3 remains closed.\n'
+              if note.strip() not in s:
+                  s += note
+              p.write_text(s)
+          PY
+
+      - name: Verify all fourteen natural archives without rerunning
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m stage2.natural_v7.verify_archive
+          python -m stage2.native_v7.freeze
+          python -m unittest discover -s stage2/native_v7/tests -v
+
+      - name: Commit T2 raw row to review branch and open PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="work/stage2-t2-raw-freeze-$GITHUB_RUN_ID"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add stage2/natural_v7/X1-T2 stage2/natural_v7/X2-T2 stage2/natural_v7/X3-T2                   stage2/natural_v7/X4-T2 stage2/natural_v7/X5-T2 stage2/natural_v7/X6-T2                   stage2/natural_v7/X7-T2 docs/R_Plan_v7.24.md stage2/README.md stage2/native_v7/README.md
+          git commit -m "Stage II: freeze seven-cell T2 raw row"
+          git push origin "$branch"
+          url=$(gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$branch"             --title "Stage II: freeze seven-cell T2 raw row"             --body "Archives the exact one-shot X1-T2 through X7-T2 artifacts from run 36177945998. X4 and X6 are preserved runner failures caused by malformed provider JSON after identical-request retry; they are evidence and are not rerun. Natural collection becomes 14/21. T2 read-only audit is next; T3 remains closed; contrast accounting stays 2/4.")
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --body "T2 raw-freeze PR opened: $url"
+          gh issue close "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
