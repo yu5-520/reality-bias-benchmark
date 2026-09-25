@@ -30,6 +30,8 @@ def artifact():
         STAGE2 / "roles.json",
         STAGE2 / "subject.json",
         BASE / "registry.json",
+        BASE / "action_contract_registry.json",
+        BASE / "action_contract.py",
         BASE / "policy.py",
         BASE / "observer.py",
         BASE / "collect.py",
