@@ -11,6 +11,16 @@ def blockers(runtime_manifest, captures_root):
     runtime = json.loads(Path(runtime_manifest).read_text())
     captures_root = Path(captures_root)
     errors = []
+    runtime_lock_path = BASE / "runtime_lock.json"
+    subject_lock_path = BASE / "subject_lock.json"
+    runtime_lock = json.loads(runtime_lock_path.read_text())
+    lock_by_probe = {row["id"]: row for row in runtime_lock["probes"]}
+    expected_runtime_lock_hash = hashlib.sha256(runtime_lock_path.read_bytes()).hexdigest()
+    expected_subject_lock_hash = hashlib.sha256(subject_lock_path.read_bytes()).hexdigest()
+    if runtime.get("runtime_lock_sha256") != expected_runtime_lock_hash:
+        errors.append("runtime lock hash mismatch")
+    if runtime.get("subject_lock_sha256") != expected_subject_lock_hash:
+        errors.append("subject lock hash mismatch")
     if runtime.get("matrix_sha256") != hashlib.sha256((BASE / "matrix.json").read_bytes()).hexdigest():
         errors.append("matrix hash mismatch")
     if not runtime.get("subject_provider") or not runtime.get("subject_model") or not runtime.get("subject_limits"):
@@ -30,6 +40,13 @@ def blockers(runtime_manifest, captures_root):
             errors.append(f"{pid}: in-repo implementation mismatch")
         if probe.get("protocol_version") and bind.get("protocol_version") != probe["protocol_version"]:
             errors.append(f"{pid}: protocol version mismatch")
+        locked = lock_by_probe.get(pid, {})
+        if locked.get("sdk_source_commit") and bind.get("sdk_source_commit") != locked["sdk_source_commit"]:
+            errors.append(f"{pid}: SDK source commit mismatch")
+        if locked.get("checkpoint") and bind.get("checkpoint") != locked["checkpoint"]:
+            errors.append(f"{pid}: checkpoint mismatch")
+        if pid == "X7" and not bind.get("checkpoint_revision"):
+            errors.append("X7: compressor checkpoint revision unbound")
         evidence_dir = captures_root / pid
         try:
             rows = [json.loads(line) for line in (evidence_dir / "events.jsonl").read_text().splitlines()]
@@ -37,8 +54,20 @@ def blockers(runtime_manifest, captures_root):
                 raise ValueError("no completed smoke sequence")
             if any(row["hook_id"] == "offline-contract-smoke" or row["binding"].get("source_commit") == "synthetic-smoke" for row in rows):
                 raise ValueError("synthetic contract smoke is not a native adapter smoke")
-            if any(row["probe"] != pid or row["binding"].get("source_commit") != bind.get("source_commit")
-                   or row["hook_id"] != bind["native_hook"] for row in rows):
+            if any(
+                row["probe"] != pid
+                or row["hook_id"] != bind["native_hook"]
+                or (probe.get("source_commit") and row["binding"].get("source_commit") != bind.get("source_commit"))
+                or (
+                    probe.get("implementation_sha256")
+                    and row["binding"].get("implementation_sha256") != bind.get("implementation_sha256")
+                )
+                or (
+                    locked.get("sdk_source_commit")
+                    and row["binding"].get("sdk_source_commit") != bind.get("sdk_source_commit")
+                )
+                for row in rows
+            ):
                 raise ValueError("native smoke provenance differs from runtime binding")
             check_capture(evidence_dir)
         except (OSError, ValueError, KeyError, AssertionError) as exc:
