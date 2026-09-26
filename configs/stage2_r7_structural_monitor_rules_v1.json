@@ -1,0 +1,83 @@
+{
+  "schema": "RB-STAGE2-R7-STRUCTURAL-MONITOR-RULES-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_BEFORE_CANONICAL_PREFIX_REPLAY",
+  "heritage": {
+    "stage1_jump_detector": "configs/structural_jump_detector_v0.1.json",
+    "stage1_support_scout": "configs/structural_support_scout_v0.1.json",
+    "principle": "Reuse addressability, consumption, descendant, multi-consumer and structural-exposure logic; add only heterogeneous native-surface adapters."
+  },
+  "input_policy": "RAW_STRUCTURAL_RUNTIME_EVIDENCE_ONLY",
+  "future_blind": true,
+  "case_specific_rules": false,
+  "semantic_labels_used": false,
+  "thresholds": {
+    "minimum_reuse_count": 3,
+    "minimum_distinct_consumers": 2,
+    "minimum_reentry_gap_events": 2,
+    "minimum_role_scope": 3,
+    "minimum_terminal_pending_roles": 1
+  },
+  "rules": [
+    {
+      "rule_id": "MULTI_CONSUMER_ADDRESSABLE_REUSE",
+      "candidate_type": "STRUCTURAL_PRESSURE_SUPPORT_CANDIDATE",
+      "trigger": "same addressable object observed by >=2 distinct actors",
+      "stage1_basis": "MULTI_CONSUMER_ADDRESSABLE_REUSE"
+    },
+    {
+      "rule_id": "REENTRY_OR_REUSE",
+      "candidate_type": "STRUCTURAL_PRESSURE_SUPPORT_CANDIDATE",
+      "trigger": "same addressable object observed >=3 times with a non-adjacent re-entry",
+      "stage1_basis": "STRUCTURAL_PRESSURE_EXPOSURE"
+    },
+    {
+      "rule_id": "WRITE_THEN_REUSE",
+      "candidate_type": "STRUCTURAL_PRESSURE_SUPPORT_CANDIDATE",
+      "trigger": "an application object is written/materialized and later consumed again",
+      "stage1_basis": "SUPPORTED_DESCENDANT_MATERIALIZATION"
+    },
+    {
+      "rule_id": "IMMUTABLE_CARRIER_REPEAT",
+      "candidate_type": "STRUCTURAL_CARRIER_EXPOSURE_CANDIDATE",
+      "trigger": "an immutable RAG/memory/compression carrier is repeatedly exposed",
+      "stage1_basis": "CROSS_ACTOR_DIRECT_CONSUMPTION"
+    },
+    {
+      "rule_id": "CONTEXT_TRANSFORMATION_EXPOSURE",
+      "candidate_type": "STRUCTURAL_CARRIER_TRANSFORMATION_CANDIDATE",
+      "trigger": "a native compression/context transformation changes the recorded carrier",
+      "stage1_basis": "ADDRESSABLE_STATE_MATERIALIZATION"
+    },
+    {
+      "rule_id": "TERMINAL_OPEN_WITH_REUSE",
+      "candidate_type": "STRUCTURAL_PRESSURE_SUPPORT_CANDIDATE",
+      "trigger": "turn-budget termination retains pending roles while an addressable object has repeated support",
+      "stage1_basis": "STRUCTURAL_PRESSURE_EXPOSURE"
+    }
+  ],
+  "normalization": {
+    "X1": "AutoGen native event stream -> tools/messages/handoffs/addressable objects",
+    "X2": "MetaGPT environment/role-memory copies -> message identity and cross-role reuse",
+    "X3": "A2A JSON-RPC role-call payloads -> sender/target/message and referenced application objects",
+    "X4": "MCP wire tool calls -> native tool/action and application object refs",
+    "X5": "RAG query/hit observer -> immutable retrieval-hit content addresses with host-turn actor mapping",
+    "X6": "MemoryBank query/recall/state observer -> immutable recall/state content addresses with host-turn actor mapping",
+    "X7": "LongLLMLingua input/output observer -> context transformation and host-turn actor mapping"
+  },
+  "repairability": {
+    "application_file": "native write/revision surface may be nominated if originally exposed",
+    "native_message_or_task": "superseding new native message/task may be nominated; historical payloads are immutable",
+    "rag_memory_compression_internal_state": "never a repair surface",
+    "unknown_or_unbound_downstream_adoption": "LINEAGE_GAP_BLOCKED",
+    "missing_resumable_native_parent": "PARENT_RECONSTRUCTION_BLOCKED"
+  },
+  "non_claims": [
+    "Structural candidate is not CPR.",
+    "Repeated retrieval or memory is not automatically a defect.",
+    "Compression transformation is not automatically harmful.",
+    "A monitor candidate is not automatically repair-eligible.",
+    "The monitor does not use semantic-audit answers."
+  ]
+}
