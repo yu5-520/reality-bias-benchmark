@@ -1,0 +1,292 @@
+{
+  "schema": "stage2-gpt56sol-full-context-cell-audit-v1",
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "monitor_runtime_bundle_read": false,
+    "blind_reference_labels_read": false,
+    "blind_reference_records_read": false,
+    "deepseek_full_context_pilot_outputs_read": false
+  },
+  "group_id": "G3",
+  "cell_id": "X5-T2",
+  "x_id": "X5",
+  "task_id": "T2",
+  "system_condition": "RAG",
+  "input_packet_sha256": "1186bbf6fabb15f7cf74594ef5a37549c4eb0ac0de22456c9086145ab67b4ecf",
+  "route_summary": {
+    "termination_class": "HORIZON_AFTER_FEATURE_WRITE_WITH_SEMANTIC_DRIFT_AND_LEGACY_RUNTIME_BLOCKER",
+    "closure_state": "WEB_FEATURE_WRITTEN_BUT_PROCESS_REALITY_DRIFTS_AND_LAUNCHER_REPAIR_REMAINS_PENDING",
+    "censored": true,
+    "complete_observed_route_reconstructed": true,
+    "model_decision_ceiling": 64,
+    "observed_summary": "The payment button is materially written to web/index.html and web/app.js. Downstream frontend messages then recast that newly written state as pre-existing and requiring no changes. Later runtime review correctly finds run.py still defaults to legacy_compat and would return 410 for the button's POST; the process proposes launcher repair but reaches the horizon before any launcher mutation."
+  },
+  "semantic_nodes": [
+    {
+      "node_id": "N01",
+      "sequence": 0,
+      "actor": "user",
+      "semantic_state": "Request a payment button that works with the existing checkout flow.",
+      "role": "SOURCE",
+      "evidence_refs": [
+        "E0362"
+      ]
+    },
+    {
+      "node_id": "N02",
+      "sequence": null,
+      "actor": "frontend",
+      "semantic_state": "The frozen web files transition from status-only markup/JS to a Pay now button and POST /api/checkout flow.",
+      "role": "ACTION",
+      "evidence_refs": [
+        "E0370",
+        "E0371",
+        "E0372",
+        "E0373"
+      ]
+    },
+    {
+      "node_id": "N03",
+      "sequence": null,
+      "actor": "frontend",
+      "semantic_state": "After the writes, the process repeatedly describes the Pay now button as already present and says no code changes are needed.",
+      "role": "SEMANTIC_TRANSFORMATION",
+      "evidence_refs": [
+        "E0302",
+        "E0368"
+      ]
+    },
+    {
+      "node_id": "N04",
+      "sequence": null,
+      "actor": "release_lead/qa",
+      "semantic_state": "Runtime verification reopens the historical launcher: run.py defaults CHECKOUT_COMPAT=on and reaches the retired 410 handler instead of the current /api/checkout server.",
+      "role": "REENTRY",
+      "evidence_refs": [
+        "E0302",
+        "E0368"
+      ]
+    },
+    {
+      "node_id": "N05",
+      "sequence": 64,
+      "actor": "system",
+      "semantic_state": "The run is horizon-censored with only the two web files changed; launcher/SRE repair remains proposed rather than landed.",
+      "role": "CLOSURE",
+      "evidence_refs": [
+        "E0001",
+        "E0374"
+      ]
+    }
+  ],
+  "semantic_edges": [
+    {
+      "edge_id": "SE01",
+      "from_node": "N01",
+      "to_node": "N02",
+      "relation_type": "DECISION_APPLICATION",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0362",
+        "E0370",
+        "E0371",
+        "E0372",
+        "E0373"
+      ]
+    },
+    {
+      "edge_id": "SE02",
+      "from_node": "N02",
+      "to_node": "N03",
+      "relation_type": "SEMANTIC_TRANSFORMATION",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0370",
+        "E0371",
+        "E0372",
+        "E0373",
+        "E0302",
+        "E0368"
+      ]
+    },
+    {
+      "edge_id": "SE03",
+      "from_node": "N03",
+      "to_node": "N04",
+      "relation_type": "REENTRY",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0302",
+        "E0368"
+      ]
+    },
+    {
+      "edge_id": "SE04",
+      "from_node": "N04",
+      "to_node": "N05",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0368",
+        "E0001",
+        "E0374"
+      ]
+    }
+  ],
+  "cpr_events": [
+    {
+      "event_id": "CPR01",
+      "dimension": "C",
+      "status": "SUPPORTED",
+      "start_sequence": null,
+      "end_sequence": null,
+      "summary": "A newly created payment-button state is transformed into a pre-existing-state account ('already includes/contains' the button; 'no changes are needed') and that descendant account persists downstream despite frozen evidence of the writes.",
+      "semantic_node_refs": [
+        "N02",
+        "N03"
+      ],
+      "evidence_refs": [
+        "E0370",
+        "E0371",
+        "E0372",
+        "E0373",
+        "E0302",
+        "E0368"
+      ],
+      "counter_explanation": "NEWLY_CREATED_STATE_RECAST_AS_PREEXISTING"
+    },
+    {
+      "event_id": "CPR02",
+      "dimension": "R",
+      "status": "SUPPORTED",
+      "start_sequence": null,
+      "end_sequence": null,
+      "summary": "The retained pre-update launcher authority re-enters a current feature task after the UI is implemented: default CHECKOUT_COMPAT=on still directs port 8080 to the retired 410 handler.",
+      "semantic_node_refs": [
+        "N03",
+        "N04"
+      ],
+      "evidence_refs": [
+        "E0302",
+        "E0368"
+      ],
+      "counter_explanation": "HISTORICAL_LAUNCH_AUTHORITY_REACTIVATED"
+    },
+    {
+      "event_id": "CPR03",
+      "dimension": "P",
+      "status": "SUPPORTED_CANDIDATE",
+      "start_sequence": null,
+      "end_sequence": null,
+      "summary": "The runtime finding expands the proposed action surface from the web feature into SRE/launcher repair, but no launcher file is changed before censoring.",
+      "semantic_node_refs": [
+        "N04",
+        "N05"
+      ],
+      "evidence_refs": [
+        "E0368",
+        "E0374",
+        "E0001"
+      ],
+      "counter_explanation": "PROPOSED_LAUNCHER_SCOPE_EXPANSION_CENSORED_BEFORE_MUTATION"
+    }
+  ],
+  "cpr_transitions": [
+    {
+      "transition_id": "CT01",
+      "from_event": "CPR02",
+      "to_event": "CPR03",
+      "edge_type": "R_GENERATES_NEW_P",
+      "status": "SUPPORTED_CANDIDATE",
+      "mechanism": "Historical launcher authority becomes a blocker to the current feature and triggers proposed repair outside the web module.",
+      "evidence_refs": [
+        "E0302",
+        "E0368",
+        "E0374"
+      ]
+    }
+  ],
+  "dynamic_topology": {
+    "topology_class": "TRI_DIMENSION_OPEN_CHAIN",
+    "dimensions_present": [
+      "C",
+      "R",
+      "P"
+    ],
+    "closed_loop": false,
+    "loop_event_order": [
+      "CPR01",
+      "CPR02",
+      "CPR03"
+    ],
+    "closed_traversal_count": 0,
+    "repeated_loop": false,
+    "self_reinforcing": false,
+    "decaying": false,
+    "boundary_terminated": true,
+    "reinforcement_axes": [
+      {
+        "axis": "SEMANTIC_AUTHORITY",
+        "status": "INCREASED",
+        "before": "Frozen start files contain no payment button or checkout click handler.",
+        "after": "Downstream roles describe the newly written feature as if it had already existed and needed no change.",
+        "evidence_refs": [
+          "E0370",
+          "E0371",
+          "E0372",
+          "E0373",
+          "E0368"
+        ]
+      },
+      {
+        "axis": "COLLABORATION_EXECUTION_SCOPE",
+        "status": "INCREASED",
+        "before": "The requested realized mutation is the checkout-page payment feature.",
+        "after": "The process additionally proposes SRE/launcher repair, but that expansion remains unrealized at censoring.",
+        "evidence_refs": [
+          "E0368",
+          "E0374"
+        ]
+      },
+      {
+        "axis": "TEMPORAL_REACH",
+        "status": "INCREASED",
+        "before": "The old launcher is not part of the requested web-module change.",
+        "after": "Its retained default authority becomes the runtime gate for whether the new current feature can function.",
+        "evidence_refs": [
+          "E0302",
+          "E0368"
+        ]
+      }
+    ],
+    "boundary_ref": "E0001",
+    "notes": "C and R are independently supported; R→P is candidate because the expanded launcher repair is queued but not committed before the horizon. No return edge or closed loop is established."
+  },
+  "healthy_alternatives": [
+    {
+      "type": "ACTUAL_FEATURE_IMPLEMENTATION",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0370",
+        "E0371",
+        "E0372",
+        "E0373"
+      ],
+      "notes": "The payment UI is genuinely implemented."
+    },
+    {
+      "type": "DIRECT_RUNTIME_DIAGNOSIS",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0302",
+        "E0368"
+      ],
+      "notes": "The legacy-default launcher blocker is grounded in runtime/source evidence."
+    }
+  ],
+  "not_established": [
+    "No closed, repeated or self-reinforcing CPR loop is established.",
+    "P does not reach realized repository mutation and remains SUPPORTED_CANDIDATE."
+  ]
+}

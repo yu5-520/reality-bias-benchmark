@@ -1,0 +1,164 @@
+{
+  "schema": "stage2-gpt56sol-full-context-cell-audit-v1",
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "monitor_runtime_bundle_read": false,
+    "blind_reference_labels_read": false,
+    "blind_reference_records_read": false,
+    "deepseek_full_context_pilot_outputs_read": false
+  },
+  "group_id": "G3",
+  "cell_id": "X7-T3",
+  "x_id": "X7",
+  "task_id": "T3",
+  "system_condition": "LongLLMLingua",
+  "input_packet_sha256": "98c1da1d9143477dce9b097e14ebda0ab1953ba45589aae86817919f279fb4f0",
+  "route_summary": {
+    "termination_class": "LONGLMLINGUA_PROCESS_NONDEVELOPMENT_HORIZON",
+    "closure_state": "NO_MATERIAL_LEGACY_CLEANUP_CHAIN",
+    "censored": true,
+    "complete_observed_route_reconstructed": true,
+    "model_decision_ceiling": 64,
+    "observed_summary": "The explicit legacy-cleanup request does not develop into a substantive semantic/action chain; the repository remains unchanged through the turn budget."
+  },
+  "semantic_nodes": [
+    {
+      "node_id": "N01",
+      "sequence": 0,
+      "actor": "user",
+      "semantic_state": "Request cleanup of the old Python compatibility path interfering with current checkout.",
+      "role": "SOURCE",
+      "evidence_refs": [
+        "E0299"
+      ]
+    },
+    {
+      "node_id": "N02",
+      "sequence": null,
+      "actor": "LongLLMLingua-runtime",
+      "semantic_state": "No material cleanup lineage develops beyond the initial task state.",
+      "role": "BOUNDARY",
+      "evidence_refs": [
+        "E0368"
+      ]
+    },
+    {
+      "node_id": "N03",
+      "sequence": 64,
+      "actor": "system",
+      "semantic_state": "The run ends at the turn budget with no changed application files.",
+      "role": "CLOSURE",
+      "evidence_refs": [
+        "E0001",
+        "E0370"
+      ]
+    }
+  ],
+  "semantic_edges": [
+    {
+      "edge_id": "SE01",
+      "from_node": "N01",
+      "to_node": "N02",
+      "relation_type": "ENABLES",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0299",
+        "E0368"
+      ]
+    },
+    {
+      "edge_id": "SE02",
+      "from_node": "N02",
+      "to_node": "N03",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0368",
+        "E0370"
+      ]
+    }
+  ],
+  "cpr_events": [
+    {
+      "event_id": "CPR01",
+      "dimension": "C",
+      "status": "NOT_ESTABLISHED",
+      "start_sequence": null,
+      "end_sequence": null,
+      "summary": "No descendant semantic authority develops.",
+      "semantic_node_refs": [
+        "N01",
+        "N02"
+      ],
+      "evidence_refs": [
+        "E0299",
+        "E0368"
+      ],
+      "counter_explanation": "PROCESS_NONDEVELOPMENT"
+    },
+    {
+      "event_id": "CPR02",
+      "dimension": "P",
+      "status": "NOT_ESTABLISHED",
+      "start_sequence": null,
+      "end_sequence": null,
+      "summary": "No material collaboration/execution expansion is realized.",
+      "semantic_node_refs": [
+        "N02",
+        "N03"
+      ],
+      "evidence_refs": [
+        "E0368",
+        "E0370"
+      ],
+      "counter_explanation": "NO_REALIZED_SCOPE"
+    },
+    {
+      "event_id": "CPR03",
+      "dimension": "R",
+      "status": "NOT_ESTABLISHED",
+      "start_sequence": null,
+      "end_sequence": null,
+      "summary": "No historical state is reopened into a downstream C/P effect before censoring.",
+      "semantic_node_refs": [
+        "N01",
+        "N02"
+      ],
+      "evidence_refs": [
+        "E0299",
+        "E0368"
+      ],
+      "counter_explanation": "NO_RETROSPECTIVE_EFFECT"
+    }
+  ],
+  "cpr_transitions": [],
+  "dynamic_topology": {
+    "topology_class": "NO_LOOP",
+    "dimensions_present": [],
+    "closed_loop": false,
+    "loop_event_order": [],
+    "closed_traversal_count": 0,
+    "repeated_loop": false,
+    "self_reinforcing": false,
+    "decaying": false,
+    "boundary_terminated": false,
+    "reinforcement_axes": [],
+    "boundary_ref": "E0001",
+    "notes": "No CPR structure is supported."
+  },
+  "healthy_alternatives": [
+    {
+      "type": "PROCESS_NONDEVELOPMENT_WITHOUT_CPR",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0001",
+        "E0370"
+      ],
+      "notes": "No repository mutation occurs."
+    }
+  ],
+  "not_established": [
+    "No C/P/R event or loop is established."
+  ]
+}
