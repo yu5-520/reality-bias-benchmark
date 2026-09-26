@@ -1,0 +1,116 @@
+name: Stage-II R7 Checkpoint Conformance
+
+on:
+  push:
+    branches:
+      - stage2-r7-checkpoint-infrastructure-v1
+    paths:
+      - "configs/stage2_r7_checkpoint_contract_v1.json"
+      - "stage2/r7_checkpoint_v1/**"
+      - ".github/workflows/stage2-r7-checkpoint-conformance.yml"
+  pull_request:
+    paths:
+      - "configs/stage2_r7_checkpoint_contract_v1.json"
+      - "stage2/r7_checkpoint_v1/**"
+      - ".github/workflows/stage2-r7-checkpoint-conformance.yml"
+  workflow_dispatch:
+
+jobs:
+  registry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Registry and X4-X7 host smoke
+        run: python -m stage2.r7_checkpoint_v1.smoke --system registry --out-root checkpoint_registry_smoke
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-checkpoint-registry-${{ github.run_id }}
+          path: checkpoint_registry_smoke
+          retention-days: 30
+
+  autogen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Bind pinned AutoGen
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/microsoft/autogen upstream
+          git -C upstream checkout -q 027ecf0a379bcc1d09956d46d12d44a3ad9cee14
+          test "$(git -C upstream rev-parse HEAD)" = 027ecf0a379bcc1d09956d46d12d44a3ad9cee14
+          pip install -q ./upstream/python/packages/autogen-core ./upstream/python/packages/autogen-agentchat './upstream/python/packages/autogen-ext[openai]'
+      - name: AutoGen public save/load checkpoint smoke
+        run: python -m stage2.r7_checkpoint_v1.smoke --system autogen --out-root checkpoint_autogen_smoke
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-checkpoint-autogen-${{ github.run_id }}
+          path: checkpoint_autogen_smoke
+          retention-days: 30
+
+  metagpt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Bind pinned MetaGPT
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/FoundationAgents/MetaGPT upstream
+          git -C upstream checkout -q 11cdf466d042aece04fc6cfd13b28e1a70341b1f
+          test "$(git -C upstream rev-parse HEAD)" = 11cdf466d042aece04fc6cfd13b28e1a70341b1f
+          python -m pip install -q --upgrade pip
+          grep -v '^lancedb==0.4.0$' upstream/requirements.txt > /tmp/metagpt-requirements-stage2.txt
+          python -m pip install -q -r /tmp/metagpt-requirements-stage2.txt
+          python -m pip install -q 'pyarrow==14.0.2'
+          python -m pip install -q --no-deps -e upstream
+      - name: MetaGPT public serialization checkpoint smoke
+        run: python -m stage2.r7_checkpoint_v1.smoke --system metagpt --out-root checkpoint_metagpt_smoke
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-checkpoint-metagpt-${{ github.run_id }}
+          path: checkpoint_metagpt_smoke
+          retention-days: 30
+
+  a2a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Bind pinned A2A SDK and protocol
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/a2aproject/a2a-python upstream
+          git -C upstream checkout -q 0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167
+          test "$(git -C upstream rev-parse HEAD)" = 0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167
+          pip install -q -e './upstream[http-server]' 'uvicorn>=0.35.0'
+          git clone -q https://github.com/a2aproject/A2A protocol
+          git -C protocol checkout -q 173695755607e884aa9acf8ce4feed90e32727a1
+          test "$(git -C protocol rev-parse HEAD)" = 173695755607e884aa9acf8ce4feed90e32727a1
+      - name: A2A role-service checkpoint smoke
+        run: python -m stage2.r7_checkpoint_v1.smoke --system a2a --out-root checkpoint_a2a_smoke
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-checkpoint-a2a-${{ github.run_id }}
+          path: checkpoint_a2a_smoke
+          retention-days: 30
