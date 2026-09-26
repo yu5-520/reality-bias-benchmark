@@ -1,0 +1,149 @@
+name: Stage-II R7 G1 Execution Readiness Preflight
+
+on:
+  push:
+    branches:
+      - stage2-r7-g1-execution-readiness-v1
+    paths:
+      - "stage2/r7_prospective_v1/capability_runner.py"
+      - "stage2/r7_prospective_v1/x2_runner.py"
+      - "stage2/r7_prospective_v1/execution_readiness_preflight.py"
+      - ".github/workflows/stage2-r7-g1-execution-readiness-preflight.yml"
+  pull_request:
+    paths:
+      - "stage2/r7_prospective_v1/capability_runner.py"
+      - "stage2/r7_prospective_v1/x2_runner.py"
+      - "stage2/r7_prospective_v1/execution_readiness_preflight.py"
+      - ".github/workflows/stage2-r7-g1-execution-readiness-preflight.yml"
+  workflow_dispatch:
+
+jobs:
+  x2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Bind pinned MetaGPT
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/FoundationAgents/MetaGPT upstream
+          git -C upstream checkout -q 11cdf466d042aece04fc6cfd13b28e1a70341b1f
+          test "$(git -C upstream rev-parse HEAD)" = 11cdf466d042aece04fc6cfd13b28e1a70341b1f
+          python -m pip install -q --upgrade pip
+          grep -v '^lancedb==0.4.0$' upstream/requirements.txt > /tmp/metagpt-requirements-stage2.txt
+          python -m pip install -q -r /tmp/metagpt-requirements-stage2.txt
+          python -m pip install -q 'pyarrow==14.0.2'
+          python -m pip install -q --no-deps -e upstream
+      - run: python -m stage2.r7_prospective_v1.execution_readiness_preflight --system X2 --out-root readiness_x2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-g1-readiness-x2-${{ github.run_id }}
+          path: readiness_x2
+          retention-days: 30
+
+  x4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m stage2.r7_prospective_v1.execution_readiness_preflight --system X4 --out-root readiness_x4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-g1-readiness-x4-${{ github.run_id }}
+          path: readiness_x4
+          retention-days: 30
+
+  x5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m stage2.r7_prospective_v1.execution_readiness_preflight --system X5 --out-root readiness_x5
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-g1-readiness-x5-${{ github.run_id }}
+          path: readiness_x5
+          retention-days: 30
+
+  x6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Bind exact frozen MemoryBank source
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/zhongwanjun/MemoryBank-SiliconFriend upstream
+          git -C upstream checkout -q cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
+          test "$(git -C upstream rev-parse HEAD)" = cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
+      - name: Install isolated MemoryBank stack
+        run: |
+          set -euo pipefail
+          python -m pip install -q --upgrade pip
+          python -m pip install -q 'torch==2.0.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q 'numpy==1.24.4' 'pydantic==1.10.13' 'huggingface-hub==0.14.1' 'tokenizers==0.13.3' 'transformers==4.28.0' 'faiss-cpu==1.7.4' 'scipy==1.10.1' 'scikit-learn==1.3.2' 'nltk==3.9.1' 'Pillow==10.4.0' 'unstructured==0.6.10' 'langchain==0.0.146'
+          python -m pip install -q --no-deps 'sentence-transformers==2.2.2'
+      - name: Run X6 readiness wrapper preflight
+        env:
+          TOKENIZERS_PARALLELISM: "false"
+          HF_HUB_OFFLINE: "1"
+          TRANSFORMERS_OFFLINE: "1"
+        run: python -m stage2.r7_prospective_v1.execution_readiness_preflight --system X6 --out-root readiness_x6 --upstream-root upstream
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-g1-readiness-x6-${{ github.run_id }}
+          path: readiness_x6
+          retention-days: 30
+
+  x7:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Bind exact frozen LLMLingua source
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/microsoft/LLMLingua upstream
+          git -C upstream checkout -q 5a4c78ae18ab17a98cf997e8259354e546081d64
+          test "$(git -C upstream rev-parse HEAD)" = 5a4c78ae18ab17a98cf997e8259354e546081d64
+      - name: Install CPU native compression environment
+        run: |
+          set -euo pipefail
+          python -m pip install -q --upgrade pip
+          python -m pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q 'transformers==4.44.2' 'accelerate>=0.33,<1' tiktoken nltk numpy tokenizers safetensors
+          python -m pip install -q --no-deps -e upstream
+      - name: Run X7 readiness wrapper preflight
+        env:
+          TOKENIZERS_PARALLELISM: "false"
+        run: python -m stage2.r7_prospective_v1.execution_readiness_preflight --system X7 --out-root readiness_x7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-g1-readiness-x7-${{ github.run_id }}
+          path: readiness_x7
+          retention-days: 30
