@@ -46,6 +46,7 @@ class HostBoundaryCheckpointRecorder:
         if boundary == "BEFORE_HOST_TURN":
             kind = CheckpointBoundary.TASK_START
         elif boundary == "AFTER_HOST_TURN_RETURNS":
+            self.controller.record_model_decision()
             kind = CheckpointBoundary.AFTER_NATIVE_MODEL_TURN
         elif boundary == "TERMINAL":
             kind = CheckpointBoundary.TERMINAL
@@ -113,6 +114,7 @@ class MetaGPTBoundaryCheckpointRecorder:
         if boundary == "BEFORE_FIRST_ENV_RUN":
             kind = CheckpointBoundary.TASK_START
         elif boundary == "AFTER_EACH_ENV_RUN_K1_RETURN":
+            self.controller.record_model_decision()
             kind = CheckpointBoundary.AFTER_NATIVE_MODEL_TURN
         elif boundary == "TERMINAL":
             kind = CheckpointBoundary.TERMINAL
