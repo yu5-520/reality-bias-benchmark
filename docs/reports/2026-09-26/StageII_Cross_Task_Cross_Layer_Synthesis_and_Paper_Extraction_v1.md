@@ -538,3 +538,71 @@ The paper-facing synthesis is therefore:
 > **Process reality is a cross-layer property of how information, authority and history move through an AI system—not a property that can be inferred from the final answer or from the name of the component carrying the state.**
 
 That is the point at which Stage II can stop being a collection of experiment reports and become the evidence backbone of the cross-AI-system paper.
+
+
+---
+
+# Appendix A — Figure P2 Complete Source Routes
+
+This appendix preserves the complete runner-recorded routes underlying the paired X3 paper figure. The semantic mechanism overlay in Figure P2 is a projection over these routes, not a replacement for them.
+
+## Figure P2-A — TIME_ALIGNED_ACTUAL_AGENT_ROUTE_WITH_SEMANTIC_LINEAGE_OVERLAY: X3-T2
+
+~~~mermaid
+flowchart TB
+  A01["A01 · release_lead · 3"] --> A02["A02 · frontend · 2"]
+  A02 --> A03["A03 · release_lead · 4"] --> A04["A04 · release_lead · 4"]
+  A04 --> A05["A05 · frontend · 3"] --> A06["A06 · frontend · 3"]
+  A06 --> A07["A07 · release_lead · 5"] --> A08["A08 · frontend · 5"]
+  A08 --> A09["A09 · release_lead · 2"] --> A10["A10 · release_lead · 4"]
+  A10 --> A11["A11 · release_lead · 5"] --> A12["A12 · frontend · 4"]
+  A12 --> A13["A13 · frontend · 1"] --> A14["A14 · release_lead · 5"]
+  A14 --> A15["A15 · reviewer · 5"] --> A16["A16 · reviewer · 5"]
+  A16 --> A17["A17 · reviewer · 3"] --> A18["A18 · release_lead · 5"]
+  A18 --> A19["A19 · reviewer · 5"] --> A20["A20 · release_lead · 4"]
+  A20 --> A21["A21 · reviewer · 5"] --> A22["A22 · reviewer · 5"]
+  A22 --> A23["A23 · reviewer · 5"] --> A24["A24 · frontend · 3"]
+  A24 --> A25["A25 · reviewer · 5"] --> A26["A26 · frontend · 4"]
+  A26 --> A27["A27 · reviewer · 4"] --> A28["A28 · frontend · 2"]
+  A28 --> A29["A29 · frontend · 4"] --> A30["A30 · reviewer · 5"]
+  A30 --> A31["A31 · release_lead · 4"] --> A32["A32 · frontend · 5"]
+~~~
+
+Semantic overlay anchors:
+
+- X3T2-N1: downstream artifact contradiction;
+- X3T2-N2: contradiction becomes release blocker;
+- X3T2-N3: current state is independently re-anchored from persisted file evidence;
+- X3T2-N4: later edit/review/test work remains open at the observation boundary.
+
+## Figure P2-B — TIME_ALIGNED_ACTUAL_AGENT_ROUTE_WITH_SEMANTIC_LINEAGE_OVERLAY: X3-T3
+
+~~~mermaid
+flowchart TB
+  B01["B01 · release_lead · 2"] --> B02["B02 · release_lead · 5"]
+  B02 --> B03["B03 · release_lead · 5"] --> B04["B04 · release_lead · 4"]
+  B04 --> B05["B05 · reviewer · 3"] --> B06["B06 · reviewer · 4"]
+  B06 --> B07["B07 · release_lead · 5"] --> B08["B08 · reviewer · 5"]
+  B08 --> B09["B09 · reviewer · 5"] --> B10["B10 · release_lead · 5"]
+  B10 --> B11["B11 · reviewer · 5"] --> B12["B12 · reviewer · 5"]
+  B12 --> B13["B13 · reviewer · 5"] --> B14["B14 · release_lead · 5"]
+  B14 --> B15["B15 · release_lead · 5"] --> B16["B16 · release_lead · 4"]
+  B16 --> B17["B17 · reviewer · 5"] --> B18["B18 · reviewer · 3"]
+  B18 --> B19["B19 · release_lead · 5"] --> B20["B20 · reviewer · 5"]
+  B20 --> B21["B21 · reviewer · 5"] --> B22["B22 · reviewer · 5"]
+  B22 --> B23["B23 · release_lead · 3"] --> B24["B24 · release_lead · 5"]
+  B24 --> B25["B25 · release_lead · 4"] --> B26["B26 · release_lead · 5"]
+  B26 --> B27["B27 · release_lead · 3"] --> B28["B28 · release_lead · 4"]
+  B28 --> B29["B29 · reviewer · 5"] --> B30["B30 · reviewer · 4"]
+  B30 --> B31["B31 · release_lead · 2"] --> B32["B32 · reviewer · 4"]
+~~~
+
+Semantic overlay anchors:
+
+- X3T3-N1: runtime authority removed while the residual module remains;
+- X3T3-N2: residual module is re-promoted into a release condition;
+- X3T3-N3: action boundary preserves the residue;
+- X3T3-N4: the same historical condition re-enters later review;
+- X3T3-N5: closure is not observed before the frozen horizon.
+
+The paired source routes preserve all 64 runner-recorded nodes. Figure P2 may compress visual spacing for publication, but no route node may be silently removed from the evidence-facing source figure.
