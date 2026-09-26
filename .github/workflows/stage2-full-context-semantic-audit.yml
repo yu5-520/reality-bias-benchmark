@@ -39,6 +39,7 @@ concurrency:
 
 env:
   AUTH_ISSUE: "264"
+  RECOVERY_ISSUE: "266"
   OUTPUT_BRANCH: stage2-full-context-semantic-audit-results-v1
   OUTPUT_ROOT: stage2/replication_v2/full_context_semantic_audit_v1
 
@@ -84,7 +85,21 @@ jobs:
           assert p["prohibited_actions"]["repair_calls"] is False
           assert p["prohibited_actions"]["monitor_evaluation"] is False
           assert p["prohibited_actions"]["blind_reference_relabel"] is False
-          print("PASS: Layer-C contract is bounded, theory-aware, monitor-blind, and reference-label-blind")
+          r=p["validator_recovery"]
+          assert r["recovery_issue"]==266
+          assert r["prior_workflow_run"]==36258923654
+          assert r["prior_claim_commit"]=="8d87da221730b2a5f31b8e475fc43e6164f85e0f"
+          assert r["preserved_completed_cells"]==10
+          assert r["rerun_preserved_completed_cells"] is False
+          assert r["failure_cell"]=="G2-X4-T2"
+          assert r["accepted_relation_added"]=="MERE_VISIBILITY"
+          assert r["scientific_prompt_change"] is False
+          assert r["model_config_change"] is False
+          assert r["evidence_packet_change"] is False
+          assert r["preserve_provider_raw_before_validation"] is True
+          assert r["known_unaccounted_prevalidation_provider_calls"]==1
+          assert r["unaccounted_prevalidation_call_reserve_usd"]==0.5
+          print("PASS: Layer-C contract + validator recovery are bounded and reference-label-blind")
           PY
 
   execute-full-context-audit:
@@ -244,6 +259,7 @@ jobs:
         run: |
           set -euo pipefail
           TAG=stage2-full-context-process-semantic-audit-claimed-v1
+          RECOVERY_TAG=stage2-full-context-process-semantic-audit-recovery1-claimed-v1
           seal_path="$OUTPUT_ROOT/final/full_context_seal.json"
           if gh api "repos/$GITHUB_REPOSITORY/contents/$seal_path?ref=$OUTPUT_BRANCH" >/dev/null 2>&1; then
             echo "FAIL: Layer-C result already sealed"
@@ -251,15 +267,54 @@ jobs:
           fi
           if tag_json=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" 2>/dev/null); then
             claimed_sha=$(printf '%s' "$tag_json" | python -c 'import json,sys; print(json.load(sys.stdin)["object"]["sha"])')
-            if [ "$claimed_sha" != "$GITHUB_SHA" ]; then
-              echo "FAIL: existing Layer-C claim belongs to another control-plane commit"
+            if [ "$claimed_sha" = "$GITHUB_SHA" ]; then
+              test -d "results/$OUTPUT_ROOT/audit"
+              echo "PASS: same-commit Layer-C claim found; resume without re-sampling completed units"
+            elif [ "$claimed_sha" = "8d87da221730b2a5f31b8e475fc43e6164f85e0f" ]; then
+              gh api "repos/$GITHUB_REPOSITORY/issues/$RECOVERY_ISSUE" > work/recovery_issue.json
+              python - <<'PY'
+          import json
+          issue=json.load(open("work/recovery_issue.json"))
+          assert issue["user"]["login"]=="yu5-520"
+          assert issue["title"]=="STAGE2 FULL-CONTEXT AUDIT VALIDATOR RECOVERY 1"
+          lines=set(x.strip() for x in issue["body"].splitlines() if x.strip())
+          required={
+            "prior_workflow_run=36258923654",
+            "completed_cells_preserve=10",
+            "completed_cells_rerun=false",
+            "failure_cell=G2-X4-T2",
+            "failure_class=EVALUATOR_OUTPUT_VALIDATOR_RELATION_ENUM_OMISSION",
+            "validator_change=ADD_MERE_VISIBILITY_RELATION",
+            "scientific_prompt_change=false",
+            "model_config_change=false",
+            "evidence_packet_change=false",
+            "preserve_raw_before_validation=true",
+            "resume_failed_and_unprocessed_only=true",
+            "recovery_budget_reserve_usd=0.5"
+          }
+          assert required <= lines
+          PY
+              python - <<'PY'
+          import json, os
+          p=f'results/{os.environ["OUTPUT_ROOT"]}/audit/cell_audit_summary.json'
+          s=json.load(open(p))
+          assert s["completed_cells"]==10
+          assert len(s["errors"])==1
+          assert s["errors"][0]["full_id"]=="G2-X4-T2"
+          assert "bad semantic relation" in s["errors"][0]["error"]
+          print("PASS: preserved 10-cell state + exact validator failure verified")
+          PY
+              if recovery_json=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RECOVERY_TAG" 2>/dev/null); then
+                recovery_sha=$(printf '%s' "$recovery_json" | python -c 'import json,sys; print(json.load(sys.stdin)["object"]["sha"])')
+                test "$recovery_sha" = "$GITHUB_SHA"
+              else
+                gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$RECOVERY_TAG" -f sha="$GITHUB_SHA" >/dev/null
+              fi
+              echo "PASS: authorized validator recovery; preserve 10 completed cells and resume at G2-X4-T2"
+            else
+              echo "FAIL: existing Layer-C claim belongs to an unauthorized control-plane commit"
               exit 43
             fi
-            if [ ! -d "results/$OUTPUT_ROOT/audit" ]; then
-              echo "FAIL: claim exists but resumable audit directory is absent"
-              exit 44
-            fi
-            echo "PASS: same-commit Layer-C claim found; resume without re-sampling completed units"
           else
             gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$TAG" -f sha="$GITHUB_SHA" >/dev/null
             echo "PASS: Layer-C audit claimed"
@@ -349,6 +404,8 @@ jobs:
           set -euo pipefail
           gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --body "Stage-II Layer-C full-context process-semantic audit completed: 80 trajectory audits + 21 same-X/T topology syntheses sealed on branch \`$OUTPUT_BRANCH\`. Monitor evaluation and engineering B were not executed."
           gh issue close "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
+          gh issue comment "$RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --body "Validator recovery completed without re-running the 10 preserved successful cell audits. Layer-C result sealed."
+          gh issue close "$RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
 
       - name: Assert complete Layer-C seal or preserve partial failure
         if: always()
