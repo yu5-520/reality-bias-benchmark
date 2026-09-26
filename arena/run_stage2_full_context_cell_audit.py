@@ -5,7 +5,7 @@ from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from adapters.deepseek_chat import chat_completion, extract_content
+from adapters.deepseek_chat import DeepSeekError, chat_completion, extract_content
 
 TOPOLOGY={
  "NO_LOOP","TWO_DIMENSION_CROSSING","TRI_DIMENSION_OPEN_CHAIN",
@@ -195,11 +195,42 @@ def main():
             continue
         try:
             if cost_usd(usage,cfg)>=effective_spend_ceiling: raise RuntimeError("effective tracked spend ceiling reached")
-            response=chat_completion(
-                cfg,
-                [{"role":"system","content":prompt},{"role":"user","content":json.dumps(packet,ensure_ascii=False,separators=(",",":"))}],
-                evaluator=True,response_format_json=True
-            )
+            try:
+                response=chat_completion(
+                    cfg,
+                    [{"role":"system","content":prompt},{"role":"user","content":json.dumps(packet,ensure_ascii=False,separators=(",",":"))}],
+                    evaluator=True,response_format_json=True
+                )
+            except DeepSeekError as provider_exc:
+                provider_responses=list(getattr(provider_exc,"provider_responses",[]) or [])
+                provider_usage=getattr(provider_exc,"usage",{}) or {}
+                provider_calls=len(provider_responses)
+                calls+=provider_calls
+                add_usage(usage,provider_usage)
+                failure_record={
+                  "full_id":full,
+                  "packet_sha256":packet["packet_sha256"],
+                  "validation_state":"PROVIDER_JSON_FORMAT_FAILURE",
+                  "error":repr(provider_exc),
+                  "provider_call_count":provider_calls,
+                  "usage":provider_usage,
+                  "responses":[
+                    {
+                      "id":r.get("id"),
+                      "model":r.get("model"),
+                      "finish_reason":((r.get("choices") or [{}])[0].get("finish_reason")),
+                      "usage":r.get("usage") or {},
+                      "raw_text":extract_content(r)
+                    }
+                    for r in provider_responses
+                  ]
+                }
+                (out/"provider_raw_attempts"/f"{full}.provider_failure.json").write_text(
+                  json.dumps(failure_record,ensure_ascii=False,indent=2,sort_keys=True)+"\n"
+                )
+                if cost_usd(usage,cfg)>effective_spend_ceiling:
+                    raise RuntimeError("effective tracked spend ceiling exceeded after provider-format failure")
+                raise
             raw=extract_content(response)
             n=1+int(response.get("_json_format_retry_count",0) or 0)
             calls+=n
