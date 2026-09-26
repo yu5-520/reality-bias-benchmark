@@ -234,7 +234,7 @@ async def run_capability_natural_A(
             checkpoint_hook=hook,
         )
         framework_binding = {
-            "system": "X7_LONGLINGUA",
+            "system": "X7_LONGLMLINGUA",
             "package": "llmlingua==0.2.2",
             "host": "software_engineering_host_v1",
         }
