@@ -174,7 +174,7 @@ def main():
     for token in [
         "Observe across boundaries; repair only through boundaries",
         "Semantic audit validates the monitor; semantic audit does not guide the monitor.",
-        "244 candidate signals -> 24 structurally assembled repair episodes/packages",
+        "The 244 candidate signals were assembled into",
         "COMPLETE_FOR_STRUCTURED_REPAIR | **0**",
         "ACTIVE REPAIR REMAINS CLOSED",
     ]:
