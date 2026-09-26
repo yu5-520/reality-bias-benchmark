@@ -135,7 +135,7 @@ def main():
     for token in [
         "21/21 frozen first-attempt natural archives scanned",
         "normalized structural events: **1120**",
-        "structural candidates: **244**",
+        "raw structural candidate signals retained: **244**",
         "active repair run from an unverified reconstructed parent",
     ]:
         require(token in report, "report missing " + token)
