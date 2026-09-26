@@ -156,7 +156,7 @@
   ],
   "evaluator": {
     "provider": "deepseek",
-    "model_config": "arena/config/model_deepseek_v0.2.json",
+    "model_config": "arena/config/model_deepseek_layerc_v0.1.json",
     "temperature": 0,
     "max_spend_usd": 10,
     "semantic_uncertainty_retry": false,
@@ -221,5 +221,31 @@
     "original_total_budget_ceiling_usd": 10,
     "known_unaccounted_provider_calls_for_failure": 2,
     "known_unaccounted_provider_calls_total": 3
+  },
+  "serialization_ceiling_recovery": {
+    "recovery_version": "1.0",
+    "recovery_issue": 271,
+    "prior_workflow_run": 36260618474,
+    "prior_control_commit": "9e5c0b5b641c8fe8dc2a6c60926ed44ff0d26653",
+    "preserved_completed_cells": 12,
+    "rerun_preserved_completed_cells": false,
+    "failure_cell": "G2-X5-T1",
+    "failure_class": "EVALUATOR_OUTPUT_TRUNCATED_AT_4000_COMPLETION_TOKENS",
+    "observed_finish_reason": "length",
+    "observed_failed_attempts": 2,
+    "observed_failed_completion_tokens_each": 4000,
+    "prior_successful_cells_all_below_old_ceiling": true,
+    "prior_successful_cells_max_completion_tokens": 3818,
+    "semantic_prompt_change": false,
+    "model_alias_change": false,
+    "temperature_change": false,
+    "thinking_change": false,
+    "evidence_packet_change": false,
+    "theory_change": false,
+    "evaluator_max_tokens_before": 4000,
+    "evaluator_max_tokens_after": 12000,
+    "change_role": "TECHNICAL_JSON_SERIALIZATION_CEILING_ONLY",
+    "resume_failed_and_unprocessed_only": true,
+    "budget_reserve_usd": 1
   }
 }

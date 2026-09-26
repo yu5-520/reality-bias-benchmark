@@ -6,6 +6,7 @@ on:
       - '.github/workflows/stage2-full-context-semantic-audit.yml'
       - 'docs/R_Plan_v7.47.md'
       - 'configs/stage2_full_context_process_semantic_audit_v1.json'
+      - 'arena/config/model_deepseek_layerc_v0.1.json'
       - 'reviews/stage2_full_context_cell_audit_prompt_v1.md'
       - 'reviews/stage2_full_context_xt_cohort_prompt_v1.md'
       - 'schemas/stage2_full_context_cell_audit_v1.schema.json'
@@ -41,6 +42,7 @@ env:
   AUTH_ISSUE: "264"
   RECOVERY_ISSUE: "266"
   PROVIDER_RECOVERY_ISSUE: "269"
+  SERIALIZATION_RECOVERY_ISSUE: "271"
   OUTPUT_BRANCH: stage2-full-context-semantic-audit-results-v1
   OUTPUT_ROOT: stage2/replication_v2/full_context_semantic_audit_v1
 
@@ -120,7 +122,34 @@ jobs:
           assert f["known_unaccounted_provider_calls_for_failure"]==2
           assert f["known_unaccounted_provider_calls_total"]==3
           assert f["total_budget_reserve_usd"]==1.0
-          print("PASS: Layer-C contract + validator/provider-format recoveries are bounded and reference-label-blind")
+          c=p["serialization_ceiling_recovery"]
+          assert p["evaluator"]["model_config"]=="arena/config/model_deepseek_layerc_v0.1.json"
+          assert c["recovery_issue"]==271
+          assert c["prior_workflow_run"]==36260618474
+          assert c["prior_control_commit"]=="9e5c0b5b641c8fe8dc2a6c60926ed44ff0d26653"
+          assert c["preserved_completed_cells"]==12
+          assert c["rerun_preserved_completed_cells"] is False
+          assert c["failure_cell"]=="G2-X5-T1"
+          assert c["observed_finish_reason"]=="length"
+          assert c["observed_failed_attempts"]==2
+          assert c["observed_failed_completion_tokens_each"]==4000
+          assert c["prior_successful_cells_all_below_old_ceiling"] is True
+          assert c["prior_successful_cells_max_completion_tokens"]==3818
+          assert c["semantic_prompt_change"] is False
+          assert c["model_alias_change"] is False
+          assert c["temperature_change"] is False
+          assert c["thinking_change"] is False
+          assert c["evidence_packet_change"] is False
+          assert c["theory_change"] is False
+          assert c["evaluator_max_tokens_before"]==4000
+          assert c["evaluator_max_tokens_after"]==12000
+          m=json.load(open("arena/config/model_deepseek_layerc_v0.1.json"))
+          assert m["evaluator"]["model_alias"]=="deepseek-flash"
+          assert m["evaluator"]["temperature"]==0.0
+          assert m["evaluator"]["thinking"]=="disabled"
+          assert m["evaluator"]["max_tokens"]==12000
+          assert m["json_format_retries"]==2
+          print("PASS: Layer-C contract + recoveries + 12000-token serialization ceiling are bounded")
           PY
 
   execute-full-context-audit:
@@ -282,67 +311,80 @@ jobs:
           TAG=stage2-full-context-process-semantic-audit-claimed-v1
           RECOVERY1_TAG=stage2-full-context-process-semantic-audit-recovery1-claimed-v1
           RECOVERY2_TAG=stage2-full-context-process-semantic-audit-format-recovery1-claimed-v1
+          RECOVERY3_TAG=stage2-full-context-process-semantic-audit-ceiling-recovery1-claimed-v1
           seal_path="$OUTPUT_ROOT/final/full_context_seal.json"
           if gh api "repos/$GITHUB_REPOSITORY/contents/$seal_path?ref=$OUTPUT_BRANCH" >/dev/null 2>&1; then
             echo "FAIL: Layer-C result already sealed"
             exit 42
           fi
 
-          tag_json=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG")
-          claimed_sha=$(printf '%s' "$tag_json" | python -c 'import json,sys; print(json.load(sys.stdin)["object"]["sha"])')
-          test "$claimed_sha" = "8d87da221730b2a5f31b8e475fc43e6164f85e0f"
-
-          python - <<'PY'
-          import json, os
-          p=f'results/{os.environ["OUTPUT_ROOT"]}/audit/cell_audit_summary.json'
-          s=json.load(open(p))
-          assert s["completed_cells"]==12
-          assert len(s["errors"])==1
-          assert s["errors"][0]["full_id"]=="G2-X5-T1"
-          assert "JSON response remained malformed" in s["errors"][0]["error"]
-          print("PASS: preserved 12-cell state + exact provider-format failure verified")
-          PY
+          base_tag=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG")
+          base_sha=$(printf '%s' "$base_tag" | python -c 'import json,sys; print(json.load(sys.stdin)["object"]["sha"])')
+          test "$base_sha" = "8d87da221730b2a5f31b8e475fc43e6164f85e0f"
 
           r1=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RECOVERY1_TAG")
           r1sha=$(printf '%s' "$r1" | python -c 'import json,sys; print(json.load(sys.stdin)["object"]["sha"])')
           test "$r1sha" = "0085b1a42074333ea8a0ca3226cf19cf47b8acae"
 
-          gh api "repos/$GITHUB_REPOSITORY/issues/$PROVIDER_RECOVERY_ISSUE" > work/provider_recovery_issue.json
+          r2=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RECOVERY2_TAG")
+          r2sha=$(printf '%s' "$r2" | python -c 'import json,sys; print(json.load(sys.stdin)["object"]["sha"])')
+          test "$r2sha" = "9e5c0b5b641c8fe8dc2a6c60926ed44ff0d26653"
+
+          python - <<'PY'
+          import json, os
+          root=f'results/{os.environ["OUTPUT_ROOT"]}/audit'
+          s=json.load(open(root+"/cell_audit_summary.json"))
+          assert s["completed_cells"]==12
+          assert len(s["errors"])==1
+          assert s["errors"][0]["full_id"]=="G2-X5-T1"
+          assert "JSON response remained malformed" in s["errors"][0]["error"]
+          r=json.load(open(root+"/provider_raw_attempts/G2-X5-T1.provider_failure.json"))
+          assert r["provider_call_count"]==2
+          assert len(r["responses"])==2
+          assert all(x["finish_reason"]=="length" for x in r["responses"])
+          assert all((x["usage"].get("completion_tokens") or 0)==4000 for x in r["responses"])
+          print("PASS: exact 4000-token serialization truncation verified")
+          PY
+
+          gh api "repos/$GITHUB_REPOSITORY/issues/$SERIALIZATION_RECOVERY_ISSUE" > work/serialization_recovery_issue.json
           python - <<'PY'
           import json
-          issue=json.load(open("work/provider_recovery_issue.json"))
+          issue=json.load(open("work/serialization_recovery_issue.json"))
           assert issue["user"]["login"]=="yu5-520"
-          assert issue["title"]=="STAGE2 FULL-CONTEXT AUDIT PROVIDER FORMAT RECOVERY 1"
+          assert issue["title"]=="STAGE2 FULL-CONTEXT AUDIT SERIALIZATION CEILING RECOVERY 1"
           lines=set(x.strip() for x in issue["body"].splitlines() if x.strip())
           required={
-            "prior_workflow_run=36259829075",
+            "prior_workflow_run=36260618474",
             "completed_cells_preserve=12",
             "completed_cells_rerun=false",
             "failure_cell=G2-X5-T1",
-            "failure_class=EVALUATOR_JSON_MALFORMED_AFTER_IDENTICAL_FORMAT_ATTEMPTS",
-            "scientific_prompt_change=false",
-            "model_config_change=false",
-            "evidence_packet_change=false",
+            "failure_class=EVALUATOR_OUTPUT_TRUNCATED_AT_4000_COMPLETION_TOKENS",
+            "observed_finish_reason=length",
+            "observed_failed_attempts=2",
+            "observed_failed_completion_tokens_each=4000",
+            "prior_successful_cells_all_completion_tokens_below_4000=true",
+            "prior_successful_cells_max_completion_tokens=3818",
+            "semantic_prompt_change=false",
+            "model_alias_change=false",
             "temperature_change=false",
+            "thinking_change=false",
+            "evidence_packet_change=false",
             "theory_change=false",
-            "technical_recovery_execution_count=1",
-            "technical_recovery_uses_existing_identical_request_policy=true",
-            "no_adaptive_reprompt=true",
-            "preserve_provider_error_responses_and_usage=true",
+            "evaluator_max_tokens_change=4000->12000",
+            "change_role=TECHNICAL_JSON_SERIALIZATION_CEILING_ONLY",
             "resume_failed_and_unprocessed_only=true",
-            "if_same_cell_format_failure_repeats=STOP_AND_PRESERVE_BOUNDARY",
-            "known_unaccounted_provider_calls_total=3",
-            "total_budget_reserve_usd=1.0"
+            "preserve_12_completed=true",
+            "budget_reserve_usd=1.0"
           }
           assert required <= lines
           PY
 
-          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RECOVERY2_TAG" >/dev/null 2>&1; then
-            echo "FAIL: bounded provider-format recovery already consumed"
-            exit 45
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RECOVERY3_TAG" >/dev/null 2>&1; then
+            echo "FAIL: serialization-ceiling recovery already consumed"
+            exit 46
           fi
-          gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$RECOVERY2_TAG" -f sha="$GITHUB_SHA" >/dev/null
-          echo "PASS: one bounded provider-format recovery claimed; preserve 12 completed cells and resume at G2-X5-T1"
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$RECOVERY3_TAG" -f sha="$GITHUB_SHA" >/dev/null
+          echo "PASS: 12000-token Layer-C serialization ceiling claimed; preserve 12 completed cells and resume at G2-X5-T1"
 
       - name: Run 80 full-context trajectory audits
         id: cells
@@ -354,7 +396,7 @@ jobs:
           python control/arena/run_stage2_full_context_cell_audit.py \
             --packets "results/$OUTPUT_ROOT/packets" \
             --prompt control/reviews/stage2_full_context_cell_audit_prompt_v1.md \
-            --model-config control/arena/config/model_deepseek_v0.2.json \
+            --model-config control/arena/config/model_deepseek_layerc_v0.1.json \
             --authorization control/configs/stage2_full_context_process_semantic_audit_v1.json \
             --out "results/$OUTPUT_ROOT/audit"
           code=$?
@@ -432,6 +474,8 @@ jobs:
           gh issue close "$RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
           gh issue comment "$PROVIDER_RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --body "Bounded provider-format recovery completed without re-running the 12 preserved successful cell audits. Layer-C result sealed."
           gh issue close "$PROVIDER_RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
+          gh issue comment "$SERIALIZATION_RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --body "Layer-C serialization ceiling recovery completed. The 12 prior valid audits remained frozen; max_tokens was raised only for unresolved/remaining Layer-C serialization."
+          gh issue close "$SERIALIZATION_RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
 
       - name: Assert complete Layer-C seal or preserve partial failure
         if: always()
