@@ -25,6 +25,8 @@ def build_run_manifest(
     natural_subject_calls: int,
     repair_subject_calls: int = 0,
     paid_evaluator_calls: int = 0,
+    group_id: str = "StageII-R7-G1",
+    semantic_audit_state: str = "LOCKED_UNTIL_A_AND_B_FROZEN",
 ) -> dict[str, Any]:
     system_id, task_id = cell_id.split("-", 1)
     checkpoint_hash = digest(checkpoint_ledger)
@@ -49,8 +51,8 @@ def build_run_manifest(
         })
 
     out = {
-        "schema": "RB-STAGE2-R7-G1-RUN-MANIFEST-v1",
-        "group_id": "StageII-R7-G1",
+        "schema": ("RB-STAGE2-R7-G1-RUN-MANIFEST-v1" if group_id == "StageII-R7-G1" else "RB-STAGE2-PROSPECTIVE-RUN-MANIFEST-v2"),
+        "group_id": group_id,
         "cell_id": cell_id,
         "system_id": system_id,
         "task_id": task_id,
@@ -82,7 +84,7 @@ def build_run_manifest(
             "repair_subject_calls": int(repair_subject_calls),
             "paid_evaluator_calls": int(paid_evaluator_calls),
         },
-        "semantic_audit_state": "LOCKED_UNTIL_A_AND_B_FROZEN",
+        "semantic_audit_state": semantic_audit_state,
     }
     out["manifest_hash"] = digest(out)
     return out
