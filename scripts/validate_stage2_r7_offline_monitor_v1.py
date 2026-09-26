@@ -21,6 +21,10 @@ SOURCE = ROOT / "configs/stage2_r7_21_path_source_freeze_v1.json"
 PACKAGE_SCHEMA = ROOT / "schemas/stage2_r7_monitor_derived_repair_package_v1.schema.json"
 REPORT = BASE / "offline_prefix_replay_report_v1.md"
 ASSEMBLY_REPORT = BASE / "package_assembly_report_v1.md"
+FREEZE_MANIFEST = ROOT / "configs/stage2_r7_offline_monitor_freeze_v1.json"
+ENGINEERING_REPORT = ROOT / "docs/reports/2026-09-26/StageII_R7_Offline_Structural_Monitor_and_Repair_Package_Freeze_Report_v1.md"
+PLAN = ROOT / "docs/R_Plan_v7.37.md"
+CHANGE_NOTE = ROOT / "theory/change_notes/CN-R-111_stage2_r7_offline_monitor_freeze.md"
 
 
 def load(path: Path):
@@ -45,6 +49,7 @@ def main():
     firewall = load(FIREWALL)
     source = load(SOURCE)
     package_schema = load(PACKAGE_SCHEMA)
+    freeze_manifest = load(FREEZE_MANIFEST)
     events = load_jsonl(EVENTS)
     candidates = load_jsonl(CANDIDATES)
     packages = load_jsonl(PACKAGES)
@@ -99,6 +104,23 @@ def main():
         "NO_REPAIR_REQUIRED": 1,
     }), "frozen gate distribution")
     require(summary["complete_for_structured_repair_count"] == 0, "no active-ready package yet")
+    require(summary["summary_hash"] == "a7372e03200ea02a819f540953bf9d41a08a862625ba0876f8e8926721b7ad3d", "frozen summary hash")
+
+    require(freeze_manifest["schema"] == "RB-STAGE2-R7-OFFLINE-MONITOR-FREEZE-v1", "freeze manifest schema")
+    require(freeze_manifest["status"] == "FROZEN_OFFLINE_STRUCTURAL_MONITOR_AND_PACKAGE_POPULATION", "freeze status")
+    require(freeze_manifest["accounting"]["normalized_structural_events"] == 1120, "manifest event count")
+    require(freeze_manifest["accounting"]["raw_structural_candidate_signals"] == 244, "manifest candidate count")
+    require(freeze_manifest["accounting"]["assembled_structural_episodes"] == 24, "manifest package count")
+    require(freeze_manifest["accounting"]["repair_gate_counts"] == {
+        "PARENT_RECONSTRUCTION_BLOCKED": 16,
+        "LINEAGE_GAP_BLOCKED": 7,
+        "NO_REPAIR_REQUIRED": 1,
+        "COMPLETE_FOR_STRUCTURED_REPAIR": 0,
+    }, "manifest gate distribution")
+    require(freeze_manifest["integrity"]["summary_hash"] == summary["summary_hash"], "manifest summary binding")
+    require(freeze_manifest["integrity"]["semantic_audit_used_as_input"] is False, "manifest semantic firewall")
+    require(freeze_manifest["integrity"]["future_evidence_used"] is False, "manifest future blindness")
+    require(freeze_manifest["integrity"]["active_repair_executed"] is False, "manifest active repair")
 
     preflight_by_id = {row["package_id"]: row for row in preflight}
     require(set(preflight_by_id) == set(ids), "preflight/package binding")
@@ -132,6 +154,9 @@ def main():
 
     report = REPORT.read_text(encoding="utf-8")
     assembly_report = ASSEMBLY_REPORT.read_text(encoding="utf-8")
+    engineering_report = ENGINEERING_REPORT.read_text(encoding="utf-8")
+    plan = PLAN.read_text(encoding="utf-8")
+    change_note = CHANGE_NOTE.read_text(encoding="utf-8")
     for token in [
         "21/21 frozen first-attempt natural archives scanned",
         "normalized structural events: **1120**",
@@ -146,6 +171,26 @@ def main():
         "LINEAGE_GAP_BLOCKED",
     ]:
         require(token in assembly_report, "assembly report missing " + token)
+    for token in [
+        "Observe across boundaries; repair only through boundaries",
+        "Semantic audit validates the monitor; semantic audit does not guide the monitor.",
+        "244 candidate signals -> 24 structurally assembled repair episodes/packages",
+        "COMPLETE_FOR_STRUCTURED_REPAIR | **0**",
+        "ACTIVE REPAIR REMAINS CLOSED",
+    ]:
+        require(token in engineering_report, "engineering report missing " + token)
+    for token in [
+        "244 RAW SIGNALS MERGED INTO 24 STRUCTURAL EPISODES",
+        "0 ACTIVE-REPAIR-READY PACKAGES",
+        "native-parent resumability layer",
+    ]:
+        require(token in plan, "plan missing " + token)
+    for token in [
+        "PARENT_RECONSTRUCTION_BLOCKED: 16",
+        "LINEAGE_GAP_BLOCKED: 7",
+        "No active repair is authorized",
+    ]:
+        require(token in change_note, "change note missing " + token)
 
     print("STAGE2_R7_OFFLINE_MONITOR=PASS")
     print("SOURCE_CELLS=21")
