@@ -38,6 +38,7 @@ async def run_x2_natural_A(
     task = json.loads(Path(task_file).read_text())
     out = Path(out_root)
     out.mkdir(parents=True, exist_ok=False)
+    subject_mode = provider is None
     active_provider = provider
     if active_provider is None:
         from stage2.native_v7.x2_metagpt.runner import build_subject_provider
@@ -103,7 +104,7 @@ async def run_x2_natural_A(
         natural_result=result,
         monitor_snapshot=bridge.snapshot(),
         packages=monitor.packages(),
-        natural_subject_calls=tap.total_records,
+        natural_subject_calls=tap.total_records if subject_mode else 0,
     )
     _write_json(out / "run_manifest.json", manifest)
     seal = {
@@ -111,7 +112,9 @@ async def run_x2_natural_A(
         "group_id": "StageII-R7-G1",
         "cell_id": f"X2-{task['id']}",
         "status": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
-        "natural_subject_calls": tap.total_records,
+        "natural_subject_calls": tap.total_records if subject_mode else 0,
+        "model_decision_count": tap.total_records,
+        "provider_mode": "SUBJECT" if subject_mode else "NON_STUDY_INJECTED",
         "checkpoint_count": len(controller.ledger()["checkpoints"]),
         "structural_event_count": len(monitor.evidence()),
         "candidate_count": len(monitor.candidates()),
