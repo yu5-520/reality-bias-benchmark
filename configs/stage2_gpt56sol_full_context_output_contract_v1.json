@@ -1,0 +1,38 @@
+{
+  "schema": "stage2-gpt56sol-full-context-output-contract-v1",
+  "version": "1.0",
+  "status": "FORMAL_LAYER_C_OUTPUT_CONTRACT",
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING"
+  },
+  "required_cell_count": 80,
+  "required_xt_cohort_count": 21,
+  "input_root": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/inputs",
+  "output_root": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/formal_review",
+  "evidence_reference_rule": "Every semantic node, semantic edge, CPR event, transition, reinforcement axis, and healthy alternative must cite E#### refs present in the frozen packet for the same cell.",
+  "topology_rules": {
+    "fixed_order_required": false,
+    "closed_loop_requires_supported_return_path": true,
+    "tri_dimension_closed_loop_requires": [
+      "C",
+      "P",
+      "R"
+    ],
+    "repeated_loop_min_closed_traversals": 2,
+    "self_reinforcing_requires_closed_loop": true,
+    "self_reinforcing_requires_increased_axis": true,
+    "reinforcement_axes": [
+      "SEMANTIC_AUTHORITY",
+      "COLLABORATION_EXECUTION_SCOPE",
+      "TEMPORAL_REACH"
+    ]
+  },
+  "independence": {
+    "monitor_runtime_bundle_read": false,
+    "blind_reference_labels_read": false,
+    "blind_reference_records_read": false,
+    "deepseek_full_context_pilot_outputs_read": false
+  },
+  "comparisons_before_seal": false
+}
