@@ -21,6 +21,17 @@ def _host_application_root(host):
     raise ValueError("prospective host checkout does not expose an application root")
 
 
+def _host_checkout_root(host):
+    checkout = host.checkout
+    root = getattr(checkout, "root", None)
+    if root is not None:
+        return root
+    proxied = getattr(checkout, "checkout", None)
+    if proxied is not None:
+        return proxied
+    raise ValueError("host checkout exposes neither root nor proxied checkout path")
+
+
 def _replication_binding() -> dict[str, Any]:
     return {
         "checkpoint_schema_version": "RB-STAGE2-R7-CHECKPOINT-MANIFEST-v1",
