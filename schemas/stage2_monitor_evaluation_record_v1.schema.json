@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/yu5-520/reality-bias-benchmark/schemas/stage2_monitor_evaluation_record_v1.schema.json",
+  "title": "Stage-II Monitor Evaluation Match Record v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "evaluation_id",
+    "group_id",
+    "cell_id",
+    "monitor_version",
+    "matching_rule_version",
+    "reference_id",
+    "match_class",
+    "observable_reference"
+  ],
+  "properties": {
+    "evaluation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "group_id": {
+      "enum": [
+        "G2",
+        "G3",
+        "G4",
+        "G5"
+      ]
+    },
+    "cell_id": {
+      "type": "string",
+      "pattern": "^X[1-7]-T[1-3]$"
+    },
+    "monitor_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "matching_rule_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reference_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "warning_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "structure_family": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "match_class": {
+      "enum": [
+        "SUPPORTED_MATCH",
+        "PARTIAL_LOCALIZATION",
+        "MISS",
+        "AUDIT_REJECTED_WARNING",
+        "UNSUPPORTED_WARNING",
+        "UNOBSERVABLE_REFERENCE"
+      ]
+    },
+    "observable_reference": {
+      "type": "boolean"
+    },
+    "source_match": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "carrier_match": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "consumer_match": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "decision_link_match": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "lineage_node_reference_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "lineage_node_matched_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "lineage_edge_reference_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "lineage_edge_matched_count": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "first_warning_sequence": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "first_consequence_sequence": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "lead_decisions": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

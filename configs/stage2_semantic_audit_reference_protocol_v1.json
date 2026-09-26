@@ -1,0 +1,130 @@
+{
+  "schema": "stage2-semantic-audit-reference-protocol-v1",
+  "version": "1.0",
+  "date_utc": "2026-09-26",
+  "status": "FROZEN_FORWARD_PROTOCOL",
+  "canonical_plan": "docs/R_Plan_v7.45.md",
+  "scope": "G2_G5_84_NATURAL_TRAJECTORIES",
+  "purpose": "Create an independent within-study semantic/process reference set for experimental synthesis and later monitor evaluation.",
+  "blindness": {
+    "monitor_blind": true,
+    "monitor_runtime_bundle_access": false,
+    "monitor_warning_access": false,
+    "monitor_candidate_access": false,
+    "monitor_confidence_access": false,
+    "monitor_package_access": false,
+    "exception": "Raw execution evidence that was also visible to the monitor remains admissible when sourced from the audit raw bundle rather than monitor-derived labels."
+  },
+  "admissible_inputs": [
+    "native framework events",
+    "messages and handoffs",
+    "protocol traffic",
+    "tool/resource calls",
+    "repository/file state and hashes",
+    "retrieval carriers",
+    "memory write/recall carriers",
+    "compression before/after carriers",
+    "checkpoint metadata needed only for route reconstruction",
+    "termination/return-code evidence",
+    "immutable provenance and run manifests"
+  ],
+  "forbidden_inputs": [
+    "monitor warning labels",
+    "monitor structural candidate labels",
+    "monitor confidence or severity",
+    "monitor-generated CPR prediction",
+    "monitor repair eligibility",
+    "monitor repair package status",
+    "post-repair evidence"
+  ],
+  "audit_unit_levels": [
+    "TRAJECTORY",
+    "STRUCTURE_CASE",
+    "SEMANTIC_NODE",
+    "SEMANTIC_EDGE",
+    "LINEAGE",
+    "NEGATIVE_BOUNDARY"
+  ],
+  "required_reference_fields": [
+    "reference_id",
+    "group_id",
+    "cell_id",
+    "structure_family",
+    "claim_status",
+    "complete_route_ref",
+    "source_ref",
+    "carrier_ref",
+    "semantic_before",
+    "semantic_after",
+    "semantic_delta",
+    "producer_actor",
+    "reader_or_adopter_actor",
+    "relation_type",
+    "decision_or_action_ref",
+    "consequence_ref",
+    "first_observable_sequence",
+    "first_consequence_sequence",
+    "cpr_dimensions",
+    "cross_penetration_path",
+    "closure_state",
+    "evidence_surface_required",
+    "evidence_surface_available",
+    "negative_case",
+    "not_established_fields",
+    "evidence_refs"
+  ],
+  "claim_statuses": [
+    "SUPPORTED",
+    "SUPPORTED_CANDIDATE",
+    "NOT_ESTABLISHED",
+    "NEGATIVE_BOUNDARY"
+  ],
+  "relation_types": [
+    "MERE_VISIBILITY",
+    "READ",
+    "ADOPTION",
+    "SEMANTIC_TRANSFORMATION",
+    "DESCENDANT_INHERITANCE",
+    "DECISION_APPLICATION",
+    "CONSTRAINS",
+    "ENABLES",
+    "REENTRY",
+    "FINALIZATION",
+    "BOUNDARY_PRESERVATION",
+    "NOT_ESTABLISHED"
+  ],
+  "cpr_rule": {
+    "static_labeling_forbidden": true,
+    "requires_observed_process_path": true,
+    "dimensions": [
+      "C",
+      "P",
+      "R"
+    ],
+    "cross_penetration_requires_recorded_path": true
+  },
+  "negative_evidence_rule": {
+    "required": true,
+    "examples": [
+      "memory active without inherited inertia",
+      "historical artifact retained but verified inert",
+      "retrieval active but semantically static",
+      "compression active but effectively no-op",
+      "monitor-visible activity without adoption",
+      "rapid clean closure"
+    ]
+  },
+  "seal_requirements": [
+    "ALL_84_NATURAL_A_SEALED",
+    "AUDIT_INPUT_HASHES_FROZEN",
+    "NO_MONITOR_RUNTIME_BUNDLE_READ",
+    "REFERENCE_RECORDS_COMPLETE_OR_EXPLICITLY_MISSING",
+    "REFERENCE_SET_HASHED_AND_SEALED"
+  ],
+  "downstream_uses": [
+    "EXPERIMENTAL_GENERAL_CHAPTER_SYNTHESIS",
+    "MONITOR_EVALUATION_AFTER_REFERENCE_SEAL",
+    "ENGINEERING_POSTHOC_QUALITY_ASSESSMENT"
+  ],
+  "prohibited_downstream_use": "May not retroactively alter natural trajectories or prospectively generated monitor outputs."
+}

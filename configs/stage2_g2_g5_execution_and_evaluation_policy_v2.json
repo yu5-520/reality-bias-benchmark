@@ -1,0 +1,172 @@
+{
+  "schema": "stage2-g2-g5-execution-and-evaluation-policy-v2",
+  "version": "2.0",
+  "date_utc": "2026-09-26",
+  "status": "FROZEN_POLICY_EXECUTION_NOT_AUTHORIZED",
+  "supersedes": "configs/stage2_g2_g5_prospective_replication_policy_v1.json",
+  "canonical_plan": "docs/R_Plan_v7.45.md",
+  "group_model": {
+    "G1": {
+      "designation": "DISCOVERY_CALIBRATION_REFERENCE",
+      "natural_cells": 21,
+      "state": "IMMUTABLE_COMPLETE",
+      "monitor_benchmark_role": "EXCLUDED_FROM_PRIMARY_PROSPECTIVE_METRICS"
+    },
+    "G2": {
+      "designation": "PROSPECTIVE_REPLICATION_1",
+      "natural_cells": 21,
+      "state": "PLANNED"
+    },
+    "G3": {
+      "designation": "PROSPECTIVE_REPLICATION_2",
+      "natural_cells": 21,
+      "state": "PLANNED"
+    },
+    "G4": {
+      "designation": "PROSPECTIVE_REPLICATION_3",
+      "natural_cells": 21,
+      "state": "PLANNED"
+    },
+    "G5": {
+      "designation": "PROSPECTIVE_REPLICATION_4",
+      "natural_cells": 21,
+      "state": "PLANNED"
+    }
+  },
+  "systems": [
+    "X1",
+    "X2",
+    "X3",
+    "X4",
+    "X5",
+    "X6",
+    "X7"
+  ],
+  "tasks": [
+    "T1",
+    "T2",
+    "T3"
+  ],
+  "prospective_natural_cells_total": 84,
+  "publication_natural_cells_total_if_complete": 105,
+  "first_attempt_only": true,
+  "natural_rerun_policy": "FORBIDDEN_WITHIN_GROUP",
+  "common_horizon": {
+    "target_logical_model_decisions": 64,
+    "state": "REQUIRES_CROSS_WRAPPER_EQUIVALENCE_PREFLIGHT",
+    "cell_specific_extension": false
+  },
+  "canonical_order": [
+    "RUN_AND_FREEZE_G2_21_A",
+    "RUN_AND_FREEZE_G3_21_A",
+    "RUN_AND_FREEZE_G4_21_A",
+    "RUN_AND_FREEZE_G5_21_A",
+    "SEAL_ALL_84_NATURAL_A",
+    "RUN_MONITOR_BLIND_FULL_SEMANTIC_AUDIT",
+    "SEAL_SEMANTIC_AUDIT_REFERENCE_SET",
+    "RUN_EXPERIMENTAL_GENERAL_CHAPTER_SYNTHESIS",
+    "RUN_MONITOR_VS_AUDIT_PRIMARY_EVALUATION",
+    "SEAL_MONITOR_PERFORMANCE_RESULT",
+    "RUN_84_CELL_ENGINEERING_ELIGIBILITY",
+    "SEAL_ENGINEERING_ELIGIBILITY",
+    "RUN_G2_ENGINEERING_BATCH",
+    "RUN_G3_ENGINEERING_BATCH",
+    "RUN_G4_ENGINEERING_BATCH",
+    "RUN_G5_ENGINEERING_BATCH",
+    "RUN_ENGINEERING_GENERAL_CHAPTER_SYNTHESIS"
+  ],
+  "natural_phase": {
+    "all_84_before_any_B": true,
+    "monitor_active": true,
+    "checkpoint_recorder_active": true,
+    "repair_actions": 0,
+    "monitor_feedback_into_subject": false,
+    "semantic_audit_feedback_into_subject": false
+  },
+  "evidence_channels": {
+    "audit_raw_bundle": {
+      "includes": [
+        "native_events",
+        "messages",
+        "protocol_calls",
+        "tool_resource_calls",
+        "repository_state",
+        "carrier_state",
+        "termination_evidence",
+        "checkpoint_metadata_for_route_reconstruction",
+        "hashes_and_provenance"
+      ],
+      "excludes": [
+        "monitor_warning_labels",
+        "monitor_candidate_labels",
+        "monitor_confidence",
+        "repair_package_labels",
+        "monitor_cpr_predictions"
+      ]
+    },
+    "monitor_runtime_bundle": {
+      "includes": [
+        "monitor_version_hash",
+        "observed_surfaces",
+        "warnings",
+        "candidates",
+        "structural_signature",
+        "source_carrier_decision_refs_if_available",
+        "warning_sequence",
+        "coverage",
+        "self_boundary_evidence",
+        "prospective_package_candidates_if_generated"
+      ],
+      "excludes": [
+        "posthoc_semantic_audit_verdicts"
+      ]
+    },
+    "join_gate": [
+      "ALL_84_NATURAL_A_SEALED",
+      "ALL_MONITOR_OUTPUTS_SEALED",
+      "SEMANTIC_AUDIT_REFERENCE_SET_SEALED",
+      "MATCHING_RULES_SEALED"
+    ]
+  },
+  "semantic_audit": {
+    "monitor_blind_until_seal": true,
+    "protocol": "configs/stage2_semantic_audit_reference_protocol_v1.json",
+    "primary_role": "WITHIN_STUDY_REFERENCE_ADJUDICATION"
+  },
+  "monitor_evaluation": {
+    "protocol": "configs/stage2_monitor_evaluation_protocol_v1.json",
+    "primary_population": "G2_G5_84_NATURAL_TRAJECTORIES",
+    "g1_in_primary_metrics": false,
+    "label": "WITHIN_STUDY_PROSPECTIVE_MONITORING_PERFORMANCE"
+  },
+  "engineering_phase": {
+    "begins_after_primary_monitor_evaluation_sealed": true,
+    "eligibility_population": 84,
+    "semantic_audit_may_create_primary_repair_candidate": false,
+    "audit_assisted_repairs_if_any": "SEPARATE_SECONDARY_EXPERIMENT_NOT_POOLED",
+    "batch_order": [
+      "G2",
+      "G3",
+      "G4",
+      "G5"
+    ],
+    "max_B_per_eligible_cell": 1,
+    "repair_executor_exit": true,
+    "second_automatic_repair": false,
+    "monitor_after_repair": "WATCH_ONLY"
+  },
+  "x1_x3": {
+    "natural_observation": true,
+    "primary_monitor_benchmark": true,
+    "semantic_audit": true,
+    "engineering_eligibility_accounting": true,
+    "current_active_midrun_B": false,
+    "reason": "NATIVE_PRESERVATION_RESUMABILITY_BOUNDARY"
+  },
+  "authorization": {
+    "subject_calls": false,
+    "repair_calls": false,
+    "paid_evaluator_calls": false,
+    "next_gate": "FREEZE_84_CELL_NATURAL_BLOCK_LAUNCH_AND_EVIDENCE_CONTRACT"
+  }
+}
