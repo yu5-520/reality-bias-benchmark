@@ -1,0 +1,51 @@
+{
+  "schema": "RB-STAGE2-R7-MONITOR-INPUT-FIREWALL-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN",
+  "purpose": "Keep monitor localization and repair-package construction independent from post-hoc semantic answers.",
+  "allowed_inputs": [
+    "stage2/natural_v7/X1-T1..X7-T3/first_attempt.tar.gz",
+    "stage2/natural_v7/X1-T1..X7-T3/manifest.json",
+    "stage2/native_v7/registry.json",
+    "stage2/native_v7/action_contract_registry.json",
+    "stage2/tasks.json",
+    "stage2/roles.json",
+    "stage2/subject.json"
+  ],
+  "forbidden_inputs": [
+    "stage2/natural_v7/r6_grade_semantic_audit/**",
+    "stage2/natural_v7/r6_grade_material/**",
+    "stage2/natural_v7/*_posthoc_audit.md",
+    "stage2/natural_v7/*_posthoc_audit.json",
+    "stage2/natural_v7/cross_task_cross_layer_audit.md",
+    "stage2/natural_v7/cross_task_cross_layer_audit.json",
+    "docs/reports/2026-09-26/StageII_*Report*.md",
+    "docs/reports/2026-09-26/StageII_Cross_Task_Cross_Layer_Synthesis_and_Paper_Extraction_v1.md",
+    "configs/stage2_cross_task_synthesis_evidence_bundle_v1.json",
+    "configs/stage2_paper_figure_table_registry_v1.json"
+  ],
+  "forbidden_semantic_fields_in_monitor_output": [
+    "cpr_label",
+    "cpr_direction",
+    "semantic_truth_judgment",
+    "human_selected_repair_priority"
+  ],
+  "monitor_output_must_be_structural": [
+    "pressure_refs",
+    "support_refs",
+    "ancestor_refs",
+    "descendant_refs",
+    "affected_closure_refs",
+    "preserve_refs",
+    "repair_anchor_ref",
+    "content_address",
+    "allowed_repair_surface",
+    "native_capability_requirements",
+    "prefix_cutoff_ref"
+  ],
+  "posthoc_only": {
+    "semantic_audit": "May evaluate monitor localization and repair consequences only after monitor-derived package freeze.",
+    "cpr_interpretation": "May classify or interpret frozen monitor/repair evidence only after package freeze."
+  }
+}

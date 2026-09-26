@@ -1,0 +1,45 @@
+name: Stage-II R7 Boundary Freeze Validate
+
+on:
+  pull_request:
+    paths:
+      - "configs/stage2_r7_boundary_contract_v1.json"
+      - "configs/stage2_r7_monitor_input_firewall_v1.json"
+      - "configs/stage2_r7_21_path_source_freeze_v1.json"
+      - "schemas/stage2_r7_monitor_derived_repair_package_v1.schema.json"
+      - "docs/StageII_R7_External_Process_Integrity_Repair_Protocol_v1.0.md"
+      - "docs/R_Plan_v7.36.md"
+      - "scripts/validate_stage2_r7_boundary_freeze_v1.py"
+      - ".github/workflows/stage2-r7-boundary-freeze-validate.yml"
+  push:
+    branches: [main]
+    paths:
+      - "configs/stage2_r7_boundary_contract_v1.json"
+      - "configs/stage2_r7_monitor_input_firewall_v1.json"
+      - "configs/stage2_r7_21_path_source_freeze_v1.json"
+      - "schemas/stage2_r7_monitor_derived_repair_package_v1.schema.json"
+      - "docs/StageII_R7_External_Process_Integrity_Repair_Protocol_v1.0.md"
+      - "docs/R_Plan_v7.36.md"
+      - "scripts/validate_stage2_r7_boundary_freeze_v1.py"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate frozen R7 boundaries and 21 source paths
+        run: python scripts/validate_stage2_r7_boundary_freeze_v1.py
+      - name: Assert no active execution authorization is embedded
+        run: |
+          python - <<'PY'
+          import json
+          p = json.load(open("configs/stage2_r7_boundary_contract_v1.json"))
+          assert p["authorization"]["new_subject_provider_call"] is False
+          assert p["authorization"]["active_repair_execution"] is False
+          assert p["authorization"]["paid_evaluator_call"] is False
+          PY
