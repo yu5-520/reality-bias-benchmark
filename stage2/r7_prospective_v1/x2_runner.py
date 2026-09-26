@@ -11,6 +11,8 @@ from stage2.r7_prospective_v1.integration import MetaGPTIntegratedCheckpointMoni
 from stage2.r7_prospective_v1.online_monitor import OnlineStructuralMonitor
 from stage2.r7_prospective_v1.recorders import MetaGPTBoundaryCheckpointRecorder
 from stage2.r7_prospective_v1.run_manifest import build_run_manifest
+from stage2.r7_prospective_v1.evidence_channels import seal_evidence_channels
+from stage2.r7_prospective_v1.replication_contract import resolve_decision_horizon, run_id, semantic_audit_state
 from stage2.r7_prospective_v1.runtime_event_adapter import (
     PassiveActionTapProvider,
     RuntimeStructuralBridge,
@@ -34,6 +36,8 @@ async def run_x2_natural_A(
     subject_file,
     out_root,
     provider=None,
+    group_id="StageII-R7-G1",
+    decision_horizon=None,
 ):
     task = json.loads(Path(task_file).read_text())
     out = Path(out_root)
@@ -44,6 +48,8 @@ async def run_x2_natural_A(
         from stage2.native_v7.x2_metagpt.runner import build_subject_provider
         subject = json.loads(Path(subject_file).read_text())
         active_provider = build_subject_provider(subject)
+    subject = json.loads(Path(subject_file).read_text())
+    horizon = resolve_decision_horizon(group_id=group_id, subject=subject, requested=decision_horizon)
 
     tap = PassiveActionTapProvider(active_provider)
     registry = CheckpointRegistry(out / "checkpoints")
@@ -52,8 +58,8 @@ async def run_x2_natural_A(
     recorder = MetaGPTBoundaryCheckpointRecorder(
         registry=registry,
         controller=controller,
-        group_id="StageII-R7-G1",
-        run_id=f"StageII-R7-G1-X2-{task['id']}",
+        group_id=group_id,
+        run_id=run_id(group_id=group_id, cell_id=f"X2-{task['id']}"),
         task_id=task["id"],
     )
     bridge = RuntimeStructuralBridge(
@@ -75,6 +81,7 @@ async def run_x2_natural_A(
             observer_root=out / "metagpt_observer",
             provider=tap,
             checkpoint_hook=hook,
+            decision_horizon=horizon,
         )
     except Exception as exc:
         failure = {"type": type(exc).__name__, "message": str(exc)}
@@ -90,8 +97,7 @@ async def run_x2_natural_A(
         _write_json(out / "repair_packages.json", monitor.packages())
         _write_json(out / "runtime_bridge.json", bridge.snapshot())
 
-    subject = json.loads(Path(subject_file).read_text())
-    if tap.total_records > int(subject["limits"]["max_turns"]):
+    if tap.total_records > horizon:
         raise RuntimeError("X2 natural A exceeded frozen turn ceiling")
     manifest = build_run_manifest(
         cell_id=f"X2-{task['id']}",
@@ -105,11 +111,20 @@ async def run_x2_natural_A(
         monitor_snapshot=bridge.snapshot(),
         packages=monitor.packages(),
         natural_subject_calls=tap.total_records if subject_mode else 0,
+        group_id=group_id,
+        semantic_audit_state=semantic_audit_state(group_id=group_id),
     )
     _write_json(out / "run_manifest.json", manifest)
+    channel_seal = seal_evidence_channels(
+        out_root=out,
+        group_id=group_id,
+        cell_id=f"X2-{task['id']}",
+        audit_paths=["natural_A_result.json", "checkpoint_ledger.json", "checkpoints", "metagpt_observer"],
+        monitor_paths=["monitor_evidence.json", "monitor_candidates.json", "repair_packages.json", "runtime_bridge.json"],
+    )
     seal = {
-        "schema": "RB-STAGE2-R7-G1-NATURAL-A-SEAL-v1",
-        "group_id": "StageII-R7-G1",
+        "schema": ("RB-STAGE2-R7-G1-NATURAL-A-SEAL-v1" if group_id == "StageII-R7-G1" else "RB-STAGE2-PROSPECTIVE-NATURAL-A-SEAL-v2"),
+        "group_id": group_id,
         "cell_id": f"X2-{task['id']}",
         "status": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
         "natural_subject_calls": tap.total_records if subject_mode else 0,
@@ -124,9 +139,10 @@ async def run_x2_natural_A(
             if row["repair_gate_status"] == "COMPLETE_FOR_STRUCTURED_REPAIR"
         ),
         "run_manifest_hash": manifest["manifest_hash"],
+        **channel_seal,
         "natural_result_hash": digest(result),
         "repair_actions_during_A": 0,
-        "semantic_audit_state": "LOCKED_UNTIL_A_AND_B_FROZEN",
+        "semantic_audit_state": semantic_audit_state(group_id=group_id),
     }
     _write_json(out / "seal.json", seal)
     return seal
@@ -139,6 +155,8 @@ def main():
     parser.add_argument("--roles-file", required=True)
     parser.add_argument("--subject-file", required=True)
     parser.add_argument("--out-root", required=True)
+    parser.add_argument("--group-id", default="StageII-R7-G1")
+    parser.add_argument("--decision-horizon", type=int)
     args = parser.parse_args()
     result = asyncio.run(
         run_x2_natural_A(
@@ -147,6 +165,8 @@ def main():
             roles_file=args.roles_file,
             subject_file=args.subject_file,
             out_root=args.out_root,
+            group_id=args.group_id,
+            decision_horizon=args.decision_horizon,
         )
     )
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
