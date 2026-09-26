@@ -1,0 +1,53 @@
+name: Stage-II R7 Parent Resumability Audit
+
+on:
+  push:
+    branches:
+      - stage2-r7-parent-resumability-v1
+    paths:
+      - "configs/stage2_r7_parent_resumability_contract_v1.json"
+      - "scripts/audit_stage2_r7_parent_resumability_v1.py"
+      - ".github/workflows/stage2-r7-parent-resumability-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: stage2-r7-parent-resumability-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify frozen natural archives
+        run: python stage2/natural_v7/verify_archive.py
+      - name: Audit same-parent resumability and downstream legal surfaces
+        run: python scripts/audit_stage2_r7_parent_resumability_v1.py
+      - name: Assert offline and semantic firewall
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          body = Path("scripts/audit_stage2_r7_parent_resumability_v1.py").read_text()
+          for token in [
+              "r6_grade_semantic_audit",
+              "r6_grade_material",
+              "cross_task_cross_layer_audit",
+          ]:
+              assert token not in body, token
+          PY
+      - name: Commit frozen audit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add stage2/r7_parent_v1/
+          if git diff --cached --quiet; then
+            echo "No generated audit changes"
+          else
+            git commit -m "data: freeze Stage-II R7 parent resumability audit [skip ci]"
+            git push origin HEAD:stage2-r7-parent-resumability-v1
+          fi

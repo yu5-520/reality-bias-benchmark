@@ -1,0 +1,65 @@
+{
+  "schema": "RB-STAGE2-R7-PARENT-RESUMABILITY-CONTRACT-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_BEFORE_RESUMABILITY_AUDIT",
+  "source_monitor_freeze": "configs/stage2_r7_offline_monitor_freeze_v1.json",
+  "principle": "Same-parent repair requires machine-verifiable native continuation state; partial application-state reconstruction is evidence but is not sufficient for active repair.",
+  "verification_levels": [
+    {
+      "level": "L0_PREFIX_BOUND",
+      "requires": ["frozen source archive", "monitor prefix cutoff", "ordered structural evidence"]
+    },
+    {
+      "level": "L1_APPLICATION_STATE_BOUND",
+      "requires": ["application/checkout state at prefix reconstructed from frozen deterministic actions", "state hash"]
+    },
+    {
+      "level": "L2_MODEL_VISIBLE_CONTEXT_BOUND",
+      "requires": ["messages/inbox/tool observations visible at next native model step", "context hash or exact frozen bytes"]
+    },
+    {
+      "level": "L3_NATIVE_RUNTIME_STATE_BOUND",
+      "requires": ["scheduler/queue/session/team state required by the native framework", "remaining horizon"]
+    },
+    {
+      "level": "L4_NATIVE_RESUME_VERIFIED",
+      "requires": ["public/native restore path", "no private-state mutation", "no subject/model replay", "all lower levels"]
+    }
+  ],
+  "active_repair_gate": "L4_NATIVE_RESUME_VERIFIED",
+  "forbidden_reconstruction": [
+    "STOCHASTIC_PREFIX_RERUN",
+    "SUBJECT_OR_MODEL_CALL_TO_RECREATE_PREFIX",
+    "PRIVATE_RUNTIME_STATE_MUTATION",
+    "SYNTHETIC_MESSAGE_OR_OBSERVATION_FILL",
+    "POSTHOC_SEMANTIC_AUDIT_AS_RECONSTRUCTION_INPUT",
+    "FRAMEWORK_OR_PROTOCOL_PATCH_FOR_RESTORE"
+  ],
+  "partial_evidence_policy": {
+    "application_state_verified_but_native_state_missing": "PARENT_RECONSTRUCTION_BLOCKED",
+    "native_messages_visible_but_checkout_state_missing": "PARENT_RECONSTRUCTION_BLOCKED",
+    "no_public_restore_path_proven": "PARENT_RECONSTRUCTION_BLOCKED"
+  },
+  "foreign_carrier_binding": {
+    "allowed_evidence": "RAW_STRUCTURAL_PREFIX_ONLY",
+    "required_for_binding": [
+      "immutable carrier ref",
+      "same-prefix-or-earlier downstream application/process object",
+      "native legal repair capability",
+      "machine-addressable relation without semantic inference"
+    ],
+    "forbidden_targets": [
+      "RAG_CORPUS_INDEX_EMBEDDING_RETRIEVAL_STATE",
+      "MEMORYBANK_MEMORY_INDEX_STRENGTH_RECALL_STATE",
+      "LONGLMLINGUA_MODEL_CHECKPOINT_COMPRESSION_STATE"
+    ],
+    "missing_binding": "LINEAGE_GAP_BLOCKED"
+  },
+  "authorization": {
+    "provider_calls": false,
+    "evaluator_calls": false,
+    "active_repair": false,
+    "offline_archive_replay": true
+  }
+}
