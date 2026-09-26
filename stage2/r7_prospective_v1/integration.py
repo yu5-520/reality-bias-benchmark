@@ -10,6 +10,27 @@ from stage2.r7_prospective_v1.runtime_event_adapter import (
 )
 
 
+def _application_root(host):
+    root = getattr(host.checkout, "root", None)
+    if root is not None:
+        return root
+    proxy_root = getattr(host.checkout, "checkout", None)
+    if proxy_root is not None:
+        return proxy_root
+    raise ValueError("prospective host checkout does not expose an application root")
+
+
+def _host_checkout_root(host):
+    checkout = host.checkout
+    root = getattr(checkout, "root", None)
+    if root is not None:
+        return root
+    proxied = getattr(checkout, "checkout", None)
+    if proxied is not None:
+        return proxied
+    raise ValueError("host checkout exposes neither root nor proxied checkout path")
+
+
 class HostIntegratedCheckpointMonitorHook:
     """Checkpoint first, then feed the completed turn's passive structural copy."""
 
@@ -31,14 +52,14 @@ class HostIntegratedCheckpointMonitorHook:
         if boundary == "AFTER_HOST_TURN_RETURNS":
             packages = self.bridge.flush_turn(
                 checkpoint_manifest=manifest,
-                checkout_root=host.checkout.root,
+                checkout_root=_application_root(host),
                 carrier_refs=carrier_refs,
             )
         elif boundary == "TERMINAL":
             packages = self.bridge.feed_terminal(
                 checkpoint_manifest=manifest,
                 pending_roles=len(host.queue),
-                checkout_root=host.checkout.root,
+                checkout_root=_application_root(host),
             )
         row = {
             "boundary": boundary,

@@ -20,6 +20,7 @@ class PassiveActionTapProvider:
     def __init__(self, provider):
         self.provider = provider
         self.records: list[dict[str, Any]] = []
+        self.total_records = 0
 
     def _record(self, result, metadata):
         row = {
@@ -36,6 +37,7 @@ class PassiveActionTapProvider:
         except (KeyError, TypeError, json.JSONDecodeError):
             pass
         self.records.append(row)
+        self.total_records += 1
         return result
 
     def complete_agent(self, messages, metadata=None):

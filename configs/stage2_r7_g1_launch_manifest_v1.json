@@ -1,0 +1,237 @@
+{
+  "schema": "RB-STAGE2-R7-G1-LAUNCH-MANIFEST-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_READY_AWAITING_EXPLICIT_ACTIVE_EXECUTION_AUTHORIZATION",
+  "source_main_sha": "bbc4d0528aa86721acb4f19a08ad4167728806e4",
+  "group_id": "StageII-R7-G1",
+  "relation_to_original_stage2": {
+    "original_21_natural_paths": "IMMUTABLE_REFERENCE_BASELINE",
+    "prospective_active_extension_cells": 15,
+    "omitted_new_runs": [
+      "X1-T1",
+      "X1-T2",
+      "X1-T3",
+      "X3-T1",
+      "X3-T2",
+      "X3-T3"
+    ],
+    "omission_reason": "X1 AutoGen mid-run and X3 nested A2A call-stack do not expose a proven legal FULL_NATIVE repair parent. Re-running them would create new natural evidence without enabling the paired R7 repair branch.",
+    "boundary_evidence_retained": true
+  },
+  "execution_order": {
+    "phase_1": "RUN_AND_FREEZE_ALL_15_NATURAL_A_FIRST_ATTEMPTS",
+    "phase_2": "AFTER_ALL_A_FROZEN_SELECT_EARLIEST_COMPLETE_PACKAGE_PER_CELL",
+    "phase_3": "RUN_AT_MOST_ONE_B_PER_ELIGIBLE_CELL_FROM_FROZEN_PARENT",
+    "phase_4": "FREEZE_ALL_B_AND_POST_REPAIR_WATCH",
+    "phase_5": "ONLY_THEN_OPEN_POSTHOC_SEMANTIC_AUDIT"
+  },
+  "cells": [
+    {
+      "order": 1,
+      "cell_id": "X2-T1",
+      "system_id": "X2",
+      "task_id": "T1",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.x2_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    },
+    {
+      "order": 2,
+      "cell_id": "X2-T2",
+      "system_id": "X2",
+      "task_id": "T2",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.x2_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    },
+    {
+      "order": 3,
+      "cell_id": "X2-T3",
+      "system_id": "X2",
+      "task_id": "T3",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.x2_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    },
+    {
+      "order": 4,
+      "cell_id": "X4-T1",
+      "system_id": "X4",
+      "task_id": "T1",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.capability_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    },
+    {
+      "order": 5,
+      "cell_id": "X4-T2",
+      "system_id": "X4",
+      "task_id": "T2",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.capability_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    },
+    {
+      "order": 6,
+      "cell_id": "X4-T3",
+      "system_id": "X4",
+      "task_id": "T3",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.capability_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    },
+    {
+      "order": 7,
+      "cell_id": "X5-T1",
+      "system_id": "X5",
+      "task_id": "T1",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.capability_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    },
+    {
+      "order": 8,
+      "cell_id": "X5-T2",
+      "system_id": "X5",
+      "task_id": "T2",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.capability_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    },
+    {
+      "order": 9,
+      "cell_id": "X5-T3",
+      "system_id": "X5",
+      "task_id": "T3",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.capability_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    },
+    {
+      "order": 10,
+      "cell_id": "X6-T1",
+      "system_id": "X6",
+      "task_id": "T1",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.capability_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    },
+    {
+      "order": 11,
+      "cell_id": "X6-T2",
+      "system_id": "X6",
+      "task_id": "T2",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.capability_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    },
+    {
+      "order": 12,
+      "cell_id": "X6-T3",
+      "system_id": "X6",
+      "task_id": "T3",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.capability_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    },
+    {
+      "order": 13,
+      "cell_id": "X7-T1",
+      "system_id": "X7",
+      "task_id": "T1",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.capability_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    },
+    {
+      "order": 14,
+      "cell_id": "X7-T2",
+      "system_id": "X7",
+      "task_id": "T2",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.capability_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    },
+    {
+      "order": 15,
+      "cell_id": "X7-T3",
+      "system_id": "X7",
+      "task_id": "T3",
+      "natural_attempts": 1,
+      "natural_A_runner": "stage2.r7_prospective_v1.capability_runner",
+      "natural_A_repair_actions": 0,
+      "active_B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+      "active_B_max": 1,
+      "semantic_audit_before_B": false
+    }
+  ],
+  "evidence_root": "stage2/r7_g1_v1",
+  "required_natural_outputs": [
+    "natural_A_result.json",
+    "checkpoint_ledger.json",
+    "monitor_evidence.json",
+    "monitor_candidates.json",
+    "repair_packages.json",
+    "runtime_bridge.json",
+    "run_manifest.json",
+    "seal.json"
+  ],
+  "repair_output_root_pattern": "stage2/r7_g1_v1/repair_B/{cell_id}/{package_id}",
+  "natural_output_root_pattern": "stage2/r7_g1_v1/natural_A/{cell_id}",
+  "package_policy": {
+    "freeze_all_monitor_packages": true,
+    "active_B_limit_per_cell": 1,
+    "active_B_selector": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+    "later_complete_packages": "FROZEN_DEFERRED_NOT_DISCARDED",
+    "semantic_selection": false,
+    "cpr_selection": false
+  },
+  "authorization": {
+    "subject_calls": false,
+    "repair_calls": false,
+    "paid_evaluator_calls": false
+  }
+}
