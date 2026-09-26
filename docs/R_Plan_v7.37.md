@@ -42,7 +42,9 @@ Frozen artifacts:
 - `stage2/r7_monitor_v1/parent_reconstruction_preflight.jsonl`;
 - `stage2/r7_monitor_v1/offline_prefix_replay_report_v1.md`;
 - `stage2/r7_monitor_v1/package_assembly_report_v1.md`;
-- `stage2/r7_monitor_v1/summary.json`.
+- `stage2/r7_monitor_v1/summary.json`;
+- `configs/stage2_r7_offline_monitor_freeze_v1.json`;
+- `docs/reports/2026-09-26/StageII_R7_Offline_Structural_Monitor_and_Repair_Package_Freeze_Report_v1.md`.
 
 ## 3. Monitor-rule freeze
 
@@ -72,7 +74,7 @@ Case-independent structural assembly is frozen in:
 
 It merges structurally connected candidate signals into lineage-bounded episodes while preserving all raw candidate rows.
 
-Final package accounting:
+Final package accounting (freeze manifest summary hash `a7372e03200ea02a819f540953bf9d41a08a862625ba0876f8e8926721b7ad3d`):
 
 - PARENT_RECONSTRUCTION_BLOCKED: 16;
 - LINEAGE_GAP_BLOCKED: 7;
