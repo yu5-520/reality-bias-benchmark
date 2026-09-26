@@ -1,0 +1,93 @@
+{
+  "schema": "RB-STAGE2-R7-G1-EXECUTION-READINESS-FREEZE-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_READY_AWAITING_EXPLICIT_ACTIVE_EXECUTION_AUTHORIZATION",
+  "preflight_workflow_run_id": 36231012529,
+  "tested_head_sha": "356a626674f83424afcc0a9908ae81edd85f5c15",
+  "provider_calls": 0,
+  "subject_calls": 0,
+  "active_repairs": 0,
+  "results": {
+    "X2": {
+      "status": "PASS",
+      "decision_count": 2,
+      "checkpoint_count": 4,
+      "control_flow_equivalent": true,
+      "checkout_equivalent": true,
+      "manifest_hash": "93161fdcfc95af10f0389cf33b503bd36d53ff40c2be69c9a1916375a566d31e"
+    },
+    "X4": {
+      "status": "PASS",
+      "decision_count": 2,
+      "checkpoint_count": 4,
+      "control_flow_equivalent": true,
+      "checkout_equivalent": true,
+      "manifest_hash": "85d6de50df1f1a0397192f1b1e4b4d8ff655b772b32c42d9a0fee26ab823dff4",
+      "mcp_protocol_modified": false
+    },
+    "X5": {
+      "status": "PASS",
+      "decision_count": 2,
+      "checkpoint_count": 4,
+      "control_flow_equivalent": true,
+      "checkout_equivalent": true,
+      "manifest_hash": "844102077e37dceab2a9a6193033e9023747390a690a434141826c3b72d050e8",
+      "rag_internal_mutation": false
+    },
+    "X6": {
+      "status": "PASS",
+      "decision_count": 2,
+      "checkpoint_count": 4,
+      "control_flow_equivalent": true,
+      "checkout_equivalent": true,
+      "manifest_hash": "cf1c5b79bdd5279ebdcf156aed5f54ee17a105a21f906cdc116dfa8db7a6d2ea",
+      "foreign_memory_mutated_by_repair": false
+    },
+    "X7": {
+      "status": "PASS",
+      "decision_count": 1,
+      "checkpoint_count": 3,
+      "control_flow_equivalent": true,
+      "checkout_equivalent": true,
+      "manifest_hash": "f1afb7f02eb201d1be0a052ff0f65a5f5a44ed9099f54a4d68d7a9a306a7b590",
+      "compressor_state_mutated_by_repair": false
+    }
+  },
+  "active_extension": {
+    "systems": [
+      "X2",
+      "X4",
+      "X5",
+      "X6",
+      "X7"
+    ],
+    "tasks": [
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "prospective_natural_cells": 15,
+    "active_B_max_per_cell": 1,
+    "active_B_selector": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+    "original_21_reference_paths": "IMMUTABLE"
+  },
+  "excluded_new_subject_runs": {
+    "X1": "MIDRUN_AUTOGEN_CHECKPOINT_BOUNDARY_BLOCKED",
+    "X3": "NESTED_A2A_CALLSTACK_CHECKPOINT_BOUNDARY_BLOCKED",
+    "rule": "Do not spend new stochastic subject runs where paired active repair cannot legally branch under the frozen boundary."
+  },
+  "resource_ceiling": {
+    "natural_logical_model_invocations": 960,
+    "B_logical_model_invocations": 960,
+    "total_logical_model_invocations": 1920,
+    "absolute_network_attempt_ceiling": 5760,
+    "paid_evaluator_calls": 0
+  },
+  "authorization": {
+    "active_subject_execution": false,
+    "active_repair_execution": false,
+    "paid_evaluation": false,
+    "next": "EXPLICIT_ACTIVE_EXECUTION_AUTHORIZATION_REQUIRED"
+  }
+}
