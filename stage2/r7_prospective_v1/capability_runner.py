@@ -17,6 +17,8 @@ from stage2.r7_prospective_v1.integration import HostIntegratedCheckpointMonitor
 from stage2.r7_prospective_v1.online_monitor import OnlineStructuralMonitor
 from stage2.r7_prospective_v1.recorders import HostBoundaryCheckpointRecorder
 from stage2.r7_prospective_v1.run_manifest import build_run_manifest
+from stage2.r7_prospective_v1.evidence_channels import seal_evidence_channels
+from stage2.r7_prospective_v1.replication_contract import resolve_decision_horizon, run_id, semantic_audit_state
 from stage2.r7_prospective_v1.runtime_event_adapter import (
     PassiveActionTapProvider,
     RuntimeStructuralBridge,
@@ -109,10 +111,13 @@ async def run_capability_natural_A(
     x6_embedding_manifest=None,
     x7_checkpoint=None,
     x7_checkpoint_manifest=None,
+    group_id="StageII-R7-G1",
+    decision_horizon=None,
 ):
     if system not in {"X4", "X5", "X6", "X7"}:
         raise ValueError("capability runner supports X4-X7")
     task, subject = _load_inputs(task_file, roles_file, subject_file)
+    horizon = resolve_decision_horizon(group_id=group_id, subject=subject, requested=decision_horizon)
     out = Path(out_root)
     out.mkdir(parents=True, exist_ok=False)
     checkpoint_root = out / "checkpoints"
@@ -135,8 +140,8 @@ async def run_capability_natural_A(
         registry=registry,
         controller=controller,
         system_id=system_ids[system],
-        group_id="StageII-R7-G1",
-        run_id=f"StageII-R7-G1-{system}-{task['id']}",
+        group_id=group_id,
+        run_id=run_id(group_id=group_id, cell_id=f"{system}-{task['id']}"),
         task_id=task["id"],
     )
     bridge = RuntimeStructuralBridge(
@@ -156,6 +161,7 @@ async def run_capability_natural_A(
             checkout=checkout,
             provider=tap,
             max_turns=int(subject["limits"]["max_turns"]),
+            decision_horizon=horizon,
             checkpoint_hook=hook,
         )
         host.checkout = MCPCheckoutProxy(checkout, observer_root=capability_observer)
@@ -174,6 +180,7 @@ async def run_capability_natural_A(
             checkout=checkout,
             provider=tap,
             max_turns=int(subject["limits"]["max_turns"]),
+            decision_horizon=horizon,
             checkpoint_hook=hook,
         )
         framework_binding = {
@@ -200,6 +207,7 @@ async def run_capability_natural_A(
             checkout=checkout,
             provider=tap,
             max_turns=int(subject["limits"]["max_turns"]),
+            decision_horizon=horizon,
             checkpoint_hook=hook,
         )
         framework_binding = {
@@ -231,6 +239,7 @@ async def run_capability_natural_A(
             checkout=checkout,
             provider=tap,
             max_turns=int(subject["limits"]["max_turns"]),
+            decision_horizon=horizon,
             checkpoint_hook=hook,
         )
         framework_binding = {
@@ -262,7 +271,7 @@ async def run_capability_natural_A(
         _write_json(out / "repair_packages.json", monitor.packages())
         _write_json(out / "runtime_bridge.json", bridge.snapshot())
 
-    if tap.total_records > int(subject["limits"]["max_turns"]):
+    if tap.total_records > horizon:
         raise RuntimeError("prospective natural A exceeded frozen model-turn ceiling")
     if result is None:
         raise RuntimeError("prospective natural A produced no result")
@@ -275,11 +284,20 @@ async def run_capability_natural_A(
         monitor_snapshot=bridge.snapshot(),
         packages=monitor.packages(),
         natural_subject_calls=tap.total_records if subject_mode else 0,
+        group_id=group_id,
+        semantic_audit_state=semantic_audit_state(group_id=group_id),
     )
     _write_json(out / "run_manifest.json", manifest)
+    channel_seal = seal_evidence_channels(
+        out_root=out,
+        group_id=group_id,
+        cell_id=f"{system}-{task['id']}",
+        audit_paths=["natural_A_result.json", "checkpoint_ledger.json", "checkpoints", "capability_observer", "memorybank_state"],
+        monitor_paths=["monitor_evidence.json", "monitor_candidates.json", "repair_packages.json", "runtime_bridge.json"],
+    )
     seal = {
-        "schema": "RB-STAGE2-R7-G1-NATURAL-A-SEAL-v1",
-        "group_id": "StageII-R7-G1",
+        "schema": ("RB-STAGE2-R7-G1-NATURAL-A-SEAL-v1" if group_id == "StageII-R7-G1" else "RB-STAGE2-PROSPECTIVE-NATURAL-A-SEAL-v2"),
+        "group_id": group_id,
         "cell_id": f"{system}-{task['id']}",
         "status": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
         "natural_subject_calls": tap.total_records if subject_mode else 0,
@@ -294,9 +312,10 @@ async def run_capability_natural_A(
             if row["repair_gate_status"] == "COMPLETE_FOR_STRUCTURED_REPAIR"
         ),
         "run_manifest_hash": manifest["manifest_hash"],
+        **channel_seal,
         "natural_result_hash": digest(result),
         "repair_actions_during_A": 0,
-        "semantic_audit_state": "LOCKED_UNTIL_A_AND_B_FROZEN",
+        "semantic_audit_state": semantic_audit_state(group_id=group_id),
     }
     _write_json(out / "seal.json", seal)
     return seal
@@ -315,6 +334,8 @@ def main():
     parser.add_argument("--x6-embedding-manifest")
     parser.add_argument("--x7-checkpoint")
     parser.add_argument("--x7-checkpoint-manifest")
+    parser.add_argument("--group-id", default="StageII-R7-G1")
+    parser.add_argument("--decision-horizon", type=int)
     args = parser.parse_args()
     result = asyncio.run(
         run_capability_natural_A(
@@ -329,6 +350,8 @@ def main():
             x6_embedding_manifest=args.x6_embedding_manifest,
             x7_checkpoint=args.x7_checkpoint,
             x7_checkpoint_manifest=args.x7_checkpoint_manifest,
+            group_id=args.group_id,
+            decision_horizon=args.decision_horizon,
         )
     )
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
