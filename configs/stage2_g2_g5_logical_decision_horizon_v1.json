@@ -1,0 +1,69 @@
+{
+  "schema": "stage2-prospective-logical-decision-horizon-v1",
+  "version": "1.0",
+  "date_utc": "2026-09-26",
+  "applies_to_groups": [
+    "G2",
+    "G3",
+    "G4",
+    "G5"
+  ],
+  "logical_decision_definition": "One actual model/provider decision call consumed by the studied execution path.",
+  "common_ceiling": 64,
+  "native_early_termination": true,
+  "cell_specific_extension": false,
+  "subject_model_binding": "stage2/subject.json",
+  "subject_model_parameters_unchanged": true,
+  "historical_g1_turn_ceiling": 32,
+  "mappings": {
+    "X1": {
+      "counter": "CountingModelClient.create_calls",
+      "native_scheduler_limit": "AutoGen Swarm max_turns",
+      "ceiling_binding": "set Swarm max_turns=64; assert model-client create_calls<=64",
+      "scheduler_unit_not_primary_metric": true
+    },
+    "X2": {
+      "counter": "RuntimeState.turns == provider complete_json calls == PassiveActionTapProvider.total_records",
+      "native_scheduler_limit": "MetaGPT RuntimeState.max_turns",
+      "ceiling_binding": "set RuntimeState.max_turns=64",
+      "scheduler_unit_not_primary_metric": true
+    },
+    "X3": {
+      "counter": "sum of nested A2A role-service turns_used",
+      "native_scheduler_limit": "remaining_turns propagated through official A2A role calls",
+      "ceiling_binding": "initial remaining_turns=64; nested calls consume the same shared remaining budget",
+      "scheduler_unit_not_primary_metric": true
+    },
+    "X4": {
+      "counter": "PassiveActionTapProvider.total_records",
+      "native_scheduler_limit": "software-engineering host max_turns",
+      "ceiling_binding": "prospective observation horizon=64",
+      "scheduler_unit_not_primary_metric": true
+    },
+    "X5": {
+      "counter": "PassiveActionTapProvider.total_records",
+      "native_scheduler_limit": "software-engineering host max_turns",
+      "ceiling_binding": "prospective observation horizon=64",
+      "scheduler_unit_not_primary_metric": true
+    },
+    "X6": {
+      "counter": "PassiveActionTapProvider.total_records",
+      "native_scheduler_limit": "software-engineering host max_turns",
+      "ceiling_binding": "prospective observation horizon=64",
+      "scheduler_unit_not_primary_metric": true
+    },
+    "X7": {
+      "counter": "PassiveActionTapProvider.total_records",
+      "native_scheduler_limit": "software-engineering host max_turns",
+      "ceiling_binding": "prospective observation horizon=64",
+      "scheduler_unit_not_primary_metric": true
+    }
+  },
+  "invariants": [
+    "The DeepSeek model/provider/temperature/max_tokens/thinking configuration remains stage2/subject.json.",
+    "Only the prospective observation horizon changes from the G1 historical 32-turn boundary to 64 logical model decisions.",
+    "Native scheduler/message/protocol counts remain separately recorded and are not normalized into fake common events.",
+    "No individual cell may exceed 64 because it appears close to closure.",
+    "A cell may stop naturally before 64."
+  ]
+}
