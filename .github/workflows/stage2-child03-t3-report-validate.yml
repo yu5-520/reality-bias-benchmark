@@ -1,0 +1,65 @@
+name: Stage-II Child Report 03 T3 Validate
+
+on:
+  pull_request:
+    paths:
+      - 'docs/reports/2026-09-26/StageII_Child03_T3_Functional_Cut_Historical_Residue_and_Semantic_Closure_Report_v1.md'
+      - 'configs/stage2_child03_t3_report_evidence_bundle_v1.json'
+      - 'schemas/process_reality_report_evidence_bundle_v0.2.schema.json'
+      - 'docs/reporting/process_reality_report_standard_v1_10.md'
+      - 'scripts/validate_stage2_child03_t3_report_v1.py'
+      - 'docs/R_Plan_v7.34.md'
+      - 'theory/change_notes/CN-R-108_stage2_child03_t3_historical_residue_freeze.md'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/reports/2026-09-26/StageII_Child03_T3_Functional_Cut_Historical_Residue_and_Semantic_Closure_Report_v1.md'
+      - 'configs/stage2_child03_t3_report_evidence_bundle_v1.json'
+      - 'schemas/process_reality_report_evidence_bundle_v0.2.schema.json'
+      - 'docs/reporting/process_reality_report_standard_v1_10.md'
+      - 'scripts/validate_stage2_child03_t3_report_v1.py'
+      - 'docs/R_Plan_v7.34.md'
+      - 'theory/change_notes/CN-R-108_stage2_child03_t3_historical_residue_freeze.md'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-child03-t3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate Stage-II Child Report 03 T3
+        run: python scripts/validate_stage2_child03_t3_report_v1.py
+      - name: Assert report layer cannot execute real subjects
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          files=[
+              'docs/reports/2026-09-26/StageII_Child03_T3_Functional_Cut_Historical_Residue_and_Semantic_Closure_Report_v1.md',
+              'configs/stage2_child03_t3_report_evidence_bundle_v1.json',
+              'scripts/validate_stage2_child03_t3_report_v1.py',
+          ]
+          forbidden=[
+              'DEEPSEEK' + '_API_KEY',
+              'DASHSCOPE' + '_API_KEY',
+              'OPENAI' + '_API_KEY',
+              'CALL_' + 'REAL_',
+              '--execute-' + 'real',
+          ]
+          hits=[]
+          for f in files:
+              t=Path(f).read_text(encoding='utf-8')
+              for x in forbidden:
+                  if x in t:
+                      hits.append((f,x))
+          if hits:
+              raise SystemExit('real-subject capability in report layer: '+repr(hits))
+          print('PASS: Child Report 03 layer contains no real-subject execution authorization')
+          PY
