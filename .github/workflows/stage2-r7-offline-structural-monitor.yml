@@ -7,6 +7,8 @@ on:
     paths:
       - "configs/stage2_r7_structural_monitor_rules_v1.json"
       - "scripts/run_stage2_r7_structural_monitor_v1.py"
+      - "configs/stage2_r7_package_assembly_rules_v1.json"
+      - "scripts/assemble_stage2_r7_repair_packages_v1.py"
       - ".github/workflows/stage2-r7-offline-structural-monitor.yml"
   workflow_dispatch:
 
@@ -28,11 +30,13 @@ jobs:
         run: python stage2/natural_v7/verify_archive.py
       - name: Run future-blind structural monitor
         run: python scripts/run_stage2_r7_structural_monitor_v1.py
+      - name: Assemble lineage-bounded structural packages
+        run: python scripts/assemble_stage2_r7_repair_packages_v1.py
       - name: Assert semantic firewall
         run: |
           python - <<'PY'
           from pathlib import Path
-          body = Path("scripts/run_stage2_r7_structural_monitor_v1.py").read_text()
+          body = Path("scripts/run_stage2_r7_structural_monitor_v1.py").read_text() + "\n" + Path("scripts/assemble_stage2_r7_repair_packages_v1.py").read_text()
           forbidden = [
               "r6_grade_semantic_audit",
               "r6_grade_material",
