@@ -1,11 +1,9 @@
 name: Stage-II G3 21A Active Natural Execution v1
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/stage2-g3-21a-active-natural.yml"
-      - "configs/stage2_g3_active_natural_authorization_v1.json"
+  workflow_run:
+    workflows: ["Stage-II G2 21A Active Natural Execution v1"]
+    types: [completed]
 
 permissions:
   contents: write
@@ -23,7 +21,34 @@ env:
   DECISION_HORIZON: "64"
 
 jobs:
+  previous-group-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Verify G2 21/21 evidence seal before G3
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREV_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$PREV_CONCLUSION" = success
+          gh api "repos/$GITHUB_REPOSITORY/contents/stage2/replication_v2/G2/group_index.json?ref=stage2-g2-natural-evidence-v1" --jq .content | base64 -d > /tmp/previous_group_index.json
+          python - <<'PY'
+          import json
+          p=json.load(open("/tmp/previous_group_index.json"))
+          assert p["group_id"]=="G2"
+          assert p["complete"] is True
+          assert p["preserved_count"]==21
+          assert p["first_attempt_only"] is True
+          assert p["repair_actions_during_A"]==0
+          assert p["semantic_audit_state"]=="LOCKED_UNTIL_ALL_84_NATURAL_A_AND_REFERENCE_AUDIT_GATE"
+          assert p["scientific_code_sha"]=="b4f1441a48b2bc6a2c61035311419fc4509e8913"
+          print("PASS: G2 21/21 frozen; G3 may enter pre-claim setup")
+          PY
+
   g3-natural-cells:
+    needs: previous-group-gate
     runs-on: ubuntu-latest
     timeout-minutes: 240
     strategy:
@@ -57,6 +82,7 @@ jobs:
       - name: Checkout active control plane
         uses: actions/checkout@v4
         with:
+          ref: main
           path: control
           fetch-depth: 1
 
