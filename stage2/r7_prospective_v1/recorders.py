@@ -11,6 +11,16 @@ from stage2.r7_checkpoint_v1.host_adapter import SoftwareHostCheckpointAdapter
 from stage2.r7_checkpoint_v1.metagpt_adapter import MetaGPTNativeCheckpointAdapter
 
 
+def _host_application_root(host):
+    root = getattr(host.checkout, "root", None)
+    if root is not None:
+        return root
+    proxy_root = getattr(host.checkout, "checkout", None)
+    if proxy_root is not None:
+        return proxy_root
+    raise ValueError("prospective host checkout does not expose an application root")
+
+
 def _replication_binding() -> dict[str, Any]:
     return {
         "checkpoint_schema_version": "RB-STAGE2-R7-CHECKPOINT-MANIFEST-v1",
@@ -57,7 +67,7 @@ class HostBoundaryCheckpointRecorder:
             system_id=self.system_id,
             host=host,
             registry=self.registry,
-            application_root=host.checkout.root,
+            application_root=_host_application_root(host),
             group_id=self.group_id,
             run_id=self.run_id,
             task_id=self.task_id,
