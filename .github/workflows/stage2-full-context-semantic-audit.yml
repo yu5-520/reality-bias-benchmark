@@ -40,6 +40,7 @@ concurrency:
 env:
   AUTH_ISSUE: "264"
   RECOVERY_ISSUE: "266"
+  PROVIDER_RECOVERY_ISSUE: "269"
   OUTPUT_BRANCH: stage2-full-context-semantic-audit-results-v1
   OUTPUT_ROOT: stage2/replication_v2/full_context_semantic_audit_v1
 
@@ -98,8 +99,28 @@ jobs:
           assert r["evidence_packet_change"] is False
           assert r["preserve_provider_raw_before_validation"] is True
           assert r["known_unaccounted_prevalidation_provider_calls"]==1
-          assert r["unaccounted_prevalidation_call_reserve_usd"]==0.5
-          print("PASS: Layer-C contract + validator recovery are bounded and reference-label-blind")
+          assert r["unaccounted_prevalidation_call_reserve_usd"]==1.0
+          f=p["provider_format_recovery"]
+          assert f["recovery_issue"]==269
+          assert f["prior_workflow_run"]==36259829075
+          assert f["prior_control_commit"]=="0085b1a42074333ea8a0ca3226cf19cf47b8acae"
+          assert f["preserved_completed_cells"]==12
+          assert f["rerun_preserved_completed_cells"] is False
+          assert f["failure_cell"]=="G2-X5-T1"
+          assert f["technical_recovery_execution_count"]==1
+          assert f["uses_existing_identical_request_policy"] is True
+          assert f["adaptive_reprompt"] is False
+          assert f["scientific_prompt_change"] is False
+          assert f["model_config_change"] is False
+          assert f["evidence_packet_change"] is False
+          assert f["temperature_change"] is False
+          assert f["theory_change"] is False
+          assert f["preserve_provider_error_responses_and_usage"] is True
+          assert f["repeat_failure_policy"]=="STOP_AND_PRESERVE_BOUNDARY"
+          assert f["known_unaccounted_provider_calls_for_failure"]==2
+          assert f["known_unaccounted_provider_calls_total"]==3
+          assert f["total_budget_reserve_usd"]==1.0
+          print("PASS: Layer-C contract + validator/provider-format recoveries are bounded and reference-label-blind")
           PY
 
   execute-full-context-audit:
@@ -259,66 +280,69 @@ jobs:
         run: |
           set -euo pipefail
           TAG=stage2-full-context-process-semantic-audit-claimed-v1
-          RECOVERY_TAG=stage2-full-context-process-semantic-audit-recovery1-claimed-v1
+          RECOVERY1_TAG=stage2-full-context-process-semantic-audit-recovery1-claimed-v1
+          RECOVERY2_TAG=stage2-full-context-process-semantic-audit-format-recovery1-claimed-v1
           seal_path="$OUTPUT_ROOT/final/full_context_seal.json"
           if gh api "repos/$GITHUB_REPOSITORY/contents/$seal_path?ref=$OUTPUT_BRANCH" >/dev/null 2>&1; then
             echo "FAIL: Layer-C result already sealed"
             exit 42
           fi
-          if tag_json=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" 2>/dev/null); then
-            claimed_sha=$(printf '%s' "$tag_json" | python -c 'import json,sys; print(json.load(sys.stdin)["object"]["sha"])')
-            if [ "$claimed_sha" = "$GITHUB_SHA" ]; then
-              test -d "results/$OUTPUT_ROOT/audit"
-              echo "PASS: same-commit Layer-C claim found; resume without re-sampling completed units"
-            elif [ "$claimed_sha" = "8d87da221730b2a5f31b8e475fc43e6164f85e0f" ]; then
-              gh api "repos/$GITHUB_REPOSITORY/issues/$RECOVERY_ISSUE" > work/recovery_issue.json
-              python - <<'PY'
-          import json
-          issue=json.load(open("work/recovery_issue.json"))
-          assert issue["user"]["login"]=="yu5-520"
-          assert issue["title"]=="STAGE2 FULL-CONTEXT AUDIT VALIDATOR RECOVERY 1"
-          lines=set(x.strip() for x in issue["body"].splitlines() if x.strip())
-          required={
-            "prior_workflow_run=36258923654",
-            "completed_cells_preserve=10",
-            "completed_cells_rerun=false",
-            "failure_cell=G2-X4-T2",
-            "failure_class=EVALUATOR_OUTPUT_VALIDATOR_RELATION_ENUM_OMISSION",
-            "validator_change=ADD_MERE_VISIBILITY_RELATION",
-            "scientific_prompt_change=false",
-            "model_config_change=false",
-            "evidence_packet_change=false",
-            "preserve_raw_before_validation=true",
-            "resume_failed_and_unprocessed_only=true",
-            "recovery_budget_reserve_usd=0.5"
-          }
-          assert required <= lines
-          PY
-              python - <<'PY'
+
+          tag_json=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG")
+          claimed_sha=$(printf '%s' "$tag_json" | python -c 'import json,sys; print(json.load(sys.stdin)["object"]["sha"])')
+          test "$claimed_sha" = "8d87da221730b2a5f31b8e475fc43e6164f85e0f"
+
+          python - <<'PY'
           import json, os
           p=f'results/{os.environ["OUTPUT_ROOT"]}/audit/cell_audit_summary.json'
           s=json.load(open(p))
-          assert s["completed_cells"]==10
+          assert s["completed_cells"]==12
           assert len(s["errors"])==1
-          assert s["errors"][0]["full_id"]=="G2-X4-T2"
-          assert "bad semantic relation" in s["errors"][0]["error"]
-          print("PASS: preserved 10-cell state + exact validator failure verified")
+          assert s["errors"][0]["full_id"]=="G2-X5-T1"
+          assert "JSON response remained malformed" in s["errors"][0]["error"]
+          print("PASS: preserved 12-cell state + exact provider-format failure verified")
           PY
-              if recovery_json=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RECOVERY_TAG" 2>/dev/null); then
-                recovery_sha=$(printf '%s' "$recovery_json" | python -c 'import json,sys; print(json.load(sys.stdin)["object"]["sha"])')
-                test "$recovery_sha" = "$GITHUB_SHA"
-              else
-                gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$RECOVERY_TAG" -f sha="$GITHUB_SHA" >/dev/null
-              fi
-              echo "PASS: authorized validator recovery; preserve 10 completed cells and resume at G2-X4-T2"
-            else
-              echo "FAIL: existing Layer-C claim belongs to an unauthorized control-plane commit"
-              exit 43
-            fi
-          else
-            gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$TAG" -f sha="$GITHUB_SHA" >/dev/null
-            echo "PASS: Layer-C audit claimed"
+
+          r1=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RECOVERY1_TAG")
+          r1sha=$(printf '%s' "$r1" | python -c 'import json,sys; print(json.load(sys.stdin)["object"]["sha"])')
+          test "$r1sha" = "0085b1a42074333ea8a0ca3226cf19cf47b8acae"
+
+          gh api "repos/$GITHUB_REPOSITORY/issues/$PROVIDER_RECOVERY_ISSUE" > work/provider_recovery_issue.json
+          python - <<'PY'
+          import json
+          issue=json.load(open("work/provider_recovery_issue.json"))
+          assert issue["user"]["login"]=="yu5-520"
+          assert issue["title"]=="STAGE2 FULL-CONTEXT AUDIT PROVIDER FORMAT RECOVERY 1"
+          lines=set(x.strip() for x in issue["body"].splitlines() if x.strip())
+          required={
+            "prior_workflow_run=36259829075",
+            "completed_cells_preserve=12",
+            "completed_cells_rerun=false",
+            "failure_cell=G2-X5-T1",
+            "failure_class=EVALUATOR_JSON_MALFORMED_AFTER_IDENTICAL_FORMAT_ATTEMPTS",
+            "scientific_prompt_change=false",
+            "model_config_change=false",
+            "evidence_packet_change=false",
+            "temperature_change=false",
+            "theory_change=false",
+            "technical_recovery_execution_count=1",
+            "technical_recovery_uses_existing_identical_request_policy=true",
+            "no_adaptive_reprompt=true",
+            "preserve_provider_error_responses_and_usage=true",
+            "resume_failed_and_unprocessed_only=true",
+            "if_same_cell_format_failure_repeats=STOP_AND_PRESERVE_BOUNDARY",
+            "known_unaccounted_provider_calls_total=3",
+            "total_budget_reserve_usd=1.0"
+          }
+          assert required <= lines
+          PY
+
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RECOVERY2_TAG" >/dev/null 2>&1; then
+            echo "FAIL: bounded provider-format recovery already consumed"
+            exit 45
           fi
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$RECOVERY2_TAG" -f sha="$GITHUB_SHA" >/dev/null
+          echo "PASS: one bounded provider-format recovery claimed; preserve 12 completed cells and resume at G2-X5-T1"
 
       - name: Run 80 full-context trajectory audits
         id: cells
@@ -406,6 +430,8 @@ jobs:
           gh issue close "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
           gh issue comment "$RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --body "Validator recovery completed without re-running the 10 preserved successful cell audits. Layer-C result sealed."
           gh issue close "$RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
+          gh issue comment "$PROVIDER_RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --body "Bounded provider-format recovery completed without re-running the 12 preserved successful cell audits. Layer-C result sealed."
+          gh issue close "$PROVIDER_RECOVERY_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
 
       - name: Assert complete Layer-C seal or preserve partial failure
         if: always()
