@@ -48,7 +48,7 @@ jobs:
 
   x4:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,7 +56,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python -m stage2.r7_prospective_v1.execution_readiness_preflight --system X4 --out-root readiness_x4
+      - name: Bind exact frozen MCP protocol and SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/modelcontextprotocol/python-sdk upstream
+          git -C upstream checkout -q f1b6589088534632fef92238ee9750951e3c0185
+          test "$(git -C upstream rev-parse HEAD)" = f1b6589088534632fef92238ee9750951e3c0185
+          git clone -q https://github.com/modelcontextprotocol/modelcontextprotocol protocol
+          git -C protocol checkout -q 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          test "$(git -C protocol rev-parse HEAD)" = 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          python -m pip install -q uv
+          (cd upstream && uv sync --frozen --no-default-groups)
+          test -x upstream/.venv/bin/python
+      - name: Run X4 readiness wrapper preflight
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: upstream/.venv/bin/python -m stage2.r7_prospective_v1.execution_readiness_preflight --system X4 --out-root readiness_x4
       - uses: actions/upload-artifact@v4
         with:
           name: stage2-r7-g1-readiness-x4-${{ github.run_id }}
