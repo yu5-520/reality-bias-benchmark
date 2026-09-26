@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 from typing import Any
 
 from stage2.r7_checkpoint_v1.common import CheckpointRegistry, digest
@@ -8,6 +9,24 @@ from stage2.r7_checkpoint_v1.common import CheckpointRegistry, digest
 
 METAGPT_COMMIT = "11cdf466d042aece04fc6cfd13b28e1a70341b1f"
 ADAPTER_ID = "stage2-r7-metagpt-native-checkpoint-v1"
+
+
+def _canonicalize_metagpt_state(value: Any, key: str | None = None) -> Any:
+    """Canonicalize only MetaGPT fields whose native type is set-like.
+
+    Message/order-bearing lists remain untouched. Pydantic serializes sets such
+    as Role.addresses, RoleContext.watch and Message.send_to as JSON lists whose
+    element order depends on Python hash iteration; those lists are sorted only
+    for content-address stability.
+    """
+    if isinstance(value, dict):
+        return {k: _canonicalize_metagpt_state(v, k) for k, v in value.items()}
+    if isinstance(value, list):
+        rows = [_canonicalize_metagpt_state(v, None) for v in value]
+        if key in {"addresses", "watch", "send_to"}:
+            return sorted(rows, key=lambda item: json.dumps(item, ensure_ascii=False, sort_keys=True))
+        return rows
+    return value
 
 
 def runtime_state_payload(runtime) -> dict[str, Any]:
@@ -52,7 +71,7 @@ class MetaGPTNativeCheckpointAdapter:
         state = environment.model_dump(mode="json")
         if not isinstance(state, dict):
             raise TypeError("MetaGPT Environment.model_dump must return a mapping")
-        return state
+        return _canonicalize_metagpt_state(state)
 
     def restore_environment(self, *, environment_class, state: dict[str, Any], context):
         return environment_class(**copy.deepcopy(state), context=context)
@@ -72,7 +91,7 @@ class MetaGPTNativeCheckpointAdapter:
 
     def serialize_stage2_environment(self, environment) -> dict[str, Any]:
         """Serialize native MetaGPT environment/role state without Stage-II object pointers."""
-        env_state = environment.model_dump(mode="json")
+        env_state = _canonicalize_metagpt_state(environment.model_dump(mode="json"))
         env_state = copy.deepcopy(env_state)
         env_state.pop("roles", None)
         roles = []
@@ -80,7 +99,7 @@ class MetaGPTNativeCheckpointAdapter:
             roles.append({
                 "name": role.name,
                 "profile": role.profile,
-                "state": role.model_dump(mode="json"),
+                "state": _canonicalize_metagpt_state(role.model_dump(mode="json")),
             })
         return {
             "schema": "stage2-r7-metagpt-stage2-environment-state-v1",
