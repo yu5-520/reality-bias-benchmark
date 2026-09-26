@@ -48,7 +48,7 @@ class HostIntegratedCheckpointMonitorHook:
             packages = self.bridge.feed_terminal(
                 checkpoint_manifest=manifest,
                 pending_roles=len(host.queue),
-                checkout_root=host.checkout.root,
+                checkout_root=_application_root(host),
             )
         row = {
             "boundary": boundary,
