@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stage2-full-context-xt-cohort-synthesis-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "x_id",
+    "task_id",
+    "included_groups",
+    "excluded_groups",
+    "group_topologies",
+    "recurring_mechanism_families",
+    "topology_variation",
+    "loop_comparison",
+    "cross_group_interpretation",
+    "not_established"
+  ],
+  "properties": {
+    "schema": {
+      "const": "stage2-full-context-xt-cohort-synthesis-v1"
+    },
+    "x_id": {
+      "enum": [
+        "X1",
+        "X2",
+        "X3",
+        "X4",
+        "X5",
+        "X6",
+        "X7"
+      ]
+    },
+    "task_id": {
+      "enum": [
+        "T1",
+        "T2",
+        "T3"
+      ]
+    },
+    "included_groups": {
+      "type": "array"
+    },
+    "excluded_groups": {
+      "type": "array"
+    },
+    "group_topologies": {
+      "type": "array"
+    },
+    "recurring_mechanism_families": {
+      "type": "array"
+    },
+    "topology_variation": {
+      "type": "object"
+    },
+    "loop_comparison": {
+      "type": "object"
+    },
+    "cross_group_interpretation": {
+      "type": "string"
+    },
+    "not_established": {
+      "type": "array"
+    }
+  }
+}
