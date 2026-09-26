@@ -1,0 +1,26 @@
+name: Stage-II R7 G1 Contract Validate
+
+on:
+  pull_request:
+    paths:
+      - "configs/stage2_r7_g1_*.json"
+      - "stage2/r7_prospective_v1/**"
+      - "stage2/r7_checkpoint_v1/**"
+      - "scripts/validate_stage2_r7_g1_contract_v1.py"
+      - "docs/R_Plan_v7.40.md"
+      - "theory/change_notes/CN-R-114_stage2_r7_g1_contract_freeze.md"
+      - ".github/workflows/stage2-r7-g1-contract-validate.yml"
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python scripts/validate_stage2_r7_g1_contract_v1.py
