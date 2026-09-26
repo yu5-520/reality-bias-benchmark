@@ -1,0 +1,64 @@
+name: Stage-II Cross-Task Synthesis Validate
+
+on:
+  pull_request:
+    paths:
+      - 'docs/reports/2026-09-26/StageII_Cross_Task_Cross_Layer_Synthesis_and_Paper_Extraction_v1.md'
+      - 'configs/stage2_cross_task_synthesis_evidence_bundle_v1.json'
+      - 'configs/stage2_paper_figure_table_registry_v1.json'
+      - 'scripts/validate_stage2_cross_task_synthesis_v1.py'
+      - 'docs/R_Plan_v7.35.md'
+      - 'theory/change_notes/CN-R-109_stage2_cross_task_synthesis_freeze.md'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/reports/2026-09-26/StageII_Cross_Task_Cross_Layer_Synthesis_and_Paper_Extraction_v1.md'
+      - 'configs/stage2_cross_task_synthesis_evidence_bundle_v1.json'
+      - 'configs/stage2_paper_figure_table_registry_v1.json'
+      - 'scripts/validate_stage2_cross_task_synthesis_v1.py'
+      - 'docs/R_Plan_v7.35.md'
+      - 'theory/change_notes/CN-R-109_stage2_cross_task_synthesis_freeze.md'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-stage2-synthesis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate Stage-II cross-task synthesis
+        run: python scripts/validate_stage2_cross_task_synthesis_v1.py
+      - name: Assert synthesis layer cannot execute real subjects
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          files=[
+              'docs/reports/2026-09-26/StageII_Cross_Task_Cross_Layer_Synthesis_and_Paper_Extraction_v1.md',
+              'configs/stage2_cross_task_synthesis_evidence_bundle_v1.json',
+              'configs/stage2_paper_figure_table_registry_v1.json',
+              'scripts/validate_stage2_cross_task_synthesis_v1.py',
+          ]
+          forbidden=[
+              'DEEPSEEK' + '_API_KEY',
+              'DASHSCOPE' + '_API_KEY',
+              'OPENAI' + '_API_KEY',
+              'CALL_' + 'REAL_',
+              '--execute-' + 'real',
+          ]
+          hits=[]
+          for f in files:
+              t=Path(f).read_text(encoding='utf-8')
+              for x in forbidden:
+                  if x in t:
+                      hits.append((f,x))
+          if hits:
+              raise SystemExit('real-subject capability in synthesis layer: '+repr(hits))
+          print('PASS: synthesis layer contains no real-subject execution authorization')
+          PY
