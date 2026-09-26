@@ -25,6 +25,8 @@ from stage2.native_v7.x3_a2a.runner import (
 from stage2.r7_checkpoint_v1.common import CheckpointRegistry, digest
 from stage2.r7_prospective_v1.online_monitor import OnlineStructuralMonitor
 from stage2.r7_prospective_v1.run_manifest import build_run_manifest
+from stage2.r7_prospective_v1.evidence_channels import seal_evidence_channels
+from stage2.r7_prospective_v1.replication_contract import resolve_decision_horizon, run_id, semantic_audit_state
 
 ROOT = Path(__file__).resolve().parents[2]
 STAGE2 = ROOT / "stage2"
@@ -114,8 +116,11 @@ async def run_x3_natural_A(
     out_root,
     mode="subject",
     script_file=None,
+    group_id="StageII-R7-G1",
+    decision_horizon=None,
 ):
     task, subject = _load_inputs(task_file, roles_file, subject_file)
+    horizon = resolve_decision_horizon(group_id=group_id, subject=subject, requested=decision_horizon)
     if mode == "subject" and not os.environ.get("DEEPSEEK_API_KEY"):
         raise RuntimeError("X3 prospective subject mode requires frozen DeepSeek credential")
     if mode == "scripted" and not script_file:
@@ -169,6 +174,8 @@ async def run_x3_natural_A(
                 mode,
                 "--checkpoint-state-file",
                 str(state_files[role]),
+                "--max-turns",
+                str(horizon),
             ]
             if script_file:
                 service_cmd += ["--script-file", str(Path(script_file).resolve())]
@@ -207,8 +214,8 @@ async def run_x3_natural_A(
         start_state = _read_sidecars(state_files)
         start_checkpoint = registry.capture(
             system_id="X3_A2A",
-            group_id="StageII-R7-G1",
-            run_id=f"StageII-R7-G1-X3-{task['id']}",
+            group_id=group_id,
+            run_id=run_id(group_id=group_id, cell_id=f"X3-{task['id']}"),
             task_id=task["id"],
             event_ref="x3:task-start",
             adapter_id="stage2-r7-a2a-role-service-sidecar-v1",
@@ -222,7 +229,7 @@ async def run_x3_natural_A(
             native_state=start_state,
             application_root=checkout,
             model_visible_context={"task_id": task["id"], "boundary": "before-top-level-request"},
-            remaining_horizon=int(subject["limits"]["max_turns"]),
+            remaining_horizon=horizon,
             external_carrier_refs=[],
             restore_capability="FULL_NATIVE",
             replication_binding={
@@ -241,7 +248,7 @@ async def run_x3_natural_A(
                 "target": ROLES["entry_agent"],
                 "kind": "user_request",
                 "content": task["user_request"],
-                "remaining_turns": int(subject["limits"]["max_turns"]),
+                "remaining_turns": horizon,
                 "depth": 0,
             },
         )
@@ -253,8 +260,8 @@ async def run_x3_natural_A(
         terminal_state = _read_sidecars(state_files)
         terminal_checkpoint = registry.capture(
             system_id="X3_A2A",
-            group_id="StageII-R7-G1",
-            run_id=f"StageII-R7-G1-X3-{task['id']}",
+            group_id=group_id,
+            run_id=run_id(group_id=group_id, cell_id=f"X3-{task['id']}"),
             task_id=task["id"],
             event_ref="x3:terminal",
             adapter_id="stage2-r7-a2a-role-service-sidecar-v1",
@@ -270,7 +277,7 @@ async def run_x3_natural_A(
             model_visible_context={"task_id": task["id"], "boundary": "after-top-level-request"},
             remaining_horizon=max(
                 0,
-                int(subject["limits"]["max_turns"]) - int(result.get("turns_used", 0)),
+                horizon - int(result.get("turns_used", 0)),
             ),
             external_carrier_refs=[],
             restore_capability="FULL_NATIVE",
@@ -290,7 +297,7 @@ async def run_x3_natural_A(
         start_checkpoint=start_checkpoint,
     )
     turns = int(result.get("turns_used", 0))
-    if turns < 1 or turns > int(subject["limits"]["max_turns"]):
+    if turns < 1 or turns > horizon:
         raise RuntimeError("X3 prospective turn accounting outside frozen ceiling")
 
     checkpoint_ledger = {
@@ -340,6 +347,8 @@ async def run_x3_natural_A(
         monitor_snapshot=monitor_snapshot,
         packages=monitor.packages(),
         natural_subject_calls=turns if mode == "subject" else 0,
+        group_id=group_id,
+        semantic_audit_state=semantic_audit_state(group_id=group_id),
     )
 
     _write_json(out / "natural_A_result.json", result)
@@ -349,9 +358,16 @@ async def run_x3_natural_A(
     _write_json(out / "repair_packages.json", monitor.packages())
     _write_json(out / "wire_index.json", wire_index)
     _write_json(out / "run_manifest.json", manifest)
+    channel_seal = seal_evidence_channels(
+        out_root=out,
+        group_id=group_id,
+        cell_id=f"X3-{task['id']}",
+        audit_paths=["natural_A_result.json", "checkpoint_ledger.json", "checkpoints", "wire", "process"],
+        monitor_paths=["monitor_evidence.json", "monitor_candidates.json", "repair_packages.json", "wire_index.json"],
+    )
     seal = {
-        "schema": "RB-STAGE2-R7-G1-NATURAL-A-SEAL-v1",
-        "group_id": "StageII-R7-G1",
+        "schema": ("RB-STAGE2-R7-G1-NATURAL-A-SEAL-v1" if group_id == "StageII-R7-G1" else "RB-STAGE2-PROSPECTIVE-NATURAL-A-SEAL-v2"),
+        "group_id": group_id,
         "cell_id": f"X3-{task['id']}",
         "status": "NATURAL_A_FROZEN_REPAIR_NESTED_CHECKPOINT_BLOCKED",
         "provider_mode": "SUBJECT" if mode == "subject" else "NON_STUDY_SCRIPTED",
@@ -365,8 +381,9 @@ async def run_x3_natural_A(
         "complete_package_count": 0,
         "a2a_protocol_modified": False,
         "run_manifest_hash": manifest["manifest_hash"],
+        **channel_seal,
         "repair_actions_during_A": 0,
-        "semantic_audit_state": "LOCKED_UNTIL_A_AND_B_FROZEN",
+        "semantic_audit_state": semantic_audit_state(group_id=group_id),
     }
     _write_json(out / "seal.json", seal)
     return seal
@@ -381,6 +398,8 @@ def main():
     parser.add_argument("--out-root", required=True)
     parser.add_argument("--mode", choices=["subject", "scripted"], default="subject")
     parser.add_argument("--script-file")
+    parser.add_argument("--group-id", default="StageII-R7-G1")
+    parser.add_argument("--decision-horizon", type=int)
     args = parser.parse_args()
     result = asyncio.run(
         run_x3_natural_A(
@@ -391,6 +410,8 @@ def main():
             out_root=args.out_root,
             mode=args.mode,
             script_file=args.script_file,
+            group_id=args.group_id,
+            decision_horizon=args.decision_horizon,
         )
     )
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
