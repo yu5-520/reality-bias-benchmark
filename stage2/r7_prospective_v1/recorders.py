@@ -32,12 +32,16 @@ def _host_checkout_root(host):
     raise ValueError("host checkout exposes neither root nor proxied checkout path")
 
 
-def _replication_binding() -> dict[str, Any]:
+def _replication_binding(group_id: str) -> dict[str, Any]:
     return {
         "checkpoint_schema_version": "RB-STAGE2-R7-CHECKPOINT-MANIFEST-v1",
         "monitor_rule_version": "RB-STAGE2-R7-STRUCTURAL-MONITOR-RULES-v1",
         "repair_package_version": "RB-STAGE2-R7-MONITOR-DERIVED-REPAIR-PACKAGE-v1",
-        "repair_contract_version": "RB-STAGE2-R7-G1-PROSPECTIVE-REPAIR-CONTRACT-v1",
+        "repair_contract_version": (
+            "RB-STAGE2-R7-G1-PROSPECTIVE-REPAIR-CONTRACT-v1"
+            if group_id == "StageII-R7-G1"
+            else "RB-STAGE2-G2-G5-PROSPECTIVE-REPAIR-CONTRACT-v2"
+        ),
     }
 
 
@@ -93,7 +97,7 @@ class HostBoundaryCheckpointRecorder:
             },
             remaining_horizon=host.max_turns - len(host.history),
             external_carrier_refs=self.external_carrier_refs,
-            replication_binding=_replication_binding(),
+            replication_binding=_replication_binding(self.group_id),
         )
         self.controller.register_manifest(
             boundary=kind,
@@ -161,7 +165,7 @@ class MetaGPTBoundaryCheckpointRecorder:
                 ),
             },
             remaining_horizon=runtime.max_turns - runtime.turns,
-            replication_binding=_replication_binding(),
+            replication_binding=_replication_binding(self.group_id),
         )
         self.controller.register_manifest(
             boundary=kind,
