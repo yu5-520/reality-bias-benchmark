@@ -372,6 +372,8 @@ jobs:
           })
           Path(os.environ["RECEIPT"]).write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n")
           PY
+          mkdir -p /tmp/stage2-g2-artifact
+          cp "$ARCHIVE" "$SHA_FILE" "$RECEIPT" /tmp/stage2-g2-artifact/
           git -C control fetch -q origin "$EVIDENCE_BRANCH:refs/remotes/origin/$EVIDENCE_BRANCH"
           rm -rf /tmp/stage2-g2-evidence
           git -C control worktree add --detach /tmp/stage2-g2-evidence "origin/$EVIDENCE_BRANCH"
@@ -385,13 +387,11 @@ jobs:
           git -C /tmp/stage2-g2-evidence add "stage2/replication_v2/G2/natural_A/$CELL"
           git -C /tmp/stage2-g2-evidence commit -m "evidence: freeze G2 $CELL first attempt [run $GITHUB_RUN_ID]"
           git -C /tmp/stage2-g2-evidence push -q origin "HEAD:refs/heads/$EVIDENCE_BRANCH"
-          mkdir -p /tmp/stage2-g2-artifact
-          cp "$ARCHIVE" "$SHA_FILE" "$RECEIPT" /tmp/stage2-g2-artifact/
           echo "preserved=true" >> "$GITHUB_OUTPUT"
           echo "PASS: $CELL first attempt durably preserved; runner exit code=$RUNNER_EXIT_CODE"
 
       - name: Upload redundant immutable Actions artifact
-        if: steps.claim.outputs.claimed == 'true'
+        if: always() && steps.claim.outputs.claimed == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: stage2-g2-${{ matrix.system }}-${{ matrix.task }}-${{ github.run_id }}
@@ -400,7 +400,7 @@ jobs:
           if-no-files-found: error
 
       - name: Assert preservation, not scientific success
-        if: steps.claim.outputs.claimed == 'true'
+        if: always() && steps.claim.outputs.claimed == 'true'
         shell: bash
         run: |
           set -euo pipefail
