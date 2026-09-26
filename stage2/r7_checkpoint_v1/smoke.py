@@ -111,7 +111,14 @@ async def smoke_autogen(destination: Path) -> dict:
     adapter = AutoGenNativeCheckpointAdapter()
 
     team1 = build_team(model_client=_client(), roles=roles, checkout=checkout, max_turns=32)
-    # Save the pristine native team parent. This is a real public AutoGen Team state.
+    # Populate a non-empty native Swarm state using the deterministic replay client.
+    task = next(
+        row for row in json.loads((STAGE2 / "tasks.json").read_text())["tasks"]
+        if row["id"] == "T2"
+    )
+    result = await team1.run(task=task["user_request"])
+    if not getattr(result, "messages", None):
+        raise RuntimeError("AutoGen checkpoint smoke produced no native team history")
     manifest = await adapter.capture(
         team=team1,
         registry=registry,
@@ -119,8 +126,8 @@ async def smoke_autogen(destination: Path) -> dict:
         group_id="SMOKE",
         run_id="autogen-smoke",
         task_id="T2",
-        event_ref="TASK_START",
-        model_visible_context={"task": "T2", "boundary": "task-start"},
+        event_ref="AFTER_NATIVE_MODEL_TURN",
+        model_visible_context={"task": "T2", "boundary": "post-deterministic-smoke-run"},
         remaining_horizon=32,
         replication_binding=_replication_binding(),
     )
