@@ -165,6 +165,43 @@ class MetaGPTNativeCheckpointAdapter:
             )
         return env
 
+    def capture_stage2(
+        self,
+        *,
+        environment,
+        runtime,
+        registry: CheckpointRegistry,
+        application_root,
+        group_id: str,
+        run_id: str,
+        task_id: str,
+        event_ref: str,
+        model_visible_context: Any,
+        remaining_horizon: Any,
+        external_carrier_refs: list[dict[str, Any]] | None = None,
+        replication_binding: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        native_state = {
+            "stage2_environment": self.serialize_stage2_environment(environment),
+            "stage2_runtime": runtime_state_payload(runtime),
+        }
+        return registry.capture(
+            system_id="X2_METAGPT",
+            group_id=group_id,
+            run_id=run_id,
+            task_id=task_id,
+            event_ref=event_ref,
+            adapter_id=ADAPTER_ID,
+            framework_binding=self.framework_binding,
+            native_state=native_state,
+            application_root=application_root,
+            model_visible_context=model_visible_context,
+            remaining_horizon=remaining_horizon,
+            external_carrier_refs=external_carrier_refs,
+            restore_capability="FULL_NATIVE",
+            replication_binding=replication_binding,
+        )
+
     def capture(
         self,
         *,
