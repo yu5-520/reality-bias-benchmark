@@ -1,0 +1,125 @@
+{
+  "schema": "stage2-g2-g5-natural-block-preflight-freeze-v1",
+  "version": "1.0",
+  "date_utc": "2026-09-26",
+  "status": "FROZEN_READY_AWAITING_EXPLICIT_ACTIVE_SUBJECT_EXECUTION",
+  "source_pr": 245,
+  "tested_head_sha": "bb0c99a2fcb3854c348ddb27094b9b4589032144",
+  "natural_block_preflight_workflow_run_id": 36237462819,
+  "legacy_g1_execution_readiness_regression_run_id": 36237462711,
+  "contract": {
+    "path": "configs/stage2_g2_g5_84_cell_natural_block_launch_contract_v1.json",
+    "cells": 84,
+    "groups": [
+      "G2",
+      "G3",
+      "G4",
+      "G5"
+    ],
+    "cells_per_group": 21,
+    "first_attempt_only": true,
+    "no_B_until_all_84_A_sealed": true
+  },
+  "horizon": {
+    "path": "configs/stage2_g2_g5_logical_decision_horizon_v1.json",
+    "logical_decision_ceiling": 64,
+    "g1_historical_default": 32,
+    "subject_model_parameters_unchanged": true,
+    "different_requested_horizon_fails_closed": true
+  },
+  "results": {
+    "X1": {
+      "status": "PASS",
+      "job_id": 108391742007,
+      "decision_count": 64,
+      "audit_entries": 292,
+      "monitor_entries": 4,
+      "audit_manifest_sha256": "def807fb7102fa233d095f549f6a4cc8721762e02583620c92f28439cc7d89b2",
+      "monitor_manifest_sha256": "88aa091170f4dcbec15b253d44aed41410dce345b1eb6094160b3547a3f81300",
+      "proof": "FULL_64_AUTOGEN_MODEL_CLIENT_DECISIONS"
+    },
+    "X2": {
+      "status": "PASS",
+      "job_id": 108391741807,
+      "decision_count": 64,
+      "audit_entries": 1058,
+      "monitor_entries": 4,
+      "audit_manifest_sha256": "75419bd298c0bca0724c31a10922a534699764a182e161667fc1d97b016ae980",
+      "monitor_manifest_sha256": "58c9cd3259223c79e527f8fbdae9328d5f50973359329160a10ec199da8fe192",
+      "proof": "FULL_64_METAGPT_PROVIDER_DECISIONS"
+    },
+    "X3": {
+      "status": "PASS",
+      "job_id": 108391741841,
+      "decision_count": 64,
+      "audit_entries": 83,
+      "monitor_entries": 4,
+      "audit_manifest_sha256": "5c7f3116246245e31e991879651fed46bcc75fddea210d6c930e5a4f9a4c20c0",
+      "monitor_manifest_sha256": "f86dbb4740d127b141984a0f0cf964f6141cee88b9d46787ac20996b46cc3b38",
+      "proof": "FULL_64_A2A_ROLE_SERVICE_MODEL_DECISIONS_NATIVE_PROTOCOL_UNCHANGED"
+    },
+    "X4": {
+      "status": "PASS",
+      "job_id": 108391741947,
+      "decision_count": 64,
+      "audit_entries": 992,
+      "monitor_entries": 4,
+      "audit_manifest_sha256": "cf8c8d5964f7c2ebb865750b01eefb124426c08e532d174116a48aa84a42d837",
+      "monitor_manifest_sha256": "852e6b215ab9060e4e4867c06c4d9bd42fa28319ee41668ec1211fa292d51c05",
+      "proof": "FULL_64_SHARED_HOST_PROVIDER_DECISIONS_MCP_BOUNDARY"
+    },
+    "X5": {
+      "status": "PASS",
+      "job_id": 108391741810,
+      "decision_count": 1,
+      "audit_entries": 51,
+      "monitor_entries": 4,
+      "audit_manifest_sha256": "0b394300b45e1af5d58557ce58d88789a4b617b7672400bbc2e54ccf7d884c1f",
+      "monitor_manifest_sha256": "48518cae78dfd991861cd90782629d0e9680710ddf692617241076cad08749b3",
+      "proof": "64_HORIZON_ADMISSION_PLUS_NATIVE_RAG_CAPABILITY_SMOKE_SHARED_HOST_FULL64_PROVEN_BY_X4"
+    },
+    "X6": {
+      "status": "PASS",
+      "job_id": 108391741840,
+      "decision_count": 1,
+      "audit_entries": 53,
+      "monitor_entries": 4,
+      "audit_manifest_sha256": "cbf28fd6666bc3e5384964ba01cd13d28b52fcb3e083c2709d643264dbd6f576",
+      "monitor_manifest_sha256": "0dc119d9752dccaefca7464b1317cd687a2e14a39142daa0d536584832c1d28e",
+      "proof": "64_HORIZON_ADMISSION_PLUS_NATIVE_MEMORYBANK_CAPABILITY_SMOKE_SHARED_HOST_FULL64_PROVEN_BY_X4"
+    },
+    "X7": {
+      "status": "PASS",
+      "job_id": 108391741868,
+      "decision_count": 1,
+      "audit_entries": 51,
+      "monitor_entries": 4,
+      "audit_manifest_sha256": "a04792ba21756bf6300f8e60dfe4353b2e87e8e3083fabda2992943317391184",
+      "monitor_manifest_sha256": "f4fd40669a0a25abe4a35c2d31a2a462a25bb3e28bc6d6d65bcefcb3cf918981",
+      "proof": "64_HORIZON_ADMISSION_PLUS_NATIVE_LONGLINGUA_CAPABILITY_SMOKE_SHARED_HOST_FULL64_PROVEN_BY_X4"
+    }
+  },
+  "evidence_channel_invariants": {
+    "audit_raw_bundle_monitor_blind": true,
+    "monitor_runtime_bundle_posthoc_audit_blind": true,
+    "manifests_disjoint": true,
+    "all_seven_verified": true
+  },
+  "legacy_compatibility": {
+    "g1_execution_readiness": "7_OF_7_PASS",
+    "native_a2a_service_source_modified": false,
+    "g1_default_horizon": 32,
+    "prospective_horizon_scoped_to_experiment_owned_wrappers": true
+  },
+  "subject_accounting": {
+    "real_subject_provider_calls": 0,
+    "paid_evaluator_calls": 0,
+    "active_repairs": 0
+  },
+  "authorization": {
+    "active_subject_execution": false,
+    "active_repair_execution": false,
+    "paid_evaluation": false,
+    "next": "EXPLICIT_ACTIVE_G2_G5_NATURAL_BLOCK_EXECUTION_AUTHORIZATION_REQUIRED"
+  }
+}

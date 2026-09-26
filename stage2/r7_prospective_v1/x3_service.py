@@ -8,6 +8,7 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+import stage2.native_v7.x3_a2a.service as native_a2a_service
 from stage2.native_v7.x3_a2a.service import build_app
 from stage2.r7_checkpoint_v1.a2a_adapter import CheckpointableRoleRuntime
 from stage2.r7_checkpoint_v1.common import digest
@@ -69,7 +70,19 @@ def main():
     parser.add_argument("--mode", choices=["subject", "scripted"], default="subject")
     parser.add_argument("--script-file")
     parser.add_argument("--checkpoint-state-file", required=True)
+    parser.add_argument("--max-turns", type=int)
     args = parser.parse_args()
+
+    if args.max_turns is not None:
+        prospective_horizon = int(args.max_turns)
+        max_invocations = int(native_a2a_service.LIMITS["max_total_model_invocations"])
+        if not 1 <= prospective_horizon <= max_invocations:
+            raise ValueError("prospective A2A horizon exceeds frozen model-invocation ceiling")
+        # Prospective-only process-local override. The frozen native v7 service
+        # source and A2A protocol remain unchanged; only this experiment-owned
+        # sidecar subprocess receives the wider observation horizon.
+        native_a2a_service.LIMITS = dict(native_a2a_service.LIMITS)
+        native_a2a_service.LIMITS["max_turns"] = prospective_horizon
 
     runtime = SidecarCheckpointRoleRuntime(
         role=args.role,
