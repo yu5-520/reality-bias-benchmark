@@ -1,0 +1,29 @@
+name: Stage-II R7 G1 Execution Readiness Validate
+
+on:
+  pull_request:
+    paths:
+      - "configs/stage2_r7_g1_execution_readiness_contract_v1.json"
+      - "configs/stage2_r7_g1_launch_manifest_v1.json"
+      - "configs/stage2_r7_g1_execution_readiness_freeze_v1.json"
+      - "stage2/r7_prospective_v1/**"
+      - "scripts/validate_stage2_r7_g1_execution_readiness_v1.py"
+      - "docs/R_Plan_v7.43.md"
+      - "docs/reports/2026-09-26/StageII_R7_G1_Scientific_Execution_Readiness_Report_v1.md"
+      - "theory/change_notes/CN-R-117_stage2_r7_g1_execution_readiness_freeze.md"
+      - ".github/workflows/stage2-r7-g1-execution-readiness-validate.yml"
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate G1 readiness freeze
+        run: python scripts/validate_stage2_r7_g1_execution_readiness_v1.py
