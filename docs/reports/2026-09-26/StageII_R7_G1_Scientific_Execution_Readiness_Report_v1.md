@@ -1,49 +1,62 @@
 # Stage-II R7 G1 Scientific Execution Readiness Report v1
 
 Date: 2026-09-26  
-Status: **READY / ACTIVE SUBJECT EXECUTION NOT YET AUTHORIZED**
+Status: **READY / SEVEN-SYSTEM WRAPPER PREFLIGHT PASS / ACTIVE SUBJECT EXECUTION NOT YET AUTHORIZED**
 
 ## 1. What is now ready
 
-The Stage-II R7 stack has completed the offline path from native execution to checkpoint, prefix-only structural monitoring, immutable repair-package freeze, boundary policing, version-bound run manifests, and production-wrapper preflight.
+The Stage-II R7 stack has completed the offline path from native execution to checkpoint, prefix-only structural monitoring, immutable repair-package freeze, boundary policing, version-bound run manifests, and prospective production-wrapper preflight.
 
-The final non-study readiness workflow was `36231012529`. It made **0 provider calls, 0 scientific subject calls, 0 active repairs, and 0 paid evaluator calls**.
+The final non-study readiness workflow was `36231420391` at tested head `51066a2b474fff3512a5feedd50c9f3c4164ef15`.
 
-## 2. Repair-capable prospective population
+It tested **all seven system/layer conditions** with deterministic/non-study execution and made:
+
+- provider calls: **0**;
+- scientific subject calls: **0**;
+- active repairs: **0**;
+- paid evaluator calls: **0**.
+
+All seven wrappers preserved native control flow and checkout effects.
+
+## 2. Seven-system engineering readiness
+
+| System | Decisions | Checkpoints | Control flow | Checkout | Active mid-process B |
+| --- | ---: | ---: | --- | --- | --- |
+| X1 AutoGen | 6 | 2 | PASS | PASS | BLOCKED |
+| X2 MetaGPT | 2 | 4 | PASS | PASS | READY |
+| X3 A2A | 7 | 2 | PASS | PASS | BLOCKED |
+| X4 MCP | 2 | 4 | PASS | PASS | READY |
+| X5 RAG | 2 | 4 | PASS | PASS | READY |
+| X6 MemoryBank | 2 | 4 | PASS | PASS | READY |
+| X7 LongLLMLingua | 1 | 3 | PASS | PASS | READY |
+
+X1 now has a prospective AutoGen wrapper with FULL_NATIVE task-start and terminal checkpoints plus passive native-stream structural observation. Its relevant **mid-run** parent remains `UNPROVEN_FAIL_CLOSED`, because the pinned AutoGen API explicitly cautions that saving a running team can be inconsistent.
+
+X3 now has a prospective A2A wrapper with start/terminal global role-service snapshots and passive A2A-wire observation. The A2A protocol remains unchanged. Its relevant **nested active call-stack** parent remains `UNPROVEN_FAIL_CLOSED`.
+
+This is useful for later replication: AutoGen and A2A are no longer missing prospective observation/checkpoint infrastructure. What remains unavailable is the exact legal mid-process branch point needed for the present paired R7 B experiment.
+
+## 3. Active repair-capable prospective population
 
 The historical Stage-II 21-cell natural matrix remains the immutable reference baseline.
 
-The active prospective R7 extension is deliberately reduced to the five system/layer conditions that expose a legal mid-process FULL_NATIVE parent under the frozen boundary:
+G1 does **not** spend six new stochastic subject runs on X1/X3 merely because their prospective wrappers now exist. Those trajectories cannot currently produce the paired active mid-process B branch under the frozen no-framework/no-protocol-modification rule.
+
+The active prospective R7 repair extension therefore remains:
 
 - X2 MetaGPT;
-- X4 MCP host;
-- X5 RAG host;
-- X6 MemoryBank host;
-- X7 LongLLMLingua host.
+- X4 MCP;
+- X5 RAG;
+- X6 MemoryBank;
+- X7 LongLLMLingua;
 
-Across T1-T3 this gives **15 new prospective natural first attempts**.
+across T1-T3 = **15 new prospective natural first attempts**.
 
-X1 AutoGen and X3 A2A are not rerun merely to add more data. Their natural Stage-II evidence and checkpoint-conformance evidence remain in the study, but their relevant mid-run/nested repair points remain `CHECKPOINT_BOUNDARY_BLOCKED`. Re-running those six cells would create new stochastic trajectories without enabling the paired R7 repair branch.
-
-This is a fail-closed engineering boundary, not an adverse framework ranking.
-
-## 3. Production-wrapper preflight
-
-All five repair-capable execution surfaces passed deterministic equivalence tests against their frozen native runners.
-
-| System | Decisions | Checkpoints | Control flow | Checkout | Subject calls |
-| --- | ---: | ---: | --- | --- | ---: |
-| X2 MetaGPT | 2 | 4 | PASS | PASS | 0 |
-| X4 MCP | 2 | 4 | PASS | PASS | 0 |
-| X5 RAG | 2 | 4 | PASS | PASS | 0 |
-| X6 MemoryBank | 2 | 4 | PASS | PASS | 0 |
-| X7 LongLLMLingua | 1 | 3 | PASS | PASS | 0 |
-
-X4 ran inside the exact frozen MCP SDK environment. X6 used the exact frozen MemoryBank upstream binding. X7 used the frozen LLMLingua implementation. The wrappers did not change their native control-flow or checkout effects.
+This is a repair-geometry/resource decision, not a framework ranking and not removal of X1/X3 from Stage-II evidence.
 
 ## 4. A-before-B execution order
 
-G1 is now frozen as:
+G1 is frozen as:
 
 `15 natural A first attempts`
 → freeze all raw evidence/checkpoints/packages
@@ -54,19 +67,19 @@ G1 is now frozen as:
 → freeze all B
 → only then open semantic audit.
 
-There is therefore no possibility for an early repair result to influence which later natural trajectories are collected.
+An early repair result therefore cannot influence which later natural trajectories are collected.
 
 ## 5. Active B selection
 
-The structural monitor still freezes **all** first-eligible object episodes produced by its generic rules.
+The structural monitor freezes **all** first-eligible object episodes produced by the generic frozen rules.
 
 For resource control, G1 launches at most one active B per cell:
 
 > earliest `COMPLETE_FOR_STRUCTURED_REPAIR` package by `prefix_sequence`, then `package_id`.
 
-This is structural and deterministic. It does not use CPR labels or semantic audit.
+This selector is structural and deterministic. It does not use CPR labels or semantic audit.
 
-Additional complete packages remain frozen and auditable; they are not deleted or reclassified. A later prospective replication group can test additional packages if scientifically useful.
+Additional complete packages remain frozen and auditable. They are not deleted, downgraded, or silently excluded from later replication.
 
 ## 6. Resource ceiling
 
@@ -78,9 +91,9 @@ Hard G1 ceilings are:
 - at most 15 B trajectories × 64 = **960 logical invocations**;
 - total = **1,920 logical model invocations**.
 
-Each B is additionally limited by the remaining horizon recorded in its parent checkpoint, so realized use should be lower.
+Each B is further bounded by the remaining horizon in its frozen parent checkpoint, so realized use should be lower.
 
-With transport `max_retries = 2`, the absolute theoretical HTTP-attempt ceiling is 5,760. This is an outer failure bound, not a sampling target.
+With transport `max_retries = 2`, the absolute theoretical HTTP-attempt ceiling is 5,760. This is an outer failure ceiling, not a sampling target.
 
 Automatic paid evaluator calls remain **0**.
 
@@ -102,16 +115,24 @@ Repair B:
 
 `stage2/r7_g1_v1/repair_B/{cell_id}/{package_id}/`
 
-Every natural cell must freeze its result, checkpoint ledger, monitor evidence, candidates, repair packages, runtime bridge, run manifest and seal.
+Every active natural cell freezes its result, checkpoint ledger, monitor evidence, candidates, repair packages, runtime bridge, run manifest and seal.
+
+The X1/X3 prospective wrappers remain available for future G2/G3 replication or checkpoint-method research without changing the present G1 active launch.
 
 ## 9. Scientific boundary
 
 This readiness result does not claim repair effectiveness, CPR coverage, prevalence, framework superiority, or cross-system causal uniformity.
 
-Those claims remain downstream of the actual prospective trajectories and posthoc semantic audit.
+Those questions remain downstream of actual prospective trajectories and posthoc semantic audit.
 
 ## 10. Gate
 
 The engineering/readiness phase is complete.
 
-**No subject/provider execution is started by this report.** The next operation is the first real G1 scientific phase: 15 prospective natural A first attempts, and it requires explicit active-execution authorization.
+**No subject/provider execution is started by this report.**
+
+The next real scientific operation is:
+
+**G1 Phase A — execute and freeze the 15 repair-capable prospective natural first attempts.**
+
+That operation requires explicit active-execution authorization.
