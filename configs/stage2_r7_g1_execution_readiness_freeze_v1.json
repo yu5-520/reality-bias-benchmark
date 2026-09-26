@@ -1,21 +1,43 @@
 {
   "schema": "RB-STAGE2-R7-G1-EXECUTION-READINESS-FREEZE-v1",
-  "version": "1.0",
+  "version": "1.1",
   "date": "2026-09-26",
   "status": "FROZEN_READY_AWAITING_EXPLICIT_ACTIVE_EXECUTION_AUTHORIZATION",
-  "preflight_workflow_run_id": 36231012529,
-  "tested_head_sha": "356a626674f83424afcc0a9908ae81edd85f5c15",
+  "preflight_workflow_run_id": 36231420391,
+  "tested_head_sha": "51066a2b474fff3512a5feedd50c9f3c4164ef15",
   "provider_calls": 0,
   "subject_calls": 0,
   "active_repairs": 0,
   "results": {
+    "X1": {
+      "status": "PASS",
+      "decision_count": 6,
+      "checkpoint_count": 2,
+      "control_flow_equivalent": true,
+      "checkout_equivalent": true,
+      "manifest_hash": "7d2c072a8aae06c8006f30a9c6bfeb28225ac55cdb480431de126a53f7383dd2",
+      "midrun_checkpoint_status": "UNPROVEN_FAIL_CLOSED",
+      "active_midrun_B_capable": false
+    },
     "X2": {
       "status": "PASS",
       "decision_count": 2,
       "checkpoint_count": 4,
       "control_flow_equivalent": true,
       "checkout_equivalent": true,
-      "manifest_hash": "93161fdcfc95af10f0389cf33b503bd36d53ff40c2be69c9a1916375a566d31e"
+      "manifest_hash": "aef19a685561fc33718b0d71f3ff6f2e9935ebc9406e48c3c1185e1a9993430b",
+      "active_midrun_B_capable": true
+    },
+    "X3": {
+      "status": "PASS",
+      "decision_count": 7,
+      "checkpoint_count": 2,
+      "control_flow_equivalent": true,
+      "checkout_equivalent": true,
+      "manifest_hash": "91f7f9370d21816dcb2d4fb8edf7092ed530cf50333b80e23efc9fbe6e2dbab9",
+      "nested_checkpoint_status": "UNPROVEN_FAIL_CLOSED",
+      "a2a_protocol_modified": false,
+      "active_midrun_B_capable": false
     },
     "X4": {
       "status": "PASS",
@@ -24,7 +46,8 @@
       "control_flow_equivalent": true,
       "checkout_equivalent": true,
       "manifest_hash": "85d6de50df1f1a0397192f1b1e4b4d8ff655b772b32c42d9a0fee26ab823dff4",
-      "mcp_protocol_modified": false
+      "mcp_protocol_modified": false,
+      "active_midrun_B_capable": true
     },
     "X5": {
       "status": "PASS",
@@ -33,7 +56,8 @@
       "control_flow_equivalent": true,
       "checkout_equivalent": true,
       "manifest_hash": "844102077e37dceab2a9a6193033e9023747390a690a434141826c3b72d050e8",
-      "rag_internal_mutation": false
+      "rag_internal_mutation": false,
+      "active_midrun_B_capable": true
     },
     "X6": {
       "status": "PASS",
@@ -42,7 +66,8 @@
       "control_flow_equivalent": true,
       "checkout_equivalent": true,
       "manifest_hash": "cf1c5b79bdd5279ebdcf156aed5f54ee17a105a21f906cdc116dfa8db7a6d2ea",
-      "foreign_memory_mutated_by_repair": false
+      "foreign_memory_mutated_by_repair": false,
+      "active_midrun_B_capable": true
     },
     "X7": {
       "status": "PASS",
@@ -51,8 +76,23 @@
       "control_flow_equivalent": true,
       "checkout_equivalent": true,
       "manifest_hash": "f1afb7f02eb201d1be0a052ff0f65a5f5a44ed9099f54a4d68d7a9a306a7b590",
-      "compressor_state_mutated_by_repair": false
+      "compressor_state_mutated_by_repair": false,
+      "active_midrun_B_capable": true
     }
+  },
+  "engineering_wrapper_readiness": {
+    "systems_preflighted": [
+      "X1",
+      "X2",
+      "X3",
+      "X4",
+      "X5",
+      "X6",
+      "X7"
+    ],
+    "all_passed": true,
+    "x1_x3_value": "PROSPECTIVE_OBSERVATION_AND_QUIESCENT_CHECKPOINT_INFRASTRUCTURE_READY_FOR_FUTURE_REPLICATION",
+    "x1_x3_current_limit": "RELEVANT_MIDRUN_OR_NESTED_REPAIR_PARENT_UNPROVEN"
   },
   "active_extension": {
     "systems": [
@@ -73,9 +113,9 @@
     "original_21_reference_paths": "IMMUTABLE"
   },
   "excluded_new_subject_runs": {
-    "X1": "MIDRUN_AUTOGEN_CHECKPOINT_BOUNDARY_BLOCKED",
-    "X3": "NESTED_A2A_CALLSTACK_CHECKPOINT_BOUNDARY_BLOCKED",
-    "rule": "Do not spend new stochastic subject runs where paired active repair cannot legally branch under the frozen boundary."
+    "X1": "ENGINEERING_WRAPPER_PASS_BUT_MIDRUN_AUTOGEN_CHECKPOINT_BOUNDARY_BLOCKED",
+    "X3": "ENGINEERING_WRAPPER_PASS_BUT_NESTED_A2A_CALLSTACK_CHECKPOINT_BOUNDARY_BLOCKED",
+    "rule": "Do not spend new stochastic G1 subject runs where the paired active repair branch cannot legally start. Keep the wrappers for later replication/checkpoint research."
   },
   "resource_ceiling": {
     "natural_logical_model_invocations": 960,
