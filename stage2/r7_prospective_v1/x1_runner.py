@@ -18,6 +18,8 @@ from stage2.r7_checkpoint_v1.autogen_adapter import AutoGenNativeCheckpointAdapt
 from stage2.r7_checkpoint_v1.common import CheckpointRegistry, digest
 from stage2.r7_prospective_v1.online_monitor import OnlineStructuralMonitor
 from stage2.r7_prospective_v1.run_manifest import build_run_manifest
+from stage2.r7_prospective_v1.evidence_channels import seal_evidence_channels
+from stage2.r7_prospective_v1.replication_contract import resolve_decision_horizon, run_id, semantic_audit_state
 
 ROOT = Path(__file__).resolve().parents[2]
 STAGE2 = ROOT / "stage2"
@@ -112,8 +114,11 @@ async def run_x1_natural_A(
     subject_file,
     out_root,
     model_client=None,
+    group_id="StageII-R7-G1",
+    decision_horizon=None,
 ):
     task, roles, subject = _load_inputs(task_file, roles_file, subject_file)
+    horizon = resolve_decision_horizon(group_id=group_id, subject=subject, requested=decision_horizon)
     out = Path(out_root)
     out.mkdir(parents=True, exist_ok=False)
     own_client = model_client is None
@@ -123,7 +128,7 @@ async def run_x1_natural_A(
         model_client=client,
         roles=roles,
         checkout=checkout,
-        max_turns=int(subject["limits"]["max_turns"]),
+        max_turns=horizon,
     )
     registry = CheckpointRegistry(out / "checkpoints")
     adapter = AutoGenNativeCheckpointAdapter()
@@ -134,12 +139,12 @@ async def run_x1_natural_A(
         team=team,
         registry=registry,
         application_root=checkout,
-        group_id="StageII-R7-G1",
-        run_id=f"StageII-R7-G1-X1-{task['id']}",
+        group_id=group_id,
+        run_id=run_id(group_id=group_id, cell_id=f"X1-{task['id']}"),
         task_id=task["id"],
         event_ref="x1:task-start",
         model_visible_context={"task_id": task["id"], "boundary": "before-team-run"},
-        remaining_horizon=int(subject["limits"]["max_turns"]),
+        remaining_horizon=horizon,
         replication_binding={
             "repair_contract_version": "RB-STAGE2-R7-G1-PROSPECTIVE-REPAIR-CONTRACT-v1"
         },
@@ -199,12 +204,12 @@ async def run_x1_natural_A(
         team=team,
         registry=registry,
         application_root=checkout,
-        group_id="StageII-R7-G1",
-        run_id=f"StageII-R7-G1-X1-{task['id']}",
+        group_id=group_id,
+        run_id=run_id(group_id=group_id, cell_id=f"X1-{task['id']}"),
         task_id=task["id"],
         event_ref="x1:terminal",
         model_visible_context={"task_id": task["id"], "boundary": "after-team-run"},
-        remaining_horizon=max(0, int(subject["limits"]["max_turns"]) - client.create_calls),
+        remaining_horizon=max(0, horizon - client.create_calls),
         replication_binding={
             "repair_contract_version": "RB-STAGE2-R7-G1-PROSPECTIVE-REPAIR-CONTRACT-v1"
         },
@@ -224,7 +229,7 @@ async def run_x1_natural_A(
     }
     if client.create_stream_calls:
         raise RuntimeError("unexpected AutoGen streaming model-client call path")
-    if client.create_calls > int(subject["limits"]["max_total_model_invocations"]):
+    if client.create_calls > horizon:
         raise RuntimeError("X1 exceeded frozen model invocation ceiling")
 
     checkpoint_ledger = {
@@ -277,6 +282,8 @@ async def run_x1_natural_A(
         monitor_snapshot=monitor_snapshot,
         packages=monitor.packages(),
         natural_subject_calls=client.create_calls if own_client else 0,
+        group_id=group_id,
+        semantic_audit_state=semantic_audit_state(group_id=group_id),
     )
 
     _write_json(out / "natural_A_result.json", result)
@@ -286,9 +293,16 @@ async def run_x1_natural_A(
     _write_json(out / "repair_packages.json", monitor.packages())
     _write_json(out / "native_event_index.json", native_rows)
     _write_json(out / "run_manifest.json", manifest)
+    channel_seal = seal_evidence_channels(
+        out_root=out,
+        group_id=group_id,
+        cell_id=f"X1-{task['id']}",
+        audit_paths=["natural_A_result.json", "checkpoint_ledger.json", "checkpoints", "autogen_observer"],
+        monitor_paths=["monitor_evidence.json", "monitor_candidates.json", "repair_packages.json", "native_event_index.json"],
+    )
     seal = {
-        "schema": "RB-STAGE2-R7-G1-NATURAL-A-SEAL-v1",
-        "group_id": "StageII-R7-G1",
+        "schema": ("RB-STAGE2-R7-G1-NATURAL-A-SEAL-v1" if group_id == "StageII-R7-G1" else "RB-STAGE2-PROSPECTIVE-NATURAL-A-SEAL-v2"),
+        "group_id": group_id,
         "cell_id": f"X1-{task['id']}",
         "status": "NATURAL_A_FROZEN_REPAIR_MIDRUN_CHECKPOINT_BLOCKED",
         "provider_mode": "SUBJECT" if own_client else "NON_STUDY_INJECTED",
@@ -301,8 +315,9 @@ async def run_x1_natural_A(
         "package_count": len(monitor.packages()),
         "complete_package_count": 0,
         "run_manifest_hash": manifest["manifest_hash"],
+        **channel_seal,
         "repair_actions_during_A": 0,
-        "semantic_audit_state": "LOCKED_UNTIL_A_AND_B_FROZEN",
+        "semantic_audit_state": semantic_audit_state(group_id=group_id),
     }
     _write_json(out / "seal.json", seal)
     return seal
@@ -315,6 +330,8 @@ def main():
     parser.add_argument("--roles-file", required=True)
     parser.add_argument("--subject-file", required=True)
     parser.add_argument("--out-root", required=True)
+    parser.add_argument("--group-id", default="StageII-R7-G1")
+    parser.add_argument("--decision-horizon", type=int)
     args = parser.parse_args()
     result = asyncio.run(
         run_x1_natural_A(
@@ -323,6 +340,8 @@ def main():
             roles_file=args.roles_file,
             subject_file=args.subject_file,
             out_root=args.out_root,
+            group_id=args.group_id,
+            decision_horizon=args.decision_horizon,
         )
     )
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
