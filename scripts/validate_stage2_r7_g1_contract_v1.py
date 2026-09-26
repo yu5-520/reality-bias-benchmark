@@ -13,6 +13,9 @@ TASKS = ROOT / "stage2/tasks.json"
 ROLES = ROOT / "stage2/roles.json"
 SUBJECT = ROOT / "stage2/subject.json"
 ACTION = ROOT / "stage2/native_v7/action_contract_registry.json"
+PREFLIGHT = ROOT / "configs/stage2_r7_g1_preflight_freeze_v1.json"
+REPLICATION = ROOT / "configs/stage2_r7_prospective_replication_registry_v1.json"
+RUN_SCHEMA = ROOT / "schemas/stage2_r7_g1_run_manifest_v1.schema.json"
 HOST = ROOT / "stage2/r7_prospective_v1/host.py"
 X2 = ROOT / "stage2/r7_prospective_v1/x2_metagpt.py"
 RECORDERS = ROOT / "stage2/r7_prospective_v1/recorders.py"
@@ -38,6 +41,9 @@ def main():
     boundaries = load(BOUNDARIES)
     checkpoint = load(CHECKPOINT)
     conformance = load(CONFORMANCE)
+    preflight = load(PREFLIGHT)
+    replication = load(REPLICATION)
+    run_schema = load(RUN_SCHEMA)
 
     require(contract["schema"] == "RB-STAGE2-R7-G1-PROSPECTIVE-REPAIR-CONTRACT-v1", "G1 contract schema")
     require(contract["status"] == "FROZEN_CONTRACT_NO_SUBJECT_EXECUTION_YET", "G1 contract status")
@@ -111,6 +117,22 @@ def main():
     require(conformance["provider_calls"] == 0 and conformance["scientific_subject_runs"] == 0, "checkpoint smoke only")
     require(conformance["systems"]["X3_A2A"]["a2a_protocol_modified"] is False, "A2A unchanged")
 
+    require(preflight["status"] == "FROZEN_NON_STUDY_PREFLIGHT_PASS_SUBJECT_EXECUTION_CLOSED", "G1 preflight status")
+    require(preflight["workflow_run_id"] == 36228869124, "G1 preflight workflow")
+    require(preflight["provider_calls"] == 0 and preflight["subject_calls"] == 0, "G1 preflight no subject")
+    require(preflight["active_repairs"] == 0, "G1 preflight no repair")
+    require(preflight["results"]["X2_METAGPT"]["checkpoint_count"] == 9, "X2 checkpoint count")
+    require(preflight["results"]["X2_METAGPT"]["control_flow_equivalent"] is True, "X2 equivalence")
+    require(preflight["results"]["X4_X7_HOST"]["checkpoint_count"] == 9, "host checkpoint count")
+    require(preflight["results"]["X4_X7_HOST"]["foreign_carrier_mutation"] is False, "foreign carrier immutable")
+    require(preflight["results"]["STATIC_BOUNDARY"]["X1_mid_run"] == "UNPROVEN_FAIL_CLOSED", "X1 static boundary")
+    require(preflight["results"]["STATIC_BOUNDARY"]["X3_mid_nested_call"] == "UNPROVEN_FAIL_CLOSED", "X3 static boundary")
+
+    require(replication["status"] == "FROZEN_NAMING_AND_BINDING_POLICY", "replication registry")
+    require(replication["groups"]["StageII-R7-G1"]["state"] == "CONTRACT_PREPARED_SUBJECT_NOT_STARTED", "G1 replication state")
+    require(run_schema["$id"] == "RB-STAGE2-R7-G1-RUN-MANIFEST-v1", "run manifest schema")
+    require(run_schema["properties"]["natural_attempt_index"]["const"] == 1, "run manifest first attempt")
+
     host = HOST.read_text(encoding="utf-8")
     x2 = X2.read_text(encoding="utf-8")
     recorders = RECORDERS.read_text(encoding="utf-8")
@@ -137,6 +159,8 @@ def main():
     print("X2_ROUND_CHECKPOINT=REGISTERED")
     print("X3_NESTED_CHECKPOINT=UNPROVEN_FAIL_CLOSED")
     print("X4_X7_HOST_TURN_CHECKPOINT=REGISTERED")
+    print("G1_CHECKPOINT_HOOK_PREFLIGHT=PASS")
+    print("G1_SCIENTIFIC_SUBJECT_STARTED=NO")
 
 
 if __name__ == "__main__":
