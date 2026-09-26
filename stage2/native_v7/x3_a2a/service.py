@@ -80,7 +80,7 @@ async def _call_agent(url, payload):
 
 
 class RoleRuntime:
-    def __init__(self, *, role, checkout, directory_file, mode, script_file=None, max_turns=None):
+    def __init__(self, *, role, checkout, directory_file, mode, script_file=None):
         if role not in DIRECTORY:
             raise ValueError("role outside frozen roster")
         self.role = role
@@ -91,9 +91,6 @@ class RoleRuntime:
             raise ValueError("A2A service directory differs from frozen nine-role roster")
         self.provider = _load_provider(mode, role, script_file)
         self.mode = mode
-        self.max_turns = int(max_turns if max_turns is not None else LIMITS["max_turns"])
-        if not 1 <= self.max_turns <= int(LIMITS["max_total_model_invocations"]):
-            raise ValueError("A2A role-service horizon exceeds frozen logical-decision ceiling")
         self.sessions = {}
 
     def _prompt(self, *, task, state, remaining_turns):
@@ -154,10 +151,10 @@ class RoleRuntime:
         if sender == self.role:
             raise ValueError("A2A self-routing is not allowed")
         remaining = int(payload.get("remaining_turns", 0))
-        if not 1 <= remaining <= self.max_turns:
+        if not 1 <= remaining <= LIMITS["max_turns"]:
             raise ValueError("A2A role call has invalid remaining-turn budget")
         depth = int(payload.get("depth", 0))
-        if depth < 0 or depth >= self.max_turns:
+        if depth < 0 or depth >= LIMITS["max_turns"]:
             raise ValueError("A2A role-call depth exceeds frozen turn budget")
         session_id = payload.get("session_id")
         if not isinstance(session_id, str) or not session_id:
@@ -427,7 +424,6 @@ def main():
     parser.add_argument("--port", required=True, type=int)
     parser.add_argument("--mode", choices=["subject", "scripted"], default="subject")
     parser.add_argument("--script-file")
-    parser.add_argument("--max-turns", type=int)
     args = parser.parse_args()
     runtime = RoleRuntime(
         role=args.role,
@@ -435,7 +431,6 @@ def main():
         directory_file=args.directory_file,
         mode=args.mode,
         script_file=args.script_file,
-        max_turns=args.max_turns,
     )
     app = build_app(runtime=runtime, public_url=args.public_url)
     uvicorn.run(
