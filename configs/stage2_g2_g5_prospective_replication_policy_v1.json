@@ -1,0 +1,130 @@
+{
+  "schema": "stage2-g2-g5-prospective-replication-policy-v1",
+  "version": "1.0",
+  "date_utc": "2026-09-26",
+  "status": "FROZEN_POLICY_EXECUTION_NOT_AUTHORIZED",
+  "experimental_general_chapter": "docs/reports/2026-09-26/StageII_Experimental_General_Chapter_Process_Reality_Methodology_and_Principles_v2.md",
+  "engineering_general_chapter": "docs/reports/2026-09-26/StageII_Engineering_General_Chapter_Process_Integrity_Monitoring_and_Repair_v1.md",
+  "group_model": {
+    "G1": {
+      "designation": "DISCOVERY_CALIBRATION_REFERENCE",
+      "source": "stage2/natural_v7",
+      "natural_cells": 21,
+      "state": "IMMUTABLE_COMPLETE",
+      "repair_role": "REFERENCE_ONLY"
+    },
+    "G2": {
+      "designation": "PROSPECTIVE_REPLICATION_1",
+      "natural_cells": 21,
+      "state": "PLANNED"
+    },
+    "G3": {
+      "designation": "PROSPECTIVE_REPLICATION_2",
+      "natural_cells": 21,
+      "state": "PLANNED"
+    },
+    "G4": {
+      "designation": "PROSPECTIVE_REPLICATION_3",
+      "natural_cells": 21,
+      "state": "PLANNED"
+    },
+    "G5": {
+      "designation": "PROSPECTIVE_REPLICATION_4",
+      "natural_cells": 21,
+      "state": "PLANNED"
+    }
+  },
+  "systems": [
+    "X1",
+    "X2",
+    "X3",
+    "X4",
+    "X5",
+    "X6",
+    "X7"
+  ],
+  "tasks": [
+    "T1",
+    "T2",
+    "T3"
+  ],
+  "natural_cell_count_per_group": 21,
+  "natural_first_attempts_per_cell": 1,
+  "natural_rerun_policy": "FORBIDDEN_WITHIN_GROUP",
+  "common_horizon": {
+    "target_logical_model_decisions": 64,
+    "g1_historical_reference": 32,
+    "state": "MUST_PASS_NATIVE_WRAPPER_EQUIVALENCE_PREFLIGHT_BEFORE_G2",
+    "cell_specific_extension": false,
+    "interpretation": "hard observation ceiling; earlier native completion is allowed"
+  },
+  "action_contract": {
+    "g1_t1_historical": "v1_t1_historical",
+    "g1_t2_t3": "v2_t2_t3_prospective",
+    "g2_g5": "USE_CLARIFIED_PROSPECTIVE_CONTRACT_FOR_APPLICABLE_CUSTOM_ACTION_SURFACES",
+    "x1": "NATIVE_AUTOGEN_TOOL_INTERFACE",
+    "invariant": "parser semantics and upstream framework/protocol semantics remain unchanged"
+  },
+  "natural_phase_order": [
+    "RUN_X1_X7_T1_T3_AS_21_FIRST_ATTEMPTS",
+    "FREEZE_ALL_21_RAW_EVIDENCE",
+    "NO_B_BEFORE_ALL_21_A_FROZEN"
+  ],
+  "termination_classes": [
+    "NATURAL_TERMINAL_CLOSURE",
+    "HORIZON_CENSORED_NON_CLOSURE",
+    "PROVIDER_OR_TRANSPORT_FAILURE",
+    "FRAMEWORK_OR_RUNNER_EXCEPTION",
+    "MEASUREMENT_INTERFACE_ARTIFACT",
+    "OTHER_EXPLICITLY_SOURCE_BOUND_STOP"
+  ],
+  "monitoring": {
+    "all_21_cells": true,
+    "start": "TASK_START",
+    "continues_through": "TERMINAL_OR_HORIZON_STOP",
+    "repair_actions_during_A": 0,
+    "semantic_cpr_input_during_A": false
+  },
+  "repair_eligibility": {
+    "evaluated_cells_per_group": 21,
+    "current_system_status": {
+      "X1": "OBSERVATION_AUDIT_ELIGIBLE_ACTIVE_B_BLOCKED_UNDER_NATIVE_PRESERVATION",
+      "X2": "ACTIVE_B_CAPABLE_IF_CELL_HAS_COMPLETE_PACKAGE_AND_LEGAL_PARENT",
+      "X3": "OBSERVATION_AUDIT_ELIGIBLE_ACTIVE_B_BLOCKED_UNDER_NATIVE_PRESERVATION",
+      "X4": "ACTIVE_B_CAPABLE_IF_CELL_HAS_COMPLETE_PACKAGE_AND_LEGAL_PARENT",
+      "X5": "ACTIVE_B_CAPABLE_IF_CELL_HAS_COMPLETE_PACKAGE_AND_LEGAL_PARENT",
+      "X6": "ACTIVE_B_CAPABLE_IF_CELL_HAS_COMPLETE_PACKAGE_AND_LEGAL_PARENT",
+      "X7": "ACTIVE_B_CAPABLE_IF_CELL_HAS_COMPLETE_PACKAGE_AND_LEGAL_PARENT"
+    },
+    "expected_max_active_B_cells_per_group": 15,
+    "actual_B_count_rule": "ONLY_CELLS_PASSING_FROZEN_ELIGIBILITY_GATE",
+    "x1_x3_rule": "Do not modify AutoGen or A2A protocol/framework to manufacture repair resumability."
+  },
+  "repair_phase": {
+    "begin_only_after_all_natural_A_frozen": true,
+    "package_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+    "max_B_per_eligible_cell": 1,
+    "semantic_selection": false,
+    "cpr_selection": false,
+    "repair_executor_exit": true,
+    "second_automatic_repair": false,
+    "monitor_after_repair": "WATCH_ONLY"
+  },
+  "evidence_roots": {
+    "G2": "stage2/replication_v1/G2",
+    "G3": "stage2/replication_v1/G3",
+    "G4": "stage2/replication_v1/G4",
+    "G5": "stage2/replication_v1/G5"
+  },
+  "legacy_supersession": {
+    "path": "configs/stage2_r7_g1_launch_manifest_v1.json",
+    "status": "HISTORICAL_READINESS_ONLY_NOT_TO_BE_ACTIVATED",
+    "reason": "It proposed 15 new natural runs by omitting X1/X3. No scientific subject execution occurred. The forward five-group design requires all 21 natural cells and applies repair eligibility only after natural freeze."
+  },
+  "authorization": {
+    "subject_calls": false,
+    "repair_calls": false,
+    "paid_evaluator_calls": false,
+    "next_gate": "G2_21_CELL_HORIZON_AND_WRAPPER_EQUIVALENCE_PREFLIGHT"
+  }
+}
