@@ -118,6 +118,7 @@ async def run_capability_natural_A(
     checkpoint_root = out / "checkpoints"
     capability_observer = out / "capability_observer"
 
+    subject_mode = provider is None
     active_provider = provider if provider is not None else _build_subject_provider(subject)
     tap = PassiveActionTapProvider(active_provider)
     registry = CheckpointRegistry(checkpoint_root)
@@ -273,7 +274,7 @@ async def run_capability_natural_A(
         natural_result=result,
         monitor_snapshot=bridge.snapshot(),
         packages=monitor.packages(),
-        natural_subject_calls=tap.total_records,
+        natural_subject_calls=tap.total_records if subject_mode else 0,
     )
     _write_json(out / "run_manifest.json", manifest)
     seal = {
@@ -281,7 +282,9 @@ async def run_capability_natural_A(
         "group_id": "StageII-R7-G1",
         "cell_id": f"{system}-{task['id']}",
         "status": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
-        "natural_subject_calls": tap.total_records,
+        "natural_subject_calls": tap.total_records if subject_mode else 0,
+        "model_decision_count": tap.total_records,
+        "provider_mode": "SUBJECT" if subject_mode else "NON_STUDY_INJECTED",
         "checkpoint_count": len(controller.ledger()["checkpoints"]),
         "structural_event_count": len(monitor.evidence()),
         "candidate_count": len(monitor.candidates()),
