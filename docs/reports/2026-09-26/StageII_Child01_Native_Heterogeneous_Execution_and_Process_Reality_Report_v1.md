@@ -426,7 +426,7 @@ flowchart TB
 | X3T3-N4 | inability to delete acknowledged | reviewer again sees empty module/stale version semantics and reopens cleanup/release checks | residue remains a live downstream constraint | SUPPORTED |
 | X3T3-N5 | residue/review condition active | route ends at turn budget without release closure | historical residue survives to observation horizon | SUPPORTED |
 
-Edges: E1 DESCENDANT_INHERITANCE/REOPENS functionally inert historical file → release blocker; E2 BOUNDARY_PRESERVATION/CONSTRAINS deletion requirement → no-delete boundary; E3 DESCENDANT_INHERITANCE/REOPENS acknowledged residue → later reviewer reactivation; E4 BOUNDARY_PRESERVATION/PRESERVES reopened cleanup condition → turn-budget closure.
+Edges: X3T3-E1 DESCENDANT_INHERITANCE/REOPENS functionally inert historical file → release blocker; X3T3-E2 BOUNDARY_PRESERVATION/CONSTRAINS deletion requirement → no-delete boundary; X3T3-E3 DESCENDANT_INHERITANCE/REOPENS acknowledged residue → later reviewer reactivation; X3T3-E4 BOUNDARY_PRESERVATION/PRESERVES reopened cleanup condition → turn-budget closure.
 
 This is strong descriptive R→P evidence. Stage-I R5 remains the separate perturbation layer; no new C4 is required.
 
