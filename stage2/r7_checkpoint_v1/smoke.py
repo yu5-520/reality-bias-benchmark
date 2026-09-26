@@ -4,6 +4,7 @@ import argparse
 import asyncio
 import copy
 import json
+import os
 import shutil
 import tempfile
 from pathlib import Path
@@ -148,6 +149,19 @@ async def smoke_autogen(destination: Path) -> dict:
 
 
 def smoke_metagpt(destination: Path) -> dict:
+    # MetaGPT eagerly loads its config at import time. Use the same isolated,
+    # non-provider bootstrap pattern as the frozen X2 runner; no API call occurs.
+    bootstrap = destination / "metagpt-home"
+    (bootstrap / ".metagpt").mkdir(parents=True)
+    (bootstrap / ".metagpt/config2.yaml").write_text(
+        "llm:\n"
+        "  api_type: openai\n"
+        "  model: stage2-checkpoint-smoke-unused\n"
+        "  base_url: https://api.openai.com/v1\n"
+        "  api_key: stage2-checkpoint-smoke-unused\n"
+    )
+    os.environ["HOME"] = str(bootstrap)
+
     from metagpt.environment import Environment
     from metagpt.schema import Message
 
