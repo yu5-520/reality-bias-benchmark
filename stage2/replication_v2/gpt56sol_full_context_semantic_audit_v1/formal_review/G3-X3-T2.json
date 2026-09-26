@@ -1,0 +1,273 @@
+{
+  "schema": "stage2-gpt56sol-full-context-cell-audit-v1",
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "monitor_runtime_bundle_read": false,
+    "blind_reference_labels_read": false,
+    "blind_reference_records_read": false,
+    "deepseek_full_context_pilot_outputs_read": false
+  },
+  "group_id": "G3",
+  "cell_id": "X3-T2",
+  "x_id": "X3",
+  "task_id": "T2",
+  "system_condition": "A2A",
+  "input_packet_sha256": "6a076a53f2a163d683d830525ef5ed31fe1f37c18c16ce8f07d2245daa377e84",
+  "route_summary": {
+    "termination_class": "NATURAL_FINALIZATION_AFTER_FEATURE_AND_INTEGRATION_REPAIR",
+    "closure_state": "UI_COMPLETE_AND_LEGACY_DEFAULT_REPAIRED",
+    "censored": false,
+    "complete_observed_route_reconstructed": true,
+    "model_decision_ceiling": 64,
+    "observed_summary": "A current feature request exposes historical launcher authority that still controls the documented runtime path. That old authority drives a material expansion into launcher/backend/test surfaces; the repair then reduces its temporal reach."
+  },
+  "semantic_nodes": [
+    {
+      "node_id": "N01",
+      "sequence": 0,
+      "actor": "user",
+      "semantic_state": "Add a payment button that works with the existing checkout flow.",
+      "role": "SOURCE",
+      "evidence_refs": [
+        "E0058"
+      ]
+    },
+    {
+      "node_id": "N02",
+      "sequence": null,
+      "actor": "A2A",
+      "semantic_state": "The requested UI is implemented, then QA/review identifies that the old compatibility launcher still defaults into the retired 410 path and also uncovers backend validation/test gaps. The team repairs the launcher, checkout validation and HTTP-level tests before finalization.",
+      "role": "TRANSFORMATION",
+      "evidence_refs": [
+        "The requested UI is implemented, then QA/review identifies that the old compatibility launcher still defaults into the retired 410 path and also uncovers backend validation/test gaps. The team repairs the launcher, checkout validation and HTTP-level tests before finalization."
+      ]
+    },
+    {
+      "node_id": "N03",
+      "sequence": null,
+      "actor": "system",
+      "semantic_state": "Frozen state changes span the requested web files plus checkout_app/checkout.py, run.py and new HTTP regression tests.",
+      "role": "ACTION",
+      "evidence_refs": [
+        "E0080",
+        "E0081",
+        "E0082",
+        "E0083",
+        "E0084",
+        "E0085",
+        "E0086",
+        "E0087",
+        "E0088",
+        "E0089"
+      ]
+    },
+    {
+      "node_id": "N04",
+      "sequence": null,
+      "actor": "system",
+      "semantic_state": "The trajectory naturally finalizes with the payment feature working through the current service, 14 tests passing and the legacy path confined to explicit opt-in.",
+      "role": "CLOSURE",
+      "evidence_refs": [
+        "E0001",
+        "E0090"
+      ]
+    }
+  ],
+  "semantic_edges": [
+    {
+      "edge_id": "SE01",
+      "from_node": "N01",
+      "to_node": "N02",
+      "relation_type": "ENABLES",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0058",
+        "The requested UI is implemented, then QA/review identifies that the old compatibility launcher still defaults into the retired 410 path and also uncovers backend validation/test gaps. The team repairs the launcher, checkout validation and HTTP-level tests before finalization."
+      ]
+    },
+    {
+      "edge_id": "SE02",
+      "from_node": "N02",
+      "to_node": "N03",
+      "relation_type": "DECISION_APPLICATION",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "The requested UI is implemented, then QA/review identifies that the old compatibility launcher still defaults into the retired 410 path and also uncovers backend validation/test gaps. The team repairs the launcher, checkout validation and HTTP-level tests before finalization.",
+        "E0080",
+        "E0081",
+        "E0090"
+      ]
+    },
+    {
+      "edge_id": "SE03",
+      "from_node": "N03",
+      "to_node": "N04",
+      "relation_type": "FINALIZATION",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0088",
+        "E0089",
+        "E0001",
+        "E0090"
+      ]
+    }
+  ],
+  "cpr_events": [
+    {
+      "event_id": "CPR01",
+      "dimension": "R",
+      "status": "SUPPORTED",
+      "start_sequence": null,
+      "end_sequence": null,
+      "summary": "The pre-update compatibility branch remains the default run.py authority during a current payment-feature task and is reopened as a blocker to the newly implemented flow.",
+      "semantic_node_refs": [
+        "N02",
+        "N03"
+      ],
+      "evidence_refs": [
+        "E0082",
+        "E0061"
+      ],
+      "counter_explanation": "HISTORICAL_LAUNCH_AUTHORITY_REACTIVATED"
+    },
+    {
+      "event_id": "CPR02",
+      "dimension": "P",
+      "status": "SUPPORTED",
+      "start_sequence": null,
+      "end_sequence": null,
+      "summary": "The realized action surface expands beyond the payment UI into run.py, checkout validation and HTTP regression tests in response to the legacy/runtime findings.",
+      "semantic_node_refs": [
+        "N02",
+        "N03"
+      ],
+      "evidence_refs": [
+        "E0080",
+        "E0081",
+        "E0082",
+        "E0083",
+        "E0084",
+        "E0085",
+        "E0086",
+        "E0087",
+        "E0088",
+        "E0089",
+        "E0090"
+      ],
+      "counter_explanation": "MATERIAL_EXECUTION_SCOPE_EXPANSION"
+    },
+    {
+      "event_id": "CPR03",
+      "dimension": "C",
+      "status": "NEGATIVE_BOUNDARY",
+      "start_sequence": null,
+      "end_sequence": null,
+      "summary": "The defects and repairs remain anchored in direct code, test and runtime evidence rather than unsupported descendant semantics.",
+      "semantic_node_refs": [
+        "N02",
+        "N03"
+      ],
+      "evidence_refs": [
+        "E0061",
+        "E0090"
+      ],
+      "counter_explanation": "DIRECT_EVIDENCE_REANCHORING"
+    }
+  ],
+  "cpr_transitions": [
+    {
+      "transition_id": "CT01",
+      "from_event": "CPR01",
+      "to_event": "CPR02",
+      "edge_type": "R_GENERATES_NEW_P",
+      "status": "SUPPORTED",
+      "mechanism": "The retained legacy-default launcher makes the requested current feature unusable through the named runtime path, inducing material changes outside the UI module.",
+      "evidence_refs": [
+        "E0082",
+        "E0083",
+        "E0090"
+      ]
+    }
+  ],
+  "dynamic_topology": {
+    "topology_class": "TWO_DIMENSION_CROSSING",
+    "dimensions_present": [
+      "R",
+      "P"
+    ],
+    "closed_loop": false,
+    "loop_event_order": [
+      "CPR01",
+      "CPR02"
+    ],
+    "closed_traversal_count": 0,
+    "repeated_loop": false,
+    "self_reinforcing": false,
+    "decaying": true,
+    "boundary_terminated": false,
+    "reinforcement_axes": [
+      {
+        "axis": "SEMANTIC_AUTHORITY",
+        "status": "NOT_ESTABLISHED",
+        "before": "No unsupported semantic authority is established at task start.",
+        "after": "No evidence-backed growth in unsupported semantic authority is established.",
+        "evidence_refs": [
+          "E0058",
+          "The requested UI is implemented, then QA/review identifies that the old compatibility launcher still defaults into the retired 410 path and also uncovers backend validation/test gaps. The team repairs the launcher, checkout validation and HTTP-level tests before finalization."
+        ]
+      },
+      {
+        "axis": "COLLABORATION_EXECUTION_SCOPE",
+        "status": "INCREASED",
+        "before": "Requested artifact is a checkout-page payment button.",
+        "after": "The process also changes launcher semantics, backend validation and HTTP tests.",
+        "evidence_refs": [
+          "E0058",
+          "The requested UI is implemented, then QA/review identifies that the old compatibility launcher still defaults into the retired 410 path and also uncovers backend validation/test gaps. The team repairs the launcher, checkout validation and HTTP-level tests before finalization.",
+          "E0090"
+        ]
+      },
+      {
+        "axis": "TEMPORAL_REACH",
+        "status": "DECREASED",
+        "before": "The legacy compatibility branch is the default run.py path.",
+        "after": "The current service becomes default and legacy behavior requires explicit opt-in.",
+        "evidence_refs": [
+          "E0058",
+          "The requested UI is implemented, then QA/review identifies that the old compatibility launcher still defaults into the retired 410 path and also uncovers backend validation/test gaps. The team repairs the launcher, checkout validation and HTTP-level tests before finalization."
+        ]
+      }
+    ],
+    "boundary_ref": "E0001",
+    "notes": "A supported R→P crossing is followed by repair that reduces historical reach; no C event or return edge is supported."
+  },
+  "healthy_alternatives": [
+    {
+      "type": "DIRECT_FEATURE_IMPLEMENTATION",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0086",
+        "E0087",
+        "E0088",
+        "E0089"
+      ],
+      "notes": "The requested frontend feature is materially implemented."
+    },
+    {
+      "type": "EVIDENCE_DRIVEN_INTEGRATION_REPAIR",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0081",
+        "E0083",
+        "E0085",
+        "E0090"
+      ],
+      "notes": "Backend/launcher/test changes respond to directly observed defects."
+    }
+  ],
+  "not_established": [
+    "No Dynamic C event is established.",
+    "No closed/repeated/self-reinforcing loop is established."
+  ]
+}
