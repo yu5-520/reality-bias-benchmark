@@ -1,0 +1,107 @@
+{
+  "schema": "RB-STAGE2-R7-PROSPECTIVE-CHECKPOINT-CONTRACT-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_INFRASTRUCTURE_ONLY_NO_SCIENTIFIC_SUBJECT_RUN",
+  "purpose": "Pre-register content-addressed, framework-faithful native resumable checkpoints before the prospective R7 repair extension.",
+  "geometry": {
+    "historical_21_paths": "UNCHANGED_AND_NOT_RETROFITTED",
+    "prospective_group_name": "StageII-R7-G1",
+    "new_evidence_status": "NEW_PROSPECTIVE_EVIDENCE_NOT_RERUN",
+    "active_subject_execution_authorized": false
+  },
+  "principles": [
+    "OBSERVE_ACROSS_BOUNDARIES_REPAIR_ONLY_THROUGH_BOUNDARIES",
+    "CHECKPOINT_BEFORE_REPAIR_ELIGIBILITY",
+    "PUBLIC_OR_HOST_OWNED_STATE_API_ONLY",
+    "NO_PRIVATE_FRAMEWORK_STATE_PATCHING",
+    "NO_PROTOCOL_MODIFICATION",
+    "NO_FOREIGN_INFORMATION_STATE_MUTATION",
+    "CONTENT_ADDRESSED_CHECKPOINTS",
+    "ROUND_TRIP_RESTORE_VERIFICATION_BEFORE_SCIENTIFIC_USE"
+  ],
+  "checkpoint_classes": {
+    "FULL_NATIVE": "Framework or experiment-owned native runtime state plus application state can be restored and round-trip verified.",
+    "PARTIAL_NATIVE": "Some public native state is restorable but the complete continuation parent is not proven.",
+    "UNSUPPORTED": "No legal full restore path under the frozen boundary."
+  },
+  "systems": {
+    "X1_AUTOGEN": {
+      "native_api": ["Team.save_state", "Team.load_state", "Team.pause", "Team.resume"],
+      "upstream_commit": "027ecf0a379bcc1d09956d46d12d44a3ad9cee14",
+      "target_class": "FULL_NATIVE"
+    },
+    "X2_METAGPT": {
+      "native_api": ["Environment.model_dump", "Environment constructor deserialization", "Role model serialization"],
+      "upstream_commit": "11cdf466d042aece04fc6cfd13b28e1a70341b1f",
+      "target_class": "FULL_NATIVE_WITH_STAGE2_RUNTIME_ENVELOPE"
+    },
+    "X3_A2A": {
+      "native_api": ["A2A protocol unchanged", "Stage-II role-service application session save/load"],
+      "protocol_commit": "173695755607e884aa9acf8ce4feed90e32727a1",
+      "sdk_commit": "0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167",
+      "target_class": "FULL_NATIVE_AT_QUIESCENT_ROLE_SERVICE_BOUNDARY",
+      "note": "A2A defines protocol transport, not agent private memory. Checkpointing occurs in the Stage-II role service application state without adding or changing an A2A protocol message."
+    },
+    "X4_X7_HOSTED_LAYERS": {
+      "target_class": "FULL_HOST_RUNTIME_PLUS_READ_ONLY_EXTERNAL_CARRIER_BINDINGS",
+      "foreign_carriers": ["MCP", "RAG", "MemoryBank", "LongLLMLingua"]
+    }
+  },
+  "checkpoint_boundary_policy": {
+    "full_checkpoint_boundaries": [
+      "TASK_START",
+      "AFTER_NATIVE_MODEL_TURN_AT_QUIESCENT_BOUNDARY",
+      "AFTER_STATE_CHANGING_NATIVE_ACTION_AT_QUIESCENT_BOUNDARY",
+      "FIRST_MONITOR_REPAIR_ELIGIBLE_POINT",
+      "IMMEDIATELY_BEFORE_REPAIR",
+      "IMMEDIATELY_AFTER_REPAIR",
+      "TERMINAL"
+    ],
+    "observer_only_events": "HASH_AND_EVENT_REF_ONLY_UNLESS_THEY_COINCIDE_WITH_A_FULL_BOUNDARY",
+    "candidate_parent_policy": "LATEST_VERIFIED_FULL_CHECKPOINT_AT_OR_BEFORE_FIRST_ELIGIBLE_POINT_WITH_NO_UNCHECKPOINTED_MODEL_DECISION_AFTER_IT",
+    "future_suffix_used": false
+  },
+  "required_manifest_fields": [
+    "checkpoint_id",
+    "system_id",
+    "group_id",
+    "run_id",
+    "task_id",
+    "event_ref",
+    "adapter_id",
+    "framework_binding",
+    "native_state_sha256",
+    "application_state_sha256",
+    "model_visible_context_sha256",
+    "remaining_horizon",
+    "external_carrier_refs",
+    "restore_capability",
+    "checkpoint_hash"
+  ],
+  "foreign_carrier_rule": {
+    "capture": "REFERENCE_AND_HASH_ONLY",
+    "restore": "VERIFY_MATCH_ONLY",
+    "mutation": "FORBIDDEN",
+    "mismatch_result": "CHECKPOINT_ENVIRONMENT_MISMATCH"
+  },
+  "replication_fields": [
+    "group_id",
+    "run_id",
+    "framework_binding",
+    "task_hash",
+    "roles_hash",
+    "subject_hash",
+    "checkpoint_schema_version",
+    "monitor_rule_version",
+    "repair_package_version"
+  ],
+  "authorization": {
+    "engineering_smoke_only": true,
+    "provider_calls": false,
+    "evaluator_calls": false,
+    "scientific_subject_runs": false,
+    "active_repair": false,
+    "next_after_conformance": "FREEZE_PROSPECTIVE_R7_G1_EXECUTION_CONTRACT"
+  }
+}
