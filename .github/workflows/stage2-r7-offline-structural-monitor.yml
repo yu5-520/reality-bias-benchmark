@@ -1,0 +1,56 @@
+name: Stage-II R7 Offline Structural Monitor
+
+on:
+  push:
+    branches:
+      - stage2-r7-structural-monitor-v1
+    paths:
+      - "configs/stage2_r7_structural_monitor_rules_v1.json"
+      - "scripts/run_stage2_r7_structural_monitor_v1.py"
+      - ".github/workflows/stage2-r7-offline-structural-monitor.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  monitor:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: stage2-r7-structural-monitor-v1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify frozen natural archives
+        run: python stage2/natural_v7/verify_archive.py
+      - name: Run future-blind structural monitor
+        run: python scripts/run_stage2_r7_structural_monitor_v1.py
+      - name: Assert semantic firewall
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          body = Path("scripts/run_stage2_r7_structural_monitor_v1.py").read_text()
+          forbidden = [
+              "r6_grade_semantic_audit",
+              "r6_grade_material",
+              "cross_task_cross_layer_audit",
+              "stage2_cross_task_synthesis_evidence_bundle",
+              "stage2_paper_figure_table_registry",
+          ]
+          for token in forbidden:
+              assert token not in body, token
+          PY
+      - name: Commit frozen offline results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add stage2/r7_monitor_v1/
+          if git diff --cached --quiet; then
+            echo "No generated monitor-result changes"
+          else
+            git commit -m "data: freeze Stage-II R7 offline monitor replay [skip ci]"
+            git push origin HEAD:stage2-r7-structural-monitor-v1
+          fi
