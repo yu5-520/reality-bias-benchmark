@@ -100,7 +100,6 @@ jobs:
           assert r["preserve_provider_raw_before_validation"] is True
           assert r["known_unaccounted_prevalidation_provider_calls"]==1
           assert r["unaccounted_prevalidation_call_reserve_usd"]==1.0
-          assert r["known_unaccounted_prevalidation_provider_calls"]==3
           f=p["provider_format_recovery"]
           assert f["recovery_issue"]==269
           assert f["prior_workflow_run"]==36259829075
@@ -118,6 +117,8 @@ jobs:
           assert f["theory_change"] is False
           assert f["preserve_provider_error_responses_and_usage"] is True
           assert f["repeat_failure_policy"]=="STOP_AND_PRESERVE_BOUNDARY"
+          assert f["known_unaccounted_provider_calls_for_failure"]==2
+          assert f["known_unaccounted_provider_calls_total"]==3
           assert f["total_budget_reserve_usd"]==1.0
           print("PASS: Layer-C contract + validator/provider-format recoveries are bounded and reference-label-blind")
           PY
