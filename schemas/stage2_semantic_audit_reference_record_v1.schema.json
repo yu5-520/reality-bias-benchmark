@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/yu5-520/reality-bias-benchmark/schemas/stage2_semantic_audit_reference_record_v1.schema.json",
+  "title": "Stage-II Semantic Audit Reference Record v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "reference_id",
+    "group_id",
+    "cell_id",
+    "structure_family",
+    "claim_status",
+    "complete_route_ref",
+    "evidence_surface_required",
+    "evidence_surface_available",
+    "negative_case",
+    "evidence_refs"
+  ],
+  "properties": {
+    "reference_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "group_id": {
+      "enum": [
+        "G2",
+        "G3",
+        "G4",
+        "G5"
+      ]
+    },
+    "cell_id": {
+      "type": "string",
+      "pattern": "^X[1-7]-T[1-3]$"
+    },
+    "structure_family": {
+      "type": "string",
+      "minLength": 1
+    },
+    "claim_status": {
+      "enum": [
+        "SUPPORTED",
+        "SUPPORTED_CANDIDATE",
+        "NOT_ESTABLISHED",
+        "NEGATIVE_BOUNDARY"
+      ]
+    },
+    "complete_route_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "carrier_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "semantic_before": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "semantic_after": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "semantic_delta": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "producer_actor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reader_or_adopter_actor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "relation_type": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "decision_or_action_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "consequence_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "first_observable_sequence": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "first_consequence_sequence": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "cpr_dimensions": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "C",
+          "P",
+          "R"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "cross_penetration_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "closure_state": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence_surface_required": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "evidence_surface_available": {
+      "type": "boolean"
+    },
+    "negative_case": {
+      "type": "boolean"
+    },
+    "not_established_fields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    }
+  }
+}
