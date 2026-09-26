@@ -1,32 +1,150 @@
 # Stage-II
 
-**Active forward track: `stage2/native_v7/` — native heterogeneous execution + external observation.**
+**Current forward track: dual General Chapters + five-group prospective replication.**
 
-Stage-II has **7 / 21 recorded natural attempts**: T1 has now been attempted exactly once for X1–X7. The v6.x files in this directory are retained as historical engineering provenance only; they are not a universal v7 execution interface.
+Canonical plan:
 
-The frozen scientific conditions remain T1–T3, the nine Software Engineering roles, the checkout fixture, the DeepSeek subject profile, the seven X targets and one natural trajectory per cell. The active boundary is:
+`docs/R_Plan_v7.44.md`
+
+## Current scientific state
+
+The original Stage-II natural matrix is complete and frozen:
+
+`X1-X7 × T1-T3 = 21 / 21 first attempts`.
+
+It is now designated:
+
+> **G1 — discovery/calibration reference group**
+
+No G1 natural cell may be rerun or overwritten.
+
+G2-G5 are four new prospective replication groups. Each group begins with the full natural matrix:
+
+`X1-X7 × T1-T3 = 21 first attempts`.
+
+The natural population is therefore planned as:
+
+`5 groups × 21 = 105 natural trajectories`
+
+if all groups complete.
+
+## Dual parent chapters
+
+Experimental parent:
+
+`docs/reports/2026-09-26/StageII_Experimental_General_Chapter_Process_Reality_Methodology_and_Principles_v2.md`
+
+Machine-readable rules:
+
+`configs/stage2_experimental_general_principles_v2.json`
+
+Engineering parent:
+
+`docs/reports/2026-09-26/StageII_Engineering_General_Chapter_Process_Integrity_Monitoring_and_Repair_v1.md`
+
+Machine-readable rules:
+
+`configs/stage2_engineering_general_principles_v1.json`
+
+Forward replication policy:
+
+`configs/stage2_g2_g5_prospective_replication_policy_v1.json`
+
+Forward reporting standard:
+
+`docs/reporting/process_reality_report_standard_v1_11.md`
+
+## G1 diagnostic lessons
+
+G1 remains immutable, including its limitations.
+
+### T1
+
+T1 X2-X7 are historical interface-dominated diagnostic trajectories under the v1 action-envelope contract.
+
+The row is useful evidence but is not a clean cross-framework task-performance baseline.
+
+### T2/T3
+
+The v2 action contract removed the dominant T1 parser-admission artifact.
+
+Among the 14 T2/T3 cells:
+
+- X4-T2 and X6-T2 are preserved provider-format failures;
+- among the remaining 12 runnable trajectories, 10 hit the historical 32-turn horizon;
+- X4-T3 naturally finalized only at turn 31.
+
+Therefore G2-G5 target a prospectively frozen 64 logical model-decision horizon after cross-wrapper equivalence preflight.
+
+A horizon stop is recorded as censoring/non-closure, not automatically as task failure.
+
+## Natural observation versus repair eligibility
+
+Natural experimental membership and engineering repair eligibility are separate.
+
+Every G2-G5 group runs all seven X conditions.
+
+X1 AutoGen and X3 A2A remain fully included in:
+
+- native natural execution;
+- external monitoring;
+- warning;
+- lineage evidence;
+- semantic audit;
+- CPR/cross-penetration analysis.
+
+Their current active mid-run repair status is fail-closed because the required legal same-parent resumability has not been demonstrated without altering native framework/protocol semantics.
+
+Do not patch AutoGen or A2A, synthesize private state, or replay a stochastic prefix merely to manufacture a B branch.
+
+The currently repair-capable system set is:
+
+`X2, X4, X5, X6, X7`
+
+subject to per-cell localization, checkpoint, parent, preserve-set, and repair-package eligibility.
+
+## Forward execution order
+
+For each G2-G5 group:
+
+1. run and freeze all 21 natural A first attempts;
+2. complete 21-cell monitor and repair-eligibility accounting;
+3. freeze eligible repair packages;
+4. run at most one legal B per eligible cell;
+5. repair executor exits;
+6. monitor continues watch-only;
+7. freeze B and post-repair evidence;
+8. only then open semantic/process comparison.
+
+No B may start before all 21 A trajectories in the group are frozen.
+
+## Native architecture invariants
 
 - X systems are registered and version-frozen, not forced through one runtime interface.
-- X1 AutoGen and X2 MetaGPT keep their native multi-agent framework scheduling; X3 keeps native A2A communication.
-- X4–X7 are capability-layer conditions and share the explicitly registered `software_engineering_host_v1` background role substrate because those X systems do not own scheduling or inter-agent transport.
-- `software_engineering_host_v1` is frozen as a de-instrumented host: historical queue/mailbox/action semantics are preserved while monitor/audit IDs are removed from execution and model-visible context.
-- monitoring is external and non-mutating; common evidence representation is created only after observation.
+- X1 AutoGen and X2 MetaGPT retain native multi-agent scheduling.
+- X3 retains native A2A communication.
+- X4-X7 remain capability-layer conditions on the explicitly registered de-instrumented software-engineering host.
+- monitoring is external and non-mutating during natural A.
+- common evidence representation is created after observation.
+- observation schema must not become a hidden execution schema.
+- native protocol/security boundaries remain binding.
 
-`docs/R_Plan_v7.22.md` records the completed v2 readiness revalidation and reviewed promotion. **Raw natural collection remains 7/21 and T1 is closed at 7/7. C1 and C2 consume 2/4 of the contrast budget. Action Contract v2 is frozen for T2/T3 and all seven X conditions are again `SUBJECT_READY` under the exact v2 readiness receipt.** The original provider receipt remains separately preserved as T1/v1 provenance. No T1 natural cell was rerun.
+## Historical readiness plan
 
-## Historical v6.x scaffold
+`configs/stage2_r7_g1_launch_manifest_v1.json` and `docs/R_Plan_v7.43.md` remain preserved as historical readiness artifacts.
 
-The v6.x track established exact target/version locks, native-boundary engineering smokes, one-shot reservation/sealing logic and the 21-cell prospective matrix. It did **not** collect a Stage-II natural trajectory. Its `CodingArena` and `RoleMailboxTransport` semantics are retained only as the declared historical source for the X4–X7 background host.
+They proposed a 15-cell prospective extension that omitted new X1/X3 natural runs because paired active B was unavailable.
 
-Do not invoke `stage2.collect_natural` for new Stage-II evidence. The active launcher is `stage2.native_v7.collect`, and it fails closed unless the selected X is explicitly `SUBJECT_READY`.
+No scientific subject execution occurred under that plan.
 
+v7.44 supersedes that launch assumption. Do not activate the old 15-cell manifest.
 
-`docs/R_Plan_v7.21.md` freezes the task-versioned action-contract boundary. Subject revalidation and reviewed promotion are complete. T2 is the next unopened natural row; T3 stays closed until T2 is preserved and read-only audited.
+## Launcher history
 
-R_Plan_v7.24 freezes the complete one-shot T2 row. Natural collection is now 14 / 21 (T1 7/7 + T2 7/7). X4-T2 and X6-T2 are preserved runner failures and must not be rerun. T2 read-only audit is next; T3 remains closed.
+Historical v6.x and early v7.x files remain repository provenance.
 
-`docs/R_Plan_v7.25.md` freezes the read-only T2 seven-cell semantic/process audit. Natural collection remains **14 / 21**; no T2 cell is rerun and no new contrast is spent. T3 is now the next admissible natural row, while the final two contrast slots remain reserved until the complete T3 audit.
+Do not treat them as the current scientific plan.
 
-`docs/R_Plan_v7.26.md` predeclares the terminal one-shot T3 X1–X7 natural row. It uses the existing frozen contract map, preserves every claimed first attempt without rerun, and leaves the final two contrast slots untouched until the complete 21-cell audit.
+The next permitted operation under v7.44 is offline/non-study construction and validation of the exact G2 21-cell launch manifest plus 64-decision cross-wrapper horizon-equivalence preflight.
 
-R_Plan_v7.27 freezes the terminal one-shot T3 row. Natural collection is now complete at 21 / 21 (T1 7/7 + T2 7/7 + T3 7/7). No natural cell may be rerun. T3 read-only audit and the full cross-task/cross-layer audit are next; contrast accounting remains 2/4.
+Scientific G2 subject/provider execution remains separately gated.
