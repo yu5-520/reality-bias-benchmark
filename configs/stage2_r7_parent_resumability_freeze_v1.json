@@ -1,0 +1,51 @@
+{
+  "schema": "RB-STAGE2-R7-PARENT-RESUMABILITY-FREEZE-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_NO_ACTIVE_REPAIR_AUTHORIZATION",
+  "source_main_sha": "3ebe9fb4cf431203f89ef60531e62db93b6d5656",
+  "source_monitor_summary_hash": "2b96ffe499198fea3d539da42b1292e6bb7bbc7674f8d23a1c28be2e98374fae",
+  "resumability_summary_hash": "0b8b327aa190820ef09c66efbc7eb8bcdf7dfb5b16a7296459ffd40ff78e3078",
+  "accounting": {
+    "source_packages": 24,
+    "parent_reconstruction_packages_audited": 16,
+    "foreign_carrier_packages_audited": 7,
+    "no_repair_required_packages_carried_forward": 1,
+    "application_state_verified_packages": 5,
+    "native_resume_verified_packages": 0,
+    "foreign_legal_surface_bound_packages": 0,
+    "parent_reconstruction_blocked": 16,
+    "lineage_gap_blocked": 7,
+    "active_repair_ready": 0,
+    "natural_reruns": 0,
+    "provider_calls": 0,
+    "evaluator_calls": 0
+  },
+  "partial_positive": {
+    "system": "X1_AUTOGEN",
+    "package_count": 5,
+    "finding": "FROZEN_NATIVE_WRITE_CALLS_DETERMINISTICALLY_RECONSTRUCT_APPLICATION_CHECKOUT_STATE",
+    "full_replay_matches_frozen_final_checkout": true,
+    "boundary": "Application-state reconstructability is not native team/session resumability."
+  },
+  "blocking_findings": {
+    "X1": "AUTOGEN_TEAM_STATE_NOT_SERIALIZED_AT_SELECTED_PREFIX",
+    "X2": "METAGPT_ACTION_ROLE_ENVIRONMENT_RESTORE_STATE_INCOMPLETE",
+    "X3": "A2A_ROLE_SESSION_TOOL_OBSERVATIONS_NOT_SERIALIZED_AS_RESTORABLE_PARENT",
+    "X5_X6_X7": "IMMUTABLE_CARRIER_NOT_MACHINE_BOUND_TO_LEGAL_DOWNSTREAM_REPAIR_SURFACE_AT_FROZEN_PREFIX"
+  },
+  "unchanged_boundaries": [
+    "NO_STOCHASTIC_PREFIX_RERUN",
+    "NO_SUBJECT_CALL_FOR_PARENT_RECONSTRUCTION",
+    "NO_PRIVATE_RUNTIME_STATE_MUTATION",
+    "NO_FRAMEWORK_OR_PROTOCOL_PATCH",
+    "NO_RAG_MEMORYBANK_LONGLMLINGUA_INTERNAL_MUTATION",
+    "NO_SEMANTIC_AUDIT_AS_REPAIR_INPUT"
+  ],
+  "authorization": {
+    "active_repair": false,
+    "new_subject_provider_continuation": false,
+    "paid_evaluator": false,
+    "next_operation": "REPAIR_EXECUTION_GEOMETRY_DECISION_AND_CHECKPOINT_STRATEGY_FREEZE"
+  }
+}
