@@ -1,0 +1,70 @@
+{
+  "audit_manifest_sha256": "463ec112f74f34b47740c25090c982b333df9b7dea2d0814594eceffabc33c81",
+  "cell_id": "X1-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "Maximum number of turns 64 reached; agent reports review complete and control with release lead for closure",
+    "negative_boundary_count": 1,
+    "notes": "Frozen packet contains only event metadata (byte counts, hashes, surface labels) for the 188-event stream plus a terminal result summary and checkpoint ledger. No event content, message text, tool calls, file diffs, or semantic payloads are exposed, so no source->carrier->adoption->transformation path can be traced. Only a horizon-censoring boundary is observable.",
+    "positive_structure_count": 0,
+    "termination_class": "HORIZON_CENSORING_MAX_TURNS"
+  },
+  "group_id": "G4",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "2ae43cca28ab1b96125952bdfcb9a8752061d088f8df041442a45f390697b360",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": null,
+      "cell_id": "X1-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "Maximum number of turns 64 reached; agent reports review complete and control with release lead for closure",
+      "complete_route_ref": "AUDIT_PACKET:G4:X1-T3:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0003",
+        "E0190",
+        "E0191"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "event message content",
+        "tool call arguments",
+        "file diffs",
+        "semantic payloads"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 0,
+      "group_id": "G4",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_before",
+        "semantic_after",
+        "semantic_delta",
+        "producer_actor",
+        "reader_or_adopter_actor",
+        "decision_or_action_ref",
+        "cross_penetration_path"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G4-X1-T3-REF-01",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": null,
+      "semantic_before": null,
+      "semantic_delta": null,
+      "source_ref": "E0001",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

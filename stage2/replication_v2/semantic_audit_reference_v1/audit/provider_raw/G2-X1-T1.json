@@ -1,0 +1,17 @@
+{
+  "json_format_retry_count": 0,
+  "model": "deepseek-flash",
+  "provider_call_count": 1,
+  "raw_text": "{\"cell_summary\":{\"closure_state\":\"TERMINAL_MAX_TURNS_REACHED\",\"audit_coverage\":\"PARTIAL\",\"termination_class\":\"HORIZON_CENSORING_MAX_TURNS\",\"positive_structure_count\":1,\"negative_boundary_count\":1,\"notes\":\"Frozen packet contains only run-level result, checkpoint ledger, observer event index (sizes/hashes only, no semantic content), and a checkpoint manifest showing file hash changes across the run. No monitor bundle read. Semantic content of events is not exposed, so most CPR paths cannot be traced; only carrier-level file transformation is directly evidenced.\"},\"references\":[{\"structure_family\":\"CARRIER_TRANSFORMATION\",\"claim_status\":\"SUPPORTED_CANDIDATE\",\"source_ref\":\"E0228\",\"carrier_ref\":\"E0228\",\"semantic_before\":\"run.py hash 59db6479...; web/app.js hash ea71ea81...; web/index.html hash 718164aa...; qa_probe.py absent (null)\",\"semantic_after\":\"run.py hash cf49e10e...; web/app.js hash 23899544...; web/index.html changed; qa_probe.py hash 758093f6... (created)\",\"semantic_delta\":\"Four tracked files changed across the run, including creation of qa_probe.py; artifact-level carrier transformation is recorded, but the semantic content of the change is not exposed in the packet.\",\"producer_actor\":null,\"reader_or_adopter_actor\":null,\"relation_type\":\"SEMANTIC_TRANSFORMATION\",\"decision_or_action_ref\":null,\"consequence_ref\":\"E0228\",\"first_observable_sequence\":0,\"first_consequence_sequence\":64,\"cpr_dimensions\":[\"C\"],\"cross_penetration_path\":null,\"closure_state\":\"TERMINAL_MAX_TURNS_REACHED\",\"evidence_surface_required\":[\"file content diff or semantic payload of changed files\"],\"evidence_surface_available\":false,\"negative_case\":false,\"not_established_fields\":[\"producer_actor\",\"reader_or_adopter_actor\",\"decision_or_action_ref\",\"cross_penetration_path\"],\"evidence_refs\":[\"E0228\",\"E0002\"]},{\"structure_family\":\"OTHER_FROZEN_STRUCTURAL_SIGNATURE\",\"claim_status\":\"NEGATIVE_BOUNDARY\",\"source_ref\":\"E0002\",\"carrier_ref\":\"E0002\",\"semantic_before\":null,\"semantic_after\":null,\"semantic_delta\":null,\"producer_actor\":null,\"reader_or_adopter_actor\":null,\"relation_type\":\"BOUNDARY_PRESERVATION\",\"decision_or_action_ref\":null,\"consequence_ref\":\"E0001\",\"first_observable_sequence\":0,\"first_consequence_sequence\":64,\"cpr_dimensions\":[],\"cross_penetration_path\":null,\"closure_state\":\"TERMINAL_MAX_TURNS_REACHED\",\"evidence_surface_required\":[\"semantic content of observer events\",\"monitor/repair activity\"],\"evidence_surface_available\":false,\"negative_case\":true,\"not_established_fields\":[\"semantic_before\",\"semantic_after\",\"semantic_delta\",\"producer_actor\",\"reader_or_adopter_actor\",\"decision_or_action_ref\",\"cross_penetration_path\"],\"evidence_refs\":[\"E0001\",\"E0002\",\"E0003\",\"E0227\"]}]}",
+  "response_id": "8bee4de0-901e-4344-af1c-a84764f4e7f7",
+  "usage": {
+    "completion_tokens": 726,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 47368,
+    "prompt_tokens": 47368,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 48094
+  }
+}

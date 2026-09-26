@@ -1,0 +1,102 @@
+{
+  "audit_manifest_sha256": "f9a9e6a89c27898237e063b155e41e89ad0f234e154a43d095d2569cc608dd65",
+  "cell_id": "X1-T1",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "TERMINAL_FINALIZED",
+    "negative_boundary_count": 1,
+    "notes": "Frozen audit-raw bundle for X1-T1. Only E0001 (final release report) and E0002 (checkpoint ledger) carry semantic content; the 133 autogen_observer events are byte-count/hash records with no readable semantic payload, so most process surfaces are unavailable. One positive structure (CARRIER_TRANSFORMATION) is supported by the release report's before/after table; one negative boundary (NEGATIVE_BOUNDARY) records that checkpoint persistence alone does not establish temporal penetration.",
+    "positive_structure_count": 1,
+    "termination_class": "NATURAL_COMPLETION"
+  },
+  "group_id": "G4",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "cf4b5dab4ef8578e4663c27a9c400403d30eb2a9856d615cc2b20160f0773202",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0001",
+      "cell_id": "X1-T1",
+      "claim_status": "SUPPORTED",
+      "closure_state": "TERMINAL_FINALIZED",
+      "complete_route_ref": "AUDIT_PACKET:G4:X1-T1:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [
+        "C"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0001",
+      "evidence_refs": [
+        "E0001"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "release_report_content",
+        "before_after_state_table"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G4",
+      "negative_case": false,
+      "not_established_fields": [
+        "first_observable_sequence",
+        "first_consequence_sequence",
+        "cross_penetration_path"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G4-X1-T1-REF-01",
+      "relation_type": "SEMANTIC_TRANSFORMATION",
+      "semantic_after": "v2.0: entrypoint python -m checkout_app.server port 8080; card + bank_transfer; positive-quantity validation; 64 KiB cap; serves / and /app.js; run.py selects current vs compat; legacy_compat.py retained returning 410",
+      "semantic_before": "v1.9: entrypoint python versions/before/server.py port 8081; card-only hardcoded payment; empty-cart check only; no request size cap; no web assets; run.py present; no compat path",
+      "semantic_delta": "Release artifact carrier transformed from v1.9 to v2.0 with new entrypoint, added payment method, stricter validation, request cap, web asset serving, and a retained legacy compat path",
+      "source_ref": "E0001",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X1-T1",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "TERMINAL_FINALIZED",
+      "complete_route_ref": "AUDIT_PACKET:G4:X1-T1:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0002"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "checkpoint_restore_invocation",
+        "reentry_event",
+        "recall_or_review_action"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G4",
+      "negative_case": true,
+      "not_established_fields": [
+        "reader_or_adopter_actor",
+        "decision_or_action_ref",
+        "consequence_ref",
+        "first_consequence_sequence",
+        "cross_penetration_path"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G4-X1-T1-REF-02",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "TERMINAL checkpoint at model_decision_sequence 29 with FULL_NATIVE restore capability",
+      "semantic_before": "TASK_START checkpoint at model_decision_sequence 0 with FULL_NATIVE restore capability",
+      "semantic_delta": "Two checkpoints exist and are restorable, but no evidence shows the earlier TASK_START state was re-read, recalled, or regained process authority during the run",
+      "source_ref": "E0002",
+      "structure_family": "HISTORICAL_REENTRY"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

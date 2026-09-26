@@ -1,0 +1,99 @@
+{
+  "audit_manifest_sha256": "780c5a451f0399e25b57d8d72d05484a5b78ce73a09af9d4b5d59dacd54bf979",
+  "cell_id": "X1-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "TERMINAL",
+    "negative_boundary_count": 1,
+    "notes": "Cell X1-T3 shows a single natural A run with 8 model decisions and terminal checkpoint. Evidence includes a final answer describing removal of a legacy compatibility path, a checkpoint ledger with TASK_START and TERMINAL boundaries, and 33 autogen observer event records. No monitor runtime bundle was read. The final answer is visible but the intermediate semantic adoption path is only partially observable through event byte counts and hashes.",
+    "positive_structure_count": 1,
+    "termination_class": "NATURAL_COMPLETION"
+  },
+  "group_id": "G3",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "a1122c90b3320ecd853fd0078c5c65af396d81be80d965a829b5806ab3ab5f10",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0037",
+      "cell_id": "X1-T3",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "TERMINAL",
+      "complete_route_ref": "AUDIT_PACKET:G3:X1-T3:ROUTE_INDEX",
+      "consequence_ref": "E0037",
+      "cpr_dimensions": [
+        "C"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0001",
+      "evidence_refs": [
+        "E0001",
+        "E0037"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "source code state",
+        "final answer",
+        "file change manifest"
+      ],
+      "first_consequence_sequence": 8,
+      "first_observable_sequence": 0,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "intermediate semantic adoption path",
+        "monitor warning or repair package"
+      ],
+      "producer_actor": "subject_agent",
+      "reader_or_adopter_actor": "subject_agent",
+      "reference_id": "G3-X1-T3-REF-01",
+      "relation_type": "SEMANTIC_TRANSFORMATION",
+      "semantic_after": "run.py launches current service (checkout_app.server.main) directly with no environment-dependent behavior; legacy_compat.py deleted; README and versions/after.json updated",
+      "semantic_before": "run.py imported legacy_compat.main and defaulted CHECKOUT_COMPAT to 'on', launching retired v1 legacy handler on port 8080",
+      "semantic_delta": "Removal of legacy compatibility path and direct launch of current service",
+      "source_ref": "E0001",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": null,
+      "cell_id": "X1-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "TERMINAL",
+      "complete_route_ref": "AUDIT_PACKET:G3:X1-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0002"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "checkpoint ledger",
+        "restore capability"
+      ],
+      "first_consequence_sequence": 8,
+      "first_observable_sequence": 0,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "temporal reentry",
+        "historical residue adoption"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X1-T3-REF-02",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": null,
+      "semantic_before": null,
+      "semantic_delta": null,
+      "source_ref": "E0002",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

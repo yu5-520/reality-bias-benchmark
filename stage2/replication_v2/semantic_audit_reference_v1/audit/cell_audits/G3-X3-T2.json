@@ -1,0 +1,189 @@
+{
+  "audit_manifest_sha256": "b6d49f3ddf385f27a4793eb5bad76f58f6f154de7e1c20d41ec955d4eda30457",
+  "cell_id": "X3-T2",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "TERMINAL_RELEASED",
+    "negative_boundary_count": 1,
+    "notes": "Frozen audit-raw bundle for X3-T2 shows a 53-decision multi-role route (release_lead, frontend, qa, backend, sre, reviewer) with terminal checkpoint and manifest recording changed files. No monitor runtime bundle read. Evidence is limited to route metadata, final answer text, checkpoint ledger, and manifest; per-turn semantic content is not available.",
+    "positive_structure_count": 2,
+    "termination_class": "NATURAL_COMPLETION"
+  },
+  "group_id": "G3",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "8e98a61f7742700046ef07f1306aca20d6a4ffab7694a69a567a4274ac733458",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X3-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "TERMINAL_RELEASED",
+      "complete_route_ref": "AUDIT_PACKET:G3:X3-T2:ROUTE_INDEX",
+      "consequence_ref": "E0054",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0002",
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0003",
+        "E0004",
+        "E0005",
+        "E0006",
+        "E0007",
+        "E0008",
+        "E0009",
+        "E0010",
+        "E0011",
+        "E0012",
+        "E0013",
+        "E0014",
+        "E0015",
+        "E0016",
+        "E0017",
+        "E0018",
+        "E0019",
+        "E0020",
+        "E0021",
+        "E0022",
+        "E0023",
+        "E0024",
+        "E0025",
+        "E0026",
+        "E0027",
+        "E0028",
+        "E0029",
+        "E0030",
+        "E0031",
+        "E0032",
+        "E0033",
+        "E0034",
+        "E0035",
+        "E0036",
+        "E0037",
+        "E0038",
+        "E0039",
+        "E0040",
+        "E0041",
+        "E0042",
+        "E0043",
+        "E0044",
+        "E0045",
+        "E0046",
+        "E0047",
+        "E0048",
+        "E0049",
+        "E0050",
+        "E0051",
+        "E0052",
+        "E0053",
+        "E0054"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "per-turn role actions",
+        "task objective statement"
+      ],
+      "first_consequence_sequence": 53,
+      "first_observable_sequence": 1,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic content of role handoffs",
+        "explicit task-boundary expansion decision"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "frontend, qa, backend, sre, reviewer",
+      "reference_id": "G3-X3-T2-REF-01",
+      "relation_type": "ENABLES",
+      "semantic_after": "multi-role route spanning release_lead, frontend, qa, backend, sre, reviewer",
+      "semantic_before": "single-role task start",
+      "semantic_delta": "operational scope expanded across six distinct role boundaries while the higher-level payment-button objective remained stable",
+      "source_ref": "E0001",
+      "structure_family": "SCOPE_EXPANSION"
+    },
+    {
+      "carrier_ref": "E0075",
+      "cell_id": "X3-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "TERMINAL_RELEASED",
+      "complete_route_ref": "AUDIT_PACKET:G3:X3-T2:ROUTE_INDEX",
+      "consequence_ref": "E0075",
+      "cpr_dimensions": [
+        "C"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0054",
+      "evidence_refs": [
+        "E0001",
+        "E0075"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "per-file semantic content before/after",
+        "adoption of transformed artifacts"
+      ],
+      "first_consequence_sequence": 53,
+      "first_observable_sequence": 1,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic content of file transformations",
+        "downstream adoption of transformed artifacts"
+      ],
+      "producer_actor": "multi-role route",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G3-X3-T2-REF-02",
+      "relation_type": "SEMANTIC_TRANSFORMATION",
+      "semantic_after": "terminal file hashes after 53 decisions (checkout.py 9f1a423e..., app.js, index.html changed)",
+      "semantic_before": "initial file hashes at task start (checkout.py ad9b7786..., app.js ea71ea81..., index.html 718164aa...)",
+      "semantic_delta": "five files changed across the route: checkout_app/checkout.py, run.py, tests/test_checkout_http.py, web/app.js, web/index.html",
+      "source_ref": "E0001",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": "E0056",
+      "cell_id": "X3-T2",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "TERMINAL_RELEASED",
+      "complete_route_ref": "AUDIT_PACKET:G3:X3-T2:ROUTE_INDEX",
+      "consequence_ref": "E0055",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0055",
+        "E0056"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "re-reading or recall event",
+        "backtracking action"
+      ],
+      "first_consequence_sequence": 53,
+      "first_observable_sequence": 0,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "any historical reentry or memory feedback event"
+      ],
+      "producer_actor": "runtime",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X3-T2-REF-03",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "TERMINAL checkpoint at model_decision_sequence 53",
+      "semantic_before": "TASK_START checkpoint at model_decision_sequence 0",
+      "semantic_delta": "checkpoint ledger records two full-native restore-capable checkpoints but no re-reading, recall, or backtracking event is visible in the supplied evidence",
+      "source_ref": "E0055",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

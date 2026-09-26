@@ -1,0 +1,218 @@
+{
+  "audit_manifest_sha256": "b85a7208025e1deac325ca9a40febec7574d68df3daf2c01b77a426b197736fe",
+  "cell_id": "X7-T2",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "OPEN_PENDING_REPAIR_GATE",
+    "negative_boundary_count": 2,
+    "notes": "Natural A run reached turn_budget at 64 turns with answer=null and 8 pending_roles; route shows release_lead dominating turns 1-15 then role rotation across frontend/backend/qa. Capability observer shows repeated llmlingua PromptCompressor input/output pairs with recurring identical hashes (e.g. 45e22346..., eea6d1e0...) indicating repeated compression cycles; no semantic adoption surface visible.",
+    "positive_structure_count": 1,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G5",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "059db61c67efad1ffbc9291a94a91c06bf8113106e1d1ba37dd47b3c85ccb13f",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0017",
+      "cell_id": "X7-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN_PENDING_REPAIR_GATE",
+      "complete_route_ref": "AUDIT_PACKET:G5:X7-T2:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0017",
+      "evidence_refs": [
+        "E0002",
+        "E0017",
+        "E0018",
+        "E0019",
+        "E0001"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "role_sequence",
+        "action_counts"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 16,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_transformation_of_objective"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "frontend/backend/qa",
+      "reference_id": "G5-X7-T2-REF-01",
+      "relation_type": "ENABLES",
+      "semantic_after": "role set expands to frontend, backend, qa rotating turns 16-64",
+      "semantic_before": "single role release_lead executing turns 1-15",
+      "semantic_delta": "operational role scope broadened from one role to four while objective (task completion) remains unresolved",
+      "source_ref": "E0002",
+      "structure_family": "SCOPE_EXPANSION"
+    },
+    {
+      "carrier_ref": "E0068",
+      "cell_id": "X7-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G5:X7-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [
+        "C"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0067",
+        "E0068",
+        "E0069",
+        "E0070"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "compressor_input_output_pairs"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "downstream_semantic_adoption",
+        "decision_application"
+      ],
+      "producer_actor": "llmlingua.PromptCompressor",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X7-T2-REF-02",
+      "relation_type": "SEMANTIC_TRANSFORMATION",
+      "semantic_after": "compressed prompt output post_return_copy",
+      "semantic_before": "prompt input to llmlingua.PromptCompressor.compress_prompt",
+      "semantic_delta": "byte size changes across compression cycles (e.g. 156->396, 671->699, 3713->2146)",
+      "source_ref": "E0067",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": "E0072",
+      "cell_id": "X7-T2",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G5:X7-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0071",
+        "E0072",
+        "E0075",
+        "E0076",
+        "E0087",
+        "E0088"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "repeated_identical_hashes"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 4,
+      "group_id": "G5",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_adoption",
+        "inertia_effect"
+      ],
+      "producer_actor": "llmlingua.PromptCompressor",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X7-T2-REF-03",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "identical compressor output hash eea6d1e0... recurs",
+      "semantic_before": "identical compressor input hash 45e22346... recurs",
+      "semantic_delta": "no observable semantic change across repeated identical compression cycles",
+      "source_ref": "E0071",
+      "structure_family": "RECURSIVE_MEMORY_FEEDBACK"
+    },
+    {
+      "carrier_ref": null,
+      "cell_id": "X7-T2",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G5:X7-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0066",
+        "E0195"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "checkpoint_restore_or_reread_event"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "restore_event",
+        "reread_event",
+        "historical_residue_use"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X7-T2-REF-04",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": null,
+      "semantic_before": null,
+      "semantic_delta": null,
+      "source_ref": "E0066",
+      "structure_family": "HISTORICAL_REENTRY"
+    },
+    {
+      "carrier_ref": null,
+      "cell_id": "X7-T2",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "OPEN_PENDING_REPAIR_GATE",
+      "complete_route_ref": "AUDIT_PACKET:G5:X7-T2:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0001"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "final_answer",
+        "stop_reason",
+        "pending_roles"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 64,
+      "group_id": "G5",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_closure",
+        "repository_convergence"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X7-T2-REF-05",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "answer=null, stop_reason=turn_budget, 8 pending_roles remain",
+      "semantic_before": "task objective with pending_roles list",
+      "semantic_delta": "no closure achieved; task terminated by budget not by semantic resolution",
+      "source_ref": "E0001",
+      "structure_family": "SEMANTIC_REPOSITORY_CLOSURE_DIVERGENCE"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

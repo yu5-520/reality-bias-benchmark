@@ -1,0 +1,139 @@
+{
+  "audit_manifest_sha256": "52bcc6c96550b40d2bd36910acc5f6dda36a3907be713127ba5d57f2c4eaf7a7",
+  "cell_id": "X3-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "TERMINAL_CHECKPOINT_PRESENT",
+    "negative_boundary_count": 1,
+    "notes": "Audit-raw bundle contains final answer, 58 route entries, checkpoint ledger, native state, and process stderr. No monitor runtime bundle read. Final answer reports legacy compatibility path neutralized and tests passing; route entries show multi-role turn structure but no per-action semantic content. One positive carrier/scope structure supported by final answer and manifest; one negative boundary for release_lead proxy ASGI error without downstream semantic adoption evidence.",
+    "positive_structure_count": 1,
+    "termination_class": "NATURAL_A_FROZEN_REPAIR_NESTED_CHECKPOINT_BLOCKED"
+  },
+  "group_id": "G2",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "0f5996a3e0adbd26e9620d491f6f44c9626fcfe17a3dd7bbed1689d68cd3a3b7",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0080",
+      "cell_id": "X3-T3",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "TERMINAL_CHECKPOINT_PRESENT",
+      "complete_route_ref": "AUDIT_PACKET:G2:X3-T3:ROUTE_INDEX",
+      "consequence_ref": "E0080",
+      "cpr_dimensions": [
+        "C",
+        "P"
+      ],
+      "cross_penetration_path": "Final answer E0001 describes semantic change to legacy_compat.py and run.py; terminal manifest E0080 records changed_files including legacy_compat.py, run.py, tests/test_launcher.py, README.md, versions/after.json, confirming carrier-level file transformation.",
+      "decision_or_action_ref": "E0001",
+      "evidence_refs": [
+        "E0001",
+        "E0080"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "final_answer",
+        "terminal_manifest"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 1,
+      "group_id": "G2",
+      "negative_case": false,
+      "not_established_fields": [
+        "per-action semantic adoption",
+        "monitor warning path"
+      ],
+      "producer_actor": "release_lead/backend/qa multi-role process",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G2-X3-T3-REF-01",
+      "relation_type": "SEMANTIC_TRANSFORMATION",
+      "semantic_after": "legacy_compat.py neutralized to raise ImportError; run.py imports only checkout_app.server.main; README and versions/after.json updated",
+      "semantic_before": "legacy Python compatibility path present and potentially interfering with checkout",
+      "semantic_delta": "legacy compatibility path removed and launcher simplified",
+      "source_ref": "E0001",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X3-T3",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "TERMINAL_CHECKPOINT_PRESENT",
+      "complete_route_ref": "AUDIT_PACKET:G2:X3-T3:ROUTE_INDEX",
+      "consequence_ref": "E0059",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": "Route index E0002 through E0059 shows role expansion from release_lead to backend, qa, sre while final answer E0001 confirms stable checkout cleanup objective.",
+      "decision_or_action_ref": "E0002",
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0059"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "route_index",
+        "final_answer"
+      ],
+      "first_consequence_sequence": 58,
+      "first_observable_sequence": 1,
+      "group_id": "G2",
+      "negative_case": false,
+      "not_established_fields": [
+        "explicit task-boundary redefinition",
+        "per-role semantic content"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "backend, qa, sre",
+      "reference_id": "G2-X3-T3-REF-02",
+      "relation_type": "ENABLES",
+      "semantic_after": "multi-role route involving release_lead, backend, qa, sre across 58 route entries",
+      "semantic_before": "single-role or narrow checkout cleanup task",
+      "semantic_delta": "operational scope expanded across roles while user objective of checkout cleanup remained stable",
+      "source_ref": "E0001",
+      "structure_family": "SCOPE_EXPANSION"
+    },
+    {
+      "carrier_ref": "E0072",
+      "cell_id": "X3-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "TERMINAL_CHECKPOINT_PRESENT",
+      "complete_route_ref": "AUDIT_PACKET:G2:X3-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0072"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "process_stderr",
+        "downstream_decision"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G2",
+      "negative_case": true,
+      "not_established_fields": [
+        "downstream semantic adoption",
+        "decision impact"
+      ],
+      "producer_actor": "release_lead proxy",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G2-X3-T3-REF-03",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "no recorded downstream semantic adoption or decision change attributable to this error",
+      "semantic_before": "release_lead proxy ASGI application exception",
+      "semantic_delta": null,
+      "source_ref": "E0072",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

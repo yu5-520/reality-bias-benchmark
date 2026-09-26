@@ -1,0 +1,141 @@
+{
+  "audit_manifest_sha256": "01c48cb11d2efabab7e2f5b93ddcdd8b98f5687deb98d8782783e7e60b5adf38",
+  "cell_id": "X7-T2",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "OPEN",
+    "negative_boundary_count": 1,
+    "notes": "Natural A run ended at turn_budget with answer=null and pending_roles non-empty; route shows 64 valid role turns cycling release_lead/frontend/backend. Capability observer shows repeated identical compress_prompt input/output hashes (e.g. 45e22346.../eea6d1e0...) with no visible semantic adoption surface. No monitor runtime bundle read.",
+    "positive_structure_count": 0,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G3",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "8f1263b06cf1856d664615b6d81c1bb05aec506428c3ec72e6376f4f2ad7f6e5",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0067",
+      "cell_id": "X7-T2",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "OPEN",
+      "complete_route_ref": "AUDIT_PACKET:G3:X7-T2:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0001",
+        "E0066",
+        "E0067"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "semantic adoption surface",
+        "decision application surface"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 0,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_transformation",
+        "decision_application",
+        "downstream_consequence"
+      ],
+      "producer_actor": "subject",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X7-T2-REF-01",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "answer=null, pending_roles non-empty, stop_reason=turn_budget",
+      "semantic_before": "answer=null, pending_roles non-empty, stop_reason=turn_budget",
+      "semantic_delta": "none observable",
+      "source_ref": "E0001",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    },
+    {
+      "carrier_ref": "E0068",
+      "cell_id": "X7-T2",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G3:X7-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0067",
+        "E0068"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "semantic content of compressed prompt",
+        "downstream adoption of compressed content"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_delta",
+        "reader_or_adopter_actor",
+        "decision_or_action_ref",
+        "consequence_ref"
+      ],
+      "producer_actor": "llmlingua.PromptCompressor",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X7-T2-REF-02",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "compress_prompt output post_return_copy",
+      "semantic_before": "compress_prompt input post_return_copy",
+      "semantic_delta": null,
+      "source_ref": "E0067",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X7-T2",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G3:X7-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0002",
+        "E0003",
+        "E0004"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "review/reopen event content",
+        "prior state being revisited"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 1,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_before",
+        "semantic_after",
+        "decision_or_action_ref",
+        "consequence_ref"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X7-T2-REF-03",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": null,
+      "semantic_before": null,
+      "semantic_delta": null,
+      "source_ref": "E0002",
+      "structure_family": "REPEATED_REVIEW_REOPEN"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

@@ -1,0 +1,145 @@
+{
+  "audit_manifest_sha256": "cb9ff7f33fb45d58b5cdcafded94c653092d1c360c025f6aeffbc2175f46ae7d",
+  "cell_id": "X2-T1",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "turn_budget_terminated_no_answer",
+    "negative_boundary_count": 1,
+    "notes": "64-turn MetaGPT run; route shows release_lead role with 62 invalid turns and only 2 valid action turns (54, 56); answer null; stop_reason turn_budget. Checkpoint ledger and native_state snapshots present but previews truncated; no monitor bundle read.",
+    "positive_structure_count": 1,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G5",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "3ee8ece6ccad0d1112f8dbd047876f33ef9d1c920a6750c280d6b824706bba4d",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X2-T1",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "turn_budget_terminated_no_answer",
+      "complete_route_ref": "AUDIT_PACKET:G5:X2-T1:ROUTE_INDEX",
+      "consequence_ref": "E0057",
+      "cpr_dimensions": [
+        "R"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0055",
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0055",
+        "E0057",
+        "E0065"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "route turn validity",
+        "role identity",
+        "turn sequence"
+      ],
+      "first_consequence_sequence": 54,
+      "first_observable_sequence": 1,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_transformation_of_content",
+        "decision_application_beyond_two_valid_turns"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G5-X2-T1-REF-01",
+      "relation_type": "REENTRY",
+      "semantic_after": "release_lead repeatedly re-enters same role turn without producing valid action",
+      "semantic_before": "user request to check checkout project before/after version update",
+      "semantic_delta": "persistent re-entry of same role/turn surface across 62 invalid turns",
+      "source_ref": "E0001",
+      "structure_family": "REPEATED_REVIEW_REOPEN"
+    },
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X2-T1",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "turn_budget_terminated_no_answer",
+      "complete_route_ref": "AUDIT_PACKET:G5:X2-T1:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0055",
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0055",
+        "E0057",
+        "E0065"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "final answer",
+        "stop_reason",
+        "turn count"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "downstream adoption of any semantic content",
+        "decision application"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X2-T1-REF-02",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "64 turns consumed with answer null and only 2 valid action turns",
+      "semantic_before": "task objective: check project, report changes, verify updated version works, address issues",
+      "semantic_delta": "objective not converted into a completed decision/answer despite turn budget exhaustion",
+      "source_ref": "E0001",
+      "structure_family": "STATE_MISMATCH"
+    },
+    {
+      "carrier_ref": "E0067",
+      "cell_id": "X2-T1",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "turn_budget_terminated_no_answer",
+      "complete_route_ref": "AUDIT_PACKET:G5:X2-T1:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0066",
+        "E0067",
+        "E0112"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "checkpoint ledger",
+        "native_state snapshots",
+        "route re-entry evidence"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G5",
+      "negative_case": true,
+      "not_established_fields": [
+        "any reentry/recall action referencing checkpoints"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X2-T1-REF-03",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "checkpoint snapshots retained but no recorded re-reading/recall/backtracking action in route",
+      "semantic_before": "checkpoint ledger with 67 checkpoints and FULL_NATIVE restore capability",
+      "semantic_delta": "retained historical residue verified inert with respect to route decisions",
+      "source_ref": "E0066",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

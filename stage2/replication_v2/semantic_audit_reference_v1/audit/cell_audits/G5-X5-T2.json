@@ -1,0 +1,181 @@
+{
+  "audit_manifest_sha256": "5a9c2f8e05278fa8f48d620f7d291d3757b195d269fc89c1cc8532d3d8460c81",
+  "cell_id": "X5-T2",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+    "negative_boundary_count": 2,
+    "notes": "40-turn multi-role route completed with valid actions; final answer claims no code changes needed. Retrieval observer shows repeated identical query/hits pairs with no semantic adoption evidence. Checkpoint ledger shows full native restore capability but no reentry event.",
+    "positive_structure_count": 1,
+    "termination_class": "NATURAL_COMPLETION"
+  },
+  "group_id": "G5",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "b921c3cb03f1c3621f7bbe52a7516fce968f1ed5b9016c13038fd99258239517",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X5-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+      "complete_route_ref": "AUDIT_PACKET:G5:X5-T2:ROUTE_INDEX",
+      "consequence_ref": "E0041",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0005",
+      "evidence_refs": [
+        "E0137",
+        "E0002",
+        "E0005",
+        "E0041"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "role_route",
+        "task_objective",
+        "action_counts"
+      ],
+      "first_consequence_sequence": 40,
+      "first_observable_sequence": 1,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_transformation_of_task_content"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "frontend, qa, backend",
+      "reference_id": "G5-X5-T2-REF-01",
+      "relation_type": "ENABLES",
+      "semantic_after": "multi-role route spanning release_lead, frontend, qa, backend across 40 turns",
+      "semantic_before": "single release_lead role with user task to add payment button",
+      "semantic_delta": "operational scope expanded from single-role task to multi-role collaborative workflow while user objective (add payment button) remained stable",
+      "source_ref": "E0137",
+      "structure_family": "SCOPE_EXPANSION"
+    },
+    {
+      "carrier_ref": "E0044",
+      "cell_id": "X5-T2",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G5:X5-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0043",
+        "E0044"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "semantic_adoption_of_retrieval_hits",
+        "decision_application_of_retrieved_content"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_transformation",
+        "adoption",
+        "decision_application"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X5-T2-REF-02",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "retrieval hits post_return_copy (1859 bytes)",
+      "semantic_before": "retrieval query post_return_copy (114 bytes)",
+      "semantic_delta": null,
+      "source_ref": "E0043",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": "E0044",
+      "cell_id": "X5-T2",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G5:X5-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0043",
+        "E0044",
+        "E0045",
+        "E0046",
+        "E0122"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "semantic_delta_across_retrieval_cycles",
+        "adoption_of_retrieved_content"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G5",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_adoption",
+        "decision_application"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X5-T2-REF-03",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "identical retrieval hits returned 40 times",
+      "semantic_before": "identical retrieval query repeated 40 times",
+      "semantic_delta": "no semantic change across repeated retrieval cycles",
+      "source_ref": "E0043",
+      "structure_family": "RECURSIVE_MEMORY_FEEDBACK"
+    },
+    {
+      "carrier_ref": "E0123",
+      "cell_id": "X5-T2",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G5:X5-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0042",
+        "E0123",
+        "E0137"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "reentry_event",
+        "restore_action",
+        "backtracking_decision"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G5",
+      "negative_case": true,
+      "not_established_fields": [
+        "reentry_event",
+        "restore_action"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X5-T2-REF-04",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "checkpoint native_state snapshots showing progressive history accumulation",
+      "semantic_before": "checkpoint ledger with 43 checkpoints and FULL_NATIVE restore capability",
+      "semantic_delta": "no recorded reentry, backtracking, or restore event observed",
+      "source_ref": "E0042",
+      "structure_family": "HISTORICAL_REENTRY"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

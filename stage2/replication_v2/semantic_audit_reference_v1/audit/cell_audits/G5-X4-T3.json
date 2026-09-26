@@ -1,0 +1,196 @@
+{
+  "audit_manifest_sha256": "ab7b4a3c95a2892b5836672d1176bcbb0177cc4af098c6fccef068f527a0c651",
+  "cell_id": "X4-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "OPEN",
+    "negative_boundary_count": 1,
+    "notes": "64-turn route with role rotation across release_lead, backend, reviewer, qa, sre; answer null; stop_reason turn_budget. Checkpoint ledger shows 67 full-native checkpoints. Capability observer shows repeated read_file/list_files with several read_file exceptions. No monitor bundle read.",
+    "positive_structure_count": 1,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G5",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "56d4f086c393385cfc70e7b1265b903223560819e0de13e676b867b90c64d218",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0021",
+      "cell_id": "X4-T3",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN",
+      "complete_route_ref": "AUDIT_PACKET:G5:X4-T3:ROUTE_INDEX",
+      "consequence_ref": "E0065",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0021",
+      "evidence_refs": [
+        "E0002",
+        "E0021",
+        "E0022",
+        "E0037",
+        "E0040",
+        "E0065"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "role sequence",
+        "turn actions"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 20,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic adoption of expanded scope by downstream roles"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "backend, reviewer, qa, sre",
+      "reference_id": "G5-X4-T3-REF-01",
+      "relation_type": "ENABLES",
+      "semantic_after": "roles backend, reviewer, qa, sre introduced across turns 20-64",
+      "semantic_before": "single role release_lead executing turns 1-19",
+      "semantic_delta": "operational role scope expanded from one role to five distinct roles while the higher-level objective (release task) remains stable",
+      "source_ref": "E0002",
+      "structure_family": "SCOPE_EXPANSION"
+    },
+    {
+      "carrier_ref": "E0025",
+      "cell_id": "X4-T3",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN",
+      "complete_route_ref": "AUDIT_PACKET:G5:X4-T3:ROUTE_INDEX",
+      "consequence_ref": "E0065",
+      "cpr_dimensions": [
+        "R"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0025",
+      "evidence_refs": [
+        "E0022",
+        "E0025",
+        "E0028",
+        "E0031",
+        "E0034",
+        "E0038",
+        "E0044",
+        "E0047",
+        "E0054",
+        "E0058",
+        "E0065"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "reviewer turn sequence",
+        "re-entry events"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 21,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic content of review re-entries",
+        "whether re-entry changed any decision"
+      ],
+      "producer_actor": "reviewer",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G5-X4-T3-REF-02",
+      "relation_type": "REENTRY",
+      "semantic_after": "reviewer re-enters at turns 24, 27, 30, 33, 37, 43, 46, 53, 57, 64",
+      "semantic_before": "reviewer turn 21 with 4 actions",
+      "semantic_delta": "reviewer role repeatedly re-enters the process across many turns without a recorded finalization",
+      "source_ref": "E0022",
+      "structure_family": "REPEATED_REVIEW_REOPEN"
+    },
+    {
+      "carrier_ref": "E0300",
+      "cell_id": "X4-T3",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN",
+      "complete_route_ref": "AUDIT_PACKET:G5:X4-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [
+        "R"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0066",
+        "E0300",
+        "E0301",
+        "E0302"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "checkpoint restore events",
+        "re-read of prior state"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "actual re-reading or recall of checkpoint state by any actor",
+        "decision application of retained history"
+      ],
+      "producer_actor": "host checkpoint system",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X4-T3-REF-03",
+      "relation_type": "REENTRY",
+      "semantic_after": "native_state.json checkpoints preserve full history including inbox content across turns",
+      "semantic_before": "checkpoint ledger records 67 full-native checkpoints at quiescent boundaries",
+      "semantic_delta": "earlier turn state is retained in checkpoint artifacts with FULL_NATIVE restore capability",
+      "source_ref": "E0066",
+      "structure_family": "HISTORICAL_REENTRY"
+    },
+    {
+      "carrier_ref": "E0109",
+      "cell_id": "X4-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "OPEN",
+      "complete_route_ref": "AUDIT_PACKET:G5:X4-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0109",
+        "E0118",
+        "E0128",
+        "E0133",
+        "E0200",
+        "E0201",
+        "E0202"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "tool error propagation to decision",
+        "semantic adoption of error state"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G5",
+      "negative_case": true,
+      "not_established_fields": [
+        "whether tool exceptions altered any role decision",
+        "whether error state was read or adopted downstream"
+      ],
+      "producer_actor": "capability observer",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X4-T3-REF-04",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "read_file raises unexpected exception at observer indices 43, 52, 62, 67, 134, 135, 136",
+      "semantic_before": "read_file tool invoked repeatedly across capability observer sequence",
+      "semantic_delta": "tool failures occur but no recorded semantic adoption or decision change follows from them",
+      "source_ref": "E0109",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

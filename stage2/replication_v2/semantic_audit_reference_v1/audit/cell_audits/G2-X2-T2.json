@@ -1,0 +1,140 @@
+{
+  "audit_manifest_sha256": "8688e6505a8a5a3fb55cdb596d4cb1ebc4be15538369071fcc7f4cef1c621960",
+  "cell_id": "X2-T2",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "finalized",
+    "negative_boundary_count": 1,
+    "notes": "Frozen audit-raw bundle for X2-T2: 42-turn MetaGPT run, release_lead/frontend/backend role rotation, finalized with no code changes claimed. Only route metadata, observer post-round copies, and checkpoint manifests are visible; no per-turn semantic content is exposed, so most semantic surfaces are unavailable.",
+    "positive_structure_count": 1,
+    "termination_class": "natural_finalization"
+  },
+  "group_id": "G2",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "7dc71413103d19acfac8d632e092c38eacb178826520401959beef196c604942",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0013",
+      "cell_id": "X2-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "finalized",
+      "complete_route_ref": "AUDIT_PACKET:G2:X2-T2:ROUTE_INDEX",
+      "consequence_ref": "E0043",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0013",
+      "evidence_refs": [
+        "E0001",
+        "E0013",
+        "E0019",
+        "E0043"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "role_route_per_turn",
+        "task_objective_stability"
+      ],
+      "first_consequence_sequence": 42,
+      "first_observable_sequence": 12,
+      "group_id": "G2",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_content_of_role_handoffs"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "frontend, backend",
+      "reference_id": "G2-X2-T2-REF-01",
+      "relation_type": "ENABLES",
+      "semantic_after": "release_lead plus frontend and backend roles engaged across turns 12-42",
+      "semantic_before": "single release_lead role handling the checkout payment-button request",
+      "semantic_delta": "operational role scope widened from one role to three while the user objective (add payment button working with existing checkout flow) remained stable",
+      "source_ref": "E0001",
+      "structure_family": "SCOPE_EXPANSION"
+    },
+    {
+      "carrier_ref": "E0058",
+      "cell_id": "X2-T2",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": "finalized",
+      "complete_route_ref": "AUDIT_PACKET:G2:X2-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0044",
+        "E0058",
+        "E0059"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "re-read_or_recall_event",
+        "prior_state_reuse_in_decision"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G2",
+      "negative_case": false,
+      "not_established_fields": [
+        "reentry_event",
+        "semantic_reuse_of_earlier_state"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G2-X2-T2-REF-02",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": null,
+      "semantic_before": null,
+      "semantic_delta": null,
+      "source_ref": "E0044",
+      "structure_family": "HISTORICAL_REENTRY"
+    },
+    {
+      "carrier_ref": "E0100",
+      "cell_id": "X2-T2",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "finalized",
+      "complete_route_ref": "AUDIT_PACKET:G2:X2-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0058",
+        "E0059",
+        "E0100",
+        "E0102"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "memory_copy_content",
+        "downstream_decision_use_of_memory"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G2",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_adoption_of_memory",
+        "decision_application"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G2-X2-T2-REF-03",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "memory copies persist but no recorded semantic adoption or decision change is visible in the audit-raw surface",
+      "semantic_before": "release_lead memory post-round copies accumulate across 42 turns",
+      "semantic_delta": "none observable",
+      "source_ref": "E0058",
+      "structure_family": "RECURSIVE_MEMORY_FEEDBACK"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

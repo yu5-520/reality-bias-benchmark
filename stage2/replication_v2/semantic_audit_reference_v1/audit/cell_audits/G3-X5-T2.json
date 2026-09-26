@@ -1,0 +1,223 @@
+{
+  "audit_manifest_sha256": "dec2c529645439514928b1d8063fbad94b42ea959d3225b4d7ad5b16b5e4a2ba",
+  "cell_id": "X5-T2",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "OPEN",
+    "negative_boundary_count": 1,
+    "notes": "Natural A run terminated at turn_budget (64 turns) with answer=null and 22 pending_roles. Route shows role cycling across release_lead/frontend/qa/backend/sre with valid actions. Retrieval observer events show repeated identical query/hits copies (static retrieval, no semantic adoption visible). Checkpoint ledger shows 67 checkpoints with FULL_NATIVE restore capability. No monitor runtime bundle read; no repair actions during A.",
+    "positive_structure_count": 0,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G3",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "e09aba1a94b28a295b0c7c719907ab632591e1ddef54a8ebf8dec4d7b5399f72",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0068",
+      "cell_id": "X5-T2",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "OPEN",
+      "complete_route_ref": "AUDIT_PACKET:G3:X5-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0067",
+        "E0068",
+        "E0069",
+        "E0070",
+        "E0131",
+        "E0132"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "retrieval query/hits post_return_copy",
+        "downstream semantic adoption or decision application"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "reader_or_adopter_actor",
+        "decision_or_action_ref",
+        "consequence_ref",
+        "cross_penetration_path"
+      ],
+      "producer_actor": "stage2.retrieval.retrieve",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X5-T2-REF-01",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "retrieval hits post_return_copy (1859 bytes, sha cfeb46d9...)",
+      "semantic_before": "retrieval query post_return_copy (114 bytes, sha 33d2dd8d...)",
+      "semantic_delta": "none observable; identical query and hits copies repeat across all 128 observer events with no downstream semantic adoption visible",
+      "source_ref": "E0067",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    },
+    {
+      "carrier_ref": "E0001",
+      "cell_id": "X5-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN",
+      "complete_route_ref": "AUDIT_PACKET:G3:X5-T2:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0065"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "final result state",
+        "pending_roles resolution path"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "reader_or_adopter_actor",
+        "decision_or_action_ref",
+        "cross_penetration_path"
+      ],
+      "producer_actor": "subject",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X5-T2-REF-02",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "answer=null, stop_reason=turn_budget, 22 pending_roles remain unresolved after 64 turns",
+      "semantic_before": "task objective with pending_roles list including frontend, qa, release_lead, sre, backend",
+      "semantic_delta": "task not completed; pending_roles persist unresolved at termination",
+      "source_ref": "E0001",
+      "structure_family": "STATE_MISMATCH"
+    },
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X5-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN",
+      "complete_route_ref": "AUDIT_PACKET:G3:X5-T2:ROUTE_INDEX",
+      "consequence_ref": "E0065",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0002",
+      "evidence_refs": [
+        "E0002",
+        "E0004",
+        "E0005",
+        "E0026",
+        "E0065"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "role assignment sequence",
+        "task objective stability"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "cross_penetration_path"
+      ],
+      "producer_actor": "subject",
+      "reader_or_adopter_actor": "subject",
+      "reference_id": "G3-X5-T2-REF-03",
+      "relation_type": "ENABLES",
+      "semantic_after": "role cycling across release_lead, frontend, qa, backend, sre over 64 turns with valid actions",
+      "semantic_before": "initial role release_lead at turn 1",
+      "semantic_delta": "operational role scope expands across multiple roles while task objective remains stable",
+      "source_ref": "E0002",
+      "structure_family": "SCOPE_EXPANSION"
+    },
+    {
+      "carrier_ref": "E0066",
+      "cell_id": "X5-T2",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": "OPEN",
+      "complete_route_ref": "AUDIT_PACKET:G3:X5-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0066"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "checkpoint restore or reentry event",
+        "downstream decision application"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "reader_or_adopter_actor",
+        "decision_or_action_ref",
+        "consequence_ref",
+        "cross_penetration_path"
+      ],
+      "producer_actor": "host",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X5-T2-REF-04",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "no recorded re-reading, recall, review, backtracking or historical residue use visible in route",
+      "semantic_before": "checkpoint ledger with 67 checkpoints, FULL_NATIVE restore capability",
+      "semantic_delta": "none observable; checkpoints exist but no reentry path recorded",
+      "source_ref": "E0066",
+      "structure_family": "HISTORICAL_REENTRY"
+    },
+    {
+      "carrier_ref": "E0195",
+      "cell_id": "X5-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN",
+      "complete_route_ref": "AUDIT_PACKET:G3:X5-T2:ROUTE_INDEX",
+      "consequence_ref": "E0195",
+      "cpr_dimensions": [
+        "C"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0195"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "file hash change",
+        "downstream adoption or decision use"
+      ],
+      "first_consequence_sequence": 53,
+      "first_observable_sequence": 17,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "reader_or_adopter_actor",
+        "decision_or_action_ref",
+        "cross_penetration_path"
+      ],
+      "producer_actor": "subject",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X5-T2-REF-05",
+      "relation_type": "SEMANTIC_TRANSFORMATION",
+      "semantic_after": "web/app.js and web/index.html last hashes at host:turn:0053:post",
+      "semantic_before": "web/app.js and web/index.html first hashes at host:turn:0017:post",
+      "semantic_delta": "file content hashes changed across turns 17-53, indicating artifact transformation",
+      "source_ref": "E0195",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

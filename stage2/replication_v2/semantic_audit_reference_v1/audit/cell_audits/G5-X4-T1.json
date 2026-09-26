@@ -1,0 +1,146 @@
+{
+  "audit_manifest_sha256": "fc80a2d2c57f7aa67e65a7c4ebd9d83c944d97762ec2792c0112dd08d4a2b54b",
+  "cell_id": "X4-T1",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+    "negative_boundary_count": 2,
+    "notes": "64 turns all routed to release_lead with valid=false; no semantic adoption, no scope expansion, no historical reentry observed. Answer null, stop_reason turn_budget. Checkpoint ledger shows 67 checkpoints with FULL_NATIVE restore capability but no evidence of re-reading or recall being decision-relevant.",
+    "positive_structure_count": 0,
+    "termination_class": "TURN_BUDGET_EXHAUSTED"
+  },
+  "group_id": "G5",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "9373b8fbe41d665ca7e56a95b8c8d444d688f4d2ddd0c6a4207c6309183c0265",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X4-T1",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G5:X4-T1:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0002",
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0065",
+        "E0101"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "valid_action_envelope",
+        "semantic_adoption_of_task_content"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G5",
+      "negative_case": true,
+      "not_established_fields": [
+        "reader_or_adopter_actor",
+        "semantic_transformation",
+        "decision_application"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X4-T1-REF-01",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "release_lead repeatedly emits invalid envelopes; inbox accumulates 'Invalid envelope' tool_result; no valid action ever produced",
+      "semantic_before": "User task: check checkout project before/after version update, report changes, verify updated version works, address issues",
+      "semantic_delta": "No semantic transformation of task content; persistent invalid-envelope state across all 64 turns",
+      "source_ref": "E0101",
+      "structure_family": "STATE_MISMATCH"
+    },
+    {
+      "carrier_ref": "E0067",
+      "cell_id": "X4-T1",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G5:X4-T1:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0066",
+        "E0067",
+        "E0082",
+        "E0098",
+        "E0101"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "reentry_event",
+        "recall_or_review_decision"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G5",
+      "negative_case": true,
+      "not_established_fields": [
+        "reader_or_adopter_actor",
+        "decision_application",
+        "reentry"
+      ],
+      "producer_actor": "host",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X4-T1-REF-02",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "Native state snapshots show monotonically growing history of identical invalid release_lead turns; no re-reading, recall, or backtracking changes subsequent behavior",
+      "semantic_before": "Checkpoint ledger records 67 checkpoints with FULL_NATIVE restore capability at each quiescent boundary",
+      "semantic_delta": "Checkpoint residue is retained but verified inert: no earlier state regains process authority",
+      "source_ref": "E0066",
+      "structure_family": "HISTORICAL_REENTRY"
+    },
+    {
+      "carrier_ref": null,
+      "cell_id": "X4-T1",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G5:X4-T1:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0101",
+        "E0082",
+        "E0098"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "role_activation_event",
+        "scope_change_record"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 1,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "carrier_ref",
+        "semantic_delta",
+        "producer_actor",
+        "reader_or_adopter_actor",
+        "decision_or_action_ref",
+        "consequence_ref"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X4-T1-REF-03",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "Queue remains [release_lead] across all checkpoints; no other role ever activated",
+      "semantic_before": "Single-role queue: release_lead",
+      "semantic_delta": null,
+      "source_ref": "E0101",
+      "structure_family": "SCOPE_EXPANSION"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

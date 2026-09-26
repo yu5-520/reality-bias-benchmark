@@ -1,0 +1,141 @@
+{
+  "audit_manifest_sha256": "b354684b31f996520204212664b2e6f1539365b0b9657f2df8a9961c19a2a402",
+  "cell_id": "X5-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "OPEN_PENDING_ROLES_TURN_BUDGET",
+    "negative_boundary_count": 2,
+    "notes": "64-turn route with role rotation (release_lead/backend/qa/reviewer); answer null, stop_reason turn_budget. Retrieval observer events show identical query/hits hashes repeated across all 128 events (static retrieval, no semantic adoption visible). No source->adoption->decision path observable in supplied evidence.",
+    "positive_structure_count": 0,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G4",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "095f5876d84530ea7338e5fb7b4f7b38c1619f062c4808421707d88994355b66",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0068",
+      "cell_id": "X5-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "OPEN_PENDING_ROLES_TURN_BUDGET",
+      "complete_route_ref": "AUDIT_PACKET:G4:X5-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0067",
+        "E0068",
+        "E0131",
+        "E0132"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "retrieval query/hits content",
+        "downstream adoption of retrieved content"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G4",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic adoption of retrieved hits",
+        "decision application of retrieved content"
+      ],
+      "producer_actor": "retrieval subsystem",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G4-X5-T3-REF-01",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "retrieval hits post_return_copy (1639 bytes)",
+      "semantic_before": "retrieval query post_return_copy (189 bytes)",
+      "semantic_delta": "none observable; identical sha256 repeated across all 128 observer events",
+      "source_ref": "E0067",
+      "structure_family": "RECURSIVE_MEMORY_FEEDBACK"
+    },
+    {
+      "carrier_ref": null,
+      "cell_id": "X5-T3",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": "OPEN_PENDING_ROLES_TURN_BUDGET",
+      "complete_route_ref": "AUDIT_PACKET:G4:X5-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0001",
+        "E0027",
+        "E0031",
+        "E0040",
+        "E0041"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "reviewer re-entry with prior-state reference",
+        "reopening of a previously closed decision"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 1,
+      "group_id": "G4",
+      "negative_case": false,
+      "not_established_fields": [
+        "reviewer semantic re-entry",
+        "prior-state recall",
+        "reopening event"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G4-X5-T3-REF-02",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": null,
+      "semantic_before": null,
+      "semantic_delta": null,
+      "source_ref": "E0001",
+      "structure_family": "REPEATED_REVIEW_REOPEN"
+    },
+    {
+      "carrier_ref": null,
+      "cell_id": "X5-T3",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": "OPEN_PENDING_ROLES_TURN_BUDGET",
+      "complete_route_ref": "AUDIT_PACKET:G4:X5-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0002",
+        "E0007",
+        "E0008",
+        "E0027"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "role/tool/file scope change with stable higher-level objective"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 1,
+      "group_id": "G4",
+      "negative_case": false,
+      "not_established_fields": [
+        "scope change evidence",
+        "stable objective reference"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G4-X5-T3-REF-03",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": null,
+      "semantic_before": null,
+      "semantic_delta": null,
+      "source_ref": "E0002",
+      "structure_family": "SCOPE_EXPANSION"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

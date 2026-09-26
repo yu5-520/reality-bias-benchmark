@@ -1,0 +1,99 @@
+{
+  "audit_manifest_sha256": "86edd49060ee5764d9751f33a934dc6e03e70f07fc781ff1481987c87b3a0845",
+  "cell_id": "X1-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "TERMINAL",
+    "negative_boundary_count": 1,
+    "notes": "Frozen audit-raw bundle for X1-T3. Terminal checkpoint present with changed_files README.md, legacy_compat.py, run.py, versions/after.json. Final answer claims legacy compatibility path removed and launcher targets current v2 service. Only event metadata (bytes/sha256) is visible for the 70 run_stream events; no message content is exposed, so semantic adoption of the legacy-removal objective cannot be traced through the event stream. One positive structure (CARRIER_TRANSFORMATION) is supported by the terminal manifest and final answer; one negative boundary records that the event stream is metadata-only and cannot establish semantic penetration.",
+    "positive_structure_count": 1,
+    "termination_class": "NATURAL_TERMINAL"
+  },
+  "group_id": "G5",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "8f89cd9e570bb21af79541b3103d15f01b4a95dc6b83bb92fc6f0c3b6ae12ec7",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0074",
+      "cell_id": "X1-T3",
+      "claim_status": "SUPPORTED",
+      "closure_state": "TERMINAL",
+      "complete_route_ref": "AUDIT_PACKET:G5:X1-T3:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [
+        "C"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0074",
+      "evidence_refs": [
+        "E0001",
+        "E0074"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "terminal manifest changed_files",
+        "final answer text"
+      ],
+      "first_consequence_sequence": 15,
+      "first_observable_sequence": 0,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "event-level semantic adoption path"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G5-X1-T3-REF-01",
+      "relation_type": "SEMANTIC_TRANSFORMATION",
+      "semantic_after": "legacy compatibility path removed; run.py unconditionally starts current v2 service; legacy_compat.py is an empty tombstone with no main() or handler",
+      "semantic_before": "legacy compatibility path present; run.py selects between v1 and v2; legacy_compat.py contains v1 HTTP handler on port 8080",
+      "semantic_delta": "carrier state changed from dual-path compatibility routing to single current-service routing; legacy handler removed",
+      "source_ref": "E0001",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": "E0072",
+      "cell_id": "X1-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "TERMINAL",
+      "complete_route_ref": "AUDIT_PACKET:G5:X1-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0003",
+        "E0072"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "event message content",
+        "semantic adoption surface"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G5",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic content of run_stream events",
+        "adoption of legacy-removal objective",
+        "decision-relevant transformation in event stream"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X1-T3-REF-02",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": null,
+      "semantic_before": null,
+      "semantic_delta": null,
+      "source_ref": "E0003",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

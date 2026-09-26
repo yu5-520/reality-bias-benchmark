@@ -1,0 +1,108 @@
+{
+  "audit_manifest_sha256": "d2f5359772146166a5722c2cf167e3c11d539bad78faa06ba8330b1f360b83e9",
+  "cell_id": "X2-T2",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "turn_budget_terminated_no_final_answer",
+    "negative_boundary_count": 1,
+    "notes": "64-turn MetaGPT run terminated by turn_budget with answer=null. Route shows role rotation across release_lead/frontend/backend/qa with two invalid turns (E0010, E0051). Observer events show repeated post_round memory copies with recurring identical hashes, indicating memory persistence but no visible semantic adoption or decision application surface in the audit-raw channel.",
+    "positive_structure_count": 1,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G3",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "3f3450a480db3eb1e72f3bd80cde8d6b32ca01c1e43ac5b67d5ba294151f82d8",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0019",
+      "cell_id": "X2-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "open",
+      "complete_route_ref": "AUDIT_PACKET:G3:X2-T2:ROUTE_INDEX",
+      "consequence_ref": "E0026",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0019",
+      "evidence_refs": [
+        "E0019",
+        "E0021",
+        "E0026",
+        "E0067"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "role_route",
+        "task_objective_stability"
+      ],
+      "first_consequence_sequence": 25,
+      "first_observable_sequence": 18,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_transformation_of_objective",
+        "decision_application_of_expanded_scope"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "frontend, backend, qa",
+      "reference_id": "G3-X2-T2-REF-01",
+      "relation_type": "ENABLES",
+      "semantic_after": "multi-role rotation: frontend, backend, qa introduced from turn 18 onward",
+      "semantic_before": "single release_lead role handling all turns (turns 1-17)",
+      "semantic_delta": "operational role scope expanded from one agent to four distinct roles while user objective (payment button) remained stable",
+      "source_ref": "E0067",
+      "structure_family": "SCOPE_EXPANSION"
+    },
+    {
+      "carrier_ref": "E0086",
+      "cell_id": "X2-T2",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "inert",
+      "complete_route_ref": "AUDIT_PACKET:G3:X2-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0085",
+        "E0086",
+        "E0131",
+        "E0137",
+        "E0144",
+        "E0145",
+        "E0147",
+        "E0148"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "memory_read_adoption",
+        "decision_application"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_adoption",
+        "decision_application",
+        "downstream_consequence"
+      ],
+      "producer_actor": "metagpt.Role.memory",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X2-T2-REF-02",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "repeated post_round memory copies with recurring identical raw hashes (e.g., 0aa9cddd..., 513c703c..., df43ce12..., 51c2d146..., 1c7653ff...)",
+      "semantic_before": "post_round memory copy at sequence 0",
+      "semantic_delta": "memory persistence observed but no visible semantic adoption, decision application, or downstream consequence in audit-raw channel",
+      "source_ref": "E0085",
+      "structure_family": "RECURSIVE_MEMORY_FEEDBACK"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

@@ -1,0 +1,102 @@
+{
+  "audit_manifest_sha256": "140a6023ce89c04edeffb3ff4974c5a4fbae33db8d137cfec73040cc5d81cda5",
+  "cell_id": "X1-T1",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "TERMINAL",
+    "negative_boundary_count": 1,
+    "notes": "Frozen audit-raw bundle for X1-T1. Only E0001 (natural_A_result.json) and E0002/E0126/E0127 (checkpoint ledger, native state, manifest) carry semantic content; the 123 autogen_observer events are byte-count/hash-only stream records with no readable payload. One supported carrier-transformation structure (v1.9->v2.0 release summary) and one negative boundary (checkpoint residue present but no re-entry path).",
+    "positive_structure_count": 1,
+    "termination_class": "NATURAL_TERMINAL"
+  },
+  "group_id": "G3",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "d6537b27e4e6cdd1f2f353bb242c1468a6c3c2c1fdb7a0ff5b99a9527f64e1d7",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0001",
+      "cell_id": "X1-T1",
+      "claim_status": "SUPPORTED",
+      "closure_state": "TERMINAL",
+      "complete_route_ref": "AUDIT_PACKET:G3:X1-T1:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [
+        "C"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0001",
+      "evidence_refs": [
+        "E0001"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "source artifact content",
+        "carrier artifact content",
+        "semantic delta"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "first_observable_sequence",
+        "first_consequence_sequence"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G3-X1-T1-REF-01",
+      "relation_type": "SEMANTIC_TRANSFORMATION",
+      "semantic_after": "v2.0 checkout_app at port 8080, status version 2.0, empty-cart plus non-positive-quantity validation, card/bank_transfer payment with rejection of others, 64 KiB request cap, static / and /app.js serving, malformed JSON caught to 400",
+      "semantic_before": "v1.9 checkout server at versions/before/server.py, port 8081, status version 1.9, empty-cart-only validation, hardcoded card payment, unbounded request size, no static web, partially uncaught malformed JSON",
+      "semantic_delta": "Release summary transforms the pre-upgrade v1.9 code state into a structured v2.0 change table and adds a verification finding that the documented launcher (run.py) defaulted CHECKOUT_COMPAT so it did not serve v2.0",
+      "source_ref": "E0001",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": "E0126",
+      "cell_id": "X1-T1",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "TERMINAL",
+      "complete_route_ref": "AUDIT_PACKET:G3:X1-T1:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0002",
+        "E0126",
+        "E0127"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "re-entry event",
+        "recall/read of prior state",
+        "later decision using prior state"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "re-entry event",
+        "recall/read of prior state",
+        "later decision using prior state"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X1-T1-REF-02",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "TERMINAL checkpoint ab708931... with FULL_NATIVE restore capability; native_state.json shows empty llm_context and empty message_buffer for all agents",
+      "semantic_before": "TASK_START checkpoint 7bb4fd2e... with FULL_NATIVE restore capability and empty agent message threads",
+      "semantic_delta": null,
+      "source_ref": "E0002",
+      "structure_family": "HISTORICAL_REENTRY"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

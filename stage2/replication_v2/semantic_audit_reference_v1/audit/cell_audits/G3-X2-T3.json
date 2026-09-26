@@ -1,0 +1,185 @@
+{
+  "audit_manifest_sha256": "72d8e02f8a9dda5055f59d17431e138883e2610d5a3eefd966b0f45bfba54f3e",
+  "cell_id": "X2-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "turn_budget_terminated",
+    "negative_boundary_count": 1,
+    "notes": "Frozen A-run terminated by turn_budget after 64 turns; route shows release_lead/qa/reviewer role cycling with no final answer. Evidence surfaces are route metadata, checkpoint ledger, and observer memory-copy events; no monitor bundle read.",
+    "positive_structure_count": 2,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G3",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "49b8f5562d6f26f4e94451ea351734c11ffd6504126c6748e9194e3c4c2e4b00",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X2-T3",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "turn_budget_terminated",
+      "complete_route_ref": "AUDIT_PACKET:G3:X2-T3:ROUTE_INDEX",
+      "consequence_ref": "E0045",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0012",
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0012",
+        "E0045"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "route role sequence",
+        "user request text"
+      ],
+      "first_consequence_sequence": 11,
+      "first_observable_sequence": 1,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "explicit scope-change decision",
+        "release condition change"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "qa",
+      "reference_id": "G3-X2-T3-REF-01",
+      "relation_type": "ENABLES",
+      "semantic_after": "release_lead, qa, and reviewer roles active across turns",
+      "semantic_before": "single release_lead role handling user request",
+      "semantic_delta": "operational role set expanded from release_lead to include qa and reviewer while user objective (clean up legacy compat path) remains stable",
+      "source_ref": "E0001",
+      "structure_family": "SCOPE_EXPANSION"
+    },
+    {
+      "carrier_ref": "E0045",
+      "cell_id": "X2-T3",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "turn_budget_terminated",
+      "complete_route_ref": "AUDIT_PACKET:G3:X2-T3:ROUTE_INDEX",
+      "consequence_ref": "E0063",
+      "cpr_dimensions": [
+        "R"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0045",
+      "evidence_refs": [
+        "E0012",
+        "E0045",
+        "E0048",
+        "E0051",
+        "E0063"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "route role sequence",
+        "turn validity flags"
+      ],
+      "first_consequence_sequence": 44,
+      "first_observable_sequence": 11,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "explicit review rejection",
+        "repair action",
+        "final review closure"
+      ],
+      "producer_actor": "qa",
+      "reader_or_adopter_actor": "reviewer",
+      "reference_id": "G3-X2-T3-REF-02",
+      "relation_type": "REENTRY",
+      "semantic_after": "reviewer role introduced at turn 44 and recurring through turn 62",
+      "semantic_before": "qa review activity at turn 11",
+      "semantic_delta": "review surface reopens repeatedly across qa and reviewer roles without a recorded finalization",
+      "source_ref": "E0012",
+      "structure_family": "REPEATED_REVIEW_REOPEN"
+    },
+    {
+      "carrier_ref": "E0067",
+      "cell_id": "X2-T3",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": "turn_budget_terminated",
+      "complete_route_ref": "AUDIT_PACKET:G3:X2-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0066",
+        "E0067"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "checkpoint restore event",
+        "re-read of earlier state",
+        "decision change from restored state"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "restore action",
+        "re-read of earlier checkpoint",
+        "decision change attributable to restored state"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X2-T3-REF-03",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": null,
+      "semantic_before": null,
+      "semantic_delta": null,
+      "source_ref": "E0066",
+      "structure_family": "HISTORICAL_REENTRY"
+    },
+    {
+      "carrier_ref": "E0084",
+      "cell_id": "X2-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "turn_budget_terminated",
+      "complete_route_ref": "AUDIT_PACKET:G3:X2-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0083",
+        "E0084",
+        "E0085",
+        "E0086"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "memory copy events",
+        "downstream decision referencing memory content"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic adoption of memory content",
+        "decision change from memory feedback"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X2-T3-REF-04",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "memory copies persist across many turns without a recorded semantic adoption or decision change",
+      "semantic_before": "observer records post-round memory copies for release_lead and qa",
+      "semantic_delta": "memory presence and repetition observed, but no evidence that retained memory altered a downstream decision",
+      "source_ref": "E0083",
+      "structure_family": "RECURSIVE_MEMORY_FEEDBACK"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

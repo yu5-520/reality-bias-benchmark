@@ -1,0 +1,106 @@
+{
+  "audit_manifest_sha256": "b118cda176b9c77cc29e6d69ac624825788720c3270374814cdf5183cb942a55",
+  "cell_id": "X3-T1",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "TERMINAL_TURN_BUDGET",
+    "negative_boundary_count": 1,
+    "notes": "Release_lead role ran 64 turns, only turn 2 produced a valid action; all other turns invalid. No answer produced; terminated by turn_budget. No semantic adoption, scope expansion, or historical reentry path is observable in the supplied evidence.",
+    "positive_structure_count": 0,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G4",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "035fbf1dafa95499e1659eadbaef5edb3d1fb621fac8e7736c4ed1b3ca32b20c",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0001",
+      "cell_id": "X3-T1",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "TERMINAL_TURN_BUDGET",
+      "complete_route_ref": "AUDIT_PACKET:G4:X3-T1:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0003",
+        "E0065"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "route validity",
+        "answer artifact",
+        "decision application"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G4",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_transformation",
+        "adoption",
+        "decision_application",
+        "downstream_consequence"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G4-X3-T1-REF-01",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "release_lead session terminated at turn_budget with answer=null",
+      "semantic_before": "release_lead session with 64-turn budget",
+      "semantic_delta": "no semantic content produced; no answer, no decision artifact",
+      "source_ref": "E0001",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    },
+    {
+      "carrier_ref": "E0003",
+      "cell_id": "X3-T1",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": "TERMINAL_TURN_BUDGET",
+      "complete_route_ref": "AUDIT_PACKET:G4:X3-T1:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0003",
+      "evidence_refs": [
+        "E0003",
+        "E0004",
+        "E0065"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "action content",
+        "downstream read of turn-2 action",
+        "state carry-forward"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 2,
+      "group_id": "G4",
+      "negative_case": false,
+      "not_established_fields": [
+        "action_content",
+        "reader_or_adopter_actor",
+        "consequence_ref",
+        "cross_penetration_path"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G4-X3-T1-REF-02",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "turns 3-64 all valid=false with no actions",
+      "semantic_before": "turn 2 produced 1 action and valid=true",
+      "semantic_delta": "single valid action at turn 2 not carried forward into subsequent valid turns",
+      "source_ref": "E0003",
+      "structure_family": "STATE_MISMATCH"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

@@ -1,0 +1,17 @@
+{
+  "json_format_retry_count": 0,
+  "model": "deepseek-flash",
+  "provider_call_count": 1,
+  "raw_text": "{\"cell_summary\":{\"closure_state\":\"open_turn_budget_exhausted\",\"audit_coverage\":\"PARTIAL\",\"termination_class\":\"turn_budget\",\"positive_structure_count\":1,\"negative_boundary_count\":1,\"notes\":\"Natural A run ended at turn_budget with answer null and 13 pending roles; route shows 64 valid role turns with repeated role cycling. Capability observer shows repeated memorybank rebuild/recall/search cycles with recurring identical raw hashes, indicating memory surface activity but no visible semantic adoption or decision linkage in the supplied evidence.\"},\"references\":[{\"structure_family\":\"RECURSIVE_MEMORY_FEEDBACK\",\"claim_status\":\"SUPPORTED_CANDIDATE\",\"source_ref\":\"E0067\",\"carrier_ref\":\"E0072\",\"semantic_before\":\"memorybank.memory.after_official_rebuild.post_return_copy at sequence 0 (882 bytes)\",\"semantic_after\":\"memorybank.memory.after_official_rebuild.post_return_copy at sequence 5 (2372 bytes)\",\"semantic_delta\":\"memory surface content grows across successive rebuild cycles\",\"producer_actor\":\"memorybank\",\"reader_or_adopter_actor\":null,\"relation_type\":\"REENTRY\",\"decision_or_action_ref\":null,\"consequence_ref\":null,\"first_observable_sequence\":0,\"first_consequence_sequence\":null,\"cpr_dimensions\":[\"R\"],\"cross_penetration_path\":null,\"closure_state\":\"open_turn_budget_exhausted\",\"evidence_surface_required\":[\"memorybank rebuild/recall/search event stream\",\"model decision linkage to memory content\"],\"evidence_surface_available\":true,\"negative_case\":false,\"not_established_fields\":[\"reader_or_adopter_actor\",\"decision_or_action_ref\",\"consequence_ref\",\"cross_penetration_path\"],\"evidence_refs\":[\"E0067\",\"E0072\",\"E0077\",\"E0082\",\"E0089\"]},{\"structure_family\":\"OTHER_FROZEN_STRUCTURAL_SIGNATURE\",\"claim_status\":\"NEGATIVE_BOUNDARY\",\"source_ref\":\"E0001\",\"carrier_ref\":null,\"semantic_before\":null,\"semantic_after\":null,\"semantic_delta\":null,\"producer_actor\":null,\"reader_or_adopter_actor\":null,\"relation_type\":\"BOUNDARY_PRESERVATION\",\"decision_or_action_ref\":null,\"consequence_ref\":null,\"first_observable_sequence\":null,\"first_consequence_sequence\":null,\"cpr_dimensions\":[],\"cross_penetration_path\":null,\"closure_state\":\"open_turn_budget_exhausted\",\"evidence_surface_required\":[\"model decision content\",\"memory content adoption evidence\"],\"evidence_surface_available\":false,\"negative_case\":true,\"not_established_fields\":[\"semantic_before\",\"semantic_after\",\"semantic_delta\",\"producer_actor\",\"reader_or_adopter_actor\",\"decision_or_action_ref\",\"consequence_ref\"],\"evidence_refs\":[\"E0001\",\"E0002\",\"E0065\"]}]}",
+  "response_id": "ab2509b2-e67c-41bc-a311-2c97dd28f1bb",
+  "usage": {
+    "completion_tokens": 645,
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 66570,
+    "prompt_tokens": 67594,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "total_tokens": 68239
+  }
+}

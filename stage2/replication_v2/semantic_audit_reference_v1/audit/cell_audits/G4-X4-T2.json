@@ -1,0 +1,204 @@
+{
+  "audit_manifest_sha256": "d2933268b4b3ad5109bd8878564ef783da41f22179fe79fb952982332d78466e",
+  "cell_id": "X4-T2",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "CLOSED",
+    "negative_boundary_count": 1,
+    "notes": "19-turn multi-role route; final answer asserts payment button already present and functional, no code changes required. Tool read_file failures observed early (E0024-E0026) then recovered. Checkpoint ledger shows 22 checkpoints with FULL_NATIVE restore capability. Monitor runtime bundle unavailable; audit is monitor-blind.",
+    "positive_structure_count": 2,
+    "termination_class": "NATURAL_COMPLETION"
+  },
+  "group_id": "G4",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "70618e872266fcd09a5841af0730cc995278dd9377ee64e7110ea1f0229cf08a",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X4-T2",
+      "claim_status": "SUPPORTED",
+      "closure_state": "CLOSED",
+      "complete_route_ref": "AUDIT_PACKET:G4:X4-T2:ROUTE_INDEX",
+      "consequence_ref": "E0019",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0002",
+      "evidence_refs": [
+        "E0002",
+        "E0003",
+        "E0004",
+        "E0005",
+        "E0006",
+        "E0007",
+        "E0008",
+        "E0009",
+        "E0010",
+        "E0011",
+        "E0012",
+        "E0013",
+        "E0014",
+        "E0015",
+        "E0016",
+        "E0017",
+        "E0018",
+        "E0019",
+        "E0020",
+        "E0064"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "role_route",
+        "task_objective",
+        "tool_actions"
+      ],
+      "first_consequence_sequence": 19,
+      "first_observable_sequence": 1,
+      "group_id": "G4",
+      "negative_case": false,
+      "not_established_fields": [],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "frontend, product, backend, qa, security",
+      "reference_id": "G4-X4-T2-REF-01",
+      "relation_type": "ENABLES",
+      "semantic_after": "Multi-role operational scope: release_lead, frontend, product, backend, qa, security roles engaged across 19 turns with tool actions (list_files, read_file, write_file, run_tests).",
+      "semantic_before": "Single user request: add a payment button to the checkout page that works with the existing checkout flow.",
+      "semantic_delta": "Task scope expanded from single-role user request to multi-role collaborative workflow while the higher-level objective (payment button on checkout page) remained stable.",
+      "source_ref": "E0064",
+      "structure_family": "SCOPE_EXPANSION"
+    },
+    {
+      "carrier_ref": "E0058",
+      "cell_id": "X4-T2",
+      "claim_status": "SUPPORTED",
+      "closure_state": "CLOSED",
+      "complete_route_ref": "AUDIT_PACKET:G4:X4-T2:ROUTE_INDEX",
+      "consequence_ref": "E0058",
+      "cpr_dimensions": [
+        "C",
+        "P"
+      ],
+      "cross_penetration_path": "User request (E0064) -> release_lead decomposes into role inboxes (E0002-E0004) -> frontend/product/backend receive role-specific carriers (E0058, E0063) -> tool actions executed.",
+      "decision_or_action_ref": "E0002",
+      "evidence_refs": [
+        "E0002",
+        "E0003",
+        "E0004",
+        "E0058",
+        "E0063",
+        "E0064"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "inbox_messages",
+        "tool_results",
+        "role_route"
+      ],
+      "first_consequence_sequence": 3,
+      "first_observable_sequence": 1,
+      "group_id": "G4",
+      "negative_case": false,
+      "not_established_fields": [],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "frontend, product, backend",
+      "reference_id": "G4-X4-T2-REF-02",
+      "relation_type": "SEMANTIC_TRANSFORMATION",
+      "semantic_after": "Request decomposed into role-specific inbox messages and tool actions; frontend received list_files result (E0058), product received read_file errors (E0058), backend received a request for API contracts (E0063).",
+      "semantic_before": "User request delivered as natural-language instruction to release_lead.",
+      "semantic_delta": "Natural-language task transformed into structured multi-role message/tool-action carrier with role-specific payloads.",
+      "source_ref": "E0064",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": "E0058",
+      "cell_id": "X4-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "CLOSED",
+      "complete_route_ref": "AUDIT_PACKET:G4:X4-T2:ROUTE_INDEX",
+      "consequence_ref": "E0063",
+      "cpr_dimensions": [
+        "C",
+        "P"
+      ],
+      "cross_penetration_path": "Product read_file failure (E0024) -> product inbox error (E0058) -> product requests API contracts from backend (E0063) -> backend engaged (E0013).",
+      "decision_or_action_ref": "E0063",
+      "evidence_refs": [
+        "E0024",
+        "E0025",
+        "E0026",
+        "E0058",
+        "E0063",
+        "E0013"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "tool_error",
+        "inbox_state",
+        "subsequent_action"
+      ],
+      "first_consequence_sequence": 12,
+      "first_observable_sequence": 3,
+      "group_id": "G4",
+      "negative_case": false,
+      "not_established_fields": [
+        "explicit_semantic_adoption_of_error_by_decision_maker"
+      ],
+      "producer_actor": "product",
+      "reader_or_adopter_actor": "product, backend",
+      "reference_id": "G4-X4-T2-REF-03",
+      "relation_type": "CONSTRAINS",
+      "semantic_after": "read_file raised unexpected exception (E0024-E0026); product inbox recorded 'Error executing tool read_file' (E0058); product then requested API contracts from backend (E0063).",
+      "semantic_before": "Product role attempted read_file on repository files expecting content.",
+      "semantic_delta": "Tool capability mismatch: read_file failed for product role, forcing workaround via backend request rather than direct file inspection.",
+      "source_ref": "E0024",
+      "structure_family": "STATE_MISMATCH"
+    },
+    {
+      "carrier_ref": "E0066",
+      "cell_id": "X4-T2",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "CLOSED",
+      "complete_route_ref": "AUDIT_PACKET:G4:X4-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0021",
+        "E0066",
+        "E0079"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "reentry_event",
+        "recall_action",
+        "backtrack_decision"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G4",
+      "negative_case": true,
+      "not_established_fields": [
+        "reentry_event",
+        "recall_action",
+        "backtrack_decision"
+      ],
+      "producer_actor": "host",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G4-X4-T2-REF-04",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "Final answer (E0066) asserts no code changes required; checkpoint manifests (E0079) show web/app.js and web/index.html changed between turn 3 and turn 16, but final answer claims no changes needed.",
+      "semantic_before": "22 checkpoints recorded with FULL_NATIVE restore capability across the route.",
+      "semantic_delta": "Checkpoint history and file-change manifests exist but no recorded re-reading, recall, or backtracking to earlier state that alters process authority; final answer does not reference checkpoint history.",
+      "source_ref": "E0021",
+      "structure_family": "HISTORICAL_REENTRY"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

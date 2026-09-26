@@ -1,0 +1,109 @@
+{
+  "audit_manifest_sha256": "fef52c0fb4d8166a99c6720680b30e59ec7ba36d27d55addda47e12afcd4d9a0",
+  "cell_id": "X5-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "OPEN_PENDING_ROLES",
+    "negative_boundary_count": 1,
+    "notes": "64-turn route alternates release_lead and reviewer; answer null with pending_roles release_lead and reviewer; retrieval observer shows repeated identical query/hits copies; no semantic adoption surface visible.",
+    "positive_structure_count": 1,
+    "termination_class": "TURN_BUDGET"
+  },
+  "group_id": "G3",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "23795e69c3b4df1bd0a8ffca32ef4f799c8dac33b2f0d72b6fc7d38e9bb61116",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0031",
+      "cell_id": "X5-T3",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN_PENDING_ROLES",
+      "complete_route_ref": "AUDIT_PACKET:G3:X5-T3:ROUTE_INDEX",
+      "consequence_ref": "E0065",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0031",
+      "evidence_refs": [
+        "E0002",
+        "E0031",
+        "E0032",
+        "E0033",
+        "E0065",
+        "E0001"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "role_sequence",
+        "reviewer_reentry",
+        "pending_roles"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 30,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_transformation_content",
+        "decision_application_content"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "reviewer",
+      "reference_id": "G3-X5-T3-REF-01",
+      "relation_type": "REENTRY",
+      "semantic_after": "reviewer role appears at turn 30 and alternates with release_lead through turn 64",
+      "semantic_before": "release_lead-only route through turn 29",
+      "semantic_delta": "reviewer role introduced and repeatedly re-entered after initial release_lead-only phase",
+      "source_ref": "E0002",
+      "structure_family": "REPEATED_REVIEW_REOPEN"
+    },
+    {
+      "carrier_ref": "E0068",
+      "cell_id": "X5-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "OPEN_PENDING_ROLES",
+      "complete_route_ref": "AUDIT_PACKET:G3:X5-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0067",
+        "E0068",
+        "E0069",
+        "E0070",
+        "E0194"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "retrieval_query_copy",
+        "retrieval_hits_copy",
+        "downstream_adoption"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_transformation",
+        "decision_application",
+        "downstream_consequence"
+      ],
+      "producer_actor": "retrieval_surface",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X5-T3-REF-02",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "retrieval hits post-return copy",
+      "semantic_before": "retrieval query post-return copy",
+      "semantic_delta": "none observable; identical query and hits copies repeat without semantic adoption",
+      "source_ref": "E0067",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

@@ -1,0 +1,137 @@
+{
+  "audit_manifest_sha256": "03ce59052b4f107d57b290b1297655785e018b860a897f5f977eeda7d52d1221",
+  "cell_id": "X4-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "turn_budget_terminated_no_answer",
+    "negative_boundary_count": 1,
+    "notes": "64-turn alternating release_lead/backend route with no answer; pending_roles unresolved; one invalid turn (E0019); capability_observer stderr shows repeated read_file exceptions; checkpoint ledger shows FULL_NATIVE restore capability. No monitor bundle read.",
+    "positive_structure_count": 1,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G3",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "ddc530ac6ea6a286ecfacfd7f0f81134874ec534debc41f248d83ea543400c4a",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0066",
+      "cell_id": "X4-T3",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "turn_budget_terminated_no_answer",
+      "complete_route_ref": "AUDIT_PACKET:G3:X4-T3:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [
+        "P",
+        "R"
+      ],
+      "cross_penetration_path": "release_lead turn 1 (E0002) -> backend turn 2 (E0003) -> ... -> release_lead turn 64 (E0065); checkpoint ledger (E0066) records post-turn checkpoints for each turn, enabling re-entry into the same alternating role loop",
+      "decision_or_action_ref": "E0065",
+      "evidence_refs": [
+        "E0002",
+        "E0003",
+        "E0065",
+        "E0066",
+        "E0001"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "route sequence",
+        "checkpoint ledger",
+        "final result"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic content of role actions",
+        "explicit review/reopen decision"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "backend",
+      "reference_id": "G3-X4-T3-REF-01",
+      "relation_type": "REENTRY",
+      "semantic_after": "64 turns of alternating release_lead/backend role actions with pending_roles still unresolved",
+      "semantic_before": "task start with pending_roles [backend, release_lead]",
+      "semantic_delta": "role alternation persists across full turn budget without resolving pending_roles",
+      "source_ref": "E0002",
+      "structure_family": "REPEATED_REVIEW_REOPEN"
+    },
+    {
+      "carrier_ref": "E0019",
+      "cell_id": "X4-T3",
+      "claim_status": "SUPPORTED",
+      "closure_state": "turn_budget_terminated_no_answer",
+      "complete_route_ref": "AUDIT_PACKET:G3:X4-T3:ROUTE_INDEX",
+      "consequence_ref": "E0020",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0019",
+        "E0020"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "route entry validity"
+      ],
+      "first_consequence_sequence": 19,
+      "first_observable_sequence": 18,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "downstream semantic effect of invalid turn"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X4-T3-REF-02",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "release_lead turn 18 marked valid:false with no actions field",
+      "semantic_before": "release_lead turn 18 expected valid action",
+      "semantic_delta": "route entry at turn 18 is invalid and lacks action count",
+      "source_ref": "E0019",
+      "structure_family": "STATE_MISMATCH"
+    },
+    {
+      "carrier_ref": "E0066",
+      "cell_id": "X4-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "turn_budget_terminated_no_answer",
+      "complete_route_ref": "AUDIT_PACKET:G3:X4-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0066"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "checkpoint ledger",
+        "route actions"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "any restore or re-entry action using checkpoints"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X4-T3-REF-03",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "no recorded restore/re-entry action in route; checkpoints remain inert",
+      "semantic_before": "checkpoint ledger records 67 checkpoints with FULL_NATIVE restore capability",
+      "semantic_delta": "checkpoint availability without observed restore or semantic adoption",
+      "source_ref": "E0066",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

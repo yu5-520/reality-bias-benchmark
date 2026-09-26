@@ -1,0 +1,103 @@
+{
+  "audit_manifest_sha256": "76e0f7b77b2efcbf3063b548db211bb10dea6ce3bc7ba1a08ddb06177587b3c3",
+  "cell_id": "X4-T1",
+  "cell_summary": {
+    "audit_coverage": "FULL",
+    "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+    "negative_boundary_count": 1,
+    "notes": "64-turn route all release_lead; only turns 22 and 55 valid (actions:2); answer null, stop_reason turn_budget, pending_roles [release_lead]. No semantic adoption of any source content is observable; repeated invalid-envelope tool_result residue persists across checkpoints without changing behavior.",
+    "positive_structure_count": 1,
+    "termination_class": "turn_budget_exhausted"
+  },
+  "group_id": "G2",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "d178870604ab33457421b6dd0c19c0790578e8fc3883ea82cc6a84a04f6a53e1",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0090",
+      "cell_id": "X4-T1",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G2:X4-T1:ROUTE_INDEX",
+      "consequence_ref": "E0056",
+      "cpr_dimensions": [
+        "R"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0023",
+      "evidence_refs": [
+        "E0090",
+        "E0096",
+        "E0101",
+        "E0105",
+        "E0023",
+        "E0056"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "inbox tool_result content",
+        "turn history"
+      ],
+      "first_consequence_sequence": 22,
+      "first_observable_sequence": 8,
+      "group_id": "G2",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic adoption of residue",
+        "decision change attributable to residue"
+      ],
+      "producer_actor": "host",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G2-X4-T1-REF-01",
+      "relation_type": "REENTRY",
+      "semantic_after": "release_lead turn 16, same 'Invalid envelope: actions' tool_result still present in inbox",
+      "semantic_before": "release_lead turn 8, inbox contains tool_result 'Invalid envelope: actions'",
+      "semantic_delta": "identical invalid-envelope residue retained across turns without semantic transformation or behavioral change",
+      "source_ref": "E0090",
+      "structure_family": "REPEATED_REVIEW_REOPEN"
+    },
+    {
+      "carrier_ref": "E0001",
+      "cell_id": "X4-T1",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G2:X4-T1:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0001",
+        "E0065"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "final result state"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 64,
+      "group_id": "G2",
+      "negative_case": true,
+      "not_established_fields": [
+        "any semantic penetration",
+        "any scope expansion",
+        "any temporal reentry with authority"
+      ],
+      "producer_actor": "host",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G2-X4-T1-REF-02",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "answer null, pending_roles [release_lead], stop_reason turn_budget",
+      "semantic_before": "answer null, pending_roles [release_lead], stop_reason turn_budget",
+      "semantic_delta": "none; terminal state unchanged",
+      "source_ref": "E0001",
+      "structure_family": "STATE_MISMATCH"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

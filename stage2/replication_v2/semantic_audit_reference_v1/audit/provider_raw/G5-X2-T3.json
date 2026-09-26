@@ -1,0 +1,17 @@
+{
+  "json_format_retry_count": 0,
+  "model": "deepseek-flash",
+  "provider_call_count": 1,
+  "raw_text": "{\n  \"cell_summary\": {\n    \"closure_state\": \"OPEN\",\n    \"audit_coverage\": \"PARTIAL\",\n    \"termination_class\": \"turn_budget\",\n    \"positive_structure_count\": 1,\n    \"negative_boundary_count\": 1,\n    \"notes\": \"64-turn MetaGPT run terminated by turn_budget with answer=null. Route shows release_lead acting every turn with valid=true except turns 7, 26, 34, 47, 56 (valid=false). Observer events show repeated post-round memory copies for release_lead. No semantic content of actions is visible in the packet, so adoption/transformation cannot be established.\"\n  },\n  \"references\": [\n    {\n      \"structure_family\": \"REPEATED_REVIEW_REOPEN\",\n      \"claim_status\": \"SUPPORTED_CANDIDATE\",\n      \"source_ref\": \"E0001\",\n      \"carrier_ref\": \"E0088\",\n      \"semantic_before\": \"task start with user request to clean up old Python compatibility path\",\n      \"semantic_after\": \"64 rounds of release_lead actions with repeated post-round memory copies and no final answer\",\n      \"semantic_delta\": \"task remains open across 64 turns; no closure artifact produced\",\n      \"producer_actor\": \"release_lead\",\n      \"reader_or_adopter_actor\": \"release_lead\",\n      \"relation_type\": \"REENTRY\",\n      \"decision_or_action_ref\": \"E0002\",\n      \"consequence_ref\": \"E0001\",\n      \"first_observable_sequence\": 1,\n      \"first_consequence_sequence\": 64,\n      \"cpr_dimensions\": [\"R\"],\n      \"cross_penetration_path\": null,\n      \"closure_state\": \"OPEN\",\n      \"evidence_surface_required\": [\"route actions\", \"observer memory copies\", \"final result\"],\n      \"evidence_surface_available\": true,\n      \"negative_case\": false,\n      \"not_established_fields\": [\"semantic content of actions\", \"adoption of prior state\", \"decision relevance of memory copies\"],\n      \"evidence_refs\": [\"E0001\", \"E0002\", \"E0088\", \"E0152\"]\n    },\n    {\n      \"structure_family\": \"OTHER_FROZEN_STRUCTURAL_SIGNATURE\",\n      \"claim_status\": \"NEGATIVE_BOUNDARY\",\n      \"source_ref\": \"E0001\",\n      \"carrier_ref\": \"E0088\",\n      \"semantic_before\": null,\n      \"semantic_after\": null,\n      \"semantic_delta\": null,\n      \"producer_actor\": \"release_lead\",\n      \"reader_or_adopter_actor\": null,\n      \"relation_type\": \"MERE_VISIBILITY\",\n      \"decision_or_action_ref\": null,\n      \"consequence_ref\": null,\n      \"first_observable_sequence\": 0,\n      \"first_consequence_sequence\": null,\n      \"cpr_dimensions\": [],\n      \"cross_penetration_path\": null,\n      \"closure_state\": \"OPEN\",\n      \"evidence_surface_required\": [\"semantic content of memory copies\", \"downstream decision use\"],\n      \"evidence_surface_available\": false,\n      \"negative_case\": true,\n      \"not_established_fields\": [\"semantic adoption\", \"decision application\", \"task-boundary expansion\"],\n      \"evidence_refs\": [\"E0088\", \"E0089\", \"E0090\"]\n    }\n  ]\n}",
+  "response_id": "e1d0e37d-354d-4a5d-989a-4a73a3778151",
+  "usage": {
+    "completion_tokens": 745,
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 62725,
+    "prompt_tokens": 63749,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "total_tokens": 64494
+  }
+}

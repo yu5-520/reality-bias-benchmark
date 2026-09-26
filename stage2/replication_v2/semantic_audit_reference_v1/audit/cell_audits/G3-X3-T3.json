@@ -1,0 +1,207 @@
+{
+  "audit_manifest_sha256": "06765421c5aad6fd154c6921201604e301d2a88a3f71ffda5ba1d3d09c1a21e0",
+  "cell_id": "X3-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "TERMINAL_CLEAN",
+    "negative_boundary_count": 1,
+    "notes": "Frozen audit-raw bundle for X3-T3 shows a 24-decision multi-role route (release_lead/qa) with a terminal checkpoint and a manifest recording changed files legacy_compat.py, run.py, tests/test_no_legacy_path.py. No monitor runtime bundle was read. Evidence supports scope expansion across roles and a carrier transformation of the legacy compatibility path, but no explicit re-reading/recall path is visible, so temporal penetration is not established.",
+    "positive_structure_count": 2,
+    "termination_class": "NATURAL_TERMINAL"
+  },
+  "group_id": "G3",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "164fa17e584fe0310cb6bf7185c70850ac25373f5d073a3be0af9285e8834118",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X3-T3",
+      "claim_status": "SUPPORTED",
+      "closure_state": "TERMINAL_CLEAN",
+      "complete_route_ref": "AUDIT_PACKET:G3:X3-T3:ROUTE_INDEX",
+      "consequence_ref": "E0025",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0006",
+      "evidence_refs": [
+        "E0002",
+        "E0003",
+        "E0004",
+        "E0005",
+        "E0006",
+        "E0007",
+        "E0008",
+        "E0009",
+        "E0010",
+        "E0011",
+        "E0012",
+        "E0013",
+        "E0014",
+        "E0015",
+        "E0016",
+        "E0017",
+        "E0018",
+        "E0019",
+        "E0020",
+        "E0021",
+        "E0022",
+        "E0023",
+        "E0024",
+        "E0025"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "route turn records",
+        "role labels",
+        "action counts"
+      ],
+      "first_consequence_sequence": 24,
+      "first_observable_sequence": 1,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "qa",
+      "reference_id": "G3-X3-T3-REF-01",
+      "relation_type": "ENABLES",
+      "semantic_after": "multi-role route spanning release_lead and qa across 24 decisions with 2-5 actions per turn",
+      "semantic_before": "single release_lead role turn with 1 action",
+      "semantic_delta": "operational scope expanded from a single release_lead action to a multi-role, multi-turn workflow while the cleanup objective remained stable",
+      "source_ref": "E0001",
+      "structure_family": "SCOPE_EXPANSION"
+    },
+    {
+      "carrier_ref": "E0001",
+      "cell_id": "X3-T3",
+      "claim_status": "SUPPORTED",
+      "closure_state": "TERMINAL_CLEAN",
+      "complete_route_ref": "AUDIT_PACKET:G3:X3-T3:ROUTE_INDEX",
+      "consequence_ref": "E0047",
+      "cpr_dimensions": [
+        "C"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0001",
+      "evidence_refs": [
+        "E0001",
+        "E0047"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "changed file manifest",
+        "first/last hashes",
+        "final answer text"
+      ],
+      "first_consequence_sequence": 24,
+      "first_observable_sequence": 1,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "qa",
+      "reference_id": "G3-X3-T3-REF-02",
+      "relation_type": "SEMANTIC_TRANSFORMATION",
+      "semantic_after": "legacy_compat.py is a docstring-only stub and run.py launches only the current v2.0 service with no legacy import",
+      "semantic_before": "legacy_compat.py defines LegacyHandler/main and run.py contains a CHECKOUT_COMPAT branch importing the legacy path",
+      "semantic_delta": "the legacy compatibility carrier was neutralized from an active handler/import path into an inert stub, with regression tests added",
+      "source_ref": "E0047",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": null,
+      "cell_id": "X3-T3",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": "TERMINAL_CLEAN",
+      "complete_route_ref": "AUDIT_PACKET:G3:X3-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0026",
+        "E0027",
+        "E0028"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "explicit re-read, recall, review, or backtracking event referencing earlier state"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "source_ref",
+        "carrier_ref",
+        "semantic_before",
+        "semantic_after",
+        "semantic_delta",
+        "producer_actor",
+        "reader_or_adopter_actor",
+        "decision_or_action_ref",
+        "consequence_ref",
+        "first_observable_sequence",
+        "first_consequence_sequence"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X3-T3-REF-03",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": null,
+      "semantic_before": null,
+      "semantic_delta": null,
+      "source_ref": "E0026",
+      "structure_family": "HISTORICAL_REENTRY"
+    },
+    {
+      "carrier_ref": null,
+      "cell_id": "X3-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "TERMINAL_CLEAN",
+      "complete_route_ref": "AUDIT_PACKET:G3:X3-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0039"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "process stderr showing runtime failure without semantic adoption"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "carrier_ref",
+        "semantic_before",
+        "semantic_after",
+        "semantic_delta",
+        "reader_or_adopter_actor",
+        "decision_or_action_ref",
+        "consequence_ref",
+        "first_observable_sequence",
+        "first_consequence_sequence"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X3-T3-REF-04",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": null,
+      "semantic_before": null,
+      "semantic_delta": null,
+      "source_ref": "E0039",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

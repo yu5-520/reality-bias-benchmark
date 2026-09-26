@@ -1,0 +1,137 @@
+{
+  "audit_manifest_sha256": "b00dae45170403c265b7ee980ab8450935438f96982c0f45559903c7c0c0dc9b",
+  "cell_id": "X7-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+    "negative_boundary_count": 2,
+    "notes": "64-turn release_lead route with no answer; pending_roles=[release_lead]; stop_reason=turn_budget. Only route action counts and compressor I/O byte sizes are visible; no semantic content of decisions is exposed.",
+    "positive_structure_count": 1,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G3",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "905efff2191b94da451d6e2d9e8ef64b606649de6d1f57a24127a7942a79a56e",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X7-T3",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G3:X7-T3:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0065",
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0065"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "role action semantics",
+        "decision content"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic content of actions",
+        "task-boundary expansion evidence"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G3-X7-T3-REF-01",
+      "relation_type": "CONSTRAINS",
+      "semantic_after": "release_lead role active across 64 turns with repeated action bursts",
+      "semantic_before": "task start, no role actions recorded",
+      "semantic_delta": "role-scoped action activity persists across full turn budget without closure",
+      "source_ref": "E0001",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    },
+    {
+      "carrier_ref": "E0068",
+      "cell_id": "X7-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G3:X7-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0067",
+        "E0068"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "compressor input/output text",
+        "downstream adoption of compressed content"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic transformation",
+        "adoption by decision-maker"
+      ],
+      "producer_actor": "llmlingua.PromptCompressor",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X7-T3-REF-02",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "compressor output copy 546 bytes",
+      "semantic_before": "compressor input copy 231 bytes",
+      "semantic_delta": "byte-size change only; no semantic content visible",
+      "source_ref": "E0067",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": "E0195",
+      "cell_id": "X7-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G3:X7-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0066",
+        "E0195"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "checkpoint restore events",
+        "semantic state deltas"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "re-reading or recall path",
+        "semantic adoption of restored state"
+      ],
+      "producer_actor": "host",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X7-T3-REF-03",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "checkpoint manifests with empty changed_files and empty first/last hashes",
+      "semantic_before": "67 checkpoints with FULL_NATIVE restore capability",
+      "semantic_delta": "checkpoint presence without observable semantic state change",
+      "source_ref": "E0066",
+      "structure_family": "RECURSIVE_MEMORY_FEEDBACK"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

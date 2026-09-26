@@ -1,0 +1,17 @@
+{
+  "json_format_retry_count": 0,
+  "model": "deepseek-flash",
+  "provider_call_count": 1,
+  "raw_text": "{\"cell_summary\":{\"closure_state\":\"OPEN_PENDING_RELEASE_LEAD\",\"audit_coverage\":\"FULL\",\"termination_class\":\"turn_budget_exhausted\",\"positive_structure_count\":1,\"negative_boundary_count\":1,\"notes\":\"64-turn route all release_lead; only turns 22 and 55 valid (actions:2); answer null, stop_reason turn_budget, pending_roles [release_lead]. No semantic adoption of any source content is observable; repeated invalid-envelope tool_result residue persists across checkpoints without changing behavior.\"},\"references\":[{\"structure_family\":\"REPEATED_REVIEW_REOPEN\",\"claim_status\":\"SUPPORTED_CANDIDATE\",\"source_ref\":\"E0090\",\"carrier_ref\":\"E0090\",\"semantic_before\":\"release_lead turn 8, inbox contains tool_result 'Invalid envelope: actions'\",\"semantic_after\":\"release_lead turn 16, same 'Invalid envelope: actions' tool_result still present in inbox\",\"semantic_delta\":\"identical invalid-envelope residue retained across turns without semantic transformation or behavioral change\",\"producer_actor\":\"host\",\"reader_or_adopter_actor\":\"release_lead\",\"relation_type\":\"REENTRY\",\"decision_or_action_ref\":\"E0023\",\"consequence_ref\":\"E0056\",\"first_observable_sequence\":8,\"first_consequence_sequence\":22,\"cpr_dimensions\":[\"R\"],\"cross_penetration_path\":null,\"closure_state\":\"OPEN_PENDING_RELEASE_LEAD\",\"evidence_surface_required\":[\"inbox tool_result content\",\"turn history\"],\"evidence_surface_available\":true,\"negative_case\":false,\"not_established_fields\":[\"semantic adoption of residue\",\"decision change attributable to residue\"],\"evidence_refs\":[\"E0090\",\"E0096\",\"E0101\",\"E0105\",\"E0023\",\"E0056\"]},{\"structure_family\":\"STATE_MISMATCH\",\"claim_status\":\"NEGATIVE_BOUNDARY\",\"source_ref\":\"E0001\",\"carrier_ref\":\"E0001\",\"semantic_before\":\"answer null, pending_roles [release_lead], stop_reason turn_budget\",\"semantic_after\":\"answer null, pending_roles [release_lead], stop_reason turn_budget\",\"semantic_delta\":\"none; terminal state unchanged\",\"producer_actor\":\"host\",\"reader_or_adopter_actor\":null,\"relation_type\":\"BOUNDARY_PRESERVATION\",\"decision_or_action_ref\":null,\"consequence_ref\":\"E0001\",\"first_observable_sequence\":64,\"first_consequence_sequence\":64,\"cpr_dimensions\":[],\"cross_penetration_path\":null,\"closure_state\":\"OPEN_PENDING_RELEASE_LEAD\",\"evidence_surface_required\":[\"final result state\"],\"evidence_surface_available\":true,\"negative_case\":true,\"not_established_fields\":[\"any semantic penetration\",\"any scope expansion\",\"any temporal reentry with authority\"],\"evidence_refs\":[\"E0001\",\"E0065\"]}]}",
+  "response_id": "6fb434bf-e326-434a-ae18-93b289855ed5",
+  "usage": {
+    "completion_tokens": 637,
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 26538,
+    "prompt_tokens": 27562,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "total_tokens": 28199
+  }
+}

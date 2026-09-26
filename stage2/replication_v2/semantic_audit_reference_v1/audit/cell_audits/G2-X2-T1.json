@@ -1,0 +1,65 @@
+{
+  "audit_manifest_sha256": "107de926bf807b1df20c7a26f31a8072218bac6dfdb506fb67652e0a61770241",
+  "cell_id": "X2-T1",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "turn_budget_exhausted_no_answer",
+    "negative_boundary_count": 1,
+    "notes": "64-turn release_lead route; only turn 48 produced a valid action; no answer produced; stop_reason=turn_budget. No semantic adoption or transformation surface visible in raw evidence.",
+    "positive_structure_count": 0,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G2",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "44239e5e9041395dbac5da2ca59c4649e3229cb3822c4ff1be1f2e7ee172e0e0",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X2-T1",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "turn_budget_exhausted_no_answer",
+      "complete_route_ref": "AUDIT_PACKET:G2:X2-T1:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0049",
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0049",
+        "E0065"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "semantic adoption surface",
+        "decision application surface",
+        "downstream consequence surface"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G2",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_transformation",
+        "adoption",
+        "decision_application",
+        "downstream_consequence"
+      ],
+      "producer_actor": "USER",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G2-X2-T1-REF-01",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "no answer produced; turn budget exhausted",
+      "semantic_before": "user request to check checkout project before/after version update",
+      "semantic_delta": "none observable",
+      "source_ref": "E0001",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

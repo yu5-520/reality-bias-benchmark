@@ -1,0 +1,146 @@
+{
+  "audit_manifest_sha256": "306c88a5262495a22a09f8089db6d101d871a327108c3dd4d4b63d5b2bc93782",
+  "cell_id": "X6-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "open_pending_roles",
+    "negative_boundary_count": 1,
+    "notes": "Natural A run ended at turn_budget with answer null and pending_roles non-empty; route shows role rotation across release_lead/backend/qa/sre with valid actions. Memorybank observer events show repeated before/after recall and official rebuild cycles with monotonically growing byte sizes, but no semantic content of memory is visible in the packet, so adoption/transformation cannot be established.",
+    "positive_structure_count": 1,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G4",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "1709c72738df295abae853026d41cc758cd6ac1cec4f4f4bda7a56fb3403e037",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0027",
+      "cell_id": "X6-T3",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "open_pending_roles",
+      "complete_route_ref": "AUDIT_PACKET:G4:X6-T3:ROUTE_INDEX",
+      "consequence_ref": "E0065",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0027",
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0027",
+        "E0028",
+        "E0054",
+        "E0061",
+        "E0065"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "role assignment per turn",
+        "action counts per turn"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 26,
+      "group_id": "G4",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic content of role handoff",
+        "explicit task-boundary negotiation"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "backend/qa/sre",
+      "reference_id": "G4-X6-T3-REF-01",
+      "relation_type": "ENABLES",
+      "semantic_after": "multi-role rotation (release_lead, backend, qa, sre) across turns 26-64",
+      "semantic_before": "single-role release_lead execution across turns 1-25",
+      "semantic_delta": "operational role scope expanded from one role to four distinct roles while the higher-level objective (task completion) remained unresolved",
+      "source_ref": "E0001",
+      "structure_family": "SCOPE_EXPANSION"
+    },
+    {
+      "carrier_ref": "E0072",
+      "cell_id": "X6-T3",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G4:X6-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0067",
+        "E0068",
+        "E0069",
+        "E0070",
+        "E0071",
+        "E0072"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "memory content payload",
+        "model read/adoption of recalled memory",
+        "decision change attributable to recall"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G4",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic content of memorybank events",
+        "adoption of recalled content by model",
+        "causal link from recall to route decisions"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G4-X6-T3-REF-02",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": null,
+      "semantic_before": null,
+      "semantic_delta": null,
+      "source_ref": "E0067",
+      "structure_family": "RECURSIVE_MEMORY_FEEDBACK"
+    },
+    {
+      "carrier_ref": "E0371",
+      "cell_id": "X6-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "open_pending_roles",
+      "complete_route_ref": "AUDIT_PACKET:G4:X6-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0066",
+        "E0371"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "restore/backtrack event in route",
+        "re-reading of earlier state affecting decision"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G4",
+      "negative_case": true,
+      "not_established_fields": [
+        "any actual reentry action"
+      ],
+      "producer_actor": "host",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G4-X6-T3-REF-03",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "no recorded restore/backtrack action in route",
+      "semantic_before": "checkpoint ledger with 67 FULL_NATIVE restore-capable checkpoints",
+      "semantic_delta": "none observed",
+      "source_ref": "E0066",
+      "structure_family": "HISTORICAL_REENTRY"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

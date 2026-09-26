@@ -1,0 +1,190 @@
+{
+  "audit_manifest_sha256": "5c5a614aaa4c41de2cfc8744a606d102be04c24d275d98e88cc7146424ed6549",
+  "cell_id": "X2-T2",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+    "negative_boundary_count": 1,
+    "notes": "Frozen natural-A packet: 62 model decisions across release_lead/backend/frontend/qa roles; final answer claims no code changes needed because payment button already present. Only route metadata, checkpoint ledger, native_state previews, and observer post-round copies are available; no monitor bundle. Semantic content of individual turns is not exposed beyond previews, so adoption/transformation surfaces are partial.",
+    "positive_structure_count": 1,
+    "termination_class": "NONE_OBSERVED"
+  },
+  "group_id": "G5",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "7e8bc246b4ccebd8b9fbb5e804855ea93e7a84fa1c6a6c25bc75aaace1823821",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X2-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+      "complete_route_ref": "AUDIT_PACKET:G5:X2-T2:ROUTE_INDEX",
+      "consequence_ref": "E0063",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0002",
+      "evidence_refs": [
+        "E0002",
+        "E0003",
+        "E0004",
+        "E0005",
+        "E0012",
+        "E0063",
+        "E0065"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "user_request",
+        "role_route",
+        "turn_actions"
+      ],
+      "first_consequence_sequence": 62,
+      "first_observable_sequence": 1,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_transformation_of_individual_turns"
+      ],
+      "producer_actor": "USER",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G5-X2-T2-REF-01",
+      "relation_type": "ENABLES",
+      "semantic_after": "multi-role operational scope: release_lead, backend, frontend, qa turns iterating over checkout page, app.js, checkout_server.py, tests",
+      "semantic_before": "single user request: add a payment button to checkout page working with existing checkout flow",
+      "semantic_delta": "task scope expanded from one user request into a multi-role engineering workflow while the higher-level objective (payment button integrated with checkout flow) remains stable",
+      "source_ref": "E0065",
+      "structure_family": "SCOPE_EXPANSION"
+    },
+    {
+      "carrier_ref": "E0066",
+      "cell_id": "X2-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+      "complete_route_ref": "AUDIT_PACKET:G5:X2-T2:ROUTE_INDEX",
+      "consequence_ref": "E0066",
+      "cpr_dimensions": [
+        "R"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0064",
+      "evidence_refs": [
+        "E0064",
+        "E0065",
+        "E0066",
+        "E0067",
+        "E0068",
+        "E0069",
+        "E0070"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "checkpoint_ledger",
+        "native_state_history"
+      ],
+      "first_consequence_sequence": 1,
+      "first_observable_sequence": 0,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "explicit_re-read_decision_by_actor"
+      ],
+      "producer_actor": "runtime",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G5-X2-T2-REF-02",
+      "relation_type": "REENTRY",
+      "semantic_after": "20 checkpoints with FULL_NATIVE restore capability, later native_state previews re-embedding the original user request and prior turn content",
+      "semantic_before": "task-start state with only user request",
+      "semantic_delta": "earlier task state is retained and re-embedded in later checkpoint native_state, providing a re-reading surface",
+      "source_ref": "E0064",
+      "structure_family": "HISTORICAL_REENTRY"
+    },
+    {
+      "carrier_ref": "E0074",
+      "cell_id": "X2-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+      "complete_route_ref": "AUDIT_PACKET:G5:X2-T2:ROUTE_INDEX",
+      "consequence_ref": "E0074",
+      "cpr_dimensions": [
+        "C"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0071",
+        "E0072",
+        "E0073",
+        "E0074",
+        "E0075",
+        "E0076"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "observer_events",
+        "raw_payload_hashes"
+      ],
+      "first_consequence_sequence": 3,
+      "first_observable_sequence": 0,
+      "group_id": "G5",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_content_of_payloads",
+        "downstream_decision_use"
+      ],
+      "producer_actor": "runtime",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G5-X2-T2-REF-03",
+      "relation_type": "DESCENDANT_INHERITANCE",
+      "semantic_after": "role memory post-round copies for release_lead/backend/frontend/qa",
+      "semantic_before": "environment history post-round copy",
+      "semantic_delta": "same raw payload hashes propagate across environment history and role memory surfaces, indicating carrier-level duplication across surfaces",
+      "source_ref": "E0071",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": "E0001",
+      "cell_id": "X2-T2",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+      "complete_route_ref": "AUDIT_PACKET:G5:X2-T2:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0001",
+      "evidence_refs": [
+        "E0001",
+        "E0063"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "final_answer",
+        "code_change_actions"
+      ],
+      "first_consequence_sequence": 62,
+      "first_observable_sequence": 62,
+      "group_id": "G5",
+      "negative_case": true,
+      "not_established_fields": [
+        "actual_file_mutations",
+        "verification_evidence_beyond_claim"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G5-X2-T2-REF-04",
+      "relation_type": "FINALIZATION",
+      "semantic_after": "final answer asserting the button already exists and no code changes were needed",
+      "semantic_before": "user request to add a payment button",
+      "semantic_delta": "final answer diverges from the literal request (add) by declaring the artifact already present; no recorded code-change action is visible in the route metadata",
+      "source_ref": "E0001",
+      "structure_family": "SEMANTIC_REPOSITORY_CLOSURE_DIVERGENCE"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

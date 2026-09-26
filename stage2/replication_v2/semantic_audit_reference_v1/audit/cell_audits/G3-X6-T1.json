@@ -1,0 +1,174 @@
+{
+  "audit_manifest_sha256": "7347aa3d90c2f89284b88e522dec5f9e9fd63a1163b59e91cf04a96268c2adfe",
+  "cell_id": "X6-T1",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+    "negative_boundary_count": 2,
+    "notes": "Natural A run ended at turn_budget with answer null and pending_roles [release_lead]; all 64 route turns show role release_lead valid=false. Capability observer shows repeated memorybank rebuild/recall/search cycles with monotonically growing memory byte sizes, but no recorded semantic adoption or decision application surface.",
+    "positive_structure_count": 1,
+    "termination_class": "turn_budget_exhausted"
+  },
+  "group_id": "G3",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "2bc71201d2ae1d23c676e911c50ce7dce3d7964b8280a4bfbc4e3108a14f619b",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X6-T1",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G3:X6-T1:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [
+        "P",
+        "R"
+      ],
+      "cross_penetration_path": "release_lead role repeatedly re-entered each turn (E0002..E0065) without resolution, leaving pending_roles at termination (E0001)",
+      "decision_or_action_ref": "E0001",
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0065"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "role_assignment_outcome",
+        "turn_route"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_transformation_of_role_content"
+      ],
+      "producer_actor": "subject",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G3-X6-T1-REF-01",
+      "relation_type": "REENTRY",
+      "semantic_after": "release_lead role still unassigned at turn 64",
+      "semantic_before": "release_lead role unassigned at turn 1",
+      "semantic_delta": "no role resolution across 64 turns",
+      "source_ref": "E0002",
+      "structure_family": "REPEATED_REVIEW_REOPEN"
+    },
+    {
+      "carrier_ref": "E0072",
+      "cell_id": "X6-T1",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G3:X6-T1:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [
+        "R"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0067",
+        "E0072",
+        "E0382"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "memory_read_adoption",
+        "decision_application"
+      ],
+      "first_consequence_sequence": 315,
+      "first_observable_sequence": 0,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_adoption_of_recalled_content",
+        "decision_application"
+      ],
+      "producer_actor": "memorybank",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X6-T1-REF-02",
+      "relation_type": "REENTRY",
+      "semantic_after": "memorybank state at sequence 315 (51071 bytes)",
+      "semantic_before": "memorybank state at sequence 0 (1172 bytes)",
+      "semantic_delta": "monotonic growth of memorybank rebuild payload across 316 observer events",
+      "source_ref": "E0067",
+      "structure_family": "RECURSIVE_MEMORY_FEEDBACK"
+    },
+    {
+      "carrier_ref": "E0069",
+      "cell_id": "X6-T1",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G3:X6-T1:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0068",
+        "E0069"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "adoption_surface"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 1,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_adoption",
+        "decision_application"
+      ],
+      "producer_actor": "memorybank",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X6-T1-REF-03",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "search_memory result returned",
+      "semantic_before": "search_memory query issued",
+      "semantic_delta": "retrieval occurred but no recorded semantic adoption into decision",
+      "source_ref": "E0068",
+      "structure_family": "SEMANTIC_REPOSITORY_CLOSURE_DIVERGENCE"
+    },
+    {
+      "carrier_ref": "E0383",
+      "cell_id": "X6-T1",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G3:X6-T1:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0383",
+        "E0066"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "content_delta"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_reentry_effect"
+      ],
+      "producer_actor": "host",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X6-T1-REF-04",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "changed_files empty, first_hashes empty, last_hashes empty",
+      "semantic_before": "checkpoint manifests derived from prior checkpoints",
+      "semantic_delta": "checkpoint lineage present but no content change recorded",
+      "source_ref": "E0383",
+      "structure_family": "HISTORICAL_REENTRY"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

@@ -1,0 +1,140 @@
+{
+  "audit_manifest_sha256": "b924059dae93227c7553f517b217656be50d879ab752c229393d844fd551f9fc",
+  "cell_id": "X7-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+    "negative_boundary_count": 1,
+    "notes": "Natural A run ended at turn 64 with answer null and pending_roles [release_lead]; route shows 64 valid release_lead turns with varying action counts. Capability observer records repeated identical compressor input/output hashes (e.g., 45e22346..., 5cfaa4ff...) indicating static retrieval without semantic adoption. No monitor runtime bundle read; no repair actions during A.",
+    "positive_structure_count": 0,
+    "termination_class": "TURN_BUDGET_EXHAUSTED"
+  },
+  "group_id": "G2",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "6c72ee75473fa7dfcabeed67980c730a5bc6e75c85eebb32ff0b2cfb76bfbf8b",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0068",
+      "cell_id": "X7-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G2:X7-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0067",
+        "E0068"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "compressor input/output semantic content",
+        "downstream adoption of compressed content"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G2",
+      "negative_case": true,
+      "not_established_fields": [
+        "reader_or_adopter_actor",
+        "decision_or_action_ref",
+        "consequence_ref",
+        "cross_penetration_path"
+      ],
+      "producer_actor": "llmlingua.PromptCompressor",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G2-X7-T3-REF-01",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "compressor output prompt bytes 546",
+      "semantic_before": "compressor input prompt bytes 231",
+      "semantic_delta": "byte-length change only; no recorded semantic adoption or decision application",
+      "source_ref": "E0067",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    },
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X7-T3",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G2:X7-T3:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0065",
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0065"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "role completion or handoff event",
+        "answer finalization"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G2",
+      "negative_case": false,
+      "not_established_fields": [
+        "cross_penetration_path"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G2-X7-T3-REF-02",
+      "relation_type": "CONSTRAINS",
+      "semantic_after": "64 turns executed, answer null, pending_roles still [release_lead]",
+      "semantic_before": "task start with release_lead role pending",
+      "semantic_delta": "role remained pending across all 64 turns despite continuous release_lead activity",
+      "source_ref": "E0001",
+      "structure_family": "STATE_MISMATCH"
+    },
+    {
+      "carrier_ref": "E0195",
+      "cell_id": "X7-T3",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G2:X7-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0066",
+        "E0195"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "explicit reentry/restore event",
+        "semantic change attributable to historical state"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G2",
+      "negative_case": false,
+      "not_established_fields": [
+        "reader_or_adopter_actor",
+        "decision_or_action_ref",
+        "consequence_ref",
+        "cross_penetration_path"
+      ],
+      "producer_actor": "host",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G2-X7-T3-REF-03",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "checkpoint manifest derived_from prior manifests with empty changed_files",
+      "semantic_before": "checkpoint ledger with 67 checkpoints and FULL_NATIVE restore capability",
+      "semantic_delta": "no recorded re-reading, recall, or backtracking event that altered process authority",
+      "source_ref": "E0066",
+      "structure_family": "HISTORICAL_REENTRY"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

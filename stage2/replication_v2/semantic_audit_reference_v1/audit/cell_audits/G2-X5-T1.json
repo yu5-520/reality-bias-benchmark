@@ -1,0 +1,147 @@
+{
+  "audit_manifest_sha256": "2985bfbb08f0e402b82b70d2175df788cb01e9febe02d3674b0b156efe8ac452",
+  "cell_id": "X5-T1",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "queue_exhausted",
+    "negative_boundary_count": 2,
+    "notes": "52-turn release_lead route; turns 1-51 invalid, turn 52 valid with 0 actions; answer null; stop_reason queue_exhausted. Retrieval observer shows repeated identical query/hits copies with no semantic adoption surface. No positive CPR structure established.",
+    "positive_structure_count": 0,
+    "termination_class": "queue_exhausted"
+  },
+  "group_id": "G2",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "9a673e86b4760b87d98629981e619f904cfee8cc41e7a50e12572bcdd3b9970f",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0002",
+      "cell_id": "X5-T1",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "queue_exhausted",
+      "complete_route_ref": "AUDIT_PACKET:G2:X5-T1:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0053",
+      "evidence_refs": [
+        "E0002",
+        "E0003",
+        "E0052",
+        "E0053",
+        "E0001"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "turn validity",
+        "turn count",
+        "stop_reason"
+      ],
+      "first_consequence_sequence": 52,
+      "first_observable_sequence": 1,
+      "group_id": "G2",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_transformation",
+        "adoption",
+        "decision_application"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G2-X5-T1-REF-01",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "release_lead turn 51 invalid",
+      "semantic_before": "release_lead turn 1 invalid",
+      "semantic_delta": "no semantic change across 51 repeated invalid turns",
+      "source_ref": "E0002",
+      "structure_family": "REPEATED_REVIEW_REOPEN"
+    },
+    {
+      "carrier_ref": "E0056",
+      "cell_id": "X5-T1",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "queue_exhausted",
+      "complete_route_ref": "AUDIT_PACKET:G2:X5-T1:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0055",
+        "E0056",
+        "E0057",
+        "E0058",
+        "E0158"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "retrieval return copy",
+        "downstream adoption/decision surface"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G2",
+      "negative_case": true,
+      "not_established_fields": [
+        "adoption",
+        "semantic_transformation",
+        "decision_application"
+      ],
+      "producer_actor": "stage2.retrieval",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G2-X5-T1-REF-02",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "retrieval hits post_return_copy (1639 bytes)",
+      "semantic_before": "retrieval query post_return_copy (189 bytes)",
+      "semantic_delta": "identical repeated query/hits copies with no downstream semantic adoption surface",
+      "source_ref": "E0055",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": "E0159",
+      "cell_id": "X5-T1",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": "queue_exhausted",
+      "complete_route_ref": "AUDIT_PACKET:G2:X5-T1:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0054",
+        "E0159",
+        "E0160",
+        "E0161"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "checkpoint restore event",
+        "re-reading/recall action",
+        "later process authority change"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G2",
+      "negative_case": false,
+      "not_established_fields": [
+        "reentry",
+        "recall",
+        "process_authority_change"
+      ],
+      "producer_actor": null,
+      "reader_or_adopter_actor": null,
+      "reference_id": "G2-X5-T1-REF-03",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": null,
+      "semantic_before": null,
+      "semantic_delta": null,
+      "source_ref": "E0054",
+      "structure_family": "HISTORICAL_REENTRY"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

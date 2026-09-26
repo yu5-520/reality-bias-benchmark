@@ -1,0 +1,188 @@
+{
+  "audit_manifest_sha256": "73ef1585250d1285335aa0fdecef0ff1a5cc883f67912c759e7cb257f1e4c1e7",
+  "cell_id": "X7-T2",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "OPEN_PENDING_ROLES_UNFILLED",
+    "negative_boundary_count": 2,
+    "notes": "Natural A run ended at turn_budget with answer=null and pending_roles [qa, release_lead, backend, frontend...]. Route shows 64 turns alternating release_lead/frontend/backend with one invalid turn (E0040). Capability observer shows repeated llmlingua compress_prompt input/output pairs with recurring identical hashes (e.g. 45e22346..., eea6d1e0...) indicating repeated compression cycles; no semantic adoption surface visible.",
+    "positive_structure_count": 1,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G2",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "7cf8c9c5b3d90773906d066f130f6caa67eba7284151578756ec4c4e9f902bbc",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0066",
+      "cell_id": "X7-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN_PENDING_ROLES_UNFILLED",
+      "complete_route_ref": "AUDIT_PACKET:G2:X7-T2:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [
+        "R"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0002",
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0065",
+        "E0066"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "role_route",
+        "pending_roles_state"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G2",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_transformation_of_role_content"
+      ],
+      "producer_actor": "subject",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G2-X7-T2-REF-01",
+      "relation_type": "REENTRY",
+      "semantic_after": "same pending_roles still unresolved at turn 64",
+      "semantic_before": "pending_roles list with qa, release_lead, backend, frontend unresolved",
+      "semantic_delta": "no closure; role set persists unresolved across 64 turns",
+      "source_ref": "E0001",
+      "structure_family": "REPEATED_REVIEW_REOPEN"
+    },
+    {
+      "carrier_ref": "E0068",
+      "cell_id": "X7-T2",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G2:X7-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0067",
+        "E0068",
+        "E0069",
+        "E0070"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "compression_output_adoption"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G2",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_adoption_of_compressed_output",
+        "decision_application"
+      ],
+      "producer_actor": "llmlingua.PromptCompressor",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G2-X7-T2-REF-02",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "compress_prompt output bytes 396",
+      "semantic_before": "compress_prompt input bytes 156",
+      "semantic_delta": "byte-size change only; no downstream semantic adoption surface visible",
+      "source_ref": "E0067",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": "E0073",
+      "cell_id": "X7-T2",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G2:X7-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0069",
+        "E0073",
+        "E0091",
+        "E0099",
+        "E0101",
+        "E0113",
+        "E0115",
+        "E0125",
+        "E0127",
+        "E0129",
+        "E0137",
+        "E0139",
+        "E0153",
+        "E0155",
+        "E0157",
+        "E0167",
+        "E0171",
+        "E0191"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "memory_feedback_into_decision"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 2,
+      "group_id": "G2",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic_feedback_path",
+        "decision_relevance"
+      ],
+      "producer_actor": "llmlingua.PromptCompressor",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G2-X7-T2-REF-03",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "identical input hash 45e22346... recurring at sequences 2,6,24,32,34,46,48,58,60,62,70,72,86,88,90,100,104,124",
+      "semantic_before": "identical input hash 45e22346...",
+      "semantic_delta": "no change; repeated identical compression input without observable semantic feedback into decisions",
+      "source_ref": "E0069",
+      "structure_family": "RECURSIVE_MEMORY_FEEDBACK"
+    },
+    {
+      "carrier_ref": null,
+      "cell_id": "X7-T2",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G2:X7-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0040"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "authority_reassignment_event"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 39,
+      "group_id": "G2",
+      "negative_case": false,
+      "not_established_fields": [
+        "authority_status_change",
+        "role_reassignment"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G2-X7-T2-REF-04",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "release_lead turn valid=false at turn 39",
+      "semantic_before": "release_lead turn valid=true",
+      "semantic_delta": "single invalid turn; no recorded authority reassignment or role-status change",
+      "source_ref": "E0040",
+      "structure_family": "AUTHORITY_STATUS_SHIFT"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

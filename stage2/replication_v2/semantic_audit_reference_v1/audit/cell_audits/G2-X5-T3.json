@@ -1,0 +1,102 @@
+{
+  "audit_manifest_sha256": "d584612a12baaf544b89bd6006e3f82b16b88cbc5604ede095b2194a1e17ccf1",
+  "cell_id": "X5-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "OPEN_PENDING_ROLES",
+    "negative_boundary_count": 1,
+    "notes": "64-turn route with alternating release_lead/reviewer roles and occasional backend/sre; answer null, stop_reason turn_budget, pending_roles unresolved. Retrieval observer shows repeated identical query/hits copies with no semantic adoption surface.",
+    "positive_structure_count": 1,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G2",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "9fbb15c5af86baf0f0cc932f33c5206b93702584b07f00398566d2e60cc533b2",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0005",
+      "cell_id": "X5-T3",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "OPEN_PENDING_ROLES",
+      "complete_route_ref": "AUDIT_PACKET:G2:X5-T3:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [
+        "P",
+        "R"
+      ],
+      "cross_penetration_path": "release_lead turn 1 -> reviewer turn 4 -> alternating reviewer/release_lead re-entries through turn 64 -> answer null with pending_roles unresolved",
+      "decision_or_action_ref": "E0005",
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0005",
+        "E0065"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "route role sequence",
+        "terminal result state"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G2",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic content of review decisions",
+        "explicit reopen trigger"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "reviewer",
+      "reference_id": "G2-X5-T3-REF-01",
+      "relation_type": "REENTRY",
+      "semantic_after": "reviewer re-enters at turn 4 and continues alternating through turn 64",
+      "semantic_before": "release_lead initiates route turn 1",
+      "semantic_delta": "reviewer role repeatedly re-enters the route across the full turn budget without terminal closure",
+      "source_ref": "E0002",
+      "structure_family": "REPEATED_REVIEW_REOPEN"
+    },
+    {
+      "carrier_ref": "E0068",
+      "cell_id": "X5-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G2:X5-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0067",
+        "E0068",
+        "E0194"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "downstream adoption of retrieved content"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G2",
+      "negative_case": true,
+      "not_established_fields": [
+        "reader/adopter of retrieval hits",
+        "semantic transformation of retrieved content"
+      ],
+      "producer_actor": "retrieval.retrieve",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G2-X5-T3-REF-02",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": "retrieval hits post_return_copy bytes=1639",
+      "semantic_before": "retrieval query post_return_copy bytes=189",
+      "semantic_delta": "identical query and hits copies repeat across 128 observer events with no downstream semantic adoption surface",
+      "source_ref": "E0067",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

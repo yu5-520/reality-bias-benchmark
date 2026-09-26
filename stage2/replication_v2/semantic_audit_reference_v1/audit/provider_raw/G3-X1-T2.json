@@ -1,0 +1,17 @@
+{
+  "json_format_retry_count": 0,
+  "model": "deepseek-flash",
+  "provider_call_count": 1,
+  "raw_text": "{\"cell_summary\":{\"closure_state\":\"TERMINAL_CHECKPOINT_FROZEN\",\"audit_coverage\":\"PARTIAL\",\"termination_class\":\"NATURAL_A_FROZEN_REPAIR_MIDRUN_CHECKPOINT_BLOCKED\",\"positive_structure_count\":1,\"negative_boundary_count\":1,\"notes\":\"Audit-raw bundle only; monitor runtime unavailable. Evidence shows a 21-decision natural run with a mid-run integration fix described in the final answer and a terminal checkpoint. No monitor warnings, repair packages, or post-repair results are present in the supplied evidence.\"},\"references\":[{\"structure_family\":\"SEMANTIC_REPOSITORY_CLOSURE_DIVERGENCE\",\"claim_status\":\"SUPPORTED_CANDIDATE\",\"source_ref\":\"E0001\",\"carrier_ref\":\"E0098\",\"semantic_before\":\"checkout page without Pay button; launcher default and README described as inconsistent with actual behavior\",\"semantic_after\":\"Pay button added to checkout page; launcher defaults to current service; tests lock contract; README matches actual behavior\",\"semantic_delta\":\"integration inconsistency identified during review and resolved; repository artifacts (README, run.py, tests, web/app.js, web/index.html) updated to a consistent state\",\"producer_actor\":\"subject_agent\",\"reader_or_adopter_actor\":\"subject_agent\",\"relation_type\":\"SEMANTIC_TRANSFORMATION\",\"decision_or_action_ref\":\"E0001\",\"consequence_ref\":\"E0098\",\"first_observable_sequence\":0,\"first_consequence_sequence\":21,\"cpr_dimensions\":[\"C\"],\"cross_penetration_path\":null,\"closure_state\":\"TERMINAL_CHECKPOINT_FROZEN\",\"evidence_surface_required\":[\"final_answer_text\",\"changed_file_manifest\"],\"evidence_surface_available\":true,\"negative_case\":false,\"not_established_fields\":[\"monitor_warning_surface\",\"repair_package_surface\",\"post_repair_result_surface\"],\"evidence_refs\":[\"E0001\",\"E0098\"]},{\"structure_family\":\"OTHER_FROZEN_STRUCTURAL_SIGNATURE\",\"claim_status\":\"NEGATIVE_BOUNDARY\",\"source_ref\":\"E0002\",\"carrier_ref\":\"E0097\",\"semantic_before\":\"task-start checkpoint with empty agent message threads\",\"semantic_after\":\"terminal checkpoint with FULL_NATIVE restore capability\",\"semantic_delta\":\"checkpoint state persisted across run but no evidence of re-reading, recall, or historical reentry into decision-making\",\"producer_actor\":\"runtime\",\"reader_or_adopter_actor\":null,\"relation_type\":\"BOUNDARY_PRESERVATION\",\"decision_or_action_ref\":null,\"consequence_ref\":null,\"first_observable_sequence\":0,\"first_consequence_sequence\":21,\"cpr_dimensions\":[],\"cross_penetration_path\":null,\"closure_state\":\"TERMINAL_CHECKPOINT_FROZEN\",\"evidence_surface_required\":[\"checkpoint_ledger\",\"native_state\"],\"evidence_surface_available\":true,\"negative_case\":true,\"not_established_fields\":[\"reentry_path\",\"semantic_adoption_of_checkpoint_state\"],\"evidence_refs\":[\"E0002\",\"E0097\"]}]}",
+  "response_id": "ee4398e5-7630-4a17-82b4-95039f567c45",
+  "usage": {
+    "completion_tokens": 682,
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 20462,
+    "prompt_tokens": 21486,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "total_tokens": 22168
+  }
+}

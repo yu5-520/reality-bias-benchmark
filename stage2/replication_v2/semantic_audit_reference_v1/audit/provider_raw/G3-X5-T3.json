@@ -1,0 +1,17 @@
+{
+  "json_format_retry_count": 0,
+  "model": "deepseek-flash",
+  "provider_call_count": 1,
+  "raw_text": "{\n  \"cell_summary\": {\n    \"closure_state\": \"OPEN_PENDING_ROLES\",\n    \"audit_coverage\": \"PARTIAL\",\n    \"termination_class\": \"TURN_BUDGET\",\n    \"positive_structure_count\": 1,\n    \"negative_boundary_count\": 1,\n    \"notes\": \"64-turn route alternates release_lead and reviewer; answer null with pending_roles release_lead and reviewer; retrieval observer shows repeated identical query/hits copies; no semantic adoption surface visible.\"\n  },\n  \"references\": [\n    {\n      \"structure_family\": \"REPEATED_REVIEW_REOPEN\",\n      \"claim_status\": \"SUPPORTED_CANDIDATE\",\n      \"source_ref\": \"E0002\",\n      \"carrier_ref\": \"E0031\",\n      \"semantic_before\": \"release_lead-only route through turn 29\",\n      \"semantic_after\": \"reviewer role appears at turn 30 and alternates with release_lead through turn 64\",\n      \"semantic_delta\": \"reviewer role introduced and repeatedly re-entered after initial release_lead-only phase\",\n      \"producer_actor\": \"release_lead\",\n      \"reader_or_adopter_actor\": \"reviewer\",\n      \"relation_type\": \"REENTRY\",\n      \"decision_or_action_ref\": \"E0031\",\n      \"consequence_ref\": \"E0065\",\n      \"first_observable_sequence\": 30,\n      \"first_consequence_sequence\": 64,\n      \"cpr_dimensions\": [\"P\"],\n      \"cross_penetration_path\": null,\n      \"closure_state\": \"OPEN_PENDING_ROLES\",\n      \"evidence_surface_required\": [\"role_sequence\", \"reviewer_reentry\", \"pending_roles\"],\n      \"evidence_surface_available\": true,\n      \"negative_case\": false,\n      \"not_established_fields\": [\"semantic_transformation_content\", \"decision_application_content\"],\n      \"evidence_refs\": [\"E0002\", \"E0031\", \"E0032\", \"E0033\", \"E0065\", \"E0001\"]\n    },\n    {\n      \"structure_family\": \"CARRIER_TRANSFORMATION\",\n      \"claim_status\": \"NEGATIVE_BOUNDARY\",\n      \"source_ref\": \"E0067\",\n      \"carrier_ref\": \"E0068\",\n      \"semantic_before\": \"retrieval query post-return copy\",\n      \"semantic_after\": \"retrieval hits post-return copy\",\n      \"semantic_delta\": \"none observable; identical query and hits copies repeat without semantic adoption\",\n      \"producer_actor\": \"retrieval_surface\",\n      \"reader_or_adopter_actor\": null,\n      \"relation_type\": \"MERE_VISIBILITY\",\n      \"decision_or_action_ref\": null,\n      \"consequence_ref\": null,\n      \"first_observable_sequence\": 0,\n      \"first_consequence_sequence\": null,\n      \"cpr_dimensions\": [],\n      \"cross_penetration_path\": null,\n      \"closure_state\": \"OPEN_PENDING_ROLES\",\n      \"evidence_surface_required\": [\"retrieval_query_copy\", \"retrieval_hits_copy\", \"downstream_adoption\"],\n      \"evidence_surface_available\": false,\n      \"negative_case\": true,\n      \"not_established_fields\": [\"semantic_transformation\", \"decision_application\", \"downstream_consequence\"],\n      \"evidence_refs\": [\"E0067\", \"E0068\", \"E0069\", \"E0070\", \"E0194\"]\n    }\n  ]\n}",
+  "response_id": "182da518-709e-4803-8ea3-0c99816ba5ec",
+  "usage": {
+    "completion_tokens": 770,
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 33392,
+    "prompt_tokens": 34416,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "total_tokens": 35186
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "json_format_retry_count": 0,
+  "model": "deepseek-flash",
+  "provider_call_count": 1,
+  "raw_text": "{\n  \"cell_summary\": {\n    \"closure_state\": \"turn_budget_exhausted_no_answer\",\n    \"audit_coverage\": \"PARTIAL\",\n    \"termination_class\": \"turn_budget\",\n    \"positive_structure_count\": 0,\n    \"negative_boundary_count\": 1,\n    \"notes\": \"64-turn release_lead route; only turn 48 produced a valid action; no answer produced; stop_reason=turn_budget. No semantic adoption or transformation surface visible in raw evidence.\"\n  },\n  \"references\": [\n    {\n      \"structure_family\": \"OTHER_FROZEN_STRUCTURAL_SIGNATURE\",\n      \"claim_status\": \"NEGATIVE_BOUNDARY\",\n      \"source_ref\": \"E0001\",\n      \"carrier_ref\": \"E0002\",\n      \"semantic_before\": \"user request to check checkout project before/after version update\",\n      \"semantic_after\": \"no answer produced; turn budget exhausted\",\n      \"semantic_delta\": \"none observable\",\n      \"producer_actor\": \"USER\",\n      \"reader_or_adopter_actor\": \"release_lead\",\n      \"relation_type\": \"MERE_VISIBILITY\",\n      \"decision_or_action_ref\": \"E0049\",\n      \"consequence_ref\": \"E0001\",\n      \"first_observable_sequence\": 1,\n      \"first_consequence_sequence\": 64,\n      \"cpr_dimensions\": [],\n      \"cross_penetration_path\": null,\n      \"closure_state\": \"turn_budget_exhausted_no_answer\",\n      \"evidence_surface_required\": [\"semantic adoption surface\", \"decision application surface\", \"downstream consequence surface\"],\n      \"evidence_surface_available\": false,\n      \"negative_case\": true,\n      \"not_established_fields\": [\"semantic_transformation\", \"adoption\", \"decision_application\", \"downstream_consequence\"],\n      \"evidence_refs\": [\"E0001\", \"E0002\", \"E0049\", \"E0065\"]\n    }\n  ]\n}",
+  "response_id": "3281af83-dc76-46ce-bc8e-1771b9a1192c",
+  "usage": {
+    "completion_tokens": 436,
+    "prompt_cache_hit_tokens": 1024,
+    "prompt_cache_miss_tokens": 23087,
+    "prompt_tokens": 24111,
+    "prompt_tokens_details": {
+      "cached_tokens": 1024
+    },
+    "total_tokens": 24547
+  }
+}

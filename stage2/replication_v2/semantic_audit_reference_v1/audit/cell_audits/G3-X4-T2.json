@@ -1,0 +1,155 @@
+{
+  "audit_manifest_sha256": "dd4b8eaf17dcebd2efda0a07362c2e3c912b4d5e5c046bf2ff3eb080cf466b21",
+  "cell_id": "X4-T2",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "CLOSED",
+    "negative_boundary_count": 1,
+    "notes": "Task T2 (add payment button). Final answer E0001/E0147/E0148 states no code changes required; button already present. Route shows 36 turns across release_lead, frontend, qa, reviewer, product, backend roles. Capability observer shows repeated read_file exceptions (E0049, E0078, E0079, E0085-E0087, E0091, E0092, E0124, E0125) but these are tool-level failures, not semantic adoption. No monitor bundle available.",
+    "positive_structure_count": 1,
+    "termination_class": "NATURAL_COMPLETION"
+  },
+  "group_id": "G3",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "cab14a7c43076b7ea1c747159c7641eb192d5529e2b752f2cc1903cc457b31cb",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0144",
+      "cell_id": "X4-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "CLOSED",
+      "complete_route_ref": "AUDIT_PACKET:G3:X4-T2:ROUTE_INDEX",
+      "consequence_ref": "E0005",
+      "cpr_dimensions": [
+        "P"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0144",
+      "evidence_refs": [
+        "E0138",
+        "E0144",
+        "E0005",
+        "E0006"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "task_decomposition",
+        "role_assignment",
+        "scope_boundary"
+      ],
+      "first_consequence_sequence": 4,
+      "first_observable_sequence": 1,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "cross_penetration_path"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "frontend, qa, backend",
+      "reference_id": "G3-X4-T2-REF-01",
+      "relation_type": "ENABLES",
+      "semantic_after": "release_lead decomposes into frontend task (wire button in web/app.js to POST /api/checkout), qa task (add tests covering payment button flow), and backend constraint (do not change backend contract).",
+      "semantic_before": "User request: add a payment button to the checkout page that works with the existing checkout flow.",
+      "semantic_delta": "Single user objective expanded into multi-role operational scope (frontend, qa, backend) while higher-level objective (working payment button) remains stable.",
+      "source_ref": "E0138",
+      "structure_family": "SCOPE_EXPANSION"
+    },
+    {
+      "carrier_ref": "E0010",
+      "cell_id": "X4-T2",
+      "claim_status": "SUPPORTED_CANDIDATE",
+      "closure_state": "CLOSED",
+      "complete_route_ref": "AUDIT_PACKET:G3:X4-T2:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [
+        "R"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0007",
+      "evidence_refs": [
+        "E0007",
+        "E0010",
+        "E0013",
+        "E0037",
+        "E0001"
+      ],
+      "evidence_surface_available": true,
+      "evidence_surface_required": [
+        "review_cycle_events",
+        "reopening_events",
+        "final_closure"
+      ],
+      "first_consequence_sequence": 36,
+      "first_observable_sequence": 6,
+      "group_id": "G3",
+      "negative_case": false,
+      "not_established_fields": [
+        "cross_penetration_path"
+      ],
+      "producer_actor": "reviewer, qa",
+      "reader_or_adopter_actor": "frontend, product",
+      "reference_id": "G3-X4-T2-REF-02",
+      "relation_type": "REENTRY",
+      "semantic_after": "Reviewer and QA roles re-enter across turns 6, 8, 9, 11, 12, 14, 16, 20, 22, 30, 32, 33 with repeated review/qa cycles.",
+      "semantic_before": "Initial frontend implementation of payment button (turn 4).",
+      "semantic_delta": "Repeated review/QA re-entry cycles across many turns without clear single closure event; final answer asserts no changes needed.",
+      "source_ref": "E0007",
+      "structure_family": "REPEATED_REVIEW_REOPEN"
+    },
+    {
+      "carrier_ref": null,
+      "cell_id": "X4-T2",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G3:X4-T2:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0049",
+        "E0078",
+        "E0079",
+        "E0085",
+        "E0086",
+        "E0087",
+        "E0091",
+        "E0092",
+        "E0124",
+        "E0125"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "tool_result_content",
+        "semantic_adoption"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": null,
+      "group_id": "G3",
+      "negative_case": true,
+      "not_established_fields": [
+        "carrier_ref",
+        "reader_or_adopter_actor",
+        "decision_or_action_ref",
+        "consequence_ref",
+        "first_observable_sequence",
+        "first_consequence_sequence"
+      ],
+      "producer_actor": "capability_observer",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G3-X4-T2-REF-03",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "Tool raised unexpected exception; no semantic content produced.",
+      "semantic_before": "read_file tool invoked by capability observer.",
+      "semantic_delta": "None — tool-level failure produced no information, no adoption, no downstream semantic effect.",
+      "source_ref": "E0049",
+      "structure_family": "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}

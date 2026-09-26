@@ -1,0 +1,142 @@
+{
+  "audit_manifest_sha256": "58d716d9dc72f39cf724d0849efa5756c31fd530e3894db0054539e2d15947db",
+  "cell_id": "X7-T3",
+  "cell_summary": {
+    "audit_coverage": "PARTIAL",
+    "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+    "negative_boundary_count": 2,
+    "notes": "Natural A run ended at turn 64 with answer=null, stop_reason=turn_budget, pending_roles=[release_lead]. Route shows 64 valid release_lead turns with varying action counts. Capability observer shows repeated llmlingua.PromptCompressor compress_prompt input/output pairs with recurring identical hashes, indicating repeated compression cycles but no visible semantic adoption or decision application surface. No monitor runtime bundle read.",
+    "positive_structure_count": 0,
+    "termination_class": "turn_budget"
+  },
+  "group_id": "G4",
+  "monitor_blind": true,
+  "monitor_runtime_bundle_read": false,
+  "packet_sha256": "f1248d961bf003b2fb248026d1e5ae68474eff77337165ae33c0756784bb68e9",
+  "provider": {
+    "model": "deepseek-flash",
+    "provider_call_count": 1
+  },
+  "reference_records": [
+    {
+      "carrier_ref": "E0068",
+      "cell_id": "X7-T3",
+      "claim_status": "NOT_ESTABLISHED",
+      "closure_state": null,
+      "complete_route_ref": "AUDIT_PACKET:G4:X7-T3:ROUTE_INDEX",
+      "consequence_ref": null,
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0067",
+        "E0068",
+        "E0069",
+        "E0070"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "compressor input/output semantic content",
+        "downstream adoption of compressed representation"
+      ],
+      "first_consequence_sequence": null,
+      "first_observable_sequence": 0,
+      "group_id": "G4",
+      "negative_case": false,
+      "not_established_fields": [
+        "semantic_before",
+        "semantic_after",
+        "semantic_delta",
+        "reader_or_adopter_actor",
+        "decision_or_action_ref",
+        "consequence_ref"
+      ],
+      "producer_actor": "llmlingua.PromptCompressor",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G4-X7-T3-REF-01",
+      "relation_type": "MERE_VISIBILITY",
+      "semantic_after": null,
+      "semantic_before": null,
+      "semantic_delta": null,
+      "source_ref": "E0067",
+      "structure_family": "CARRIER_TRANSFORMATION"
+    },
+    {
+      "carrier_ref": "E0065",
+      "cell_id": "X7-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G4:X7-T3:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [
+        "R"
+      ],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": "E0065",
+      "evidence_refs": [
+        "E0001",
+        "E0002",
+        "E0065"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "evidence of re-reading or recall of earlier state",
+        "review reopening event"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G4",
+      "negative_case": true,
+      "not_established_fields": [
+        "re-reading or recall evidence",
+        "review reopening event"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": "release_lead",
+      "reference_id": "G4-X7-T3-REF-02",
+      "relation_type": "BOUNDARY_PRESERVATION",
+      "semantic_after": "release_lead turn 64 valid, answer null, pending release_lead",
+      "semantic_before": "release_lead turn 1 valid",
+      "semantic_delta": "no closure achieved; role remains pending",
+      "source_ref": "E0002",
+      "structure_family": "REPEATED_REVIEW_REOPEN"
+    },
+    {
+      "carrier_ref": "E0001",
+      "cell_id": "X7-T3",
+      "claim_status": "NEGATIVE_BOUNDARY",
+      "closure_state": "OPEN_PENDING_RELEASE_LEAD",
+      "complete_route_ref": "AUDIT_PACKET:G4:X7-T3:ROUTE_INDEX",
+      "consequence_ref": "E0001",
+      "cpr_dimensions": [],
+      "cross_penetration_path": null,
+      "decision_or_action_ref": null,
+      "evidence_refs": [
+        "E0001"
+      ],
+      "evidence_surface_available": false,
+      "evidence_surface_required": [
+        "semantic content of decisions",
+        "adoption of state change"
+      ],
+      "first_consequence_sequence": 64,
+      "first_observable_sequence": 1,
+      "group_id": "G4",
+      "negative_case": true,
+      "not_established_fields": [
+        "semantic content of decisions",
+        "adoption of state change"
+      ],
+      "producer_actor": "release_lead",
+      "reader_or_adopter_actor": null,
+      "reference_id": "G4-X7-T3-REF-03",
+      "relation_type": "NOT_ESTABLISHED",
+      "semantic_after": "answer null, pending_roles [release_lead], stop_reason turn_budget",
+      "semantic_before": "task start with release_lead role",
+      "semantic_delta": "no semantic resolution; role still pending at termination",
+      "source_ref": "E0001",
+      "structure_family": "STATE_MISMATCH"
+    }
+  ],
+  "schema": "stage2-84a-cell-semantic-audit-v1"
+}
