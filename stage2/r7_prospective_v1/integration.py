@@ -20,6 +20,17 @@ def _application_root(host):
     raise ValueError("prospective host checkout does not expose an application root")
 
 
+def _host_checkout_root(host):
+    checkout = host.checkout
+    root = getattr(checkout, "root", None)
+    if root is not None:
+        return root
+    proxied = getattr(checkout, "checkout", None)
+    if proxied is not None:
+        return proxied
+    raise ValueError("host checkout exposes neither root nor proxied checkout path")
+
+
 class HostIntegratedCheckpointMonitorHook:
     """Checkpoint first, then feed the completed turn's passive structural copy."""
 
