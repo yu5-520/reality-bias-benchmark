@@ -4,7 +4,7 @@
 
 Canonical plan:
 
-`docs/R_Plan_v7.45.md`
+`docs/R_Plan_v7.46.md`
 
 ## Current scientific state
 
@@ -61,6 +61,18 @@ Independent semantic-audit reference protocol:
 Prospective monitor evaluation protocol:
 
 `configs/stage2_monitor_evaluation_protocol_v1.json`
+
+84-cell natural-block launch contract:
+
+`configs/stage2_g2_g5_84_cell_natural_block_launch_contract_v1.json`
+
+64-decision horizon contract:
+
+`configs/stage2_g2_g5_logical_decision_horizon_v1.json`
+
+Preflight readiness freeze:
+
+`configs/stage2_g2_g5_natural_block_preflight_freeze_v1.json`
 
 Forward reporting standard:
 
@@ -233,13 +245,40 @@ Per eligible cell:
 
 Do not activate historical sequencing where it conflicts with v7.45.
 
+## Pre-execution readiness
+
+The exact 84-cell natural block, 64-decision wrapper mapping, and audit/monitor channel separation have passed the non-study preflight.
+
+Primary preflight workflow run:
+
+`36237462819`
+
+Result:
+
+`contract + X1-X7 = 8/8 PASS`.
+
+Legacy G1 execution-readiness regression:
+
+`36237462711`
+
+Result:
+
+`X1-X7 = 7/7 PASS`.
+
+No real subject/provider call, paid evaluator, or active repair was used.
+
+Full report:
+
+`docs/reports/2026-09-26/StageII_G2_G5_84_Cell_Natural_Block_Preflight_Report_v1.md`
+
 ## Next gate
 
-Allowed now:
+Engineering preparation is complete.
 
-- offline governance validation;
-- 84-cell natural-block launch/evidence contract construction;
-- 64-decision wrapper-equivalence preflight;
-- monitor/audit evidence-channel separation preflight.
+Scientific subject/provider execution remains explicitly gated.
 
-Scientific subject/provider execution remains separately gated.
+After active execution authorization, the next scientific action is:
+
+`G2 21 natural A -> G3 21A -> G4 21A -> G5 21A`
+
+with the same frozen monitor version, 64-decision horizon, zero repair during A, and independent audit/monitor evidence channels.
