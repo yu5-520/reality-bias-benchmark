@@ -1,0 +1,37 @@
+name: Stage-II R7 G1 Online Monitor Preflight
+
+on:
+  push:
+    branches:
+      - stage2-r7-g1-online-monitor-v1
+    paths:
+      - "configs/stage2_r7_g1_online_monitor_contract_v1.json"
+      - "schemas/stage2_r7_g1_monitor_derived_repair_package_v1.schema.json"
+      - "stage2/r7_prospective_v1/online_monitor.py"
+      - "stage2/r7_prospective_v1/repair_boundary_watcher.py"
+      - "stage2/r7_prospective_v1/online_monitor_preflight.py"
+      - ".github/workflows/stage2-r7-g1-online-monitor-preflight.yml"
+  pull_request:
+    paths:
+      - "configs/stage2_r7_g1_online_monitor_contract_v1.json"
+      - "schemas/stage2_r7_g1_monitor_derived_repair_package_v1.schema.json"
+      - "stage2/r7_prospective_v1/online_monitor.py"
+      - "stage2/r7_prospective_v1/repair_boundary_watcher.py"
+      - "stage2/r7_prospective_v1/online_monitor_preflight.py"
+      - ".github/workflows/stage2-r7-g1-online-monitor-preflight.yml"
+  workflow_dispatch:
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Prefix-only monitor and boundary watcher preflight
+        run: python -m stage2.r7_prospective_v1.online_monitor_preflight
