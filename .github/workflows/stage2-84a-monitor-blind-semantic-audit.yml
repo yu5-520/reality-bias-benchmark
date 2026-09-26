@@ -189,8 +189,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm -rf "auditout/$AUDIT_ROOT"
-          mkdir -p "auditout/$AUDIT_ROOT/packets"
+          # Rebuild packets deterministically, but preserve any already-completed
+          # cell audits on the dedicated reference branch for resume-without-resampling.
+          rm -rf "auditout/$AUDIT_ROOT/packets"
+          mkdir -p "auditout/$AUDIT_ROOT/packets" "auditout/$AUDIT_ROOT/audit"
           python control/arena/build_stage2_84a_monitor_blind_audit_packets.py \
             --g2 g2 --g3 g3 --g4 g4 --g5 g5 \
             --out "auditout/$AUDIT_ROOT/packets"
@@ -217,16 +219,25 @@ jobs:
         run: |
           set -euo pipefail
           TAG=stage2-84a-monitor-blind-semantic-audit-claimed-v1
-          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" >/dev/null 2>&1; then
-            echo "FAIL: semantic audit launch already claimed"
-            exit 41
-          fi
-          if gh api "repos/$GITHUB_REPOSITORY/contents/$AUDIT_ROOT/reference_set_seal.json?ref=$OUTPUT_BRANCH" >/dev/null 2>&1; then
+          if gh api "repos/$GITHUB_REPOSITORY/contents/$AUDIT_ROOT/audit/reference_set_seal.json?ref=$OUTPUT_BRANCH" >/dev/null 2>&1; then
             echo "FAIL: semantic reference set already sealed"
             exit 42
           fi
-          gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$TAG" -f sha="$GITHUB_SHA" >/dev/null
-          echo "PASS: semantic audit claimed after all offline/input/credential checks"
+          if tag_json=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" 2>/dev/null); then
+            claimed_sha=$(printf '%s' "$tag_json" | python -c 'import json,sys; print(json.load(sys.stdin)["object"]["sha"])')
+            if [ "$claimed_sha" != "$GITHUB_SHA" ]; then
+              echo "FAIL: prior audit claim belongs to a different control-plane commit"
+              exit 43
+            fi
+            if [ ! -d "auditout/$AUDIT_ROOT/audit/cell_audits" ]; then
+              echo "FAIL: claim exists but no resumable partial audit state is present"
+              exit 44
+            fi
+            echo "PASS: same-commit audit claim found; resume completed cells without re-sampling"
+          else
+            gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$TAG" -f sha="$GITHUB_SHA" >/dev/null
+            echo "PASS: semantic audit claimed after all offline/input/credential checks"
+          fi
 
       - name: Execute monitor-blind semantic adjudication
         id: audit
