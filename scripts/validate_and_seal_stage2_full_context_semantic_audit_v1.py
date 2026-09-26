@@ -37,7 +37,9 @@ def main():
     assert xtsum["monitor_runtime_bundle_read"] is False and xtsum["blind_reference_labels_read"] is False
     assert cellsum["subject_calls"]==0 and cellsum["subject_reruns"]==0 and cellsum["repair_calls"]==0
     assert xtsum["subject_calls"]==0 and xtsum["subject_reruns"]==0 and xtsum["repair_calls"]==0
-    assert xtsum["estimated_cost_usd_peak_total"]<=cfg["evaluator"]["max_spend_usd"]
+    reserve=float((cfg.get("validator_recovery") or {}).get("unaccounted_prevalidation_call_reserve_usd",0) or 0)
+    effective_ceiling=float(cfg["evaluator"]["max_spend_usd"])-reserve
+    assert xtsum["estimated_cost_usd_peak_total"]<=effective_ceiling
 
     packet_by={x["full_id"]:x for x in pidx["cells"]}
     assert len(packet_by)==80
@@ -125,6 +127,9 @@ def main():
       "subject_calls":0,"subject_reruns":0,"repair_calls":0,"monitor_evaluation":False,
       "provider_call_count_total":xtsum["provider_call_count_total"],
       "estimated_cost_usd_peak_total":xtsum["estimated_cost_usd_peak_total"],
+      "recovery_budget_reserve_usd":reserve,
+      "effective_tracked_spend_ceiling_usd":effective_ceiling,
+      "known_unaccounted_prevalidation_provider_calls":int((cfg.get("validator_recovery") or {}).get("known_unaccounted_prevalidation_provider_calls",0) or 0),
       "packet_index_sha256":sha(pd/"packet_index.json"),
       "cell_audit_summary_sha256":sha(ad/"cell_audit_summary.json"),
       "xt_synthesis_summary_sha256":sha(ad/"xt_synthesis_summary.json"),

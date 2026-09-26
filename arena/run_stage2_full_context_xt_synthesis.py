@@ -95,6 +95,8 @@ def main():
     usage=dict(cell_summary.get("aggregate_usage") or {})
     calls=int(cell_summary.get("provider_call_count") or 0)
     max_spend=float(auth["evaluator"]["max_spend_usd"])
+    reserve=float((auth.get("validator_recovery") or {}).get("unaccounted_prevalidation_call_reserve_usd",0) or 0)
+    effective_spend_ceiling=max_spend-reserve
     errors=[]; done=[]
     for xnum in range(1,8):
         for tnum in range(1,4):
@@ -120,7 +122,7 @@ def main():
                 print(json.dumps({"xt":key,"resumed":True,"cost_usd":round(cost_usd(usage,cfg),6)},sort_keys=True),flush=True)
                 continue
             try:
-                if cost_usd(usage,cfg)>=max_spend: raise RuntimeError("hard spend ceiling reached")
+                if cost_usd(usage,cfg)>=effective_spend_ceiling: raise RuntimeError("effective tracked spend ceiling reached")
                 response=chat_completion(
                     cfg,
                     [{"role":"system","content":prompt},{"role":"user","content":json.dumps(payload,ensure_ascii=False,separators=(",",":"))}],
@@ -130,7 +132,7 @@ def main():
                 obj=validate(parse_json_text(raw),x,t,payload)
                 n=1+int(response.get("_json_format_retry_count",0) or 0)
                 calls+=n; add_usage(usage,response.get("usage") or {})
-                if cost_usd(usage,cfg)>max_spend: raise RuntimeError("hard spend ceiling exceeded")
+                if cost_usd(usage,cfg)>effective_spend_ceiling: raise RuntimeError("effective tracked spend ceiling exceeded")
                 wrapper={
                   "schema":"stage2-full-context-xt-cohort-record-v1",
                   "x_id":x,"task_id":t,"included_groups":included,"excluded_groups":excluded,
@@ -154,6 +156,7 @@ def main():
       "requested_cohorts":21,"completed_cohorts":len(done),"errors":errors,
       "provider_call_count_total":calls,"aggregate_usage_total":usage,
       "estimated_cost_usd_peak_total":cost_usd(usage,cfg),"max_spend_usd":max_spend,
+      "effective_tracked_spend_ceiling_usd":effective_spend_ceiling,"recovery_budget_reserve_usd":reserve,
       "monitor_runtime_bundle_read":False,"blind_reference_labels_read":False,
       "subject_calls":0,"subject_reruns":0,"repair_calls":0,"monitor_evaluation":False,
       "cell_audit_summary_sha256":digest((root/"cell_audit_summary.json").read_bytes()),

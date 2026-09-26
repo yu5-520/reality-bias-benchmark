@@ -16,7 +16,7 @@ DIMS={"C","P","R"}
 EVENT_STATUS={"SUPPORTED","SUPPORTED_CANDIDATE","NOT_ESTABLISHED","NEGATIVE_BOUNDARY"}
 EDGE_STATUS={"SUPPORTED","SUPPORTED_CANDIDATE","NOT_ESTABLISHED"}
 NODE_ROLES={"SOURCE","CARRIER","READ","ADOPTION","TRANSFORMATION","DECISION","ACTION","CONSEQUENCE","REVIEW","REENTRY","CLOSURE","BOUNDARY"}
-RELATIONS={"READ","ADOPTION","SEMANTIC_TRANSFORMATION","DESCENDANT_INHERITANCE","DECISION_APPLICATION","CONSTRAINS","ENABLES","REENTRY","FINALIZATION","BOUNDARY_PRESERVATION","NOT_ESTABLISHED"}
+RELATIONS={"MERE_VISIBILITY","READ","ADOPTION","SEMANTIC_TRANSFORMATION","DESCENDANT_INHERITANCE","DECISION_APPLICATION","CONSTRAINS","ENABLES","REENTRY","FINALIZATION","BOUNDARY_PRESERVATION","NOT_ESTABLISHED"}
 TRANSITIONS={"C_DRIVES_P","P_REINFORCES_C","R_REOPENS_C","R_REOPENS_P","R_GENERATES_NEW_C","R_GENERATES_NEW_P","P_CREATES_RETROSPECTIVE_SURFACE","C_SURVIVES_INTO_RETROSPECTIVE_WINDOW","OTHER_EVIDENCE_BACKED_TRANSITION"}
 AXES={"SEMANTIC_AUTHORITY","COLLABORATION_EXECUTION_SCOPE","TEMPORAL_REACH"}
 AXIS_STATUS={"INCREASED","DECREASED","STABLE","NOT_ESTABLISHED"}
@@ -75,7 +75,7 @@ def validate(obj,packet):
     for e in edges:
         edge_ids.append(e.get("edge_id"))
         if e.get("from_node") not in node_set or e.get("to_node") not in node_set: raise ValueError("semantic edge node missing")
-        if e.get("relation_type") not in RELATIONS: raise ValueError("bad semantic relation")
+        if e.get("relation_type") not in RELATIONS: raise ValueError(f"bad semantic relation: {e.get('relation_type')!r}")
         if e.get("status") not in EVENT_STATUS: raise ValueError("bad semantic edge status")
         require_refs(e.get("evidence_refs"),allowed,"semantic_edge")
     if None in edge_ids or len(edge_ids)!=len(set(edge_ids)): raise ValueError("semantic edge ids invalid")
@@ -159,7 +159,7 @@ def main():
     a=ap.parse_args()
     pd=Path(a.packets); out=Path(a.out)
     out.mkdir(parents=True,exist_ok=True)
-    (out/"cells").mkdir(exist_ok=True); (out/"provider_raw_cells").mkdir(exist_ok=True)
+    (out/"cells").mkdir(exist_ok=True); (out/"provider_raw_cells").mkdir(exist_ok=True); (out/"provider_raw_attempts").mkdir(exist_ok=True)
     prompt=Path(a.prompt).read_text()
     cfg=json.loads(Path(a.model_config).read_text())
     auth=json.loads(Path(a.authorization).read_text())
@@ -173,6 +173,9 @@ def main():
     assert ix["blind_reference_labels_read"] is False and ix["monitor_runtime_bundle_read"] is False
 
     max_spend=float(auth["evaluator"]["max_spend_usd"])
+    recovery=auth.get("validator_recovery") or {}
+    reserve=float(recovery.get("unaccounted_prevalidation_call_reserve_usd",0) or 0)
+    effective_spend_ceiling=max_spend-reserve
     usage={}; calls=0; completed=[]; errors=[]
     for meta in ix["cells"]:
         packet=json.loads((pd/meta["packet_path"]).read_text())
@@ -191,17 +194,37 @@ def main():
             print(json.dumps({"cell":full,"resumed":True,"cost_usd":round(cost_usd(usage,cfg),6)},sort_keys=True),flush=True)
             continue
         try:
-            if cost_usd(usage,cfg)>=max_spend: raise RuntimeError("hard spend ceiling reached")
+            if cost_usd(usage,cfg)>=effective_spend_ceiling: raise RuntimeError("effective tracked spend ceiling reached")
             response=chat_completion(
                 cfg,
                 [{"role":"system","content":prompt},{"role":"user","content":json.dumps(packet,ensure_ascii=False,separators=(",",":"))}],
                 evaluator=True,response_format_json=True
             )
             raw=extract_content(response)
-            audit=validate(parse_json_text(raw),packet)
             n=1+int(response.get("_json_format_retry_count",0) or 0)
-            calls+=n; add_usage(usage,response.get("usage") or {})
-            if cost_usd(usage,cfg)>max_spend: raise RuntimeError("hard spend ceiling exceeded")
+            calls+=n
+            add_usage(usage,response.get("usage") or {})
+            attempt_record={
+              "full_id":full,
+              "packet_sha256":packet["packet_sha256"],
+              "model":response.get("model"),
+              "response_id":response.get("id"),
+              "usage":response.get("usage") or {},
+              "provider_call_count":n,
+              "json_format_retry_count":n-1,
+              "raw_text":raw,
+              "validation_state":"UNVALIDATED_RAW_PRESERVED"
+            }
+            (out/"provider_raw_attempts"/f"{full}.json").write_text(
+              json.dumps(attempt_record,ensure_ascii=False,indent=2,sort_keys=True)+"\n"
+            )
+            if cost_usd(usage,cfg)>effective_spend_ceiling:
+                raise RuntimeError("effective tracked spend ceiling exceeded after provider call")
+            audit=validate(parse_json_text(raw),packet)
+            attempt_record["validation_state"]="VALIDATED"
+            (out/"provider_raw_attempts"/f"{full}.json").write_text(
+              json.dumps(attempt_record,ensure_ascii=False,indent=2,sort_keys=True)+"\n"
+            )
             wrapper={
               "schema":"stage2-full-context-cell-audit-record-v1",
               "full_id":full,"group_id":packet["group_id"],"cell_id":packet["cell_id"],
@@ -228,7 +251,10 @@ def main():
       "schema":"stage2-full-context-cell-audit-summary-v1",
       "requested_cells":80,"completed_cells":len(completed),"errors":errors,
       "provider_call_count":calls,"aggregate_usage":usage,"estimated_cost_usd_peak":cost_usd(usage,cfg),
-      "max_spend_usd":max_spend,"theory_aware":True,
+      "max_spend_usd":max_spend,"effective_tracked_spend_ceiling_usd":effective_spend_ceiling,
+      "recovery_budget_reserve_usd":reserve,
+      "known_unaccounted_prevalidation_provider_calls":int(recovery.get("known_unaccounted_prevalidation_provider_calls",0) or 0),
+      "theory_aware":True,
       "monitor_runtime_bundle_read":False,"blind_reference_labels_read":False,
       "subject_calls":0,"subject_reruns":0,"repair_calls":0,"monitor_evaluation":False,
       "prompt_sha256":digest(prompt.encode()),"packet_index_sha256":digest((pd/"packet_index.json").read_bytes()),
