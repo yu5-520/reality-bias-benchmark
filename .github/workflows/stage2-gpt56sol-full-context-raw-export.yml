@@ -1,0 +1,204 @@
+name: Stage-II GPT-5.6 Sol Full-Context Raw Evidence Export v1
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/stage2-gpt56sol-full-context-raw-export.yml'
+      - 'arena/export_stage2_gpt56sol_full_context_raw_evidence.py'
+      - 'configs/stage2_gpt56sol_full_context_audit_v1.json'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/stage2-gpt56sol-full-context-raw-export.yml'
+      - 'arena/export_stage2_gpt56sol_full_context_raw_evidence.py'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stage2-gpt56sol-full-context-raw-export-v1
+  cancel-in-progress: false
+
+env:
+  OUTPUT_BRANCH: stage2-gpt56sol-full-context-audit-results-v1
+  OUTPUT_ROOT: stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1
+
+jobs:
+  offline-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile raw export
+        run: |
+          set -euo pipefail
+          python -m py_compile arena/export_stage2_gpt56sol_full_context_raw_evidence.py
+      - name: Verify formal reviewer boundary
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          cfg=json.load(open("configs/stage2_gpt56sol_full_context_audit_v1.json"))
+          assert cfg["status"]=="AUTHORIZED_FORMAL_LAYER_C"
+          assert cfg["reviewer"]["model"]=="GPT-5.6 Sol"
+          assert cfg["reviewer"]["execution_mode"]=="CHATGPT_NATIVE_REASONING"
+          assert cfg["reviewer"]["deepseek_api_used_for_formal_layer_c"] is False
+          assert cfg["population"]["formal_full_context_eligible"]==80
+          assert cfg["inputs"]["monitor_runtime_bundle_access"] is False
+          assert cfg["inputs"]["blind_reference_labels_access"] is False
+          assert cfg["inputs"]["blind_reference_records_access"] is False
+          assert cfg["inputs"]["deepseek_full_context_pilot_outputs_access"] is False
+          assert cfg["prohibited_actions"]["deepseek_formal_layer_c_calls"] is False
+          print("PASS: raw export is GPT-5.6 Sol only and isolated from comparison outputs")
+          PY
+
+  export-raw-review-evidence:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: offline-preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout control plane
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: control
+          fetch-depth: 1
+
+      - name: Checkout G2 frozen evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g2-natural-evidence-v1
+          path: g2
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G2/natural_A
+            stage2/replication_v2/G2/group_index.json
+
+      - name: Checkout G3 frozen evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g3-natural-evidence-v1
+          path: g3
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G3/natural_A
+            stage2/replication_v2/G3/group_index.json
+
+      - name: Checkout G4 frozen evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g4-natural-evidence-v1
+          path: g4
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G4/natural_A
+            stage2/replication_v2/G4/group_index.json
+
+      - name: Checkout G5 frozen evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g5-natural-evidence-v1
+          path: g5
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G5/natural_A
+            stage2/replication_v2/G5/group_index.json
+            stage2/replication_v2/G2_G5_84A_block_index.json
+
+      - name: Checkout formal GPT result branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-gpt56sol-full-context-audit-results-v1
+          path: results
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Export exact audit-raw reviewer evidence
+        run: |
+          set -euo pipefail
+          rm -rf work/raw_review
+          mkdir -p work/raw_review
+          python control/arena/export_stage2_gpt56sol_full_context_raw_evidence.py \
+            --g2 g2 --g3 g3 --g4 g4 --g5 g5 \
+            --config control/configs/stage2_gpt56sol_full_context_audit_v1.json \
+            --out work/raw_review
+
+      - name: Verify 80-cell raw export
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          x=json.load(open("work/raw_review/raw_evidence_export_index.json"))
+          assert x["status"]=="SEALED_EXPORT_READY_FOR_GPT56SOL_REVIEW"
+          assert x["cell_count"]==80
+          assert x["monitor_runtime_bundle_read"] is False
+          assert x["blind_reference_labels_read"] is False
+          assert x["blind_reference_records_read"] is False
+          assert x["deepseek_full_context_pilot_outputs_read"] is False
+          assert x["deepseek_api_calls"]==0
+          print("PASS: 80 full raw reviewer bundles ready")
+          PY
+
+      - name: Upload GPT-5.6 Sol raw reviewer evidence
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-gpt56sol-full-context-raw-evidence-${{ github.run_id }}
+          path: work/raw_review/
+          compression-level: 6
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Persist raw export receipt without duplicating raw evidence
+        shell: bash
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact-id }}
+          ARTIFACT_URL: ${{ steps.upload.outputs.artifact-url }}
+          ARTIFACT_DIGEST: ${{ steps.upload.outputs.artifact-digest }}
+        run: |
+          set -euo pipefail
+          target="results/$OUTPUT_ROOT/raw_export"
+          mkdir -p "$target"
+          cp work/raw_review/raw_evidence_export_index.json "$target/raw_evidence_export_index.json"
+          python - <<'PY'
+          import hashlib,json,os
+          p=f'results/{os.environ["OUTPUT_ROOT"]}/raw_export/raw_evidence_export_index.json'
+          receipt={
+            "schema":"stage2-gpt56sol-full-context-raw-export-receipt-v1",
+            "status":"SEALED_RAW_REVIEW_INPUT",
+            "reviewer":"GPT-5.6 Sol",
+            "execution_mode":"CHATGPT_NATIVE_REASONING",
+            "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
+            "artifact_id":int(os.environ["ARTIFACT_ID"]),
+            "artifact_url":os.environ["ARTIFACT_URL"],
+            "artifact_digest":os.environ["ARTIFACT_DIGEST"],
+            "raw_evidence_export_index_sha256":hashlib.sha256(open(p,"rb").read()).hexdigest(),
+            "cell_count":80,
+            "monitor_runtime_bundle_read":False,
+            "blind_reference_labels_read":False,
+            "blind_reference_records_read":False,
+            "deepseek_full_context_pilot_outputs_read":False,
+            "deepseek_api_calls":0
+          }
+          out=f'results/{os.environ["OUTPUT_ROOT"]}/raw_export/raw_export_receipt.json'
+          open(out,"w").write(json.dumps(receipt,indent=2,sort_keys=True)+"\n")
+          print(json.dumps(receipt,sort_keys=True))
+          PY
+          git -C results config user.name "stage2-gpt56sol-raw-export-bot"
+          git -C results config user.email "stage2-gpt56sol-raw-export@users.noreply.github.com"
+          git -C results add "$OUTPUT_ROOT/raw_export"
+          if ! git -C results diff --cached --quiet; then
+            git -C results commit -m "audit: freeze GPT-5.6 Sol raw reviewer export [run $GITHUB_RUN_ID]"
+            git -C results push origin "HEAD:refs/heads/$OUTPUT_BRANCH"
+          fi
