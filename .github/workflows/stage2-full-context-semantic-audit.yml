@@ -1,0 +1,367 @@
+name: Stage-II Full-Context Process-Semantic Audit v1
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/stage2-full-context-semantic-audit.yml'
+      - 'docs/R_Plan_v7.47.md'
+      - 'configs/stage2_full_context_process_semantic_audit_v1.json'
+      - 'reviews/stage2_full_context_cell_audit_prompt_v1.md'
+      - 'reviews/stage2_full_context_xt_cohort_prompt_v1.md'
+      - 'schemas/stage2_full_context_cell_audit_v1.schema.json'
+      - 'schemas/stage2_full_context_xt_cohort_v1.schema.json'
+      - 'arena/build_stage2_full_context_semantic_packets.py'
+      - 'arena/run_stage2_full_context_cell_audit.py'
+      - 'arena/run_stage2_full_context_xt_synthesis.py'
+      - 'scripts/validate_and_seal_stage2_full_context_semantic_audit_v1.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/stage2-full-context-semantic-audit.yml'
+      - 'docs/R_Plan_v7.47.md'
+      - 'configs/stage2_full_context_process_semantic_audit_v1.json'
+      - 'reviews/stage2_full_context_cell_audit_prompt_v1.md'
+      - 'reviews/stage2_full_context_xt_cohort_prompt_v1.md'
+      - 'schemas/stage2_full_context_cell_audit_v1.schema.json'
+      - 'schemas/stage2_full_context_xt_cohort_v1.schema.json'
+      - 'arena/build_stage2_full_context_semantic_packets.py'
+      - 'arena/run_stage2_full_context_cell_audit.py'
+      - 'arena/run_stage2_full_context_xt_synthesis.py'
+      - 'scripts/validate_and_seal_stage2_full_context_semantic_audit_v1.py'
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-full-context-process-semantic-audit-v1
+  cancel-in-progress: false
+
+env:
+  AUTH_ISSUE: "264"
+  OUTPUT_BRANCH: stage2-full-context-semantic-audit-results-v1
+  OUTPUT_ROOT: stage2/replication_v2/full_context_semantic_audit_v1
+
+jobs:
+  offline-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile full-context audit code
+        run: |
+          set -euo pipefail
+          python -m py_compile \
+            arena/build_stage2_full_context_semantic_packets.py \
+            arena/run_stage2_full_context_cell_audit.py \
+            arena/run_stage2_full_context_xt_synthesis.py \
+            scripts/validate_and_seal_stage2_full_context_semantic_audit_v1.py
+      - name: Validate frozen Layer-C contract
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          p=json.load(open("configs/stage2_full_context_process_semantic_audit_v1.json"))
+          assert p["status"]=="AUTHORIZED_ACTIVE_FORWARD_ANALYSIS"
+          assert p["authorization_issue"]==264
+          assert p["population"]["natural_total"]==84
+          assert p["population"]["eligible_full_context"]==80
+          assert len(p["population"]["eligible_cells"])==80
+          assert len(set(p["population"]["eligible_cells"]))==80
+          assert p["inputs"]["monitor_runtime_bundle_access"] is False
+          assert p["inputs"]["blind_reference_prerequisite"]["labels_read"] is False
+          assert p["inputs"]["blind_reference_prerequisite"]["records_read"] is False
+          assert p["inputs"]["blind_reference_prerequisite"]["seal_blob_sha"]=="b2c52e28c69bd4fba0f85198a372cb21fb1aaf9c"
+          assert p["theory"]["fixed_order_required"] is False
+          assert p["theory"]["loop_search_enabled"] is True
+          assert p["evaluator"]["temperature"]==0.0
+          assert p["evaluator"]["max_spend_usd"]==10.0
+          assert p["prohibited_actions"]["subject_calls"] is False
+          assert p["prohibited_actions"]["subject_reruns"] is False
+          assert p["prohibited_actions"]["repair_calls"] is False
+          assert p["prohibited_actions"]["monitor_evaluation"] is False
+          assert p["prohibited_actions"]["blind_reference_relabel"] is False
+          print("PASS: Layer-C contract is bounded, theory-aware, monitor-blind, and reference-label-blind")
+          PY
+
+  execute-full-context-audit:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: offline-preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Checkout control plane
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: control
+          fetch-depth: 1
+
+      - name: Checkout G2 frozen evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g2-natural-evidence-v1
+          path: g2
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G2/natural_A
+            stage2/replication_v2/G2/group_index.json
+
+      - name: Checkout G3 frozen evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g3-natural-evidence-v1
+          path: g3
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G3/natural_A
+            stage2/replication_v2/G3/group_index.json
+
+      - name: Checkout G4 frozen evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g4-natural-evidence-v1
+          path: g4
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G4/natural_A
+            stage2/replication_v2/G4/group_index.json
+
+      - name: Checkout G5 frozen evidence and 84A seal
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g5-natural-evidence-v1
+          path: g5
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G5/natural_A
+            stage2/replication_v2/G5/group_index.json
+            stage2/replication_v2/G2_G5_84A_block_index.json
+
+      - name: Checkout Layer-C result branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-full-context-semantic-audit-results-v1
+          path: results
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify authorization, 84A seal, and blind-reference seal gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          python - <<'PY'
+          import json, os, subprocess, base64
+          cfg=json.load(open("control/configs/stage2_full_context_process_semantic_audit_v1.json"))
+          issue=json.loads(subprocess.check_output([
+            "gh","api",f'repos/{os.environ["GITHUB_REPOSITORY"]}/issues/{os.environ["AUTH_ISSUE"]}'
+          ],text=True))
+          assert issue["user"]["login"]=="yu5-520"
+          assert issue["title"]=="STAGE2 FULL-CONTEXT PROCESS-SEMANTIC AUDIT AUTHORIZATION"
+          required={
+            "phase=STAGE2_FULL_CONTEXT_PROCESS_SEMANTIC_AUDIT_V1",
+            "full_context_eligible=80",
+            "blind_reference_labels_access=false",
+            "monitor_runtime_bundle_access=false",
+            "subject_calls=false",
+            "subject_reruns=false",
+            "repair_calls=false",
+            "monitor_evaluation=false",
+            "paid_evaluator_calls=true",
+            "max_spend_usd=10.0",
+            "cell_audit_count=80",
+            "cross_group_xt_synthesis_count=21",
+            "dynamic_cpr_loop_search=true",
+            "self_reinforcing_loop_requires_explicit_growth_evidence=true"
+          }
+          lines=set(x.strip() for x in issue["body"].splitlines() if x.strip())
+          assert required <= lines
+
+          block=json.load(open("g5/stage2/replication_v2/G2_G5_84A_block_index.json"))
+          assert block["complete"] is True and block["natural_first_attempts"]==84
+          assert block["repair_actions_during_A"]==0
+          assert block["engineering_B_state"]=="LOCKED"
+          for g,root in [("G2","g2"),("G3","g3"),("G4","g4"),("G5","g5")]:
+            idx=json.load(open(f"{root}/stage2/replication_v2/{g}/group_index.json"))
+            assert idx["complete"] is True and idx["preserved_count"]==21
+            assert idx["first_attempt_only"] is True and idx["repair_actions_during_A"]==0
+
+          api=f'repos/{os.environ["GITHUB_REPOSITORY"]}/contents/{cfg["inputs"]["blind_reference_prerequisite"]["seal_path"]}?ref={cfg["inputs"]["blind_reference_prerequisite"]["branch"]}'
+          seal_obj=json.loads(subprocess.check_output(["gh","api",api],text=True))
+          assert seal_obj["sha"]==cfg["inputs"]["blind_reference_prerequisite"]["seal_blob_sha"]
+          raw=base64.b64decode(seal_obj["content"])
+          open("work/blind_reference_seal.json","wb").write(raw)
+          seal=json.loads(raw)
+          assert seal["status"]=="SEALED" and seal["monitor_blind"] is True
+          print("PASS: 84A + authorization + blind-reference seal gate verified without reading blind labels")
+          PY
+
+      - name: Build 80 full-context packets from audit-raw channels only
+        shell: bash
+        run: |
+          set -euo pipefail
+          target="results/$OUTPUT_ROOT"
+          rm -rf "$target/packets"
+          mkdir -p "$target/packets" "$target/audit"
+          python control/arena/build_stage2_full_context_semantic_packets.py \
+            --g2 g2 --g3 g3 --g4 g4 --g5 g5 \
+            --config control/configs/stage2_full_context_process_semantic_audit_v1.json \
+            --out "$target/packets"
+          python - <<'PY'
+          import json, os
+          p=json.load(open(f'results/{os.environ["OUTPUT_ROOT"]}/packets/packet_index.json'))
+          assert p["eligible_cell_count"]==80
+          assert p["monitor_runtime_bundle_read"] is False
+          assert p["blind_reference_labels_read"] is False
+          print("PASS: 80 full-context packets built")
+          PY
+
+      - name: Verify evaluator credential before Layer-C claim
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$DEEPSEEK_API_KEY"
+          echo "PASS: evaluator credential present; no provider call made by this step"
+
+      - name: Claim Layer-C semantic audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG=stage2-full-context-process-semantic-audit-claimed-v1
+          seal_path="$OUTPUT_ROOT/final/full_context_seal.json"
+          if gh api "repos/$GITHUB_REPOSITORY/contents/$seal_path?ref=$OUTPUT_BRANCH" >/dev/null 2>&1; then
+            echo "FAIL: Layer-C result already sealed"
+            exit 42
+          fi
+          if tag_json=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" 2>/dev/null); then
+            claimed_sha=$(printf '%s' "$tag_json" | python -c 'import json,sys; print(json.load(sys.stdin)["object"]["sha"])')
+            if [ "$claimed_sha" != "$GITHUB_SHA" ]; then
+              echo "FAIL: existing Layer-C claim belongs to another control-plane commit"
+              exit 43
+            fi
+            if [ ! -d "results/$OUTPUT_ROOT/audit" ]; then
+              echo "FAIL: claim exists but resumable audit directory is absent"
+              exit 44
+            fi
+            echo "PASS: same-commit Layer-C claim found; resume without re-sampling completed units"
+          else
+            gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$TAG" -f sha="$GITHUB_SHA" >/dev/null
+            echo "PASS: Layer-C audit claimed"
+          fi
+
+      - name: Run 80 full-context trajectory audits
+        id: cells
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        shell: bash
+        run: |
+          set +e
+          python control/arena/run_stage2_full_context_cell_audit.py \
+            --packets "results/$OUTPUT_ROOT/packets" \
+            --prompt control/reviews/stage2_full_context_cell_audit_prompt_v1.md \
+            --model-config control/arena/config/model_deepseek_v0.2.json \
+            --authorization control/configs/stage2_full_context_process_semantic_audit_v1.json \
+            --out "results/$OUTPUT_ROOT/audit"
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Run 21 same-X/T cross-group topology syntheses
+        id: cohorts
+        if: steps.cells.outputs.exit_code == '0'
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        shell: bash
+        run: |
+          set +e
+          python control/arena/run_stage2_full_context_xt_synthesis.py \
+            --cell-audit "results/$OUTPUT_ROOT/audit" \
+            --prompt control/reviews/stage2_full_context_xt_cohort_prompt_v1.md \
+            --model-config control/arena/config/model_deepseek_v0.2.json \
+            --authorization control/configs/stage2_full_context_process_semantic_audit_v1.json \
+            --out "results/$OUTPUT_ROOT/audit"
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Validate and seal Layer-C Dynamic CPR result
+        id: seal
+        if: steps.cells.outputs.exit_code == '0' && steps.cohorts.outputs.exit_code == '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "results/$OUTPUT_ROOT/final"
+          python control/scripts/validate_and_seal_stage2_full_context_semantic_audit_v1.py \
+            --packets "results/$OUTPUT_ROOT/packets" \
+            --audit "results/$OUTPUT_ROOT/audit" \
+            --authorization control/configs/stage2_full_context_process_semantic_audit_v1.json \
+            --blind-seal work/blind_reference_seal.json \
+            --out "results/$OUTPUT_ROOT/final"
+          echo "sealed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Preserve Layer-C outputs to dedicated result branch
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C results config user.name "stage2-full-context-audit-bot"
+          git -C results config user.email "stage2-full-context-audit@users.noreply.github.com"
+          git -C results add "$OUTPUT_ROOT"
+          if git -C results diff --cached --quiet; then
+            echo "No new Layer-C outputs to preserve"
+          else
+            git -C results commit -m "audit: preserve Stage II full-context semantic outputs [run $GITHUB_RUN_ID]"
+            git -C results push origin "HEAD:refs/heads/$OUTPUT_BRANCH"
+          fi
+
+      - name: Upload redundant Layer-C artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-full-context-semantic-audit-${{ github.run_id }}
+          path: results/stage2/replication_v2/full_context_semantic_audit_v1/
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Close authorization on successful Layer-C seal
+        if: steps.seal.outputs.sealed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --body "Stage-II Layer-C full-context process-semantic audit completed: 80 trajectory audits + 21 same-X/T topology syntheses sealed on branch \`$OUTPUT_BRANCH\`. Monitor evaluation and engineering B were not executed."
+          gh issue close "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
+
+      - name: Assert complete Layer-C seal or preserve partial failure
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.cells.outputs.exit_code }}" != "0" ]; then
+            echo "FAIL: trajectory audit incomplete; partial outputs preserved"
+            exit 1
+          fi
+          if [ "${{ steps.cohorts.outputs.exit_code }}" != "0" ]; then
+            echo "FAIL: cross-group synthesis incomplete; completed outputs preserved"
+            exit 2
+          fi
+          test "${{ steps.seal.outputs.sealed }}" = "true"
+          echo "PASS: Layer-C full-context process-semantic audit sealed"
