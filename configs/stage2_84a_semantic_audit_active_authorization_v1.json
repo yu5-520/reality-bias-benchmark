@@ -1,0 +1,48 @@
+{
+  "schema": "stage2-84a-monitor-blind-semantic-audit-authorization-v1",
+  "version": "1.0",
+  "date_utc": "2026-09-26",
+  "status": "AUTHORIZED_BY_USER_CHAT_EXECUTE",
+  "authorization_issue": 261,
+  "population": "G2_G5_84_NATURAL_A",
+  "source_block_index": {
+    "branch": "stage2-g5-natural-evidence-v1",
+    "path": "stage2/replication_v2/G2_G5_84A_block_index.json",
+    "blob_sha": "b3599a0a6b46f279b94a648b0c82213e58455e33",
+    "expected_complete": true,
+    "expected_natural_first_attempts": 84
+  },
+  "evidence_branches": {
+    "G2": "stage2-g2-natural-evidence-v1",
+    "G3": "stage2-g3-natural-evidence-v1",
+    "G4": "stage2-g4-natural-evidence-v1",
+    "G5": "stage2-g5-natural-evidence-v1"
+  },
+  "blindness": {
+    "monitor_runtime_bundle_access": false,
+    "monitor_warning_access": false,
+    "monitor_candidate_access": false,
+    "monitor_confidence_access": false,
+    "monitor_package_access": false
+  },
+  "evaluator": {
+    "provider": "deepseek",
+    "model_config": "arena/config/model_deepseek_v0.2.json",
+    "temperature": 0,
+    "max_spend_usd": 10,
+    "semantic_uncertainty_retry": false,
+    "adaptive_reprompt": false,
+    "json_format_identical_request_retry_only": true
+  },
+  "prohibited_actions": {
+    "subject_calls": false,
+    "subject_reruns": false,
+    "repair_calls": false,
+    "monitor_evaluation": false,
+    "engineering_B": false
+  },
+  "output_branch": "stage2-semantic-audit-reference-v1",
+  "required_cell_count": 84,
+  "reference_protocol": "configs/stage2_semantic_audit_reference_protocol_v1.json",
+  "reference_schema": "schemas/stage2_semantic_audit_reference_record_v1.schema.json"
+}
