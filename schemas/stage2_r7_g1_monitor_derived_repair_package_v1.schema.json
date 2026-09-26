@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-STAGE2-R7-G1-MONITOR-DERIVED-REPAIR-PACKAGE-v1",
+  "title": "Stage-II R7 G1 monitor-derived repair package",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "package_id",
+    "source_cell",
+    "prefix_cutoff_ref",
+    "prefix_sequence",
+    "monitor_rule_id",
+    "monitor_evidence_refs",
+    "pressure_refs",
+    "support_refs",
+    "affected_closure_refs",
+    "preserve_refs",
+    "repair_anchor_ref",
+    "content_address",
+    "detection_surface",
+    "allowed_repair_surface",
+    "forbidden_mutations",
+    "parent_reconstruction",
+    "repair_gate_status",
+    "g1_block_code",
+    "semantic_audit_used",
+    "future_evidence_used",
+    "package_hash"
+  ],
+  "properties": {
+    "schema": {"const": "RB-STAGE2-R7-G1-MONITOR-DERIVED-REPAIR-PACKAGE-v1"},
+    "package_id": {"type": "string", "pattern": "^g1pkg:"},
+    "source_cell": {"type": "string", "pattern": "^X[1-7]-T[1-3]$"},
+    "prefix_cutoff_ref": {"type": "string"},
+    "prefix_sequence": {"type": "integer", "minimum": 1},
+    "monitor_rule_id": {"type": "string"},
+    "preserve_refs": {"type": "array", "items": {"type": "string"}},
+    "allowed_repair_surface": {"type": "array", "items": {"type": "string"}},
+    "repair_gate_status": {
+      "enum": [
+        "COMPLETE_FOR_STRUCTURED_REPAIR",
+        "LINEAGE_GAP_BLOCKED",
+        "PARENT_RECONSTRUCTION_BLOCKED",
+        "NATIVE_CAPABILITY_BLOCKED",
+        "SAFETY_BOUNDARY_BLOCKED"
+      ]
+    },
+    "g1_block_code": {
+      "type": ["string","null"]
+    },
+    "semantic_audit_used": {"const": false},
+    "future_evidence_used": {"const": false},
+    "cpr_label": {"type": "null"},
+    "package_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
