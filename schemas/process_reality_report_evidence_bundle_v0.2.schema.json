@@ -1,0 +1,419 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RB-PROCESS-REALITY-REPORT-EVIDENCE-BUNDLE-v0.2",
+  "title": "Stage-II Process Reality Child Report Evidence Bundle v0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "report_id",
+    "report_family",
+    "reporting_standard",
+    "general_chapter",
+    "evidence_policy",
+    "experiment_accounting",
+    "domain_scope",
+    "trajectory_cases",
+    "contrast_sets",
+    "structural_summary",
+    "semantic_summary",
+    "claim_registry",
+    "figure_specs",
+    "provenance",
+    "report_gate_status"
+  ],
+  "properties": {
+    "schema": {
+      "const": "RB-PROCESS-REALITY-REPORT-EVIDENCE-BUNDLE-v0.2"
+    },
+    "report_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "report_family": {
+      "enum": [
+        "STAGE2_NATIVE_PROCESS",
+        "STAGE2_TASK_PRESSURE",
+        "STAGE2_INFORMATION_LAYER",
+        "STAGE2_SYNTHESIS"
+      ]
+    },
+    "reporting_standard": {
+      "const": "RB-PROCESS-REALITY-REPORT-STANDARD-v1.10"
+    },
+    "general_chapter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "version",
+        "adopted_methodological_ids",
+        "hypotheses_informed",
+        "anti_circularity_acknowledged"
+      ],
+      "properties": {
+        "path": {
+          "const": "docs/reports/2026-09-26/StageII_General_Chapter_Process_Reality_Methodology_and_Hypotheses_v1.md"
+        },
+        "version": {
+          "const": "1.0"
+        },
+        "adopted_methodological_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^GC-M[1-5]$"
+          }
+        },
+        "hypotheses_informed": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^GC-H[1-3][abc]$"
+          }
+        },
+        "anti_circularity_acknowledged": {
+          "const": true
+        }
+      }
+    },
+    "evidence_policy": {
+      "enum": [
+        "FROZEN",
+        "FROZEN_SOURCE_SYNTHESIS"
+      ]
+    },
+    "experiment_accounting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "natural_cells",
+        "natural_reruns",
+        "selected_source_bound_cases",
+        "subject_calls_for_report",
+        "provider_calls_for_report",
+        "evaluator_calls_for_report",
+        "contrasts_spent_by_report"
+      ],
+      "properties": {
+        "natural_cells": {
+          "const": 21
+        },
+        "natural_reruns": {
+          "const": 0
+        },
+        "selected_source_bound_cases": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "subject_calls_for_report": {
+          "const": 0
+        },
+        "provider_calls_for_report": {
+          "const": 0
+        },
+        "evaluator_calls_for_report": {
+          "const": 0
+        },
+        "contrasts_spent_by_report": {
+          "const": 0
+        }
+      }
+    },
+    "domain_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary_experiment_domains",
+        "task_families",
+        "systems"
+      ],
+      "properties": {
+        "primary_experiment_domains": {
+          "const": [
+            "software_engineering"
+          ]
+        },
+        "task_families": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "T1",
+              "T2",
+              "T3"
+            ]
+          }
+        },
+        "systems": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "pattern": "^X[1-7]$"
+          }
+        }
+      }
+    },
+    "trajectory_cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "case_id",
+          "system_id",
+          "task_id",
+          "evidence_role",
+          "selection_reason",
+          "route_material_ref",
+          "semantic_ledger_ref",
+          "coverage_status",
+          "route_representation",
+          "complete_recorded_route",
+          "semantic_lineage_overlay_present",
+          "raw_manifest_ref",
+          "archive_sha256"
+        ],
+        "properties": {
+          "case_id": {
+            "type": "string",
+            "pattern": "^X[1-7]-T[1-3]$"
+          },
+          "system_id": {
+            "type": "string",
+            "pattern": "^X[1-7]$"
+          },
+          "task_id": {
+            "type": "string",
+            "pattern": "^T[1-3]$"
+          },
+          "evidence_role": {
+            "enum": [
+              "PRIMARY_COMPLETE_ROUTE",
+              "SYSTEM_REPRESENTATIVE",
+              "PROCESS_CONTRAST",
+              "NEGATIVE_MECHANISM_BOUNDARY"
+            ]
+          },
+          "selection_reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "route_material_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "semantic_ledger_ref": {
+            "const": "stage2/natural_v7/r6_grade_semantic_audit/case_semantic_ledgers.jsonl"
+          },
+          "coverage_status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "route_representation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "complete_recorded_route": {
+            "const": true
+          },
+          "semantic_lineage_overlay_present": {
+            "const": true
+          },
+          "raw_manifest_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "archive_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "contrast_sets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "contrast_id",
+          "case_ids",
+          "purpose",
+          "claim_supported",
+          "boundary"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "contrast_id": {
+            "type": "string"
+          },
+          "case_ids": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "string"
+            }
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "claim_supported": {
+            "type": "string"
+          },
+          "boundary": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "structural_summary": {
+      "type": "object",
+      "required": [
+        "role"
+      ],
+      "properties": {
+        "role": {
+          "const": "FACTUAL_SUBSTRATE_AND_SUPPORTING_DISPLAY"
+        }
+      },
+      "additionalProperties": true
+    },
+    "semantic_summary": {
+      "type": "object",
+      "required": [
+        "role"
+      ],
+      "properties": {
+        "role": {
+          "const": "PRIMARY_INTERPRETIVE_CONTENT"
+        }
+      },
+      "additionalProperties": true
+    },
+    "claim_registry": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "claim_id",
+          "claim_text",
+          "claim_status",
+          "semantic_audit_refs",
+          "structural_support_refs",
+          "boundary"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "claim_id": {
+            "type": "string"
+          },
+          "claim_text": {
+            "type": "string"
+          },
+          "claim_status": {
+            "enum": [
+              "DIRECTLY_EVIDENCED",
+              "SUPPORTED",
+              "SUPPORTED_CANDIDATE",
+              "UNRESOLVED",
+              "NOT_ESTABLISHED",
+              "NOT_OBSERVED",
+              "CONTRADICTED",
+              "NOT_ADJUDICATED"
+            ]
+          },
+          "semantic_audit_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "structural_support_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "boundary": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "figure_specs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "figure_id",
+          "figure_type",
+          "case_ids",
+          "all_recorded_route_nodes_required",
+          "semantic_overlay_required"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "figure_id": {
+            "type": "string"
+          },
+          "figure_type": {
+            "enum": [
+              "SYSTEM_LAYER_MAP",
+              "TIME_ALIGNED_ACTUAL_AGENT_ROUTE_WITH_SEMANTIC_LINEAGE_OVERLAY",
+              "CONTRASTED_AGENT_ROUTE_PAIR",
+              "SUPPORTING_STRUCTURAL_SUMMARY"
+            ]
+          },
+          "case_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "all_recorded_route_nodes_required": {
+            "type": "boolean"
+          },
+          "semantic_overlay_required": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "raw_evidence_mutation",
+        "missing_events_reconstructed",
+        "new_subject_provider_evaluator_calls_for_report",
+        "source_main_sha"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "raw_evidence_mutation": {
+          "const": false
+        },
+        "missing_events_reconstructed": {
+          "const": false
+        },
+        "new_subject_provider_evaluator_calls_for_report": {
+          "const": 0
+        },
+        "source_main_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        }
+      }
+    },
+    "report_gate_status": {
+      "const": "READY_FOR_REPORT_FREEZE"
+    }
+  }
+}
