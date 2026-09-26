@@ -1,0 +1,101 @@
+name: Stage-II G2-G5 84A Natural Block Seal v1
+
+on:
+  workflow_run:
+    workflows: ["Stage-II G5 21A Active Natural Execution v1"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stage2-g2-g5-84a-natural-block-seal-v1
+  cancel-in-progress: false
+
+env:
+  SCIENCE_SHA: b4f1441a48b2bc6a2c61035311419fc4509e8913
+
+jobs:
+  seal-84a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Verify G5 workflow succeeded
+        env:
+          PREV_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        run: |
+          set -euo pipefail
+          test "$PREV_CONCLUSION" = success
+
+      - uses: actions/checkout@v4
+        with:
+          ref: stage2-g5-natural-evidence-v1
+          path: evidence
+          fetch-depth: 1
+
+      - name: Verify all four 21/21 group seals
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, subprocess, hashlib
+          from pathlib import Path
+
+          repo=os.environ["GITHUB_REPOSITORY"]
+          science=os.environ["SCIENCE_SHA"]
+          rows=[]
+          for group in ("G2","G3","G4","G5"):
+              branch=f"stage2-{group.lower()}-natural-evidence-v1"
+              path=f"stage2/replication_v2/{group}/group_index.json"
+              raw=subprocess.check_output([
+                  "gh","api",f"repos/{repo}/contents/{path}?ref={branch}","--jq",".content"
+              ], text=True)
+              import base64
+              payload=json.loads(base64.b64decode(raw).decode())
+              assert payload["group_id"]==group
+              assert payload["complete"] is True
+              assert payload["preserved_count"]==21
+              assert len(payload["expected_cells"])==21
+              assert payload["first_attempt_only"] is True
+              assert payload["repair_actions_during_A"]==0
+              assert payload["semantic_audit_state"]=="LOCKED_UNTIL_ALL_84_NATURAL_A_AND_REFERENCE_AUDIT_GATE"
+              assert payload["scientific_code_sha"]==science
+              rows.append({
+                  "group_id":group,
+                  "branch":branch,
+                  "path":path,
+                  "preserved_count":payload["preserved_count"],
+                  "index_sha256":hashlib.sha256(
+                      json.dumps(payload,sort_keys=True,separators=(",",":")).encode()
+                  ).hexdigest(),
+              })
+          out={
+              "schema":"stage2-g2-g5-84a-natural-block-index-v1",
+              "scientific_code_sha":science,
+              "groups":rows,
+              "group_count":4,
+              "natural_first_attempts":84,
+              "complete":True,
+              "first_attempt_only":True,
+              "repair_actions_during_A":0,
+              "semantic_audit_state":"READY_TO_OPEN_ONLY_AFTER_THIS_84A_SEAL",
+              "monitor_evaluation_state":"LOCKED_UNTIL_INDEPENDENT_SEMANTIC_REFERENCE_SEAL",
+              "engineering_B_state":"LOCKED",
+              "paid_evaluator_calls":0,
+          }
+          dest=Path("evidence/stage2/replication_v2/G2_G5_84A_block_index.json")
+          dest.parent.mkdir(parents=True,exist_ok=True)
+          dest.write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
+          print("PASS: G2-G5 84A natural block verified 84/84")
+          PY
+
+      - name: Freeze 84A block index
+        run: |
+          set -euo pipefail
+          git -C evidence config user.name "stage2-84a-seal-bot"
+          git -C evidence config user.email "stage2-84a-seal@users.noreply.github.com"
+          git -C evidence add stage2/replication_v2/G2_G5_84A_block_index.json
+          git -C evidence commit -m "evidence: seal G2-G5 84A natural block [run $GITHUB_RUN_ID]"
+          git -C evidence push origin HEAD:refs/heads/stage2-g5-natural-evidence-v1
