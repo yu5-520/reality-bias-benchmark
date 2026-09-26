@@ -69,6 +69,7 @@ def main():
     parser.add_argument("--mode", choices=["subject", "scripted"], default="subject")
     parser.add_argument("--script-file")
     parser.add_argument("--checkpoint-state-file", required=True)
+    parser.add_argument("--max-turns", type=int)
     args = parser.parse_args()
 
     runtime = SidecarCheckpointRoleRuntime(
@@ -78,6 +79,7 @@ def main():
         mode=args.mode,
         script_file=args.script_file,
         checkpoint_state_file=args.checkpoint_state_file,
+        max_turns=args.max_turns,
     )
     app = build_app(runtime=runtime, public_url=args.public_url)
     uvicorn.run(
