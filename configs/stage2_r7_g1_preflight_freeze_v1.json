@@ -1,0 +1,52 @@
+{
+  "schema": "RB-STAGE2-R7-G1-CHECKPOINT-HOOK-PREFLIGHT-FREEZE-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_NON_STUDY_PREFLIGHT_PASS_SUBJECT_EXECUTION_CLOSED",
+  "workflow_run_id": 36228869124,
+  "tested_head_sha": "89906fd4889ea812788befca27df0d4abf5357f8",
+  "provider_calls": 0,
+  "subject_calls": 0,
+  "active_repairs": 0,
+  "results": {
+    "STATIC_BOUNDARY": {
+      "status": "PASS",
+      "X1_mid_run": "UNPROVEN_FAIL_CLOSED",
+      "X3_mid_nested_call": "UNPROVEN_FAIL_CLOSED",
+      "A2A_protocol_modified": false
+    },
+    "X2_METAGPT": {
+      "status": "PASS",
+      "native_rounds": 7,
+      "scripted_model_decisions": 7,
+      "checkpoint_count": 9,
+      "control_flow_equivalent": true,
+      "checkout_equivalent": true,
+      "first_checkpoint_hash": "082c1cb99294678b7c72e299f223273f3f38fe6772e7747196e1bc6c345ca71f",
+      "last_checkpoint_hash": "41eff351bb40bfaff80605ae0df93b5303be29eaeea9dd112e28aabb21ed84d8"
+    },
+    "X4_X7_HOST": {
+      "status": "PASS",
+      "scripted_model_decisions": 7,
+      "checkpoint_count": 9,
+      "control_flow_equivalent": true,
+      "checkout_equivalent": true,
+      "foreign_carrier_mutation": false,
+      "first_checkpoint_hash": "481aa8a3a68e9b63a82189e077d3f924aa115a4662be71460d14e2d0bea4c60c",
+      "last_checkpoint_hash": "b6e29ce7d669a5eddfd43da3c8e2c5d04cb559b2df15a5f8653e201ae5cc9dcf"
+    }
+  },
+  "interpretation_boundary": [
+    "This is deterministic engineering preflight, not scientific subject evidence.",
+    "X2 and X4-X7 now have verified passive checkpoint insertion at natural outer-loop boundaries.",
+    "X1 AutoGen public save/load remains valid only at non-running or separately proven quiescent boundaries.",
+    "X3 A2A role-service state round-trips, but nested active call-stack restoration is not proven.",
+    "No blocked system may be made repairable by changing framework/protocol semantics."
+  ],
+  "authorization": {
+    "prospective_subject_provider_calls": false,
+    "active_repair_provider_calls": false,
+    "paid_evaluator_calls": false,
+    "next_operation": "IMPLEMENT_ONLINE_PREFIX_STRUCTURAL_MONITOR_AND_REPAIR_BOUNDARY_WATCHER_FOR_G1"
+  }
+}

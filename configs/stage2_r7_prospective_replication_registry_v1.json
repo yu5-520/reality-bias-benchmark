@@ -1,0 +1,28 @@
+{
+  "schema": "RB-STAGE2-R7-PROSPECTIVE-REPLICATION-REGISTRY-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_NAMING_AND_BINDING_POLICY",
+  "groups": {
+    "StageII-R7-G1": {
+      "role": "FIRST_PROSPECTIVE_CHECKPOINT_CAPABLE_REPAIR_VALIDATION_GROUP",
+      "state": "CONTRACT_PREPARED_SUBJECT_NOT_STARTED"
+    },
+    "StageII-R7-G2": {
+      "role": "FUTURE_PROSPECTIVE_REPLICATION_GROUP",
+      "state": "NOT_SCHEDULED"
+    },
+    "StageII-R7-G3": {
+      "role": "FUTURE_PROSPECTIVE_REPLICATION_GROUP",
+      "state": "NOT_SCHEDULED"
+    }
+  },
+  "rules": [
+    "A later group is new prospective evidence, never a retry of a prior output.",
+    "A group must bind framework/version, task, roles, subject, action contract, checkpoint schema, monitor rules, package rules and repair contract.",
+    "A change to any scientific input requires a new explicit contract version.",
+    "No group may replace, overwrite or back-fill an earlier group's raw evidence.",
+    "Replicate groups may be added only when scientifically or review-wise useful; repeated sampling is not used to manufacture determinism."
+  ],
+  "manifest_schema": "schemas/stage2_r7_g1_run_manifest_v1.schema.json"
+}
