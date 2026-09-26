@@ -1,0 +1,89 @@
+{
+  "schema": "RB-STAGE2-R7-G1-EXECUTION-READINESS-CONTRACT-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_READY_AWAITING_EXPLICIT_ACTIVE_EXECUTION_AUTHORIZATION",
+  "source_main_sha": "bbc4d0528aa86721acb4f19a08ad4167728806e4",
+  "launch_manifest": "configs/stage2_r7_g1_launch_manifest_v1.json",
+  "scientific_geometry": {
+    "historical_reference_cells": 21,
+    "new_prospective_cells": 15,
+    "active_systems": [
+      "X2",
+      "X4",
+      "X5",
+      "X6",
+      "X7"
+    ],
+    "active_tasks": [
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "first_attempt_only": true,
+    "natural_resampling": false,
+    "all_A_before_any_B": true,
+    "B_per_cell_max": 1,
+    "B_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+    "best_of_n": false,
+    "retry_for_reproducibility": false
+  },
+  "boundary_map": {
+    "X1": "REFERENCE_BASELINE_PLUS_CHECKPOINT_CONFORMANCE; MIDRUN_ACTIVE_REPAIR=CHECKPOINT_BOUNDARY_BLOCKED",
+    "X2": "PROSPECTIVE_ACTIVE_REPAIR_CAPABLE",
+    "X3": "REFERENCE_BASELINE_PLUS_CHECKPOINT_CONFORMANCE; NESTED_ACTIVE_REPAIR=CHECKPOINT_BOUNDARY_BLOCKED",
+    "X4": "PROSPECTIVE_ACTIVE_REPAIR_CAPABLE; MCP_BOUNDARY_UNCHANGED",
+    "X5": "PROSPECTIVE_ACTIVE_REPAIR_CAPABLE; RAG_INTERNAL_STATE_READ_ONLY",
+    "X6": "PROSPECTIVE_ACTIVE_REPAIR_CAPABLE; MEMORYBANK_INTERNAL_STATE_READ_ONLY",
+    "X7": "PROSPECTIVE_ACTIVE_REPAIR_CAPABLE; LONGLMLINGUA_INTERNAL_STATE_READ_ONLY"
+  },
+  "model_resource_ceiling": {
+    "per_trajectory_logical_model_invocations": 64,
+    "prospective_natural_cells": 15,
+    "natural_logical_invocation_ceiling": 960,
+    "active_B_branch_ceiling": 15,
+    "B_logical_invocation_ceiling": 960,
+    "group_logical_model_invocation_ceiling": 1920,
+    "transport_max_retries": 2,
+    "max_network_attempts_per_logical_invocation": 3,
+    "absolute_network_attempt_ceiling": 5760,
+    "note": "A B branch is additionally bounded by the remaining horizon frozen in its parent checkpoint, so the realized total should be lower than the hard ceiling."
+  },
+  "failure_policy": {
+    "provider_transport_failure": "FREEZE_FAILURE_RECORD_NO_NATURAL_RERUN",
+    "invalid_envelope": "NATIVE_SYSTEM_HANDLES_WITHIN_EXISTING_BUDGET",
+    "checkpoint_mismatch": "CHECKPOINT_ENVIRONMENT_MISMATCH_NO_B",
+    "checkpoint_boundary_gap": "CHECKPOINT_BOUNDARY_BLOCKED_NO_B",
+    "lineage_gap": "LINEAGE_GAP_BLOCKED_NO_B",
+    "safety_boundary_conflict": "SAFETY_BOUNDARY_BLOCKED_NO_B",
+    "preserve_set_drift": "PRESERVE_SET_MISMATCH_STOP_B",
+    "package_hash_mismatch": "PACKAGE_HASH_MISMATCH_STOP_B"
+  },
+  "evidence_ordering": {
+    "natural_A_repair_actions": 0,
+    "monitor_future_blind": true,
+    "package_frozen_before_B": true,
+    "natural_A_frozen_before_B": true,
+    "repair_executor_exits_after_one_package": true,
+    "post_repair_monitor_watch_only": true,
+    "semantic_audit_after_all_A_and_B_frozen": true
+  },
+  "immutable_boundaries": [
+    "NO_FRAMEWORK_SOURCE_MODIFICATION",
+    "NO_PROTOCOL_MODIFICATION",
+    "NO_NATIVE_SECURITY_BOUNDARY_BYPASS",
+    "NO_PRIVATE_RUNTIME_STATE_MUTATION",
+    "NO_MCP_BACKEND_DIRECT_MUTATION",
+    "NO_RAG_INTERNAL_MUTATION",
+    "NO_MEMORYBANK_INTERNAL_MUTATION",
+    "NO_LONGLMLINGUA_INTERNAL_MUTATION",
+    "NO_SEMANTIC_AUDIT_AS_REPAIR_INPUT"
+  ],
+  "authorization": {
+    "readiness_freeze": true,
+    "prospective_subject_provider_calls": false,
+    "active_repair_provider_calls": false,
+    "paid_evaluator_calls": false,
+    "next_operation": "EXPLICIT_ACTIVE_EXECUTION_AUTHORIZATION_THEN_PHASE_1_15_NATURAL_A"
+  }
+}
