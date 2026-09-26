@@ -18,55 +18,136 @@
     "monitor",
     "repair_packages",
     "provider_accounting",
-    "semantic_audit_state"
+    "semantic_audit_state",
+    "manifest_hash"
   ],
   "properties": {
-    "schema": {"const": "RB-STAGE2-R7-G1-RUN-MANIFEST-v1"},
-    "group_id": {"type": "string", "pattern": "^StageII-R7-G[0-9]+$"},
-    "cell_id": {"type": "string", "pattern": "^X[1-7]-T[1-3]$"},
-    "system_id": {"type": "string", "pattern": "^X[1-7]$"},
-    "task_id": {"enum": ["T1","T2","T3"]},
-    "natural_attempt_index": {"const": 1},
-    "framework_binding": {"type": "object"},
+    "schema": {
+      "const": "RB-STAGE2-R7-G1-RUN-MANIFEST-v1"
+    },
+    "group_id": {
+      "type": "string",
+      "pattern": "^StageII-R7-G[0-9]+$"
+    },
+    "cell_id": {
+      "type": "string",
+      "pattern": "^X[1-7]-T[1-3]$"
+    },
+    "system_id": {
+      "type": "string",
+      "pattern": "^X[1-7]$"
+    },
+    "task_id": {
+      "enum": [
+        "T1",
+        "T2",
+        "T3"
+      ]
+    },
+    "natural_attempt_index": {
+      "const": 1
+    },
+    "framework_binding": {
+      "type": "object"
+    },
     "input_bindings": {
       "type": "object",
-      "required": ["tasks_blob","roles_blob","subject_blob","action_contract_blob"],
+      "required": [
+        "tasks_blob",
+        "roles_blob",
+        "subject_blob",
+        "action_contract_blob"
+      ],
       "properties": {
-        "tasks_blob": {"type": "string"},
-        "roles_blob": {"type": "string"},
-        "subject_blob": {"type": "string"},
-        "action_contract_blob": {"type": "string"}
+        "tasks_blob": {
+          "type": "string"
+        },
+        "roles_blob": {
+          "type": "string"
+        },
+        "subject_blob": {
+          "type": "string"
+        },
+        "action_contract_blob": {
+          "type": "string"
+        }
       }
     },
     "checkpoint_ledger": {
       "type": "object",
-      "required": ["ref","sha256","full_checkpoint_count","environment_mismatch"],
+      "required": [
+        "ref",
+        "sha256",
+        "full_checkpoint_count",
+        "environment_mismatch"
+      ],
       "properties": {
-        "ref": {"type": "string"},
-        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "full_checkpoint_count": {"type": "integer", "minimum": 1},
-        "environment_mismatch": {"type": "boolean"}
+        "ref": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "full_checkpoint_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "environment_mismatch": {
+          "type": "boolean"
+        }
       }
     },
     "natural_A": {
       "type": "object",
-      "required": ["archive_ref","sha256","repair_actions","frozen"],
+      "required": [
+        "archive_ref",
+        "sha256",
+        "repair_actions",
+        "frozen"
+      ],
       "properties": {
-        "archive_ref": {"type": "string"},
-        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "repair_actions": {"const": 0},
-        "frozen": {"const": true}
+        "archive_ref": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "repair_actions": {
+          "const": 0
+        },
+        "frozen": {
+          "const": true
+        }
       }
     },
     "monitor": {
       "type": "object",
-      "required": ["future_blind","semantic_audit_input","cpr_input","output_ref","output_sha256"],
+      "required": [
+        "future_blind",
+        "semantic_audit_input",
+        "cpr_input",
+        "output_ref",
+        "output_sha256"
+      ],
       "properties": {
-        "future_blind": {"const": true},
-        "semantic_audit_input": {"const": false},
-        "cpr_input": {"const": false},
-        "output_ref": {"type": "string"},
-        "output_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        "future_blind": {
+          "const": true
+        },
+        "semantic_audit_input": {
+          "const": false
+        },
+        "cpr_input": {
+          "const": false
+        },
+        "output_ref": {
+          "type": "string"
+        },
+        "output_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
       }
     },
     "repair_packages": {
@@ -82,11 +163,27 @@
           "B_state"
         ],
         "properties": {
-          "package_id": {"type": "string"},
-          "package_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-          "gate_status": {"type": "string"},
-          "parent_checkpoint_hash": {"type": ["string","null"]},
-          "B_attempts": {"type": "integer", "minimum": 0, "maximum": 1},
+          "package_id": {
+            "type": "string"
+          },
+          "package_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "gate_status": {
+            "type": "string"
+          },
+          "parent_checkpoint_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "B_attempts": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1
+          },
           "B_state": {
             "enum": [
               "NOT_ELIGIBLE",
@@ -101,22 +198,53 @@
               "PACKAGE_HASH_MISMATCH"
             ]
           },
-          "B_archive_ref": {"type": ["string","null"]},
-          "B_sha256": {"type": ["string","null"]}
+          "B_archive_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "B_sha256": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
         }
       }
     },
     "provider_accounting": {
       "type": "object",
-      "required": ["natural_subject_calls","repair_subject_calls","paid_evaluator_calls"],
+      "required": [
+        "natural_subject_calls",
+        "repair_subject_calls",
+        "paid_evaluator_calls"
+      ],
       "properties": {
-        "natural_subject_calls": {"type": "integer", "minimum": 0},
-        "repair_subject_calls": {"type": "integer", "minimum": 0},
-        "paid_evaluator_calls": {"type": "integer", "minimum": 0}
+        "natural_subject_calls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "repair_subject_calls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "paid_evaluator_calls": {
+          "type": "integer",
+          "minimum": 0
+        }
       }
     },
     "semantic_audit_state": {
-      "enum": ["LOCKED_UNTIL_A_AND_B_FROZEN","READY_POSTHOC","COMPLETE"]
+      "enum": [
+        "LOCKED_UNTIL_A_AND_B_FROZEN",
+        "READY_POSTHOC",
+        "COMPLETE"
+      ]
+    },
+    "manifest_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
     }
   }
 }

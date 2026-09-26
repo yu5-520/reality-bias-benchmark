@@ -1,0 +1,25 @@
+{
+  "schema": "RB-STAGE2-R7-G1-PARENT-FREEZE-SEMANTICS-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_BEFORE_NATIVE_EVENT_INTEGRATION_PREFLIGHT",
+  "rule": "Checkpoint freshness is adjudicated when the first eligible monitor package is frozen. Later natural-A continuation does not invalidate the already-frozen historical parent checkpoint.",
+  "requirements_at_package_freeze": [
+    "FULL_NATIVE checkpoint exists at the exact legal boundary",
+    "no model decision occurred between checkpoint capture and candidate/package freeze",
+    "package binds checkpoint hash immutably",
+    "framework/protocol/foreign-state environment bindings match"
+  ],
+  "after_package_freeze": {
+    "natural_A_must_continue": true,
+    "later_A_model_decisions_may_occur": true,
+    "package_parent_hash_may_change": false,
+    "package_scope_may_expand": false,
+    "B_launch_after_A_freeze_may_restore_original_frozen_parent": true
+  },
+  "controller_api": {
+    "repair_parent_at_freeze": "returns the historically frozen parent after A has continued",
+    "repair_parent": "retains the stricter current-state check for callers that require the frozen parent to still be the current runtime state"
+  },
+  "non_claim": "This rule does not permit retroactive checkpoint reconstruction or stochastic prefix rerun."
+}

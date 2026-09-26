@@ -1,0 +1,87 @@
+name: Stage-II R7 G1 Native Event Integration Preflight
+
+on:
+  push:
+    branches:
+      - stage2-r7-g1-native-event-integration-v1
+    paths:
+      - "configs/stage2_r7_g1_parent_freeze_semantics_v1.json"
+      - "schemas/stage2_r7_g1_run_manifest_v1.schema.json"
+      - "stage2/r7_checkpoint_v1/controller.py"
+      - "stage2/r7_prospective_v1/runtime_event_adapter.py"
+      - "stage2/r7_prospective_v1/integration.py"
+      - "stage2/r7_prospective_v1/run_manifest.py"
+      - "stage2/r7_prospective_v1/native_event_integration_preflight.py"
+      - ".github/workflows/stage2-r7-g1-native-event-integration-preflight.yml"
+  pull_request:
+    paths:
+      - "configs/stage2_r7_g1_parent_freeze_semantics_v1.json"
+      - "schemas/stage2_r7_g1_run_manifest_v1.schema.json"
+      - "stage2/r7_checkpoint_v1/controller.py"
+      - "stage2/r7_prospective_v1/runtime_event_adapter.py"
+      - "stage2/r7_prospective_v1/integration.py"
+      - "stage2/r7_prospective_v1/run_manifest.py"
+      - "stage2/r7_prospective_v1/native_event_integration_preflight.py"
+      - ".github/workflows/stage2-r7-g1-native-event-integration-preflight.yml"
+  workflow_dispatch:
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m stage2.r7_prospective_v1.native_event_integration_preflight --system static --out-root preflight_static
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-g1-native-event-static-${{ github.run_id }}
+          path: preflight_static
+          retention-days: 30
+
+  x5-rag-host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m stage2.r7_prospective_v1.native_event_integration_preflight --system x5 --out-root preflight_x5
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-g1-native-event-x5-${{ github.run_id }}
+          path: preflight_x5
+          retention-days: 30
+
+  x2-metagpt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Bind pinned MetaGPT
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/FoundationAgents/MetaGPT upstream
+          git -C upstream checkout -q 11cdf466d042aece04fc6cfd13b28e1a70341b1f
+          test "$(git -C upstream rev-parse HEAD)" = 11cdf466d042aece04fc6cfd13b28e1a70341b1f
+          python -m pip install -q --upgrade pip
+          grep -v '^lancedb==0.4.0$' upstream/requirements.txt > /tmp/metagpt-requirements-stage2.txt
+          python -m pip install -q -r /tmp/metagpt-requirements-stage2.txt
+          python -m pip install -q 'pyarrow==14.0.2'
+          python -m pip install -q --no-deps -e upstream
+      - run: python -m stage2.r7_prospective_v1.native_event_integration_preflight --system x2 --out-root preflight_x2
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-g1-native-event-x2-${{ github.run_id }}
+          path: preflight_x2
+          retention-days: 30

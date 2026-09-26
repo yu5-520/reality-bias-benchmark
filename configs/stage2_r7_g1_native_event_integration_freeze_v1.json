@@ -1,0 +1,75 @@
+{
+  "schema": "RB-STAGE2-R7-G1-NATIVE-EVENT-INTEGRATION-FREEZE-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_NON_STUDY_INTEGRATION_PASS_SUBJECT_EXECUTION_CLOSED",
+  "workflow_run_id": 36230045769,
+  "tested_head_sha": "f9e9e7b3eb1a69d3e51c674e24545c24f789529d",
+  "provider_calls": 0,
+  "subject_calls": 0,
+  "active_repairs": 0,
+  "semantic_audit_input": false,
+  "cpr_input": false,
+  "results": {
+    "STATIC_BOUNDARY": {
+      "status": "PASS",
+      "X1_mid_run": "CHECKPOINT_BOUNDARY_BLOCKED",
+      "X3_nested_call": "CHECKPOINT_BOUNDARY_BLOCKED",
+      "historical_parent_survives_natural_A_continuation": true
+    },
+    "X2_METAGPT": {
+      "status": "PASS",
+      "native_rounds": 5,
+      "checkpoint_count": 7,
+      "structural_event_count": 6,
+      "candidate_count": 1,
+      "package_count": 1,
+      "complete_package_count": 1,
+      "control_flow_equivalent": true,
+      "checkout_equivalent": true,
+      "frozen_at_model_decision": 3,
+      "natural_A_final_model_decision": 5,
+      "historical_parent_available_after_A": true,
+      "strict_current_parent_blocked_after_A": true,
+      "frozen_parent_hash": "d691d1706181e2f0446c853d1d9c21a0be9bd9d0f03e1c169019114af6957367",
+      "run_manifest_hash": "dd073aaf44d7c6814847fbbbef0e0446f7e9f7e468067d25dfb45e642a23161f"
+    },
+    "X5_RAG_HOST": {
+      "status": "PASS",
+      "scripted_model_decisions": 5,
+      "checkpoint_count": 7,
+      "structural_event_count": 21,
+      "candidate_count": 4,
+      "package_count": 4,
+      "complete_package_count": 1,
+      "foreign_lineage_gap_count": 3,
+      "control_flow_equivalent": true,
+      "checkout_equivalent": true,
+      "frozen_at_model_decision": 3,
+      "natural_A_final_model_decision": 5,
+      "historical_parent_available_after_A": true,
+      "strict_current_parent_blocked_after_A": true,
+      "frozen_parent_hash": "e7ac2c57721af99ef0073cc624e8f644d4cf9f63343a1daabc47511e7e6e0261",
+      "run_manifest_hash": "02ed2c25a187986170265f4d8decb1aa318f7838d2011d85e190704c6c1113fa"
+    }
+  },
+  "runtime_bridge": {
+    "provider_response_identity": "RETURNED_UNCHANGED",
+    "action_copy_role": "PASSIVE_STRUCTURAL_EVIDENCE_ONLY",
+    "checkpoint_order": "CHECKPOINT_FIRST_THEN_FLUSH_COMPLETED_TURN_STRUCTURAL_COPY",
+    "foreign_carrier_temporal_proximity_implies_lineage": false,
+    "run_manifest_semantic_audit_state": "LOCKED_UNTIL_A_AND_B_FROZEN"
+  },
+  "parent_freeze_semantics": {
+    "freshness_checked_at_package_freeze": true,
+    "later_natural_A_continuation_invalidates_frozen_parent": false,
+    "later_natural_A_continuation_may_expand_package": false,
+    "B_after_A_freeze_may_restore_exact_frozen_parent": true
+  },
+  "authorization": {
+    "prospective_subject_provider_calls": false,
+    "active_repair_provider_calls": false,
+    "paid_evaluator_calls": false,
+    "next_operation": "FREEZE_G1_SCIENTIFIC_EXECUTION_READINESS_AND_SUBJECT_CALL_CEILING"
+  }
+}
