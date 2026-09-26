@@ -121,6 +121,7 @@ async def run_x3_natural_A(
 ):
     task, subject = _load_inputs(task_file, roles_file, subject_file)
     horizon = resolve_decision_horizon(group_id=group_id, subject=subject, requested=decision_horizon)
+    repair_contract_version = ("RB-STAGE2-R7-G1-PROSPECTIVE-REPAIR-CONTRACT-v1" if group_id == "StageII-R7-G1" else "RB-STAGE2-G2-G5-PROSPECTIVE-REPAIR-CONTRACT-v2")
     if mode == "subject" and not os.environ.get("DEEPSEEK_API_KEY"):
         raise RuntimeError("X3 prospective subject mode requires frozen DeepSeek credential")
     if mode == "scripted" and not script_file:
@@ -233,7 +234,7 @@ async def run_x3_natural_A(
             external_carrier_refs=[],
             restore_capability="FULL_NATIVE",
             replication_binding={
-                "repair_contract_version": "RB-STAGE2-R7-G1-PROSPECTIVE-REPAIR-CONTRACT-v1"
+                "repair_contract_version": repair_contract_version
             },
         )
 
@@ -282,7 +283,7 @@ async def run_x3_natural_A(
             external_carrier_refs=[],
             restore_capability="FULL_NATIVE",
             replication_binding={
-                "repair_contract_version": "RB-STAGE2-R7-G1-PROSPECTIVE-REPAIR-CONTRACT-v1"
+                "repair_contract_version": repair_contract_version
             },
         )
     finally:
