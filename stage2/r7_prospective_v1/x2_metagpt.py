@@ -40,12 +40,13 @@ async def run_task_with_checkpoints(
     observer_root=None,
     provider=None,
     checkpoint_hook=None,
+    decision_horizon=None,
 ):
     """MetaGPT-native task with callbacks only between env.run(k=1) rounds."""
 
     task, subject = _load_inputs(task_file, roles_file, subject_file)
     active_provider = provider if provider is not None else build_subject_provider(subject)
-    runtime = RuntimeState(max_turns=int(subject["limits"]["max_turns"]))
+    runtime = RuntimeState(max_turns=int(decision_horizon if decision_horizon is not None else subject["limits"]["max_turns"]))
     runtime.task = task
     checkout_api = MetaGPTCheckout(checkout)
     env = Environment(desc="Software Engineering")
