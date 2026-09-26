@@ -1,0 +1,61 @@
+{
+  "schema": "RB-STAGE2-R7-OFFLINE-MONITOR-FREEZE-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_OFFLINE_STRUCTURAL_MONITOR_AND_PACKAGE_POPULATION",
+  "source_main_sha": "d2ef2b4c964bb72fffa60b64a22d5a2a1dd05827",
+  "boundary_contract": "configs/stage2_r7_boundary_contract_v1.json",
+  "source_population": "configs/stage2_r7_21_path_source_freeze_v1.json",
+  "monitor_firewall": "configs/stage2_r7_monitor_input_firewall_v1.json",
+  "monitor_rules": "configs/stage2_r7_structural_monitor_rules_v1.json",
+  "package_assembly_rules": "configs/stage2_r7_package_assembly_rules_v1.json",
+  "repair_package_schema": "schemas/stage2_r7_monitor_derived_repair_package_v1.schema.json",
+  "outputs": {
+    "normalized_events": "stage2/r7_monitor_v1/normalized_structural_events.jsonl",
+    "structural_candidates": "stage2/r7_monitor_v1/structural_candidates.jsonl",
+    "candidate_scan_summary": "stage2/r7_monitor_v1/candidate_scan_summary.json",
+    "repair_packages": "stage2/r7_monitor_v1/monitor_derived_repair_packages.jsonl",
+    "parent_preflight": "stage2/r7_monitor_v1/parent_reconstruction_preflight.jsonl",
+    "summary": "stage2/r7_monitor_v1/summary.json",
+    "prefix_replay_report": "stage2/r7_monitor_v1/offline_prefix_replay_report_v1.md",
+    "package_assembly_report": "stage2/r7_monitor_v1/package_assembly_report_v1.md"
+  },
+  "accounting": {
+    "source_cells": 21,
+    "natural_reruns": 0,
+    "provider_calls": 0,
+    "evaluator_calls": 0,
+    "normalized_structural_events": 1120,
+    "raw_structural_candidate_signals": 244,
+    "cells_with_candidates": 15,
+    "assembled_structural_episodes": 24,
+    "package_cells": 15,
+    "repair_gate_counts": {
+      "PARENT_RECONSTRUCTION_BLOCKED": 16,
+      "LINEAGE_GAP_BLOCKED": 7,
+      "NO_REPAIR_REQUIRED": 1,
+      "COMPLETE_FOR_STRUCTURED_REPAIR": 0
+    }
+  },
+  "rule_counts": {
+    "MULTI_CONSUMER_ADDRESSABLE_REUSE": 101,
+    "REENTRY_OR_REUSE": 93,
+    "TERMINAL_OPEN_WITH_REUSE": 21,
+    "IMMUTABLE_CARRIER_REPEAT": 16,
+    "WRITE_THEN_REUSE": 11,
+    "CONTEXT_TRANSFORMATION_EXPOSURE": 2
+  },
+  "integrity": {
+    "semantic_audit_used_as_input": false,
+    "cpr_labels_used_as_input": false,
+    "future_evidence_used": false,
+    "case_specific_package_rules": false,
+    "framework_or_protocol_modified": false,
+    "foreign_information_state_mutated": false,
+    "active_repair_executed": false,
+    "summary_hash": "a7372e03200ea02a819f540953bf9d41a08a862625ba0876f8e8926721b7ad3d",
+    "candidate_scan_summary_hash": "64b29aa6d69a6ef4ffa3e437f7b5340684dcfea7248c05d1d0e882540c995e0a"
+  },
+  "decision": "HOLD_ACTIVE_REPAIR_PENDING_NATIVE_PARENT_RESUMABILITY_AND_DOWNSTREAM_LINEAGE_BINDING",
+  "next_operation": "FRAMEWORK_SPECIFIC_NATIVE_PARENT_RESUMABILITY_AND_RECONSTRUCTION_PROOF_NO_PROVIDER_CALL"
+}

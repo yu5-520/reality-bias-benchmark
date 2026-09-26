@@ -1,0 +1,39 @@
+name: Stage-II R7 Offline Monitor Validate
+
+on:
+  pull_request:
+    paths:
+      - "configs/stage2_r7_structural_monitor_rules_v1.json"
+      - "configs/stage2_r7_package_assembly_rules_v1.json"
+      - "scripts/run_stage2_r7_structural_monitor_v1.py"
+      - "scripts/assemble_stage2_r7_repair_packages_v1.py"
+      - "scripts/validate_stage2_r7_offline_monitor_v1.py"
+      - "stage2/r7_monitor_v1/**"
+      - "configs/stage2_r7_offline_monitor_freeze_v1.json"
+      - "docs/reports/2026-09-26/StageII_R7_Offline_Structural_Monitor_and_Repair_Package_Freeze_Report_v1.md"
+      - "docs/R_Plan_v7.37.md"
+      - "theory/change_notes/CN-R-111_stage2_r7_offline_monitor_freeze.md"
+      - ".github/workflows/stage2-r7-offline-monitor-validate.yml"
+  push:
+    branches: [main]
+    paths:
+      - "configs/stage2_r7_structural_monitor_rules_v1.json"
+      - "configs/stage2_r7_package_assembly_rules_v1.json"
+      - "scripts/run_stage2_r7_structural_monitor_v1.py"
+      - "scripts/assemble_stage2_r7_repair_packages_v1.py"
+      - "scripts/validate_stage2_r7_offline_monitor_v1.py"
+      - "stage2/r7_monitor_v1/**"
+      - "docs/R_Plan_v7.37.md"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate frozen Stage-II R7 monitor results
+        run: python scripts/validate_stage2_r7_offline_monitor_v1.py
