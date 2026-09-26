@@ -1,0 +1,40 @@
+{
+  "schema": "stage2-g4-x7-t2-preclaim-recovery-v1",
+  "version": "1.0",
+  "date_utc": "2026-09-26",
+  "status": "AUTHORIZED_INFRASTRUCTURE_RECOVERY_ONLY",
+  "group_id": "G4",
+  "cell_id": "X7-T2",
+  "scientific_code_sha": "b4f1441a48b2bc6a2c61035311419fc4509e8913",
+  "evidence_branch": "stage2-g4-natural-evidence-v1",
+  "authorization_issue": 251,
+  "failure_class": "PRE_CLAIM_INFRASTRUCTURE_HF_429",
+  "failed_workflow_run_id": 36245969662,
+  "failed_job_id": 108415120167,
+  "claim_tag": "stage2-g4-x7-t2-execution-claimed-v1",
+  "claim_observed_before_recovery": false,
+  "evidence_observed_before_recovery": false,
+  "allowed_change": "retry exact frozen X7 checkpoint validation before claim",
+  "forbidden_changes": [
+    "scientific code",
+    "model/provider configuration",
+    "task content",
+    "decision horizon",
+    "monitor version",
+    "semantic audit",
+    "repair B"
+  ],
+  "checkpoint": {
+    "model_id": "distilbert/distilgpt2",
+    "revision": "2290a62682d06624634c1f46a6ad5be0f47f38aa",
+    "manifest": "stage2/native_v7/study/x7_checkpoint_manifest.json",
+    "max_preclaim_attempts": 6,
+    "backoff_seconds": [
+      30,
+      60,
+      120,
+      180,
+      240
+    ]
+  }
+}
