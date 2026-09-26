@@ -1,0 +1,43 @@
+{
+  "schema": "RB-STAGE2-R7-G1-ONLINE-MONITOR-PREFLIGHT-FREEZE-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_OFFLINE_PREFLIGHT_PASS_SUBJECT_EXECUTION_CLOSED",
+  "workflow_run_id": 36229433474,
+  "tested_head_sha": "88fc27345de7590f3c157f11b4a8763190018d2b",
+  "provider_calls": 0,
+  "subject_calls": 0,
+  "active_repairs": 0,
+  "semantic_audit_input": false,
+  "cpr_input": false,
+  "results": {
+    "first_eligible_prefix_sequence": 2,
+    "package_checkpoint_hash": "ecdc451ce77661381da9af162bbf8cc96789c90e23753b39cc10f56fc0bd3e0e",
+    "package_hash": "c7e69c57e83dc65e4427375e54b7f268f4d14b611e25b9e999449527e8cadf16",
+    "future_event_package_immutability": "PASS",
+    "valid_repair_action_boundary": "PASS",
+    "repair_executor_exit": true,
+    "post_repair_watch_only": true,
+    "post_repair_action_violation": "POST_REPAIR_CONTINUOUS_REPAIR_FORBIDDEN",
+    "forbidden_foreign_mutation_violation": "FORBIDDEN_MUTATION_CLASS:RAG_INTERNAL_MUTATION",
+    "preserve_set_violation": "PRESERVE_SET_MISMATCH:file:tests/test_checkout.py",
+    "foreign_carrier_without_downstream_binding": "LINEAGE_GAP_BLOCKED",
+    "stale_checkpoint_gate": "CHECKPOINT_BOUNDARY_BLOCKED",
+    "watch_only_candidate_count": 1,
+    "watch_only_package_count": 0
+  },
+  "interpretation_boundary": [
+    "Synthetic structural events are engineering preflight only and are not Stage-II scientific evidence.",
+    "The monitor freezes a package at the first prefix-only structural trigger and later events cannot expand or rewrite it.",
+    "A COMPLETE repair package must bind an exact FULL_NATIVE checkpoint and legal native repair surface.",
+    "RAG/MemoryBank/LongLLMLingua carriers never become direct repair targets.",
+    "The repair boundary watcher fails closed on forbidden mutation classes and preserve-set drift.",
+    "After repair executor exit the monitor remains watch-only and cannot perform continuous repair."
+  ],
+  "authorization": {
+    "prospective_subject_provider_calls": false,
+    "active_repair_provider_calls": false,
+    "paid_evaluator_calls": false,
+    "next_operation": "WIRE_RUNTIME_STRUCTURAL_EVENT_ADAPTERS_INTO_G1_CHECKPOINT_BOUNDARIES_AND_RUN_NON_STUDY_INTEGRATION_PREFLIGHT"
+  }
+}
