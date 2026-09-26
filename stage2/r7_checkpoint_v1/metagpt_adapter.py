@@ -118,7 +118,32 @@ class MetaGPTNativeCheckpointAdapter:
         env.add_roles(restored_roles)
         round_trip = self.serialize_stage2_environment(env)
         if digest(round_trip) != digest(state):
-            raise RuntimeError("Stage-II MetaGPT environment/role state did not round-trip")
+            def first_diff(left, right, path="root"):
+                if type(left) is not type(right):
+                    return f"{path}:type:{type(left).__name__}!={type(right).__name__}"
+                if isinstance(left, dict):
+                    if set(left) != set(right):
+                        return f"{path}:keys:{sorted(set(left)^set(right))}"
+                    for key in sorted(left):
+                        found = first_diff(left[key], right[key], f"{path}.{key}")
+                        if found:
+                            return found
+                    return None
+                if isinstance(left, list):
+                    if len(left) != len(right):
+                        return f"{path}:len:{len(left)}!={len(right)}"
+                    for index, (lv, rv) in enumerate(zip(left, right)):
+                        found = first_diff(lv, rv, f"{path}[{index}]")
+                        if found:
+                            return found
+                    return None
+                if left != right:
+                    return f"{path}:value:{left!r}!={right!r}"
+                return None
+            raise RuntimeError(
+                "Stage-II MetaGPT environment/role state did not round-trip; "
+                + str(first_diff(state, round_trip))
+            )
         return env
 
     def capture(
