@@ -119,6 +119,7 @@ async def run_x1_natural_A(
 ):
     task, roles, subject = _load_inputs(task_file, roles_file, subject_file)
     horizon = resolve_decision_horizon(group_id=group_id, subject=subject, requested=decision_horizon)
+    repair_contract_version = ("RB-STAGE2-R7-G1-PROSPECTIVE-REPAIR-CONTRACT-v1" if group_id == "StageII-R7-G1" else "RB-STAGE2-G2-G5-PROSPECTIVE-REPAIR-CONTRACT-v2")
     out = Path(out_root)
     out.mkdir(parents=True, exist_ok=False)
     own_client = model_client is None
@@ -146,7 +147,7 @@ async def run_x1_natural_A(
         model_visible_context={"task_id": task["id"], "boundary": "before-team-run"},
         remaining_horizon=horizon,
         replication_binding={
-            "repair_contract_version": "RB-STAGE2-R7-G1-PROSPECTIVE-REPAIR-CONTRACT-v1"
+            "repair_contract_version": repair_contract_version
         },
     )
 
@@ -211,7 +212,7 @@ async def run_x1_natural_A(
         model_visible_context={"task_id": task["id"], "boundary": "after-team-run"},
         remaining_horizon=max(0, horizon - client.create_calls),
         replication_binding={
-            "repair_contract_version": "RB-STAGE2-R7-G1-PROSPECTIVE-REPAIR-CONTRACT-v1"
+            "repair_contract_version": repair_contract_version
         },
     )
     if own_client:
