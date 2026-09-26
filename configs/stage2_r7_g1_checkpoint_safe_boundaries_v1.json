@@ -1,0 +1,93 @@
+{
+  "schema": "RB-STAGE2-R7-G1-CHECKPOINT-SAFE-BOUNDARIES-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_BEFORE_G1_SUBJECT_RUN",
+  "source_main_sha": "91f7085bfe4e532c7b41b188630e6fa30a4c1cae",
+  "principle": "A checkpoint may be called FULL_NATIVE only at a boundary where the complete continuation parent can be saved/restored without private-state mutation, protocol modification, or stochastic prefix replay.",
+  "systems": {
+    "X1": {
+      "name": "AutoGen",
+      "adapter": "stage2.r7_checkpoint_v1.autogen_adapter.AutoGenNativeCheckpointAdapter",
+      "safe_full_boundaries": [
+        "BEFORE_TEAM_RUN_START",
+        "AFTER_TEAM_RUN_RETURNS"
+      ],
+      "mid_run_boundary": "UNPROVEN",
+      "reason": "Pinned AutoGen exposes Team.save_state/load_state, but upstream cautions that save_state while the team is running may be inconsistent. G1 must not infer a mid-run resumable parent from run_stream yields.",
+      "repair_parent_rule": "A monitor candidate arising after an uncheckpointed model decision is CHECKPOINT_BOUNDARY_BLOCKED until a separately frozen quiescent-native-boundary proof exists."
+    },
+    "X2": {
+      "name": "MetaGPT",
+      "adapter": "stage2.r7_checkpoint_v1.metagpt_adapter.MetaGPTNativeCheckpointAdapter",
+      "safe_full_boundaries": [
+        "BEFORE_FIRST_ENV_RUN",
+        "AFTER_EACH_ENV_RUN_K1_RETURN",
+        "TERMINAL"
+      ],
+      "mid_run_boundary": "VERIFIED_BY_RUNNER_GEOMETRY",
+      "reason": "The frozen runner advances MetaGPT with await env.run(k=1) inside an outer loop; the external checkpoint is captured only after that await returns, before the next round begins.",
+      "repair_parent_rule": "The first eligible package may use the checkpoint captured after the most recent completed env.run(k=1), only if no later model decision has occurred."
+    },
+    "X3": {
+      "name": "A2A",
+      "adapter": "stage2.r7_checkpoint_v1.a2a_adapter.A2ANativeCheckpointAdapter",
+      "safe_full_boundaries": [
+        "BEFORE_TOP_LEVEL_A2A_REQUEST",
+        "AFTER_TOP_LEVEL_A2A_REQUEST_RETURNS"
+      ],
+      "mid_nested_call_boundary": "UNPROVEN",
+      "reason": "Nine role-service session states round-trip, but a nested role return can occur while an ancestor A2A request is still active. G1 does not call such a partial call-stack state a global resumable parent.",
+      "repair_parent_rule": "A candidate inside an active nested request is CHECKPOINT_BOUNDARY_BLOCKED unless the complete active continuation frame is separately proven restorable without changing A2A."
+    },
+    "X4": {
+      "name": "MCP",
+      "adapter": "stage2.r7_checkpoint_v1.host_adapter.SoftwareHostCheckpointAdapter",
+      "safe_full_boundaries": [
+        "BEFORE_HOST_TURN",
+        "AFTER_HOST_TURN_RETURNS",
+        "TERMINAL"
+      ],
+      "foreign_boundary": "MCP protocol/server/tool/resource state is not checkpoint-mutated; only host/application state plus immutable MCP binding is saved."
+    },
+    "X5": {
+      "name": "RAG",
+      "adapter": "stage2.r7_checkpoint_v1.host_adapter.SoftwareHostCheckpointAdapter",
+      "safe_full_boundaries": [
+        "BEFORE_HOST_TURN",
+        "AFTER_HOST_TURN_RETURNS",
+        "TERMINAL"
+      ],
+      "foreign_boundary": "RAG corpus/index/embedding/retrieval structure is reference/hash only and never restored by mutation."
+    },
+    "X6": {
+      "name": "MemoryBank",
+      "adapter": "stage2.r7_checkpoint_v1.host_adapter.SoftwareHostCheckpointAdapter",
+      "safe_full_boundaries": [
+        "BEFORE_HOST_TURN",
+        "AFTER_HOST_TURN_RETURNS",
+        "TERMINAL"
+      ],
+      "foreign_boundary": "MemoryBank internal memory/index/strength/recall state is reference/hash only and never restored by mutation."
+    },
+    "X7": {
+      "name": "LongLLMLingua",
+      "adapter": "stage2.r7_checkpoint_v1.host_adapter.SoftwareHostCheckpointAdapter",
+      "safe_full_boundaries": [
+        "BEFORE_HOST_TURN",
+        "AFTER_HOST_TURN_RETURNS",
+        "TERMINAL"
+      ],
+      "foreign_boundary": "LongLLMLingua model/checkpoint/compression state is reference/hash only and never restored by mutation."
+    }
+  },
+  "global_rules": {
+    "checkpoint_after_every_model_decision_when_safe": true,
+    "first_eligible_candidate_requires_full_checkpoint": true,
+    "uncheckpointed_model_decision_after_parent": "CHECKPOINT_BOUNDARY_BLOCKED",
+    "foreign_carrier_hash_mismatch": "CHECKPOINT_ENVIRONMENT_MISMATCH",
+    "private_runtime_patch": "FORBIDDEN",
+    "protocol_patch": "FORBIDDEN",
+    "framework_patch": "FORBIDDEN"
+  }
+}
