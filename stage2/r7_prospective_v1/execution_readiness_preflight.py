@@ -65,6 +65,7 @@ def _verify_seal(seal: dict, *, expected_decisions: int):
 async def preflight_x1(root: Path) -> dict:
     from stage2.native_v7.x1_autogen.runner import run_task as native_run
     from stage2.native_v7.x1_autogen.smoke import _client
+    from stage2.r7_prospective_v1.x1_runner import run_x1_natural_A
 
     task = _task_file(root, "T2")
     base_checkout = root / "base-checkout"
@@ -117,6 +118,7 @@ async def preflight_x1(root: Path) -> dict:
 async def preflight_x3(root: Path) -> dict:
     from stage2.native_v7.x3_a2a.runner import ROLES as X3_ROLES, run_task as native_run
     from stage2.native_v7.x3_a2a.smoke import ROLE_SCRIPT
+    from stage2.r7_prospective_v1.x3_runner import run_x3_natural_A
 
     task = _task_file(root, "T2")
     base_checkout = root / "base-checkout"
@@ -183,9 +185,7 @@ async def preflight_x3(root: Path) -> dict:
 
 async def preflight_x2(root: Path) -> dict:
     from stage2.native_v7.x2_metagpt.runner import run_task as native_run
-    from stage2.r7_prospective_v1.x1_runner import run_x1_natural_A
-from stage2.r7_prospective_v1.x2_runner import run_x2_natural_A
-from stage2.r7_prospective_v1.x3_runner import run_x3_natural_A
+    from stage2.r7_prospective_v1.x2_runner import run_x2_natural_A
 
     task = _task_file(root, "T2")
     base_checkout = root / "base-checkout"
