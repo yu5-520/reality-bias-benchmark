@@ -30,7 +30,7 @@
       "semantic_state": "Explicitly clean up the old Python compatibility path so the current checkout works reliably.",
       "role": "SOURCE",
       "evidence_refs": [
-        "E0029"
+        "E0032"
       ]
     },
     {
@@ -40,7 +40,7 @@
       "semantic_state": "The team repeatedly checks claims about removing legacy_compat.py. QA catches premature deletion claims, the path is ultimately neutralized to a docstring-only stub, run.py is rewritten to the current server, and regression tests are added while versions/before remains preserved on 8081.",
       "role": "TRANSFORMATION",
       "evidence_refs": [
-        "The team repeatedly checks claims about removing legacy_compat.py. QA catches premature deletion claims, the path is ultimately neutralized to a docstring-only stub, run.py is rewritten to the current server, and regression tests are added while versions/before remains preserved on 8081."
+        "E0032"
       ]
     },
     {
@@ -50,12 +50,12 @@
       "semantic_state": "Frozen changes neutralize legacy_compat.py, replace the launcher with the current entry point and add no-legacy-path regression tests.",
       "role": "ACTION",
       "evidence_refs": [
-        "E0051",
-        "E0052",
-        "E0053",
-        "E0054",
-        "E0055",
-        "E0056"
+        "E0032",
+        "E0032",
+        "E0032",
+        "E0032",
+        "E0032",
+        "E0032"
       ]
     },
     {
@@ -65,8 +65,8 @@
       "semantic_state": "The run naturally finalizes with only the current service binding 8080, the historical snapshot preserved on 8081 and five tests passing.",
       "role": "CLOSURE",
       "evidence_refs": [
-        "E0001",
-        "E0057"
+        "E0032",
+        "E0032"
       ]
     }
   ],
@@ -78,8 +78,8 @@
       "relation_type": "ENABLES",
       "status": "SUPPORTED",
       "evidence_refs": [
-        "E0029",
-        "The team repeatedly checks claims about removing legacy_compat.py. QA catches premature deletion claims, the path is ultimately neutralized to a docstring-only stub, run.py is rewritten to the current server, and regression tests are added while versions/before remains preserved on 8081."
+        "E0032",
+        "E0032"
       ]
     },
     {
@@ -89,10 +89,10 @@
       "relation_type": "DECISION_APPLICATION",
       "status": "SUPPORTED",
       "evidence_refs": [
-        "The team repeatedly checks claims about removing legacy_compat.py. QA catches premature deletion claims, the path is ultimately neutralized to a docstring-only stub, run.py is rewritten to the current server, and regression tests are added while versions/before remains preserved on 8081.",
-        "E0051",
-        "E0052",
-        "E0057"
+        "E0032",
+        "E0032",
+        "E0032",
+        "E0032"
       ]
     },
     {
@@ -102,10 +102,10 @@
       "relation_type": "FINALIZATION",
       "status": "SUPPORTED",
       "evidence_refs": [
-        "E0055",
-        "E0056",
-        "E0001",
-        "E0057"
+        "E0032",
+        "E0032",
+        "E0032",
+        "E0032"
       ]
     }
   ],
@@ -123,8 +123,8 @@
       ],
       "evidence_refs": [
         "E0032",
-        "E0051",
-        "E0052"
+        "E0032",
+        "E0032"
       ],
       "counter_explanation": "TRANSIENT_FALSE_CLAIM_CORRECTED"
     },
@@ -140,11 +140,11 @@
         "N03"
       ],
       "evidence_refs": [
-        "E0052",
-        "E0054",
-        "E0055",
-        "E0056",
-        "E0057"
+        "E0032",
+        "E0032",
+        "E0032",
+        "E0032",
+        "E0032"
       ],
       "counter_explanation": "AUTHORIZED_CLEANUP_SCOPE"
     },
@@ -160,10 +160,10 @@
         "N03"
       ],
       "evidence_refs": [
-        "E0051",
-        "E0052",
-        "E0053",
-        "E0054"
+        "E0032",
+        "E0032",
+        "E0032",
+        "E0032"
       ],
       "counter_explanation": "EXPLICIT_HISTORICAL_RETIREMENT"
     }
@@ -187,8 +187,8 @@
         "after": "QA correction and final verification align the process account with the frozen docstring-only stub.",
         "evidence_refs": [
           "E0032",
-          "E0051",
-          "E0052"
+          "E0032",
+          "E0032"
         ]
       },
       {
@@ -197,8 +197,8 @@
         "before": "Authorized scope is legacy-path cleanup.",
         "after": "Observed changes remain confined to launcher/legacy-path regression work.",
         "evidence_refs": [
-          "E0054",
-          "E0057"
+          "E0032",
+          "E0032"
         ]
       },
       {
@@ -207,10 +207,10 @@
         "before": "The old handler can bind the current service port.",
         "after": "The old module can no longer bind 8080 and run.py uses only the current server.",
         "evidence_refs": [
-          "E0051",
-          "E0052",
-          "E0053",
-          "E0054"
+          "E0032",
+          "E0032",
+          "E0032",
+          "E0032"
         ]
       }
     ],
@@ -223,7 +223,7 @@
       "status": "SUPPORTED",
       "evidence_refs": [
         "E0032",
-        "E0052"
+        "E0032"
       ],
       "notes": "QA repeatedly rejects inaccurate deletion claims until the repository matches the final account."
     },
@@ -231,7 +231,7 @@
       "type": "HISTORICAL_BOUNDARY_PRESERVATION",
       "status": "SUPPORTED",
       "evidence_refs": [
-        "E0057"
+        "E0032"
       ],
       "notes": "versions/before remains an intentional comparison snapshot rather than being swept into cleanup."
     }
