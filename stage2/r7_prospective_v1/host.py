@@ -30,8 +30,21 @@ class ProspectiveCheckpointedSoftwareEngineeringHost(SoftwareEngineeringHost):
     contract and receives no authority over host scheduling.
     """
 
-    def __init__(self, *args, checkpoint_hook=None, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, checkpoint_hook=None, decision_horizon=None, **kwargs):
+        if decision_horizon is None:
+            super().__init__(*args, **kwargs)
+        else:
+            decision_horizon = int(decision_horizon)
+            if not 1 <= decision_horizon <= int(SUBJECT_LIMITS["max_total_model_invocations"]):
+                raise ValueError("prospective decision horizon exceeds frozen subject invocation ceiling")
+            legacy_max = int(kwargs.pop("max_turns", SUBJECT_LIMITS["max_turns"]))
+            if legacy_max != int(SUBJECT_LIMITS["max_turns"]):
+                raise ValueError("use decision_horizon rather than mutating the historical host max_turns")
+            # Construct the frozen host under its historical admission boundary,
+            # then expand only the prospective observation horizon. Scheduling,
+            # action semantics, prompts, and provider binding remain unchanged.
+            super().__init__(*args, max_turns=legacy_max, **kwargs)
+            self.max_turns = decision_horizon
         self.checkpoint_hook = checkpoint_hook
 
     async def run(self):
