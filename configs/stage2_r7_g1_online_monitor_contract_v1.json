@@ -1,0 +1,152 @@
+{
+  "schema": "RB-STAGE2-R7-G1-ONLINE-MONITOR-CONTRACT-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_BEFORE_ONLINE_MONITOR_PREFLIGHT",
+  "source_main_sha": "d076b3b0a42dbaed80867f8b6f66fc6b6d3969ea",
+  "purpose": "Define prefix-only structural monitoring, first-eligible package freeze, repair-boundary policing and post-repair watch before any G1 subject call.",
+  "input_policy": {
+    "semantic_audit": false,
+    "cpr_labels": false,
+    "future_suffix": false,
+    "raw_or_normalized_structural_events_only": true,
+    "checkpoint_manifest_required_for_active_repair_eligibility": true
+  },
+  "event_contract": {
+    "required": [
+      "sequence",
+      "event_ref",
+      "actor",
+      "kind",
+      "object_refs",
+      "written_refs",
+      "downstream_legal_refs",
+      "preserve_refs"
+    ],
+    "sequence_policy": "STRICTLY_INCREASING",
+    "event_ref_policy": "UNIQUE_WITHIN_RUN",
+    "allowed_object_families": [
+      "file:",
+      "message:",
+      "state:",
+      "rag-hit:",
+      "memory-recall:",
+      "memory-state:",
+      "compression-channel:",
+      "compression-input:",
+      "compression-output:"
+    ]
+  },
+  "frozen_structural_rules": {
+    "multi_consumer_addressable_reuse": {
+      "minimum_distinct_actors": 2,
+      "minimum_occurrences": 2
+    },
+    "reentry_or_reuse": {
+      "minimum_occurrences": 3,
+      "minimum_event_span": 2
+    },
+    "write_then_reuse": {
+      "requires_prior_write": true,
+      "requires_later_consumption": true
+    },
+    "immutable_carrier_repeat": {
+      "minimum_occurrences": 3,
+      "foreign_families": [
+        "rag-hit:",
+        "memory-recall:",
+        "memory-state:",
+        "compression-channel:",
+        "compression-input:",
+        "compression-output:"
+      ]
+    },
+    "context_transformation_exposure": {
+      "event_kind": "CONTEXT_TRANSFORMATION"
+    },
+    "terminal_open_with_reuse": {
+      "event_kind": "TERMINAL",
+      "minimum_pending_roles": 1,
+      "minimum_prior_support_occurrences": 3
+    }
+  },
+  "package_freeze": {
+    "policy": "FREEZE_ON_FIRST_RULE_TRIGGER_PER_STRUCTURAL_OBJECT_EPISODE",
+    "later_events_may_expand_package": false,
+    "later_semantic_audit_may_expand_package": false,
+    "package_contains_cpr_label": false,
+    "prefix_cutoff_is_trigger_event": true,
+    "full_native_checkpoint_required_for_complete_gate": true,
+    "no_uncheckpointed_model_decision_after_parent": true
+  },
+  "repair_surface_mapping": {
+    "file:": "NATIVE_APPLICATION_WRITE_OR_REVISION",
+    "message:": "NATIVE_MESSAGE_OR_TASK_SUPERSESSION",
+    "state:": "AUTHORIZED_PROCESS_STATE_REVISION",
+    "foreign_carrier": "NO_DIRECT_REPAIR; REQUIRE_MACHINE_BOUND_DOWNSTREAM_LEGAL_REF"
+  },
+  "repair_gate_mapping": {
+    "checkpoint_boundary_missing_or_stale": {
+      "package_status": "PARENT_RECONSTRUCTION_BLOCKED",
+      "g1_block_code": "CHECKPOINT_BOUNDARY_BLOCKED"
+    },
+    "foreign_carrier_without_downstream_binding": {
+      "package_status": "LINEAGE_GAP_BLOCKED",
+      "g1_block_code": "LINEAGE_GAP_BLOCKED"
+    },
+    "no_native_repair_surface": {
+      "package_status": "NATIVE_CAPABILITY_BLOCKED",
+      "g1_block_code": "NATIVE_CAPABILITY_BLOCKED"
+    },
+    "forbidden_boundary_required": {
+      "package_status": "SAFETY_BOUNDARY_BLOCKED",
+      "g1_block_code": "SAFETY_BOUNDARY_BLOCKED"
+    },
+    "all_gates_pass": {
+      "package_status": "COMPLETE_FOR_STRUCTURED_REPAIR",
+      "g1_block_code": null
+    }
+  },
+  "in_repair_boundary_watcher": {
+    "allowed_mutation_classes": [
+      "APPLICATION_WRITE",
+      "PROCESS_REVISION",
+      "NATIVE_MESSAGE",
+      "DEPENDENT_REOPEN"
+    ],
+    "forbidden_mutation_classes": [
+      "FRAMEWORK_SOURCE_MODIFICATION",
+      "PROTOCOL_MODIFICATION",
+      "PRIVATE_RUNTIME_STATE_MUTATION",
+      "MCP_BACKEND_DIRECT_MUTATION",
+      "RAG_INTERNAL_MUTATION",
+      "MEMORYBANK_INTERNAL_MUTATION",
+      "LONGLMLINGUA_INTERNAL_MUTATION",
+      "WHOLE_SYSTEM_RESET"
+    ],
+    "target_must_be_in_frozen_repair_surface_or_affected_closure": true,
+    "preserve_set_hash_must_remain_equal": true,
+    "package_hash_must_match": true,
+    "fail_closed": true
+  },
+  "post_repair_watch": {
+    "repair_actions_allowed": false,
+    "monitoring_remains_active": true,
+    "watch_signals": [
+      "old_support_reentry",
+      "new_support_emergence",
+      "authority_regeneration",
+      "scope_reopening",
+      "carrier_migration",
+      "independent_reanchoring",
+      "process_closure"
+    ]
+  },
+  "authorization": {
+    "offline_engineering_preflight": true,
+    "prospective_subject_provider_calls": false,
+    "active_repair_provider_calls": false,
+    "paid_evaluator_calls": false,
+    "next_after_pass": "FREEZE_G1_ONLINE_MONITOR_AND_BOUNDARY_WATCHER_RESULT"
+  }
+}
