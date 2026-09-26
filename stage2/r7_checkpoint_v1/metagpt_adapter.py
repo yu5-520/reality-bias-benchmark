@@ -69,6 +69,58 @@ class MetaGPTNativeCheckpointAdapter:
             raise RuntimeError("MetaGPT public environment serialization did not round-trip")
         return state
 
+
+    def serialize_stage2_environment(self, environment) -> dict[str, Any]:
+        """Serialize native MetaGPT environment/role state without Stage-II object pointers."""
+        env_state = environment.model_dump(mode="json")
+        env_state = copy.deepcopy(env_state)
+        env_state.pop("roles", None)
+        roles = []
+        for role in sorted(environment.roles.values(), key=lambda item: item.name):
+            roles.append({
+                "name": role.name,
+                "profile": role.profile,
+                "state": role.model_dump(mode="json"),
+            })
+        return {
+            "schema": "stage2-r7-metagpt-stage2-environment-state-v1",
+            "environment": env_state,
+            "roles": roles,
+        }
+
+    def restore_stage2_environment(
+        self,
+        *,
+        state: dict[str, Any],
+        environment_class,
+        role_class,
+        context,
+        runtime,
+        checkout_api,
+        directory: dict[str, Any],
+        entry: str,
+        llm_factory,
+    ):
+        if state.get("schema") != "stage2-r7-metagpt-stage2-environment-state-v1":
+            raise ValueError("unexpected Stage-II MetaGPT checkpoint schema")
+        env = environment_class(**copy.deepcopy(state["environment"]), context=context)
+        restored_roles = []
+        for row in state["roles"]:
+            role_state = copy.deepcopy(row["state"])
+            role_state.update({
+                "llm": llm_factory(row["name"]),
+                "stage2_runtime": runtime,
+                "stage2_checkout": checkout_api,
+                "stage2_directory": directory,
+                "stage2_entry": entry,
+            })
+            restored_roles.append(role_class(**role_state))
+        env.add_roles(restored_roles)
+        round_trip = self.serialize_stage2_environment(env)
+        if digest(round_trip) != digest(state):
+            raise RuntimeError("Stage-II MetaGPT environment/role state did not round-trip")
+        return env
+
     def capture(
         self,
         *,
