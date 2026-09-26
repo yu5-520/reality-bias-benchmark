@@ -1,0 +1,28 @@
+name: Stage-II General Chapter v1 Validation
+
+on:
+  pull_request:
+    paths:
+      - 'docs/reports/2026-09-26/StageII_General_Chapter_Process_Reality_Methodology_and_Hypotheses_v1.md'
+      - 'configs/stage2_general_chapter_claim_registry_v1.json'
+      - 'docs/reporting/process_reality_report_standard_v1_9.md'
+      - 'docs/R_Plan_v7.31.md'
+      - 'scripts/validate_stage2_general_chapter_v1.py'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/reports/2026-09-26/StageII_General_Chapter_Process_Reality_Methodology_and_Hypotheses_v1.md'
+      - 'configs/stage2_general_chapter_claim_registry_v1.json'
+      - 'docs/reporting/process_reality_report_standard_v1_9.md'
+      - 'docs/R_Plan_v7.31.md'
+      - 'scripts/validate_stage2_general_chapter_v1.py'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python scripts/validate_stage2_general_chapter_v1.py
