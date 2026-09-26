@@ -83,6 +83,19 @@ class ProspectiveCheckpointController:
         manifest = capture()
         return self.register_manifest(boundary=boundary, event_ref=event_ref, manifest=manifest)
 
+    def repair_parent_at_freeze(self) -> CheckpointPointer:
+        """Return the parent frozen at first eligibility, even after natural A continues.
+
+        Exactness is established when FIRST_MONITOR_REPAIR_ELIGIBLE is registered.
+        Later natural-A model decisions do not rewrite or stale that historical
+        checkpoint; they only mean it is no longer the *current* runtime state.
+        """
+        if self.first_eligible_checkpoint is None:
+            raise RuntimeError("no first eligible repair checkpoint has been frozen")
+        if self.first_eligible_checkpoint.restore_capability != "FULL_NATIVE":
+            raise RuntimeError("first eligible checkpoint is not FULL_NATIVE")
+        return self.first_eligible_checkpoint
+
     def repair_parent(self) -> CheckpointPointer:
         if self.first_eligible_checkpoint is None:
             raise RuntimeError("no first eligible repair checkpoint has been frozen")
