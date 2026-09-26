@@ -1,0 +1,30 @@
+name: Stage-II R7 Checkpoint Infrastructure Validate
+
+on:
+  pull_request:
+    paths:
+      - "configs/stage2_r7_checkpoint_contract_v1.json"
+      - "configs/stage2_r7_checkpoint_conformance_freeze_v1.json"
+      - "schemas/stage2_r7_checkpoint_manifest_v1.schema.json"
+      - "stage2/r7_checkpoint_v1/**"
+      - "scripts/validate_stage2_r7_checkpoint_infrastructure_v1.py"
+      - "docs/StageII_R7_Prospective_Checkpoint_Infrastructure_v1.0.md"
+      - "docs/reports/2026-09-26/StageII_R7_Prospective_Checkpoint_Conformance_Report_v1.md"
+      - "docs/R_Plan_v7.39.md"
+      - "theory/change_notes/CN-R-113_stage2_r7_checkpoint_infrastructure_freeze.md"
+      - ".github/workflows/stage2-r7-checkpoint-infrastructure-validate.yml"
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate prospective checkpoint freeze
+        run: python scripts/validate_stage2_r7_checkpoint_infrastructure_v1.py
