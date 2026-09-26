@@ -215,6 +215,15 @@ jobs:
           rm -rf /tmp/stage2-x7-study
           (cd science && python -m stage2.study_assets.validate --probe X7 --out-root /tmp/stage2-x7-study)
 
+      - name: Verify subject credential injected before claim
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$DEEPSEEK_API_KEY"
+          echo "PASS: subject credential is present; no provider call made"
+
       - name: Irrevocably claim first attempt
         id: claim
         env:
@@ -270,7 +279,7 @@ jobs:
           printf '%s\n' "$AUTH_ISSUE" > "$LOG_ROOT/authorization_issue.txt"
           printf '%s\n' "${{ github.run_id }}" > "$LOG_ROOT/workflow_run_id.txt"
           printf '%s\n' "$CELL" > "$LOG_ROOT/cell_id.txt"
-          export PYTHONPATH="$GITHUB_WORKSPACE/science:$PYTHONPATH"
+          if [ -n "${PYTHONPATH-}" ]; then export PYTHONPATH="$GITHUB_WORKSPACE/science:$PYTHONPATH"; else export PYTHONPATH="$GITHUB_WORKSPACE/science"; fi
           export TOKENIZERS_PARALLELISM=false
           export HF_HUB_OFFLINE=1
           export TRANSFORMERS_OFFLINE=1
@@ -363,7 +372,7 @@ jobs:
           })
           Path(os.environ["RECEIPT"]).write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n")
           PY
-          git -C control fetch -q origin "$EVIDENCE_BRANCH"
+          git -C control fetch -q origin "$EVIDENCE_BRANCH:refs/remotes/origin/$EVIDENCE_BRANCH"
           rm -rf /tmp/stage2-g2-evidence
           git -C control worktree add --detach /tmp/stage2-g2-evidence "origin/$EVIDENCE_BRANCH"
           DEST="/tmp/stage2-g2-evidence/stage2/replication_v2/G2/natural_A/$CELL"
@@ -415,7 +424,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git -C control fetch -q origin "$EVIDENCE_BRANCH"
+          git -C control fetch -q origin "$EVIDENCE_BRANCH:refs/remotes/origin/$EVIDENCE_BRANCH"
           rm -rf /tmp/stage2-g2-evidence
           git -C control worktree add --detach /tmp/stage2-g2-evidence "origin/$EVIDENCE_BRANCH"
           export ROOT=/tmp/stage2-g2-evidence
