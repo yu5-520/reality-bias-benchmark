@@ -1,0 +1,254 @@
+name: Stage-II GPT-5.6 Sol Full-Context Input Freeze v1
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/stage2-gpt56sol-full-context-input-freeze.yml'
+      - 'docs/R_Plan_v7.48.md'
+      - 'configs/stage2_gpt56sol_full_context_audit_v1.json'
+      - 'configs/stage2_deepseek_full_context_pilot_disposition_v1.json'
+      - 'arena/build_stage2_full_context_semantic_packets.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/stage2-gpt56sol-full-context-input-freeze.yml'
+      - 'docs/R_Plan_v7.48.md'
+      - 'configs/stage2_gpt56sol_full_context_audit_v1.json'
+      - 'configs/stage2_deepseek_full_context_pilot_disposition_v1.json'
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-gpt56sol-full-context-input-freeze-v1
+  cancel-in-progress: false
+
+env:
+  AUTH_ISSUE: "274"
+  OUTPUT_BRANCH: stage2-gpt56sol-full-context-audit-results-v1
+  OUTPUT_ROOT: stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1
+
+jobs:
+  offline-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile packet builder
+        run: |
+          set -euo pipefail
+          python -m py_compile arena/build_stage2_full_context_semantic_packets.py
+      - name: Validate formal reviewer split
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          cfg=json.load(open("configs/stage2_gpt56sol_full_context_audit_v1.json"))
+          pilot=json.load(open("configs/stage2_deepseek_full_context_pilot_disposition_v1.json"))
+          assert cfg["status"]=="AUTHORIZED_FORMAL_LAYER_C"
+          assert cfg["authorization_issue"]==274
+          assert cfg["reviewer"]["model"]=="GPT-5.6 Sol"
+          assert cfg["reviewer"]["execution_mode"]=="CHATGPT_NATIVE_REASONING"
+          assert cfg["reviewer"]["deepseek_api_used_for_formal_layer_c"] is False
+          assert cfg["population"]["natural_total"]==84
+          assert cfg["population"]["formal_full_context_eligible"]==80
+          assert len(cfg["population"]["eligible_cells"])==80
+          assert len(set(cfg["population"]["eligible_cells"]))==80
+          assert cfg["inputs"]["monitor_runtime_bundle_access"] is False
+          assert cfg["inputs"]["blind_reference_labels_access"] is False
+          assert cfg["inputs"]["blind_reference_records_access"] is False
+          assert cfg["inputs"]["deepseek_full_context_pilot_outputs_access"] is False
+          assert cfg["prohibited_actions"]["deepseek_formal_layer_c_calls"] is False
+          assert cfg["prohibited_actions"]["subject_calls"] is False
+          assert cfg["prohibited_actions"]["subject_reruns"] is False
+          assert cfg["prohibited_actions"]["monitor_evaluation"] is False
+          assert cfg["prohibited_actions"]["repair_calls"] is False
+          assert pilot["status"]=="ABORTED_DEVELOPMENT_PILOT_ONLY"
+          assert "formal Layer-C denominator" in pilot["prohibited_uses"]
+          print("PASS: reviewer split and pilot exclusion frozen")
+          PY
+
+  freeze-inputs:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: offline-preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout control plane
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: control
+          fetch-depth: 1
+
+      - name: Checkout G2 frozen evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g2-natural-evidence-v1
+          path: g2
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G2/natural_A
+            stage2/replication_v2/G2/group_index.json
+
+      - name: Checkout G3 frozen evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g3-natural-evidence-v1
+          path: g3
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G3/natural_A
+            stage2/replication_v2/G3/group_index.json
+
+      - name: Checkout G4 frozen evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g4-natural-evidence-v1
+          path: g4
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G4/natural_A
+            stage2/replication_v2/G4/group_index.json
+
+      - name: Checkout G5 frozen evidence and 84A seal
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g5-natural-evidence-v1
+          path: g5
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G5/natural_A
+            stage2/replication_v2/G5/group_index.json
+            stage2/replication_v2/G2_G5_84A_block_index.json
+
+      - name: Checkout formal Layer-C result branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-gpt56sol-full-context-audit-results-v1
+          path: results
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify formal authorization and evidence gates
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          python - <<'PY'
+          import base64,json,os,subprocess
+          cfg=json.load(open("control/configs/stage2_gpt56sol_full_context_audit_v1.json"))
+          issue=json.loads(subprocess.check_output([
+            "gh","api",f'repos/{os.environ["GITHUB_REPOSITORY"]}/issues/{os.environ["AUTH_ISSUE"]}'
+          ],text=True))
+          assert issue["user"]["login"]=="yu5-520"
+          assert issue["title"]=="STAGE2 GPT-5.6 SOL FULL-CONTEXT PROCESS-SEMANTIC AUDIT AUTHORIZATION"
+          required={
+            "reviewer=GPT-5.6_SOL",
+            "reviewer_execution_mode=CHATGPT_NATIVE_REASONING",
+            "deepseek_full_context_api_calls=false",
+            "monitor_runtime_bundle_access=false",
+            "blind_reference_labels_access=false",
+            "blind_reference_records_access=false",
+            "deepseek_full_context_pilot_outputs_access=false",
+            "subject_calls=false",
+            "subject_reruns=false",
+            "repair_calls=false",
+            "monitor_evaluation=false",
+            "full_context_eligible=80",
+            "pilot_outputs_excluded_from_formal_denominator=true"
+          }
+          lines=set(x.strip() for x in issue["body"].splitlines() if x.strip())
+          assert required <= lines
+
+          block=json.load(open("g5/stage2/replication_v2/G2_G5_84A_block_index.json"))
+          assert block["complete"] is True and block["natural_first_attempts"]==84
+          assert block["repair_actions_during_A"]==0
+          assert block["engineering_B_state"]=="LOCKED"
+
+          gate=cfg["inputs"]["blind_reference_seal_gate"]
+          api=f'repos/{os.environ["GITHUB_REPOSITORY"]}/contents/{gate["path"]}?ref={gate["branch"]}'
+          seal_obj=json.loads(subprocess.check_output(["gh","api",api],text=True))
+          assert seal_obj["sha"]==gate["blob_sha"]
+          seal=json.loads(base64.b64decode(seal_obj["content"]))
+          assert seal["status"]=="SEALED" and seal["monitor_blind"] is True
+          print("PASS: formal GPT-5.6 Sol input gates verified without reading blind labels")
+          PY
+
+      - name: Build exactly 80 formal GPT-5.6 Sol input packets
+        run: |
+          set -euo pipefail
+          target="results/$OUTPUT_ROOT"
+          rm -rf "$target/inputs"
+          mkdir -p "$target/inputs"
+          python control/arena/build_stage2_full_context_semantic_packets.py \
+            --g2 g2 --g3 g3 --g4 g4 --g5 g5 \
+            --config control/configs/stage2_gpt56sol_full_context_audit_v1.json \
+            --out "$target/inputs"
+          python - <<'PY'
+          import hashlib,json,os
+          root=f'results/{os.environ["OUTPUT_ROOT"]}'
+          ix=json.load(open(root+"/inputs/packet_index.json"))
+          assert ix["eligible_cell_count"]==80
+          assert ix["monitor_runtime_bundle_read"] is False
+          assert ix["blind_reference_labels_read"] is False
+          manifest={
+            "schema":"stage2-gpt56sol-full-context-input-freeze-v1",
+            "status":"SEALED_INPUTS_READY_FOR_GPT56SOL_REVIEW",
+            "formal_reviewer":"GPT-5.6 Sol",
+            "execution_mode":"CHATGPT_NATIVE_REASONING",
+            "cell_count":80,
+            "monitor_runtime_bundle_read":False,
+            "blind_reference_labels_read":False,
+            "blind_reference_records_read":False,
+            "deepseek_full_context_pilot_outputs_read":False,
+            "deepseek_api_calls":0,
+            "subject_calls":0,
+            "subject_reruns":0,
+            "repair_calls":0,
+            "monitor_evaluation":False,
+            "packet_index_sha256":hashlib.sha256(open(root+"/inputs/packet_index.json","rb").read()).hexdigest()
+          }
+          open(root+"/formal_input_freeze.json","w").write(json.dumps(manifest,indent=2,sort_keys=True)+"\n")
+          print(json.dumps(manifest,sort_keys=True))
+          PY
+
+      - name: Persist formal GPT-5.6 Sol inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C results config user.name "stage2-gpt56sol-input-freeze-bot"
+          git -C results config user.email "stage2-gpt56sol-input-freeze@users.noreply.github.com"
+          git -C results add "$OUTPUT_ROOT"
+          if ! git -C results diff --cached --quiet; then
+            git -C results commit -m "audit: freeze GPT-5.6 Sol Layer-C inputs [run $GITHUB_RUN_ID]"
+            git -C results push origin "HEAD:refs/heads/$OUTPUT_BRANCH"
+          fi
+
+      - name: Upload redundant formal input artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-gpt56sol-full-context-inputs-${{ github.run_id }}
+          path: results/stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Mark formal input freeze ready
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --body "Formal GPT-5.6 Sol Layer-C input freeze completed: 80 hashed packets are ready on branch `$OUTPUT_BRANCH`. No evaluator API, monitor output, blind-reference labels, subject rerun, repair, or monitor evaluation was used."
