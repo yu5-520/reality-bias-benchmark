@@ -4,6 +4,10 @@ on:
   workflow_run:
     workflows: ["Stage-II G2 21A Active Natural Execution v1"]
     types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/stage2-g3-21a-active-natural.yml"
 
 permissions:
   contents: write
@@ -28,11 +32,19 @@ jobs:
       - name: Verify G2 21/21 evidence seal before G3
         env:
           GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
           PREV_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
         shell: bash
         run: |
           set -euo pipefail
-          test "$PREV_CONCLUSION" = success
+          if [ "$EVENT_NAME" = workflow_run ]; then
+            test "$PREV_CONCLUSION" = success
+          elif [ "$EVENT_NAME" = push ]; then
+            echo "Recovery push: previous-group completion is revalidated from frozen evidence."
+          else
+            echo "Unsupported trigger: $EVENT_NAME"
+            exit 2
+          fi
           gh api "repos/$GITHUB_REPOSITORY/contents/stage2/replication_v2/G2/group_index.json?ref=stage2-g2-natural-evidence-v1" --jq .content | base64 -d > /tmp/previous_group_index.json
           python - <<'PY'
           import json
