@@ -162,9 +162,18 @@ def smoke_metagpt(destination: Path) -> dict:
     )
     os.environ["HOME"] = str(bootstrap)
 
+    from metagpt.actions import UserRequirement
     from metagpt.environment import Environment
     from metagpt.schema import Message
 
+    from stage2.native_v7.x2_metagpt.checkout import MetaGPTCheckout
+    from stage2.native_v7.x2_metagpt.runner import (
+        DIRECTORY as META_DIRECTORY,
+        ROLES as META_ROLES,
+        RuntimeState,
+        Stage2MetaRole,
+        Stage2ProviderLLM,
+    )
     from stage2.r7_checkpoint_v1.metagpt_adapter import (
         MetaGPTNativeCheckpointAdapter,
         restore_runtime_state,
@@ -175,6 +184,7 @@ def smoke_metagpt(destination: Path) -> dict:
     registry = _registry(destination)
     adapter = MetaGPTNativeCheckpointAdapter()
 
+    # First verify the pinned upstream Environment public serialization contract.
     environment = Environment()
     environment.publish_message(Message(content="checkpoint-smoke"))
     native = adapter.validate_environment_round_trip(
@@ -182,15 +192,75 @@ def smoke_metagpt(destination: Path) -> dict:
         environment_class=Environment,
         context=environment.context,
     )
-
-    runtime = SimpleNamespace(
-        max_turns=32,
-        turns=3,
-        answer=None,
-        stop_reason=None,
-        history=[{"turn": 1, "role": "release_lead"}],
-        task={"id": "T2", "user_request": "smoke"},
+    restored_env = adapter.restore_environment(
+        environment_class=Environment,
+        state=native,
+        context=environment.context,
     )
+    if digest(adapter.serialize_environment(restored_env)) != digest(native):
+        raise RuntimeError("MetaGPT environment did not restore from public serialization")
+
+    # Then verify the actual Stage-II role/environment envelope without calling a model.
+    task = next(
+        row for row in json.loads((STAGE2 / "tasks.json").read_text())["tasks"]
+        if row["id"] == "T2"
+    )
+    runtime = RuntimeState(max_turns=32)
+    runtime.task = task
+    checkout_api = MetaGPTCheckout(checkout)
+    provider = ScriptedProvider([{"actions": [{"type": "finalize", "answer": "unused"}]}])
+    stage2_env = Environment(desc="Software Engineering")
+    stage2_roles = [
+        Stage2MetaRole(
+            name=row["id"],
+            profile=row["role"],
+            goal=row["responsibility"],
+            llm=Stage2ProviderLLM(provider),
+            stage2_runtime=runtime,
+            stage2_checkout=checkout_api,
+            stage2_directory=META_DIRECTORY,
+            stage2_entry=META_ROLES["entry_agent"],
+        )
+        for row in META_ROLES["agents"]
+    ]
+    stage2_env.add_roles(stage2_roles)
+    stage2_env.publish_message(
+        Message(
+            content=task["user_request"],
+            role="user",
+            sent_from="USER",
+            send_to={META_ROLES["entry_agent"]},
+            cause_by=UserRequirement,
+            metadata={"kind": "user_request"},
+        )
+    )
+    stage2_state = adapter.serialize_stage2_environment(stage2_env)
+
+    runtime2 = RuntimeState(max_turns=32)
+    runtime2.task = task
+    checkout_api2 = MetaGPTCheckout(checkout)
+    provider2 = ScriptedProvider([{"actions": [{"type": "finalize", "answer": "unused"}]}])
+    restored_stage2_env = adapter.restore_stage2_environment(
+        state=stage2_state,
+        environment_class=Environment,
+        role_class=Stage2MetaRole,
+        context=stage2_env.context,
+        runtime=runtime2,
+        checkout_api=checkout_api2,
+        directory=META_DIRECTORY,
+        entry=META_ROLES["entry_agent"],
+        llm_factory=lambda _role: Stage2ProviderLLM(provider2),
+    )
+    if digest(adapter.serialize_stage2_environment(restored_stage2_env)) != digest(stage2_state):
+        raise RuntimeError("Stage-II MetaGPT role/environment state did not restore")
+
+    runtime.turns = 3
+    runtime.history = [{"turn": 1, "role": "release_lead"}]
+    runtime_payload = runtime_state_payload(runtime)
+    restore_runtime_state(runtime2, runtime_payload)
+    if digest(runtime_state_payload(runtime2)) != digest(runtime_payload):
+        raise RuntimeError("Stage-II MetaGPT runtime envelope did not round-trip")
+
     manifest = registry.capture(
         system_id="X2_METAGPT",
         group_id="SMOKE",
@@ -200,8 +270,8 @@ def smoke_metagpt(destination: Path) -> dict:
         adapter_id="stage2-r7-metagpt-native-checkpoint-v1",
         framework_binding=adapter.framework_binding,
         native_state={
-            "environment": native,
-            "stage2_runtime": runtime_state_payload(runtime),
+            "stage2_environment": stage2_state,
+            "stage2_runtime": runtime_payload,
         },
         application_root=checkout,
         model_visible_context={"role": "release_lead", "turn": 3},
@@ -210,27 +280,13 @@ def smoke_metagpt(destination: Path) -> dict:
         replication_binding=_replication_binding(),
     )
 
-    restored_env = adapter.restore_environment(
-        environment_class=Environment,
-        state=native,
-        context=environment.context,
-    )
-    if digest(adapter.serialize_environment(restored_env)) != digest(native):
-        raise RuntimeError("MetaGPT environment did not restore from public serialization")
-
-    runtime2 = SimpleNamespace(
-        max_turns=1, turns=0, answer="wrong", stop_reason="wrong", history=[], task=None
-    )
-    restore_runtime_state(runtime2, runtime_state_payload(runtime))
-    if digest(runtime_state_payload(runtime2)) != digest(runtime_state_payload(runtime)):
-        raise RuntimeError("Stage-II MetaGPT runtime envelope did not round-trip")
-
     return {
         "schema": "stage2-r7-metagpt-checkpoint-smoke-v1",
         "status": "PASS",
         "native_api": ["Environment.model_dump", "Environment(**state, context=context)"],
         "checkpoint_hash": manifest["checkpoint_hash"],
         "environment_round_trip": "PASS",
+        "stage2_role_environment_round_trip": "PASS",
         "stage2_runtime_envelope_round_trip": "PASS",
         "provider_calls": 0,
     }
