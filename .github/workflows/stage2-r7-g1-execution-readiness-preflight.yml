@@ -22,6 +22,59 @@ on:
   workflow_dispatch:
 
 jobs:
+  x1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Bind exact frozen AutoGen
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/microsoft/autogen upstream
+          git -C upstream checkout -q 027ecf0a379bcc1d09956d46d12d44a3ad9cee14
+          test "$(git -C upstream rev-parse HEAD)" = 027ecf0a379bcc1d09956d46d12d44a3ad9cee14
+          pip install -q ./upstream/python/packages/autogen-core ./upstream/python/packages/autogen-agentchat './upstream/python/packages/autogen-ext[openai]'
+      - name: Run X1 prospective production-wrapper preflight
+        run: python -m stage2.r7_prospective_v1.execution_readiness_preflight --system X1 --out-root readiness_x1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-g1-readiness-x1-${{ github.run_id }}
+          path: readiness_x1
+          retention-days: 30
+
+  x3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Bind exact frozen A2A protocol and SDK
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/a2aproject/a2a-python upstream
+          git -C upstream checkout -q 0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167
+          test "$(git -C upstream rev-parse HEAD)" = 0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167
+          pip install -q -e './upstream[http-server]' 'uvicorn>=0.35.0'
+          git clone -q https://github.com/a2aproject/A2A protocol
+          git -C protocol checkout -q 173695755607e884aa9acf8ce4feed90e32727a1
+          test "$(git -C protocol rev-parse HEAD)" = 173695755607e884aa9acf8ce4feed90e32727a1
+      - name: Run X3 prospective sidecar checkpoint preflight
+        run: python -m stage2.r7_prospective_v1.execution_readiness_preflight --system X3 --out-root readiness_x3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-g1-readiness-x3-${{ github.run_id }}
+          path: readiness_x3
+          retention-days: 30
+
   x2:
     runs-on: ubuntu-latest
     timeout-minutes: 60
