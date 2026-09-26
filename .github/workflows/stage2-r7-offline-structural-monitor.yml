@@ -47,6 +47,8 @@ jobs:
           for token in forbidden:
               assert token not in body, token
           PY
+      - name: Validate final offline monitor freeze
+        run: python scripts/validate_stage2_r7_offline_monitor_v1.py
       - name: Commit frozen offline results
         run: |
           git config user.name "github-actions[bot]"
