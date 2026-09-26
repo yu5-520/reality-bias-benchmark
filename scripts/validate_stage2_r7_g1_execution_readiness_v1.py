@@ -10,7 +10,9 @@ FREEZE = ROOT / "configs/stage2_r7_g1_execution_readiness_freeze_v1.json"
 SUBJECT = ROOT / "stage2/subject.json"
 PLAN = ROOT / "docs/R_Plan_v7.43.md"
 REPORT = ROOT / "docs/reports/2026-09-26/StageII_R7_G1_Scientific_Execution_Readiness_Report_v1.md"
+X1 = ROOT / "stage2/r7_prospective_v1/x1_runner.py"
 X2 = ROOT / "stage2/r7_prospective_v1/x2_runner.py"
+X3 = ROOT / "stage2/r7_prospective_v1/x3_runner.py"
 CAP = ROOT / "stage2/r7_prospective_v1/capability_runner.py"
 
 
@@ -76,28 +78,39 @@ def main():
 
     require(freeze["schema"] == "RB-STAGE2-R7-G1-EXECUTION-READINESS-FREEZE-v1", "freeze schema")
     require(freeze["status"] == "FROZEN_READY_AWAITING_EXPLICIT_ACTIVE_EXECUTION_AUTHORIZATION", "freeze status")
-    require(freeze["preflight_workflow_run_id"] == 36231012529, "preflight workflow")
+    require(freeze["preflight_workflow_run_id"] == 36231420391, "preflight workflow")
     require(freeze["provider_calls"] == 0 and freeze["subject_calls"] == 0, "offline preflight")
     require(freeze["active_repairs"] == 0, "no active repair")
-    for system in ["X2","X4","X5","X6","X7"]:
+    for system in ["X1","X2","X3","X4","X5","X6","X7"]:
         row = freeze["results"][system]
         require(row["status"] == "PASS", f"{system} readiness")
         require(row["control_flow_equivalent"] is True, f"{system} flow")
         require(row["checkout_equivalent"] is True, f"{system} checkout")
+    require(freeze["results"]["X1"]["midrun_checkpoint_status"] == "UNPROVEN_FAIL_CLOSED", "X1 midrun fail closed")
+    require(freeze["results"]["X1"]["active_midrun_B_capable"] is False, "X1 no active midrun B")
+    require(freeze["results"]["X3"]["nested_checkpoint_status"] == "UNPROVEN_FAIL_CLOSED", "X3 nested fail closed")
+    require(freeze["results"]["X3"]["a2a_protocol_modified"] is False, "A2A unchanged")
+    require(freeze["results"]["X3"]["active_midrun_B_capable"] is False, "X3 no active nested B")
+    require(freeze["engineering_wrapper_readiness"]["all_passed"] is True, "seven wrapper preflight")
     require(freeze["results"]["X4"]["mcp_protocol_modified"] is False, "MCP unchanged")
     require(freeze["results"]["X6"]["foreign_memory_mutated_by_repair"] is False, "MemoryBank untouched")
     require(freeze["results"]["X7"]["compressor_state_mutated_by_repair"] is False, "LongLLMLingua untouched")
     require(freeze["authorization"]["active_subject_execution"] is False, "active execution closed")
 
+    x1 = X1.read_text(encoding="utf-8")
     x2 = X2.read_text(encoding="utf-8")
+    x3 = X3.read_text(encoding="utf-8")
     cap = CAP.read_text(encoding="utf-8")
-    require("repair_actions_during_A" in x2 and "repair_actions_during_A" in cap, "A repair-free seal")
-    require("semantic_audit_state" in x2 and "semantic_audit_state" in cap, "semantic lock")
+    require("repair_actions_during_A" in x1 and "repair_actions_during_A" in x2 and "repair_actions_during_A" in x3 and "repair_actions_during_A" in cap, "A repair-free seal")
+    require("semantic_audit_state" in x1 and "semantic_audit_state" in x2 and "semantic_audit_state" in x3 and "semantic_audit_state" in cap, "semantic lock")
+    require("UNPROVEN_FAIL_CLOSED" in x1, "X1 wrapper must retain midrun fail-close")
+    require("UNPROVEN_FAIL_CLOSED" in x3 and "a2a_protocol_modified" in x3, "X3 wrapper must retain nested fail-close and protocol accounting")
     require('"X7": "X7_LONGLMLINGUA"' in cap, "canonical X7 system id")
 
     report = REPORT.read_text(encoding="utf-8")
     for token in [
         "READY / ACTIVE SUBJECT EXECUTION NOT YET AUTHORIZED",
+        "SEVEN-SYSTEM WRAPPER PREFLIGHT PASS",
         "15 new prospective natural first attempts",
         "1,920 logical model invocations",
         "COMPLETE_FOR_STRUCTURED_REPAIR",
@@ -107,7 +120,8 @@ def main():
 
     plan = PLAN.read_text(encoding="utf-8")
     for token in [
-        "15 PROSPECTIVE FIRST ATTEMPTS READY",
+        "SEVEN PROSPECTIVE WRAPPERS ENGINEERING-READY",
+        "15 ACTIVE PROSPECTIVE FIRST ATTEMPTS READY",
         "X1/X3 MID-RUN REPAIR FAIL-CLOSED",
         "Not yet authorized:",
         "G1 Phase A",
@@ -115,6 +129,9 @@ def main():
         require(token in plan, "plan missing " + token)
 
     print("STAGE2_R7_G1_EXECUTION_READINESS=PASS")
+    print("SEVEN_SYSTEM_WRAPPER_PREFLIGHT=PASS")
+    print("X1_MIDRUN_ACTIVE_B=BLOCKED")
+    print("X3_NESTED_ACTIVE_B=BLOCKED")
     print("HISTORICAL_REFERENCE_CELLS=21")
     print("PROSPECTIVE_ACTIVE_CELLS=15")
     print("ACTIVE_SYSTEMS=X2,X4,X5,X6,X7")
