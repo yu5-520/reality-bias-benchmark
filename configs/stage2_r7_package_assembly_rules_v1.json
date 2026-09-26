@@ -1,0 +1,37 @@
+{
+  "schema": "RB-STAGE2-R7-PACKAGE-ASSEMBLY-RULES-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_BEFORE_CANONICAL_PACKAGE_ASSEMBLY",
+  "semantic_audit_used": false,
+  "case_specific_rules": false,
+  "principle": "Candidate signals remain individually auditable; repair packages merge structurally connected pressure/support signals into lineage-bounded episodes without semantic labels.",
+  "application_episode": {
+    "maximum_prefix_gap_events": 4,
+    "require_actor_overlap_or_same_object": true,
+    "terminal_candidate_rejoins_existing_object_episode": true
+  },
+  "immutable_carrier_episode": {
+    "merge_same_carrier_family_within_cell": true,
+    "families": [
+      "rag-hit",
+      "memory-recall",
+      "compression-channel",
+      "compression-input",
+      "compression-output"
+    ]
+  },
+  "gate_precedence": [
+    "SAFETY_BOUNDARY_BLOCKED",
+    "LINEAGE_GAP_BLOCKED",
+    "PARENT_RECONSTRUCTION_BLOCKED",
+    "NATIVE_CAPABILITY_BLOCKED",
+    "NO_REPAIR_REQUIRED",
+    "COMPLETE_FOR_STRUCTURED_REPAIR"
+  ],
+  "non_claims": [
+    "A merged episode is not a semantic lineage adjudication.",
+    "Package merging does not imply all objects are semantically equivalent.",
+    "The package scope is structural and remains subject to later independent semantic validation."
+  ]
+}
