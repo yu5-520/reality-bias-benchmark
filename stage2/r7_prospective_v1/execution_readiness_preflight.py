@@ -10,7 +10,6 @@ from pathlib import Path
 from arena.providers import ScriptedProvider
 from stage2.r7_checkpoint_v1.common import file_tree_digest
 from stage2.r7_prospective_v1.capability_runner import run_capability_natural_A
-from stage2.r7_prospective_v1.x2_runner import run_x2_natural_A
 
 ROOT = Path(__file__).resolve().parents[2]
 STAGE2 = ROOT / "stage2"
@@ -63,6 +62,7 @@ def _verify_seal(seal: dict, *, expected_decisions: int):
 
 async def preflight_x2(root: Path) -> dict:
     from stage2.native_v7.x2_metagpt.runner import run_task as native_run
+    from stage2.r7_prospective_v1.x2_runner import run_x2_natural_A
 
     task = _task_file(root, "T2")
     base_checkout = root / "base-checkout"
