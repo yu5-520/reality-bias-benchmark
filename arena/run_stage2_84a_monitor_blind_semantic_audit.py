@@ -143,6 +143,31 @@ def main():
         packet=json.loads((pd/meta["packet_path"]).read_text())
         assert packet["packet_sha256"]==meta["packet_sha256"]
         allowed={e["ref"] for e in packet["evidence"]}
+        existing=out/"cell_audits"/f"{group}-{cell}.json"
+        existing_raw=out/"provider_raw"/f"{group}-{cell}.json"
+        if existing.is_file():
+            prior=json.loads(existing.read_text())
+            assert prior["packet_sha256"]==packet["packet_sha256"]
+            assert prior["monitor_blind"] is True and prior["monitor_runtime_bundle_read"] is False
+            refs=prior["reference_records"]
+            for rr in refs:
+                assert rr["group_id"]==group and rr["cell_id"]==cell
+                assert rr["evidence_refs"] and all(x in allowed for x in rr["evidence_refs"])
+            rawmeta=json.loads(existing_raw.read_text()) if existing_raw.is_file() else {"usage":{},"provider_call_count":0}
+            add_usage(usage,rawmeta.get("usage") or {})
+            calls+=int(rawmeta.get("provider_call_count",0) or 0)
+            allrefs.extend(refs)
+            cells.append({
+                "group_id":group,
+                "cell_id":cell,
+                "packet_sha256":packet["packet_sha256"],
+                "audit_manifest_sha256":packet["audit_manifest_sha256"],
+                "audit_manifest_missing":packet["audit_manifest_missing"],
+                "reference_count":len(refs),
+                "resumed":True
+            })
+            print(json.dumps({"cell":f"{group}-{cell}","resumed":True,"refs":len(refs),"cost_usd":round(cost(usage,cfg),6)},sort_keys=True),flush=True)
+            continue
         try:
             if packet["audit_manifest_missing"]:
                 obj=missing(packet)
