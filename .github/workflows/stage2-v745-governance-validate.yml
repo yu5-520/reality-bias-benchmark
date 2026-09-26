@@ -1,0 +1,38 @@
+name: Stage-II v7.45 Governance Validate
+
+on:
+  pull_request:
+    paths:
+      - "docs/R_Plan_v7.45.md"
+      - "docs/reporting/process_reality_report_standard_v1_12.md"
+      - "docs/reports/2026-09-26/StageII_Dual_General_Chapter_Independent_Audit_and_Monitor_Evaluation_Addendum_v1.md"
+      - "configs/stage2_g2_g5_execution_and_evaluation_policy_v2.json"
+      - "configs/stage2_semantic_audit_reference_protocol_v1.json"
+      - "configs/stage2_monitor_evaluation_protocol_v1.json"
+      - "configs/stage2_dual_general_chapter_independent_audit_monitor_eval_addendum_v1.json"
+      - "schemas/stage2_semantic_audit_reference_record_v1.schema.json"
+      - "schemas/stage2_monitor_evaluation_record_v1.schema.json"
+      - "scripts/validate_stage2_v745_governance.py"
+      - "stage2/README.md"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/R_Plan_v7.45.md"
+      - "configs/stage2_g2_g5_execution_and_evaluation_policy_v2.json"
+      - "configs/stage2_semantic_audit_reference_protocol_v1.json"
+      - "configs/stage2_monitor_evaluation_protocol_v1.json"
+      - "scripts/validate_stage2_v745_governance.py"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate v7.45 governance
+        run: python scripts/validate_stage2_v745_governance.py
