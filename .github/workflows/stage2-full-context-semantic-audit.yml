@@ -1,4 +1,8 @@
-name: Stage-II Full-Context Process-Semantic Audit v1
+# Historical-only workflow after v7.48.
+# Formal Layer C is GPT-5.6 Sol native reasoning. This file must never make
+# further DeepSeek full-context evaluator calls. Existing pilot outputs remain
+# preserved on their historical result branch for development provenance only.
+name: Stage-II DeepSeek Full-Context Pilot Archive v1
 
 on:
   pull_request:
@@ -153,7 +157,7 @@ jobs:
           PY
 
   execute-full-context-audit:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: ${{ false }}
     needs: offline-preflight
     runs-on: ubuntu-latest
     timeout-minutes: 360
