@@ -1,0 +1,117 @@
+{
+  "schema": "stage2-monitor-evaluation-matching-rules-v1",
+  "version": "1.0",
+  "date_utc": "2026-09-27",
+  "status": "FROZEN_BEFORE_PRIMARY_JOIN",
+  "primary_population": "G2_G5_84_NATURAL_TRAJECTORIES",
+  "reference_set": {
+    "branch": "stage2-semantic-audit-reference-v1",
+    "path": "stage2/replication_v2/semantic_audit_reference_v1/audit/reference_records.jsonl",
+    "sha256": "6afa4ff292da7b0a1c032b39a6ad987e7d2780c29b0ad8e945417a4bd838a172",
+    "strict_positive_claim_status": [
+      "SUPPORTED"
+    ],
+    "sensitivity_positive_claim_status": [
+      "SUPPORTED",
+      "SUPPORTED_CANDIDATE"
+    ],
+    "negative_status": "NEGATIVE_BOUNDARY",
+    "unresolved_status": "NOT_ESTABLISHED"
+  },
+  "monitor": {
+    "rule_version": "RB-STAGE2-R7-STRUCTURAL-MONITOR-RULES-v1",
+    "warning_unit": "monitor_candidates.json record",
+    "package_unit": "repair_packages.json record",
+    "cpr_labels_expected_null": true,
+    "semantic_audit_used_expected_false": true,
+    "future_evidence_used_expected_false": true
+  },
+  "rule_structure_compatibility": {
+    "MULTI_CONSUMER_ADDRESSABLE_REUSE": [
+      "SCOPE_EXPANSION",
+      "REPEATED_REVIEW_REOPEN"
+    ],
+    "REENTRY_OR_REUSE": [
+      "HISTORICAL_REENTRY",
+      "REPEATED_REVIEW_REOPEN",
+      "RECURSIVE_MEMORY_FEEDBACK"
+    ],
+    "WRITE_THEN_REUSE": [
+      "HISTORICAL_REENTRY",
+      "STATE_MISMATCH",
+      "AUTHORITY_STATUS_SHIFT"
+    ],
+    "IMMUTABLE_CARRIER_REPEAT": [
+      "RECURSIVE_MEMORY_FEEDBACK",
+      "HISTORICAL_REENTRY"
+    ],
+    "CONTEXT_TRANSFORMATION_EXPOSURE": [
+      "CARRIER_TRANSFORMATION"
+    ],
+    "TERMINAL_OPEN_WITH_REUSE": [
+      "REPEATED_REVIEW_REOPEN"
+    ]
+  },
+  "explicitly_unmapped_reference_families": [
+    "SEMANTIC_REPOSITORY_CLOSURE_DIVERGENCE",
+    "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+  ],
+  "matching_order": [
+    "same_group_and_cell",
+    "compatible_structure_family",
+    "object_localization_if_observable",
+    "sequence_window_if_available",
+    "lineage_overlap_if_available"
+  ],
+  "object_localization": {
+    "mode": "NORMALIZED_LITERAL_OR_BASENAME_EVIDENCE_BINDING",
+    "normalize_prefixes": [
+      "file:",
+      "state:",
+      "message:",
+      "rag-hit:",
+      "memory-recall:",
+      "memory-state:",
+      "compression-channel:",
+      "compression-input:",
+      "compression-output:"
+    ],
+    "full_match_sources": [
+      "semantic_before",
+      "semantic_after",
+      "semantic_delta",
+      "cross_penetration_path"
+    ],
+    "fallback_evidence_preview_lookup": true,
+    "partial_if_family_only": true,
+    "never_infer_hidden_source": true
+  },
+  "sequence_matching": {
+    "max_absolute_sequence_distance_when_both_available": 8,
+    "absent_sequence_does_not_reject_family_match": true,
+    "candidate_must_not_follow_first_consequence_when_both_available": true
+  },
+  "result_class_rules": {
+    "SUPPORTED_MATCH": "strict/sensitivity positive reference + compatible monitor rule + localized object/carrier identity; sequence constraints pass when available",
+    "PARTIAL_LOCALIZATION": "positive reference + compatible monitor rule, but source/carrier identity is unavailable or not localized",
+    "MISS": "positive observable reference has no compatible prospective monitor candidate",
+    "AUDIT_REJECTED_WARNING": "monitor candidate maps to an explicit NEGATIVE_BOUNDARY reference with compatible family/localization",
+    "UNSUPPORTED_WARNING": "monitor candidate has no positive or negative adjudication sufficient to confirm/reject it, including NOT_ESTABLISHED-only evidence",
+    "UNOBSERVABLE_REFERENCE": "reference is positive/candidate but required evidence surface is unavailable and no legal source-bound match can be adjudicated"
+  },
+  "denominators": {
+    "primary_strict_structure_recall": "SUPPORTED references only",
+    "sensitivity_structure_recall": "SUPPORTED + SUPPORTED_CANDIDATE",
+    "primary_warning_precision": "warnings matched to SUPPORTED references / all monitor warnings",
+    "candidate_inclusive_warning_support": "warnings matched to SUPPORTED or SUPPORTED_CANDIDATE / all monitor warnings",
+    "observable_conditional_recall": "positive references with evidence_surface_available=true"
+  },
+  "anti_tuning_rules": [
+    "No rule-to-family mapping may be changed after primary monitor outputs are joined to the sealed reference set.",
+    "No candidate threshold or sequence window may be tuned from realized monitor performance.",
+    "A monitor warning cannot inherit a CPR label from the audit.",
+    "Audit misses cannot create replacement prospective monitor candidates.",
+    "G1 is excluded from primary performance denominators."
+  ],
+  "publication_label": "WITHIN_STUDY_PROSPECTIVE_MONITORING_PERFORMANCE"
+}
