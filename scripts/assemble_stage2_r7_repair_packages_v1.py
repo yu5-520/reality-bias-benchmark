@@ -305,6 +305,19 @@ def main():
     summary["no_repair_required_count"] = gate_counts.get("NO_REPAIR_REQUIRED", 0)
     summary["package_cells"] = len(package_cell_counts)
     summary["package_cell_counts"] = dict(sorted(package_cell_counts.items()))
+    package_gates_by_cell = {}
+    for package in packages:
+        package_gates_by_cell.setdefault(package["source_cell"], Counter())
+        package_gates_by_cell[package["source_cell"]][package["repair_gate_status"]] += 1
+    rewritten_cells = []
+    for row in summary.get("cell_summary", []):
+        item = dict(row)
+        item["candidate_gate_counts_preassembly"] = item.pop("gate_counts", {})
+        item["candidate_record_count_preassembly"] = item.pop("package_count", item.get("candidate_count", 0))
+        item["repair_package_count"] = package_cell_counts.get(item["cell"], 0)
+        item["repair_package_gate_counts"] = dict(sorted(package_gates_by_cell.get(item["cell"], {}).items()))
+        rewritten_cells.append(item)
+    summary["cell_summary"] = rewritten_cells
     summary["package_assembly"] = {
         "schema": cfg["schema"],
         "semantic_audit_used": False,
@@ -348,6 +361,66 @@ def main():
         "The gate remains fail-closed. No package may enter active repair until its parent reconstruction is machine-verified and any lineage gap between an immutable foreign carrier and a legal downstream repair surface is resolved without modifying the foreign system.",
     ]
     (BASE / "package_assembly_report_v1.md").write_text("\n".join(md) + "\n", encoding="utf-8")
+
+    final_report = [
+        "# Stage-II R7 Offline Structural Monitor / Prefix Replay Result v1",
+        "",
+        "Date: 2026-09-26  ",
+        "Status: **OFFLINE PREFIX REPLAY + PACKAGE ASSEMBLY COMPLETE / ACTIVE REPAIR NOT AUTHORIZED**",
+        "",
+        "## Frozen execution boundary",
+        "",
+        "- 21/21 frozen first-attempt natural archives scanned.",
+        "- 0 natural reruns.",
+        "- 0 subject/provider calls.",
+        "- 0 evaluator calls.",
+        "- semantic audit used as monitor input: **NO**.",
+        "- CPR labels used as monitor input: **NO**.",
+        "- future suffix used to choose a prefix candidate: **NO**.",
+        "",
+        "## Structural monitor result",
+        "",
+        f"- normalized structural events: **{summary['normalized_event_count']}**;",
+        f"- raw structural candidate signals retained: **{len(candidates)}** across **{summary['cells_with_candidates']}/21** cells;",
+        f"- structurally assembled repair episodes/packages: **{len(packages)}** across **{len(package_cell_counts)}/21** cells;",
+        f"- raw candidate rule counts: `{json.dumps(summary['rule_counts'], sort_keys=True)}`;",
+        f"- final repair-gate counts: `{json.dumps(dict(sorted(gate_counts.items())), sort_keys=True)}`.",
+        "",
+        "Raw candidate signals remain individually auditable. They are not counted as separate repair experiments. Generic structural assembly merges connected pressure/support signals into lineage-bounded package episodes without semantic labels.",
+        "",
+        "## Parent reconstruction / lineage gate",
+        "",
+        f"- PARENT_RECONSTRUCTION_BLOCKED: **{gate_counts.get('PARENT_RECONSTRUCTION_BLOCKED', 0)}** packages;",
+        f"- LINEAGE_GAP_BLOCKED: **{gate_counts.get('LINEAGE_GAP_BLOCKED', 0)}** packages;",
+        f"- NO_REPAIR_REQUIRED: **{gate_counts.get('NO_REPAIR_REQUIRED', 0)}** packages;",
+        f"- COMPLETE_FOR_STRUCTURED_REPAIR: **{gate_counts.get('COMPLETE_FOR_STRUCTURED_REPAIR', 0)}** packages.",
+        "",
+        "The current frozen archives preserve rich process evidence but do not freeze framework-native resumable runtime checkpoints at the monitor-selected prefixes. Immutable RAG / MemoryBank / compression carriers are also deliberately not treated as writable repair surfaces; where a legal downstream adoption anchor is not fully bound by raw structural evidence, the package remains LINEAGE_GAP_BLOCKED.",
+        "",
+        "The monitor therefore fails closed. This is an engineering readiness result, not an R7 repair-efficacy result.",
+        "",
+        "## Cell accounting",
+        "",
+        "| Cell | Events | Raw candidates | Packages | Package gates | First prefix |",
+        "| --- | ---: | ---: | ---: | --- | --- |",
+    ]
+    for row in summary["cell_summary"]:
+        final_report.append(
+            f"| {row['cell']} | {row['normalized_event_count']} | {row['candidate_count']} | "
+            f"{row['repair_package_count']} | `{json.dumps(row['repair_package_gate_counts'], sort_keys=True)}` | "
+            f"{row['first_candidate_prefix'] or '-'} |"
+        )
+    final_report += [
+        "",
+        "## Next engineering operation",
+        "",
+        "Do **not** start an active repair continuation from an unverified parent.",
+        "",
+        "Next: build and audit framework-specific native-parent resumability/reconstruction proofs for monitor-selected prefixes, without modifying upstream framework/protocol semantics and without rerunning the stochastic natural prefix. For immutable foreign information carriers, bind the observed carrier to the nearest legal downstream application/process repair surface without mutating the foreign store.",
+        "",
+        "Only machine-verified packages may later move to active R7 authorization. The existing complete semantic audit remains sealed from this engineering path until package freeze and later validation.",
+    ]
+    (BASE / "offline_prefix_replay_report_v1.md").write_text("\n".join(final_report) + "\n", encoding="utf-8")
 
     print("STAGE2_R7_PACKAGE_ASSEMBLY=PASS")
     print("CANDIDATES=" + str(len(candidates)))
