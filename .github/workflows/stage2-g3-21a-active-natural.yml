@@ -142,14 +142,14 @@ jobs:
           assert issue["user"]["login"]=="yu5-520"
           assert issue["title"]=="STAGE2 G3 21A ACTIVE NATURAL AUTHORIZATION"
           assert issue["body"].strip()==expected
-          launch=json.loads(Path("science/configs/stage2_g3_g5_84_cell_natural_block_launch_contract_v1.json").read_text())
+          launch=json.loads(Path("science/configs/stage2_g2_g5_84_cell_natural_block_launch_contract_v1.json").read_text())
           row=next(r for r in launch["cells"] if r["group_id"]=="G3" and r["cell_id"]==cell)
           assert row["logical_decision_ceiling"]==64
           assert row["natural_attempt_index"]==1
           assert row["repair_actions_during_A"]==0
           print("PASS: exact G3 active authorization and frozen cell contract")
           PY
-          (cd science && python scripts/validate_stage2_g3_g5_84_cell_contract_v1.py)
+          (cd science && python scripts/validate_stage2_g2_g5_84_cell_contract_v1.py)
           (cd science && python -m stage2.native_v7.freeze)
 
       - name: Bind exact X1 AutoGen environment
