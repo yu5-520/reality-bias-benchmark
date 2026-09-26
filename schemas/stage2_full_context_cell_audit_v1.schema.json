@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stage2-full-context-cell-audit-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "group_id",
+    "cell_id",
+    "route_summary",
+    "semantic_nodes",
+    "semantic_edges",
+    "cpr_events",
+    "cpr_transitions",
+    "dynamic_topology",
+    "healthy_alternatives",
+    "not_established"
+  ],
+  "properties": {
+    "schema": {
+      "const": "stage2-full-context-cell-audit-v1"
+    },
+    "group_id": {
+      "enum": [
+        "G2",
+        "G3",
+        "G4",
+        "G5"
+      ]
+    },
+    "cell_id": {
+      "type": "string",
+      "pattern": "^X[1-7]-T[1-3]$"
+    },
+    "route_summary": {
+      "type": "object"
+    },
+    "semantic_nodes": {
+      "type": "array"
+    },
+    "semantic_edges": {
+      "type": "array"
+    },
+    "cpr_events": {
+      "type": "array"
+    },
+    "cpr_transitions": {
+      "type": "array"
+    },
+    "dynamic_topology": {
+      "type": "object"
+    },
+    "healthy_alternatives": {
+      "type": "array"
+    },
+    "not_established": {
+      "type": "array"
+    }
+  }
+}
