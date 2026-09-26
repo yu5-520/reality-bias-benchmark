@@ -1,0 +1,503 @@
+name: Stage-II G4 21A Active Natural Execution v1
+
+on:
+  workflow_run:
+    workflows: ["Stage-II G3 21A Active Natural Execution v1"]
+    types: [completed]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-g4-21a-active-natural-v1
+  cancel-in-progress: false
+
+env:
+  SCIENCE_SHA: b4f1441a48b2bc6a2c61035311419fc4509e8913
+  AUTH_ISSUE: "251"
+  EVIDENCE_BRANCH: stage2-g4-natural-evidence-v1
+  GROUP_ID: G4
+  DECISION_HORIZON: "64"
+
+jobs:
+  previous-group-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Verify G3 21/21 evidence seal before G4
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREV_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$PREV_CONCLUSION" = success
+          gh api "repos/$GITHUB_REPOSITORY/contents/stage2/replication_v2/G3/group_index.json?ref=stage2-g3-natural-evidence-v1" --jq .content | base64 -d > /tmp/previous_group_index.json
+          python - <<'PY'
+          import json
+          p=json.load(open("/tmp/previous_group_index.json"))
+          assert p["group_id"]=="G3"
+          assert p["complete"] is True
+          assert p["preserved_count"]==21
+          assert p["first_attempt_only"] is True
+          assert p["repair_actions_during_A"]==0
+          assert p["semantic_audit_state"]=="LOCKED_UNTIL_ALL_84_NATURAL_A_AND_REFERENCE_AUDIT_GATE"
+          assert p["scientific_code_sha"]=="b4f1441a48b2bc6a2c61035311419fc4509e8913"
+          print("PASS: G3 21/21 frozen; G4 may enter pre-claim setup")
+          PY
+
+  g4-natural-cells:
+    needs: previous-group-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        include:
+          - {system: X1, task: T1, python: "3.11"}
+          - {system: X1, task: T2, python: "3.11"}
+          - {system: X1, task: T3, python: "3.11"}
+          - {system: X2, task: T1, python: "3.10"}
+          - {system: X2, task: T2, python: "3.10"}
+          - {system: X2, task: T3, python: "3.10"}
+          - {system: X3, task: T1, python: "3.11"}
+          - {system: X3, task: T2, python: "3.11"}
+          - {system: X3, task: T3, python: "3.11"}
+          - {system: X4, task: T1, python: "3.11"}
+          - {system: X4, task: T2, python: "3.11"}
+          - {system: X4, task: T3, python: "3.11"}
+          - {system: X5, task: T1, python: "3.11"}
+          - {system: X5, task: T2, python: "3.11"}
+          - {system: X5, task: T3, python: "3.11"}
+          - {system: X6, task: T1, python: "3.10"}
+          - {system: X6, task: T2, python: "3.10"}
+          - {system: X6, task: T3, python: "3.10"}
+          - {system: X7, task: T1, python: "3.11"}
+          - {system: X7, task: T2, python: "3.11"}
+          - {system: X7, task: T3, python: "3.11"}
+
+    steps:
+      - name: Checkout active control plane
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: control
+          fetch-depth: 1
+
+      - name: Checkout exact frozen scientific code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.SCIENCE_SHA }}
+          path: science
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Verify authorization, exact code and cell contract
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SYS: ${{ matrix.system }}
+          TASK: ${{ matrix.task }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/main
+          test "$(git -C science rev-parse HEAD)" = "$SCIENCE_SHA"
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          cfg=json.loads(Path("control/configs/stage2_g4_active_natural_authorization_v1.json").read_text())
+          assert cfg["status"]=="AUTHORIZED_BY_USER_CHAT_EXECUTE"
+          assert cfg["authorization_issue"]==int(os.environ["AUTH_ISSUE"])
+          assert cfg["scientific_code_sha"]==os.environ["SCIENCE_SHA"]
+          assert cfg["evidence_branch"]==os.environ["EVIDENCE_BRANCH"]
+          assert cfg["group_id"]=="G4"
+          assert cfg["logical_decision_ceiling"]==64
+          assert cfg["first_attempt_only"] is True
+          assert cfg["repair_actions_during_A"]==0
+          assert cfg["semantic_audit_locked"] is True
+          cell=f'{os.environ["SYS"]}-{os.environ["TASK"]}'
+          assert cell in cfg["cell_sequence"]
+          issue=json.loads(subprocess.check_output([
+              "gh","api",f'repos/{os.environ["GITHUB_REPOSITORY"]}/issues/{os.environ["AUTH_ISSUE"]}'
+          ], text=True))
+          expected="\n".join([
+              "group=G4",
+              "cells="+",".join(cfg["cell_sequence"]),
+              "control_plane=CHAT_AUTHORIZATION_STAGE2_G4_21A_v1",
+              f'scientific_code_sha={os.environ["SCIENCE_SHA"]}',
+              f'evidence_branch={os.environ["EVIDENCE_BRANCH"]}',
+              "logical_decision_ceiling=64",
+              "max_natural_trajectories=21",
+              "first_attempt_only=true",
+              "preserve_failed_attempt=true",
+              "repair_actions_during_A=0",
+              "semantic_audit_locked=true",
+              "paid_evaluator_calls=0",
+          ])
+          assert issue["user"]["login"]=="yu5-520"
+          assert issue["title"]=="STAGE2 G4 21A ACTIVE NATURAL AUTHORIZATION"
+          assert issue["body"].strip()==expected
+          launch=json.loads(Path("science/configs/stage2_g4_g5_84_cell_natural_block_launch_contract_v1.json").read_text())
+          row=next(r for r in launch["cells"] if r["group_id"]=="G4" and r["cell_id"]==cell)
+          assert row["logical_decision_ceiling"]==64
+          assert row["natural_attempt_index"]==1
+          assert row["repair_actions_during_A"]==0
+          print("PASS: exact G4 active authorization and frozen cell contract")
+          PY
+          (cd science && python scripts/validate_stage2_g4_g5_84_cell_contract_v1.py)
+          (cd science && python -m stage2.native_v7.freeze)
+
+      - name: Bind exact X1 AutoGen environment
+        if: matrix.system == 'X1'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/microsoft/autogen /tmp/stage2-x1-autogen
+          git -C /tmp/stage2-x1-autogen checkout -q 027ecf0a379bcc1d09956d46d12d44a3ad9cee14
+          test "$(git -C /tmp/stage2-x1-autogen rev-parse HEAD)" = 027ecf0a379bcc1d09956d46d12d44a3ad9cee14
+          pip install -q /tmp/stage2-x1-autogen/python/packages/autogen-core /tmp/stage2-x1-autogen/python/packages/autogen-agentchat '/tmp/stage2-x1-autogen/python/packages/autogen-ext[openai]'
+
+      - name: Bind exact X2 MetaGPT environment
+        if: matrix.system == 'X2'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/FoundationAgents/MetaGPT /tmp/stage2-x2-metagpt
+          git -C /tmp/stage2-x2-metagpt checkout -q 11cdf466d042aece04fc6cfd13b28e1a70341b1f
+          test "$(git -C /tmp/stage2-x2-metagpt rev-parse HEAD)" = 11cdf466d042aece04fc6cfd13b28e1a70341b1f
+          python -m pip install -q --upgrade pip
+          grep -v '^lancedb==0.4.0$' /tmp/stage2-x2-metagpt/requirements.txt > /tmp/stage2-metagpt-requirements.txt
+          python -m pip install -q -r /tmp/stage2-metagpt-requirements.txt
+          python -m pip install -q 'pyarrow==14.0.2'
+          python -m pip install -q --no-deps -e /tmp/stage2-x2-metagpt
+
+      - name: Bind exact X3 A2A environment
+        if: matrix.system == 'X3'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/a2aproject/a2a-python /tmp/stage2-x3-a2a
+          git -C /tmp/stage2-x3-a2a checkout -q 0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167
+          test "$(git -C /tmp/stage2-x3-a2a rev-parse HEAD)" = 0d5473ca4fa6d40034a6a7c8d65bce5cd85d8167
+          python -m pip install -q -e '/tmp/stage2-x3-a2a[http-server]' 'uvicorn>=0.35.0'
+          git clone -q https://github.com/a2aproject/A2A /tmp/stage2-x3-protocol
+          git -C /tmp/stage2-x3-protocol checkout -q 173695755607e884aa9acf8ce4feed90e32727a1
+          test "$(git -C /tmp/stage2-x3-protocol rev-parse HEAD)" = 173695755607e884aa9acf8ce4feed90e32727a1
+
+      - name: Bind exact X4 MCP environment
+        if: matrix.system == 'X4'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/modelcontextprotocol/python-sdk /tmp/stage2-x4-mcp
+          git -C /tmp/stage2-x4-mcp checkout -q f1b6589088534632fef92238ee9750951e3c0185
+          test "$(git -C /tmp/stage2-x4-mcp rev-parse HEAD)" = f1b6589088534632fef92238ee9750951e3c0185
+          git clone -q https://github.com/modelcontextprotocol/modelcontextprotocol /tmp/stage2-x4-protocol
+          git -C /tmp/stage2-x4-protocol checkout -q 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          test "$(git -C /tmp/stage2-x4-protocol rev-parse HEAD)" = 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          python -m pip install -q uv
+          (cd /tmp/stage2-x4-mcp && uv sync --frozen --no-default-groups)
+          test -x /tmp/stage2-x4-mcp/.venv/bin/python
+
+      - name: Verify frozen X5 RAG source
+        if: matrix.system == 'X5'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(sha256sum science/stage2/retrieval.py | awk '{print $1}')" = baf19cd7f7dde0a2f7ebfde254bffac6690e018b88d8d9ea4a811d37a53b12c4
+
+      - name: Bind exact X6 MemoryBank environment and study embedding
+        if: matrix.system == 'X6'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/zhongwanjun/MemoryBank-SiliconFriend /tmp/stage2-x6-memorybank
+          git -C /tmp/stage2-x6-memorybank checkout -q cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
+          test "$(git -C /tmp/stage2-x6-memorybank rev-parse HEAD)" = cf61c4196e4cfdb0f2b7a0316249fa40312dc3a9
+          python -m pip install -q --upgrade pip
+          python -m pip install -q 'torch==2.0.1+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q 'numpy==1.24.4' 'pydantic==1.10.13' 'huggingface-hub==0.14.1' 'tokenizers==0.13.3' 'transformers==4.28.0' 'faiss-cpu==1.7.4' 'scipy==1.10.1' 'scikit-learn==1.3.2' 'nltk==3.9.1' 'Pillow==10.4.0' 'unstructured==0.6.10' 'langchain==0.0.146'
+          python -m pip install -q --no-deps 'sentence-transformers==2.2.2'
+          rm -rf /tmp/stage2-x6-study
+          (cd science && python -m stage2.study_assets.validate --probe X6 --out-root /tmp/stage2-x6-study)
+
+      - name: Bind exact X7 LongLLMLingua environment and study checkpoint
+        if: matrix.system == 'X7'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/microsoft/LLMLingua /tmp/stage2-x7-longllmlingua
+          git -C /tmp/stage2-x7-longllmlingua checkout -q 5a4c78ae18ab17a98cf997e8259354e546081d64
+          test "$(git -C /tmp/stage2-x7-longllmlingua rev-parse HEAD)" = 5a4c78ae18ab17a98cf997e8259354e546081d64
+          python -m pip install -q --upgrade pip
+          python -m pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q 'transformers==4.44.2' 'accelerate>=0.33,<1' tiktoken nltk numpy tokenizers safetensors
+          python -m pip install -q --no-deps -e /tmp/stage2-x7-longllmlingua
+          rm -rf /tmp/stage2-x7-study
+          (cd science && python -m stage2.study_assets.validate --probe X7 --out-root /tmp/stage2-x7-study)
+
+      - name: Verify subject credential injected before claim
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$DEEPSEEK_API_KEY"
+          echo "PASS: subject credential is present; no provider call made"
+
+      - name: Irrevocably claim first attempt
+        id: claim
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SYS: ${{ matrix.system }}
+          TASK: ${{ matrix.task }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          CELL="$SYS-$TASK"
+          TAG="stage2-g4-$(echo "$CELL" | tr '[:upper:]' '[:lower:]')-execution-claimed-v1"
+          EVIDENCE_PATH="stage2/replication_v2/G4/natural_A/$CELL/first_attempt.tar.gz"
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" >/dev/null 2>&1; then
+            echo "FAIL: $CELL already claimed; no second subject attempt is permitted"
+            exit 41
+          fi
+          if gh api "repos/$GITHUB_REPOSITORY/contents/$EVIDENCE_PATH?ref=$EVIDENCE_BRANCH" >/dev/null 2>&1; then
+            echo "FAIL: $CELL evidence already exists; no second subject attempt is permitted"
+            exit 42
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$TAG" -f sha="$SCIENCE_SHA" >/dev/null
+          echo "claimed=true" >> "$GITHUB_OUTPUT"
+          echo "claim_tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "PASS: $CELL first attempt claimed before subject-provider execution"
+
+      - name: Execute exactly one prospective natural A
+        id: execute
+        if: steps.claim.outputs.claimed == 'true'
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          SYS: ${{ matrix.system }}
+          TASK: ${{ matrix.task }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          CELL="$SYS-$TASK"
+          OUT="$GITHUB_WORKSPACE/science/stage2/replication_v2/G4/natural_A/$CELL"
+          CHECKOUT="/tmp/stage2-g4-$CELL-checkout"
+          TASK_FILE="/tmp/stage2-g4-$CELL-task.json"
+          LOG_ROOT="/tmp/stage2-g4-$CELL-control"
+          rm -rf "$OUT" "$CHECKOUT" "$LOG_ROOT"
+          mkdir -p "$LOG_ROOT"
+          cp -a "$GITHUB_WORKSPACE/science/stage2/fixtures/project" "$CHECKOUT"
+          export TASK TASK_FILE
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          tasks=json.loads(Path("science/stage2/tasks.json").read_text())["tasks"]
+          row=next(x for x in tasks if x["id"]==os.environ["TASK"])
+          Path(os.environ["TASK_FILE"]).write_text(json.dumps(row,ensure_ascii=False,indent=2,sort_keys=True)+"\n")
+          PY
+          printf '%s\n' "$SCIENCE_SHA" > "$LOG_ROOT/scientific_code_sha.txt"
+          printf '%s\n' "$AUTH_ISSUE" > "$LOG_ROOT/authorization_issue.txt"
+          printf '%s\n' "${{ github.run_id }}" > "$LOG_ROOT/workflow_run_id.txt"
+          printf '%s\n' "$CELL" > "$LOG_ROOT/cell_id.txt"
+          if [ -n "${PYTHONPATH-}" ]; then export PYTHONPATH="$GITHUB_WORKSPACE/science:$PYTHONPATH"; else export PYTHONPATH="$GITHUB_WORKSPACE/science"; fi
+          export TOKENIZERS_PARALLELISM=false
+          export HF_HUB_OFFLINE=1
+          export TRANSFORMERS_OFFLINE=1
+          cd "$GITHUB_WORKSPACE/science"
+          PYBIN=python
+          if [ "$SYS" = X4 ]; then PYBIN=/tmp/stage2-x4-mcp/.venv/bin/python; fi
+          set +e
+          case "$SYS" in
+            X1)
+              timeout --signal=TERM --kill-after=30s 180m "$PYBIN" -m stage2.r7_prospective_v1.x1_runner                 --checkout "$CHECKOUT" --task-file "$TASK_FILE" --roles-file stage2/roles.json --subject-file stage2/subject.json                 --out-root "$OUT" --group-id G4 --decision-horizon 64 ;;
+            X2)
+              timeout --signal=TERM --kill-after=30s 180m "$PYBIN" -m stage2.r7_prospective_v1.x2_runner                 --checkout "$CHECKOUT" --task-file "$TASK_FILE" --roles-file stage2/roles.json --subject-file stage2/subject.json                 --out-root "$OUT" --group-id G4 --decision-horizon 64 ;;
+            X3)
+              timeout --signal=TERM --kill-after=30s 180m "$PYBIN" -m stage2.r7_prospective_v1.x3_runner                 --checkout "$CHECKOUT" --task-file "$TASK_FILE" --roles-file stage2/roles.json --subject-file stage2/subject.json                 --out-root "$OUT" --group-id G4 --decision-horizon 64 ;;
+            X4|X5)
+              timeout --signal=TERM --kill-after=30s 180m "$PYBIN" -m stage2.r7_prospective_v1.capability_runner                 --system "$SYS" --checkout "$CHECKOUT" --task-file "$TASK_FILE" --roles-file stage2/roles.json --subject-file stage2/subject.json                 --out-root "$OUT" --group-id G4 --decision-horizon 64 ;;
+            X6)
+              timeout --signal=TERM --kill-after=30s 180m "$PYBIN" -m stage2.r7_prospective_v1.capability_runner                 --system X6 --checkout "$CHECKOUT" --task-file "$TASK_FILE" --roles-file stage2/roles.json --subject-file stage2/subject.json                 --out-root "$OUT" --group-id G4 --decision-horizon 64                 --x6-upstream /tmp/stage2-x6-memorybank                 --x6-embedding-model /tmp/stage2-x6-study/checkpoint                 --x6-embedding-manifest stage2/native_v7/study/x6_embedding_manifest.json ;;
+            X7)
+              timeout --signal=TERM --kill-after=30s 180m "$PYBIN" -m stage2.r7_prospective_v1.capability_runner                 --system X7 --checkout "$CHECKOUT" --task-file "$TASK_FILE" --roles-file stage2/roles.json --subject-file stage2/subject.json                 --out-root "$OUT" --group-id G4 --decision-horizon 64                 --x7-checkpoint /tmp/stage2-x7-study/checkpoint                 --x7-checkpoint-manifest stage2/native_v7/study/x7_checkpoint_manifest.json ;;
+          esac > "$LOG_ROOT/runner_stdout.txt" 2> "$LOG_ROOT/runner_stderr.txt"
+          CODE=$?
+          set -e
+          printf '%s\n' "$CODE" > "$LOG_ROOT/runner_exit_code.txt"
+          echo "runner_exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Preserve first attempt to durable evidence branch
+        id: preserve
+        if: steps.claim.outputs.claimed == 'true'
+        env:
+          SYS: ${{ matrix.system }}
+          TASK: ${{ matrix.task }}
+          CLAIM_TAG: ${{ steps.claim.outputs.claim_tag }}
+          RUNNER_EXIT_CODE: ${{ steps.execute.outputs.runner_exit_code }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          CELL="$SYS-$TASK"
+          OUT="$GITHUB_WORKSPACE/science/stage2/replication_v2/G4/natural_A/$CELL"
+          LOG_ROOT="/tmp/stage2-g4-$CELL-control"
+          mkdir -p "$OUT/control"
+          cp -a "$LOG_ROOT"/. "$OUT/control"/
+          export OUT CELL CLAIM_TAG RUNNER_EXIT_CODE
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          out=Path(os.environ["OUT"])
+          seal_path=out/"seal.json"
+          seal=json.loads(seal_path.read_text()) if seal_path.exists() else None
+          meta={
+              "schema":"stage2-g4-first-attempt-metadata-v1",
+              "group_id":"G4",
+              "cell_id":os.environ["CELL"],
+              "attempt_index":1,
+              "scientific_code_sha":os.environ["SCIENCE_SHA"],
+              "authorization_issue":int(os.environ["AUTH_ISSUE"]),
+              "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
+              "claim_tag":os.environ["CLAIM_TAG"],
+              "runner_exit_code":int(os.environ["RUNNER_EXIT_CODE"] or -999),
+              "repair_actions_during_A":0,
+              "semantic_audit_state":"LOCKED",
+              "seal_present":seal is not None,
+              "seal_status":seal.get("status") if seal else None,
+              "model_decision_count":seal.get("model_decision_count") if seal else None,
+              "natural_subject_calls":seal.get("natural_subject_calls") if seal else None,
+              "provider_mode":seal.get("provider_mode") if seal else None,
+          }
+          (out/"control"/"attempt_metadata.json").write_text(json.dumps(meta,indent=2,sort_keys=True)+"\n")
+          PY
+          ARCHIVE="/tmp/stage2-g4-$CELL-first_attempt.tar.gz"
+          SHA_FILE="$ARCHIVE.sha256"
+          RECEIPT="/tmp/stage2-g4-$CELL-attempt_receipt.json"
+          tar -czf "$ARCHIVE" -C "$OUT" .
+          sha256sum "$ARCHIVE" > "$SHA_FILE"
+          export ARCHIVE SHA_FILE RECEIPT
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          archive=Path(os.environ["ARCHIVE"])
+          out=Path(os.environ["OUT"])
+          meta=json.loads((out/"control"/"attempt_metadata.json").read_text())
+          receipt=dict(meta)
+          receipt.update({
+              "schema":"stage2-g4-first-attempt-receipt-v1",
+              "archive_sha256":hashlib.sha256(archive.read_bytes()).hexdigest(),
+              "archive_bytes":archive.stat().st_size,
+              "preserved":True,
+              "scientific_success_not_inferred":True,
+          })
+          Path(os.environ["RECEIPT"]).write_text(json.dumps(receipt,indent=2,sort_keys=True)+"\n")
+          PY
+          mkdir -p /tmp/stage2-g4-artifact
+          cp "$ARCHIVE" "$SHA_FILE" "$RECEIPT" /tmp/stage2-g4-artifact/
+          git -C control fetch -q origin "$EVIDENCE_BRANCH:refs/remotes/origin/$EVIDENCE_BRANCH"
+          rm -rf /tmp/stage2-g4-evidence
+          git -C control worktree add --detach /tmp/stage2-g4-evidence "origin/$EVIDENCE_BRANCH"
+          DEST="/tmp/stage2-g4-evidence/stage2/replication_v2/G4/natural_A/$CELL"
+          mkdir -p "$DEST"
+          cp "$ARCHIVE" "$DEST/first_attempt.tar.gz"
+          cp "$SHA_FILE" "$DEST/first_attempt.tar.gz.sha256"
+          cp "$RECEIPT" "$DEST/attempt_receipt.json"
+          git -C /tmp/stage2-g4-evidence config user.name "stage2-g4-evidence-bot"
+          git -C /tmp/stage2-g4-evidence config user.email "stage2-g4-evidence@users.noreply.github.com"
+          git -C /tmp/stage2-g4-evidence add "stage2/replication_v2/G4/natural_A/$CELL"
+          git -C /tmp/stage2-g4-evidence commit -m "evidence: freeze G4 $CELL first attempt [run $GITHUB_RUN_ID]"
+          git -C /tmp/stage2-g4-evidence push -q origin "HEAD:refs/heads/$EVIDENCE_BRANCH"
+          echo "preserved=true" >> "$GITHUB_OUTPUT"
+          echo "PASS: $CELL first attempt durably preserved; runner exit code=$RUNNER_EXIT_CODE"
+
+      - name: Upload redundant immutable Actions artifact
+        if: always() && steps.claim.outputs.claimed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-g4-${{ matrix.system }}-${{ matrix.task }}-${{ github.run_id }}
+          path: /tmp/stage2-g4-artifact/
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Assert preservation, not scientific success
+        if: always() && steps.claim.outputs.claimed == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ steps.preserve.outputs.preserved }}" = true
+          echo "PASS: first attempt preservation complete; no semantic audit or repair executed"
+
+  g4-group-freeze:
+    if: always()
+    needs: g4-natural-cells
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: control
+          fetch-depth: 1
+
+      - name: Build and freeze G4 first-attempt group index
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C control fetch -q origin "$EVIDENCE_BRANCH:refs/remotes/origin/$EVIDENCE_BRANCH"
+          rm -rf /tmp/stage2-g4-evidence
+          git -C control worktree add --detach /tmp/stage2-g4-evidence "origin/$EVIDENCE_BRANCH"
+          export ROOT=/tmp/stage2-g4-evidence
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root=Path(os.environ["ROOT"])
+          expected=[f"X{x}-T{t}" for x in range(1,8) for t in range(1,4)]
+          rows=[]
+          for cell in expected:
+              base=root/"stage2/replication_v2/G4/natural_A"/cell
+              receipt=base/"attempt_receipt.json"
+              archive=base/"first_attempt.tar.gz"
+              sha_file=base/"first_attempt.tar.gz.sha256"
+              if not (receipt.is_file() and archive.is_file() and sha_file.is_file()):
+                  continue
+              r=json.loads(receipt.read_text())
+              observed=hashlib.sha256(archive.read_bytes()).hexdigest()
+              assert observed==r["archive_sha256"]
+              assert sha_file.read_text().split()[0]==observed
+              rows.append(r)
+          payload={
+              "schema":"stage2-g4-natural-group-index-v1",
+              "group_id":"G4",
+              "scientific_code_sha":os.environ["SCIENCE_SHA"],
+              "authorization_issue":int(os.environ["AUTH_ISSUE"]),
+              "expected_cells":expected,
+              "preserved_cells":[r["cell_id"] for r in rows],
+              "preserved_count":len(rows),
+              "complete":len(rows)==21,
+              "first_attempt_only":True,
+              "repair_actions_during_A":0,
+              "semantic_audit_state":"LOCKED_UNTIL_ALL_84_NATURAL_A_AND_REFERENCE_AUDIT_GATE",
+              "paid_evaluator_calls":0,
+              "receipts":rows,
+          }
+          path=root/"stage2/replication_v2/G4/group_index.json"
+          path.parent.mkdir(parents=True,exist_ok=True)
+          path.write_text(json.dumps(payload,indent=2,sort_keys=True)+"\n")
+          if len(rows)!=21:
+              raise SystemExit(f"G4 incomplete: preserved {len(rows)}/21")
+          print("PASS: G4 21/21 first attempts preserved; audit remains locked")
+          PY
+          git -C /tmp/stage2-g4-evidence config user.name "stage2-g4-evidence-bot"
+          git -C /tmp/stage2-g4-evidence config user.email "stage2-g4-evidence@users.noreply.github.com"
+          git -C /tmp/stage2-g4-evidence add stage2/replication_v2/G4/group_index.json
+          git -C /tmp/stage2-g4-evidence commit -m "evidence: seal G4 21A group index [run $GITHUB_RUN_ID]"
+          git -C /tmp/stage2-g4-evidence push -q origin "HEAD:refs/heads/$EVIDENCE_BRANCH"
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --body "G4 21A active natural execution preserved 21/21 first attempts in branch `$EVIDENCE_BRANCH`. Workflow run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID. Semantic audit and repair remain locked."
+          gh issue close "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
