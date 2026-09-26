@@ -1,0 +1,59 @@
+{
+  "schema": "RB-STAGE2-R7-CHECKPOINT-CONFORMANCE-FREEZE-v1",
+  "version": "1.0",
+  "date": "2026-09-26",
+  "status": "FROZEN_ENGINEERING_CONFORMANCE_PASS_NO_SCIENTIFIC_SUBJECT_RUN",
+  "tested_head_sha": "74a67eaedf851ca218dcfcb46aa530043dfce3da",
+  "workflow_run_id": 36228005932,
+  "provider_calls": 0,
+  "evaluator_calls": 0,
+  "scientific_subject_runs": 0,
+  "active_repairs": 0,
+  "systems": {
+    "REGISTRY_X4_X7_HOST": {
+      "status": "PASS",
+      "checkpoint_hash": "26671b9de5df13c3a2be598288af46a3dc62ecc29420799edb859315a081a139",
+      "application_restore": "PASS",
+      "host_state_round_trip": "PASS",
+      "foreign_carrier_policy": "VERIFY_ONLY"
+    },
+    "X1_AUTOGEN": {
+      "status": "PASS",
+      "checkpoint_hash": "15ed5ac42a19c459c1056a227aad87f40210327b2f0ae9ba08ac84415c3c7c88",
+      "native_state_round_trip": "PASS",
+      "application_state_round_trip": "PASS",
+      "public_api": ["Team.save_state", "Team.load_state"],
+      "boundary": "NON_RUNNING_OR_EXPLICITLY_QUIESCENT_NATIVE_BOUNDARY"
+    },
+    "X2_METAGPT": {
+      "status": "PASS",
+      "checkpoint_hash": "0cabc99d26f1e882956ada5ba1ec32c3aa618ed36256db1202acfd3140907796",
+      "environment_round_trip": "PASS",
+      "stage2_role_environment_round_trip": "PASS",
+      "stage2_runtime_envelope_round_trip": "PASS",
+      "public_api": ["Environment.model_dump", "Environment(**state, context=context)"],
+      "canonicalized_set_like_fields": ["addresses", "watch", "send_to"]
+    },
+    "X3_A2A": {
+      "status": "PASS",
+      "checkpoint_hash": "af2c8b5724e00010b587d2214b6d3791fad72cf6ea10194345513dbaa62f4fd8",
+      "role_count": 9,
+      "role_service_state_round_trip": "PASS",
+      "a2a_protocol_modified": false,
+      "boundary": "QUIESCENT_STAGE2_ROLE_SERVICE_APPLICATION_STATE"
+    }
+  },
+  "foreign_information_systems": {
+    "MCP": "PROTOCOL_AND_SECURITY_BOUNDARY_UNCHANGED",
+    "RAG": "REFERENCE_HASH_ONLY_NO_INTERNAL_MUTATION",
+    "MemoryBank": "REFERENCE_HASH_ONLY_NO_INTERNAL_MUTATION",
+    "LongLLMLingua": "REFERENCE_HASH_ONLY_NO_INTERNAL_MUTATION"
+  },
+  "prospective_geometry": {
+    "group": "StageII-R7-G1",
+    "original_21_paths": "IMMUTABLE_NOT_RETROFITTED",
+    "replicates": "NEW_PROSPECTIVE_GROUPS_NOT_NATURAL_RERUNS",
+    "first_active_subject_run_authorized": false
+  },
+  "next_gate": "FREEZE_STAGEII_R7_G1_PROSPECTIVE_REPAIR_EXECUTION_CONTRACT"
+}
