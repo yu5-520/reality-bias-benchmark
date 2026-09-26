@@ -1,0 +1,305 @@
+name: Stage-II 84A Monitor-Blind Semantic Audit v1
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/stage2-84a-monitor-blind-semantic-audit.yml"
+      - "arena/build_stage2_84a_monitor_blind_audit_packets.py"
+      - "arena/run_stage2_84a_monitor_blind_semantic_audit.py"
+      - "scripts/validate_and_seal_stage2_84a_semantic_reference_v1.py"
+      - "reviews/stage2_84a_semantic_audit_prompt_v1.md"
+      - "configs/stage2_84a_semantic_audit_active_authorization_v1.json"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/stage2-84a-monitor-blind-semantic-audit.yml"
+      - "arena/build_stage2_84a_monitor_blind_audit_packets.py"
+      - "arena/run_stage2_84a_monitor_blind_semantic_audit.py"
+      - "scripts/validate_and_seal_stage2_84a_semantic_reference_v1.py"
+      - "reviews/stage2_84a_semantic_audit_prompt_v1.md"
+      - "configs/stage2_84a_semantic_audit_active_authorization_v1.json"
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-84a-monitor-blind-semantic-audit-v1
+  cancel-in-progress: false
+
+env:
+  AUTH_ISSUE: "261"
+  OUTPUT_BRANCH: stage2-semantic-audit-reference-v1
+  AUDIT_ROOT: stage2/replication_v2/semantic_audit_reference_v1
+
+jobs:
+  offline-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Compile audit code
+        run: |
+          set -euo pipefail
+          python -m py_compile \
+            arena/build_stage2_84a_monitor_blind_audit_packets.py \
+            arena/run_stage2_84a_monitor_blind_semantic_audit.py \
+            scripts/validate_and_seal_stage2_84a_semantic_reference_v1.py
+      - name: Validate frozen authorization contract
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          p=json.load(open("configs/stage2_84a_semantic_audit_active_authorization_v1.json"))
+          assert p["status"]=="AUTHORIZED_BY_USER_CHAT_EXECUTE"
+          assert p["authorization_issue"]==261
+          assert p["required_cell_count"]==84
+          assert p["source_block_index"]["expected_complete"] is True
+          assert p["source_block_index"]["expected_natural_first_attempts"]==84
+          assert p["source_block_index"]["blob_sha"]=="b3599a0a6b46f279b94a648b0c82213e58455e33"
+          assert p["blindness"]["monitor_runtime_bundle_access"] is False
+          assert p["blindness"]["monitor_warning_access"] is False
+          assert p["blindness"]["monitor_candidate_access"] is False
+          assert p["evaluator"]["temperature"]==0.0
+          assert p["evaluator"]["max_spend_usd"]==10.0
+          assert p["evaluator"]["adaptive_reprompt"] is False
+          assert p["prohibited_actions"]["subject_calls"] is False
+          assert p["prohibited_actions"]["subject_reruns"] is False
+          assert p["prohibited_actions"]["repair_calls"] is False
+          assert p["prohibited_actions"]["monitor_evaluation"] is False
+          print("PASS: 84A semantic-audit authorization is bounded and monitor-blind")
+          PY
+
+  execute-audit:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: offline-preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Checkout audit control plane
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: control
+          fetch-depth: 1
+
+      - name: Checkout G2 frozen evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g2-natural-evidence-v1
+          path: g2
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G2/natural_A
+            stage2/replication_v2/G2/group_index.json
+
+      - name: Checkout G3 frozen evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g3-natural-evidence-v1
+          path: g3
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G3/natural_A
+            stage2/replication_v2/G3/group_index.json
+
+      - name: Checkout G4 frozen evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g4-natural-evidence-v1
+          path: g4
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G4/natural_A
+            stage2/replication_v2/G4/group_index.json
+
+      - name: Checkout G5 frozen evidence and 84A seal
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g5-natural-evidence-v1
+          path: g5
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            stage2/replication_v2/G5/natural_A
+            stage2/replication_v2/G5/group_index.json
+            stage2/replication_v2/G2_G5_84A_block_index.json
+
+      - name: Checkout semantic-audit output branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-semantic-audit-reference-v1
+          path: auditout
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify authorization issue and 84A seal
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          cfg=json.load(open("control/configs/stage2_84a_semantic_audit_active_authorization_v1.json"))
+          issue=json.loads(subprocess.check_output([
+            "gh","api",f'repos/{os.environ["GITHUB_REPOSITORY"]}/issues/{os.environ["AUTH_ISSUE"]}'
+          ],text=True))
+          assert issue["user"]["login"]=="yu5-520"
+          assert issue["title"]=="STAGE2 84A MONITOR-BLIND SEMANTIC AUDIT AUTHORIZATION"
+          required={
+            "phase=STAGE2_MONITOR_BLIND_FULL_SEMANTIC_AUDIT_V1",
+            "population=G2_G5_84_NATURAL_A",
+            "natural_first_attempts=84",
+            "monitor_runtime_bundle_access=false",
+            "subject_calls=false",
+            "subject_reruns=false",
+            "repair_calls=false",
+            "monitor_evaluation=false",
+            "paid_evaluator_calls=true",
+            "max_spend_usd=10.0",
+            "adaptive_reprompt=false"
+          }
+          lines=set(x.strip() for x in issue["body"].splitlines() if x.strip())
+          assert required <= lines
+          idx_path=Path("g5/stage2/replication_v2/G2_G5_84A_block_index.json")
+          idx=json.loads(idx_path.read_text())
+          assert idx["complete"] is True and idx["natural_first_attempts"]==84
+          assert idx["engineering_B_state"]=="LOCKED"
+          assert idx["semantic_audit_state"]=="READY_TO_OPEN_ONLY_AFTER_THIS_84A_SEAL"
+          for g,root in [("G2","g2"),("G3","g3"),("G4","g4"),("G5","g5")]:
+            p=json.load(open(f"{root}/stage2/replication_v2/{g}/group_index.json"))
+            assert p["complete"] is True and p["preserved_count"]==21
+            assert p["first_attempt_only"] is True and p["repair_actions_during_A"]==0
+          print("PASS: authorization + G2-G5 84A seal verified")
+          PY
+
+      - name: Build monitor-blind audit packets from audit-raw channels only
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "auditout/$AUDIT_ROOT"
+          mkdir -p "auditout/$AUDIT_ROOT/packets"
+          python control/arena/build_stage2_84a_monitor_blind_audit_packets.py \
+            --g2 g2 --g3 g3 --g4 g4 --g5 g5 \
+            --out "auditout/$AUDIT_ROOT/packets"
+          python - <<'PY'
+          import json, os
+          p=json.load(open(f'auditout/{os.environ["AUDIT_ROOT"]}/packets/packet_index.json'))
+          assert p["cell_count"]==84
+          assert p["monitor_runtime_bundle_read"] is False
+          print("PASS: 84 monitor-blind packets frozen in working tree")
+          PY
+
+      - name: Verify evaluator credential before audit claim
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$DEEPSEEK_API_KEY"
+          echo "PASS: evaluator credential present; no call made yet"
+
+      - name: Irrevocably claim semantic-audit launch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG=stage2-84a-monitor-blind-semantic-audit-claimed-v1
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" >/dev/null 2>&1; then
+            echo "FAIL: semantic audit launch already claimed"
+            exit 41
+          fi
+          if gh api "repos/$GITHUB_REPOSITORY/contents/$AUDIT_ROOT/reference_set_seal.json?ref=$OUTPUT_BRANCH" >/dev/null 2>&1; then
+            echo "FAIL: semantic reference set already sealed"
+            exit 42
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$TAG" -f sha="$GITHUB_SHA" >/dev/null
+          echo "PASS: semantic audit claimed after all offline/input/credential checks"
+
+      - name: Execute monitor-blind semantic adjudication
+        id: audit
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        shell: bash
+        run: |
+          set +e
+          python control/arena/run_stage2_84a_monitor_blind_semantic_audit.py \
+            --packets "auditout/$AUDIT_ROOT/packets" \
+            --prompt control/reviews/stage2_84a_semantic_audit_prompt_v1.md \
+            --model-config control/arena/config/model_deepseek_v0.2.json \
+            --authorization control/configs/stage2_84a_semantic_audit_active_authorization_v1.json \
+            --out "auditout/$AUDIT_ROOT/audit"
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Validate and seal semantic reference set
+        id: seal
+        if: steps.audit.outputs.exit_code == '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python control/scripts/validate_and_seal_stage2_84a_semantic_reference_v1.py \
+            --packets "auditout/$AUDIT_ROOT/packets" \
+            --audit "auditout/$AUDIT_ROOT/audit" \
+            --authorization control/configs/stage2_84a_semantic_audit_active_authorization_v1.json \
+            --source-block-index g5/stage2/replication_v2/G2_G5_84A_block_index.json
+          echo "sealed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Preserve audit outputs to dedicated branch
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C auditout config user.name "stage2-semantic-audit-bot"
+          git -C auditout config user.email "stage2-semantic-audit@users.noreply.github.com"
+          git -C auditout add "$AUDIT_ROOT"
+          if git -C auditout diff --cached --quiet; then
+            echo "No new audit outputs to preserve"
+          else
+            git -C auditout commit -m "audit: preserve Stage II 84A monitor-blind semantic reference outputs [run $GITHUB_RUN_ID]"
+            git -C auditout push origin "HEAD:refs/heads/$OUTPUT_BRANCH"
+          fi
+
+      - name: Upload redundant audit artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-84a-monitor-blind-semantic-audit-${{ github.run_id }}
+          path: auditout/stage2/replication_v2/semantic_audit_reference_v1/
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Close authorization on successful seal
+        if: steps.seal.outputs.sealed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --body "84A monitor-blind semantic audit completed and reference set sealed on branch \`$OUTPUT_BRANCH\`. Run: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID. Monitor evaluation and engineering B remain locked until their own gates."
+          gh issue close "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --reason completed
+
+      - name: Assert complete seal or preserve partial failure
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.audit.outputs.exit_code }}" != "0" ]; then
+            echo "FAIL: semantic audit incomplete; partial outputs were preserved and must not be treated as a sealed reference set"
+            exit 1
+          fi
+          test "${{ steps.seal.outputs.sealed }}" = "true"
+          echo "PASS: 84-cell semantic reference set sealed; monitor evaluation may open next"
