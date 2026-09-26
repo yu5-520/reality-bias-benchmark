@@ -109,7 +109,7 @@ def main():
 
     report = REPORT.read_text(encoding="utf-8")
     for token in [
-        "READY / ACTIVE SUBJECT EXECUTION NOT YET AUTHORIZED",
+        "READY / SEVEN-SYSTEM WRAPPER PREFLIGHT PASS / ACTIVE SUBJECT EXECUTION NOT YET AUTHORIZED",
         "SEVEN-SYSTEM WRAPPER PREFLIGHT PASS",
         "15 new prospective natural first attempts",
         "1,920 logical model invocations",
