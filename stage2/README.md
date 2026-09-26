@@ -1,10 +1,10 @@
 # Stage-II
 
-**Current forward track: dual General Chapters + five-group prospective replication.**
+**Current forward track: five-group natural block -> independent semantic audit -> monitor benchmark -> engineering batches.**
 
 Canonical plan:
 
-`docs/R_Plan_v7.44.md`
+`docs/R_Plan_v7.45.md`
 
 ## Current scientific state
 
@@ -12,47 +12,158 @@ The original Stage-II natural matrix is complete and frozen:
 
 `X1-X7 × T1-T3 = 21 / 21 first attempts`.
 
-It is now designated:
+It is designated:
 
 > **G1 — discovery/calibration reference group**
 
 No G1 natural cell may be rerun or overwritten.
 
-G2-G5 are four new prospective replication groups. Each group begins with the full natural matrix:
+G2-G5 are four prospective replication groups, each with:
 
-`X1-X7 × T1-T3 = 21 first attempts`.
+`X1-X7 × T1-T3 = 21 natural first attempts`.
 
-The natural population is therefore planned as:
+Prospective block:
 
-`5 groups × 21 = 105 natural trajectories`
+`4 × 21 = 84 natural trajectories`.
 
-if all groups complete.
+Publication-facing total if complete:
 
-## Dual parent chapters
+`G1 21 + G2-G5 84 = 105 natural trajectories`.
+
+## Dual General Chapters
 
 Experimental parent:
 
 `docs/reports/2026-09-26/StageII_Experimental_General_Chapter_Process_Reality_Methodology_and_Principles_v2.md`
 
-Machine-readable rules:
-
-`configs/stage2_experimental_general_principles_v2.json`
-
 Engineering parent:
 
 `docs/reports/2026-09-26/StageII_Engineering_General_Chapter_Process_Integrity_Monitoring_and_Repair_v1.md`
 
-Machine-readable rules:
+Independent-audit / monitor-evaluation addendum:
 
-`configs/stage2_engineering_general_principles_v1.json`
+`docs/reports/2026-09-26/StageII_Dual_General_Chapter_Independent_Audit_and_Monitor_Evaluation_Addendum_v1.md`
 
-Forward replication policy:
+Machine-readable addendum:
 
-`configs/stage2_g2_g5_prospective_replication_policy_v1.json`
+`configs/stage2_dual_general_chapter_independent_audit_monitor_eval_addendum_v1.json`
+
+## Canonical forward protocols
+
+Execution/evaluation policy:
+
+`configs/stage2_g2_g5_execution_and_evaluation_policy_v2.json`
+
+Independent semantic-audit reference protocol:
+
+`configs/stage2_semantic_audit_reference_protocol_v1.json`
+
+Prospective monitor evaluation protocol:
+
+`configs/stage2_monitor_evaluation_protocol_v1.json`
 
 Forward reporting standard:
 
-`docs/reporting/process_reality_report_standard_v1_11.md`
+`docs/reporting/process_reality_report_standard_v1_12.md`
+
+## Canonical forward order
+
+No longer use per-group `A -> eligibility -> B`.
+
+The forward order is:
+
+1. G2 — run and freeze 21 natural A;
+2. G3 — run and freeze 21 natural A;
+3. G4 — run and freeze 21 natural A;
+4. G5 — run and freeze 21 natural A;
+5. seal all 84 prospective natural trajectories;
+6. run the monitor-blind full semantic audit;
+7. seal the semantic reference set;
+8. complete Experimental General Chapter cross-group synthesis;
+9. join frozen monitor outputs to the frozen audit reference set;
+10. compute primary within-study prospective monitoring performance;
+11. freeze 84-cell engineering eligibility;
+12. run engineering B in G2, G3, G4, G5 batches;
+13. synthesize the Engineering General Chapter.
+
+No active B is allowed before the full 84-trajectory natural block and the primary independent audit/monitor-evaluation block are frozen.
+
+## Natural-run evidence separation
+
+Every G2-G5 natural cell preserves two logically separate evidence channels.
+
+### Audit raw bundle
+
+May contain raw/native evidence required to reconstruct the route.
+
+Must exclude:
+
+- monitor warning labels;
+- monitor candidate labels;
+- monitor confidence/severity;
+- monitor-generated CPR labels;
+- monitor repair eligibility/package verdicts.
+
+### Monitor runtime bundle
+
+May contain prospectively generated:
+
+- warnings;
+- candidates;
+- structural signatures;
+- localization refs;
+- observed-surface coverage;
+- warning sequence;
+- monitor self-boundary evidence;
+- prospective package candidates.
+
+Must exclude post-hoc semantic-audit verdicts.
+
+The two channels are not joined until both are independently sealed.
+
+## Independent semantic audit
+
+The full semantic audit is monitor-blind until reference-set sealing.
+
+It evaluates complete routes, source/carrier/descendant semantics, adoption/decision linkage, C/P/R and cross-penetration, closure state, negative boundaries, and missing/unobservable evidence.
+
+The audit reference set is a within-study adjudication layer, not omniscient ground truth.
+
+It may record monitor misses later, but it may not backfill a primary repair candidate the monitor failed to identify prospectively.
+
+## Monitor benchmark
+
+Primary monitor-performance population:
+
+`G2-G5 = 84 natural trajectories`.
+
+G1 is retained for scientific mechanism synthesis and calibration context but is not silently pooled into the primary prospective monitor benchmark.
+
+Primary formal wording:
+
+> **within-study prospective monitoring performance**
+
+Required distinctions include:
+
+- detector miss vs unobservable evidence surface;
+- unsupported warning vs audit-rejected warning;
+- trajectory hit vs correct source/carrier/decision localization;
+- structural-signature detection vs post-hoc CPR interpretation.
+
+Required metric families include:
+
+- trajectory detection/miss;
+- structure recall/miss;
+- warning precision;
+- rejected-warning rate;
+- unsupported-warning rate;
+- source/carrier/consumer/decision localization;
+- lineage node/edge coverage;
+- warning lead distance;
+- end-to-end capture rate;
+- conditional detector recall over legally observable reference structures.
+
+Every rate shows numerator and denominator.
 
 ## G1 diagnostic lessons
 
@@ -62,89 +173,73 @@ G1 remains immutable, including its limitations.
 
 T1 X2-X7 are historical interface-dominated diagnostic trajectories under the v1 action-envelope contract.
 
-The row is useful evidence but is not a clean cross-framework task-performance baseline.
+They are not a clean cross-framework task-performance baseline.
 
 ### T2/T3
 
-The v2 action contract removed the dominant T1 parser-admission artifact.
+After action-contract clarification:
 
-Among the 14 T2/T3 cells:
-
+- 14 T2/T3 cells exist;
 - X4-T2 and X6-T2 are preserved provider-format failures;
 - among the remaining 12 runnable trajectories, 10 hit the historical 32-turn horizon;
-- X4-T3 naturally finalized only at turn 31.
+- X4-T3 finalized only at turn 31.
 
 Therefore G2-G5 target a prospectively frozen 64 logical model-decision horizon after cross-wrapper equivalence preflight.
 
-A horizon stop is recorded as censoring/non-closure, not automatically as task failure.
+A horizon stop is censoring/non-closure, not automatically task failure.
 
-## Natural observation versus repair eligibility
-
-Natural experimental membership and engineering repair eligibility are separate.
-
-Every G2-G5 group runs all seven X conditions.
+## X1/X3 boundary
 
 X1 AutoGen and X3 A2A remain fully included in:
 
-- native natural execution;
-- external monitoring;
-- warning;
-- lineage evidence;
-- semantic audit;
-- CPR/cross-penetration analysis.
+- all 84 prospective natural trajectories;
+- primary monitor benchmark;
+- independent semantic audit;
+- CPR/cross-penetration analysis;
+- engineering eligibility accounting.
 
-Their current active mid-run repair status is fail-closed because the required legal same-parent resumability has not been demonstrated without altering native framework/protocol semantics.
+Their current active mid-run B remains fail-closed because the required legal same-parent resumability has not been demonstrated under native-preservation constraints.
 
-Do not patch AutoGen or A2A, synthesize private state, or replay a stochastic prefix merely to manufacture a B branch.
+Do not patch AutoGen/A2A, synthesize private state, or replay a stochastic prefix to manufacture B.
 
-The currently repair-capable system set is:
+## Engineering phase
 
-`X2, X4, X5, X6, X7`
+Engineering begins only after the primary natural/audit/monitor block is frozen.
 
-subject to per-cell localization, checkpoint, parent, preserve-set, and repair-package eligibility.
+All 84 prospective natural trajectories enter eligibility accounting.
 
-## Forward execution order
+Primary repair candidates must come from the prospectively frozen monitor/localization/checkpoint/package pipeline.
 
-For each G2-G5 group:
+Audit-assisted repairs, if later studied, are a separate secondary experiment and cannot be pooled with the primary engineering result.
 
-1. run and freeze all 21 natural A first attempts;
-2. complete 21-cell monitor and repair-eligibility accounting;
-3. freeze eligible repair packages;
-4. run at most one legal B per eligible cell;
-5. repair executor exits;
-6. monitor continues watch-only;
-7. freeze B and post-repair evidence;
-8. only then open semantic/process comparison.
+Engineering B proceeds by group batches:
 
-No B may start before all 21 A trajectories in the group are frozen.
+`G2 -> G3 -> G4 -> G5`.
 
-## Native architecture invariants
+Per eligible cell:
 
-- X systems are registered and version-frozen, not forced through one runtime interface.
-- X1 AutoGen and X2 MetaGPT retain native multi-agent scheduling.
-- X3 retains native A2A communication.
-- X4-X7 remain capability-layer conditions on the explicitly registered de-instrumented software-engineering host.
-- monitoring is external and non-mutating during natural A.
-- common evidence representation is created after observation.
-- observation schema must not become a hidden execution schema.
-- native protocol/security boundaries remain binding.
+- maximum one B;
+- frozen same parent;
+- frozen package;
+- repair executor exits;
+- monitor remains watch-only;
+- no second automatic repair.
 
-## Historical readiness plan
+## Historical plans
 
-`configs/stage2_r7_g1_launch_manifest_v1.json` and `docs/R_Plan_v7.43.md` remain preserved as historical readiness artifacts.
+`docs/R_Plan_v7.43.md` and the old 15-cell launch manifest remain historical readiness artifacts.
 
-They proposed a 15-cell prospective extension that omitted new X1/X3 natural runs because paired active B was unavailable.
+`docs/R_Plan_v7.44.md` remains the previous five-group governance version, but its per-group A->B sequencing is superseded by v7.45.
 
-No scientific subject execution occurred under that plan.
+Do not activate historical sequencing where it conflicts with v7.45.
 
-v7.44 supersedes that launch assumption. Do not activate the old 15-cell manifest.
+## Next gate
 
-## Launcher history
+Allowed now:
 
-Historical v6.x and early v7.x files remain repository provenance.
+- offline governance validation;
+- 84-cell natural-block launch/evidence contract construction;
+- 64-decision wrapper-equivalence preflight;
+- monitor/audit evidence-channel separation preflight.
 
-Do not treat them as the current scientific plan.
-
-The next permitted operation under v7.44 is offline/non-study construction and validation of the exact G2 21-cell launch manifest plus 64-decision cross-wrapper horizon-equivalence preflight.
-
-Scientific G2 subject/provider execution remains separately gated.
+Scientific subject/provider execution remains separately gated.
