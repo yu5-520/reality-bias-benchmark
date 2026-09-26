@@ -129,7 +129,7 @@ async def run_capability_natural_A(
         "X4": "X4_MCP",
         "X5": "X5_RAG",
         "X6": "X6_MEMORYBANK",
-        "X7": "X7_LONGLINGUA",
+        "X7": "X7_LONGLMLINGUA",
     }
     recorder = HostBoundaryCheckpointRecorder(
         registry=registry,
