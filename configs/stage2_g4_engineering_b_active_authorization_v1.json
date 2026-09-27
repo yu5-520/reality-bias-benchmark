@@ -70,7 +70,9 @@
     "B_root": "stage2/replication_v2/G4/engineering_B_v1",
     "execution_claim_path": "stage2/replication_v2/G4/engineering_B_v1/control/execution_claim.json",
     "execution_claim_must_advance_from": "5213f92b3934b5a441314e16e7d71d4fa9cb0e3b",
-    "execution_claim_rule": "ATOMIC_FAST_FORWARD_BEFORE_ANY_PROVIDER_CALL"
+    "execution_claim_rule": "G4_CANONICAL_RUN_PRECEDES_PROTOCOL; ANY_NEW_G4_LAUNCH_FAILS_CLOSED_BY_CONSUMPTION_LATCH",
+    "canonical_run_has_atomic_execution_claim": false,
+    "consumption_latch": "configs/stage2_g4_engineering_b_attempt_consumption_latch_v1.json"
   },
   "execution": {
     "one_B_per_cell": true,
@@ -89,9 +91,13 @@
     "repair_executor_exits_after_one_package": true,
     "post_repair_monitor_mode": "WATCH_ONLY",
     "post_repair_additional_repair_packages": 0,
-    "atomic_run_execution_claim_required": true,
+    "atomic_run_execution_claim_required": false,
     "receipt_absence_is_authorization": false,
-    "execution_claim_protocol": "configs/stage2_engineering_b_execution_claim_protocol_v1.json"
+    "execution_claim_protocol": "configs/stage2_engineering_b_execution_claim_protocol_v1.json",
+    "atomic_run_execution_claim_required_for_any_new_G4_launch": true,
+    "canonical_first_attempt_workflow_run": 36310474950,
+    "G4_relaunch_authorized": false,
+    "if_canonical_freeze_fails": "ARTIFACT_ONLY_RECOVERY_ZERO_PROVIDER_RERUN"
   },
   "independence": {
     "semantic_audit_used_for_selection": false,
@@ -110,7 +116,7 @@
     "semantic_audit": false,
     "G5_B": false
   },
-  "next_gate": "FREEZE_ALL_12_FIRST_B_ATTEMPTS_THEN_G4_PAIRED_SEMANTIC_AUDIT",
+  "next_gate": "FREEZE_CANONICAL_G4_RUN_36310474950_THEN_G4_PAIRED_SEMANTIC_AUDIT",
   "incident_boundary": {
     "source": "stage2/replication_v2/G3/engineering_B_v1/control/duplicate_execution_incident_v1.json",
     "canonical_G3_run": 36309205795,
