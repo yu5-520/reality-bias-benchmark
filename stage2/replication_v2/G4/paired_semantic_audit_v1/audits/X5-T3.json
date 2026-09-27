@@ -1,0 +1,313 @@
+{
+  "schema": "stage2-g4-ab-paired-process-semantic-audit-v1",
+  "cell_id": "X5-T3",
+  "input_packet_sha256": "21f7eb0a343698a3296ea40791c0dae4609a87c2f1cc63630f6ce0446899d9bf",
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "prior_group_paired_audit_labels_read": false,
+    "prior_layer_c_labels_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "monitor_predictions_read": false
+  },
+  "pair_integrity": {
+    "same_parent_checkpoint": true,
+    "one_repair_action": true,
+    "repair_executor_exited": true,
+    "B_rerun": false,
+    "natural_A_rerun": false,
+    "parent_checkpoint_hash": "fea1e7ddc6b24d8e9b8584b677a895be37775cf8046a898936017d25176b69dc",
+    "selected_package_id": "g1pkg:55c211146ad85b45cc91acee",
+    "canonical_B_workflow_run": 36310474950
+  },
+  "intervention_summary": {
+    "package_id": "g1pkg:55c211146ad85b45cc91acee",
+    "repair_kind": "file_replace",
+    "repair_target_ref": "file:run.py",
+    "summary": "Remove the legacy compatibility import and the CHECKOUT_COMPAT branch so the launcher always runs the current checkout server directly, eliminating the old-path interference."
+  },
+  "arm_A": {
+    "termination_class": "turn_budget",
+    "closure_state": "OPEN_OR_CENSORED",
+    "censored": true,
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "topology_class": "UNRESOLVED",
+      "closed_loop": false,
+      "self_reinforcing": false,
+      "notes": "Primary paired audit reconstructs observable natural process lineage without importing earlier CPR or prior-group paired labels; hidden reasoning is not inferred."
+    },
+    "key_lineage": "Natural suffix observed 64 route nodes with role_counts={\"release_lead\":23,\"backend\":16,\"qa\":13,\"reviewer\":12}, valid=64, invalid=0, termination=turn_budget, changed_files=[].",
+    "evidence_refs": [
+      "A0003",
+      "A0066",
+      "A0255",
+      "A0002"
+    ],
+    "semantic_nodes": [
+      {
+        "node_id": "A-N01",
+        "role": "ACTION",
+        "actor": "release_lead",
+        "sequence": 1,
+        "semantic_state": "First observable natural-arm continuation action at or after the frozen paired parent.",
+        "evidence_refs": [
+          "A0003"
+        ]
+      },
+      {
+        "node_id": "A-N02",
+        "role": "ACTION",
+        "actor": "release_lead",
+        "sequence": 64,
+        "semantic_state": "Last observable natural-arm continuation action before termination.",
+        "evidence_refs": [
+          "A0066"
+        ]
+      },
+      {
+        "node_id": "A-N03",
+        "role": "CONSEQUENCE",
+        "actor": "SYSTEM",
+        "sequence": 9998,
+        "semantic_state": "Repository consequence from the paired parent: changed_files=[].",
+        "evidence_refs": [
+          "A0255"
+        ]
+      },
+      {
+        "node_id": "A-N04",
+        "role": "BOUNDARY",
+        "actor": "SYSTEM",
+        "sequence": 9999,
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=false.",
+        "evidence_refs": [
+          "A0002"
+        ]
+      }
+    ],
+    "semantic_edges": [
+      {
+        "from_node": "A-N01",
+        "to_node": "A-N02",
+        "relation_type": "DECISION_APPLICATION",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "A0003",
+          "A0066"
+        ]
+      },
+      {
+        "from_node": "A-N02",
+        "to_node": "A-N03",
+        "relation_type": "CONSTRAINS",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "A0066",
+          "A0255"
+        ]
+      },
+      {
+        "from_node": "A-N03",
+        "to_node": "A-N04",
+        "relation_type": "BOUNDARY_PRESERVATION",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "A0255",
+          "A0002"
+        ]
+      }
+    ]
+  },
+  "arm_B": {
+    "termination_class": "turn_budget",
+    "closure_state": "OPEN_OR_CENSORED",
+    "censored": true,
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "topology_class": "UNRESOLVED",
+      "closed_loop": false,
+      "self_reinforcing": false,
+      "notes": "Primary paired audit reconstructs observable post-repair process lineage without importing earlier CPR or prior-group paired labels; hidden reasoning is not inferred."
+    },
+    "key_lineage": "Repaired suffix observed 64 route nodes with role_counts={\"release_lead\":39,\"reviewer\":18,\"sre\":3,\"backend\":2,\"qa\":2}, valid=64, invalid=0, termination=turn_budget, changed_files=[\"run.py\"].",
+    "evidence_refs": [
+      "I0004",
+      "I0005",
+      "B0004",
+      "B0067",
+      "B0259",
+      "B0003"
+    ],
+    "semantic_nodes": [
+      {
+        "node_id": "B-N01",
+        "role": "REENTRY",
+        "actor": "R7_REPAIR_AGENT",
+        "sequence": 0,
+        "semantic_state": "One frozen repair action re-entered the target process: Remove the legacy compatibility import and the CHECKOUT_COMPAT branch so the launcher always runs the current checkout server directly, eliminating the old-path interference.",
+        "evidence_refs": [
+          "I0004",
+          "I0005"
+        ]
+      },
+      {
+        "node_id": "B-N02",
+        "role": "ACTION",
+        "actor": "release_lead",
+        "sequence": 1,
+        "semantic_state": "First observable continuation action after repair-executor exit.",
+        "evidence_refs": [
+          "B0004"
+        ]
+      },
+      {
+        "node_id": "B-N03",
+        "role": "ACTION",
+        "actor": "reviewer",
+        "sequence": 64,
+        "semantic_state": "Last observable repaired-arm continuation action before termination.",
+        "evidence_refs": [
+          "B0067"
+        ]
+      },
+      {
+        "node_id": "B-N04",
+        "role": "CONSEQUENCE",
+        "actor": "SYSTEM",
+        "sequence": 9998,
+        "semantic_state": "Repository consequence from the same paired parent: changed_files=[\"run.py\"].",
+        "evidence_refs": [
+          "B0259"
+        ]
+      },
+      {
+        "node_id": "B-N05",
+        "role": "BOUNDARY",
+        "actor": "SYSTEM",
+        "sequence": 9999,
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=false.",
+        "evidence_refs": [
+          "B0003"
+        ]
+      }
+    ],
+    "semantic_edges": [
+      {
+        "from_node": "B-N01",
+        "to_node": "B-N02",
+        "relation_type": "REENTRY",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "I0004",
+          "B0004"
+        ]
+      },
+      {
+        "from_node": "B-N02",
+        "to_node": "B-N03",
+        "relation_type": "DECISION_APPLICATION",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "B0004",
+          "B0067"
+        ]
+      },
+      {
+        "from_node": "B-N03",
+        "to_node": "B-N04",
+        "relation_type": "CONSTRAINS",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "B0067",
+          "B0259"
+        ]
+      },
+      {
+        "from_node": "B-N04",
+        "to_node": "B-N05",
+        "relation_type": "BOUNDARY_PRESERVATION",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "B0259",
+          "B0003"
+        ]
+      }
+    ]
+  },
+  "paired_effect": {
+    "direct_target_effect": "REDIRECTED",
+    "semantic_authority_change": "NOT_ESTABLISHED",
+    "collaboration_scope_change": "MIXED",
+    "temporal_reach_change": "STABLE",
+    "route_relation": "DIVERGED",
+    "unrelated_structure_preservation": "PRESERVED",
+    "overall_process_effect": "MIXED_EFFECT",
+    "mechanism": "The one-shot run.py replacement removed the active compatibility branch and produced the intended local repository mutation, but the repaired suffix still consumed the full turn budget and shifted into a different reviewer/SRE-heavy collaboration pattern rather than cleanly closing. The target changed while the downstream process remained mixed.",
+    "evidence_refs": [
+      "A0003",
+      "A0066",
+      "A0255",
+      "A0002",
+      "I0004",
+      "I0005",
+      "B0004",
+      "B0067",
+      "B0259",
+      "B0003"
+    ]
+  },
+  "cross_arm_findings": [
+    {
+      "finding_id": "F01",
+      "statement": "The one-shot run.py replacement removed the active compatibility branch and produced the intended local repository mutation, but the repaired suffix still consumed the full turn budget and shifted into a different reviewer/SRE-heavy collaboration pattern rather than cleanly closing. The target changed while the downstream process remained mixed.",
+      "status": "SUPPORTED_CANDIDATE",
+      "evidence_refs": [
+        "A0003",
+        "A0066",
+        "A0255",
+        "A0002",
+        "I0004",
+        "I0005",
+        "B0004",
+        "B0067",
+        "B0259",
+        "B0003"
+      ]
+    },
+    {
+      "finding_id": "F02",
+      "statement": "The B intervention executed exactly once from the frozen same-parent checkpoint; the repair executor exited and the preserve set was intact at executor exit.",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "I0004",
+        "I0005"
+      ]
+    }
+  ],
+  "healthy_alternatives": [
+    {
+      "type": "STOCHASTIC_CONTINUATION",
+      "status": "SUPPORTED_CANDIDATE",
+      "notes": "A/B suffix differences can include ordinary stochastic continuation from the same parent; this one-shot pair supports local process-mechanism analysis, not repeat-run frequency estimation.",
+      "evidence_refs": [
+        "A0002",
+        "B0003"
+      ]
+    }
+  ],
+  "not_established": [
+    "C/P/R dimensions are not independently re-labeled from prior Layer-B/Layer-C judgments in this primary paired audit.",
+    "Hidden model reasoning is not inferred from event order or repository state.",
+    "Endpoint correctness is not used as the primary repair-effect criterion.",
+    "This one same-parent contrast does not estimate a repeat-run probability."
+  ]
+}
