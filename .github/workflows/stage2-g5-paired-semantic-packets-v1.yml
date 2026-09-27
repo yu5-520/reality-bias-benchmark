@@ -1,0 +1,122 @@
+name: Stage-II G5 Paired Semantic Packet Freeze
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "configs/stage2_g5_paired_audit_launch_v1.json"
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  freeze-packets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout paired-audit result branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g5-paired-audit-v1
+          path: repo
+          fetch-depth: 0
+
+      - name: Checkout exact G5 Natural-A evidence
+        uses: actions/checkout@v4
+        with:
+          ref: 1409a07241ca8fc49485bd1c805e040d01ad6444
+          path: a-evidence
+          fetch-depth: 1
+
+      - name: Checkout exact frozen G5 Engineering-B evidence
+        uses: actions/checkout@v4
+        with:
+          ref: 7a128c8b8b43002bed0194a0ab511f08248f2a07
+          path: b-evidence
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify audit authorization
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          cfg=json.loads(Path("repo/configs/stage2_g5_ab_paired_semantic_audit_v1.json").read_text())
+          assert cfg["authorization_issue"]==331
+          assert cfg["reviewer"]["model"]=="GPT-5.6 Sol"
+          assert cfg["reviewer"]["execution_mode"]=="CHATGPT_NATIVE_REASONING"
+          assert cfg["source"]["natural_A_evidence_commit"]=="1409a07241ca8fc49485bd1c805e040d01ad6444"
+          assert cfg["source"]["repair_B_evidence_commit"]=="7a128c8b8b43002bed0194a0ab511f08248f2a07"
+          assert len(cfg["population"]["valid_paired_cells"])==11
+          assert cfg["population"]["execution_boundary_cells"]==["X4-T2"]
+          assert cfg["synthesis"]["boundary_not_imputed_as_repair_failure"] is True
+          issue=json.loads(subprocess.check_output(["gh","api",f'repos/{os.environ["GITHUB_REPOSITORY"]}/issues/331'],text=True))
+          assert issue["state"]=="open"
+          assert issue["user"]["login"]=="yu5-520"
+          assert issue["title"]=="STAGE2 G5 A-B PAIRED PROCESS-SEMANTIC AUDIT AUTHORIZATION"
+          assert "valid_paired_cells=X2-T1,X2-T2,X2-T3,X4-T1,X4-T2,X4-T3,X5-T1,X5-T3,X7-T1,X7-T2,X7-T3" in issue["body"]
+          assert "source_readiness_boundary_cells=X4-T2" in issue["body"]
+          print("PASS: G5 paired-audit authorization bound")
+          PY
+
+      - name: Build 11 paired packets plus X4-T2 source-readiness boundary record
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="stage2/replication_v2/G5/paired_semantic_audit_v1"
+          test ! -e "repo/$ROOT"
+          (cd repo && python arena/build_stage2_g5_ab_semantic_packets_v1.py \
+            --a-root "$GITHUB_WORKSPACE/a-evidence" \
+            --b-root "$GITHUB_WORKSPACE/b-evidence" \
+            --config configs/stage2_g5_ab_paired_semantic_audit_v1.json \
+            --out "$ROOT")
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path("repo/stage2/replication_v2/G5/paired_semantic_audit_v1")
+          idx=json.loads((root/"packets"/"packet_index.json").read_text())
+          boundary=json.loads((root/"execution_boundaries"/"X4-T2.json").read_text())
+          assert idx["status"]=="FROZEN_11_VALID_PAIRS_PLUS_1_SOURCE_READINESS_BOUNDARY"
+          assert idx["attempted_cell_count"]==12
+          assert idx["paired_cell_count"]==11
+          assert idx["execution_boundary_count"]==1
+          assert len(idx["cells"])==11
+          assert boundary["status"]=="ACTIVE_B_EXECUTION_READINESS_BOUNDARY"
+          assert boundary["B_attempt_created"] is False
+          assert boundary["B_provider_calls"]==0
+          assert boundary["source_boundary"]["class"]=="CANONICAL_NATURAL_A_MISSING_SEAL"
+          assert boundary["B_rerun"] is False
+          assert boundary["not_imputed_as_repair_failure"] is True
+          assert idx["new_subject_provider_calls"]==0
+          assert idx["repair_calls"]==0
+          assert idx["paid_evaluator_calls"]==0
+          print("PASS: G5 11-pair + 1-source-boundary packet population frozen")
+          PY
+
+      - name: Freeze packets append-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="stage2/replication_v2/G5/paired_semantic_audit_v1"
+          git -C repo config user.name "stage2-g5-paired-audit"
+          git -C repo config user.email "stage2-g5-paired-audit@users.noreply.github.com"
+          git -C repo add "$ROOT"
+          git -C repo commit -m "audit: freeze G5 paired semantic packets [run $GITHUB_RUN_ID]"
+          git -C repo push origin HEAD:stage2-g5-paired-audit-v1
+
+      - name: Report packet freeze
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh issue comment 331 --repo "$GITHUB_REPOSITORY" --body "G5 paired semantic audit inputs frozen: 11 valid same-parent A↔B packets plus 1 explicit X4-T2 source-readiness boundary. No subject/provider, repair, or evaluator calls were used. X4-T2 received no B call, was not rerun, and is not imputed as a repair-effect sample."
