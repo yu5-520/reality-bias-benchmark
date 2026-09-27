@@ -319,27 +319,45 @@ Full report:
 
 `docs/reports/2026-09-26/StageII_G2_G5_84_Cell_Natural_Block_Preflight_Report_v1.md`
 
+## Current engineering closure
+
+The prospective G2-G5 engineering pipeline is now closed through independent paired process-semantic audit and final cross-group synthesis.
+
+Frozen final population:
+
+- group-cell structural eligibility rows: **48**;
+- canonical B first attempts: **47**;
+- valid same-parent paired effects: **45**;
+- explicit boundaries: **3**;
+- direct target changed: **27/45**;
+- clean targeted suppression/redirection: **7/45**;
+- persistence: **18/45**;
+- mixed effect: **15/45**;
+- regeneration: **5/45**;
+- unrelated structure preserved: **45/45**.
+
+Boundary taxonomy:
+
+- G2:X5-T2 — B-execution no-effect boundary;
+- G4:X5-T2 — B-execution no-effect boundary;
+- G5:X4-T2 — pre-B canonical-source readiness boundary.
+
+No boundary is imputed as a negative repair-effect sample, and no rerun is used to manufacture a preferred pair.
+
+The G3 duplicate-execution control incident remains disclosed and excluded from scientific evidence. The forward control plane uses a group-scoped atomic execution claim before provider calls.
+
+Final engineering synthesis:
+
+`docs/reports/2026-09-27/StageII_Engineering_General_Chapter_Final_G2_G5_Synthesis_v1.md`
+
+Machine-readable synthesis:
+
+`stage2/replication_v2/engineering_cross_group_g2_g5_v1/`
+
 ## Next gate
 
-G2 is closed through paired semantic synthesis.
+**Publication integration.**
 
-Frozen G2 result:
+No additional G2-G5 experimental rerun is required by the final engineering synthesis.
 
-- first B attempts preserved: **12/12**;
-- valid same-parent paired contrasts: **11**;
-- execution boundary: **X5-T2**;
-- direct target changed: **7/11**;
-- clean targeted suppression/redirection: **2/11**;
-- unrelated structure preserved: **11/11**.
-
-G3 has independently frozen its package/checkpoint selection and passed the 12/12 zero-call continuation preflight. Its active-B batch may run while G2 closure is promoted.
-
-The engineering pipeline is now:
-
-`audit G2 || execute G3`  
-`audit G3 || execute G4`  
-`audit G4 || execute G5`
-
-A previous group's semantic findings may enter later synthesis, but may not change the next group's already-frozen package selection, repair rule, parent checkpoint, or execution geometry.
-
-G4 zero-call preflight may be prepared while G3 B runs. G4 active B remains separately gated until G3 first attempts are frozen.
+The next work item is to connect the frozen engineering chapter with the Stage-II experimental general chapter, natural-emergence evidence, monitor benchmark, semantic-lineage evidence, and the cross-system paper narrative.
