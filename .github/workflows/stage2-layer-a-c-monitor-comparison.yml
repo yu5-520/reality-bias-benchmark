@@ -1,0 +1,281 @@
+name: Stage-II Layer A-C Full-Context Monitor Comparison
+
+on:
+  push:
+    branches:
+      - stage2-gpt56sol-full-context-audit-results-v1
+    paths:
+      - ".github/workflows/stage2-layer-a-c-monitor-comparison.yml"
+      - "configs/stage2_monitor_full_context_localization_rule_v1.json"
+
+permissions:
+  contents: write
+
+jobs:
+  compare-a-c:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: stage2-layer-a-c-monitor-comparison
+      cancel-in-progress: false
+    steps:
+      - name: Checkout sealed Layer-A/C branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-gpt56sol-full-context-audit-results-v1
+          fetch-depth: 0
+
+      - name: Build A-C full-context localization comparison
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+          from collections import Counter, defaultdict
+
+          root=Path("stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1")
+          aroot=root/"layer_a_monitor_export"
+          out=root/"layer_a_c_monitor_comparison_v1"
+          out.mkdir(parents=True,exist_ok=True)
+
+          protocol=json.loads(Path("configs/stage2_monitor_evaluation_protocol_v1.json").read_text())
+          rule=json.loads(Path("configs/stage2_monitor_full_context_localization_rule_v1.json").read_text())
+          aindex=json.loads((aroot/"export_index.json").read_text())
+          cindex=json.loads((root/"audit_index.json").read_text())
+          cseal=json.loads((root/"population_seal.json").read_text())
+          assert aindex["eligible_cell_count"]==80 and aindex["cpr_labels_used_for_monitor_generation"] is False
+          assert cindex["validated_audit_count"]==80
+          assert cseal["state"]=="SEALED"
+          assert rule["no_posthoc_threshold_tuning"] is True
+          assert rule["matching"]["use_monitor_rule_to_cpr_dimension_mapping"] is False
+
+          positive={"SUPPORTED","SUPPORTED_CANDIDATE"}
+          minlen=rule["object_normalization"]["minimum_token_length"]
+
+          def tokens(obj):
+              if not obj: return set()
+              s=str(obj).strip().lower()
+              if ":" in s: s=s.split(":",1)[1]
+              vals=set()
+              if len(s)>=minlen: vals.add(s)
+              base=s.rsplit("/",1)[-1]
+              if len(base)>=minlen: vals.add(base)
+              stem=base.rsplit(".",1)[0]
+              if len(stem)>=minlen: vals.add(stem)
+              return vals
+
+          def overlaps(obj,text):
+              text=(text or "").lower()
+              return any(t in text for t in tokens(obj))
+
+          audits={a["full_id"]:a for a in cindex["audits"]}
+          arecs={r["full_id"]:r for r in aindex["records"]}
+          assert set(audits)==set(arecs)
+
+          rows=[]; cell_rows=[]; warning_state={}
+          by_group=defaultdict(Counter); by_x=defaultdict(Counter); by_t=defaultdict(Counter); by_dim=defaultdict(Counter); by_topology=defaultdict(Counter)
+          total_events=0; strict_hits=0; broad_hits=0; pos_traj=0; hit_traj=0
+
+          for full in sorted(audits):
+              group,x,t=full.split("-"); cell=f"{x}-{t}"
+              audit=json.loads((root/audits[full]["audit_path"]).read_text())
+              packet=json.loads((root/"inputs"/f"{full}.json").read_text())
+              candidates=json.loads((aroot/"cells"/full/"monitor_candidates.json").read_text())
+              evmap={e["ref"]:e for e in packet["evidence"]}
+              nmap={n["node_id"]:n for n in audit["semantic_nodes"]}
+              pos_events=[e for e in audit["cpr_events"] if e["status"] in positive]
+              neg_events=[e for e in audit["cpr_events"] if e["status"]=="NEGATIVE_BOUNDARY"]
+              if pos_events: pos_traj+=1
+              cell_broad=0; cell_strict=0
+              used=set()
+
+              def texts(ev):
+                  core=[ev.get("summary",""),ev.get("counter_explanation","")]
+                  for nid in ev.get("semantic_node_refs") or []:
+                      if nid in nmap: core.append(nmap[nid].get("semantic_state",""))
+                  evidence=[]
+                  for ref in ev.get("evidence_refs") or []:
+                      er=evmap.get(ref)
+                      if er: evidence.append(er.get("preview") or "")
+                  return " ".join(core), " ".join(evidence)
+
+              def temporal(c,ev):
+                  end=ev.get("end_sequence")
+                  seq=c.get("prefix_sequence")
+                  if end is None or seq is None: return True
+                  return int(seq)<=int(end)
+
+              def score(c,ev):
+                  if not temporal(c,ev): return -1
+                  core,evidence=texts(ev)
+                  if overlaps(c.get("object_ref"),core): return 2
+                  if overlaps(c.get("object_ref"),evidence): return 1
+                  return -1
+
+              for ev in pos_events:
+                  total_events+=1
+                  opts=sorted(((score(c,ev),c) for c in candidates),key=lambda z:(z[0],-(z[1].get("prefix_sequence") or 0)),reverse=True)
+                  sc,best=(opts[0] if opts else (-1,None))
+                  if sc==2:
+                      klass="SUPPORTED_MATCH"; strict_hits+=1; broad_hits+=1; cell_strict+=1; cell_broad+=1
+                  elif sc==1:
+                      klass="PARTIAL_LOCALIZATION"; broad_hits+=1; cell_broad+=1
+                  else:
+                      klass="MISS"
+                  wid=best.get("candidate_hash") if sc>=1 and best else None
+                  if wid:
+                      used.add(wid); warning_state[wid]="SUPPORTED"
+                  first_warn=best.get("prefix_sequence") if wid else None
+                  end=ev.get("end_sequence")
+                  core,_=texts(ev)
+                  matched_nodes=sum(1 for nid in ev.get("semantic_node_refs") or [] if nid in nmap and best and overlaps(best.get("object_ref"),nmap[nid].get("semantic_state","")))
+                  ref_nodes=len(ev.get("semantic_node_refs") or [])
+                  row={
+                    "evaluation_id":f"AC:{full}:{ev['event_id']}",
+                    "group_id":group,"cell_id":cell,
+                    "monitor_version":"RB-STAGE2-R7-G1-ONLINE-MONITOR-CONTRACT-v1",
+                    "matching_rule_version":"stage2-monitor-full-context-localization-rule-v1",
+                    "reference_id":f"{full}:{ev['event_id']}","warning_id":wid,
+                    "structure_family":f"CPR_{ev['dimension']}",
+                    "match_class":klass,"observable_reference":True,
+                    "source_match":None,
+                    "carrier_match":True if sc==2 else (False if sc==1 else None),
+                    "consumer_match":None,"decision_link_match":None,
+                    "lineage_node_reference_count":ref_nodes,
+                    "lineage_node_matched_count":matched_nodes if wid else 0,
+                    "lineage_edge_reference_count":None,"lineage_edge_matched_count":None,
+                    "first_warning_sequence":first_warn,
+                    "first_consequence_sequence":end,
+                    "lead_decisions":(end-first_warn) if isinstance(end,int) and isinstance(first_warn,int) else None,
+                    "notes":f"Layer-C {ev['dimension']} status={ev['status']}; monitor rule_id={(best or {}).get('rule_id')}; rule ID was not translated into CPR dimension."
+                  }
+                  rows.append(row)
+                  by_group[group][klass]+=1; by_x[x][klass]+=1; by_t[t][klass]+=1; by_dim[ev["dimension"]][klass]+=1; by_topology[audit["dynamic_topology"]["topology_class"]][klass]+=1
+
+              if pos_events and cell_broad>0: hit_traj+=1
+
+              for c in candidates:
+                  wid=c.get("candidate_hash")
+                  if wid in used: continue
+                  rejected=False
+                  for ev in neg_events:
+                      if score(c,ev)>=1:
+                          rejected=True; break
+                  klass="AUDIT_REJECTED_WARNING" if rejected else "UNSUPPORTED_WARNING"
+                  if warning_state.get(wid)!="SUPPORTED":
+                      warning_state[wid]="REJECTED" if rejected else "UNSUPPORTED"
+                  rows.append({
+                    "evaluation_id":f"AC:{full}:WARN:{wid[:16]}",
+                    "group_id":group,"cell_id":cell,
+                    "monitor_version":"RB-STAGE2-R7-G1-ONLINE-MONITOR-CONTRACT-v1",
+                    "matching_rule_version":"stage2-monitor-full-context-localization-rule-v1",
+                    "reference_id":None,"warning_id":wid,"structure_family":None,
+                    "match_class":klass,"observable_reference":False,
+                    "source_match":None,"carrier_match":None,"consumer_match":None,"decision_link_match":None,
+                    "lineage_node_reference_count":None,"lineage_node_matched_count":None,
+                    "lineage_edge_reference_count":None,"lineage_edge_matched_count":None,
+                    "first_warning_sequence":c.get("prefix_sequence"),"first_consequence_sequence":None,
+                    "lead_decisions":None,
+                    "notes":f"Unmatched frozen warning; rule_id={c.get('rule_id')} object_ref={c.get('object_ref')}."
+                  })
+
+              cell_rows.append({
+                "full_id":full,"group_id":group,"cell_id":cell,
+                "layer_c_positive_event_count":len(pos_events),
+                "strict_localized_event_count":cell_strict,
+                "broad_localized_event_count":cell_broad,
+                "monitor_warning_count":len(candidates),
+                "layer_c_topology_class":audit["dynamic_topology"]["topology_class"]
+              })
+
+          supported=sum(1 for v in warning_state.values() if v=="SUPPORTED")
+          rejected=sum(1 for v in warning_state.values() if v=="REJECTED")
+          unsupported=sum(1 for v in warning_state.values() if v=="UNSUPPORTED")
+          warnings=len(warning_state)
+
+          def frac(n,d): return {"numerator":n,"denominator":d,"value":(n/d if d else None)}
+          leads=[r["lead_decisions"] for r in rows if r["reference_id"] is not None and r["match_class"] in {"SUPPORTED_MATCH","PARTIAL_LOCALIZATION"} and isinstance(r["lead_decisions"],int)]
+          leads_sorted=sorted(leads)
+          median=(leads_sorted[len(leads_sorted)//2] if leads_sorted else None)
+
+          summary={
+            "schema":"stage2-layer-a-c-monitor-comparison-summary-v1","state":"SEALED",
+            "population":"SEALED_LAYER_C_80_ELIGIBLE_CELLS",
+            "cell_count":80,
+            "monitor_generation_used_cpr_labels":False,
+            "monitor_rule_to_cpr_dimension_mapping_used":False,
+            "matching_rule_version":"stage2-monitor-full-context-localization-rule-v1",
+            "matching_rule_sha256":hashlib.sha256(Path("configs/stage2_monitor_full_context_localization_rule_v1.json").read_bytes()).hexdigest(),
+            "trajectory":{
+              "layer_c_positive_trajectories":pos_traj,
+              "monitor_localized_trajectories":hit_traj,
+              "trajectory_detection_rate":frac(hit_traj,pos_traj),
+              "trajectory_miss_rate":frac(pos_traj-hit_traj,pos_traj)
+            },
+            "mechanism_event":{
+              "layer_c_positive_cpr_events":total_events,
+              "strict_core_localized_events":strict_hits,
+              "broad_core_or_bound_evidence_localized_events":broad_hits,
+              "strict_event_localization_recall":frac(strict_hits,total_events),
+              "broad_event_localization_recall":frac(broad_hits,total_events),
+              "event_miss_rate_broad":frac(total_events-broad_hits,total_events)
+            },
+            "warning_accounting":{
+              "monitor_warning_count":warnings,
+              "full_context_supported_warning_count":supported,
+              "full_context_supported_warning_rate":frac(supported,warnings),
+              "full_context_rejected_warning_count":rejected,
+              "full_context_rejected_warning_rate":frac(rejected,warnings),
+              "full_context_unsupported_warning_count":unsupported,
+              "full_context_unsupported_warning_rate":frac(unsupported,warnings)
+            },
+            "localization":{
+              "median_first_warning_to_event_end_lead_decisions":median,
+              "lead_decision_observation_count":len(leads),
+              "lead_decisions":leads_sorted
+            },
+            "breakdowns":{
+              "by_group":{k:dict(v) for k,v in sorted(by_group.items())},
+              "by_system":{k:dict(v) for k,v in sorted(by_x.items())},
+              "by_task":{k:dict(v) for k,v in sorted(by_t.items())},
+              "by_cpr_dimension":{k:dict(v) for k,v in sorted(by_dim.items())},
+              "by_layer_c_topology":{k:dict(v) for k,v in sorted(by_topology.items())}
+            },
+            "scope_statement":protocol["publication_boundary"]["required_scope_statement"],
+            "interpretation_rules":[
+              "Layer-A rule IDs are not converted into C/P/R labels.",
+              "Strict localization requires concrete monitor object/carrier overlap with Layer-C mechanism text or semantic-node state.",
+              "Partial localization requires overlap only in frozen evidence bound to the Layer-C event.",
+              "This comparison measures prospective structural localization against full-context reconstruction; it does not make Layer A a CPR classifier.",
+              "All rates retain numerator and denominator and apply only to the frozen study population."
+            ]
+          }
+
+          with (out/"evaluation_records.jsonl").open("w") as f:
+              for r in rows: f.write(json.dumps(r,sort_keys=True)+"\n")
+          (out/"cell_summary.json").write_text(json.dumps(cell_rows,indent=2,sort_keys=True)+"\n")
+          (out/"comparison_summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n")
+          seal={
+            "schema":"stage2-layer-a-c-monitor-comparison-seal-v1","state":"SEALED","cell_count":80,
+            "layer_c_population_sealed":True,"monitor_cpr_label_freeze_confirmed":True,
+            "rule_id_to_cpr_label_mapping_used":False,
+            "comparison_summary_sha256":hashlib.sha256((out/"comparison_summary.json").read_bytes()).hexdigest(),
+            "evaluation_records_sha256":hashlib.sha256((out/"evaluation_records.jsonl").read_bytes()).hexdigest(),
+            "next_stage":"INTEGRATE_A_B_B_C_A_C_AND_OPEN_ENGINEERING_B"
+          }
+          (out/"comparison_seal.json").write_text(json.dumps(seal,indent=2,sort_keys=True)+"\n")
+          print(json.dumps({"status":"PASS","cells":80,"positive_events":total_events,"strict":strict_hits,"broad":broad_hits,
+                            "warnings":warnings,"supported_warnings":supported,"rejected_warnings":rejected,
+                            "unsupported_warnings":unsupported},sort_keys=True))
+          PY
+
+      - name: Commit sealed A-C comparison
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_c_monitor_comparison_v1"
+          git config user.name "stage2-layer-a-c-eval"
+          git config user.email "stage2-layer-a-c-eval@users.noreply.github.com"
+          git add "$ROOT"
+          git commit -m "Seal Stage-II Layer A-C full-context monitor comparison"
+          git push origin HEAD:stage2-gpt56sol-full-context-audit-results-v1

@@ -1,0 +1,25 @@
+{
+  "schema": "stage2-monitor-full-context-localization-rule-v1",
+  "version": "1.0",
+  "status": "FROZEN_BEFORE_A_C_EVALUATION",
+  "date_utc": "2026-09-27",
+  "purpose": "Compare prospectively frozen Layer-A structural warnings with sealed Layer-C full-context CPR mechanisms without translating monitor rule IDs into CPR labels.",
+  "no_posthoc_threshold_tuning": true,
+  "matching": {
+    "use_monitor_rule_to_cpr_dimension_mapping": false,
+    "supported_match": "normalized monitor object overlaps Layer-C event mechanism text or referenced semantic-node state and warning sequence is not after event end",
+    "partial_localization": "no core semantic overlap, but normalized monitor object overlaps frozen evidence preview bound to that Layer-C event and warning sequence is not after event end",
+    "miss": "positive Layer-C CPR event has no supported or partial frozen monitor localization",
+    "audit_rejected_warning": "unmatched warning overlaps a Layer-C NEGATIVE_BOUNDARY event in core semantic or bound evidence text",
+    "unsupported_warning": "unmatched warning is neither positively localized nor directly rejected"
+  },
+  "object_normalization": {
+    "strip_family_prefix": true,
+    "full_tail": true,
+    "basename": true,
+    "stem": true,
+    "minimum_token_length": 4
+  },
+  "temporal_rule": "prefix_sequence <= cpr_event.end_sequence when end_sequence exists; otherwise temporal check passes",
+  "publication_boundary": "This is within-study full-context localization performance, not universal monitor accuracy or a claim that structural warning rules are equivalent to CPR labels."
+}
