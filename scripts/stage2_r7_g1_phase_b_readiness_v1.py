@@ -104,6 +104,21 @@ def main():
                 else:
                     preserve_nonfile_refs.append(ref)
             surfaces=list(pkg["allowed_repair_surface"])
+            external_checks=[]
+            for ext in manifest.get("external_carrier_refs") or []:
+                family=ext.get("family")
+                if family=="memory-state":
+                    src=root/"memorybank_state"/str(ext.get("source_ref"))
+                    if not src.is_file():
+                        raise SystemExit(f"{cell}: parent MemoryBank source_ref missing from frozen A archive: {ext.get('source_ref')}")
+                    observed_ext=hashlib.sha256(src.read_bytes()).hexdigest()
+                    if observed_ext!=ext.get("sha256"):
+                        raise SystemExit(f"{cell}: parent MemoryBank state cannot be reconstructed from frozen A archive")
+                    external_checks.append({"family":family,"source_ref":ext.get("source_ref"),"sha256":observed_ext,"status":"RECONSTRUCTABLE_FROM_FROZEN_ARCHIVE"})
+                elif family in {"rag-hit","compression-output"}:
+                    external_checks.append({"family":family,"source_ref":ext.get("source_ref"),"sha256":ext.get("sha256"),"status":"IMMUTABLE_REFERENCE_BOUND"})
+                else:
+                    external_checks.append({"family":family,"source_ref":ext.get("source_ref"),"sha256":ext.get("sha256"),"status":"REFERENCE_BOUND"})
             target=pkg["detection_surface"]
             if target.startswith(("rag-hit:","memory-recall:","memory-state:","compression-channel:","compression-input:","compression-output:")):
                 legal_targets=[x.split(":",1)[1] if False else x for x in pkg["affected_closure_refs"][1:]]
@@ -127,6 +142,7 @@ def main():
                 "parent_system_id":manifest["system_id"],
                 "remaining_horizon":manifest["remaining_horizon"],
                 "external_carrier_refs":manifest.get("external_carrier_refs") or [],
+                "external_reconstruction_checks":external_checks,
                 "future_evidence_used":False,
                 "semantic_audit_used":False,
                 "cpr_label_used":False,
