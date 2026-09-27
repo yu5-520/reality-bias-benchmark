@@ -1,0 +1,81 @@
+{
+  "schema": "stage2-g2-ab-paired-process-semantic-audit-seal-v1",
+  "state": "SEALED",
+  "group_id": "G2",
+  "authorization_issue": 301,
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING"
+  },
+  "population": {
+    "attempted_B_cells": 12,
+    "valid_same_parent_pairs": 11,
+    "execution_boundary_cells": [
+      "X5-T2"
+    ],
+    "paired_effect_denominator": 11,
+    "blocked_or_no_package_cells": 9
+  },
+  "source": {
+    "A_evidence_commit": "8e8cf0765da4a129d09b6761c349fcca5ce7cfb2",
+    "A_workflow_run": 36238551502,
+    "B_evidence_commit": "956636cf8a5cf85495300a768036c057574583bd",
+    "B_workflow_run": 36306739453,
+    "packet_freeze_commit": "e609fd0e3c531801b46c25fc89b3381daae62a61",
+    "packet_index_blob": "7141efcc30e2df1987757fcf84ff7020596e6b75",
+    "audit_index_blob": "3f551041c8015652daaf3b1476a70ea8392434fe",
+    "synthesis_json_blob": "fb86873cc3b3d662cb2741061e8cbe21970bafa1",
+    "synthesis_report_blob": "25fd9a8a10c1bdc800026a9785fba9eb9bdbb53a",
+    "execution_boundary_source_blob": "d1605d4c94ae462982c29021be161d5ae8192a28",
+    "execution_boundary_audit_blob": "5727859306a65ccc607f50386db73e45c8454886"
+  },
+  "audit_blobs": {
+    "X2-T1": "ee1992d9f48e27b75131b37c653b71b24b035272",
+    "X2-T2": "d8b478a859082dc883f9ec5e6fa7f1fc79d049f6",
+    "X2-T3": "734a6e92160cc85f18f057cfb243f97ced745abb",
+    "X4-T1": "a11080e1c737850f53e9304ebada513d538a01aa",
+    "X4-T2": "c38edd116ec895f57b19de2ce71024159f19ce2c",
+    "X4-T3": "775d074a170dffa986435477843b86385ff0e5f5",
+    "X5-T1": "9cc7ffe4474da8f665f254ef498adaf9b536d739",
+    "X5-T3": "604c5dd8db0527b5d1dfc493a36111e38ccdd249",
+    "X7-T1": "4182a9d2e5f3c5d4b5b3cd1436b5a322ff96983b",
+    "X7-T2": "fe9796d45c454590a2a74b9cbe80289dcb26df54",
+    "X7-T3": "6355130a661040d849e07d101c046db1819c2bf5"
+  },
+  "frozen_counts": {
+    "direct_target_effect": {
+      "PERSISTED": 4,
+      "REDIRECTED": 5,
+      "REDUCED": 1,
+      "REGENERATED": 1
+    },
+    "overall_process_effect": {
+      "PERSISTENCE": 4,
+      "MIXED_EFFECT": 4,
+      "TARGETED_SUPPRESSION": 1,
+      "TARGETED_REDIRECTION": 1,
+      "REGENERATION": 1
+    },
+    "unrelated_structure_preserved": 11,
+    "execution_boundary_count": 1
+  },
+  "independence": {
+    "prior_layer_c_labels_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "monitor_predictions_read": false,
+    "natural_A_reruns": 0,
+    "B_reruns": 0,
+    "new_subject_provider_calls": 0,
+    "repair_calls_during_audit": 0,
+    "paid_evaluator_calls": 0
+  },
+  "claim_boundary": {
+    "causal_scope": "LOCAL_PAIRED_CONTRAST_FROM_SAME_FROZEN_PARENT",
+    "frequency_estimation_claim": false,
+    "universal_success_claim": false,
+    "endpoint_correctness_primary": false,
+    "process_reality_primary": true,
+    "execution_boundary_not_in_paired_effect_denominator": true
+  },
+  "next_gate": "G2_AUDIT_CLOSURE_AND_CROSS_GROUP_ENGINEERING_PIPELINE"
+}
