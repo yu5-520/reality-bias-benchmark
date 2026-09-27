@@ -81,7 +81,7 @@ jobs:
           import json, os, subprocess
           from pathlib import Path
           cfg=json.loads(Path("control/configs/stage2_r7_g1_phase_a_provider_first_sample_v1.json").read_text())
-          assert cfg["status"]=="AUTHORIZED_BY_USER_CHAT_EXECUTE"
+          assert cfg["status"]=="AUTHORIZED_PROVIDER_BACKED_FIRST_SAMPLES"
           assert cfg["authorization_issue"]==283
           assert cfg["scientific_code_sha"]==os.environ["SCIENCE_SHA"]
           assert cfg["evidence_branch"]==os.environ["EVIDENCE_BRANCH"]
