@@ -1,0 +1,116 @@
+name: Stage-II R7 G1 A-B Repair-Effect Synthesis v1
+
+on:
+  push:
+    branches:
+      - stage2-r7-g1-ab-semantic-audit-v1
+    paths:
+      - ".github/workflows/stage2-r7-g1-ab-repair-effect-synthesis-v1.yml"
+      - "arena/synthesize_stage2_r7_g1_ab_repair_effect_v1.py"
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-r7-g1-ab-repair-effect-synthesis-v1
+  cancel-in-progress: false
+
+env:
+  ROOT: "stage2/r7_g1_v1/ab_semantic_audit_v1"
+  AUDIT_SEAL_COMMIT: "3602c94d23370b1c398bf035f374a0a5ad3bed87"
+  AUTH_ISSUE: "287"
+
+jobs:
+  synthesize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout audit branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-r7-g1-ab-semantic-audit-v1
+          path: repo
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify sealed 12-cell audit gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C repo merge-base --is-ancestor "$AUDIT_SEAL_COMMIT" HEAD
+          test -f "repo/$ROOT/formal_audit_seal.json"
+          test -f "repo/$ROOT/audits/audit_index.json"
+          test ! -e "repo/$ROOT/synthesis"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path("repo/stage2/r7_g1_v1/ab_semantic_audit_v1")
+          seal=json.loads((root/"formal_audit_seal.json").read_text())
+          idx=json.loads((root/"audits/audit_index.json").read_text())
+          assert seal["status"]=="SEALED"
+          assert seal["audit_count"]==12
+          assert seal["validated_count"]==12
+          assert seal["cross_cell_synthesis_gate"]=="OPEN_AFTER_12_CELL_SEAL"
+          assert idx["status"]=="SEALED_12_OF_12_VALIDATED"
+          assert idx["audit_count"]==12
+          assert idx["new_subject_provider_calls"]==0
+          assert idx["repair_calls"]==0
+          assert idx["paid_evaluator_calls"]==0
+          print("PASS: 12-cell semantic audit seal opens cross-cell synthesis")
+          PY
+
+      - name: Build cross-cell paired repair-effect synthesis
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$GITHUB_WORKSPACE/repo" python repo/arena/synthesize_stage2_r7_g1_ab_repair_effect_v1.py             --root "repo/$ROOT"             --out "repo/$ROOT/synthesis"
+
+      - name: Validate synthesis accounting
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("repo/stage2/r7_g1_v1/ab_semantic_audit_v1/synthesis/cross_cell_synthesis_v1.json")
+          x=json.loads(p.read_text())
+          assert x["status"]=="SEALED"
+          assert x["population"]["paired_cells"]==12
+          assert x["population"]["excluded_fail_closed_cells"]==["X6-T1","X6-T2","X6-T3"]
+          d=x["derived_descriptive_counts"]
+          assert d["observable_direct_target_change"]==6
+          assert d["targeted_redirection_or_suppression"]==4
+          assert d["persistence"]==4
+          assert d["mixed_effect"]==3
+          assert d["inconclusive"]==1
+          assert d["unrelated_structure_preserved"]==12
+          assert sum(x["overall_counts"]["overall_process_effect"].values())==12
+          assert x["claim_boundary"]["new_subject_provider_calls"]==0
+          assert x["claim_boundary"]["repair_calls"]==0
+          assert x["claim_boundary"]["paid_evaluator_calls"]==0
+          assert x["claim_boundary"]["natural_A_reruns"]==0
+          assert x["claim_boundary"]["B_reruns"]==0
+          print("PASS: synthesis counts and claim boundary validated")
+          PY
+
+      - name: Freeze synthesis append-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C repo config user.name "stage2-r7-g1-ab-audit-bot"
+          git -C repo config user.email "stage2-r7-g1-ab-audit@users.noreply.github.com"
+          git -C repo add "$ROOT/synthesis"
+          git -C repo commit -m "audit: freeze R7 G1 cross-cell paired repair-effect synthesis [run $GITHUB_RUN_ID]"
+          git -C repo push origin HEAD:stage2-r7-g1-ab-semantic-audit-v1
+
+      - name: Report synthesis to authorization issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --body             "R7 G1 cross-cell paired repair-effect synthesis sealed after the 12/12 semantic-audit seal. Descriptive group counts: direct target change 6/12; clean targeted redirection/suppression 4/12; persistence 4/12; mixed effect 3/12; inconclusive 1/12; unrelated structure preserved 12/12. X6 remains a fail-closed engineering-boundary population and is excluded from paired-effect counts. No reruns or new model/evaluator calls were used."
