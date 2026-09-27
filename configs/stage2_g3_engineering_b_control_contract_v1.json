@@ -1,0 +1,107 @@
+{
+  "schema": "stage2-g3-engineering-b-control-contract-v1",
+  "version": "1.0",
+  "date": "2026-09-27",
+  "status": "FROZEN_BEFORE_G3_B_PREFLIGHT",
+  "group_id": "G3",
+  "source_A": {
+    "evidence_branch": "stage2-g3-natural-evidence-v1",
+    "workflow_run": 36242414243,
+    "scientific_code_sha": "b4f1441a48b2bc6a2c61035311419fc4509e8913",
+    "first_attempt_only": true,
+    "natural_rerun": false
+  },
+  "eligibility": {
+    "source": "stage2/replication_v2/engineering_eligibility_84_v1/G3_b_selection_index.json",
+    "eligible_cell_count": 12,
+    "cells": [
+      "X2-T1",
+      "X2-T2",
+      "X2-T3",
+      "X4-T1",
+      "X4-T2",
+      "X4-T3",
+      "X5-T1",
+      "X5-T2",
+      "X5-T3",
+      "X7-T1",
+      "X7-T2",
+      "X7-T3"
+    ],
+    "excluded_cells": {
+      "parent_reconstruction_blocked": [
+        "X1-T1",
+        "X1-T2",
+        "X1-T3",
+        "X6-T1",
+        "X6-T2",
+        "X6-T3"
+      ],
+      "no_prospective_package": [
+        "X3-T1",
+        "X3-T2",
+        "X3-T3"
+      ]
+    },
+    "selection_rule": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID",
+    "semantic_audit_used": false,
+    "cpr_labels_used": false,
+    "audit_backfill_used": false
+  },
+  "B_geometry": {
+    "max_B_per_eligible_cell": 1,
+    "same_parent_checkpoint_required": true,
+    "selected_frozen_package_required": true,
+    "first_B_stochastic_attempt_only": true,
+    "best_of_N": false,
+    "automatic_retry": false,
+    "repair_agent_calls_per_cell": 1,
+    "repair_executor_exits_after_one_package": true,
+    "post_repair_monitor_mode": "WATCH_ONLY",
+    "post_repair_additional_repair_packages": 0,
+    "preserve_failed_first_B_attempt": true
+  },
+  "native_bindings": {
+    "X2": {
+      "framework": "MetaGPT",
+      "commit": "11cdf466d042aece04fc6cfd13b28e1a70341b1f",
+      "python": "3.10"
+    },
+    "X4": {
+      "framework": "MCP",
+      "sdk_commit": "f1b6589088534632fef92238ee9750951e3c0185",
+      "protocol_commit": "5f5440bb26a62e2cf3440b92da5a667efa03b267",
+      "python": "3.11"
+    },
+    "X5": {
+      "framework": "Frozen RAG + Stage-II software host",
+      "python": "3.11"
+    },
+    "X7": {
+      "framework": "LongLLMLingua",
+      "commit": "5a4c78ae18ab17a98cf997e8259354e546081d64",
+      "python": "3.11"
+    }
+  },
+  "preflight": {
+    "required": true,
+    "external_provider_calls": 0,
+    "scientific_repair_actions": 0,
+    "exact_12_cells": true,
+    "full_restore_repair_continuation_path": true,
+    "fake_provider_only": true,
+    "all_12_must_pass_before_active_B": true
+  },
+  "authorization": {
+    "zero_call_preflight": true,
+    "active_B": false,
+    "provider_calls": false,
+    "repair_calls": false,
+    "paid_evaluator_calls": false,
+    "semantic_audit": false
+  },
+  "next_gate_after_preflight": "SEPARATE_G3_ENGINEERING_B_ACTIVE_AUTHORIZATION",
+  "independence": {
+    "G2_semantic_audit_results_may_modify_G3": false
+  }
+}
