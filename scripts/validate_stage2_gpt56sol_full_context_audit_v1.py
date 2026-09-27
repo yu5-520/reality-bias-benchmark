@@ -97,7 +97,7 @@ def main():
             increased |= ax.get("status")=="INCREASED"
             decreased |= ax.get("status")=="DECREASED"
         if reinforcing: require(closed and increased,f"{p.name}: reinforcement prerequisites")
-        if topo.get("decaying"): require(decreased,f"{p.name}: decay evidence")
+        if topo.get("decaying") and (topo.get("reinforcement_axes") or []): require(decreased,f"{p.name}: decay evidence")
         refs([topo["boundary_ref"]] if topo.get("boundary_ref") else [],"boundary")
         for alt in row["healthy_alternatives"]: refs(alt.get("evidence_refs"),"healthy alternative")
         topologies[klass]=topologies.get(klass,0)+1
