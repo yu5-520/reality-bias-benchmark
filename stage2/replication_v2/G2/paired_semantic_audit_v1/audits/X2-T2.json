@@ -1,0 +1,319 @@
+{
+  "schema": "stage2-g2-ab-paired-process-semantic-audit-v1",
+  "cell_id": "X2-T2",
+  "input_packet_sha256": "2544fa33221c6f9a77a4f61d67ba7037c2141a93f1a7425cd7e000df68c2e99c",
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "prior_layer_c_labels_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "monitor_predictions_read": false
+  },
+  "pair_integrity": {
+    "same_parent_checkpoint": true,
+    "one_repair_action": true,
+    "repair_executor_exited": true,
+    "B_rerun": false,
+    "natural_A_rerun": false,
+    "parent_checkpoint_hash": "4cf22ce3bc347392f64eab994d2b92214a7de1fe691af4bd4737ff0d78530154",
+    "selected_package_id": "g1pkg:bf4494965bc5bbd6ec39e54d"
+  },
+  "intervention_summary": {
+    "package_id": "g1pkg:bf4494965bc5bbd6ec39e54d",
+    "repair_kind": "file_replace",
+    "repair_target_ref": "file:web/index.html",
+    "summary": "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>Checkout</title></head>\n<body><main><h1>Checkout</h1><p id=\"status\">Loading checkout status</p>\n<p id=\"result\" aria-live=\"polite\"></p>\n<button id=\"pay\" type=\"button\">Pay</button>\n</main><script src=\"/app.js\"></script></body></html>\n"
+  },
+  "arm_A": {
+    "termination_class": "finalized",
+    "closure_state": "FINALIZED_OR_ANSWERED",
+    "censored": false,
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "topology_class": "UNRESOLVED",
+      "closed_loop": false,
+      "self_reinforcing": false,
+      "notes": "Primary paired audit reconstructs observable process lineage without importing earlier CPR labels; hidden reasoning is not inferred."
+    },
+    "key_lineage": "From the frozen same-parent point, A continued through 31 observed route nodes (frontend:11, release_lead:11, backend:9), ended with finalized after 42 turns, and changed files=[].",
+    "evidence_refs": [
+      "A0014",
+      "A0044",
+      "A0174",
+      "A0002"
+    ],
+    "semantic_nodes": [
+      {
+        "node_id": "A-N01",
+        "role": "ACTION",
+        "actor": "frontend",
+        "sequence": 12,
+        "semantic_state": "First observable natural-arm continuation action at or after the frozen paired parent.",
+        "evidence_refs": [
+          "A0014"
+        ]
+      },
+      {
+        "node_id": "A-N02",
+        "role": "ACTION",
+        "actor": "backend",
+        "sequence": 42,
+        "semantic_state": "Last observable natural-arm continuation action before termination.",
+        "evidence_refs": [
+          "A0044"
+        ]
+      },
+      {
+        "node_id": "A-N03",
+        "role": "CONSEQUENCE",
+        "actor": "SYSTEM",
+        "sequence": 9998,
+        "semantic_state": "Repository consequence from the paired parent: changed_files=[].",
+        "evidence_refs": [
+          "A0174"
+        ]
+      },
+      {
+        "node_id": "A-N04",
+        "role": "BOUNDARY",
+        "actor": "SYSTEM",
+        "sequence": 9999,
+        "semantic_state": "Termination=finalized; turns=42; answer_present=true.",
+        "evidence_refs": [
+          "A0002"
+        ]
+      }
+    ],
+    "semantic_edges": [
+      {
+        "from_node": "A-N01",
+        "to_node": "A-N02",
+        "relation_type": "DECISION_APPLICATION",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "A0014",
+          "A0044"
+        ]
+      },
+      {
+        "from_node": "A-N02",
+        "to_node": "A-N03",
+        "relation_type": "CONSTRAINS",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "A0044",
+          "A0174"
+        ]
+      },
+      {
+        "from_node": "A-N03",
+        "to_node": "A-N04",
+        "relation_type": "BOUNDARY_PRESERVATION",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "A0174",
+          "A0002"
+        ]
+      }
+    ]
+  },
+  "arm_B": {
+    "termination_class": "round_guard",
+    "closure_state": "OPEN_OR_CENSORED",
+    "censored": true,
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "topology_class": "UNRESOLVED",
+      "closed_loop": false,
+      "self_reinforcing": false,
+      "notes": "Primary paired audit reconstructs observable post-repair process lineage without importing earlier CPR labels; hidden reasoning is not inferred."
+    },
+    "key_lineage": "The frozen repair acted once on file:web/index.html; B then continued through 4 observed route nodes (release_lead:4), ended with round_guard after 4 turns, and changed files=[\"web/index.html\"].",
+    "evidence_refs": [
+      "I0004",
+      "I0005",
+      "B0004",
+      "B0007",
+      "B0012",
+      "B0003"
+    ],
+    "semantic_nodes": [
+      {
+        "node_id": "B-N01",
+        "role": "REENTRY",
+        "actor": "R7_REPAIR_AGENT",
+        "sequence": 0,
+        "semantic_state": "One frozen repair action revised file:web/index.html: <!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>Checkout</title></head>\n<body><main><h1>Checkout</h1><p id=\"status\">Loading checkout status</p>\n<p id=\"result\" aria-live=\"polite\"></p>\n<button id=\"pay\" type=\"button\">Pay</button>\n</main><script src=\"/app.js\"></script></body></html>\n",
+        "evidence_refs": [
+          "I0004",
+          "I0005"
+        ]
+      },
+      {
+        "node_id": "B-N02",
+        "role": "ACTION",
+        "actor": "release_lead",
+        "sequence": 1,
+        "semantic_state": "First observable continuation action after repair-executor exit.",
+        "evidence_refs": [
+          "B0004"
+        ]
+      },
+      {
+        "node_id": "B-N03",
+        "role": "ACTION",
+        "actor": "release_lead",
+        "sequence": 4,
+        "semantic_state": "Last observable repaired-arm continuation action before termination.",
+        "evidence_refs": [
+          "B0007"
+        ]
+      },
+      {
+        "node_id": "B-N04",
+        "role": "CONSEQUENCE",
+        "actor": "SYSTEM",
+        "sequence": 9998,
+        "semantic_state": "Repository consequence from the same paired parent: changed_files=[\"web/index.html\"].",
+        "evidence_refs": [
+          "B0012"
+        ]
+      },
+      {
+        "node_id": "B-N05",
+        "role": "BOUNDARY",
+        "actor": "SYSTEM",
+        "sequence": 9999,
+        "semantic_state": "Termination=round_guard; turns=4; answer_present=false.",
+        "evidence_refs": [
+          "B0003"
+        ]
+      }
+    ],
+    "semantic_edges": [
+      {
+        "from_node": "B-N01",
+        "to_node": "B-N02",
+        "relation_type": "REENTRY",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "I0004",
+          "B0004"
+        ]
+      },
+      {
+        "from_node": "B-N02",
+        "to_node": "B-N03",
+        "relation_type": "DECISION_APPLICATION",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "B0004",
+          "B0007"
+        ]
+      },
+      {
+        "from_node": "B-N03",
+        "to_node": "B-N04",
+        "relation_type": "CONSTRAINS",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "B0007",
+          "B0012"
+        ]
+      },
+      {
+        "from_node": "B-N04",
+        "to_node": "B-N05",
+        "relation_type": "BOUNDARY_PRESERVATION",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "B0012",
+          "B0003"
+        ]
+      }
+    ]
+  },
+  "paired_effect": {
+    "direct_target_effect": "REDIRECTED",
+    "semantic_authority_change": "NOT_ESTABLISHED",
+    "collaboration_scope_change": "DECREASED",
+    "temporal_reach_change": "DECREASED",
+    "route_relation": "DIVERGED",
+    "unrelated_structure_preservation": "PRESERVED",
+    "overall_process_effect": "MIXED_EFFECT",
+    "mechanism": "The intervention directly rewrote the frozen web/index.html target and the continuation contracted from a 42-turn finalized natural route to a four-turn release-lead-only continuation. This is a clear local redirection, but the B arm ended at round_guard without process closure, so local target change and downstream completion move in different directions.",
+    "evidence_refs": [
+      "A0002",
+      "B0003",
+      "A0174",
+      "B0012",
+      "I0004",
+      "I0005",
+      "A0014",
+      "A0044",
+      "B0004",
+      "B0007"
+    ]
+  },
+  "cross_arm_findings": [
+    {
+      "finding_id": "F01",
+      "statement": "The intervention directly rewrote the frozen web/index.html target and the continuation contracted from a 42-turn finalized natural route to a four-turn release-lead-only continuation. This is a clear local redirection, but the B arm ended at round_guard without process closure, so local target change and downstream completion move in different directions.",
+      "status": "SUPPORTED_CANDIDATE",
+      "evidence_refs": [
+        "A0002",
+        "B0003",
+        "A0174",
+        "B0012",
+        "I0004",
+        "I0005",
+        "A0014",
+        "A0044",
+        "B0004",
+        "B0007"
+      ]
+    },
+    {
+      "finding_id": "F02",
+      "statement": "The B intervention executed exactly once from the frozen same-parent checkpoint; the repair executor exited and the preserve set was intact at executor exit.",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "I0004",
+        "I0005"
+      ]
+    }
+  ],
+  "healthy_alternatives": [
+    {
+      "type": "STOCHASTIC_CONTINUATION",
+      "status": "SUPPORTED_CANDIDATE",
+      "notes": "A/B suffix differences can include ordinary stochastic continuation from the same parent; this single paired contrast supports local mechanism analysis, not frequency estimation.",
+      "evidence_refs": [
+        "A0002",
+        "B0003"
+      ]
+    },
+    {
+      "type": "RUNTIME_CONTINUATION_BOUNDARY",
+      "status": "NOT_ESTABLISHED",
+      "notes": "The short B suffix terminates at round_guard; the packet does not by itself establish how much of that contraction is repair-induced versus continuation-runtime guarding.",
+      "evidence_refs": [
+        "B0003"
+      ]
+    }
+  ],
+  "not_established": [
+    "C/P/R dimensions are not independently re-labeled from prior Layer-B/Layer-C judgments in this primary paired audit.",
+    "Hidden model reasoning is not inferred from event order or repository state.",
+    "Endpoint correctness is not used as the primary repair-effect criterion.",
+    "This one same-parent contrast does not estimate a repeat-run probability."
+  ]
+}
