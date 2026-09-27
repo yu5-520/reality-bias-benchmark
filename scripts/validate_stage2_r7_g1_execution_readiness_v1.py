@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from stage2.r7_prospective_v1.replication_contract import (
     resolve_decision_horizon,
     run_id as prospective_run_id,
     semantic_audit_state as prospective_semantic_audit_state,
 )
-
-ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "configs/stage2_r7_g1_execution_readiness_contract_v1.json"
 LAUNCH = ROOT / "configs/stage2_r7_g1_launch_manifest_v1.json"
 FREEZE = ROOT / "configs/stage2_r7_g1_execution_readiness_freeze_v1.json"
