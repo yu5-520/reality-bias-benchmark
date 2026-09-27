@@ -1,0 +1,960 @@
+[
+  {
+    "affected_closure_refs": [
+      "file:README.md"
+    ],
+    "allowed_repair_surface": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:README.md"
+    ],
+    "ancestor_refs": [
+      "X5-T3:struct:000024"
+    ],
+    "content_address": "sha256:6c3ef97bf48de18b0bcd4fac2b81c000bdcfcb06115b0d2c99c2d8f3a26e1655",
+    "cpr_label": null,
+    "descendant_refs": [],
+    "detection_surface": "file:README.md",
+    "forbidden_mutations": [
+      "FRAMEWORK_SOURCE_MODIFICATION",
+      "PROTOCOL_MODIFICATION",
+      "PRIVATE_RUNTIME_STATE_MUTATION",
+      "MCP_BACKEND_DIRECT_MUTATION",
+      "RAG_INTERNAL_MUTATION",
+      "MEMORYBANK_INTERNAL_MUTATION",
+      "LONGLMLINGUA_INTERNAL_MUTATION",
+      "WHOLE_SYSTEM_RESET"
+    ],
+    "future_evidence_used": false,
+    "g1_block_code": null,
+    "monitor_evidence_refs": [
+      "X5-T3:struct:000024",
+      "X5-T3:struct:000133"
+    ],
+    "monitor_rule_id": "MULTI_CONSUMER_ADDRESSABLE_REUSE",
+    "native_capability_requirements": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:README.md"
+    ],
+    "package_hash": "2dcfc6f8daa210dca5fd5c980675bfa81ce1962c7f25e4a02bc1d032140531b9",
+    "package_id": "g1pkg:6c3ef97bf48de18b0bcd4fac",
+    "parent_reconstruction": {
+      "future_evidence_used": false,
+      "parent_hash_refs": [
+        "c32de0b25fe16f805b097f18bd43f1af6f54c6cbb9cbcc24bad789c9e1a3ab43"
+      ],
+      "status": "VERIFIED"
+    },
+    "post_repair_watch": {
+      "authority_regeneration": true,
+      "carrier_migration": true,
+      "new_support_emergence": true,
+      "old_support_reentry": true,
+      "scope_reopening": true
+    },
+    "prefix_cutoff_ref": "X5-T3:struct:000133",
+    "prefix_sequence": 133,
+    "preserve_refs": [
+      "file:checkout_app/__init__.py",
+      "file:checkout_app/checkout.py",
+      "file:checkout_app/server.py",
+      "file:legacy_compat.py",
+      "file:run.py",
+      "file:tests/test_checkout.py",
+      "file:versions/after.json",
+      "file:versions/before.json",
+      "file:versions/before/server.py",
+      "file:web/app.js",
+      "file:web/index.html"
+    ],
+    "pressure_refs": [
+      "X5-T3:struct:000133"
+    ],
+    "repair_anchor_ref": "X5-T3:struct:000133",
+    "repair_gate_status": "COMPLETE_FOR_STRUCTURED_REPAIR",
+    "schema": "RB-STAGE2-R7-G1-MONITOR-DERIVED-REPAIR-PACKAGE-v1",
+    "semantic_audit_used": false,
+    "source_cell": "X5-T3",
+    "support_refs": [
+      "X5-T3:struct:000024",
+      "X5-T3:struct:000133"
+    ]
+  },
+  {
+    "affected_closure_refs": [
+      "file:checkout_app/server.py"
+    ],
+    "allowed_repair_surface": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:checkout_app/server.py"
+    ],
+    "ancestor_refs": [
+      "X5-T3:struct:000010",
+      "X5-T3:struct:000022"
+    ],
+    "content_address": "sha256:9bfebd8d7b48e357c57399ba73c6e84eb8a54edb055e1412f2fc3b77d4f62714",
+    "cpr_label": null,
+    "descendant_refs": [],
+    "detection_surface": "file:checkout_app/server.py",
+    "forbidden_mutations": [
+      "FRAMEWORK_SOURCE_MODIFICATION",
+      "PROTOCOL_MODIFICATION",
+      "PRIVATE_RUNTIME_STATE_MUTATION",
+      "MCP_BACKEND_DIRECT_MUTATION",
+      "RAG_INTERNAL_MUTATION",
+      "MEMORYBANK_INTERNAL_MUTATION",
+      "LONGLMLINGUA_INTERNAL_MUTATION",
+      "WHOLE_SYSTEM_RESET"
+    ],
+    "future_evidence_used": false,
+    "g1_block_code": null,
+    "monitor_evidence_refs": [
+      "X5-T3:struct:000010",
+      "X5-T3:struct:000022",
+      "X5-T3:struct:000038"
+    ],
+    "monitor_rule_id": "REENTRY_OR_REUSE",
+    "native_capability_requirements": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:checkout_app/server.py"
+    ],
+    "package_hash": "870141bcd76de900e244485cd8c93fbb89232518290a2cef94bf05faf168e60c",
+    "package_id": "g1pkg:9bfebd8d7b48e357c57399ba",
+    "parent_reconstruction": {
+      "future_evidence_used": false,
+      "parent_hash_refs": [
+        "bcfd525da61312fadf2d91148f43e71536b06e874fb2f583b99e21d707702759"
+      ],
+      "status": "VERIFIED"
+    },
+    "post_repair_watch": {
+      "authority_regeneration": true,
+      "carrier_migration": true,
+      "new_support_emergence": true,
+      "old_support_reentry": true,
+      "scope_reopening": true
+    },
+    "prefix_cutoff_ref": "X5-T3:struct:000038",
+    "prefix_sequence": 38,
+    "preserve_refs": [
+      "file:README.md",
+      "file:checkout_app/__init__.py",
+      "file:checkout_app/checkout.py",
+      "file:legacy_compat.py",
+      "file:run.py",
+      "file:tests/test_checkout.py",
+      "file:versions/after.json",
+      "file:versions/before.json",
+      "file:versions/before/server.py",
+      "file:web/app.js",
+      "file:web/index.html"
+    ],
+    "pressure_refs": [
+      "X5-T3:struct:000038"
+    ],
+    "repair_anchor_ref": "X5-T3:struct:000038",
+    "repair_gate_status": "COMPLETE_FOR_STRUCTURED_REPAIR",
+    "schema": "RB-STAGE2-R7-G1-MONITOR-DERIVED-REPAIR-PACKAGE-v1",
+    "semantic_audit_used": false,
+    "source_cell": "X5-T3",
+    "support_refs": [
+      "X5-T3:struct:000010",
+      "X5-T3:struct:000022",
+      "X5-T3:struct:000038"
+    ]
+  },
+  {
+    "affected_closure_refs": [
+      "file:legacy_compat.py"
+    ],
+    "allowed_repair_surface": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:legacy_compat.py"
+    ],
+    "ancestor_refs": [
+      "X5-T3:struct:000009",
+      "X5-T3:struct:000017"
+    ],
+    "content_address": "sha256:e17fe7ac3c6340ea593278762121d8e33a297407fa694f560d6ec2068eee1875",
+    "cpr_label": null,
+    "descendant_refs": [],
+    "detection_surface": "file:legacy_compat.py",
+    "forbidden_mutations": [
+      "FRAMEWORK_SOURCE_MODIFICATION",
+      "PROTOCOL_MODIFICATION",
+      "PRIVATE_RUNTIME_STATE_MUTATION",
+      "MCP_BACKEND_DIRECT_MUTATION",
+      "RAG_INTERNAL_MUTATION",
+      "MEMORYBANK_INTERNAL_MUTATION",
+      "LONGLMLINGUA_INTERNAL_MUTATION",
+      "WHOLE_SYSTEM_RESET"
+    ],
+    "future_evidence_used": false,
+    "g1_block_code": null,
+    "monitor_evidence_refs": [
+      "X5-T3:struct:000009",
+      "X5-T3:struct:000017",
+      "X5-T3:struct:000036"
+    ],
+    "monitor_rule_id": "REENTRY_OR_REUSE",
+    "native_capability_requirements": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:legacy_compat.py"
+    ],
+    "package_hash": "8c79641b117de593a32e4988b24c099bb1ff8fbf095946b1bbb90e8113f07aa3",
+    "package_id": "g1pkg:e17fe7ac3c6340ea59327876",
+    "parent_reconstruction": {
+      "future_evidence_used": false,
+      "parent_hash_refs": [
+        "bcfd525da61312fadf2d91148f43e71536b06e874fb2f583b99e21d707702759"
+      ],
+      "status": "VERIFIED"
+    },
+    "post_repair_watch": {
+      "authority_regeneration": true,
+      "carrier_migration": true,
+      "new_support_emergence": true,
+      "old_support_reentry": true,
+      "scope_reopening": true
+    },
+    "prefix_cutoff_ref": "X5-T3:struct:000036",
+    "prefix_sequence": 36,
+    "preserve_refs": [
+      "file:README.md",
+      "file:checkout_app/__init__.py",
+      "file:checkout_app/checkout.py",
+      "file:checkout_app/server.py",
+      "file:run.py",
+      "file:tests/test_checkout.py",
+      "file:versions/after.json",
+      "file:versions/before.json",
+      "file:versions/before/server.py",
+      "file:web/app.js",
+      "file:web/index.html"
+    ],
+    "pressure_refs": [
+      "X5-T3:struct:000036"
+    ],
+    "repair_anchor_ref": "X5-T3:struct:000036",
+    "repair_gate_status": "COMPLETE_FOR_STRUCTURED_REPAIR",
+    "schema": "RB-STAGE2-R7-G1-MONITOR-DERIVED-REPAIR-PACKAGE-v1",
+    "semantic_audit_used": false,
+    "source_cell": "X5-T3",
+    "support_refs": [
+      "X5-T3:struct:000009",
+      "X5-T3:struct:000017",
+      "X5-T3:struct:000036"
+    ]
+  },
+  {
+    "affected_closure_refs": [
+      "file:run.py"
+    ],
+    "allowed_repair_surface": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:run.py"
+    ],
+    "ancestor_refs": [
+      "X5-T3:struct:000002",
+      "X5-T3:struct:000008"
+    ],
+    "content_address": "sha256:e4b02a7fe8a7ef54748b9675a97f8f4953576e5790f3d01d7a6ac3671d205e3e",
+    "cpr_label": null,
+    "descendant_refs": [],
+    "detection_surface": "file:run.py",
+    "forbidden_mutations": [
+      "FRAMEWORK_SOURCE_MODIFICATION",
+      "PROTOCOL_MODIFICATION",
+      "PRIVATE_RUNTIME_STATE_MUTATION",
+      "MCP_BACKEND_DIRECT_MUTATION",
+      "RAG_INTERNAL_MUTATION",
+      "MEMORYBANK_INTERNAL_MUTATION",
+      "LONGLMLINGUA_INTERNAL_MUTATION",
+      "WHOLE_SYSTEM_RESET"
+    ],
+    "future_evidence_used": false,
+    "g1_block_code": null,
+    "monitor_evidence_refs": [
+      "X5-T3:struct:000002",
+      "X5-T3:struct:000008",
+      "X5-T3:struct:000016"
+    ],
+    "monitor_rule_id": "REENTRY_OR_REUSE",
+    "native_capability_requirements": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:run.py"
+    ],
+    "package_hash": "7f7175c2af694b08f7f0965922ff1898c5a2fcef0ce9b42e23617cfa1cee30f6",
+    "package_id": "g1pkg:e4b02a7fe8a7ef54748b9675",
+    "parent_reconstruction": {
+      "future_evidence_used": false,
+      "parent_hash_refs": [
+        "4dd26df27fa1072aae48bfacdc875fe8dd2c9914ce4a5bb1c6fbfafcf136f912"
+      ],
+      "status": "VERIFIED"
+    },
+    "post_repair_watch": {
+      "authority_regeneration": true,
+      "carrier_migration": true,
+      "new_support_emergence": true,
+      "old_support_reentry": true,
+      "scope_reopening": true
+    },
+    "prefix_cutoff_ref": "X5-T3:struct:000016",
+    "prefix_sequence": 16,
+    "preserve_refs": [
+      "file:README.md",
+      "file:checkout_app/__init__.py",
+      "file:checkout_app/checkout.py",
+      "file:checkout_app/server.py",
+      "file:legacy_compat.py",
+      "file:tests/test_checkout.py",
+      "file:versions/after.json",
+      "file:versions/before.json",
+      "file:versions/before/server.py",
+      "file:web/app.js",
+      "file:web/index.html"
+    ],
+    "pressure_refs": [
+      "X5-T3:struct:000016"
+    ],
+    "repair_anchor_ref": "X5-T3:struct:000016",
+    "repair_gate_status": "COMPLETE_FOR_STRUCTURED_REPAIR",
+    "schema": "RB-STAGE2-R7-G1-MONITOR-DERIVED-REPAIR-PACKAGE-v1",
+    "semantic_audit_used": false,
+    "source_cell": "X5-T3",
+    "support_refs": [
+      "X5-T3:struct:000002",
+      "X5-T3:struct:000008",
+      "X5-T3:struct:000016"
+    ]
+  },
+  {
+    "affected_closure_refs": [
+      "file:tests/test_checkout.py"
+    ],
+    "allowed_repair_surface": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:tests/test_checkout.py"
+    ],
+    "ancestor_refs": [
+      "X5-T3:struct:000011",
+      "X5-T3:struct:000023"
+    ],
+    "content_address": "sha256:9a697283634d4643ed96bf49219587a5db1408ad14a61b4032e43eb588556b31",
+    "cpr_label": null,
+    "descendant_refs": [],
+    "detection_surface": "file:tests/test_checkout.py",
+    "forbidden_mutations": [
+      "FRAMEWORK_SOURCE_MODIFICATION",
+      "PROTOCOL_MODIFICATION",
+      "PRIVATE_RUNTIME_STATE_MUTATION",
+      "MCP_BACKEND_DIRECT_MUTATION",
+      "RAG_INTERNAL_MUTATION",
+      "MEMORYBANK_INTERNAL_MUTATION",
+      "LONGLMLINGUA_INTERNAL_MUTATION",
+      "WHOLE_SYSTEM_RESET"
+    ],
+    "future_evidence_used": false,
+    "g1_block_code": null,
+    "monitor_evidence_refs": [
+      "X5-T3:struct:000011",
+      "X5-T3:struct:000023",
+      "X5-T3:struct:000037"
+    ],
+    "monitor_rule_id": "REENTRY_OR_REUSE",
+    "native_capability_requirements": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:tests/test_checkout.py"
+    ],
+    "package_hash": "1c9699bd9e5072438dbd80db67248aaaaa0d1c0fdfbfe3c0ff6d63eae6caa5b4",
+    "package_id": "g1pkg:9a697283634d4643ed96bf49",
+    "parent_reconstruction": {
+      "future_evidence_used": false,
+      "parent_hash_refs": [
+        "bcfd525da61312fadf2d91148f43e71536b06e874fb2f583b99e21d707702759"
+      ],
+      "status": "VERIFIED"
+    },
+    "post_repair_watch": {
+      "authority_regeneration": true,
+      "carrier_migration": true,
+      "new_support_emergence": true,
+      "old_support_reentry": true,
+      "scope_reopening": true
+    },
+    "prefix_cutoff_ref": "X5-T3:struct:000037",
+    "prefix_sequence": 37,
+    "preserve_refs": [
+      "file:README.md",
+      "file:checkout_app/__init__.py",
+      "file:checkout_app/checkout.py",
+      "file:checkout_app/server.py",
+      "file:legacy_compat.py",
+      "file:run.py",
+      "file:versions/after.json",
+      "file:versions/before.json",
+      "file:versions/before/server.py",
+      "file:web/app.js",
+      "file:web/index.html"
+    ],
+    "pressure_refs": [
+      "X5-T3:struct:000037"
+    ],
+    "repair_anchor_ref": "X5-T3:struct:000037",
+    "repair_gate_status": "COMPLETE_FOR_STRUCTURED_REPAIR",
+    "schema": "RB-STAGE2-R7-G1-MONITOR-DERIVED-REPAIR-PACKAGE-v1",
+    "semantic_audit_used": false,
+    "source_cell": "X5-T3",
+    "support_refs": [
+      "X5-T3:struct:000011",
+      "X5-T3:struct:000023",
+      "X5-T3:struct:000037"
+    ]
+  },
+  {
+    "affected_closure_refs": [
+      "file:versions/after.json"
+    ],
+    "allowed_repair_surface": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:versions/after.json"
+    ],
+    "ancestor_refs": [
+      "X5-T3:struct:000149"
+    ],
+    "content_address": "sha256:fd75f5f1c343ad2c958768cc916a36eaa937ba3b3fdb973b73dd6d56f20e3b3d",
+    "cpr_label": null,
+    "descendant_refs": [],
+    "detection_surface": "file:versions/after.json",
+    "forbidden_mutations": [
+      "FRAMEWORK_SOURCE_MODIFICATION",
+      "PROTOCOL_MODIFICATION",
+      "PRIVATE_RUNTIME_STATE_MUTATION",
+      "MCP_BACKEND_DIRECT_MUTATION",
+      "RAG_INTERNAL_MUTATION",
+      "MEMORYBANK_INTERNAL_MUTATION",
+      "LONGLMLINGUA_INTERNAL_MUTATION",
+      "WHOLE_SYSTEM_RESET"
+    ],
+    "future_evidence_used": false,
+    "g1_block_code": null,
+    "monitor_evidence_refs": [
+      "X5-T3:struct:000149",
+      "X5-T3:struct:000319"
+    ],
+    "monitor_rule_id": "MULTI_CONSUMER_ADDRESSABLE_REUSE",
+    "native_capability_requirements": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:versions/after.json"
+    ],
+    "package_hash": "a1b0ac4cfce2b4c5d26214c5d08d63b76a1d69db13d9d16a1d64760d603e1b85",
+    "package_id": "g1pkg:fd75f5f1c343ad2c958768cc",
+    "parent_reconstruction": {
+      "future_evidence_used": false,
+      "parent_hash_refs": [
+        "eafa28bb3516e8adaffbe0b7115b9b1ac56780dd68e28903eb62a8b1f0f45333"
+      ],
+      "status": "VERIFIED"
+    },
+    "post_repair_watch": {
+      "authority_regeneration": true,
+      "carrier_migration": true,
+      "new_support_emergence": true,
+      "old_support_reentry": true,
+      "scope_reopening": true
+    },
+    "prefix_cutoff_ref": "X5-T3:struct:000319",
+    "prefix_sequence": 319,
+    "preserve_refs": [
+      "file:README.md",
+      "file:checkout_app/__init__.py",
+      "file:checkout_app/checkout.py",
+      "file:checkout_app/server.py",
+      "file:legacy_compat.py",
+      "file:run.py",
+      "file:tests/test_checkout.py",
+      "file:versions/before.json",
+      "file:versions/before/server.py",
+      "file:web/app.js",
+      "file:web/index.html"
+    ],
+    "pressure_refs": [
+      "X5-T3:struct:000319"
+    ],
+    "repair_anchor_ref": "X5-T3:struct:000319",
+    "repair_gate_status": "COMPLETE_FOR_STRUCTURED_REPAIR",
+    "schema": "RB-STAGE2-R7-G1-MONITOR-DERIVED-REPAIR-PACKAGE-v1",
+    "semantic_audit_used": false,
+    "source_cell": "X5-T3",
+    "support_refs": [
+      "X5-T3:struct:000149",
+      "X5-T3:struct:000319"
+    ]
+  },
+  {
+    "affected_closure_refs": [
+      "file:versions/before.json"
+    ],
+    "allowed_repair_surface": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:versions/before.json"
+    ],
+    "ancestor_refs": [
+      "X5-T3:struct:000004",
+      "X5-T3:struct:000031"
+    ],
+    "content_address": "sha256:c93192639a1387a960541854ff7594856115852477b67d8f728432d701c013ef",
+    "cpr_label": null,
+    "descendant_refs": [],
+    "detection_surface": "file:versions/before.json",
+    "forbidden_mutations": [
+      "FRAMEWORK_SOURCE_MODIFICATION",
+      "PROTOCOL_MODIFICATION",
+      "PRIVATE_RUNTIME_STATE_MUTATION",
+      "MCP_BACKEND_DIRECT_MUTATION",
+      "RAG_INTERNAL_MUTATION",
+      "MEMORYBANK_INTERNAL_MUTATION",
+      "LONGLMLINGUA_INTERNAL_MUTATION",
+      "WHOLE_SYSTEM_RESET"
+    ],
+    "future_evidence_used": false,
+    "g1_block_code": null,
+    "monitor_evidence_refs": [
+      "X5-T3:struct:000004",
+      "X5-T3:struct:000031",
+      "X5-T3:struct:000056"
+    ],
+    "monitor_rule_id": "REENTRY_OR_REUSE",
+    "native_capability_requirements": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:versions/before.json"
+    ],
+    "package_hash": "8ca08b77a80ff4947259cea33827b72b40ab7e277a5b258701d84c137e496cc0",
+    "package_id": "g1pkg:c93192639a1387a960541854",
+    "parent_reconstruction": {
+      "future_evidence_used": false,
+      "parent_hash_refs": [
+        "3964a8bc93ff5a38b74d19eef3cf340ab98f0c6be40cac7f9a3521a1c34eccea"
+      ],
+      "status": "VERIFIED"
+    },
+    "post_repair_watch": {
+      "authority_regeneration": true,
+      "carrier_migration": true,
+      "new_support_emergence": true,
+      "old_support_reentry": true,
+      "scope_reopening": true
+    },
+    "prefix_cutoff_ref": "X5-T3:struct:000056",
+    "prefix_sequence": 56,
+    "preserve_refs": [
+      "file:README.md",
+      "file:checkout_app/__init__.py",
+      "file:checkout_app/checkout.py",
+      "file:checkout_app/server.py",
+      "file:legacy_compat.py",
+      "file:run.py",
+      "file:tests/test_checkout.py",
+      "file:versions/after.json",
+      "file:versions/before/server.py",
+      "file:web/app.js",
+      "file:web/index.html"
+    ],
+    "pressure_refs": [
+      "X5-T3:struct:000056"
+    ],
+    "repair_anchor_ref": "X5-T3:struct:000056",
+    "repair_gate_status": "COMPLETE_FOR_STRUCTURED_REPAIR",
+    "schema": "RB-STAGE2-R7-G1-MONITOR-DERIVED-REPAIR-PACKAGE-v1",
+    "semantic_audit_used": false,
+    "source_cell": "X5-T3",
+    "support_refs": [
+      "X5-T3:struct:000004",
+      "X5-T3:struct:000031",
+      "X5-T3:struct:000056"
+    ]
+  },
+  {
+    "affected_closure_refs": [
+      "file:versions/before/server.py"
+    ],
+    "allowed_repair_surface": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:versions/before/server.py"
+    ],
+    "ancestor_refs": [
+      "X5-T3:struct:000003",
+      "X5-T3:struct:000025"
+    ],
+    "content_address": "sha256:129419cc927b3231b0a8bc826740a4cd650add04035daeaa0735e29a466deff8",
+    "cpr_label": null,
+    "descendant_refs": [],
+    "detection_surface": "file:versions/before/server.py",
+    "forbidden_mutations": [
+      "FRAMEWORK_SOURCE_MODIFICATION",
+      "PROTOCOL_MODIFICATION",
+      "PRIVATE_RUNTIME_STATE_MUTATION",
+      "MCP_BACKEND_DIRECT_MUTATION",
+      "RAG_INTERNAL_MUTATION",
+      "MEMORYBANK_INTERNAL_MUTATION",
+      "LONGLMLINGUA_INTERNAL_MUTATION",
+      "WHOLE_SYSTEM_RESET"
+    ],
+    "future_evidence_used": false,
+    "g1_block_code": null,
+    "monitor_evidence_refs": [
+      "X5-T3:struct:000003",
+      "X5-T3:struct:000025",
+      "X5-T3:struct:000051"
+    ],
+    "monitor_rule_id": "REENTRY_OR_REUSE",
+    "native_capability_requirements": [
+      "NATIVE_APPLICATION_WRITE_OR_REVISION:file:versions/before/server.py"
+    ],
+    "package_hash": "2695e9efffbbcf3a72de14cdccef67641e5edd3b53794374d7d4c98dfab34304",
+    "package_id": "g1pkg:129419cc927b3231b0a8bc82",
+    "parent_reconstruction": {
+      "future_evidence_used": false,
+      "parent_hash_refs": [
+        "d51074141c9edc1259e2914bbd674adae4f36f3d507bb626291b507f54e99979"
+      ],
+      "status": "VERIFIED"
+    },
+    "post_repair_watch": {
+      "authority_regeneration": true,
+      "carrier_migration": true,
+      "new_support_emergence": true,
+      "old_support_reentry": true,
+      "scope_reopening": true
+    },
+    "prefix_cutoff_ref": "X5-T3:struct:000051",
+    "prefix_sequence": 51,
+    "preserve_refs": [
+      "file:README.md",
+      "file:checkout_app/__init__.py",
+      "file:checkout_app/checkout.py",
+      "file:checkout_app/server.py",
+      "file:legacy_compat.py",
+      "file:run.py",
+      "file:tests/test_checkout.py",
+      "file:versions/after.json",
+      "file:versions/before.json",
+      "file:web/app.js",
+      "file:web/index.html"
+    ],
+    "pressure_refs": [
+      "X5-T3:struct:000051"
+    ],
+    "repair_anchor_ref": "X5-T3:struct:000051",
+    "repair_gate_status": "COMPLETE_FOR_STRUCTURED_REPAIR",
+    "schema": "RB-STAGE2-R7-G1-MONITOR-DERIVED-REPAIR-PACKAGE-v1",
+    "semantic_audit_used": false,
+    "source_cell": "X5-T3",
+    "support_refs": [
+      "X5-T3:struct:000003",
+      "X5-T3:struct:000025",
+      "X5-T3:struct:000051"
+    ]
+  },
+  {
+    "affected_closure_refs": [
+      "rag-hit:11fe60236b048a9794f3441196c886f2ba9c52cf0bfd3dff95975a908aa99f12"
+    ],
+    "allowed_repair_surface": [],
+    "ancestor_refs": [
+      "X5-T3:struct:000005",
+      "X5-T3:struct:000012"
+    ],
+    "content_address": "sha256:6a55559d995cd00e157015d40be8f8675665b7fe1f699b57ea8938223f95eac6",
+    "cpr_label": null,
+    "descendant_refs": [],
+    "detection_surface": "rag-hit:11fe60236b048a9794f3441196c886f2ba9c52cf0bfd3dff95975a908aa99f12",
+    "forbidden_mutations": [
+      "FRAMEWORK_SOURCE_MODIFICATION",
+      "PROTOCOL_MODIFICATION",
+      "PRIVATE_RUNTIME_STATE_MUTATION",
+      "MCP_BACKEND_DIRECT_MUTATION",
+      "RAG_INTERNAL_MUTATION",
+      "MEMORYBANK_INTERNAL_MUTATION",
+      "LONGLMLINGUA_INTERNAL_MUTATION",
+      "WHOLE_SYSTEM_RESET"
+    ],
+    "future_evidence_used": false,
+    "g1_block_code": "LINEAGE_GAP_BLOCKED",
+    "monitor_evidence_refs": [
+      "X5-T3:struct:000005",
+      "X5-T3:struct:000012",
+      "X5-T3:struct:000018"
+    ],
+    "monitor_rule_id": "REENTRY_OR_REUSE",
+    "native_capability_requirements": [],
+    "package_hash": "6155fad6c9c04ba39c987dce88ced6b8f21c795c84e5ca32050aeb19991ed022",
+    "package_id": "g1pkg:6a55559d995cd00e157015d4",
+    "parent_reconstruction": {
+      "future_evidence_used": false,
+      "parent_hash_refs": [
+        "4dd26df27fa1072aae48bfacdc875fe8dd2c9914ce4a5bb1c6fbfafcf136f912"
+      ],
+      "status": "VERIFIED"
+    },
+    "post_repair_watch": {
+      "authority_regeneration": true,
+      "carrier_migration": true,
+      "new_support_emergence": true,
+      "old_support_reentry": true,
+      "scope_reopening": true
+    },
+    "prefix_cutoff_ref": "X5-T3:struct:000018",
+    "prefix_sequence": 18,
+    "preserve_refs": [
+      "file:README.md",
+      "file:checkout_app/__init__.py",
+      "file:checkout_app/checkout.py",
+      "file:checkout_app/server.py",
+      "file:legacy_compat.py",
+      "file:run.py",
+      "file:tests/test_checkout.py",
+      "file:versions/after.json",
+      "file:versions/before.json",
+      "file:versions/before/server.py",
+      "file:web/app.js",
+      "file:web/index.html"
+    ],
+    "pressure_refs": [
+      "X5-T3:struct:000018"
+    ],
+    "repair_anchor_ref": "X5-T3:struct:000018",
+    "repair_gate_status": "LINEAGE_GAP_BLOCKED",
+    "schema": "RB-STAGE2-R7-G1-MONITOR-DERIVED-REPAIR-PACKAGE-v1",
+    "semantic_audit_used": false,
+    "source_cell": "X5-T3",
+    "support_refs": [
+      "X5-T3:struct:000005",
+      "X5-T3:struct:000012",
+      "X5-T3:struct:000018"
+    ]
+  },
+  {
+    "affected_closure_refs": [
+      "rag-hit:ad9b7786ee90545cbfd55c63c8e738b4af468d953ef134c95c3f25e16aa4e1a2"
+    ],
+    "allowed_repair_surface": [],
+    "ancestor_refs": [
+      "X5-T3:struct:000007",
+      "X5-T3:struct:000014"
+    ],
+    "content_address": "sha256:c6d8ec1ddd4be2a89c34228b85f930efd7f6098b0075a7bc69994ffe956e3c92",
+    "cpr_label": null,
+    "descendant_refs": [],
+    "detection_surface": "rag-hit:ad9b7786ee90545cbfd55c63c8e738b4af468d953ef134c95c3f25e16aa4e1a2",
+    "forbidden_mutations": [
+      "FRAMEWORK_SOURCE_MODIFICATION",
+      "PROTOCOL_MODIFICATION",
+      "PRIVATE_RUNTIME_STATE_MUTATION",
+      "MCP_BACKEND_DIRECT_MUTATION",
+      "RAG_INTERNAL_MUTATION",
+      "MEMORYBANK_INTERNAL_MUTATION",
+      "LONGLMLINGUA_INTERNAL_MUTATION",
+      "WHOLE_SYSTEM_RESET"
+    ],
+    "future_evidence_used": false,
+    "g1_block_code": "LINEAGE_GAP_BLOCKED",
+    "monitor_evidence_refs": [
+      "X5-T3:struct:000007",
+      "X5-T3:struct:000014",
+      "X5-T3:struct:000020"
+    ],
+    "monitor_rule_id": "REENTRY_OR_REUSE",
+    "native_capability_requirements": [],
+    "package_hash": "d91e46e2a37223394e3d800b355c0ff6cf5a16bf5cf0f6cfef9add7cd4506ce7",
+    "package_id": "g1pkg:c6d8ec1ddd4be2a89c34228b",
+    "parent_reconstruction": {
+      "future_evidence_used": false,
+      "parent_hash_refs": [
+        "4dd26df27fa1072aae48bfacdc875fe8dd2c9914ce4a5bb1c6fbfafcf136f912"
+      ],
+      "status": "VERIFIED"
+    },
+    "post_repair_watch": {
+      "authority_regeneration": true,
+      "carrier_migration": true,
+      "new_support_emergence": true,
+      "old_support_reentry": true,
+      "scope_reopening": true
+    },
+    "prefix_cutoff_ref": "X5-T3:struct:000020",
+    "prefix_sequence": 20,
+    "preserve_refs": [
+      "file:README.md",
+      "file:checkout_app/__init__.py",
+      "file:checkout_app/checkout.py",
+      "file:checkout_app/server.py",
+      "file:legacy_compat.py",
+      "file:run.py",
+      "file:tests/test_checkout.py",
+      "file:versions/after.json",
+      "file:versions/before.json",
+      "file:versions/before/server.py",
+      "file:web/app.js",
+      "file:web/index.html"
+    ],
+    "pressure_refs": [
+      "X5-T3:struct:000020"
+    ],
+    "repair_anchor_ref": "X5-T3:struct:000020",
+    "repair_gate_status": "LINEAGE_GAP_BLOCKED",
+    "schema": "RB-STAGE2-R7-G1-MONITOR-DERIVED-REPAIR-PACKAGE-v1",
+    "semantic_audit_used": false,
+    "source_cell": "X5-T3",
+    "support_refs": [
+      "X5-T3:struct:000007",
+      "X5-T3:struct:000014",
+      "X5-T3:struct:000020"
+    ]
+  },
+  {
+    "affected_closure_refs": [
+      "rag-hit:d9a43382138922db1762bedbb42d4926139302ff202ec877f6176f374c78738b"
+    ],
+    "allowed_repair_surface": [],
+    "ancestor_refs": [
+      "X5-T3:struct:000006",
+      "X5-T3:struct:000013"
+    ],
+    "content_address": "sha256:e9f4a1a1c4a69c3ab006ffab8fdfa2e2464ec219c5da0aa04d00304101990cff",
+    "cpr_label": null,
+    "descendant_refs": [],
+    "detection_surface": "rag-hit:d9a43382138922db1762bedbb42d4926139302ff202ec877f6176f374c78738b",
+    "forbidden_mutations": [
+      "FRAMEWORK_SOURCE_MODIFICATION",
+      "PROTOCOL_MODIFICATION",
+      "PRIVATE_RUNTIME_STATE_MUTATION",
+      "MCP_BACKEND_DIRECT_MUTATION",
+      "RAG_INTERNAL_MUTATION",
+      "MEMORYBANK_INTERNAL_MUTATION",
+      "LONGLMLINGUA_INTERNAL_MUTATION",
+      "WHOLE_SYSTEM_RESET"
+    ],
+    "future_evidence_used": false,
+    "g1_block_code": "LINEAGE_GAP_BLOCKED",
+    "monitor_evidence_refs": [
+      "X5-T3:struct:000006",
+      "X5-T3:struct:000013",
+      "X5-T3:struct:000019"
+    ],
+    "monitor_rule_id": "REENTRY_OR_REUSE",
+    "native_capability_requirements": [],
+    "package_hash": "d31d427323d1a6fa5062a5a995033be3cf33976c9bd783c9c1f6cd462281478b",
+    "package_id": "g1pkg:e9f4a1a1c4a69c3ab006ffab",
+    "parent_reconstruction": {
+      "future_evidence_used": false,
+      "parent_hash_refs": [
+        "4dd26df27fa1072aae48bfacdc875fe8dd2c9914ce4a5bb1c6fbfafcf136f912"
+      ],
+      "status": "VERIFIED"
+    },
+    "post_repair_watch": {
+      "authority_regeneration": true,
+      "carrier_migration": true,
+      "new_support_emergence": true,
+      "old_support_reentry": true,
+      "scope_reopening": true
+    },
+    "prefix_cutoff_ref": "X5-T3:struct:000019",
+    "prefix_sequence": 19,
+    "preserve_refs": [
+      "file:README.md",
+      "file:checkout_app/__init__.py",
+      "file:checkout_app/checkout.py",
+      "file:checkout_app/server.py",
+      "file:legacy_compat.py",
+      "file:run.py",
+      "file:tests/test_checkout.py",
+      "file:versions/after.json",
+      "file:versions/before.json",
+      "file:versions/before/server.py",
+      "file:web/app.js",
+      "file:web/index.html"
+    ],
+    "pressure_refs": [
+      "X5-T3:struct:000019"
+    ],
+    "repair_anchor_ref": "X5-T3:struct:000019",
+    "repair_gate_status": "LINEAGE_GAP_BLOCKED",
+    "schema": "RB-STAGE2-R7-G1-MONITOR-DERIVED-REPAIR-PACKAGE-v1",
+    "semantic_audit_used": false,
+    "source_cell": "X5-T3",
+    "support_refs": [
+      "X5-T3:struct:000006",
+      "X5-T3:struct:000013",
+      "X5-T3:struct:000019"
+    ]
+  },
+  {
+    "affected_closure_refs": [
+      "state:file-list"
+    ],
+    "allowed_repair_surface": [
+      "AUTHORIZED_PROCESS_STATE_REVISION:state:file-list"
+    ],
+    "ancestor_refs": [
+      "X5-T3:struct:000001",
+      "X5-T3:struct:000015"
+    ],
+    "content_address": "sha256:4bfff817fa7913cc24af749d78bbb3c13a66ef9cafe4e4e1feb93f6058901794",
+    "cpr_label": null,
+    "descendant_refs": [],
+    "detection_surface": "state:file-list",
+    "forbidden_mutations": [
+      "FRAMEWORK_SOURCE_MODIFICATION",
+      "PROTOCOL_MODIFICATION",
+      "PRIVATE_RUNTIME_STATE_MUTATION",
+      "MCP_BACKEND_DIRECT_MUTATION",
+      "RAG_INTERNAL_MUTATION",
+      "MEMORYBANK_INTERNAL_MUTATION",
+      "LONGLMLINGUA_INTERNAL_MUTATION",
+      "WHOLE_SYSTEM_RESET"
+    ],
+    "future_evidence_used": false,
+    "g1_block_code": null,
+    "monitor_evidence_refs": [
+      "X5-T3:struct:000001",
+      "X5-T3:struct:000015",
+      "X5-T3:struct:000030"
+    ],
+    "monitor_rule_id": "REENTRY_OR_REUSE",
+    "native_capability_requirements": [
+      "AUTHORIZED_PROCESS_STATE_REVISION:state:file-list"
+    ],
+    "package_hash": "9d3a3f6531c19d97a11acd6d090c85b019c9eb13dd2d446e55539de9ddf640b8",
+    "package_id": "g1pkg:4bfff817fa7913cc24af749d",
+    "parent_reconstruction": {
+      "future_evidence_used": false,
+      "parent_hash_refs": [
+        "7b3bbbdec20635c02490256f21e69e48606dc6c798dc41d6ab2a489591119555"
+      ],
+      "status": "VERIFIED"
+    },
+    "post_repair_watch": {
+      "authority_regeneration": true,
+      "carrier_migration": true,
+      "new_support_emergence": true,
+      "old_support_reentry": true,
+      "scope_reopening": true
+    },
+    "prefix_cutoff_ref": "X5-T3:struct:000030",
+    "prefix_sequence": 30,
+    "preserve_refs": [
+      "file:README.md",
+      "file:checkout_app/__init__.py",
+      "file:checkout_app/checkout.py",
+      "file:checkout_app/server.py",
+      "file:legacy_compat.py",
+      "file:run.py",
+      "file:tests/test_checkout.py",
+      "file:versions/after.json",
+      "file:versions/before.json",
+      "file:versions/before/server.py",
+      "file:web/app.js",
+      "file:web/index.html"
+    ],
+    "pressure_refs": [
+      "X5-T3:struct:000030"
+    ],
+    "repair_anchor_ref": "X5-T3:struct:000030",
+    "repair_gate_status": "COMPLETE_FOR_STRUCTURED_REPAIR",
+    "schema": "RB-STAGE2-R7-G1-MONITOR-DERIVED-REPAIR-PACKAGE-v1",
+    "semantic_audit_used": false,
+    "source_cell": "X5-T3",
+    "support_refs": [
+      "X5-T3:struct:000001",
+      "X5-T3:struct:000015",
+      "X5-T3:struct:000030"
+    ]
+  }
+]
