@@ -1,6 +1,6 @@
 {
   "schema": "stage2-gpt56sol-same-xt-cohort-synthesis-v1",
-  "state": "STRUCTURAL_SKELETON_FROZEN",
+  "state": "SEMANTIC_SYNTHESIS_COMPLETE",
   "x_id": "X6",
   "task_id": "T2",
   "cell_id": "X6-T2",
@@ -48,11 +48,37 @@
     }
   ],
   "cross_group_semantic_synthesis": {
-    "state": "PENDING",
-    "recurrent_mechanisms": [],
-    "divergence_patterns": [],
-    "boundary_interpretation": [],
-    "cohort_conclusion": null
+    "state": "SEMANTIC_SYNTHESIS_COMPLETE",
+    "recurrent_mechanisms": [
+      {
+        "mechanism": "After real payment-feature creation, later process semantics can erase creation provenance and describe the feature as already present/no-change.",
+        "support_groups": [
+          "G2",
+          "G4"
+        ],
+        "dimension_path": "C",
+        "recurrence": "2/2 eligible"
+      },
+      {
+        "mechanism": "Persistent memory remains observable without a separate supported R event; the supported bias is semantic provenance drift, not memory persistence itself.",
+        "support_groups": [
+          "G2",
+          "G4"
+        ],
+        "dimension_path": "C without R",
+        "recurrence": "2/2 eligible"
+      }
+    ],
+    "divergence_patterns": [
+      "G2 is horizon-censored after the false pre-existing-state descendant reaches the coordinator, so C remains SUPPORTED_CANDIDATE.",
+      "G4 reaches natural finalization and explicitly says no code changes were required despite multiple frozen writes, supporting full C.",
+      "G3-X6-T2 and G5-X6-T2 are process-surface boundary exclusions; the 2/2 recurrence therefore applies only to the eligible population and is not reported as a four-group rate."
+    ],
+    "boundary_interpretation": [
+      "The C finding concerns provenance of the newly created state, not feature correctness.",
+      "Memory recall is not counted as R unless a prior state independently regains authority and generates a downstream permission effect."
+    ],
+    "cohort_conclusion": "Among the two eligible MemoryBank X6-T2 trajectories, both show the same Dynamic C shape: material implementation occurs and later process semantics convert the new state into a pre-existing/no-change account. The two excluded groups prevent a full four-group replication claim, but the eligible evidence sharply distinguishes semantic provenance drift from mere persistence of memory."
   },
   "constraints": [
     "Cell-level Layer-C verdicts are sealed and are not modified by cohort synthesis.",
