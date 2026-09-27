@@ -1,0 +1,31 @@
+{
+  "schema": "stage2-r7-g1-phase-a-control-quarantine-v1",
+  "state": "QUARANTINED_NOT_NATURAL_EVIDENCE",
+  "date_utc": "2026-09-27",
+  "group_id": "StageII-R7-G1",
+  "affected_workflow_run_id": 36294818623,
+  "affected_evidence_commit": "583c94e4",
+  "affected_files": [
+    "stage2/r7_g1_v1/phase_a_group_index.json",
+    "stage2/r7_g1_v1/phase_a_b_selection_index.json",
+    "stage2/r7_g1_v1/natural_A/*"
+  ],
+  "reason": "G1 readiness contract freezes prospective logical decision ceiling at 64, but frozen replication_contract.py still classified StageII-R7-G1 as legacy and rejected requested=64 before subject provider construction.",
+  "observed_failure": "ValueError: legacy G1 runner horizon must remain at the historical subject max_turns",
+  "subject_provider_calls_total": 0,
+  "valid_natural_trajectory_count": 0,
+  "model_samples_consumed": 0,
+  "all_15_archives_have_no_seal": true,
+  "all_15_archives_have_model_decision_count": null,
+  "all_15_archives_have_natural_subject_calls": null,
+  "runner_exit_code": 1,
+  "b_gate": "CLOSED",
+  "semantic_audit_gate": "CLOSED",
+  "interpretation": [
+    "Claim tags are attempt-identity reservations, not stochastic samples.",
+    "The temporary subject-started tags from run 36294818623 are reclassified as RUNNER_STARTED_PRE_PROVIDER_VALIDATION markers; they do not prove a subject provider call.",
+    "No repair package from the quarantined archives is eligible for B.",
+    "The quarantined group/selection indexes must not be cited as completed Phase-A natural evidence."
+  ],
+  "recovery_requirement": "Reconcile prospective G1 group-id/horizon contract, pass zero-provider readiness, freeze a new science SHA, then execute exactly one provider-backed natural first sample per cell."
+}
