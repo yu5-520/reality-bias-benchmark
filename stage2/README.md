@@ -1,12 +1,23 @@
 # Stage-II
 
-**Current forward track: five-group natural block -> independent semantic audit -> monitor benchmark -> engineering batches.**
+**Current forward track: frozen natural block -> formal semantic closure -> monitor benchmark -> G2-G5 engineering batches.**
 
 Canonical plan:
 
-`docs/R_Plan_v7.46.md`
+`docs/R_Plan_v7.49.md`
 
 ## Current scientific state
+
+Current frozen forward state:
+
+- G2-G5 Natural A: **84/84 sealed**;
+- DeepSeek monitor-blind semantic reference: **sealed**;
+- formal GPT-5.6 Sol Layer-C contract/input boundary: **frozen**;
+- StageII-R7-G1 prospective paired-repair group: **closed and sealed**;
+- R7-G1 paired population: **12/12 audited and synthesized**;
+- R7-G1 X6-T1/T2/T3: **fail-closed boundary observations**, not repair-failure samples.
+
+The R7-G1 engineering cohort is distinct from the original 21-cell natural G1 discovery/calibration matrix.
 
 The original Stage-II natural matrix is complete and frozen:
 
@@ -47,6 +58,18 @@ Independent-audit / monitor-evaluation addendum:
 Machine-readable addendum:
 
 `configs/stage2_dual_general_chapter_independent_audit_monitor_eval_addendum_v1.json`
+
+R7-G1 engineering closure:
+
+`docs/reports/2026-09-27/StageII_R7_G1_Paired_Repair_Effect_Child_Report_v1.md`
+
+Engineering locality/efficacy addendum:
+
+`docs/reports/2026-09-27/StageII_Engineering_General_Chapter_Locality_Efficacy_Addendum_v1.md`
+
+Machine-readable R7-G1 closure registry:
+
+`configs/stage2_r7_g1_closure_registry_v1.json`
 
 ## Canonical forward protocols
 
@@ -273,12 +296,17 @@ Full report:
 
 ## Next gate
 
-Engineering preparation is complete.
+R7-G1 is closed. Do not rerun it.
 
-Scientific subject/provider execution remains explicitly gated.
+The forward main-track gate is:
 
-After active execution authorization, the next scientific action is:
+1. complete and seal the formal GPT-5.6 Sol Layer-C result set under the frozen reviewer-independence contract;
+2. complete the Experimental General Chapter cross-group semantic synthesis;
+3. join the independently sealed monitor outputs and semantic references;
+4. freeze the primary within-study prospective monitor benchmark;
+5. freeze G2-G5 engineering eligibility;
+6. execute engineering B by group batch: `G2 -> G3 -> G4 -> G5`;
+7. perform per-batch paired process-semantic audit;
+8. perform final cross-group R7 repair-response synthesis.
 
-`G2 21 natural A -> G3 21A -> G4 21A -> G5 21A`
-
-with the same frozen monitor version, 64-decision horizon, zero repair during A, and independent audit/monitor evidence channels.
+No G2-G5 Natural-A rerun is required. No R7-G1 rerun is permitted by the closure plan.
