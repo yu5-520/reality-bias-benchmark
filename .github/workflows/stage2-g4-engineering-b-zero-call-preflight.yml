@@ -102,16 +102,15 @@ jobs:
           assert row["selected_package_id"]
           assert row["selected_package_hash"]
           assert row["selected_parent_checkpoint_hash"]
-          import tarfile
-          archive=Path(f"evidence/stage2/replication_v2/G4/natural_A/{cell}/first_attempt.tar.gz")
-          with tarfile.open(archive,"r:gz") as tf:
-              members=[m for m in tf.getmembers() if m.isfile() and Path(m.name).name=="attempt_receipt.json"]
-              assert len(members)==1
-              receipt=json.loads(tf.extractfile(members[0]).read())
+          group_index=json.loads(Path("evidence/stage2/replication_v2/G4/group_index.json").read_text())
+          receipts=[r for r in group_index["receipts"] if r["cell_id"]==cell]
+          assert len(receipts)==1
+          receipt=receipts[0]
           assert receipt["workflow_run_id"]==int(os.environ["SOURCE_A_WORKFLOW_RUN"])
           assert receipt["attempt_index"]==1
           assert receipt["scientific_code_sha"]==os.environ["SOURCE_A_SCIENCE_SHA"]
-          print("PASS: frozen G4 selection, source-run binding, and control contract")
+          assert receipt["preserved"] is True
+          print("PASS: frozen G4 selection, first-attempt source-run binding, and control contract")
           PY
 
       - name: Bind exact X2 MetaGPT environment
