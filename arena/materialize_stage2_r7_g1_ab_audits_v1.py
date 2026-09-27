@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse, json
+import argparse, json, hashlib
 from pathlib import Path
 
 JUDGMENTS = {
@@ -104,7 +104,8 @@ def main():
         }
         (out/f"{cell}.json").write_text(json.dumps(audit,ensure_ascii=False,indent=2,sort_keys=True)+"\n")
         results.append({"cell_id":cell,"input_packet_sha256":row["packet_sha256"],"overall_process_effect":j["overall"],"direct_target_effect":j["direct"]})
-    index={"schema":"stage2-r7-g1-ab-paired-process-semantic-audit-index-v1","status":"DRAFTED_12_OF_12_PENDING_VALIDATION","reviewer_model":"GPT-5.6 Sol","execution_mode":"CHATGPT_NATIVE_REASONING","authorization_issue":287,"source_packet_index_sha256":idx.get("packet_index_sha256"),"audit_count":12,"cells":results,"new_subject_provider_calls":0,"repair_calls":0,"paid_evaluator_calls":0}
+    packet_index_sha256=hashlib.sha256((packet_root/"packet_index.json").read_bytes()).hexdigest()
+    index={"schema":"stage2-r7-g1-ab-paired-process-semantic-audit-index-v1","status":"DRAFTED_12_OF_12_PENDING_VALIDATION","reviewer_model":"GPT-5.6 Sol","execution_mode":"CHATGPT_NATIVE_REASONING","authorization_issue":287,"source_packet_freeze_commit":"8b4c996b55909855bb8c678e578e310e2863376c","source_packet_index_sha256":packet_index_sha256,"audit_count":12,"cells":results,"new_subject_provider_calls":0,"repair_calls":0,"paid_evaluator_calls":0}
     (out/"audit_index.json").write_text(json.dumps(index,ensure_ascii=False,indent=2,sort_keys=True)+"\n")
     print(json.dumps({"status":"MATERIALIZED","audits":12},sort_keys=True))
 
