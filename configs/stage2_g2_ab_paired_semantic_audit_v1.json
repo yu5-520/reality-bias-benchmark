@@ -1,0 +1,104 @@
+{
+  "schema": "stage2-g2-ab-paired-process-semantic-audit-config-v1",
+  "version": "1.0",
+  "date_utc": "2026-09-27",
+  "status": "AUTHORIZED_POST_B_FREEZE_ANALYSIS",
+  "authorization_issue": 301,
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING"
+  },
+  "source": {
+    "natural_A_branch": "stage2-g2-natural-evidence-v1",
+    "natural_A_evidence_commit": "8e8cf0765da4a129d09b6761c349fcca5ce7cfb2",
+    "natural_A_workflow_run": 36238551502,
+    "repair_B_branch": "stage2-g2-engineering-b-evidence-v1",
+    "repair_B_evidence_commit": "956636cf8a5cf85495300a768036c057574583bd",
+    "repair_B_workflow_run": 36306739453,
+    "repair_B_group_index": "stage2/replication_v2/G2/engineering_B_v1/group_index.json",
+    "repair_B_group_seal": "stage2/replication_v2/G2/engineering_B_v1/group_seal.json"
+  },
+  "population": {
+    "attempted_cells": [
+      "X2-T1",
+      "X2-T2",
+      "X2-T3",
+      "X4-T1",
+      "X4-T2",
+      "X4-T3",
+      "X5-T1",
+      "X5-T2",
+      "X5-T3",
+      "X7-T1",
+      "X7-T2",
+      "X7-T3"
+    ],
+    "valid_paired_cells": [
+      "X2-T1",
+      "X2-T2",
+      "X2-T3",
+      "X4-T1",
+      "X4-T2",
+      "X4-T3",
+      "X5-T1",
+      "X5-T3",
+      "X7-T1",
+      "X7-T2",
+      "X7-T3"
+    ],
+    "execution_boundary_cells": [
+      "X5-T2"
+    ],
+    "execution_boundary_role": "B_EXECUTION_FAILURE_BOUNDARY_NOT_PAIRED_EFFECT_SAMPLE",
+    "blocked_or_no_package_cells": [
+      "X1-T1",
+      "X1-T2",
+      "X1-T3",
+      "X3-T1",
+      "X3-T2",
+      "X3-T3",
+      "X6-T1",
+      "X6-T2",
+      "X6-T3"
+    ]
+  },
+  "pairing": {
+    "same_parent_checkpoint_required": true,
+    "selected_package_fixed_before_B": true,
+    "one_B_per_cell": true,
+    "automatic_retries": 0,
+    "natural_A_reruns": 0,
+    "B_reruns": 0
+  },
+  "primary_audit_isolation": {
+    "prior_layer_c_labels_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "monitor_predictions_read": false,
+    "monitor_candidate_labels_read": false,
+    "endpoint_correctness_primary_object": false,
+    "repair_package_visible_posthoc": true,
+    "actual_repair_action_visible_posthoc": true,
+    "frozen_raw_execution_evidence_visible": true
+  },
+  "synthesis": {
+    "paired_effect_denominator": 11,
+    "execution_boundary_count": 1,
+    "boundary_not_imputed_as_repair_failure": true,
+    "require_all_11_paired_audits": true,
+    "require_1_boundary_record": true
+  },
+  "execution_boundary": {
+    "new_subject_provider_calls": 0,
+    "repair_calls": 0,
+    "paid_evaluator_calls": 0,
+    "evidence_mutation": false,
+    "prior_semantic_label_mutation": false
+  },
+  "outputs": {
+    "branch": "stage2-g2-paired-audit-v1",
+    "root": "stage2/replication_v2/G2/paired_semantic_audit_v1",
+    "paired_packet_count": 11,
+    "boundary_record_count": 1,
+    "paired_audit_count": 11
+  }
+}
