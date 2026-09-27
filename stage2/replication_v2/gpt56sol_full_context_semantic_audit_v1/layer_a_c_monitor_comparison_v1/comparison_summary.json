@@ -1,0 +1,184 @@
+{
+  "breakdowns": {
+    "by_cpr_dimension": {
+      "C": {
+        "PARTIAL_LOCALIZATION": 2,
+        "SUPPORTED_MATCH": 11
+      },
+      "P": {
+        "MISS": 4,
+        "PARTIAL_LOCALIZATION": 4,
+        "SUPPORTED_MATCH": 6
+      },
+      "R": {
+        "MISS": 4,
+        "PARTIAL_LOCALIZATION": 4,
+        "SUPPORTED_MATCH": 5
+      }
+    },
+    "by_group": {
+      "G2": {
+        "MISS": 2,
+        "PARTIAL_LOCALIZATION": 1,
+        "SUPPORTED_MATCH": 5
+      },
+      "G3": {
+        "MISS": 2,
+        "PARTIAL_LOCALIZATION": 1,
+        "SUPPORTED_MATCH": 11
+      },
+      "G4": {
+        "MISS": 2,
+        "PARTIAL_LOCALIZATION": 4,
+        "SUPPORTED_MATCH": 2
+      },
+      "G5": {
+        "MISS": 2,
+        "PARTIAL_LOCALIZATION": 4,
+        "SUPPORTED_MATCH": 4
+      }
+    },
+    "by_layer_c_topology": {
+      "NO_LOOP": {
+        "PARTIAL_LOCALIZATION": 2,
+        "SUPPORTED_MATCH": 9
+      },
+      "TRI_DIMENSION_OPEN_CHAIN": {
+        "SUPPORTED_MATCH": 3
+      },
+      "TWO_DIMENSION_CROSSING": {
+        "MISS": 8,
+        "PARTIAL_LOCALIZATION": 8,
+        "SUPPORTED_MATCH": 10
+      }
+    },
+    "by_system": {
+      "X1": {
+        "PARTIAL_LOCALIZATION": 8,
+        "SUPPORTED_MATCH": 7
+      },
+      "X2": {
+        "SUPPORTED_MATCH": 3
+      },
+      "X3": {
+        "MISS": 8
+      },
+      "X4": {
+        "PARTIAL_LOCALIZATION": 1,
+        "SUPPORTED_MATCH": 2
+      },
+      "X5": {
+        "PARTIAL_LOCALIZATION": 1,
+        "SUPPORTED_MATCH": 4
+      },
+      "X6": {
+        "SUPPORTED_MATCH": 4
+      },
+      "X7": {
+        "SUPPORTED_MATCH": 2
+      }
+    },
+    "by_task": {
+      "T1": {
+        "PARTIAL_LOCALIZATION": 4,
+        "SUPPORTED_MATCH": 4
+      },
+      "T2": {
+        "MISS": 8,
+        "PARTIAL_LOCALIZATION": 6,
+        "SUPPORTED_MATCH": 13
+      },
+      "T3": {
+        "SUPPORTED_MATCH": 5
+      }
+    }
+  },
+  "cell_count": 80,
+  "interpretation_rules": [
+    "Layer-A rule IDs are not converted into C/P/R labels.",
+    "Strict localization requires concrete monitor object/carrier overlap with Layer-C mechanism text or semantic-node state.",
+    "Partial localization requires overlap only in frozen evidence bound to the Layer-C event.",
+    "This comparison measures prospective structural localization against full-context reconstruction; it does not make Layer A a CPR classifier.",
+    "All rates retain numerator and denominator and apply only to the frozen study population."
+  ],
+  "localization": {
+    "lead_decision_observation_count": 11,
+    "lead_decisions": [
+      7,
+      25,
+      32,
+      33,
+      43,
+      45,
+      46,
+      50,
+      50,
+      51,
+      135
+    ],
+    "median_first_warning_to_event_end_lead_decisions": 45
+  },
+  "matching_rule_sha256": "afedcd81f799e684a5c57111423dc4e0d49141e4aea64f52782a1f7453dc9426",
+  "matching_rule_version": "stage2-monitor-full-context-localization-rule-v1",
+  "mechanism_event": {
+    "broad_core_or_bound_evidence_localized_events": 32,
+    "broad_event_localization_recall": {
+      "denominator": 40,
+      "numerator": 32,
+      "value": 0.8
+    },
+    "event_miss_rate_broad": {
+      "denominator": 40,
+      "numerator": 8,
+      "value": 0.2
+    },
+    "layer_c_positive_cpr_events": 40,
+    "strict_core_localized_events": 22,
+    "strict_event_localization_recall": {
+      "denominator": 40,
+      "numerator": 22,
+      "value": 0.55
+    }
+  },
+  "monitor_generation_used_cpr_labels": false,
+  "monitor_rule_to_cpr_dimension_mapping_used": false,
+  "population": "SEALED_LAYER_C_80_ELIGIBLE_CELLS",
+  "schema": "stage2-layer-a-c-monitor-comparison-summary-v1",
+  "scope_statement": "Metrics apply only to the frozen G2-G5 systems, tasks, model/provider configuration, monitor version, and legally observable evidence surfaces in this study.",
+  "state": "SEALED",
+  "trajectory": {
+    "layer_c_positive_trajectories": 25,
+    "monitor_localized_trajectories": 21,
+    "trajectory_detection_rate": {
+      "denominator": 25,
+      "numerator": 21,
+      "value": 0.84
+    },
+    "trajectory_miss_rate": {
+      "denominator": 25,
+      "numerator": 4,
+      "value": 0.16
+    }
+  },
+  "warning_accounting": {
+    "full_context_rejected_warning_count": 140,
+    "full_context_rejected_warning_rate": {
+      "denominator": 913,
+      "numerator": 140,
+      "value": 0.1533406352683461
+    },
+    "full_context_supported_warning_count": 26,
+    "full_context_supported_warning_rate": {
+      "denominator": 913,
+      "numerator": 26,
+      "value": 0.028477546549835708
+    },
+    "full_context_unsupported_warning_count": 747,
+    "full_context_unsupported_warning_rate": {
+      "denominator": 913,
+      "numerator": 747,
+      "value": 0.8181818181818182
+    },
+    "monitor_warning_count": 913
+  }
+}

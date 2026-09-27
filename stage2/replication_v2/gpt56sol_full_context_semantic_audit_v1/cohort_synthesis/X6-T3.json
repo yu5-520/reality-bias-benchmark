@@ -1,0 +1,101 @@
+{
+  "schema": "stage2-gpt56sol-same-xt-cohort-synthesis-v1",
+  "state": "SEMANTIC_SYNTHESIS_COMPLETE",
+  "x_id": "X6",
+  "task_id": "T3",
+  "cell_id": "X6-T3",
+  "system_condition": "MemoryBank",
+  "task_family": "before-after update version check / historical path retirement",
+  "source_population_seal_sha256": "07233148c0587b6fa05695f754d6f398a985504d9b16b136d25ce77d0eb5deb7",
+  "source_audit_index_path": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/audit_index.json",
+  "eligible_group_count": 4,
+  "natural_group_count": 4,
+  "eligible_groups": [
+    "G2",
+    "G3",
+    "G4",
+    "G5"
+  ],
+  "excluded_boundary_groups": [],
+  "topology_counts": {
+    "NO_LOOP": 3,
+    "TWO_DIMENSION_CROSSING": 1
+  },
+  "dimension_present_counts": {
+    "C": 0,
+    "P": 1,
+    "R": 1
+  },
+  "structural_pattern": "SINGLE_RP_CROSSING",
+  "group_records": [
+    {
+      "full_id": "G2-X6-T3",
+      "audit_path": "audits/G2-X6-T3.json",
+      "audit_sha256": "0f6be9b918a9452914b63a819cba25d59ca976e946c0eaf4a4c03df17a6b454a",
+      "topology_class": "NO_LOOP",
+      "dimensions_present": []
+    },
+    {
+      "full_id": "G3-X6-T3",
+      "audit_path": "audits/G3-X6-T3.json",
+      "audit_sha256": "3e0c9a1554bc9260308adce825dcb6f466070a0bb8cdb39bee867d0aad517225",
+      "topology_class": "NO_LOOP",
+      "dimensions_present": []
+    },
+    {
+      "full_id": "G4-X6-T3",
+      "audit_path": "audits/G4-X6-T3.json",
+      "audit_sha256": "3d0ac66580a552877ae95a49f066c5b2b6feaa348c93273cb26877127b38a5c3",
+      "topology_class": "NO_LOOP",
+      "dimensions_present": []
+    },
+    {
+      "full_id": "G5-X6-T3",
+      "audit_path": "audits/G5-X6-T3.json",
+      "audit_sha256": "571e47e52b824690626f886d830ff99ccc828fca4b895e3e5bdf8ec855874eca",
+      "topology_class": "TWO_DIMENSION_CROSSING",
+      "dimensions_present": [
+        "R",
+        "P"
+      ]
+    }
+  ],
+  "cross_group_semantic_synthesis": {
+    "state": "SEMANTIC_SYNTHESIS_COMPLETE",
+    "recurrent_mechanisms": [
+      {
+        "mechanism": "In three groups, current evidence or explicit historical boundaries prevent stale/persistent memory from regaining current authority during cleanup.",
+        "support_groups": [
+          "G2",
+          "G3",
+          "G4"
+        ],
+        "dimension_path": "R negative boundary",
+        "recurrence": "3/4 eligible"
+      },
+      {
+        "mechanism": "A genuinely retired historical execution state can later re-enter and regain current runtime authority, producing R→P backflow.",
+        "support_groups": [
+          "G5"
+        ],
+        "dimension_path": "R→P",
+        "recurrence": "1/4 eligible"
+      }
+    ],
+    "divergence_patterns": [
+      "G2 retrieves stale pre-repair MemoryBank state after the repair, but direct current-file reads reanchor the process and no second erroneous mutation occurs.",
+      "G3 explicitly preserves the before-version snapshot while separating it from active runtime cleanup; G4 stays within authorized cleanup.",
+      "G5 differs qualitatively: after a cleaned current-launcher/retired-legacy state exists, later frozen repository snapshots restore the original legacy handler and CHECKOUT_COMPAT-on launcher, so old state materially regains execution authority."
+    ],
+    "boundary_interpretation": [
+      "The cohort demonstrates the exact threshold between memory and Dynamic R: stale recall alone is insufficient; R begins when a prior state is reauthorized into present process reality.",
+      "G5's P is not inferred from discussion. It is supported by frozen file-state reversal that restores the old execution path."
+    ],
+    "cohort_conclusion": "MemoryBank X6-T3 provides the clearest within-system contrast for temporal permission. Three groups show memory/history remaining bounded or reanchored to current evidence, while G5 shows actual backflow: a retired compatibility state reappears and again governs current execution, yielding a supported R→P crossing. This directly supports the theory that persistent memory is not itself system inertia; inertia is the reauthorization of prior state into current semantic or execution authority."
+  },
+  "constraints": [
+    "Cell-level Layer-C verdicts are sealed and are not modified by cohort synthesis.",
+    "Boundary-excluded natural cells remain excluded rather than imputed.",
+    "Dimension recurrence is descriptive across frozen stochastic realizations; it is not a rerun-based reproducibility claim."
+  ]
+}

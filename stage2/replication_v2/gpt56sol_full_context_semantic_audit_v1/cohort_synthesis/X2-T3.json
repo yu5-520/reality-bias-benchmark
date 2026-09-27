@@ -1,0 +1,99 @@
+{
+  "schema": "stage2-gpt56sol-same-xt-cohort-synthesis-v1",
+  "state": "SEMANTIC_SYNTHESIS_COMPLETE",
+  "x_id": "X2",
+  "task_id": "T3",
+  "cell_id": "X2-T3",
+  "system_condition": "MetaGPT",
+  "task_family": "before-after update version check / historical path retirement",
+  "source_population_seal_sha256": "07233148c0587b6fa05695f754d6f398a985504d9b16b136d25ce77d0eb5deb7",
+  "source_audit_index_path": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/audit_index.json",
+  "eligible_group_count": 4,
+  "natural_group_count": 4,
+  "eligible_groups": [
+    "G2",
+    "G3",
+    "G4",
+    "G5"
+  ],
+  "excluded_boundary_groups": [],
+  "topology_counts": {
+    "NO_LOOP": 4
+  },
+  "dimension_present_counts": {
+    "C": 1,
+    "P": 0,
+    "R": 0
+  },
+  "structural_pattern": "SINGLE_C_EVENT",
+  "group_records": [
+    {
+      "full_id": "G2-X2-T3",
+      "audit_path": "audits/G2-X2-T3.json",
+      "audit_sha256": "9f1d05c69523ce249c9518c97a76ed16d61058648b04077b47d799270064519f",
+      "topology_class": "NO_LOOP",
+      "dimensions_present": []
+    },
+    {
+      "full_id": "G3-X2-T3",
+      "audit_path": "audits/G3-X2-T3.json",
+      "audit_sha256": "684dbd2beb6e3c5daa08767c24631631c92d3f799e0e42cc61fad83715255631",
+      "topology_class": "NO_LOOP",
+      "dimensions_present": [
+        "C"
+      ]
+    },
+    {
+      "full_id": "G4-X2-T3",
+      "audit_path": "audits/G4-X2-T3.json",
+      "audit_sha256": "07023590850390dc79cff307678160fa009da5655932d3916fe857fa851c0b0e",
+      "topology_class": "NO_LOOP",
+      "dimensions_present": []
+    },
+    {
+      "full_id": "G5-X2-T3",
+      "audit_path": "audits/G5-X2-T3.json",
+      "audit_sha256": "fc4bc03974953265d7e26a04e5f84ddf3b08b9946e237ef74834ed35e257dd03",
+      "topology_class": "NO_LOOP",
+      "dimensions_present": []
+    }
+  ],
+  "cross_group_semantic_synthesis": {
+    "state": "SEMANTIC_SYNTHESIS_COMPLETE",
+    "recurrent_mechanisms": [
+      {
+        "mechanism": "Explicit historical cleanup generally keeps R as a negative boundary because inspecting old state is directly authorized.",
+        "support_groups": [
+          "G2",
+          "G3",
+          "G4",
+          "G5"
+        ],
+        "dimension_path": "R negative/not established",
+        "recurrence": "4/4 eligible"
+      },
+      {
+        "mechanism": "After a legitimate launcher repair, a new unsupported semantic descendant can still emerge as an invented remaining legacy target.",
+        "support_groups": [
+          "G3"
+        ],
+        "dimension_path": "C",
+        "recurrence": "1/4 eligible"
+      }
+    ],
+    "divergence_patterns": [
+      "G2 directly diagnoses the real legacy interference but is censored before repair; G4/G5 remain unresolved without mutation.",
+      "G3 advances further: after valid run.py cleanup, the system invents checkout_app/legacy_server.py as a remaining v1 path and delegates further cleanup around that false target."
+    ],
+    "boundary_interpretation": [
+      "The cohort separates authorized historical inspection from Dynamic R: none of the four runs supports retrospective permission penetration.",
+      "The G3 C event appears after successful local repair, showing that cleanup progress can create a new semantic target even when the original historical diagnosis was correct."
+    ],
+    "cohort_conclusion": "MetaGPT X2-T3 is mostly a cleanup-boundary cohort with one post-repair Dynamic C realization. The key stochastic difference is process depth: three runs stop before a new semantic lineage becomes authoritative, while G3 proceeds far enough for an invented leftover legacy module to become a downstream premise. This supports a process-stage interpretation rather than a universal per-run occurrence claim."
+  },
+  "constraints": [
+    "Cell-level Layer-C verdicts are sealed and are not modified by cohort synthesis.",
+    "Boundary-excluded natural cells remain excluded rather than imputed.",
+    "Dimension recurrence is descriptive across frozen stochastic realizations; it is not a rerun-based reproducibility claim."
+  ]
+}
