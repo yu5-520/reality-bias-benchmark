@@ -45,8 +45,14 @@ def arm_object(row, arm):
         if e2["ref"] != e["ref"]:
             nodes.append({"node_id":f"{arm}-N02","sequence":e2.get("sequence") or 0,"actor":o2.get("role","unknown"),"role":"ACTION","semantic_state":f"Last observable valid {arm} continuation action before termination.","evidence_refs":[e2["ref"]]})
     repo = parse_content(repo_ev)
-    nodes.append({"node_id":f"{arm}-N{len(nodes)+1:02d}","sequence":9998,"actor":"SYSTEM","role":"CONSEQUENCE","semantic_state":f"Repository consequence from parent: changed_files={json.dumps(repo.get('changed_files',[]),ensure_ascii=False)}.","evidence_refs":[repo_ev["ref"]]})
+    if isinstance(repo,dict):
+        repo_state=f"Repository consequence from parent: changed_files={json.dumps(repo.get('changed_files',[]),ensure_ascii=False)}."
+    else:
+        repo_state="Repository consequence is present in the frozen packet but its clipped projection is not safely reparsed; no additional repository semantics are inferred."
+    nodes.append({"node_id":f"{arm}-N{len(nodes)+1:02d}","sequence":9998,"actor":"SYSTEM","role":"CONSEQUENCE","semantic_state":repo_state,"evidence_refs":[repo_ev["ref"]]})
     summ = parse_content(summary)
+    if not isinstance(summ,dict):
+        summ={}
     nodes.append({"node_id":f"{arm}-N{len(nodes)+1:02d}","sequence":9999,"actor":"SYSTEM","role":"BOUNDARY","semantic_state":f"Termination={summ.get('stop_reason','unknown')}; turns={summ.get('turns','unknown')}; answer_present={summ.get('answer') is not None}.","evidence_refs":[summary["ref"]]})
     refs=[]
     for n in nodes:
