@@ -1,0 +1,305 @@
+name: Stage-II Layer A-B Monitor Evaluation
+
+on:
+  push:
+    branches:
+      - stage2-gpt56sol-full-context-audit-results-v1
+    paths:
+      - ".github/workflows/stage2-layer-a-b-monitor-evaluation.yml"
+      - "configs/stage2_monitor_source_bound_matching_rule_v1.json"
+
+permissions:
+  contents: write
+
+jobs:
+  evaluate-a-b:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: stage2-layer-a-b-monitor-evaluation
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Layer-A/C result branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-gpt56sol-full-context-audit-results-v1
+          fetch-depth: 0
+
+      - name: Checkout sealed Layer-B reference
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-semantic-audit-reference-v1
+          path: _layer_b_reference
+          fetch-depth: 1
+
+      - name: Evaluate frozen Layer-A against sealed Layer-B
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, hashlib, re
+          from pathlib import Path
+          from collections import Counter, defaultdict
+
+          root=Path("stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1")
+          aroot=root/"layer_a_monitor_export"
+          broot=Path("_layer_b_reference/stage2/replication_v2/semantic_audit_reference_v1/audit")
+          out=root/"layer_a_b_monitor_evaluation_v1"
+          out.mkdir(parents=True,exist_ok=True)
+
+          protocol=json.loads(Path("configs/stage2_monitor_evaluation_protocol_v1.json").read_text())
+          rule=json.loads(Path("configs/stage2_monitor_source_bound_matching_rule_v1.json").read_text())
+          aindex=json.loads((aroot/"export_index.json").read_text())
+          bindex=json.loads((broot/"reference_set_index.json").read_text())
+
+          assert protocol["monitor_freeze"]["posthoc_threshold_tuning_for_primary_result"] is False
+          assert rule["no_posthoc_tuning"] is True
+          assert aindex["eligible_cell_count"]==80
+          assert aindex["cpr_labels_used_for_monitor_generation"] is False
+          assert bindex["status"]=="SEALED_MONITOR_BLIND_REFERENCE_SET"
+          assert bindex["monitor_blind"] is True
+          assert bindex["monitor_runtime_bundle_read"] is False
+
+          positive_status={"SUPPORTED","SUPPORTED_CANDIDATE"}
+          fammap={k:set(v) for k,v in rule["monitor_rule_to_compatible_structure_families"].items()}
+          minlen=rule["object_matching"]["minimum_token_length"]
+
+          def tail(obj):
+              if not obj: return ""
+              s=str(obj).strip().lower()
+              if ":" in s: s=s.split(":",1)[1]
+              return s.strip()
+
+          def object_tokens(obj):
+              s=tail(obj)
+              vals=set()
+              if len(s)>=minlen: vals.add(s)
+              base=s.rsplit("/",1)[-1]
+              if len(base)>=minlen: vals.add(base)
+              stem=base.rsplit(".",1)[0]
+              if len(stem)>=minlen: vals.add(stem)
+              return vals
+
+          def ref_text(rr):
+              vals=[rr.get("semantic_before"),rr.get("semantic_after"),rr.get("semantic_delta"),
+                    rr.get("source_ref"),rr.get("carrier_ref"),rr.get("consequence_ref"),
+                    rr.get("decision_or_action_ref")]
+              return " ".join(str(x) for x in vals if x is not None).lower()
+
+          def compatible(c,rr):
+              return rr.get("structure_family") in fammap.get(c.get("rule_id"),set())
+
+          def overlap(c,rr):
+              txt=ref_text(rr)
+              return any(tok in txt for tok in object_tokens(c.get("object_ref")))
+
+          def temporal_ok(c,rr):
+              cs=c.get("prefix_sequence")
+              rs=rr.get("first_consequence_sequence")
+              if cs is None or rs is None: return True
+              return int(cs)<=int(rs)
+
+          def score(c,rr):
+              if not compatible(c,rr) or not temporal_ok(c,rr): return -1
+              return 2 if overlap(c,rr) else 1
+
+          records=[]
+          warning_state={}
+          by_group=defaultdict(Counter); by_x=defaultdict(Counter); by_t=defaultdict(Counter); by_family=defaultdict(Counter)
+          totals=Counter()
+          cell_rows=[]
+
+          for rec in aindex["records"]:
+              full=rec["full_id"]; group=rec["group_id"]; cell=rec["cell_id"]
+              x,t=cell.split("-")
+              cpath=aroot/"cells"/full/"monitor_candidates.json"
+              candidates=json.loads(cpath.read_text())
+              bf=broot/"cell_audits"/f"{full}.json"
+              b=json.loads(bf.read_text())
+              assert b["group_id"]==group and b["cell_id"]==cell
+              assert b["monitor_blind"] is True and b["monitor_runtime_bundle_read"] is False
+
+              positives=[rr for rr in b["reference_records"] if (not rr.get("negative_case")) and rr.get("claim_status") in positive_status]
+              negatives=[rr for rr in b["reference_records"] if rr.get("negative_case") or rr.get("claim_status")=="NEGATIVE_BOUNDARY"]
+              matched_warning_ids=set()
+              strict_hits=0; broad_hits=0; observable_pos=0; unobservable_pos=0
+
+              for rr in positives:
+                  options=sorted(((score(c,rr),c) for c in candidates),key=lambda z:(z[0],-(z[1].get("prefix_sequence") or 0)),reverse=True)
+                  best_score,best=(options[0] if options else (-1,None))
+                  observable=bool(rr.get("evidence_surface_available",True))
+                  if observable: observable_pos+=1
+                  else: unobservable_pos+=1
+                  if best_score==2:
+                      klass="SUPPORTED_MATCH"; strict_hits+=1; broad_hits+=1
+                  elif best_score==1:
+                      klass="PARTIAL_LOCALIZATION"; broad_hits+=1
+                  else:
+                      klass="MISS" if observable else "UNOBSERVABLE_REFERENCE"
+                  wid=best.get("candidate_hash") if best_score>=1 and best else None
+                  if wid:
+                      matched_warning_ids.add(wid)
+                      warning_state[wid]="SUPPORTED"
+                  first_warn=best.get("prefix_sequence") if wid else None
+                  first_cons=rr.get("first_consequence_sequence")
+                  lead=(first_cons-first_warn) if isinstance(first_cons,int) and isinstance(first_warn,int) else None
+                  row={
+                    "evaluation_id":f"AB:{full}:{rr['reference_id']}",
+                    "group_id":group,"cell_id":cell,
+                    "monitor_version":"RB-STAGE2-R7-G1-ONLINE-MONITOR-CONTRACT-v1",
+                    "matching_rule_version":"stage2-monitor-source-bound-matching-rule-v1",
+                    "reference_id":rr["reference_id"],"warning_id":wid,
+                    "structure_family":rr.get("structure_family"),
+                    "match_class":klass,"observable_reference":observable,
+                    "source_match":True if best_score==2 else (False if best_score==1 else None),
+                    "carrier_match":True if best_score==2 else (False if best_score==1 else None),
+                    "consumer_match":None,"decision_link_match":None,
+                    "lineage_node_reference_count":None,"lineage_node_matched_count":None,
+                    "lineage_edge_reference_count":None,"lineage_edge_matched_count":None,
+                    "first_warning_sequence":first_warn,"first_consequence_sequence":first_cons,
+                    "lead_decisions":lead,
+                    "notes":"Frozen source-bound match; no free-form semantic similarity or posthoc CPR label used."
+                  }
+                  records.append(row)
+                  totals[f"reference:{klass}"]+=1
+                  by_group[group][klass]+=1; by_x[x][klass]+=1; by_t[t][klass]+=1; by_family[rr.get("structure_family") or "NULL"][klass]+=1
+
+              for c in candidates:
+                  wid=c.get("candidate_hash")
+                  if wid in matched_warning_ids: continue
+                  rejected=False
+                  for rr in negatives:
+                      if compatible(c,rr) and temporal_ok(c,rr) and overlap(c,rr):
+                          rejected=True; break
+                  klass="AUDIT_REJECTED_WARNING" if rejected else "UNSUPPORTED_WARNING"
+                  if warning_state.get(wid)!="SUPPORTED":
+                      warning_state[wid]="REJECTED" if rejected else "UNSUPPORTED"
+                  records.append({
+                    "evaluation_id":f"AB:{full}:WARN:{wid[:16]}",
+                    "group_id":group,"cell_id":cell,
+                    "monitor_version":"RB-STAGE2-R7-G1-ONLINE-MONITOR-CONTRACT-v1",
+                    "matching_rule_version":"stage2-monitor-source-bound-matching-rule-v1",
+                    "reference_id":None,"warning_id":wid,"structure_family":None,
+                    "match_class":klass,"observable_reference":False,
+                    "source_match":None,"carrier_match":None,"consumer_match":None,"decision_link_match":None,
+                    "lineage_node_reference_count":None,"lineage_node_matched_count":None,
+                    "lineage_edge_reference_count":None,"lineage_edge_matched_count":None,
+                    "first_warning_sequence":c.get("prefix_sequence"),"first_consequence_sequence":None,
+                    "lead_decisions":None,
+                    "notes":f"Unmatched frozen warning; rule_id={c.get('rule_id')} object_ref={c.get('object_ref')}."
+                  })
+                  totals[f"warning:{klass}"]+=1
+
+              target_pos=len(positives)
+              cell_hit=1 if broad_hits>0 else 0
+              cell_rows.append({
+                "full_id":full,"group_id":group,"cell_id":cell,
+                "positive_reference_count":target_pos,
+                "observable_positive_reference_count":observable_pos,
+                "unobservable_positive_reference_count":unobservable_pos,
+                "strict_matched_reference_count":strict_hits,
+                "broad_matched_reference_count":broad_hits,
+                "monitor_warning_count":len(candidates),
+                "trajectory_positive":target_pos>0,
+                "trajectory_hit":bool(target_pos>0 and cell_hit)
+              })
+
+          # Unique warning accounting
+          supported=sum(1 for v in warning_state.values() if v=="SUPPORTED")
+          rejected=sum(1 for v in warning_state.values() if v=="REJECTED")
+          unsupported=sum(1 for v in warning_state.values() if v=="UNSUPPORTED")
+          warn_total=len(warning_state)
+          pos_refs=sum(r["positive_reference_count"] for r in cell_rows)
+          obs_refs=sum(r["observable_positive_reference_count"] for r in cell_rows)
+          unobs_refs=sum(r["unobservable_positive_reference_count"] for r in cell_rows)
+          strict=sum(r["strict_matched_reference_count"] for r in cell_rows)
+          broad=sum(r["broad_matched_reference_count"] for r in cell_rows)
+          pos_traj=sum(1 for r in cell_rows if r["trajectory_positive"])
+          hit_traj=sum(1 for r in cell_rows if r["trajectory_hit"])
+
+          def frac(n,d):
+              return {"numerator":n,"denominator":d,"value":(n/d if d else None)}
+
+          summary={
+            "schema":"stage2-layer-a-b-monitor-evaluation-summary-v1",
+            "state":"SEALED",
+            "population":"G2_G5_LAYER_C_ELIGIBLE_80_CELLS",
+            "monitor_generation_used_cpr_labels":False,
+            "layer_b_monitor_blind":True,
+            "matching_rule_version":"stage2-monitor-source-bound-matching-rule-v1",
+            "matching_rule_sha256":hashlib.sha256(Path("configs/stage2_monitor_source_bound_matching_rule_v1.json").read_bytes()).hexdigest(),
+            "cell_count":len(cell_rows),
+            "trajectory":{
+              "audit_target_positive_trajectories":pos_traj,
+              "monitor_hit_trajectories":hit_traj,
+              "trajectory_detection_rate":frac(hit_traj,pos_traj),
+              "trajectory_miss_rate":frac(pos_traj-hit_traj,pos_traj)
+            },
+            "structure_case":{
+              "audit_confirmed_structure_count":pos_refs,
+              "strict_matched_structure_count":strict,
+              "broad_matched_structure_count":broad,
+              "strict_structure_recall":frac(strict,pos_refs),
+              "broad_structure_recall":frac(broad,pos_refs),
+              "structure_miss_rate_broad":frac(pos_refs-broad,pos_refs),
+              "monitor_warning_count":warn_total,
+              "audit_supported_warning_count":supported,
+              "warning_precision":frac(supported,warn_total),
+              "audit_rejected_warning_count":rejected,
+              "audit_rejected_warning_rate":frac(rejected,warn_total),
+              "unsupported_warning_count":unsupported,
+              "unsupported_warning_rate":frac(unsupported,warn_total)
+            },
+            "observability":{
+              "all_audit_reference_structures":pos_refs,
+              "observable_reference_structures":obs_refs,
+              "unobservable_reference_structures":unobs_refs,
+              "end_to_end_capture_rate_full_reference_set":frac(broad,pos_refs),
+              "conditional_detector_recall_observable_reference_set":frac(
+                  sum(1 for r in records if r["reference_id"] is not None and r["observable_reference"] and r["match_class"] in {"SUPPORTED_MATCH","PARTIAL_LOCALIZATION"}),
+                  obs_refs),
+              "unobservable_reference_rate":frac(unobs_refs,pos_refs)
+            },
+            "breakdowns":{
+              "by_group":{k:dict(v) for k,v in sorted(by_group.items())},
+              "by_system":{k:dict(v) for k,v in sorted(by_x.items())},
+              "by_task":{k:dict(v) for k,v in sorted(by_t.items())},
+              "by_structure_family":{k:dict(v) for k,v in sorted(by_family.items())}
+            },
+            "scope_statement":protocol["publication_boundary"]["required_scope_statement"],
+            "interpretation_rules":[
+              "Layer B is a sealed monitor-blind partial semantic reference, not universal ground truth.",
+              "SUPPORTED_MATCH requires frozen structure-family compatibility, source/carrier object overlap, and valid temporal ordering.",
+              "PARTIAL_LOCALIZATION is reported separately and is not counted as strict localization.",
+              "A reference marked evidence-surface unavailable by Layer B is not converted into a detector miss when no warning qualifies.",
+              "Monitor warnings are counted once by frozen candidate_hash for warning precision."
+            ]
+          }
+
+          with (out/"evaluation_records.jsonl").open("w") as f:
+              for r in records: f.write(json.dumps(r,sort_keys=True)+"\n")
+          (out/"cell_summary.json").write_text(json.dumps(cell_rows,indent=2,sort_keys=True)+"\n")
+          (out/"evaluation_summary.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n")
+          seal={
+            "schema":"stage2-layer-a-b-monitor-evaluation-seal-v1","state":"SEALED",
+            "cell_count":len(cell_rows),"matching_rule_frozen_before_evaluation":True,
+            "monitor_cpr_label_freeze_confirmed":True,"layer_b_monitor_blind_confirmed":True,
+            "evaluation_summary_sha256":hashlib.sha256((out/"evaluation_summary.json").read_bytes()).hexdigest(),
+            "evaluation_records_sha256":hashlib.sha256((out/"evaluation_records.jsonl").read_bytes()).hexdigest(),
+            "next_stage":"LAYER_A_C_FULL_CONTEXT_COMPARISON"
+          }
+          (out/"evaluation_seal.json").write_text(json.dumps(seal,indent=2,sort_keys=True)+"\n")
+          print(json.dumps({"status":"PASS","cells":len(cell_rows),"positive_refs":pos_refs,"warnings":warn_total,
+                            "strict_matches":strict,"broad_matches":broad,"supported_warnings":supported,
+                            "rejected_warnings":rejected,"unsupported_warnings":unsupported},sort_keys=True))
+          PY
+
+      - name: Commit sealed A-B evaluation
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_b_monitor_evaluation_v1"
+          git config user.name "stage2-layer-a-b-eval"
+          git config user.email "stage2-layer-a-b-eval@users.noreply.github.com"
+          git add "$ROOT"
+          git commit -m "Seal Stage-II Layer A-B prospective monitor evaluation"
+          git push origin HEAD:stage2-gpt56sol-full-context-audit-results-v1
