@@ -1,0 +1,115 @@
+{
+  "schema": "stage2-g5-ab-paired-process-semantic-audit-index-v1",
+  "status": "SEALED_11_PAIRED_AUDITS_PLUS_1_SOURCE_READINESS_BOUNDARY",
+  "authorization_issue": 331,
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING"
+  },
+  "source_A_evidence_commit": "1409a07241ca8fc49485bd1c805e040d01ad6444",
+  "source_B_evidence_commit": "7a128c8b8b43002bed0194a0ab511f08248f2a07",
+  "canonical_B_workflow_run": 36313248041,
+  "packet_freeze_commit": "bd2fb03e36d7c473c0829088386b788552fa9330",
+  "paired_audit_count": 11,
+  "execution_boundary_count": 1,
+  "audits": [
+    {
+      "cell_id": "X2-T1",
+      "path": "audits/X2-T1.json",
+      "direct_target_effect": "PERSISTED",
+      "overall_process_effect": "PERSISTENCE",
+      "route_relation": "NEAR_IDENTICAL"
+    },
+    {
+      "cell_id": "X2-T2",
+      "path": "audits/X2-T2.json",
+      "direct_target_effect": "REGENERATED",
+      "overall_process_effect": "REGENERATION",
+      "route_relation": "DIVERGED"
+    },
+    {
+      "cell_id": "X2-T3",
+      "path": "audits/X2-T3.json",
+      "direct_target_effect": "REDIRECTED",
+      "overall_process_effect": "MIXED_EFFECT",
+      "route_relation": "DIVERGED"
+    },
+    {
+      "cell_id": "X4-T1",
+      "path": "audits/X4-T1.json",
+      "direct_target_effect": "PERSISTED",
+      "overall_process_effect": "PERSISTENCE",
+      "route_relation": "NEAR_IDENTICAL"
+    },
+    {
+      "cell_id": "X4-T3",
+      "path": "audits/X4-T3.json",
+      "direct_target_effect": "REDIRECTED",
+      "overall_process_effect": "MIXED_EFFECT",
+      "route_relation": "DIVERGED"
+    },
+    {
+      "cell_id": "X5-T1",
+      "path": "audits/X5-T1.json",
+      "direct_target_effect": "PERSISTED",
+      "overall_process_effect": "PERSISTENCE",
+      "route_relation": "NEAR_IDENTICAL"
+    },
+    {
+      "cell_id": "X5-T2",
+      "path": "audits/X5-T2.json",
+      "direct_target_effect": "REGENERATED",
+      "overall_process_effect": "REGENERATION",
+      "route_relation": "DIVERGED"
+    },
+    {
+      "cell_id": "X5-T3",
+      "path": "audits/X5-T3.json",
+      "direct_target_effect": "REDIRECTED",
+      "overall_process_effect": "MIXED_EFFECT",
+      "route_relation": "DIVERGED"
+    },
+    {
+      "cell_id": "X7-T1",
+      "path": "audits/X7-T1.json",
+      "direct_target_effect": "PERSISTED",
+      "overall_process_effect": "PERSISTENCE",
+      "route_relation": "NEAR_IDENTICAL"
+    },
+    {
+      "cell_id": "X7-T2",
+      "path": "audits/X7-T2.json",
+      "direct_target_effect": "REDIRECTED",
+      "overall_process_effect": "MIXED_EFFECT",
+      "route_relation": "DIVERGED"
+    },
+    {
+      "cell_id": "X7-T3",
+      "path": "audits/X7-T3.json",
+      "direct_target_effect": "PERSISTED",
+      "overall_process_effect": "PERSISTENCE",
+      "route_relation": "NEAR_IDENTICAL"
+    }
+  ],
+  "execution_boundary": {
+    "cell_id": "X4-T2",
+    "source_path": "execution_boundaries/X4-T2.json",
+    "audit_path": "audits/X4-T2.boundary.json",
+    "role": "ACTIVE_B_EXECUTION_READINESS_BOUNDARY_NOT_PAIRED_EFFECT_SAMPLE",
+    "status": "CANONICAL_NATURAL_A_SOURCE_READINESS_BOUNDARY"
+  },
+  "isolation": {
+    "prior_group_paired_audit_labels_read": false,
+    "prior_layer_c_labels_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "monitor_predictions_read": false,
+    "monitor_candidate_labels_read": false
+  },
+  "accounting": {
+    "natural_A_reruns": 0,
+    "B_reruns": 0,
+    "new_subject_provider_calls_during_audit": 0,
+    "repair_calls_during_audit": 0,
+    "paid_evaluator_calls": 0
+  }
+}

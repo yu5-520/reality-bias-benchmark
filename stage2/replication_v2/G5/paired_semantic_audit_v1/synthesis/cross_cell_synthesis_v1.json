@@ -1,0 +1,115 @@
+{
+  "schema": "stage2-g5-ab-paired-repair-effect-synthesis-v1",
+  "status": "SEALED",
+  "group_id": "G5",
+  "paired_effect_denominator": 11,
+  "execution_boundary_count": 1,
+  "counts": {
+    "direct_target_effect": {
+      "PERSISTED": 5,
+      "REDIRECTED": 4,
+      "REGENERATED": 2
+    },
+    "overall_process_effect": {
+      "PERSISTENCE": 5,
+      "MIXED_EFFECT": 4,
+      "REGENERATION": 2
+    },
+    "unrelated_structure_preservation": {
+      "PRESERVED": 11
+    }
+  },
+  "derived": {
+    "direct_target_changed": 6,
+    "clean_targeted_redirection_or_suppression": 0,
+    "persistence": 5,
+    "mixed_effect": 4,
+    "regeneration": 2,
+    "preserve_unrelated_structure": 11
+  },
+  "task_family_pattern": {
+    "T1": {
+      "paired_cells": [
+        "X2-T1",
+        "X4-T1",
+        "X5-T1",
+        "X7-T1"
+      ],
+      "effects": [
+        "PERSISTENCE",
+        "PERSISTENCE",
+        "PERSISTENCE",
+        "PERSISTENCE"
+      ],
+      "summary": "All four valid G5 T1 pairs remained persistent: a one-shot local process-state revision did not dislodge the release-lead-dominated unresolved/invalid continuation pattern."
+    },
+    "T2": {
+      "paired_cells": [
+        "X2-T2",
+        "X5-T2",
+        "X7-T2"
+      ],
+      "effects": [
+        "REGENERATION",
+        "REGENERATION",
+        "MIXED_EFFECT"
+      ],
+      "execution_boundary": "X4-T2",
+      "summary": "T2 produced two regeneration cases, one mixed route-redirection case, and one canonical Natural-A source-readiness boundary with zero B call. Both regeneration cases reopened naturally finalized suffixes into horizon-censored post-repair work."
+    },
+    "T3": {
+      "paired_cells": [
+        "X2-T3",
+        "X4-T3",
+        "X5-T3",
+        "X7-T3"
+      ],
+      "effects": [
+        "MIXED_EFFECT",
+        "MIXED_EFFECT",
+        "MIXED_EFFECT",
+        "PERSISTENCE"
+      ],
+      "summary": "G5 T3 broke the exact group-level response symmetry seen in G2-G4: three cells were mixed route/target redirections and one persisted, with no clean targeted suppression/redirection."
+    }
+  },
+  "strongest_mechanism_observations": [
+    {
+      "cell_id": "X2-T2",
+      "role": "REGENERATION_AFTER_NATURAL_FINALIZATION",
+      "statement": "The natural arm finalized with payment-button changes in web/app.js and web/index.html, while the repaired arm reopened into 64 turns and produced no repository mutation."
+    },
+    {
+      "cell_id": "X5-T2",
+      "role": "LOCAL_FILE_REPAIR_PLUS_REGENERATION",
+      "statement": "The natural arm finalized after 40 turns without repository mutation. The one-shot web/index.html repair inserted the payment button and regenerated a 64-turn continuation without finalization."
+    }
+  ],
+  "boundary_finding": {
+    "cell_id": "X4-T2",
+    "status": "CANONICAL_NATURAL_A_SOURCE_READINESS_BOUNDARY",
+    "statement": "The canonical Natural-A first attempt had runner_exit_code=1 and no seal.json, so same-parent active B was never authorized. No B provider call, Natural-A rerun, fabricated seal, or prefix replay was used."
+  },
+  "interpretation": [
+    "G5 preserves the locality-versus-efficacy separation: all 11 valid interventions preserved unrelated structure, while none produced clean targeted process closure.",
+    "T1 is uniformly persistent for the second consecutive fully observed four-system group pattern, strengthening the descriptive recurrence of unresolved process-state inertia.",
+    "T2 contains two independent regeneration cases in the same group, showing that local intervention can reopen naturally closed work under more than one system condition.",
+    "The X4-T2 readiness boundary demonstrates that source integrity is an independent precondition for legal same-parent repair; structural package eligibility alone does not authorize B.",
+    "The G2-G4 T3 group-level symmetry does not persist in G5, so that earlier recurrence should remain a sample pattern rather than a deterministic task law."
+  ],
+  "claim_boundary": {
+    "causal_scope": "LOCAL_PAIRED_CONTRAST_FROM_SAME_FROZEN_PARENT",
+    "frequency_estimation_claim": false,
+    "universal_success_claim": false,
+    "endpoint_correctness_primary": false,
+    "process_reality_primary": true,
+    "execution_boundary_not_in_denominator": true
+  },
+  "accounting": {
+    "natural_A_reruns": 0,
+    "B_reruns": 0,
+    "new_subject_provider_calls_during_audit": 0,
+    "repair_calls_during_audit": 0,
+    "paid_evaluator_calls": 0
+  }
+}
