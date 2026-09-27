@@ -1,0 +1,103 @@
+{
+  "schema": "stage2-g2-g5-engineering-eligibility-contract-v1",
+  "version": "1.0",
+  "date": "2026-09-27",
+  "status": "FROZEN_BEFORE_84_CELL_ELIGIBILITY_EXECUTION",
+  "population": {
+    "groups": [
+      "G2",
+      "G3",
+      "G4",
+      "G5"
+    ],
+    "systems": [
+      "X1",
+      "X2",
+      "X3",
+      "X4",
+      "X5",
+      "X6",
+      "X7"
+    ],
+    "tasks": [
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "natural_cells": 84,
+    "natural_attempt_index": 1
+  },
+  "admissible_inputs": [
+    "frozen Natural-A first_attempt.tar.gz",
+    "repair_packages.json generated prospectively during Natural A",
+    "monitor_candidates.json generated prospectively during Natural A",
+    "checkpoint_ledger.json generated prospectively during Natural A",
+    "run_manifest.json and seal.json from the same Natural-A archive",
+    "frozen engineering schemas/contracts already present before eligibility"
+  ],
+  "forbidden_inputs": [
+    "Layer-B semantic reference verdicts",
+    "Layer-C semantic verdicts",
+    "A-B/A-C/B-C comparison results",
+    "post-hoc semantic audit labels",
+    "paper-facing claim selection",
+    "new model/provider output"
+  ],
+  "package_selection": {
+    "rule": "EARLIEST_COMPLETE_PROSPECTIVE_PACKAGE",
+    "ordering": [
+      "prefix_sequence ASC",
+      "package_id ASC"
+    ],
+    "maximum_selected_packages_per_cell": 1,
+    "blocked_package_may_not_be_rewritten": true,
+    "audit_miss_backfill": false
+  },
+  "cell_classification": {
+    "complete_package": "ELIGIBLE_FOR_ONE_B",
+    "no_package_file": "OBSERVABILITY_ONLY_NON_INTERVENABLE",
+    "empty_package_list": "NO_PROSPECTIVE_PACKAGE",
+    "PARENT_RECONSTRUCTION_BLOCKED": "PARENT_RECONSTRUCTION_BLOCKED",
+    "LINEAGE_GAP_BLOCKED": "LINEAGE_GAP_BLOCKED",
+    "NATIVE_CAPABILITY_BLOCKED": "NATIVE_CAPABILITY_BLOCKED",
+    "SAFETY_BOUNDARY_BLOCKED": "SAFETY_OR_PROTOCOL_BLOCKED",
+    "NO_REPAIR_REQUIRED": "NO_PROSPECTIVE_PACKAGE"
+  },
+  "complete_package_verification": [
+    "semantic_audit_used=false",
+    "future_evidence_used=false",
+    "cpr_label=null",
+    "parent_reconstruction.status=VERIFIED",
+    "one parent checkpoint hash is present",
+    "parent checkpoint hash resolves in checkpoint_ledger.checkpoints",
+    "resolved checkpoint restore_capability=FULL_NATIVE",
+    "checkpoint_ledger.first_eligible_checkpoint_hash equals selected package parent hash",
+    "checkpoint_ledger.first_eligible_event_ref equals selected package prefix_cutoff_ref",
+    "selected package is earliest COMPLETE_FOR_STRUCTURED_REPAIR by frozen ordering"
+  ],
+  "fail_closed_rules": {
+    "invalid_package_hash": "BLOCK_EXECUTION_AND_FAIL_LEDGER_BUILD",
+    "invalid_parent_binding": "BLOCK_EXECUTION_AND_FAIL_LEDGER_BUILD",
+    "semantic_leakage": "BLOCK_EXECUTION_AND_FAIL_LEDGER_BUILD",
+    "missing_archive": "BLOCK_EXECUTION_AND_FAIL_LEDGER_BUILD",
+    "missing_monitor_package_file": "PRESERVE_AS_OBSERVABILITY_ONLY_NON_INTERVENABLE",
+    "blocked_cell_active_B": false
+  },
+  "intervention_geometry": {
+    "natural_A_rerun": false,
+    "selected_B_per_eligible_cell_max": 1,
+    "same_parent_required": true,
+    "package_frozen_before_B": true,
+    "repair_executor_exits": true,
+    "post_repair_monitor_mode": "WATCH_ONLY",
+    "adaptive_second_repair": false
+  },
+  "authorization": {
+    "eligibility_execution": true,
+    "subject_provider_calls": false,
+    "paid_evaluator_calls": false,
+    "repair_calls": false,
+    "engineering_B": false
+  },
+  "next_gate_after_seal": "G2_ENGINEERING_B_BATCH_AUTHORIZATION"
+}
