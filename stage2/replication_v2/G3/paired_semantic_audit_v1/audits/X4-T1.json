@@ -1,0 +1,315 @@
+{
+  "schema": "stage2-g3-ab-paired-process-semantic-audit-v1",
+  "cell_id": "X4-T1",
+  "input_packet_sha256": "877e9a40ddc16aad2d85ac7fcbf99db243f2870945b269b09c66295558e8ef93",
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "prior_group_paired_audit_labels_read": false,
+    "prior_layer_c_labels_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "monitor_predictions_read": false,
+    "duplicate_G3_run_read_as_scientific_evidence": false
+  },
+  "pair_integrity": {
+    "same_parent_checkpoint": true,
+    "one_repair_action": true,
+    "repair_executor_exited": true,
+    "B_rerun": false,
+    "natural_A_rerun": false,
+    "parent_checkpoint_hash": "d38c6386ac8a0ee02e2c4c60e0d066dbaae49056f2e950276ccf297094d0b7fc",
+    "selected_package_id": "g1pkg:07163b581aa9aeab4419b3bc",
+    "canonical_B_workflow_run": 36309205795
+  },
+  "intervention_summary": {
+    "package_id": "g1pkg:07163b581aa9aeab4419b3bc",
+    "repair_kind": "process_revision",
+    "repair_target_ref": "state:action:unknown",
+    "summary": "Reopen the unresolved action state and re-derive the next step from the frozen structural evidence at X4-T1:struct:000005, without reusing any prior action conclusion."
+  },
+  "arm_A": {
+    "termination_class": "turn_budget",
+    "closure_state": "OPEN_OR_CENSORED",
+    "censored": true,
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "topology_class": "UNRESOLVED",
+      "closed_loop": false,
+      "self_reinforcing": false,
+      "notes": "Primary paired audit reconstructs observable natural process lineage without importing earlier CPR labels; hidden reasoning is not inferred."
+    },
+    "key_lineage": "Natural suffix observed 64 route nodes with role_counts={\"release_lead\":64}, valid=2, invalid=62, termination=turn_budget, changed_files=[].",
+    "evidence_refs": [
+      "A0003",
+      "A0066",
+      "A0260",
+      "A0002"
+    ],
+    "semantic_nodes": [
+      {
+        "node_id": "A-N01",
+        "role": "ACTION",
+        "actor": "release_lead",
+        "sequence": 1,
+        "semantic_state": "First observable natural-arm continuation action at or after the frozen paired parent.",
+        "evidence_refs": [
+          "A0003"
+        ]
+      },
+      {
+        "node_id": "A-N02",
+        "role": "ACTION",
+        "actor": "release_lead",
+        "sequence": 64,
+        "semantic_state": "Last observable natural-arm continuation action before termination.",
+        "evidence_refs": [
+          "A0066"
+        ]
+      },
+      {
+        "node_id": "A-N03",
+        "role": "CONSEQUENCE",
+        "actor": "SYSTEM",
+        "sequence": 9998,
+        "semantic_state": "Repository consequence from the paired parent: changed_files=[].",
+        "evidence_refs": [
+          "A0260"
+        ]
+      },
+      {
+        "node_id": "A-N04",
+        "role": "BOUNDARY",
+        "actor": "SYSTEM",
+        "sequence": 9999,
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=false.",
+        "evidence_refs": [
+          "A0002"
+        ]
+      }
+    ],
+    "semantic_edges": [
+      {
+        "from_node": "A-N01",
+        "to_node": "A-N02",
+        "relation_type": "DECISION_APPLICATION",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "A0003",
+          "A0066"
+        ]
+      },
+      {
+        "from_node": "A-N02",
+        "to_node": "A-N03",
+        "relation_type": "CONSTRAINS",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "A0066",
+          "A0260"
+        ]
+      },
+      {
+        "from_node": "A-N03",
+        "to_node": "A-N04",
+        "relation_type": "BOUNDARY_PRESERVATION",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "A0260",
+          "A0002"
+        ]
+      }
+    ]
+  },
+  "arm_B": {
+    "termination_class": "turn_budget",
+    "closure_state": "OPEN_OR_CENSORED",
+    "censored": true,
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "topology_class": "UNRESOLVED",
+      "closed_loop": false,
+      "self_reinforcing": false,
+      "notes": "Primary paired audit reconstructs observable post-repair process lineage without importing earlier CPR labels; hidden reasoning is not inferred."
+    },
+    "key_lineage": "Repaired suffix observed 64 route nodes with role_counts={\"release_lead\":64}, valid=3, invalid=61, termination=turn_budget, changed_files=[].",
+    "evidence_refs": [
+      "I0004",
+      "I0005",
+      "B0004",
+      "B0067",
+      "B0251",
+      "B0003"
+    ],
+    "semantic_nodes": [
+      {
+        "node_id": "B-N01",
+        "role": "REENTRY",
+        "actor": "R7_REPAIR_AGENT",
+        "sequence": 0,
+        "semantic_state": "One frozen repair action re-entered the target process: Reopen the unresolved action state and re-derive the next step from the frozen structural evidence at X4-T1:struct:000005, without reusing any prior action conclusion.",
+        "evidence_refs": [
+          "I0004",
+          "I0005"
+        ]
+      },
+      {
+        "node_id": "B-N02",
+        "role": "ACTION",
+        "actor": "release_lead",
+        "sequence": 1,
+        "semantic_state": "First observable continuation action after repair-executor exit.",
+        "evidence_refs": [
+          "B0004"
+        ]
+      },
+      {
+        "node_id": "B-N03",
+        "role": "ACTION",
+        "actor": "release_lead",
+        "sequence": 64,
+        "semantic_state": "Last observable repaired-arm continuation action before termination.",
+        "evidence_refs": [
+          "B0067"
+        ]
+      },
+      {
+        "node_id": "B-N04",
+        "role": "CONSEQUENCE",
+        "actor": "SYSTEM",
+        "sequence": 9998,
+        "semantic_state": "Repository consequence from the same paired parent: changed_files=[].",
+        "evidence_refs": [
+          "B0251"
+        ]
+      },
+      {
+        "node_id": "B-N05",
+        "role": "BOUNDARY",
+        "actor": "SYSTEM",
+        "sequence": 9999,
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=false.",
+        "evidence_refs": [
+          "B0003"
+        ]
+      }
+    ],
+    "semantic_edges": [
+      {
+        "from_node": "B-N01",
+        "to_node": "B-N02",
+        "relation_type": "REENTRY",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "I0004",
+          "B0004"
+        ]
+      },
+      {
+        "from_node": "B-N02",
+        "to_node": "B-N03",
+        "relation_type": "DECISION_APPLICATION",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "B0004",
+          "B0067"
+        ]
+      },
+      {
+        "from_node": "B-N03",
+        "to_node": "B-N04",
+        "relation_type": "CONSTRAINS",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "B0067",
+          "B0251"
+        ]
+      },
+      {
+        "from_node": "B-N04",
+        "to_node": "B-N05",
+        "relation_type": "BOUNDARY_PRESERVATION",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "B0251",
+          "B0003"
+        ]
+      }
+    ]
+  },
+  "paired_effect": {
+    "direct_target_effect": "PERSISTED",
+    "semantic_authority_change": "NOT_ESTABLISHED",
+    "collaboration_scope_change": "STABLE",
+    "temporal_reach_change": "STABLE",
+    "route_relation": "NEAR_IDENTICAL",
+    "unrelated_structure_preservation": "PRESERVED",
+    "overall_process_effect": "PERSISTENCE",
+    "mechanism": "Reopening the unresolved action state did not break the dominant release-lead invalid-envelope cycle. Both arms ran to the same turn budget with no repository consequence and nearly identical role geometry, so the targeted process pattern persisted.",
+    "evidence_refs": [
+      "A0003",
+      "A0066",
+      "A0260",
+      "A0002",
+      "I0004",
+      "I0005",
+      "B0004",
+      "B0067",
+      "B0251",
+      "B0003"
+    ]
+  },
+  "cross_arm_findings": [
+    {
+      "finding_id": "F01",
+      "statement": "Reopening the unresolved action state did not break the dominant release-lead invalid-envelope cycle. Both arms ran to the same turn budget with no repository consequence and nearly identical role geometry, so the targeted process pattern persisted.",
+      "status": "SUPPORTED_CANDIDATE",
+      "evidence_refs": [
+        "A0003",
+        "A0066",
+        "A0260",
+        "A0002",
+        "I0004",
+        "I0005",
+        "B0004",
+        "B0067",
+        "B0251",
+        "B0003"
+      ]
+    },
+    {
+      "finding_id": "F02",
+      "statement": "The B intervention executed exactly once from the frozen same-parent checkpoint; the repair executor exited and the preserve set was intact at executor exit.",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "I0004",
+        "I0005"
+      ]
+    }
+  ],
+  "healthy_alternatives": [
+    {
+      "type": "STOCHASTIC_CONTINUATION",
+      "status": "SUPPORTED_CANDIDATE",
+      "notes": "A/B suffix differences can include ordinary stochastic continuation from the same parent; this single paired contrast supports local mechanism analysis, not frequency estimation.",
+      "evidence_refs": [
+        "A0002",
+        "B0003"
+      ]
+    }
+  ],
+  "not_established": [
+    "C/P/R dimensions are not independently re-labeled from prior Layer-B/Layer-C judgments in this primary paired audit.",
+    "Hidden model reasoning is not inferred from event order or repository state.",
+    "Endpoint correctness is not used as the primary repair-effect criterion.",
+    "This one same-parent contrast does not estimate a repeat-run probability.",
+    "The excluded duplicate workflow run 36309645952 is not used as scientific evidence."
+  ]
+}
