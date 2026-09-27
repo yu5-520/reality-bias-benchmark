@@ -1,0 +1,48 @@
+{
+  "schema": "stage2-r7-g1-phase-b-provider-v2-group-claim-v1",
+  "state": "IRREVERSIBLY_CLAIMED_BEFORE_ANY_B_PROVIDER_CALL",
+  "date_utc": "2026-09-27",
+  "group_id": "StageII-R7-G1",
+  "phase": "PHASE_B_PAIRED_REPAIR_12_READY_CELLS_ZERO_CALL_RECOVERY_V2",
+  "authorization_issue": 286,
+  "source_authorization_issue": 285,
+  "source_failed_run": 36299266423,
+  "source_quarantine_commit": "b354e294a19b903499448bd87b84b4cf7bfdc0c4",
+  "b_code_sha": "2dcfbd46551842bb96a7ea295f69adcdc2abd745",
+  "source_input_evidence_sha": "15c1c0b37331b88edb5b415d63413162553fd784",
+  "b_evidence_root": "stage2/r7_g1_v1/repair_B_provider_v2",
+  "claimed_cells": [
+    "X2-T1",
+    "X2-T2",
+    "X2-T3",
+    "X4-T1",
+    "X4-T2",
+    "X4-T3",
+    "X5-T1",
+    "X5-T2",
+    "X5-T3",
+    "X7-T1",
+    "X7-T2",
+    "X7-T3"
+  ],
+  "attempt_index_by_cell": 1,
+  "claim_scope": "GROUP_RESERVATION_FOR_FIRST_PROVIDER_BACKED_B_ATTEMPT",
+  "preclaim_repair_b_runner_invoked_cells": 0,
+  "preclaim_total_B_provider_calls": 0,
+  "preclaim_scientific_repair_actions": 0,
+  "preclaim_B_stochastic_attempts_consumed": 0,
+  "natural_A_reruns": 0,
+  "x6_blocked_cells": [
+    "X6-T1",
+    "X6-T2",
+    "X6-T3"
+  ],
+  "x6_provider_calls": 0,
+  "no_automatic_retry": true,
+  "recovery_rule": "Only a separately frozen zero-call infrastructure recovery may replace this technical namespace if a cell fails before any B provider call. Any provider-backed B call consumes that cell's sole B stochastic attempt.",
+  "interpretation": [
+    "This append-only group claim replaces workflow-created tag claims, which were blocked by GitHub Actions integration permissions.",
+    "The claim itself makes zero provider calls and performs zero scientific repair actions.",
+    "Each listed cell remains limited to one provider-backed B stochastic attempt from its already frozen selected parent."
+  ]
+}
