@@ -6,6 +6,11 @@ on:
       - main
     paths:
       - "configs/stage2_g3_engineering_b_active_authorization_v1.json"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "configs/stage2_g3_engineering_b_launch_v1.json"
 
 permissions:
   actions: read
@@ -440,7 +445,7 @@ jobs:
               assert arc.is_file(), f"{cell}: missing archive"
               assert shp.is_file(), f"{cell}: missing sha"
               r=json.loads(rp.read_text())
-              assert r["schema"]=="stage2-g2-engineering-b-first-attempt-receipt-v1"
+              assert r["schema"]=="stage2-g3-engineering-b-first-attempt-receipt-v1"
               assert r["group_id"]=="G3"
               assert r["cell_id"]==cell
               assert r["attempt_index"]==1
@@ -549,8 +554,8 @@ jobs:
           print(json.dumps({"preserved":12,"successful":len(success),"failed":len(failed),"known_successful_total_B_provider_calls":known_calls},sort_keys=True))
           PY
 
-          git -C evidence config user.name "stage2-g2-engineering-b-evidence"
-          git -C evidence config user.email "stage2-g2-engineering-b-evidence@users.noreply.github.com"
+          git -C evidence config user.name "stage2-g3-engineering-b-evidence"
+          git -C evidence config user.email "stage2-g3-engineering-b-evidence@users.noreply.github.com"
           git -C evidence add "$B_EVIDENCE_ROOT"
           git -C evidence diff --cached --quiet && { echo "FAIL: no G3 B freeze output"; exit 50; }
           git -C evidence commit -m "evidence: freeze G3 12-cell first Engineering-B attempts [run $GITHUB_RUN_ID]"
