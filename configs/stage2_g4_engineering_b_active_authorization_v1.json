@@ -67,7 +67,10 @@
     "branch": "stage2-g4-engineering-b-evidence-v1",
     "claim_commit": "5213f92b3934b5a441314e16e7d71d4fa9cb0e3b",
     "claim_path": "stage2/replication_v2/G4/engineering_B_v1/control/group_claim.json",
-    "B_root": "stage2/replication_v2/G4/engineering_B_v1"
+    "B_root": "stage2/replication_v2/G4/engineering_B_v1",
+    "execution_claim_path": "stage2/replication_v2/G4/engineering_B_v1/control/execution_claim.json",
+    "execution_claim_must_advance_from": "5213f92b3934b5a441314e16e7d71d4fa9cb0e3b",
+    "execution_claim_rule": "ATOMIC_FAST_FORWARD_BEFORE_ANY_PROVIDER_CALL"
   },
   "execution": {
     "one_B_per_cell": true,
@@ -85,7 +88,10 @@
     "selected_frozen_package_required": true,
     "repair_executor_exits_after_one_package": true,
     "post_repair_monitor_mode": "WATCH_ONLY",
-    "post_repair_additional_repair_packages": 0
+    "post_repair_additional_repair_packages": 0,
+    "atomic_run_execution_claim_required": true,
+    "receipt_absence_is_authorization": false,
+    "execution_claim_protocol": "configs/stage2_engineering_b_execution_claim_protocol_v1.json"
   },
   "independence": {
     "semantic_audit_used_for_selection": false,
@@ -94,7 +100,8 @@
     "G2_semantic_audit_results_may_modify_G4": false,
     "G3_semantic_audit_results_may_modify_G4": false,
     "natural_A_reruns": 0,
-    "paid_evaluator_calls": 0
+    "paid_evaluator_calls": 0,
+    "G3_duplicate_run_used_for_G4": false
   },
   "authorization": {
     "active_B": true,
@@ -103,5 +110,11 @@
     "semantic_audit": false,
     "G5_B": false
   },
-  "next_gate": "FREEZE_ALL_12_FIRST_B_ATTEMPTS_THEN_G4_PAIRED_SEMANTIC_AUDIT"
+  "next_gate": "FREEZE_ALL_12_FIRST_B_ATTEMPTS_THEN_G4_PAIRED_SEMANTIC_AUDIT",
+  "incident_boundary": {
+    "source": "stage2/replication_v2/G3/engineering_B_v1/control/duplicate_execution_incident_v1.json",
+    "canonical_G3_run": 36309205795,
+    "excluded_duplicate_G3_run": 36309645952,
+    "rule": "G3 incident informs only execution-control hardening; it cannot modify G4 selection, package, parent checkpoint, repair rule, or semantic target."
+  }
 }
