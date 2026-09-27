@@ -1,0 +1,84 @@
+{
+  "schema": "stage2-g3-ab-paired-process-semantic-audit-seal-v1",
+  "state": "SEALED",
+  "group_id": "G3",
+  "authorization_issue": 314,
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING"
+  },
+  "population": {
+    "attempted_B_cells": 12,
+    "valid_same_parent_pairs": 12,
+    "execution_boundary_cells": [],
+    "paired_effect_denominator": 12
+  },
+  "source": {
+    "A_evidence_commit": "858796145d912562cf8ef889b4d4083175d1f21e",
+    "B_evidence_commit": "9d50bedb9564b31da5e92eecf2d6330a24d2373c",
+    "B_workflow_run": 36309205795,
+    "packet_freeze_commit": "7fabb512a2cc401bc718edccd3747baac62ea1de",
+    "packet_index_blob": "4eb423c2d53529896b8effdefdda19f5697423a1",
+    "audit_index_blob": "0407f6809450bd56310905deb9d92e49380a1765",
+    "synthesis_json_blob": "4e551d9df81481a6f1cd7ebfea7d51e3958db862",
+    "synthesis_report_blob": "450f2819807fb59e09de54c6f578d9b615e83cfa"
+  },
+  "audit_blobs": {
+    "X2-T1": "84dc050f8bb48ad2825fce05946a31c5f8713cf5",
+    "X2-T2": "d5dd0b7aacc14fc99f355a8c19456eea51cc4a01",
+    "X2-T3": "984a94de21637b6bb881995f1f08f6abf25f5227",
+    "X4-T1": "fd0c3afbc6cc10d63e98de3d26479376c15441c9",
+    "X4-T2": "df820d38e847c757e5afba9c73fe3e89f4c648b3",
+    "X4-T3": "aa9f9fe46795298b1b6ec7b7d4a60f3c8bb1f8ba",
+    "X5-T1": "e891541afe621c2bf096ea63a09218202707b25c",
+    "X5-T2": "3a70e0480d00983b8a3296075a7c4aef05728f1c",
+    "X5-T3": "6abfb8d88b91337d3e3f7fc1dc0805d6e3e4fa4c",
+    "X7-T1": "3abc0dc4388178f440ff4af4617ea6d86bc37287",
+    "X7-T2": "4ceb967cc435e91964b4958bd07bdef348e44e37",
+    "X7-T3": "acb9c3ce2a741c5300a07c10bc8452420cba937b"
+  },
+  "frozen_counts": {
+    "direct_target_effect": {
+      "PERSISTED": 4,
+      "REDIRECTED": 6,
+      "REDUCED": 1,
+      "REGENERATED": 1
+    },
+    "overall_process_effect": {
+      "PERSISTENCE": 4,
+      "MIXED_EFFECT": 4,
+      "TARGETED_SUPPRESSION": 1,
+      "TARGETED_REDIRECTION": 2,
+      "REGENERATION": 1
+    },
+    "unrelated_structure_preserved": 12,
+    "execution_boundary_count": 0
+  },
+  "incident_accounting": {
+    "canonical_first_B_run": 36309205795,
+    "canonical_B_evidence_commit": "9d50bedb9564b31da5e92eecf2d6330a24d2373c",
+    "excluded_duplicate_run": 36309645952,
+    "out_of_protocol_duplicate_provider_executions": 6,
+    "duplicate_run_used_as_scientific_evidence": false
+  },
+  "independence": {
+    "prior_group_paired_audit_labels_read": false,
+    "prior_layer_c_labels_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "monitor_predictions_read": false,
+    "natural_A_reruns": 0,
+    "canonical_B_reruns": 0,
+    "new_subject_provider_calls_during_audit": 0,
+    "repair_calls_during_audit": 0,
+    "paid_evaluator_calls": 0
+  },
+  "claim_boundary": {
+    "causal_scope": "LOCAL_PAIRED_CONTRAST_FROM_SAME_FROZEN_PARENT",
+    "frequency_estimation_claim": false,
+    "universal_success_claim": false,
+    "endpoint_correctness_primary": false,
+    "process_reality_primary": true,
+    "execution_boundary_not_in_paired_effect_denominator": true
+  },
+  "next_gate": "G3_AUDIT_CLOSURE_AND_G4_PAIRED_PROCESS_SEMANTIC_AUDIT"
+}
