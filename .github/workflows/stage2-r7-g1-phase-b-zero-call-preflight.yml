@@ -11,9 +11,13 @@ on:
 permissions:
   contents: read
 
+env:
+  B_CODE_SHA: 69e4f874fa85b21c24710600a5e671f1e26c3b4e
+  EVIDENCE_SHA: baa8ba0692d2f29980f50a3106e837c491b7e95b
+
 concurrency:
   group: stage2-r7-g1-phase-b-zero-call-preflight-v1
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   preflight:
@@ -41,14 +45,14 @@ jobs:
       - name: Checkout B control plane
         uses: actions/checkout@v4
         with:
-          ref: stage2-gpt56sol-full-context-audit-results-v1
+          ref: ${{ env.B_CODE_SHA }}
           path: control
           fetch-depth: 1
 
       - name: Checkout frozen A evidence
         uses: actions/checkout@v4
         with:
-          ref: stage2-r7-g1-evidence-v1
+          ref: ${{ env.EVIDENCE_SHA }}
           path: evidence
           fetch-depth: 1
 
