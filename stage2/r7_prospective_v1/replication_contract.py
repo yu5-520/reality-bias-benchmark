@@ -5,8 +5,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "configs" / "stage2_g2_g5_logical_decision_horizon_v1.json"
-LEGACY_GROUP = "StageII-R7-G1"
-PROSPECTIVE_GROUPS = {"G2", "G3", "G4", "G5"}
+LEGACY_GROUP = "StageII-R7-G1-LEGACY"
+G1_PROSPECTIVE_GROUP = "StageII-R7-G1"
+PROSPECTIVE_GROUPS = {G1_PROSPECTIVE_GROUP, "G2", "G3", "G4", "G5"}
 
 
 def load_horizon_contract() -> dict:
@@ -30,7 +31,7 @@ def resolve_decision_horizon(*, group_id: str, subject: dict, requested: int | N
     ceiling = int(contract["common_ceiling"])
     horizon = ceiling if requested is None else int(requested)
     if horizon != ceiling:
-        raise ValueError("G2-G5 must use the frozen common 64-decision horizon")
+        raise ValueError("prospective Stage-II groups must use the frozen common 64-decision horizon")
     max_invocations = int(subject["limits"]["max_total_model_invocations"])
     if horizon > max_invocations:
         raise ValueError("prospective horizon exceeds frozen subject model-invocation ceiling")
@@ -39,6 +40,8 @@ def resolve_decision_horizon(*, group_id: str, subject: dict, requested: int | N
 
 def run_id(*, group_id: str, cell_id: str) -> str:
     if group_id == LEGACY_GROUP:
+        return f"StageII-R7-G1-LEGACY-{cell_id}"
+    if group_id == G1_PROSPECTIVE_GROUP:
         return f"StageII-R7-G1-{cell_id}"
     if group_id not in PROSPECTIVE_GROUPS:
         raise ValueError(f"unsupported group_id: {group_id}")
@@ -46,6 +49,8 @@ def run_id(*, group_id: str, cell_id: str) -> str:
 
 
 def semantic_audit_state(*, group_id: str) -> str:
-    if group_id == LEGACY_GROUP:
+    if group_id in {LEGACY_GROUP, G1_PROSPECTIVE_GROUP}:
         return "LOCKED_UNTIL_A_AND_B_FROZEN"
+    if group_id not in PROSPECTIVE_GROUPS:
+        raise ValueError(f"unsupported group_id: {group_id}")
     return "LOCKED_UNTIL_ALL_84_NATURAL_A_AND_REFERENCE_AUDIT_GATE"

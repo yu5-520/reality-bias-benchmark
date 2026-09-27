@@ -3,6 +3,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from stage2.r7_prospective_v1.replication_contract import (
+    resolve_decision_horizon,
+    run_id as prospective_run_id,
+    semantic_audit_state as prospective_semantic_audit_state,
+)
+
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "configs/stage2_r7_g1_execution_readiness_contract_v1.json"
 LAUNCH = ROOT / "configs/stage2_r7_g1_launch_manifest_v1.json"
@@ -45,7 +51,30 @@ def main():
     require(geometry["best_of_n"] is False and geometry["retry_for_reproducibility"] is False, "no retry/best-of")
 
     resources = contract["model_resource_ceiling"]
+    require(subject["limits"]["max_turns"] == 32, "native role-turn ceiling remains frozen at 32")
     require(subject["limits"]["max_total_model_invocations"] == 64, "subject invocation ceiling")
+    require(
+        resolve_decision_horizon(
+            group_id="StageII-R7-G1", subject=subject, requested=64
+        ) == 64,
+        "prospective G1 explicit logical-decision horizon",
+    )
+    require(
+        resolve_decision_horizon(
+            group_id="StageII-R7-G1", subject=subject, requested=None
+        ) == 64,
+        "prospective G1 default logical-decision horizon",
+    )
+    require(
+        prospective_run_id(group_id="StageII-R7-G1", cell_id="X2-T1")
+        == "StageII-R7-G1-X2-T1",
+        "prospective G1 run id",
+    )
+    require(
+        prospective_semantic_audit_state(group_id="StageII-R7-G1")
+        == "LOCKED_UNTIL_A_AND_B_FROZEN",
+        "prospective G1 semantic-audit lock",
+    )
     require(resources["per_trajectory_logical_model_invocations"] == 64, "contract per-trajectory ceiling")
     require(resources["prospective_natural_cells"] == 15, "resource natural cells")
     require(resources["natural_logical_invocation_ceiling"] == 960, "natural ceiling")
