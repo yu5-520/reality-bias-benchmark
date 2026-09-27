@@ -1,0 +1,75 @@
+{
+  "schema": "nmi-cross-system-publication-evidence-index-v1",
+  "version": "1.0",
+  "date_utc": "2026-09-28",
+  "scientific_evidence_base_commit": "26b617f1630c318aea404c56cd65d90b6075c322",
+  "note": "Publication-facing locator only. This index adds no subject runs, semantic labels, monitor outputs, repair executions, or scientific evidence.",
+  "stage2_frozen_inputs": {
+    "task_registry": "stage2/tasks.json",
+    "role_registry": "stage2/roles.json",
+    "subject_binding": "stage2/subject.json",
+    "implementation_lock": "stage2/versions.json",
+    "native_registry": "stage2/native_v7/registry.json",
+    "action_contract_registry": "stage2/native_v7/action_contract_registry.json"
+  },
+  "semantic_audit": {
+    "monitor_blind_reference_protocol": "configs/stage2_semantic_audit_reference_protocol_v1.json",
+    "full_context_gpt56sol_contract": "configs/stage2_gpt56sol_full_context_audit_v1.json",
+    "full_context_population_contract": "configs/stage2_full_context_process_semantic_audit_v1.json",
+    "layer_c_audit_index": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/audit_index.json",
+    "layer_c_formal_seal": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/formal_review_seal.json",
+    "layer_b_c_comparison_summary": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_b_c_comparison/mechanism_synthesis.json",
+    "exemplar_positive": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/formal_review/G3-X5-T2.json",
+    "exemplar_matched_negative": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/formal_review/G4-X5-T2.json",
+    "functional_acceptance_process_divergence": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/formal_review/G2-X2-T2.json"
+  },
+  "prospective_monitor": {
+    "structural_rules": "configs/stage2_r7_structural_monitor_rules_v1.json",
+    "evaluation_protocol": "configs/stage2_monitor_evaluation_protocol_v1.json",
+    "layer_a_b_primary_summary": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_b_monitor_evaluation_v1/evaluation_summary.json",
+    "layer_a_b_seal": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_b_monitor_evaluation_v1/evaluation_seal.json",
+    "layer_a_c_secondary_summary": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_c_monitor_comparison_v1/comparison_summary.json",
+    "layer_a_c_seal": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_c_monitor_comparison_v1/comparison_seal.json"
+  },
+  "engineering": {
+    "eligibility_contract": "configs/stage2_engineering_eligibility_84_contract_v1.json",
+    "eligibility_seal": "stage2/replication_v2/engineering_eligibility_84_v1/eligibility_seal.json",
+    "cross_group_summary": "stage2/replication_v2/engineering_cross_group_g2_g5_v1/summary.json",
+    "g2_paired_audit_index": "stage2/replication_v2/G2/paired_semantic_audit_v1/audits/audit_index.json",
+    "g3_paired_audit_index": "stage2/replication_v2/G3/paired_semantic_audit_v1/audits/audit_index.json",
+    "g4_paired_audit_index": "stage2/replication_v2/G4/paired_semantic_audit_v1/audits/audit_index.json",
+    "g5_paired_audit_index": "stage2/replication_v2/G5/paired_semantic_audit_v1/audits/audit_index.json",
+    "final_general_chapter": "docs/reports/2026-09-27/StageII_Engineering_General_Chapter_Final_G2_G5_Synthesis_v1.md"
+  },
+  "stage1_mechanism": {
+    "phenomenon_mechanism_synthesis": "docs/reports/2026-09-20/R2-R6_Phenomenon_and_Mechanism_Synthesis_Report_v1.md",
+    "dynamic_cpr_closure": "docs/reports/2026-09-20/R8_Trajectory_First_Dynamic_CPR_Semantic_Closure_Report_v1.md",
+    "engineering_synthesis": "docs/reports/2026-09-20/R5-R7_Process_Integrity_Engineering_Synthesis_Report_v1.md"
+  },
+  "paper_figure_data": {
+    "fig1": [
+      "docs/reports/2026-09-20/R2-R6_Phenomenon_and_Mechanism_Synthesis_Report_v1.md",
+      "docs/reports/2026-09-20/R8_Trajectory_First_Dynamic_CPR_Semantic_Closure_Report_v1.md"
+    ],
+    "fig2": [
+      "stage2/tasks.json",
+      "stage2/subject.json",
+      "stage2/versions.json",
+      "stage2/native_v7/registry.json"
+    ],
+    "fig3": [
+      "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/audit_index.json",
+      "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_b_c_comparison/mechanism_synthesis.json"
+    ],
+    "fig4": [
+      "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_b_monitor_evaluation_v1/evaluation_summary.json",
+      "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_c_monitor_comparison_v1/comparison_summary.json",
+      "stage2/replication_v2/engineering_eligibility_84_v1/eligibility_seal.json",
+      "stage2/replication_v2/engineering_cross_group_g2_g5_v1/summary.json"
+    ]
+  },
+  "frozen_raw_release_stage1": {
+    "tag": "frozen-raw-evidence-v1",
+    "target_commit": "df6082c841f2a0b21b770d71d4526b3c396204fc"
+  }
+}
