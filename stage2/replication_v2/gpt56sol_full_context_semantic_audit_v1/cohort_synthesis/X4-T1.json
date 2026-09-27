@@ -1,6 +1,6 @@
 {
   "schema": "stage2-gpt56sol-same-xt-cohort-synthesis-v1",
-  "state": "STRUCTURAL_SKELETON_FROZEN",
+  "state": "SEMANTIC_SYNTHESIS_COMPLETE",
   "x_id": "X4",
   "task_id": "T1",
   "cell_id": "X4-T1",
@@ -57,11 +57,40 @@
     }
   ],
   "cross_group_semantic_synthesis": {
-    "state": "PENDING",
-    "recurrent_mechanisms": [],
-    "divergence_patterns": [],
-    "boundary_interpretation": [],
-    "cohort_conclusion": null
+    "state": "SEMANTIC_SYNTHESIS_COMPLETE",
+    "recurrent_mechanisms": [
+      {
+        "mechanism": "All four MCP T1 trajectories are dominated by action/tool/process boundaries before a material version-review chain forms.",
+        "support_groups": [
+          "G2",
+          "G3",
+          "G4",
+          "G5"
+        ],
+        "dimension_path": "none",
+        "recurrence": "4/4 eligible"
+      },
+      {
+        "mechanism": "Repository state remains unchanged, preventing realized P and leaving no post-retrospective effect for R.",
+        "support_groups": [
+          "G2",
+          "G3",
+          "G4",
+          "G5"
+        ],
+        "dimension_path": "negative process boundary",
+        "recurrence": "4/4 eligible"
+      }
+    ],
+    "divergence_patterns": [
+      "G2 and G3 explicitly expose MCP action-envelope/process failures; G4/G5 reach similar nondevelopment horizons without material repair.",
+      "The exact interface symptom differs, but the scientific consequence is the same: the route never reaches a mechanism-bearing version-review state."
+    ],
+    "boundary_interpretation": [
+      "This cohort isolates protocol/tool-interface nondevelopment from CPR; long duration is not treated as temporal persistence.",
+      "Absence of CPR here is an observability result for this MCP/T1 execution path, not a general claim about MCP."
+    ],
+    "cohort_conclusion": "MCP X4-T1 is a consistent process-boundary cohort: 4/4 frozen runs fail before material semantic/adoption/action propagation, with no repository mutation and no supported C/P/R. The result is useful precisely because it prevents interface friction from being misclassified as process-reality bias."
   },
   "constraints": [
     "Cell-level Layer-C verdicts are sealed and are not modified by cohort synthesis.",
