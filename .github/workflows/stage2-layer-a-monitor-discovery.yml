@@ -1,0 +1,117 @@
+name: Stage-II Layer A Monitor Discovery
+
+on:
+  push:
+    branches:
+      - stage2-gpt56sol-full-context-audit-results-v1
+    paths:
+      - ".github/workflows/stage2-layer-a-monitor-discovery.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  discover-layer-a:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout result branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-gpt56sol-full-context-audit-results-v1
+          fetch-depth: 0
+
+      - name: Checkout G2 evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g2-natural-evidence-v1
+          path: _g2
+          fetch-depth: 1
+      - name: Checkout G3 evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g3-natural-evidence-v1
+          path: _g3
+          fetch-depth: 1
+      - name: Checkout G4 evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g4-natural-evidence-v1
+          path: _g4
+          fetch-depth: 1
+      - name: Checkout G5 evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g5-natural-evidence-v1
+          path: _g5
+          fetch-depth: 1
+
+      - name: Inventory prospective monitor assets inside 84 frozen archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, tarfile, re, hashlib
+          from pathlib import Path
+          from collections import Counter,defaultdict
+
+          out=Path("stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_monitor_discovery")
+          out.mkdir(parents=True,exist_ok=True)
+          groups={"G2":Path("_g2"),"G3":Path("_g3"),"G4":Path("_g4"),"G5":Path("_g5")}
+          rx=re.compile(r"(monitor|warning|candidate|structural|watch|repair|prospective|alert)",re.I)
+          records=[]
+          names=Counter()
+          groups_with_assets=Counter()
+          cells_with_assets=0
+          for g,root in groups.items():
+              base=root/f"stage2/replication_v2/{g}/natural_A"
+              archives=sorted(base.glob("X*-T*/first_attempt.tar.gz"))
+              assert len(archives)==21,(g,len(archives))
+              for arc in archives:
+                  cell=arc.parent.name
+                  with tarfile.open(arc,"r:gz") as tf:
+                      members=[m.name for m in tf.getmembers() if m.isfile()]
+                  matched=sorted(n for n in members if rx.search(n))
+                  for n in matched:
+                      names[n.split("/")[-1]]+=1
+                  if matched:
+                      groups_with_assets[g]+=1
+                      cells_with_assets+=1
+                  records.append({
+                      "group_id":g,
+                      "cell_id":cell,
+                      "archive_path":str(arc.relative_to(root)),
+                      "archive_sha256":hashlib.sha256(arc.read_bytes()).hexdigest(),
+                      "file_count":len(members),
+                      "monitor_like_file_count":len(matched),
+                      "monitor_like_paths":matched
+                  })
+          assert len(records)==84
+          index={
+              "schema":"stage2-layer-a-monitor-archive-discovery-v1",
+              "state":"DISCOVERY_COMPLETE",
+              "natural_archive_count":84,
+              "cells_with_monitor_like_assets":cells_with_assets,
+              "cells_without_monitor_like_assets":84-cells_with_assets,
+              "cells_with_monitor_like_assets_by_group":dict(groups_with_assets),
+              "monitor_like_basename_counts":dict(names.most_common()),
+              "records":records
+          }
+          (out/"discovery_index.json").write_text(json.dumps(index,indent=2,sort_keys=True)+"\n")
+          print(json.dumps({
+              "status":"PASS",
+              "archives":84,
+              "cells_with_assets":cells_with_assets,
+              "top_basenames":names.most_common(30)
+          }))
+          PY
+
+      - name: Commit Layer A discovery index
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_monitor_discovery"
+          git config user.name "stage2-layer-a-discovery"
+          git config user.email "stage2-layer-a-discovery@users.noreply.github.com"
+          git add "$ROOT/discovery_index.json"
+          git commit -m "Inventory Layer-A monitor assets across 84 frozen natural archives"
+          git push origin HEAD:stage2-gpt56sol-full-context-audit-results-v1
