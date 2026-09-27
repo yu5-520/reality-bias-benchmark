@@ -1,0 +1,54 @@
+name: Stage-II R7 G1 Phase B Zero-Call Readiness
+
+on:
+  push:
+    branches:
+      - stage2-gpt56sol-full-context-audit-results-v1
+    paths:
+      - ".github/workflows/stage2-r7-g1-phase-b-readiness.yml"
+      - "scripts/stage2_r7_g1_phase_b_readiness_v1.py"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stage2-r7-g1-phase-b-readiness-v1
+  cancel-in-progress: false
+
+jobs:
+  readiness:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout control branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-gpt56sol-full-context-audit-results-v1
+          path: control
+          fetch-depth: 1
+
+      - name: Checkout frozen evidence branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-r7-g1-evidence-v1
+          path: evidence
+          fetch-depth: 1
+
+      - name: Validate all 15 frozen A parents and selected packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          python control/scripts/stage2_r7_g1_phase_b_readiness_v1.py             --evidence-root evidence/stage2/r7_g1_v1             --out evidence/stage2/r7_g1_v1/control/phase_b_readiness_v1.json
+
+      - name: Freeze readiness result on evidence branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C evidence config user.name "stage2-r7-g1-evidence-bot"
+          git -C evidence config user.email "stage2-r7-g1-evidence@users.noreply.github.com"
+          git -C evidence add stage2/r7_g1_v1/control/phase_b_readiness_v1.json
+          if git -C evidence diff --cached --quiet; then
+            echo "readiness report already frozen"
+          else
+            git -C evidence commit -m "evidence: freeze R7 G1 Phase B zero-call readiness [run $GITHUB_RUN_ID]"
+            git -C evidence push origin HEAD:stage2-r7-g1-evidence-v1
+          fi
