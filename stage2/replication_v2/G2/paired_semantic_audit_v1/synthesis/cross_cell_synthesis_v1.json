@@ -1,0 +1,120 @@
+{
+  "schema": "stage2-g2-ab-paired-repair-effect-synthesis-v1",
+  "status": "SEALED",
+  "group_id": "G2",
+  "paired_effect_denominator": 11,
+  "execution_boundary_count": 1,
+  "counts": {
+    "direct_target_effect": {
+      "PERSISTED": 4,
+      "REDIRECTED": 5,
+      "REDUCED": 1,
+      "REGENERATED": 1
+    },
+    "overall_process_effect": {
+      "PERSISTENCE": 4,
+      "MIXED_EFFECT": 4,
+      "TARGETED_SUPPRESSION": 1,
+      "TARGETED_REDIRECTION": 1,
+      "REGENERATION": 1
+    },
+    "route_relation": {
+      "NEAR_IDENTICAL": 4,
+      "DIVERGED": 5,
+      "PARTIAL_DIVERGENCE": 2
+    },
+    "temporal_reach_change": {
+      "STABLE": 8,
+      "DECREASED": 2,
+      "INCREASED": 1
+    },
+    "collaboration_scope_change": {
+      "STABLE": 6,
+      "DECREASED": 3,
+      "MIXED": 2
+    },
+    "unrelated_structure_preservation": {
+      "PRESERVED": 11
+    }
+  },
+  "derived": {
+    "direct_target_changed": 7,
+    "clean_targeted_redirection_or_suppression": 2,
+    "persistence": 4,
+    "mixed_effect": 4,
+    "regeneration": 1,
+    "preserve_unrelated_structure": 11
+  },
+  "task_family_pattern": {
+    "T1": {
+      "paired_cells": [
+        "X2-T1",
+        "X4-T1",
+        "X5-T1",
+        "X7-T1"
+      ],
+      "effects": [
+        "PERSISTENCE",
+        "PERSISTENCE",
+        "REGENERATION",
+        "PERSISTENCE"
+      ],
+      "summary": "T1 was dominated by persistence: three unresolved process-state repairs remained persistent and one reactivated/extended the process."
+    },
+    "T2": {
+      "paired_cells": [
+        "X2-T2",
+        "X4-T2",
+        "X7-T2"
+      ],
+      "effects": [
+        "MIXED_EFFECT",
+        "MIXED_EFFECT",
+        "MIXED_EFFECT"
+      ],
+      "execution_boundary": "X5-T2",
+      "summary": "All three valid T2 pairs were mixed: local target or route redirection occurred without clean downstream closure; X5-T2 failed closed because the legal repair surface could not express a non-no-op change."
+    },
+    "T3": {
+      "paired_cells": [
+        "X2-T3",
+        "X4-T3",
+        "X5-T3",
+        "X7-T3"
+      ],
+      "effects": [
+        "TARGETED_SUPPRESSION",
+        "TARGETED_REDIRECTION",
+        "MIXED_EFFECT",
+        "PERSISTENCE"
+      ],
+      "summary": "T3 showed the widest response range, from local suppression/redirection to mixed response and persistence."
+    }
+  },
+  "boundary_finding": {
+    "cell_id": "X5-T2",
+    "status": "FAIL_CLOSED_NO_EFFECT_BOUNDARY",
+    "statement": "The repair agent judged that the frozen run.py-only legal surface could not implement a payment button without changing preserved checkout-flow files, returned run.py byte-identically, and the runner stopped with REPAIR_AGENT_NO_EFFECT. This is an intervention-boundary result, not a repair-effect failure sample."
+  },
+  "interpretation": [
+    "G2 reproduces the distinction between repair locality and repair efficacy: all 11 valid interventions preserved unrelated structure, while downstream process effects remained heterogeneous.",
+    "Process-state interventions in T1 frequently persisted or regenerated rather than cleanly closing.",
+    "T2 exposed a second engineering limit: a package can be structurally eligible yet the concrete legal surface can still collapse to a no-effect boundary at execution time.",
+    "The result supports one-shot, fail-closed intervention accounting rather than automatic retry or outcome-forcing."
+  ],
+  "claim_boundary": {
+    "causal_scope": "LOCAL_PAIRED_CONTRAST_FROM_SAME_FROZEN_PARENT",
+    "frequency_estimation_claim": false,
+    "universal_success_claim": false,
+    "endpoint_correctness_primary": false,
+    "process_reality_primary": true,
+    "execution_boundary_not_in_denominator": true
+  },
+  "accounting": {
+    "natural_A_reruns": 0,
+    "B_reruns": 0,
+    "new_subject_provider_calls": 0,
+    "repair_calls_during_audit": 0,
+    "paid_evaluator_calls": 0
+  }
+}
