@@ -4,7 +4,7 @@
 
 Canonical plan:
 
-`docs/R_Plan_v7.50.md`
+`docs/R_Plan_v7.51.md`
 
 ## Current scientific state
 
@@ -15,7 +15,7 @@ Current frozen forward state:
 - GPT-5.6 Sol formal Layer-C: **80/80 eligible cells sealed**;
 - same-X/T Layer-C cohort synthesis: **21/21 sealed**;
 - Layer B↔C mechanism comparison: **sealed**;
-- primary Layer A↔B prospective monitor benchmark: **sealed**;
+- primary Layer A↔B prospective monitor benchmark: **84/84 sealed**;
 - explanatory Layer A↔C full-context localization comparison: **sealed**;
 - StageII-R7-G1 prospective paired-repair group: **closed and sealed**;
 - R7-G1 paired population: **12/12 audited and synthesized**;
@@ -77,11 +77,11 @@ Machine-readable R7-G1 closure registry:
 
 Post-audit semantic/monitor closure:
 
-`docs/reports/2026-09-27/StageII_Post_Audit_Semantic_and_Monitor_Benchmark_Closure_v1.md`
+`docs/reports/2026-09-27/StageII_Post_Audit_Semantic_and_Monitor_Benchmark_Closure_v2.md`
 
 Machine-readable post-audit closure registry:
 
-`configs/stage2_post_audit_closure_registry_v1.json`
+`configs/stage2_post_audit_closure_registry_v2.json`
 
 ## Canonical forward protocols
 
@@ -184,33 +184,29 @@ Primary monitor-performance population:
 
 `G2-G5 = 84 natural trajectories`.
 
-G1 is retained for scientific mechanism synthesis and calibration context but is not silently pooled into the primary prospective monitor benchmark.
+The corrected primary benchmark is frozen at:
 
-Primary formal wording:
+`stage2/replication_v2/primary_monitor_benchmark_84_v1/`
 
-> **within-study prospective monitoring performance**
+The earlier 80-cell A↔B artifact remains immutable but is now formally classified as:
 
-Required distinctions include:
+`LAYER_C_ALIGNED_SUBSET_DIAGNOSTIC`
 
-- detector miss vs unobservable evidence surface;
-- unsupported warning vs audit-rejected warning;
-- trajectory hit vs correct source/carrier/decision localization;
-- structural-signature detection vs post-hoc CPR interpretation.
+because Layer-C eligibility must not redefine the preregistered A↔B primary denominator.
 
-Required metric families include:
+Primary 84-cell warning accounting:
 
-- trajectory detection/miss;
-- structure recall/miss;
-- warning precision;
-- rejected-warning rate;
-- unsupported-warning rate;
-- source/carrier/consumer/decision localization;
-- lineage node/edge coverage;
-- warning lead distance;
-- end-to-end capture rate;
-- conditional detector recall over legally observable reference structures.
+- 955 unique frozen warning IDs;
+- 36 audit-supported;
+- 18 audit-rejected;
+- 901 unsupported.
 
-Every rate shows numerator and denominator.
+Trajectory/structure accounting:
+
+- 36/59 reference-positive trajectories hit;
+- 45/97 broad structure matches;
+- 16/97 strict structure matches;
+- 36/81 conditionally detected observable reference structures.
 
 ## G1 diagnostic lessons
 
