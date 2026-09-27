@@ -1,0 +1,306 @@
+name: Stage-II R7 G1 Phase B Provider-v2 Freeze Recovery v2
+
+on:
+  push:
+    branches:
+      - stage2-gpt56sol-full-context-audit-results-v1
+    paths:
+      - ".github/workflows/stage2-r7-g1-phase-b-provider-v2-freeze-recovery-v2.yml"
+
+permissions:
+  actions: read
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-r7-g1-phase-b-provider-v2-freeze-recovery-v2
+  cancel-in-progress: false
+
+env:
+  SOURCE_RUN_ID: "36299581459"
+  SOURCE_RUN_HEAD_SHA: "4564dfae427733061648315e0a05b4e3f56c3322"
+  B_CODE_SHA: "2dcfbd46551842bb96a7ea295f69adcdc2abd745"
+  SOURCE_A_SCIENCE_SHA: "76e2405644f6626822a3a9220cd9a73d3284e755"
+  INPUT_EVIDENCE_SHA: "c62fd836cb25171f428fe0cc7b54e457c76efe8a"
+  GROUP_CLAIM_COMMIT: "c62fd836cb25171f428fe0cc7b54e457c76efe8a"
+  EVIDENCE_BRANCH: "stage2-r7-g1-evidence-v1"
+  B_EVIDENCE_ROOT: "stage2/r7_g1_v1/repair_B_provider_v2"
+  AUTH_ISSUE: "286"
+
+jobs:
+  freeze-only-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout current evidence branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EVIDENCE_BRANCH }}
+          path: evidence
+          fetch-depth: 0
+
+      - name: Verify frozen source ancestry and recovery preconditions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C evidence merge-base --is-ancestor "$INPUT_EVIDENCE_SHA" HEAD
+          test -f evidence/stage2/r7_g1_v1/control/phase_b_provider_v2_group_claim_v1.json
+          test -f evidence/stage2/r7_g1_v1/control/phase_b_active_v1_preprovider_abort_quarantine_v1.json
+          test ! -e evidence/stage2/r7_g1_v1/phase_b_provider_v2_group_index.json
+
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+
+          claim=json.loads(Path("evidence/stage2/r7_g1_v1/control/phase_b_provider_v2_group_claim_v1.json").read_text())
+          expected=[
+              "X2-T1","X2-T2","X2-T3",
+              "X4-T1","X4-T2","X4-T3",
+              "X5-T1","X5-T2","X5-T3",
+              "X7-T1","X7-T2","X7-T3",
+          ]
+          assert claim["state"]=="IRREVERSIBLY_CLAIMED_BEFORE_ANY_B_PROVIDER_CALL"
+          assert claim["authorization_issue"]==286
+          assert claim["b_code_sha"]==os.environ["B_CODE_SHA"]
+          assert claim["b_evidence_root"]==os.environ["B_EVIDENCE_ROOT"]
+          assert claim["claimed_cells"]==expected
+          assert claim["attempt_index_by_cell"]==1
+          assert claim["preclaim_total_B_provider_calls"]==0
+          assert claim["preclaim_scientific_repair_actions"]==0
+          assert claim["preclaim_B_stochastic_attempts_consumed"]==0
+          assert claim["no_automatic_retry"] is True
+
+          run=json.loads(subprocess.check_output([
+              "gh","api",f'repos/{os.environ["GITHUB_REPOSITORY"]}/actions/runs/{os.environ["SOURCE_RUN_ID"]}'
+          ],text=True))
+          assert run["head_sha"]==os.environ["SOURCE_RUN_HEAD_SHA"]
+          assert run["status"]=="completed"
+          assert run["conclusion"]=="failure"
+          print("PASS: exact provider-v2 source run and append-only group claim are bound; recovery performs no provider call")
+          PY
+
+      - name: Download all 12 immutable B artifacts from exact source run
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ env.SOURCE_RUN_ID }}
+          pattern: stage2-r7-g1-b-v2-*-${{ env.SOURCE_RUN_ID }}
+          path: /tmp/stage2-r7-g1-b-v2-source
+          merge-multiple: true
+
+      - name: Validate and freeze provider-v2 B evidence without re-execution
+        id: freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ROOT="$GITHUB_WORKSPACE/evidence"
+          export DL="/tmp/stage2-r7-g1-b-v2-source"
+          python - <<'PY'
+          import hashlib, json, os, shutil, tarfile, tempfile
+          from pathlib import Path
+
+          root=Path(os.environ["ROOT"])
+          dl=Path(os.environ["DL"])
+          expected=[
+              "X2-T1","X2-T2","X2-T3",
+              "X4-T1","X4-T2","X4-T3",
+              "X5-T1","X5-T2","X5-T3",
+              "X7-T1","X7-T2","X7-T3",
+          ]
+          receipts=[]
+          scientific_provider_calls=0
+
+          for cell in expected:
+              src=dl/cell
+              receipt_path=src/"attempt_receipt.json"
+              archive=src/"first_B_attempt.tar.gz"
+              sha_file=src/"first_B_attempt.tar.gz.sha256"
+              assert receipt_path.is_file(), f"{cell}: missing receipt"
+              assert archive.is_file(), f"{cell}: missing archive"
+              assert sha_file.is_file(), f"{cell}: missing archive sha file"
+
+              r=json.loads(receipt_path.read_text())
+              assert r["schema"]=="stage2-r7-g1-phase-b-provider-v2-first-attempt-receipt-v1"
+              assert r["cell_id"]==cell
+              assert r["attempt_index"]==1
+              assert r["authorization_issue"]==286
+              assert r["b_code_sha"]==os.environ["B_CODE_SHA"]
+              assert r["input_evidence_sha"]==os.environ["INPUT_EVIDENCE_SHA"]
+              assert r["workflow_run_id"]==int(os.environ["SOURCE_RUN_ID"])
+              assert r["runner_exit_code"]==0
+              assert r["seal_present"] is True
+              assert r["seal_status"]=="REPAIR_B_FROZEN"
+              assert r["repair_action_count"]==1
+              assert r["repair_agent_calls"]==1
+              assert isinstance(r["subject_continuation_calls"], int)
+              assert r["subject_continuation_calls"] >= 0
+              assert isinstance(r["total_B_provider_calls"], int)
+              assert r["total_B_provider_calls"] == 1 + r["subject_continuation_calls"]
+              assert r["same_parent_checkpoint"] is True
+              assert r["repair_executor_exited"] is True
+              assert r["post_repair_monitor_mode"]=="WATCH_ONLY"
+              assert r["post_repair_repair_packages"]==0
+              assert r["semantic_audit_used"] is False
+              assert r["cpr_labels_used"] is False
+              assert r["preserved_failed_attempt"] is True
+              assert r["repair_request_present"] is True
+              assert r["repair_response_present"] is True
+              assert r["preserved"] is True
+              assert r["scientific_success_not_inferred"] is True
+              assert r["no_automatic_retry"] is True
+              assert str(r["claim_tag"]).startswith("group-claim:"+os.environ["GROUP_CLAIM_COMMIT"]+":"+cell)
+
+              observed=hashlib.sha256(archive.read_bytes()).hexdigest()
+              assert observed==r["archive_sha256"]
+              assert sha_file.read_text().split()[0]==observed
+
+              with tempfile.TemporaryDirectory() as td:
+                  t=Path(td)
+                  with tarfile.open(archive,"r:gz") as tf:
+                      tf.extractall(t)
+                  seal=json.loads((t/"seal.json").read_text())
+                  meta=json.loads((t/"control"/"attempt_metadata.json").read_text())
+                  assert seal["schema"]=="stage2-r7-g1-paired-repair-b-seal-v1"
+                  assert seal["status"]=="REPAIR_B_FROZEN"
+                  assert seal["cell_id"]==cell
+                  assert seal["source_A_workflow_run"]==36296703851
+                  assert seal["source_A_science_sha"]==os.environ["SOURCE_A_SCIENCE_SHA"]
+                  assert seal["repair_action_count"]==1
+                  assert seal["repair_agent_calls"]==1
+                  assert seal["same_parent_checkpoint"] is True
+                  assert seal["semantic_audit_used"] is False
+                  assert seal["cpr_labels_used"] is False
+                  assert seal["future_evidence_used_for_selection"] is False
+                  assert seal["repair_executor_exited"] is True
+                  assert seal["post_repair_monitor_mode"]=="WATCH_ONLY"
+                  assert seal["post_repair_repair_packages"]==0
+                  assert meta["schema"]=="stage2-r7-g1-phase-b-provider-v2-first-attempt-metadata-v1"
+                  assert meta["workflow_run_id"]==int(os.environ["SOURCE_RUN_ID"])
+                  assert meta["authorization_issue"]==286
+                  assert meta["runner_exit_code"]==0
+                  assert meta["seal_status"]=="REPAIR_B_FROZEN"
+
+              dest=root/os.environ["B_EVIDENCE_ROOT"]/cell
+              assert not dest.exists(), f"{cell}: provider-v2 evidence path already exists; refusing overwrite"
+              dest.mkdir(parents=True)
+              shutil.copy2(archive,dest/"first_B_attempt.tar.gz")
+              shutil.copy2(sha_file,dest/"first_B_attempt.tar.gz.sha256")
+              shutil.copy2(receipt_path,dest/"attempt_receipt.json")
+              receipts.append(r)
+              scientific_provider_calls += r["total_B_provider_calls"]
+
+          assert len(receipts)==12
+          assert [r["cell_id"] for r in receipts]==expected
+
+          group={
+              "schema":"stage2-r7-g1-phase-b-provider-v2-group-index-v1",
+              "state":"FROZEN_B_FIRST_ATTEMPTS",
+              "group_id":"StageII-R7-G1",
+              "phase":"PHASE_B_PAIRED_REPAIR_12_READY_CELLS_ZERO_CALL_RECOVERY_V2",
+              "authorization_issue":286,
+              "source_workflow_run":int(os.environ["SOURCE_RUN_ID"]),
+              "source_workflow_head_sha":os.environ["SOURCE_RUN_HEAD_SHA"],
+              "b_code_sha":os.environ["B_CODE_SHA"],
+              "input_evidence_sha":os.environ["INPUT_EVIDENCE_SHA"],
+              "group_claim_commit":os.environ["GROUP_CLAIM_COMMIT"],
+              "source_A_workflow_run":36296703851,
+              "source_A_evidence_commit":"012530514bb2c6d8a0d7c89bebec6e60028995db",
+              "zero_call_preflight_run":36298466846,
+              "zero_call_continuation_preflight_run":36298772109,
+              "source_failed_active_v1_run":36299266423,
+              "source_zero_call_quarantine_commit":"b354e294a19b903499448bd87b84b4cf7bfdc0c4",
+              "expected_cells":expected,
+              "preserved_cells":expected,
+              "missing_cells":[],
+              "preserved_count":12,
+              "successful_B_cells":expected,
+              "successful_B_count":12,
+              "failed_B_cells":[],
+              "failed_B_count":0,
+              "blocked_cells":["X6-T1","X6-T2","X6-T3"],
+              "blocked_reason":"FOREIGN_PARENT_STATE_RECONSTRUCTION_BLOCKED",
+              "one_B_per_cell":True,
+              "automatic_retries":0,
+              "repair_agent_calls_total":12,
+              "known_successful_total_B_provider_calls":scientific_provider_calls,
+              "repair_executor_exit_required":True,
+              "post_repair_monitor_mode":"WATCH_ONLY",
+              "semantic_audit_execution":"NOT_EXECUTED",
+              "semantic_audit_gate":"OPEN_AFTER_B_FREEZE",
+              "paid_evaluator_calls":0,
+              "natural_A_reruns":0,
+              "x6_provider_calls":0,
+              "freeze_recovery_provider_calls":0,
+              "receipts":receipts,
+          }
+          group_path=root/"stage2/r7_g1_v1/phase_b_provider_v2_group_index.json"
+          group_path.write_text(json.dumps(group,indent=2,sort_keys=True)+"\n")
+
+          recovery={
+              "schema":"stage2-r7-g1-phase-b-provider-v2-freeze-recovery-v2",
+              "state":"FREEZE_ONLY_RECOVERY_AFTER_SCIENTIFIC_EXECUTION",
+              "source_workflow_run":int(os.environ["SOURCE_RUN_ID"]),
+              "source_workflow_head_sha":os.environ["SOURCE_RUN_HEAD_SHA"],
+              "source_workflow_conclusion":"failure",
+              "scientific_cell_jobs_successful":12,
+              "scientific_runner_exit_zero":12,
+              "scientific_artifacts_preserved":12,
+              "freeze_failure_root_cause":"SOURCE_FREEZE_STALE_V1_AUTHORIZATION_ASSERTION_285; RECOVERY_V1_ADDITIONALLY_MISBOUND_SOURCE_A_SCIENCE_SHA_TO_B_CODE_SHA",
+              "expected_authorization_issue":286,
+              "stale_assertion_authorization_issue":285,
+              "provider_calls_during_recovery":0,
+              "repair_actions_during_recovery":0,
+              "natural_A_reruns":0,
+              "B_reruns":0,
+              "source_artifacts_reused":True,
+              "group_index_path":"stage2/r7_g1_v1/phase_b_provider_v2_group_index.json",
+              "semantic_audit_gate_after_recovery":"OPEN_AFTER_B_FREEZE",
+          }
+          recovery_path=root/"stage2/r7_g1_v1/control/phase_b_provider_v2_freeze_recovery_v1.json"
+          recovery_path.write_text(json.dumps(recovery,indent=2,sort_keys=True)+"\n")
+
+          print(json.dumps({
+              "preserved":12,
+              "successful":12,
+              "failed":0,
+              "missing":0,
+              "provider_calls_during_recovery":0,
+              "scientific_B_provider_calls":scientific_provider_calls,
+              "semantic_audit_gate":"OPEN_AFTER_B_FREEZE",
+          },sort_keys=True))
+          PY
+
+          git -C evidence config user.name "stage2-r7-g1-evidence-bot"
+          git -C evidence config user.email "stage2-r7-g1-evidence@users.noreply.github.com"
+          git -C evidence add stage2/r7_g1_v1
+          git -C evidence diff --cached --quiet && { echo "FAIL: no freeze-only recovery output"; exit 50; }
+          git -C evidence commit -m "evidence: freeze 12/12 R7 G1 provider-v2 Repair B without rerun [source run $SOURCE_RUN_ID]"
+          git -C evidence push origin "HEAD:$EVIDENCE_BRANCH"
+          echo "frozen=true" >> "$GITHUB_OUTPUT"
+
+      - name: Report recovered B freeze to authorization issue
+        if: steps.freeze.outputs.frozen == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SUMMARY="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          g=json.loads(Path("evidence/stage2/r7_g1_v1/phase_b_provider_v2_group_index.json").read_text())
+          print(
+              f"Provider-v2 Repair B freeze recovered without re-running any model call: "
+              f"preserved={g['preserved_count']}/12, successful={g['successful_B_count']}, "
+              f"failed={g['failed_B_count']}, missing={len(g['missing_cells'])}. "
+              f"Source scientific run={g['source_workflow_run']}; the source workflow's red conclusion "
+              f"came only from the stale v1 authorization assertion in freeze-b after all 12 cell artifacts "
+              f"were already preserved. Freeze-recovery provider calls=0; B reruns=0; natural A reruns=0. "
+              f"Semantic-audit gate is now {g['semantic_audit_gate']}."
+          )
+          PY
+          )"
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$SUMMARY"
