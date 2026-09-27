@@ -1,0 +1,193 @@
+{
+  "arm_A": {
+    "censored": true,
+    "closure_state": "OPEN_OR_CENSORED",
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "closed_loop": false,
+      "notes": "The paired packet supports route/termination comparison but does not independently establish a closed CPR loop without importing prior semantic labels.",
+      "self_reinforcing": false,
+      "topology_class": "UNRESOLVED"
+    },
+    "evidence_refs": [
+      "A0030",
+      "A0342",
+      "A0002"
+    ],
+    "key_lineage": "Observable execution route and repository consequence reconstructed from frozen arm evidence; hidden reasoning is not inferred.",
+    "semantic_edges": [],
+    "semantic_nodes": [
+      {
+        "actor": "release_lead",
+        "evidence_refs": [
+          "A0030"
+        ],
+        "node_id": "A-N01",
+        "role": "ACTION",
+        "semantic_state": "First observable valid A continuation action after the paired parent.",
+        "sequence": 28
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "A0342"
+        ],
+        "node_id": "A-N02",
+        "role": "CONSEQUENCE",
+        "semantic_state": "Repository consequence from parent: changed_files=[].",
+        "sequence": 9998
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "A0002"
+        ],
+        "node_id": "A-N03",
+        "role": "BOUNDARY",
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=False.",
+        "sequence": 9999
+      }
+    ],
+    "termination_class": "turn_budget"
+  },
+  "arm_B": {
+    "censored": true,
+    "closure_state": "OPEN_OR_CENSORED",
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "closed_loop": false,
+      "notes": "The paired packet supports route/termination comparison but does not independently establish a closed CPR loop without importing prior semantic labels.",
+      "self_reinforcing": false,
+      "topology_class": "UNRESOLVED"
+    },
+    "evidence_refs": [
+      "B0054",
+      "B0322",
+      "B0003"
+    ],
+    "key_lineage": "Observable execution route and repository consequence reconstructed from frozen arm evidence; hidden reasoning is not inferred.",
+    "semantic_edges": [],
+    "semantic_nodes": [
+      {
+        "actor": "release_lead",
+        "evidence_refs": [
+          "B0054"
+        ],
+        "node_id": "B-N01",
+        "role": "ACTION",
+        "semantic_state": "First observable valid B continuation action after the paired parent.",
+        "sequence": 51
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "B0322"
+        ],
+        "node_id": "B-N02",
+        "role": "CONSEQUENCE",
+        "semantic_state": "Repository consequence from parent: changed_files=[].",
+        "sequence": 9998
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "B0003"
+        ],
+        "node_id": "B-N03",
+        "role": "BOUNDARY",
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=False.",
+        "sequence": 9999
+      }
+    ],
+    "termination_class": "turn_budget"
+  },
+  "cell_id": "X7-T1",
+  "cross_arm_findings": [
+    {
+      "evidence_refs": [
+        "A0002",
+        "B0003",
+        "A0342",
+        "B0322",
+        "I0004",
+        "I0005"
+      ],
+      "finding_id": "F01",
+      "statement": "The local process revision changed when a valid release-lead action appeared but did not change the full-horizon termination or repository state. The targeted unresolved action state therefore remained persistent at the observed process level.",
+      "status": "SUPPORTED_CANDIDATE"
+    },
+    {
+      "evidence_refs": [
+        "I0004",
+        "I0005"
+      ],
+      "finding_id": "F02",
+      "statement": "The B intervention executed exactly once within the frozen repair boundary and the preserve set was intact at repair-executor exit.",
+      "status": "SUPPORTED"
+    }
+  ],
+  "healthy_alternatives": [
+    {
+      "evidence_refs": [
+        "A0002",
+        "B0003"
+      ],
+      "notes": "A/B route differences may partly reflect probabilistic continuation from the same parent; this paired observation is used as a local causal contrast, not as rerun-based frequency evidence.",
+      "status": "SUPPORTED_CANDIDATE",
+      "type": "STOCHASTIC_CONTINUATION"
+    }
+  ],
+  "input_packet_sha256": "e869de8bb58fc3f95dad75dce22239103991e726e3a878bcfd65ed5fc23d2310",
+  "intervention_summary": {
+    "package_id": "g1pkg:6f05ff55b1c76a1ba54da541",
+    "repair_kind": "process_revision",
+    "repair_target_ref": "state:action:unknown",
+    "summary": "Re-open the unresolved action-state for T1 and revalidate it against the frozen support refs (X7-T1:struct:000001, X7-T1:struct:000004, X7-T1:struct:000007) before any further step; do not reuse the prior unresolved action-state as a settled conclusion."
+  },
+  "not_established": [
+    "C/P/R dimensions are not independently re-labeled from prior Layer-B/Layer-C judgments in this primary paired audit.",
+    "Hidden model reasoning is not inferred from event order.",
+    "Endpoint correctness is not used as the primary repair-effect criterion."
+  ],
+  "pair_integrity": {
+    "B_rerun": false,
+    "natural_A_rerun": false,
+    "one_repair_action": true,
+    "repair_executor_exited": true,
+    "same_parent_checkpoint": true
+  },
+  "paired_effect": {
+    "collaboration_scope_change": "STABLE",
+    "direct_target_effect": "PERSISTED",
+    "evidence_refs": [
+      "A0002",
+      "B0003",
+      "A0342",
+      "B0322",
+      "I0004",
+      "I0005"
+    ],
+    "mechanism": "The local process revision changed when a valid release-lead action appeared but did not change the full-horizon termination or repository state. The targeted unresolved action state therefore remained persistent at the observed process level.",
+    "overall_process_effect": "PERSISTENCE",
+    "route_relation": "PARTIAL_DIVERGENCE",
+    "semantic_authority_change": "NOT_ESTABLISHED",
+    "temporal_reach_change": "STABLE",
+    "unrelated_structure_preservation": "PRESERVED"
+  },
+  "reviewer": {
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "model": "GPT-5.6 Sol",
+    "monitor_predictions_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "prior_layer_c_labels_read": false
+  },
+  "schema": "stage2-r7-g1-ab-paired-process-semantic-audit-v1"
+}

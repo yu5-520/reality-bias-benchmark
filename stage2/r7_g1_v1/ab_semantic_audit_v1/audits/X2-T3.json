@@ -1,0 +1,215 @@
+{
+  "arm_A": {
+    "censored": true,
+    "closure_state": "OPEN_OR_CENSORED",
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "closed_loop": false,
+      "notes": "The paired packet supports route/termination comparison but does not independently establish a closed CPR loop without importing prior semantic labels.",
+      "self_reinforcing": false,
+      "topology_class": "UNRESOLVED"
+    },
+    "evidence_refs": [
+      "A0003",
+      "A0066",
+      "A0132",
+      "A0002"
+    ],
+    "key_lineage": "Observable execution route and repository consequence reconstructed from frozen arm evidence; hidden reasoning is not inferred.",
+    "semantic_edges": [],
+    "semantic_nodes": [
+      {
+        "actor": "release_lead",
+        "evidence_refs": [
+          "A0003"
+        ],
+        "node_id": "A-N01",
+        "role": "ACTION",
+        "semantic_state": "First observable valid A continuation action after the paired parent.",
+        "sequence": 1
+      },
+      {
+        "actor": "release_lead",
+        "evidence_refs": [
+          "A0066"
+        ],
+        "node_id": "A-N02",
+        "role": "ACTION",
+        "semantic_state": "Last observable valid A continuation action before termination.",
+        "sequence": 64
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "A0132"
+        ],
+        "node_id": "A-N03",
+        "role": "CONSEQUENCE",
+        "semantic_state": "Repository consequence from parent: changed_files=[].",
+        "sequence": 9998
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "A0002"
+        ],
+        "node_id": "A-N04",
+        "role": "BOUNDARY",
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=False.",
+        "sequence": 9999
+      }
+    ],
+    "termination_class": "turn_budget"
+  },
+  "arm_B": {
+    "censored": true,
+    "closure_state": "OPEN_OR_CENSORED",
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "closed_loop": false,
+      "notes": "The paired packet supports route/termination comparison but does not independently establish a closed CPR loop without importing prior semantic labels.",
+      "self_reinforcing": false,
+      "topology_class": "UNRESOLVED"
+    },
+    "evidence_refs": [
+      "B0004",
+      "B0007",
+      "B0012",
+      "B0003"
+    ],
+    "key_lineage": "Observable execution route and repository consequence reconstructed from frozen arm evidence; hidden reasoning is not inferred.",
+    "semantic_edges": [],
+    "semantic_nodes": [
+      {
+        "actor": "release_lead",
+        "evidence_refs": [
+          "B0004"
+        ],
+        "node_id": "B-N01",
+        "role": "ACTION",
+        "semantic_state": "First observable valid B continuation action after the paired parent.",
+        "sequence": 1
+      },
+      {
+        "actor": "release_lead",
+        "evidence_refs": [
+          "B0007"
+        ],
+        "node_id": "B-N02",
+        "role": "ACTION",
+        "semantic_state": "Last observable valid B continuation action before termination.",
+        "sequence": 4
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "B0012"
+        ],
+        "node_id": "B-N03",
+        "role": "CONSEQUENCE",
+        "semantic_state": "Repository consequence from parent: changed_files=[\"legacy_compat.py\"].",
+        "sequence": 9998
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "B0003"
+        ],
+        "node_id": "B-N04",
+        "role": "BOUNDARY",
+        "semantic_state": "Termination=round_guard; turns=4; answer_present=False.",
+        "sequence": 9999
+      }
+    ],
+    "termination_class": "round_guard"
+  },
+  "cell_id": "X2-T3",
+  "cross_arm_findings": [
+    {
+      "evidence_refs": [
+        "A0002",
+        "B0003",
+        "A0132",
+        "B0012",
+        "I0004",
+        "I0005"
+      ],
+      "finding_id": "F01",
+      "statement": "The repair directly rewrote the legacy compatibility target while preserving the unrelated file set. Relative to the 64-turn natural suffix, B contracted to four continuation turns, supporting a local suppression effect on the legacy-route surface, although full semantic closure is not independently established.",
+      "status": "SUPPORTED_CANDIDATE"
+    },
+    {
+      "evidence_refs": [
+        "I0004",
+        "I0005"
+      ],
+      "finding_id": "F02",
+      "statement": "The B intervention executed exactly once within the frozen repair boundary and the preserve set was intact at repair-executor exit.",
+      "status": "SUPPORTED"
+    }
+  ],
+  "healthy_alternatives": [
+    {
+      "evidence_refs": [
+        "A0002",
+        "B0003"
+      ],
+      "notes": "A/B route differences may partly reflect probabilistic continuation from the same parent; this paired observation is used as a local causal contrast, not as rerun-based frequency evidence.",
+      "status": "SUPPORTED_CANDIDATE",
+      "type": "STOCHASTIC_CONTINUATION"
+    }
+  ],
+  "input_packet_sha256": "73fb89fd9413b196699c0bf593465d9e3962b16f86f46d42478cbab32b851630",
+  "intervention_summary": {
+    "package_id": "g1pkg:0e0673184e73c8794ec8a939",
+    "repair_kind": "file_replace",
+    "repair_target_ref": "file:legacy_compat.py",
+    "summary": "The legacy compatibility module still exposed a runnable server entry point (main binding 127.0.0.1:8080), which is the reuse/re-entry surface interfering with the current version. Removing the live server path and making the module inert eliminates the old route without touching the current checkout application or any preserved files."
+  },
+  "not_established": [
+    "C/P/R dimensions are not independently re-labeled from prior Layer-B/Layer-C judgments in this primary paired audit.",
+    "Hidden model reasoning is not inferred from event order.",
+    "Endpoint correctness is not used as the primary repair-effect criterion."
+  ],
+  "pair_integrity": {
+    "B_rerun": false,
+    "natural_A_rerun": false,
+    "one_repair_action": true,
+    "repair_executor_exited": true,
+    "same_parent_checkpoint": true
+  },
+  "paired_effect": {
+    "collaboration_scope_change": "DECREASED",
+    "direct_target_effect": "REDUCED",
+    "evidence_refs": [
+      "A0002",
+      "B0003",
+      "A0132",
+      "B0012",
+      "I0004",
+      "I0005"
+    ],
+    "mechanism": "The repair directly rewrote the legacy compatibility target while preserving the unrelated file set. Relative to the 64-turn natural suffix, B contracted to four continuation turns, supporting a local suppression effect on the legacy-route surface, although full semantic closure is not independently established.",
+    "overall_process_effect": "TARGETED_SUPPRESSION",
+    "route_relation": "DIVERGED",
+    "semantic_authority_change": "NOT_ESTABLISHED",
+    "temporal_reach_change": "DECREASED",
+    "unrelated_structure_preservation": "PRESERVED"
+  },
+  "reviewer": {
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "model": "GPT-5.6 Sol",
+    "monitor_predictions_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "prior_layer_c_labels_read": false
+  },
+  "schema": "stage2-r7-g1-ab-paired-process-semantic-audit-v1"
+}

@@ -1,0 +1,171 @@
+{
+  "arm_A": {
+    "censored": true,
+    "closure_state": "OPEN_OR_CENSORED",
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "closed_loop": false,
+      "notes": "The paired packet supports route/termination comparison but does not independently establish a closed CPR loop without importing prior semantic labels.",
+      "self_reinforcing": false,
+      "topology_class": "UNRESOLVED"
+    },
+    "evidence_refs": [
+      "A0319",
+      "A0002"
+    ],
+    "key_lineage": "Observable execution route and repository consequence reconstructed from frozen arm evidence; hidden reasoning is not inferred.",
+    "semantic_edges": [],
+    "semantic_nodes": [
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "A0319"
+        ],
+        "node_id": "A-N01",
+        "role": "CONSEQUENCE",
+        "semantic_state": "Repository consequence from parent: changed_files=[].",
+        "sequence": 9998
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "A0002"
+        ],
+        "node_id": "A-N02",
+        "role": "BOUNDARY",
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=False.",
+        "sequence": 9999
+      }
+    ],
+    "termination_class": "turn_budget"
+  },
+  "arm_B": {
+    "censored": true,
+    "closure_state": "OPEN_OR_CENSORED",
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "closed_loop": false,
+      "notes": "The paired packet supports route/termination comparison but does not independently establish a closed CPR loop without importing prior semantic labels.",
+      "self_reinforcing": false,
+      "topology_class": "UNRESOLVED"
+    },
+    "evidence_refs": [
+      "B0319",
+      "B0003"
+    ],
+    "key_lineage": "Observable execution route and repository consequence reconstructed from frozen arm evidence; hidden reasoning is not inferred.",
+    "semantic_edges": [],
+    "semantic_nodes": [
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "B0319"
+        ],
+        "node_id": "B-N01",
+        "role": "CONSEQUENCE",
+        "semantic_state": "Repository consequence from parent: changed_files=[].",
+        "sequence": 9998
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "B0003"
+        ],
+        "node_id": "B-N02",
+        "role": "BOUNDARY",
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=False.",
+        "sequence": 9999
+      }
+    ],
+    "termination_class": "turn_budget"
+  },
+  "cell_id": "X5-T1",
+  "cross_arm_findings": [
+    {
+      "evidence_refs": [
+        "A0002",
+        "B0003",
+        "A0319",
+        "B0319",
+        "I0004",
+        "I0005"
+      ],
+      "finding_id": "F01",
+      "statement": "Both natural and repaired arms exhausted the turn budget without valid route progress or repository mutation. The local process revision therefore did not produce an observable downstream resolution of the targeted unknown action state.",
+      "status": "SUPPORTED_CANDIDATE"
+    },
+    {
+      "evidence_refs": [
+        "I0004",
+        "I0005"
+      ],
+      "finding_id": "F02",
+      "statement": "The B intervention executed exactly once within the frozen repair boundary and the preserve set was intact at repair-executor exit.",
+      "status": "SUPPORTED"
+    }
+  ],
+  "healthy_alternatives": [
+    {
+      "evidence_refs": [
+        "A0002",
+        "B0003"
+      ],
+      "notes": "A/B route differences may partly reflect probabilistic continuation from the same parent; this paired observation is used as a local causal contrast, not as rerun-based frequency evidence.",
+      "status": "SUPPORTED_CANDIDATE",
+      "type": "STOCHASTIC_CONTINUATION"
+    }
+  ],
+  "input_packet_sha256": "13670e09063881a0ba75eb8f6dbbc03f3a959536351fabb4839ee04d7cb0124a",
+  "intervention_summary": {
+    "package_id": "g1pkg:39b0df10f97c4c1a4e197753",
+    "repair_kind": "process_revision",
+    "repair_target_ref": "state:action:unknown",
+    "summary": "Re-open the unresolved action state for the checkout before/after comparison and require it to be revalidated against the frozen support refs (struct:000001, struct:000002, struct:000003) before any further reuse; do not carry over the prior unresolved action as completed."
+  },
+  "not_established": [
+    "C/P/R dimensions are not independently re-labeled from prior Layer-B/Layer-C judgments in this primary paired audit.",
+    "Hidden model reasoning is not inferred from event order.",
+    "Endpoint correctness is not used as the primary repair-effect criterion."
+  ],
+  "pair_integrity": {
+    "B_rerun": false,
+    "natural_A_rerun": false,
+    "one_repair_action": true,
+    "repair_executor_exited": true,
+    "same_parent_checkpoint": true
+  },
+  "paired_effect": {
+    "collaboration_scope_change": "STABLE",
+    "direct_target_effect": "PERSISTED",
+    "evidence_refs": [
+      "A0002",
+      "B0003",
+      "A0319",
+      "B0319",
+      "I0004",
+      "I0005"
+    ],
+    "mechanism": "Both natural and repaired arms exhausted the turn budget without valid route progress or repository mutation. The local process revision therefore did not produce an observable downstream resolution of the targeted unknown action state.",
+    "overall_process_effect": "PERSISTENCE",
+    "route_relation": "NEAR_IDENTICAL",
+    "semantic_authority_change": "NOT_ESTABLISHED",
+    "temporal_reach_change": "STABLE",
+    "unrelated_structure_preservation": "PRESERVED"
+  },
+  "reviewer": {
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "model": "GPT-5.6 Sol",
+    "monitor_predictions_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "prior_layer_c_labels_read": false
+  },
+  "schema": "stage2-r7-g1-ab-paired-process-semantic-audit-v1"
+}

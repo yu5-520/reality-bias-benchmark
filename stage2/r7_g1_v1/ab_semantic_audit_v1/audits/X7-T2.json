@@ -1,0 +1,215 @@
+{
+  "arm_A": {
+    "censored": true,
+    "closure_state": "OPEN_OR_CENSORED",
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "closed_loop": false,
+      "notes": "The paired packet supports route/termination comparison but does not independently establish a closed CPR loop without importing prior semantic labels.",
+      "self_reinforcing": false,
+      "topology_class": "UNRESOLVED"
+    },
+    "evidence_refs": [
+      "A0003",
+      "A0066",
+      "A0262",
+      "A0002"
+    ],
+    "key_lineage": "Observable execution route and repository consequence reconstructed from frozen arm evidence; hidden reasoning is not inferred.",
+    "semantic_edges": [],
+    "semantic_nodes": [
+      {
+        "actor": "release_lead",
+        "evidence_refs": [
+          "A0003"
+        ],
+        "node_id": "A-N01",
+        "role": "ACTION",
+        "semantic_state": "First observable valid A continuation action after the paired parent.",
+        "sequence": 1
+      },
+      {
+        "actor": "qa",
+        "evidence_refs": [
+          "A0066"
+        ],
+        "node_id": "A-N02",
+        "role": "ACTION",
+        "semantic_state": "Last observable valid A continuation action before termination.",
+        "sequence": 64
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "A0262"
+        ],
+        "node_id": "A-N03",
+        "role": "CONSEQUENCE",
+        "semantic_state": "Repository consequence from parent: changed_files=[].",
+        "sequence": 9998
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "A0002"
+        ],
+        "node_id": "A-N04",
+        "role": "BOUNDARY",
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=False.",
+        "sequence": 9999
+      }
+    ],
+    "termination_class": "turn_budget"
+  },
+  "arm_B": {
+    "censored": true,
+    "closure_state": "OPEN_OR_CENSORED",
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "closed_loop": false,
+      "notes": "The paired packet supports route/termination comparison but does not independently establish a closed CPR loop without importing prior semantic labels.",
+      "self_reinforcing": false,
+      "topology_class": "UNRESOLVED"
+    },
+    "evidence_refs": [
+      "B0004",
+      "B0067",
+      "B0275",
+      "B0003"
+    ],
+    "key_lineage": "Observable execution route and repository consequence reconstructed from frozen arm evidence; hidden reasoning is not inferred.",
+    "semantic_edges": [],
+    "semantic_nodes": [
+      {
+        "actor": "release_lead",
+        "evidence_refs": [
+          "B0004"
+        ],
+        "node_id": "B-N01",
+        "role": "ACTION",
+        "semantic_state": "First observable valid B continuation action after the paired parent.",
+        "sequence": 1
+      },
+      {
+        "actor": "backend",
+        "evidence_refs": [
+          "B0067"
+        ],
+        "node_id": "B-N02",
+        "role": "ACTION",
+        "semantic_state": "Last observable valid B continuation action before termination.",
+        "sequence": 64
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "B0275"
+        ],
+        "node_id": "B-N03",
+        "role": "CONSEQUENCE",
+        "semantic_state": "Repository consequence from parent: changed_files=[\"web/index.html\"].",
+        "sequence": 9998
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "B0003"
+        ],
+        "node_id": "B-N04",
+        "role": "BOUNDARY",
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=False.",
+        "sequence": 9999
+      }
+    ],
+    "termination_class": "turn_budget"
+  },
+  "cell_id": "X7-T2",
+  "cross_arm_findings": [
+    {
+      "evidence_refs": [
+        "A0002",
+        "B0003",
+        "A0262",
+        "B0275",
+        "I0004",
+        "I0005"
+      ],
+      "finding_id": "F01",
+      "statement": "The repair directly modified the web/index.html target and changed the continuation route, but B still exhausted the full horizon. The target surface was reduced locally without demonstrating global process closure.",
+      "status": "SUPPORTED_CANDIDATE"
+    },
+    {
+      "evidence_refs": [
+        "I0004",
+        "I0005"
+      ],
+      "finding_id": "F02",
+      "statement": "The B intervention executed exactly once within the frozen repair boundary and the preserve set was intact at repair-executor exit.",
+      "status": "SUPPORTED"
+    }
+  ],
+  "healthy_alternatives": [
+    {
+      "evidence_refs": [
+        "A0002",
+        "B0003"
+      ],
+      "notes": "A/B route differences may partly reflect probabilistic continuation from the same parent; this paired observation is used as a local causal contrast, not as rerun-based frequency evidence.",
+      "status": "SUPPORTED_CANDIDATE",
+      "type": "STOCHASTIC_CONTINUATION"
+    }
+  ],
+  "input_packet_sha256": "1139a65377f15b8d82b7491a4bc248218ba6bdc0e23a73c499508f31308a4c86",
+  "intervention_summary": {
+    "package_id": "g1pkg:a7005156b8d0cd0bff125ae3",
+    "repair_kind": "file_replace",
+    "repair_target_ref": "file:web/index.html",
+    "summary": "Adds a payment button element inside the existing checkout page main flow, leaving the existing app.js script hook and status/result anchors untouched so the existing checkout flow wiring remains intact."
+  },
+  "not_established": [
+    "C/P/R dimensions are not independently re-labeled from prior Layer-B/Layer-C judgments in this primary paired audit.",
+    "Hidden model reasoning is not inferred from event order.",
+    "Endpoint correctness is not used as the primary repair-effect criterion."
+  ],
+  "pair_integrity": {
+    "B_rerun": false,
+    "natural_A_rerun": false,
+    "one_repair_action": true,
+    "repair_executor_exited": true,
+    "same_parent_checkpoint": true
+  },
+  "paired_effect": {
+    "collaboration_scope_change": "MIXED",
+    "direct_target_effect": "REDUCED",
+    "evidence_refs": [
+      "A0002",
+      "B0003",
+      "A0262",
+      "B0275",
+      "I0004",
+      "I0005"
+    ],
+    "mechanism": "The repair directly modified the web/index.html target and changed the continuation route, but B still exhausted the full horizon. The target surface was reduced locally without demonstrating global process closure.",
+    "overall_process_effect": "MIXED_EFFECT",
+    "route_relation": "DIVERGED",
+    "semantic_authority_change": "NOT_ESTABLISHED",
+    "temporal_reach_change": "STABLE",
+    "unrelated_structure_preservation": "PRESERVED"
+  },
+  "reviewer": {
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "model": "GPT-5.6 Sol",
+    "monitor_predictions_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "prior_layer_c_labels_read": false
+  },
+  "schema": "stage2-r7-g1-ab-paired-process-semantic-audit-v1"
+}

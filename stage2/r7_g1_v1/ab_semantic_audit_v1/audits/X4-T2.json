@@ -1,0 +1,215 @@
+{
+  "arm_A": {
+    "censored": true,
+    "closure_state": "OPEN_OR_CENSORED",
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "closed_loop": false,
+      "notes": "The paired packet supports route/termination comparison but does not independently establish a closed CPR loop without importing prior semantic labels.",
+      "self_reinforcing": false,
+      "topology_class": "UNRESOLVED"
+    },
+    "evidence_refs": [
+      "A0003",
+      "A0066",
+      "A0323",
+      "A0002"
+    ],
+    "key_lineage": "Observable execution route and repository consequence reconstructed from frozen arm evidence; hidden reasoning is not inferred.",
+    "semantic_edges": [],
+    "semantic_nodes": [
+      {
+        "actor": "release_lead",
+        "evidence_refs": [
+          "A0003"
+        ],
+        "node_id": "A-N01",
+        "role": "ACTION",
+        "semantic_state": "First observable valid A continuation action after the paired parent.",
+        "sequence": 1
+      },
+      {
+        "actor": "qa",
+        "evidence_refs": [
+          "A0066"
+        ],
+        "node_id": "A-N02",
+        "role": "ACTION",
+        "semantic_state": "Last observable valid A continuation action before termination.",
+        "sequence": 64
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "A0323"
+        ],
+        "node_id": "A-N03",
+        "role": "CONSEQUENCE",
+        "semantic_state": "Repository consequence is present in the frozen packet but its clipped projection is not safely reparsed; no additional repository semantics are inferred.",
+        "sequence": 9998
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "A0002"
+        ],
+        "node_id": "A-N04",
+        "role": "BOUNDARY",
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=False.",
+        "sequence": 9999
+      }
+    ],
+    "termination_class": "turn_budget"
+  },
+  "arm_B": {
+    "censored": false,
+    "closure_state": "FINALIZED_OR_ANSWERED",
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "closed_loop": false,
+      "notes": "The paired packet supports route/termination comparison but does not independently establish a closed CPR loop without importing prior semantic labels.",
+      "self_reinforcing": false,
+      "topology_class": "UNRESOLVED"
+    },
+    "evidence_refs": [
+      "B0004",
+      "B0017",
+      "B0092",
+      "B0003"
+    ],
+    "key_lineage": "Observable execution route and repository consequence reconstructed from frozen arm evidence; hidden reasoning is not inferred.",
+    "semantic_edges": [],
+    "semantic_nodes": [
+      {
+        "actor": "release_lead",
+        "evidence_refs": [
+          "B0004"
+        ],
+        "node_id": "B-N01",
+        "role": "ACTION",
+        "semantic_state": "First observable valid B continuation action after the paired parent.",
+        "sequence": 1
+      },
+      {
+        "actor": "release_lead",
+        "evidence_refs": [
+          "B0017"
+        ],
+        "node_id": "B-N02",
+        "role": "ACTION",
+        "semantic_state": "Last observable valid B continuation action before termination.",
+        "sequence": 14
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "B0092"
+        ],
+        "node_id": "B-N03",
+        "role": "CONSEQUENCE",
+        "semantic_state": "Repository consequence from parent: changed_files=[\"web/app.js\", \"web/index.html\"].",
+        "sequence": 9998
+      },
+      {
+        "actor": "SYSTEM",
+        "evidence_refs": [
+          "B0003"
+        ],
+        "node_id": "B-N04",
+        "role": "BOUNDARY",
+        "semantic_state": "Termination=finalized; turns=14; answer_present=True.",
+        "sequence": 9999
+      }
+    ],
+    "termination_class": "finalized"
+  },
+  "cell_id": "X4-T2",
+  "cross_arm_findings": [
+    {
+      "evidence_refs": [
+        "A0002",
+        "B0003",
+        "A0323",
+        "B0092",
+        "I0004",
+        "I0005"
+      ],
+      "finding_id": "F01",
+      "statement": "Revalidating the shared file-list state was followed by a substantially shorter continuation that finalized after modifying the web payment-button path, whereas the natural arm exhausted its horizon without repository change. The preserved-set boundary remained intact.",
+      "status": "SUPPORTED_CANDIDATE"
+    },
+    {
+      "evidence_refs": [
+        "I0004",
+        "I0005"
+      ],
+      "finding_id": "F02",
+      "statement": "The B intervention executed exactly once within the frozen repair boundary and the preserve set was intact at repair-executor exit.",
+      "status": "SUPPORTED"
+    }
+  ],
+  "healthy_alternatives": [
+    {
+      "evidence_refs": [
+        "A0002",
+        "B0003"
+      ],
+      "notes": "A/B route differences may partly reflect probabilistic continuation from the same parent; this paired observation is used as a local causal contrast, not as rerun-based frequency evidence.",
+      "status": "SUPPORTED_CANDIDATE",
+      "type": "STOCHASTIC_CONTINUATION"
+    }
+  ],
+  "input_packet_sha256": "158aa2bc77c2b52e4e02ee1a7e2ad332ed378ee7f99cba0b5a963cf6814e418b",
+  "intervention_summary": {
+    "package_id": "g1pkg:9ce16efef1fdd5a3faf6ccc1",
+    "repair_kind": "process_revision",
+    "repair_target_ref": "state:file-list",
+    "summary": "Reopen the file-list process state and revalidate that the existing checkout flow files (checkout_app/checkout.py, checkout_app/server.py, web/app.js, web/index.html, tests/test_checkout.py) are enumerated and mutually consistent before adding the payment button, so the new button is wired into the existing flow rather than a parallel one."
+  },
+  "not_established": [
+    "C/P/R dimensions are not independently re-labeled from prior Layer-B/Layer-C judgments in this primary paired audit.",
+    "Hidden model reasoning is not inferred from event order.",
+    "Endpoint correctness is not used as the primary repair-effect criterion."
+  ],
+  "pair_integrity": {
+    "B_rerun": false,
+    "natural_A_rerun": false,
+    "one_repair_action": true,
+    "repair_executor_exited": true,
+    "same_parent_checkpoint": true
+  },
+  "paired_effect": {
+    "collaboration_scope_change": "DECREASED",
+    "direct_target_effect": "REDIRECTED",
+    "evidence_refs": [
+      "A0002",
+      "B0003",
+      "A0323",
+      "B0092",
+      "I0004",
+      "I0005"
+    ],
+    "mechanism": "Revalidating the shared file-list state was followed by a substantially shorter continuation that finalized after modifying the web payment-button path, whereas the natural arm exhausted its horizon without repository change. The preserved-set boundary remained intact.",
+    "overall_process_effect": "TARGETED_REDIRECTION",
+    "route_relation": "DIVERGED",
+    "semantic_authority_change": "NOT_ESTABLISHED",
+    "temporal_reach_change": "DECREASED",
+    "unrelated_structure_preservation": "PRESERVED"
+  },
+  "reviewer": {
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "model": "GPT-5.6 Sol",
+    "monitor_predictions_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "prior_layer_c_labels_read": false
+  },
+  "schema": "stage2-r7-g1-ab-paired-process-semantic-audit-v1"
+}
