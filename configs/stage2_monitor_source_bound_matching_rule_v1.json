@@ -1,0 +1,87 @@
+{
+  "schema": "stage2-monitor-source-bound-matching-rule-v1",
+  "version": "1.0",
+  "status": "FROZEN_BEFORE_A_B_EVALUATION",
+  "date_utc": "2026-09-27",
+  "purpose": "Deterministic source-bound comparison of frozen Layer-A structural monitor warnings against sealed Layer-B monitor-blind reference records.",
+  "no_posthoc_tuning": true,
+  "monitor_rule_to_compatible_structure_families": {
+    "MULTI_CONSUMER_ADDRESSABLE_REUSE": [
+      "AUTHORITY_STATUS_SHIFT",
+      "REPEATED_REVIEW_REOPEN",
+      "HISTORICAL_REENTRY",
+      "RECURSIVE_MEMORY_FEEDBACK",
+      "CARRIER_TRANSFORMATION",
+      "STATE_MISMATCH",
+      "SEMANTIC_REPOSITORY_CLOSURE_DIVERGENCE",
+      "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    ],
+    "REENTRY_OR_REUSE": [
+      "HISTORICAL_REENTRY",
+      "REPEATED_REVIEW_REOPEN",
+      "RECURSIVE_MEMORY_FEEDBACK",
+      "AUTHORITY_STATUS_SHIFT",
+      "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    ],
+    "WRITE_THEN_REUSE": [
+      "CARRIER_TRANSFORMATION",
+      "STATE_MISMATCH",
+      "SEMANTIC_REPOSITORY_CLOSURE_DIVERGENCE",
+      "AUTHORITY_STATUS_SHIFT",
+      "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    ],
+    "IMMUTABLE_CARRIER_REPEAT": [
+      "RECURSIVE_MEMORY_FEEDBACK",
+      "HISTORICAL_REENTRY",
+      "CARRIER_TRANSFORMATION",
+      "AUTHORITY_STATUS_SHIFT",
+      "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    ],
+    "CONTEXT_TRANSFORMATION_EXPOSURE": [
+      "CARRIER_TRANSFORMATION",
+      "STATE_MISMATCH",
+      "AUTHORITY_STATUS_SHIFT",
+      "SEMANTIC_REPOSITORY_CLOSURE_DIVERGENCE",
+      "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    ],
+    "TERMINAL_OPEN_WITH_REUSE": [
+      "REPEATED_REVIEW_REOPEN",
+      "SCOPE_EXPANSION",
+      "AUTHORITY_STATUS_SHIFT",
+      "OTHER_FROZEN_STRUCTURAL_SIGNATURE"
+    ]
+  },
+  "object_matching": {
+    "exact_normalized_tail": true,
+    "basename_token": true,
+    "minimum_token_length": 4,
+    "free_form_semantic_similarity": false
+  },
+  "temporal_matching": {
+    "warning_must_not_follow_reference_consequence_by_more_than": 0,
+    "missing_consequence_allows_family_only_partial_localization": true
+  },
+  "classes": {
+    "SUPPORTED_MATCH": "Compatible structure family plus source/carrier object overlap and warning at or before the reference consequence.",
+    "PARTIAL_LOCALIZATION": "Compatible structure family and valid temporal ordering but no source/carrier object overlap.",
+    "MISS": "Observable positive reference without a qualifying frozen warning.",
+    "UNOBSERVABLE_REFERENCE": "Positive reference whose sealed Layer-B record marks required evidence surface unavailable and no qualifying warning is present.",
+    "AUDIT_REJECTED_WARNING": "Unmatched warning overlaps a sealed negative-boundary record on compatible structure/object evidence.",
+    "UNSUPPORTED_WARNING": "Unmatched warning that is neither positively supported nor directly rejected by the sealed Layer-B reference."
+  },
+  "metric_policy": {
+    "strict_match_classes": [
+      "SUPPORTED_MATCH"
+    ],
+    "broad_match_classes": [
+      "SUPPORTED_MATCH",
+      "PARTIAL_LOCALIZATION"
+    ],
+    "warning_supported_classes": [
+      "SUPPORTED_MATCH",
+      "PARTIAL_LOCALIZATION"
+    ],
+    "zero_denominator": "NA",
+    "report_numerator_and_denominator": true
+  }
+}
