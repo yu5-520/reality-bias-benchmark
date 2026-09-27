@@ -1,0 +1,141 @@
+name: Stage-II R7 G1 A-B Paired Semantic Audit v1
+
+on:
+  push:
+    branches:
+      - stage2-r7-g1-ab-semantic-audit-v1
+    paths:
+      - ".github/workflows/stage2-r7-g1-ab-paired-semantic-audit-v1.yml"
+      - "arena/materialize_stage2_r7_g1_ab_audits_v1.py"
+      - "scripts/validate_stage2_r7_g1_ab_semantic_audit_v2.py"
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-r7-g1-ab-paired-semantic-audit-v1
+  cancel-in-progress: false
+
+env:
+  AUTH_ISSUE: "287"
+  PACKET_FREEZE_COMMIT: "8b4c996b55909855bb8c678e578e310e2863376c"
+  ROOT: "stage2/r7_g1_v1/ab_semantic_audit_v1"
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout audit branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-r7-g1-ab-semantic-audit-v1
+          path: repo
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify frozen packet ancestry and audit authorization
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C repo merge-base --is-ancestor "$PACKET_FREEZE_COMMIT" HEAD
+          test -d "repo/$ROOT/packets_v2"
+          test ! -e "repo/$ROOT/audits"
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          idx=json.loads(Path("repo/stage2/r7_g1_v1/ab_semantic_audit_v1/packets_v2/packet_index.json").read_text())
+          assert idx["schema"]=="stage2-r7-g1-ab-process-semantic-packet-index-v2"
+          assert idx["status"]=="FROZEN_BALANCED_PRIMARY_A_B_AUDIT_INPUTS"
+          assert idx["authorization_issue"]==287
+          assert idx["cell_count"]==12
+          assert idx["new_subject_provider_calls"]==0
+          assert idx["repair_calls"]==0
+          assert idx["paid_evaluator_calls"]==0
+          issue=json.loads(subprocess.check_output([
+              "gh","api",f'repos/{os.environ["GITHUB_REPOSITORY"]}/issues/{os.environ["AUTH_ISSUE"]}'
+          ],text=True))
+          assert issue["user"]["login"]=="yu5-520"
+          assert issue["title"]=="STAGE2 R7 G1 A-B PAIRED PROCESS-SEMANTIC AUDIT AUTHORIZATION"
+          assert "reviewer=GPT-5.6 Sol" in issue["body"]
+          assert "execution_mode=CHATGPT_NATIVE_REASONING" in issue["body"]
+          assert "cross_cell_synthesis_after_12_cell_seal=true" in issue["body"]
+          print("PASS: packet freeze and audit authorization bound")
+          PY
+
+      - name: Materialize 12 GPT-5.6 Sol paired audit judgments
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$GITHUB_WORKSPACE/repo" python repo/arena/materialize_stage2_r7_g1_ab_audits_v1.py             --packets "repo/$ROOT/packets_v2"             --out "repo/$ROOT/audits"
+
+      - name: Validate 12 paired audits against frozen packet evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$GITHUB_WORKSPACE/repo" python repo/scripts/validate_stage2_r7_g1_ab_semantic_audit_v2.py             --packets "repo/$ROOT/packets_v2"             --audits "repo/$ROOT/audits"
+
+      - name: Seal validated audit index
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root=Path("repo/stage2/r7_g1_v1/ab_semantic_audit_v1")
+          audits=root/"audits"
+          idx=json.loads((audits/"audit_index.json").read_text())
+          idx["status"]="SEALED_12_OF_12_VALIDATED"
+          idx["validation"]="PASS"
+          idx["cross_cell_synthesis_gate"]="OPEN_AFTER_12_CELL_SEAL"
+          idx["audit_files_sha256"]={}
+          for p in sorted(audits.glob("X*-T*.json")):
+              idx["audit_files_sha256"][p.name]=hashlib.sha256(p.read_bytes()).hexdigest()
+          (audits/"audit_index.json").write_text(json.dumps(idx,ensure_ascii=False,indent=2,sort_keys=True)+"\n")
+          seal={
+              "schema":"stage2-r7-g1-ab-paired-process-semantic-audit-seal-v1",
+              "status":"SEALED",
+              "reviewer_model":"GPT-5.6 Sol",
+              "execution_mode":"CHATGPT_NATIVE_REASONING",
+              "authorization_issue":287,
+              "packet_freeze_commit":"8b4c996b55909855bb8c678e578e310e2863376c",
+              "audit_count":12,
+              "validated_count":12,
+              "new_subject_provider_calls":0,
+              "repair_calls":0,
+              "paid_evaluator_calls":0,
+              "natural_A_reruns":0,
+              "B_reruns":0,
+              "prior_layer_c_labels_read":False,
+              "prior_layer_b_reference_labels_read":False,
+              "monitor_predictions_read":False,
+              "cross_cell_synthesis_gate":"OPEN_AFTER_12_CELL_SEAL",
+              "audit_index_sha256":hashlib.sha256((audits/"audit_index.json").read_bytes()).hexdigest()
+          }
+          (root/"formal_audit_seal.json").write_text(json.dumps(seal,ensure_ascii=False,indent=2,sort_keys=True)+"\n")
+          print(json.dumps({"status":"SEALED","audits":12,"synthesis_gate":"OPEN_AFTER_12_CELL_SEAL"},sort_keys=True))
+          PY
+
+      - name: Freeze audit outputs append-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C repo config user.name "stage2-r7-g1-ab-audit-bot"
+          git -C repo config user.email "stage2-r7-g1-ab-audit@users.noreply.github.com"
+          git -C repo add "$ROOT/audits" "$ROOT/formal_audit_seal.json"
+          git -C repo commit -m "audit: seal 12/12 R7 G1 paired A-B semantic audits [run $GITHUB_RUN_ID]"
+          git -C repo push origin HEAD:stage2-r7-g1-ab-semantic-audit-v1
+
+      - name: Report seal to authorization issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --body             "R7 G1 paired A↔B process-semantic audit sealed 12/12 on stage2-r7-g1-ab-semantic-audit-v1. Validation PASS. No subject reruns, no Repair B reruns, no paid evaluator calls, and no prior Layer-B/Layer-C labels or monitor predictions were read in the primary paired audit. Cross-cell synthesis gate is now OPEN_AFTER_12_CELL_SEAL."
