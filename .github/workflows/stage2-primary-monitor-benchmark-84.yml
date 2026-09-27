@@ -1,0 +1,100 @@
+name: Stage-II Primary 84-Cell Monitor Benchmark
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/stage2-primary-monitor-benchmark-84.yml"
+      - "scripts/build_stage2_primary_monitor_benchmark_84_v1.py"
+      - "configs/stage2_monitor_source_bound_matching_rule_v1.json"
+
+permissions:
+  contents: write
+
+jobs:
+  benchmark-84:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: stage2-primary-monitor-benchmark-84
+      cancel-in-progress: false
+    steps:
+      - name: Checkout post-audit result branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-post-audit-closure-v1
+          fetch-depth: 0
+
+      - name: Checkout sealed Layer-B reference
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-semantic-audit-reference-v1
+          path: _layer_b_reference
+          fetch-depth: 1
+
+      - name: Checkout G2 natural evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g2-natural-evidence-v1
+          path: _g2
+          fetch-depth: 1
+
+      - name: Checkout G3 natural evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g3-natural-evidence-v1
+          path: _g3
+          fetch-depth: 1
+
+      - name: Checkout G4 natural evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g4-natural-evidence-v1
+          path: _g4
+          fetch-depth: 1
+
+      - name: Checkout G5 natural evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g5-natural-evidence-v1
+          path: _g5
+          fetch-depth: 1
+
+      - name: Build sealed 84-cell A-B primary benchmark
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/build_stage2_primary_monitor_benchmark_84_v1.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path("stage2/replication_v2/primary_monitor_benchmark_84_v1")
+          summary=json.loads((root/"evaluation_summary.json").read_text())
+          seal=json.loads((root/"benchmark_seal.json").read_text())
+          source=json.loads((root/"monitor_source_index.json").read_text())
+          assert summary["state"]=="SEALED"
+          assert summary["cell_count"]==84
+          assert summary["population"]=="G2_G5_84_NATURAL_A_PRIMARY"
+          assert summary["layer_c_used"] is False
+          assert seal["state"]=="SEALED" and seal["cell_count"]==84
+          assert seal["primary_population"]=="G2_G5_84_NATURAL_A"
+          assert source["cell_count"]==84 and source["layer_c_used"] is False
+          assert summary["monitor_output_availability"]["cells_with_monitor_candidates_file"]==83
+          assert summary["monitor_output_availability"]["cells_without_monitor_candidates_file"]==1
+          print("PRIMARY_84_BENCHMARK_GATE=PASS")
+          PY
+
+      - name: Commit frozen benchmark outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="stage2/replication_v2/primary_monitor_benchmark_84_v1"
+          git config user.name "stage2-primary-monitor-benchmark"
+          git config user.email "stage2-primary-monitor-benchmark@users.noreply.github.com"
+          git add "$ROOT"
+          if git diff --cached --quiet; then
+            echo "No benchmark output change to commit."
+            exit 0
+          fi
+          git commit -m "Seal Stage-II primary 84-cell prospective monitor benchmark"
+          git push origin HEAD:stage2-post-audit-closure-v1
