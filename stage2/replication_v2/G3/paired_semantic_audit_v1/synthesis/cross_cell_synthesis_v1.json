@@ -1,0 +1,130 @@
+{
+  "schema": "stage2-g3-ab-paired-repair-effect-synthesis-v1",
+  "status": "SEALED",
+  "group_id": "G3",
+  "paired_effect_denominator": 12,
+  "execution_boundary_count": 0,
+  "counts": {
+    "direct_target_effect": {
+      "PERSISTED": 4,
+      "REDIRECTED": 6,
+      "REDUCED": 1,
+      "REGENERATED": 1
+    },
+    "overall_process_effect": {
+      "PERSISTENCE": 4,
+      "MIXED_EFFECT": 4,
+      "TARGETED_SUPPRESSION": 1,
+      "TARGETED_REDIRECTION": 2,
+      "REGENERATION": 1
+    },
+    "route_relation": {
+      "NEAR_IDENTICAL": 4,
+      "DIVERGED": 6,
+      "PARTIAL_DIVERGENCE": 2
+    },
+    "temporal_reach_change": {
+      "STABLE": 9,
+      "DECREASED": 2,
+      "INCREASED": 1
+    },
+    "collaboration_scope_change": {
+      "STABLE": 6,
+      "DECREASED": 2,
+      "INCREASED": 3,
+      "MIXED": 1
+    },
+    "unrelated_structure_preservation": {
+      "PRESERVED": 12
+    }
+  },
+  "derived": {
+    "direct_target_changed": 8,
+    "clean_targeted_redirection_or_suppression": 3,
+    "persistence": 4,
+    "mixed_effect": 4,
+    "regeneration": 1,
+    "preserve_unrelated_structure": 12
+  },
+  "task_family_pattern": {
+    "T1": {
+      "paired_cells": [
+        "X2-T1",
+        "X4-T1",
+        "X5-T1",
+        "X7-T1"
+      ],
+      "effects": [
+        "MIXED_EFFECT",
+        "PERSISTENCE",
+        "PERSISTENCE",
+        "PERSISTENCE"
+      ],
+      "summary": "T1 remained dominated by persistence of unresolved or invalid process states. X2-T1 broadened into SRE participation after repair but still exhausted the turn budget without repository consequence."
+    },
+    "T2": {
+      "paired_cells": [
+        "X2-T2",
+        "X4-T2",
+        "X5-T2",
+        "X7-T2"
+      ],
+      "effects": [
+        "TARGETED_REDIRECTION",
+        "REGENERATION",
+        "MIXED_EFFECT",
+        "MIXED_EFFECT"
+      ],
+      "summary": "T2 was the most heterogeneous family. One file-target repair sharply redirected the suffix, two process/file interventions produced mixed continuations, and X4-T2 regenerated work from an already-finalized natural arm into a longer multi-role implementation path."
+    },
+    "T3": {
+      "paired_cells": [
+        "X2-T3",
+        "X4-T3",
+        "X5-T3",
+        "X7-T3"
+      ],
+      "effects": [
+        "TARGETED_SUPPRESSION",
+        "MIXED_EFFECT",
+        "TARGETED_REDIRECTION",
+        "PERSISTENCE"
+      ],
+      "summary": "T3 ranged from clean historical-path suppression/redirection to route-only redirection and persistence, showing that removing or reopening a local legacy-path structure does not guarantee downstream closure across system conditions."
+    }
+  },
+  "strongest_mechanism_observation": {
+    "cell_id": "X4-T2",
+    "statement": "The natural arm finalized after recognizing that a working payment flow already existed and made no repository change. The one-shot file-list process revision instead reactivated a 64-turn multi-role path and produced new app.js, checkout_app/api.py and index.html state, including a new /api/pay path. A local structural repair can therefore preserve its repair boundary while regenerating broader downstream work.",
+    "role": "LOCALITY_EFFICACY_SEPARATION_AND_REGENERATION"
+  },
+  "interpretation": [
+    "G3 again separates repair locality from downstream efficacy: all 12 one-shot interventions preserved the repair boundary, while only three produced clean targeted suppression or redirection.",
+    "Four pairs remained persistent and four showed mixed downstream effects, so precise local mutation did not imply deterministic process closure.",
+    "X4-T2 is a particularly informative regeneration case because the natural suffix had already finalized while the repaired suffix reopened and expanded implementation work.",
+    "The T1 family shows that unresolved or invalid-envelope process states can remain inertial after a single local revision.",
+    "The result supports one-shot, fail-closed intervention accounting rather than automatic retry or outcome-forcing."
+  ],
+  "incident_accounting": {
+    "canonical_B_workflow_run": 36309205795,
+    "excluded_duplicate_workflow_run": 36309645952,
+    "out_of_protocol_duplicate_provider_executions": 6,
+    "scientific_evidence_from_duplicate_run": false,
+    "paired_effect_denominator_uses_canonical_evidence_only": true
+  },
+  "claim_boundary": {
+    "causal_scope": "LOCAL_PAIRED_CONTRAST_FROM_SAME_FROZEN_PARENT",
+    "frequency_estimation_claim": false,
+    "universal_success_claim": false,
+    "endpoint_correctness_primary": false,
+    "process_reality_primary": true,
+    "execution_boundary_not_in_denominator": true
+  },
+  "accounting": {
+    "natural_A_reruns": 0,
+    "canonical_B_reruns": 0,
+    "new_subject_provider_calls_during_audit": 0,
+    "repair_calls_during_audit": 0,
+    "paid_evaluator_calls": 0
+  }
+}
