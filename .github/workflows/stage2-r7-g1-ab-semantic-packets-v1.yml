@@ -1,0 +1,127 @@
+name: Stage-II R7 G1 A-B Semantic Packet Materialization v1
+
+on:
+  push:
+    branches:
+      - stage2-r7-g1-ab-semantic-audit-v1
+    paths:
+      - ".github/workflows/stage2-r7-g1-ab-semantic-packets-v1.yml"
+      - "configs/stage2_r7_g1_ab_paired_semantic_audit_v1.json"
+      - "reviews/stage2_r7_g1_ab_paired_semantic_audit_prompt_v1.md"
+      - "arena/build_stage2_r7_g1_ab_semantic_packets_v1.py"
+      - "scripts/validate_stage2_r7_g1_ab_semantic_audit_v1.py"
+
+permissions:
+  contents: write
+  issues: read
+
+concurrency:
+  group: stage2-r7-g1-ab-semantic-packets-v1
+  cancel-in-progress: false
+
+env:
+  AUTH_ISSUE: "287"
+  EVIDENCE_SHA: "c78d140b42f512abab41190163e3f2d8b0750c39"
+  OUTPUT_ROOT: "stage2/r7_g1_v1/ab_semantic_audit_v1"
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout audit control/result branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-r7-g1-ab-semantic-audit-v1
+          path: audit
+          fetch-depth: 1
+
+      - name: Checkout exact frozen R7 G1 evidence
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.EVIDENCE_SHA }}
+          path: evidence
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify post-B-freeze authorization and exact evidence identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C evidence rev-parse HEAD)" = "$EVIDENCE_SHA"
+          python - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          cfg=json.loads(Path("audit/configs/stage2_r7_g1_ab_paired_semantic_audit_v1.json").read_text())
+          assert cfg["status"]=="AUTHORIZED_POST_B_FREEZE_ANALYSIS"
+          assert cfg["authorization_issue"]==287
+          assert cfg["reviewer"]["model"]=="GPT-5.6 Sol"
+          assert cfg["reviewer"]["execution_mode"]=="CHATGPT_NATIVE_REASONING"
+          assert cfg["source"]["evidence_commit"]==os.environ["EVIDENCE_SHA"]
+          assert cfg["source"]["repair_B_workflow_run"]==36299581459
+          assert cfg["population"]["paired_count"]==12
+          assert cfg["pairing"]["natural_A_reruns"]==0
+          assert cfg["pairing"]["B_reruns"]==0
+          assert cfg["execution_boundary"]["new_subject_provider_calls"]==0
+          assert cfg["execution_boundary"]["repair_calls"]==0
+          assert cfg["execution_boundary"]["paid_evaluator_calls"]==0
+          g=json.loads(Path("evidence/stage2/r7_g1_v1/phase_b_provider_v2_group_index.json").read_text())
+          assert g["state"]=="FROZEN_B_FIRST_ATTEMPTS"
+          assert g["preserved_count"]==12
+          assert g["successful_B_count"]==12
+          assert g["failed_B_count"]==0
+          assert g["missing_cells"]==[]
+          assert g["semantic_audit_gate"]=="OPEN_AFTER_B_FREEZE"
+          issue=json.loads(subprocess.check_output([
+              "gh","api",f'repos/{os.environ["GITHUB_REPOSITORY"]}/issues/{os.environ["AUTH_ISSUE"]}'
+          ],text=True))
+          assert issue["user"]["login"]=="yu5-520"
+          assert issue["title"]=="STAGE2 R7 G1 A-B PAIRED PROCESS-SEMANTIC AUDIT AUTHORIZATION"
+          for needle in [
+              "phase=POST_B_FREEZE_PAIRED_PROCESS_SEMANTIC_AUDIT_V1",
+              "reviewer=GPT-5.6 Sol",
+              "source_B_freeze_commit="+os.environ["EVIDENCE_SHA"],
+              "natural_A_reruns=0","B_reruns=0","repair_calls=0",
+              "new_subject_provider_calls=0","paid_evaluator_calls=0",
+              "primary_audit_reads_prior_layer_c_labels=false",
+              "primary_audit_reads_monitor_predictions=false"
+          ]:
+              assert needle in issue["body"]
+          print("PASS: exact post-B-freeze semantic-audit authorization and evidence are bound")
+          PY
+
+      - name: Build 12 frozen same-parent A-B semantic packets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "audit/$OUTPUT_ROOT/packets"
+          PYTHONPATH="$GITHUB_WORKSPACE/audit" python audit/arena/build_stage2_r7_g1_ab_semantic_packets_v1.py             --evidence-root evidence/stage2/r7_g1_v1             --config audit/configs/stage2_r7_g1_ab_paired_semantic_audit_v1.json             --out "audit/$OUTPUT_ROOT/packets"
+
+      - name: Validate packet population and isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH="$GITHUB_WORKSPACE/audit" python audit/scripts/validate_stage2_r7_g1_ab_semantic_audit_v1.py             --packets "audit/$OUTPUT_ROOT/packets"
+
+      - name: Freeze packets append-only on audit branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C audit config user.name "stage2-r7-g1-ab-audit-bot"
+          git -C audit config user.email "stage2-r7-g1-ab-audit@users.noreply.github.com"
+          git -C audit add "$OUTPUT_ROOT/packets"
+          git -C audit commit -m "audit: freeze 12 R7 G1 same-parent A-B semantic packets [run $GITHUB_RUN_ID]"
+          git -C audit push origin HEAD:stage2-r7-g1-ab-semantic-audit-v1
+
+      - name: Upload redundant packet artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage2-r7-g1-ab-semantic-packets-${{ github.run_id }}
+          path: audit/stage2/r7_g1_v1/ab_semantic_audit_v1/packets/
+          retention-days: 90
+          if-no-files-found: error
