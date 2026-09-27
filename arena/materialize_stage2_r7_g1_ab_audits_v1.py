@@ -19,10 +19,15 @@ JUDGMENTS = {
 }
 
 def parse_content(e):
-    try:
-        return json.loads(e["content"])
-    except Exception:
-        return e["content"]
+    value=e["content"]
+    for _ in range(3):
+        if not isinstance(value,str):
+            break
+        try:
+            value=json.loads(value)
+        except Exception:
+            break
+    return value
 
 def first(row, kind):
     return next(e for e in row["evidence"] if e["kind"] == kind)
