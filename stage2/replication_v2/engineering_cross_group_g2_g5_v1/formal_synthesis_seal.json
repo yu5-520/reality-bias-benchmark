@@ -1,0 +1,113 @@
+{
+  "schema": "stage2-engineering-g2-g5-final-synthesis-seal-v1",
+  "state": "SEALED_FINAL_G2_G5_ENGINEERING_SYNTHESIS",
+  "date": "2026-09-27",
+  "source_group_seals": {
+    "G2": {
+      "path": "stage2/replication_v2/G2/paired_semantic_audit_v1/formal_audit_seal.json",
+      "blob_sha": "eec8ebbeee7e199f62f7782662d527ed53e35017"
+    },
+    "G3": {
+      "path": "stage2/replication_v2/G3/paired_semantic_audit_v1/formal_audit_seal.json",
+      "blob_sha": "83dfa4f48798d9ae8b3744ac62b162fbeef4f260"
+    },
+    "G4": {
+      "path": "stage2/replication_v2/G4/paired_semantic_audit_v1/formal_audit_seal.json",
+      "blob_sha": "12c3a68d9dd0a26ca325f104abbd66005386edb1"
+    },
+    "G5": {
+      "path": "stage2/replication_v2/G5/paired_semantic_audit_v1/formal_audit_seal.json",
+      "blob_sha": "5db1f28cad17884f87de4e0b97b9a2d8373a46b4"
+    }
+  },
+  "final_artifacts": {
+    "response_matrix": {
+      "path": "stage2/replication_v2/engineering_cross_group_g2_g5_v1/response_matrix.json",
+      "blob_sha": "fffea32f8c176e7582361fb5bfdfd65c42224c50"
+    },
+    "summary": {
+      "path": "stage2/replication_v2/engineering_cross_group_g2_g5_v1/summary.json",
+      "blob_sha": "e8eed70916c5fbba1d4ed5f46d509c4333fc761c"
+    },
+    "report": {
+      "path": "docs/reports/2026-09-27/StageII_Engineering_General_Chapter_Final_G2_G5_Synthesis_v1.md",
+      "blob_sha": "11255e9900d8bccfd9695d4833d18cd9b2a69911"
+    },
+    "config": {
+      "path": "configs/stage2_engineering_general_final_synthesis_v1.json",
+      "blob_sha": "db7cd753c37aee7971efcfed2572b2830229f206"
+    }
+  },
+  "frozen_population": {
+    "group_cell_structural_eligibility_rows": 48,
+    "canonical_B_first_attempts": 47,
+    "valid_same_parent_pairs": 45,
+    "explicit_boundaries": 3,
+    "B_execution_boundaries": 2,
+    "pre_B_source_readiness_boundaries": 1
+  },
+  "frozen_effect_counts": {
+    "direct_target_effect": {
+      "PERSISTED": 18,
+      "REDIRECTED": 19,
+      "REDUCED": 3,
+      "REGENERATED": 5
+    },
+    "overall_process_effect": {
+      "PERSISTENCE": 18,
+      "MIXED_EFFECT": 15,
+      "TARGETED_SUPPRESSION": 3,
+      "TARGETED_REDIRECTION": 4,
+      "REGENERATION": 5
+    },
+    "direct_target_changed": 27,
+    "clean_targeted_redirection_or_suppression": 7,
+    "unrelated_structure_preserved": 45
+  },
+  "boundary_accounting": [
+    {
+      "group_id": "G2",
+      "cell_id": "X5-T2",
+      "class": "REPAIR_AGENT_NO_EFFECT_ON_FROZEN_LEGAL_SURFACE",
+      "stage": "B_EXECUTION",
+      "paired_effect_sample": false
+    },
+    {
+      "group_id": "G4",
+      "cell_id": "X5-T2",
+      "class": "REPAIR_AGENT_NO_EFFECT_ON_FROZEN_LEGAL_SURFACE",
+      "stage": "B_EXECUTION",
+      "paired_effect_sample": false
+    },
+    {
+      "group_id": "G5",
+      "cell_id": "X4-T2",
+      "class": "CANONICAL_NATURAL_A_MISSING_SEAL",
+      "stage": "PRE_B_SOURCE_READINESS",
+      "paired_effect_sample": false
+    }
+  ],
+  "governance_accounting": {
+    "G3_duplicate_run": 36309645952,
+    "G3_duplicate_provider_executions": 6,
+    "duplicate_outputs_used_as_scientific_evidence": false,
+    "forward_atomic_execution_claim_rule": true
+  },
+  "independence": {
+    "natural_A_reruns_used_to_manufacture_pairs": 0,
+    "B_reruns_used_to_manufacture_preferred_outcomes": 0,
+    "final_synthesis_provider_calls": 0,
+    "final_synthesis_repair_calls": 0,
+    "final_synthesis_paid_evaluator_calls": 0
+  },
+  "claim_boundary": {
+    "population_prevalence": false,
+    "repeat_run_probability": false,
+    "universal_repair_success": false,
+    "framework_ranking": false,
+    "deterministic_task_law": false,
+    "endpoint_correctness_primary": false,
+    "process_reality_primary": true
+  },
+  "next_gate": "PUBLICATION_INTEGRATION_NO_G2_G5_RERUN_REQUIRED"
+}
