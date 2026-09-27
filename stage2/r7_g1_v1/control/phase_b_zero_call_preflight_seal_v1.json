@@ -1,0 +1,49 @@
+{
+  "schema": "stage2-r7-g1-phase-b-zero-call-preflight-seal-v1",
+  "status": "PASS_12_OF_12_EXECUTION_READY_CELLS",
+  "workflow_run_id": 36298466846,
+  "workflow_url": "https://github.com/yu5-520/reality-bias-benchmark/actions/runs/36298466846",
+  "b_code_sha": "2dcfbd46551842bb96a7ea295f69adcdc2abd745",
+  "input_evidence_sha": "baa8ba0692d2f29980f50a3106e837c491b7e95b",
+  "day1_offline_conformance_run": 36298459714,
+  "ready_cells": [
+    "X2-T1",
+    "X2-T2",
+    "X2-T3",
+    "X4-T1",
+    "X4-T2",
+    "X4-T3",
+    "X5-T1",
+    "X5-T2",
+    "X5-T3",
+    "X7-T1",
+    "X7-T2",
+    "X7-T3"
+  ],
+  "blocked_cells": [
+    {
+      "cell_id": "X6-T1",
+      "reason": "FOREIGN_PARENT_STATE_RECONSTRUCTION_BLOCKED"
+    },
+    {
+      "cell_id": "X6-T2",
+      "reason": "FOREIGN_PARENT_STATE_RECONSTRUCTION_BLOCKED"
+    },
+    {
+      "cell_id": "X6-T3",
+      "reason": "FOREIGN_PARENT_STATE_RECONSTRUCTION_BLOCKED"
+    }
+  ],
+  "same_parent_restore_preflight": true,
+  "structured_repair_boundary_preflight": true,
+  "preserve_set_preflight": true,
+  "provider_calls": 0,
+  "repair_actions_on_scientific_evidence": 0,
+  "semantic_audit_used": false,
+  "cpr_labels_used": false,
+  "interpretation": [
+    "All 12 execution-ready X2/X4/X5/X7 cells restored the frozen selected parent and accepted exactly one synthetic local repair under the boundary watcher in zero-call preflight.",
+    "X6 remains fail-closed because the exact historical mutable MemoryBank parent state is not reconstructable from frozen A evidence.",
+    "This seal authorizes no provider call by itself."
+  ]
+}
