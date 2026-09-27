@@ -133,7 +133,14 @@ class MetaGPTNativeCheckpointAdapter:
                 "stage2_directory": directory,
                 "stage2_entry": entry,
             })
-            restored_roles.append(role_class(**role_state))
+            restored_role = role_class(**role_state)
+            # MetaGPT Role initialization marks deserialized roles as recovered.
+            # Preserve the public serialized flag from the exact parent checkpoint
+            # after construction so a same-parent Stage-II restore round-trips
+            # without patching framework internals or protocol behavior.
+            if "recovered" in row["state"]:
+                restored_role.recovered = bool(row["state"]["recovered"])
+            restored_roles.append(restored_role)
         env.add_roles(restored_roles)
         round_trip = self.serialize_stage2_environment(env)
         if digest(round_trip) != digest(state):
