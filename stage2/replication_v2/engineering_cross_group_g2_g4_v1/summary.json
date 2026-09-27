@@ -1,0 +1,96 @@
+{
+  "schema": "stage2-engineering-g2-g4-crossgroup-one-shot-response-synthesis-v1",
+  "version": "1.0",
+  "date": "2026-09-27",
+  "status": "SEALED_FROM_G2_G4_PAIRED_AUDITS",
+  "source_groups": {
+    "G2": {
+      "paired_effect_denominator": 11,
+      "execution_boundary_count": 1,
+      "direct_target_changed": 7,
+      "clean_targeted_redirection_or_suppression": 2,
+      "persistence": 4,
+      "mixed_effect": 4,
+      "regeneration": 1,
+      "unrelated_structure_preserved": 11
+    },
+    "G3": {
+      "paired_effect_denominator": 12,
+      "execution_boundary_count": 0,
+      "direct_target_changed": 8,
+      "clean_targeted_redirection_or_suppression": 3,
+      "persistence": 4,
+      "mixed_effect": 4,
+      "regeneration": 1,
+      "unrelated_structure_preserved": 12
+    },
+    "G4": {
+      "paired_effect_denominator": 11,
+      "execution_boundary_count": 1,
+      "direct_target_changed": 6,
+      "clean_targeted_redirection_or_suppression": 2,
+      "persistence": 5,
+      "mixed_effect": 3,
+      "regeneration": 1,
+      "unrelated_structure_preserved": 11
+    }
+  },
+  "cumulative_descriptive_accounting": {
+    "attempted_B_first_attempts": 36,
+    "valid_same_parent_paired_effects": 34,
+    "execution_boundaries": 2,
+    "direct_target_changed": 21,
+    "clean_targeted_redirection_or_suppression": 7,
+    "persistence": 13,
+    "mixed_effect": 11,
+    "regeneration": 3,
+    "unrelated_structure_preserved": 34
+  },
+  "task_family_recurrence": {
+    "T1": {
+      "valid_pairs": 12,
+      "persistence": 10,
+      "mixed_effect": 1,
+      "regeneration": 1,
+      "statement": "Across G2-G4, T1 is dominated by persistence of unresolved/invalid process states after one local process-state revision."
+    },
+    "T2": {
+      "attempted_cells": 12,
+      "valid_pairs": 10,
+      "execution_boundaries": 2,
+      "mixed_effect": 7,
+      "targeted_redirection": 1,
+      "regeneration": 2,
+      "statement": "T2 repeatedly produces route redirection without clean closure, regeneration, and fail-closed no-effect boundaries."
+    },
+    "T3": {
+      "valid_pairs": 12,
+      "targeted_suppression": 3,
+      "targeted_redirection": 3,
+      "mixed_effect": 3,
+      "persistence": 3,
+      "statement": "At the group-level response distribution, G2, G3 and G4 each contain one targeted suppression, one targeted redirection, one mixed effect and one persistence result; system identity within the middle categories is not identical across every group."
+    }
+  },
+  "engineering_findings": [
+    "Locality and efficacy remain empirically separable: all 34 valid paired interventions preserved unrelated structure while downstream effects were heterogeneous.",
+    "One-shot local process-state repair does not imply closure; persistence and mixed effects remain common descriptive outcomes in the frozen paired sample.",
+    "Regeneration is reproduced in each of G2, G3 and G4, supporting repair-generated process expansion as an observed engineering phenomenon rather than a single-group anomaly.",
+    "Fail-closed no-effect boundaries recur in G2 and G4 and are preserved outside the paired-effect denominator instead of being retried into a preferred outcome.",
+    "T1/T2/T3 show distinct recurring response geometries that should remain explicit in the final G2-G5 engineering synthesis."
+  ],
+  "boundary": {
+    "universal_success_claim": false,
+    "population_prevalence_claim": false,
+    "framework_ranking": false,
+    "repeat_run_probability_estimate": false,
+    "endpoint_correctness_primary": false,
+    "process_reality_primary": true,
+    "G5_not_included_until_frozen_and_audited": true
+  },
+  "sources": [
+    "stage2/replication_v2/G2/paired_semantic_audit_v1/synthesis/cross_cell_synthesis_v1.json",
+    "stage2/replication_v2/G3/paired_semantic_audit_v1/synthesis/cross_cell_synthesis_v1.json",
+    "stage2/replication_v2/G4/paired_semantic_audit_v1/synthesis/cross_cell_synthesis_v1.json"
+  ]
+}
