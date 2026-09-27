@@ -1,0 +1,104 @@
+{
+  "schema": "stage2-post-audit-closure-registry-v2",
+  "date": "2026-09-27",
+  "status": "SEALED",
+  "supersedes_forward_accounting": "configs/stage2_post_audit_closure_registry_v1.json",
+  "population": {
+    "natural_A": 84,
+    "layer_b_reference": 84,
+    "layer_c_eligible": 80,
+    "primary_layer_a_b_monitor_benchmark": 84,
+    "layer_b_c_comparison": 80,
+    "layer_a_c_comparison": 80,
+    "layer_c_boundary_exclusions": [
+      "G3-X6-T2",
+      "G5-X3-T1",
+      "G5-X4-T2",
+      "G5-X6-T2"
+    ]
+  },
+  "layer_c": {
+    "reviewer": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "formal_review_count": 80,
+    "formal_seal_commit": "59250da361d044d0019457a1807bb05f2e1f693d",
+    "cohort_count": 21,
+    "cohort_seal_commit": "47ff898d1ed74307f1e76691c60ad182ed7e65c4",
+    "topology_counts": {
+      "NO_LOOP": 66,
+      "TWO_DIMENSION_CROSSING": 13,
+      "TRI_DIMENSION_OPEN_CHAIN": 1
+    },
+    "dimension_presence": {
+      "C": 13,
+      "P": 14,
+      "R": 13
+    }
+  },
+  "layer_b_c": {
+    "seal_commit": "84bb00164d7c91c6c9ef11cb9f7713462e02dd64",
+    "compared_cells": 80,
+    "full_context_recovery": {
+      "C": 6,
+      "P": 6,
+      "R": 10
+    },
+    "b_structural_positive_not_sustained": {
+      "C": 22,
+      "P": 30,
+      "R": 21
+    }
+  },
+  "layer_a_b_primary_monitor_benchmark": {
+    "population": "G2_G5_84_NATURAL_A",
+    "benchmark_path": "stage2/replication_v2/primary_monitor_benchmark_84_v1",
+    "benchmark_seal_blob": "faea989fa6ca24ea2ff42c1ca4803832af529c86",
+    "evaluation_summary_blob": "b08ffdb8e477ccbf199e0626cea459b60067118f",
+    "evaluation_records_blob": "3560b1cac6caa30b8f24d023ed0f2d718dfdc81b",
+    "monitor_source_index_blob": "8591239763fea269a0c634695440c9ff35e15f75",
+    "cell_summary_blob": "40fdcabdfb5346965ea6b1f8b3c35553718cdbc5",
+    "legacy_80_subset_disposition_blob": "2b3cb17a5bbdf4be37c32c7f091ad03a65d89762",
+    "deterministic_workflow_run": 36304997356,
+    "target_positive_trajectories": 59,
+    "monitor_hit_trajectories": 36,
+    "audit_confirmed_structures": 97,
+    "broad_matched_structures": 45,
+    "strict_matched_structures": 16,
+    "observable_reference_structures": 81,
+    "conditionally_detected_observable_structures": 36,
+    "monitor_warnings": 955,
+    "supported_warnings": 36,
+    "rejected_warnings": 18,
+    "unsupported_warnings": 901,
+    "monitor_candidate_file_present_cells": 83,
+    "monitor_candidate_file_absent_cells": 1,
+    "monitor_runtime_manifest_present_cells": 80,
+    "monitor_runtime_manifest_absent_cells": 4
+  },
+  "legacy_layer_a_b_80_subset": {
+    "path": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_b_monitor_evaluation_v1",
+    "role": "LAYER_C_ALIGNED_SUBSET_DIAGNOSTIC",
+    "primary_benchmark": false,
+    "artifacts_modified": false
+  },
+  "layer_a_c_full_context_comparison": {
+    "seal_commit": "11b37b161151096be96ed0ead44c50cba77d128e",
+    "compared_cells": 80,
+    "positive_trajectories": 25,
+    "monitor_localized_trajectories": 21,
+    "positive_cpr_events": 40,
+    "strict_core_localized_events": 22,
+    "broad_localized_events": 32
+  },
+  "correction_accounting": {
+    "natural_reruns": 0,
+    "subject_provider_calls": 0,
+    "semantic_reaudits": 0,
+    "paid_evaluator_calls": 0,
+    "repair_calls": 0,
+    "layer_b_mutations": 0,
+    "layer_c_mutations": 0,
+    "monitor_candidate_mutations": 0
+  },
+  "next_gate": "G2_G5_84_CELL_ENGINEERING_ELIGIBILITY_FREEZE"
+}
