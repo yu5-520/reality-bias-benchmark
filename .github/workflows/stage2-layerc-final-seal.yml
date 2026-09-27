@@ -1,0 +1,132 @@
+name: Stage-II GPT-5.6 Sol Layer-C Final Seal
+
+on:
+  push:
+    branches:
+      - stage2-gpt56sol-full-context-audit-results-v1
+    paths:
+      - ".github/workflows/stage2-layerc-final-seal.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-seal:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: stage2-layerc-final-seal
+      cancel-in-progress: false
+    steps:
+      - name: Checkout result branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-gpt56sol-full-context-audit-results-v1
+          fetch-depth: 0
+
+      - name: Validate all 80 formal reviews against frozen packets
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1"
+          test "$(find "$ROOT/formal_review" -maxdepth 1 -type f -name 'G*-X*-T*.json' | wc -l)" -eq 80
+          rm -rf /tmp/layerc_formal
+          mkdir -p /tmp/layerc_formal
+          cp "$ROOT"/formal_review/G*-X*-T*.json /tmp/layerc_formal/
+          python scripts/validate_stage2_gpt56sol_full_context_audit_v1.py             --inputs "$ROOT/inputs"             --audits /tmp/layerc_formal             --expected-count 80
+
+      - name: Promote formal reviews to validated audits
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1"
+          mkdir -p "$ROOT/audits"
+          if [ -f "$ROOT/audits/G2-X1-T1.json" ]; then
+            cmp "$ROOT/audits/G2-X1-T1.json" "$ROOT/formal_review/G2-X1-T1.json"
+          fi
+          cp "$ROOT"/formal_review/G*-X*-T*.json "$ROOT/audits/"
+          python scripts/validate_stage2_gpt56sol_full_context_audit_v1.py             --inputs "$ROOT/inputs"             --audits "$ROOT/audits"             --expected-count 80
+
+      - name: Build immutable audit index and population seal
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1"
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          from collections import Counter
+
+          root=Path("stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1")
+          inp=root/"inputs"
+          audits=root/"audits"
+          rows=[]
+          topology=Counter()
+          dimension_status=Counter()
+          groups=Counter()
+          for p in sorted(audits.glob("G*-X*-T*.json")):
+              raw=p.read_bytes()
+              obj=json.loads(raw)
+              full=f'{obj["group_id"]}-{obj["cell_id"]}'
+              groups[obj["group_id"]]+=1
+              topology[obj["dynamic_topology"]["topology_class"]]+=1
+              for ev in obj["cpr_events"]:
+                  dimension_status[f'{ev["dimension"]}:{ev["status"]}']+=1
+              rows.append({
+                  "full_id":full,
+                  "audit_path":str(p.relative_to(root)),
+                  "audit_sha256":hashlib.sha256(raw).hexdigest(),
+                  "input_packet_sha256":obj["input_packet_sha256"],
+                  "topology_class":obj["dynamic_topology"]["topology_class"],
+                  "dimensions_present":obj["dynamic_topology"].get("dimensions_present",[]),
+              })
+          assert len(rows)==80
+          ix={
+              "schema":"stage2-gpt56sol-full-context-audit-index-v1",
+              "reviewer_model":"GPT-5.6 Sol",
+              "execution_mode":"CHATGPT_NATIVE_REASONING",
+              "validated_audit_count":80,
+              "eligible_cell_count":80,
+              "excluded_boundary_cell_count":4,
+              "group_counts":dict(sorted(groups.items())),
+              "topology_counts":dict(sorted(topology.items())),
+              "dimension_status_counts":dict(sorted(dimension_status.items())),
+              "audits":rows,
+          }
+          (root/"audit_index.json").write_text(json.dumps(ix,indent=2,sort_keys=True)+"\n")
+          ix_raw=(root/"audit_index.json").read_bytes()
+          packet_raw=(inp/"packet_index.json").read_bytes()
+          seal={
+              "schema":"stage2-gpt56sol-full-context-population-seal-v1",
+              "state":"SEALED",
+              "reviewer_model":"GPT-5.6 Sol",
+              "execution_mode":"CHATGPT_NATIVE_REASONING",
+              "eligible_cell_count":80,
+              "validated_audit_count":80,
+              "excluded_boundary_cell_count":4,
+              "monitor_runtime_bundle_read":False,
+              "blind_reference_labels_read":False,
+              "blind_reference_records_read":False,
+              "deepseek_full_context_pilot_outputs_read":False,
+              "packet_index_sha256":hashlib.sha256(packet_raw).hexdigest(),
+              "audit_index_sha256":hashlib.sha256(ix_raw).hexdigest(),
+              "formal_review_promoted_without_reinterpretation":True,
+              "validator":"scripts/validate_stage2_gpt56sol_full_context_audit_v1.py",
+          }
+          (root/"population_seal.json").write_text(json.dumps(seal,indent=2,sort_keys=True)+"\n")
+          print(json.dumps({"status":"PASS","validated":80,"groups":dict(groups),"topology":dict(topology)},sort_keys=True))
+          PY
+
+      - name: Commit validated audits and seal
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1"
+          git config user.name "stage2-layerc-seal"
+          git config user.email "stage2-layerc-seal@users.noreply.github.com"
+          git add "$ROOT/audits" "$ROOT/audit_index.json" "$ROOT/population_seal.json"
+          if git diff --cached --quiet; then
+            echo "Nothing new to seal."
+            exit 0
+          fi
+          git commit -m "Seal GPT-5.6 Sol Layer-C 80-cell validated audit population"
+          git push origin HEAD:stage2-gpt56sol-full-context-audit-results-v1
