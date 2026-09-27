@@ -1,0 +1,103 @@
+{
+  "schema": "stage2-g4-ab-paired-process-semantic-audit-index-v1",
+  "status": "SEALED_11_PAIRED_AUDITS_PLUS_1_EXECUTION_BOUNDARY",
+  "authorization_issue": 320,
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING"
+  },
+  "source_A_evidence_commit": "21c34d6260513090ea52ebe63a53114d5e70a809",
+  "source_B_evidence_commit": "69fc52675dcb3bea7164e4cc5f291226e2a07d58",
+  "canonical_B_workflow_run": 36310474950,
+  "paired_audit_count": 11,
+  "execution_boundary_count": 1,
+  "audits": [
+    {
+      "cell_id": "X2-T1",
+      "path": "audits/X2-T1.json",
+      "direct_target_effect": "PERSISTED",
+      "overall_process_effect": "PERSISTENCE"
+    },
+    {
+      "cell_id": "X2-T2",
+      "path": "audits/X2-T2.json",
+      "direct_target_effect": "REDIRECTED",
+      "overall_process_effect": "MIXED_EFFECT"
+    },
+    {
+      "cell_id": "X2-T3",
+      "path": "audits/X2-T3.json",
+      "direct_target_effect": "REDUCED",
+      "overall_process_effect": "TARGETED_SUPPRESSION"
+    },
+    {
+      "cell_id": "X4-T1",
+      "path": "audits/X4-T1.json",
+      "direct_target_effect": "PERSISTED",
+      "overall_process_effect": "PERSISTENCE"
+    },
+    {
+      "cell_id": "X4-T2",
+      "path": "audits/X4-T2.json",
+      "direct_target_effect": "REGENERATED",
+      "overall_process_effect": "REGENERATION"
+    },
+    {
+      "cell_id": "X4-T3",
+      "path": "audits/X4-T3.json",
+      "direct_target_effect": "REDIRECTED",
+      "overall_process_effect": "TARGETED_REDIRECTION"
+    },
+    {
+      "cell_id": "X5-T1",
+      "path": "audits/X5-T1.json",
+      "direct_target_effect": "PERSISTED",
+      "overall_process_effect": "PERSISTENCE"
+    },
+    {
+      "cell_id": "X5-T3",
+      "path": "audits/X5-T3.json",
+      "direct_target_effect": "REDIRECTED",
+      "overall_process_effect": "MIXED_EFFECT"
+    },
+    {
+      "cell_id": "X7-T1",
+      "path": "audits/X7-T1.json",
+      "direct_target_effect": "PERSISTED",
+      "overall_process_effect": "PERSISTENCE"
+    },
+    {
+      "cell_id": "X7-T2",
+      "path": "audits/X7-T2.json",
+      "direct_target_effect": "REDIRECTED",
+      "overall_process_effect": "MIXED_EFFECT"
+    },
+    {
+      "cell_id": "X7-T3",
+      "path": "audits/X7-T3.json",
+      "direct_target_effect": "PERSISTED",
+      "overall_process_effect": "PERSISTENCE"
+    }
+  ],
+  "execution_boundary": {
+    "cell_id": "X5-T2",
+    "source_path": "execution_boundaries/X5-T2.json",
+    "audit_path": "audits/X5-T2.boundary.json",
+    "role": "B_EXECUTION_FAILURE_BOUNDARY_NOT_PAIRED_EFFECT_SAMPLE",
+    "status": "FAIL_CLOSED_NO_EFFECT_BOUNDARY"
+  },
+  "isolation": {
+    "prior_group_paired_audit_labels_read": false,
+    "prior_layer_c_labels_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "monitor_predictions_read": false,
+    "monitor_candidate_labels_read": false
+  },
+  "accounting": {
+    "natural_A_reruns": 0,
+    "B_reruns": 0,
+    "new_subject_provider_calls_during_audit": 0,
+    "repair_calls_during_audit": 0,
+    "paid_evaluator_calls": 0
+  }
+}
