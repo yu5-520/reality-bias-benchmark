@@ -1,0 +1,88 @@
+{
+  "schema": "stage2-g2-engineering-b-active-authorization-v1",
+  "version": "1.0",
+  "date": "2026-09-27",
+  "status": "AUTHORIZED_AFTER_12_OF_12_ZERO_CALL_PREFLIGHT",
+  "authorization_issue": 298,
+  "group_id": "G2",
+  "phase": "ENGINEERING_B_ONE_SHOT_PAIRED_REPAIR_V1",
+  "control_main_sha": "41514acaeada6f01e183d2602f7b26d179d6675c",
+  "zero_call_preflight_run": 36306316901,
+  "zero_call_preflight_result": "PASS_12_OF_12_ZERO_EXTERNAL_CALL_FULL_CONTINUATION",
+  "source_A": {
+    "evidence_branch": "stage2-g2-natural-evidence-v1",
+    "evidence_sha": "8e8cf0765da4a129d09b6761c349fcca5ce7cfb2",
+    "workflow_run": 36238551502,
+    "scientific_code_sha": "b4f1441a48b2bc6a2c61035311419fc4509e8913",
+    "first_attempt_only": true
+  },
+  "eligibility": {
+    "seal_path": "stage2/replication_v2/engineering_eligibility_84_v1/eligibility_seal.json",
+    "selection_path": "stage2/replication_v2/engineering_eligibility_84_v1/G2_b_selection_index.json",
+    "selection_blob_sha": "f2c451128718ee7b8361e84abfd3d3d29de0d1b1",
+    "cells": [
+      "X2-T1",
+      "X2-T2",
+      "X2-T3",
+      "X4-T1",
+      "X4-T2",
+      "X4-T3",
+      "X5-T1",
+      "X5-T2",
+      "X5-T3",
+      "X7-T1",
+      "X7-T2",
+      "X7-T3"
+    ],
+    "blocked_or_no_package": [
+      "X1-T1",
+      "X1-T2",
+      "X1-T3",
+      "X3-T1",
+      "X3-T2",
+      "X3-T3",
+      "X6-T1",
+      "X6-T2",
+      "X6-T3"
+    ]
+  },
+  "evidence": {
+    "branch": "stage2-g2-engineering-b-evidence-v1",
+    "claim_commit": "eb751f87265a4536a76f870fb84bdb0d8f4a6f14",
+    "claim_path": "stage2/replication_v2/G2/engineering_B_v1/control/group_claim.json",
+    "B_root": "stage2/replication_v2/G2/engineering_B_v1"
+  },
+  "execution": {
+    "one_B_per_cell": true,
+    "first_B_stochastic_attempt_only": true,
+    "best_of_N": false,
+    "automatic_retry": false,
+    "max_parallel": 4,
+    "repair_agent_calls_per_cell": 1,
+    "repair_agent_retries": 0,
+    "max_repair_agent_calls": 12,
+    "max_subject_continuation_calls": 726,
+    "max_total_B_provider_calls": 738,
+    "preserve_failed_first_attempt": true,
+    "same_parent_checkpoint_required": true,
+    "selected_frozen_package_required": true,
+    "repair_executor_exits_after_one_package": true,
+    "post_repair_monitor_mode": "WATCH_ONLY",
+    "post_repair_additional_repair_packages": 0
+  },
+  "independence": {
+    "semantic_audit_used_for_selection": false,
+    "cpr_labels_used_for_selection": false,
+    "layer_c_used_for_selection": false,
+    "natural_A_reruns": 0,
+    "paid_evaluator_calls": 0
+  },
+  "authorization": {
+    "active_B": true,
+    "subject_provider_calls": true,
+    "repair_calls": true,
+    "semantic_audit": false,
+    "G3_G5_B": false
+  },
+  "next_gate": "FREEZE_ALL_12_FIRST_B_ATTEMPTS_THEN_PAIRED_SEMANTIC_AUDIT"
+}
