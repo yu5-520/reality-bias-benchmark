@@ -1,0 +1,147 @@
+name: Stage-II Layer-C 21-Cohort Final Seal
+
+on:
+  push:
+    branches:
+      - stage2-gpt56sol-full-context-audit-results-v1
+    paths:
+      - ".github/workflows/stage2-layerc-cohort-final-seal.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-seal-cohorts:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: stage2-layerc-cohort-final-seal
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Layer-C result branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-gpt56sol-full-context-audit-results-v1
+          fetch-depth: 0
+
+      - name: Validate 21 cohort syntheses
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+          from collections import Counter
+
+          root=Path("stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1")
+          cdir=root/"cohort_synthesis"
+          index=json.loads((root/"audit_index.json").read_text())
+          pop=json.loads((root/"population_seal.json").read_text())
+          files=sorted(cdir.glob("X[1-7]-T[1-3].json"))
+          assert len(files)==21, len(files)
+          audit_rows={r["full_id"]:r for r in index["audits"]}
+          expected_cells={f"X{x}-T{t}" for x in range(1,8) for t in range(1,4)}
+          seen=set()
+          structural=Counter()
+          eligible_total=0
+          records=[]
+          for p in files:
+              row=json.loads(p.read_text())
+              cell=row["cell_id"]
+              assert cell in expected_cells and cell not in seen
+              seen.add(cell)
+              assert row["schema"]=="stage2-gpt56sol-same-xt-cohort-synthesis-v1"
+              assert row["state"]=="SEMANTIC_SYNTHESIS_COMPLETE"
+              syn=row["cross_group_semantic_synthesis"]
+              assert syn["state"]=="SEMANTIC_SYNTHESIS_COMPLETE"
+              assert isinstance(syn["recurrent_mechanisms"],list)
+              assert isinstance(syn["divergence_patterns"],list)
+              assert isinstance(syn["boundary_interpretation"],list)
+              assert isinstance(syn["cohort_conclusion"],str) and syn["cohort_conclusion"].strip()
+              assert row["source_population_seal_sha256"]==pop["audit_index_sha256"]
+              gr=row["group_records"]
+              assert len(gr)==row["eligible_group_count"]
+              assert len(row["eligible_groups"])==row["eligible_group_count"]
+              assert row["eligible_group_count"]+len(row["excluded_boundary_groups"])==4
+              calc_topo=Counter()
+              calc_dims=Counter({"C":0,"P":0,"R":0})
+              for g in gr:
+                  full=g["full_id"]
+                  a=audit_rows[full]
+                  assert a["audit_sha256"]==g["audit_sha256"]
+                  assert a["topology_class"]==g["topology_class"]
+                  assert a["dimensions_present"]==g["dimensions_present"]
+                  assert full.endswith("-"+cell)
+                  calc_topo[g["topology_class"]]+=1
+                  for d in g["dimensions_present"]:
+                      calc_dims[d]+=1
+              assert dict(calc_topo)==row["topology_counts"], (cell,calc_topo,row["topology_counts"])
+              assert dict(calc_dims)==row["dimension_present_counts"], (cell,calc_dims,row["dimension_present_counts"])
+              structural[row["structural_pattern"]]+=1
+              eligible_total+=row["eligible_group_count"]
+              raw=p.read_bytes()
+              records.append({
+                  "cell_id":cell,
+                  "x_id":row["x_id"],
+                  "task_id":row["task_id"],
+                  "system_condition":row["system_condition"],
+                  "eligible_group_count":row["eligible_group_count"],
+                  "excluded_boundary_groups":row["excluded_boundary_groups"],
+                  "structural_pattern":row["structural_pattern"],
+                  "topology_counts":row["topology_counts"],
+                  "dimension_present_counts":row["dimension_present_counts"],
+                  "cohort_path":str(p.relative_to(root)),
+                  "cohort_sha256":hashlib.sha256(raw).hexdigest()
+              })
+          assert seen==expected_cells
+          out={
+              "schema":"stage2-gpt56sol-same-xt-cohort-index-v1",
+              "state":"SEALED",
+              "source_population_seal_sha256":pop["audit_index_sha256"],
+              "source_validated_audit_count":pop["validated_audit_count"],
+              "cohort_count":21,
+              "eligible_cell_memberships":eligible_total,
+              "structural_pattern_counts":dict(sorted(structural.items())),
+              "cohorts":records,
+              "cross_cohort_observations":{
+                  "recurrent_rp_all_eligible":["X1-T1","X3-T2"],
+                  "recurrent_rp_stage_dependent":["X1-T2"],
+                  "recurrent_dynamic_c":["X2-T2","X4-T2","X5-T2","X6-T2"],
+                  "tri_dimension_open_chain_cells":["G3-X5-T2"],
+                  "carrier_presence_not_sufficient_controls":["X5-T1","X6-T1","X7-T1"],
+                  "explicit_historical_cleanup_negative_controls":["X3-T3","X5-T3","X7-T3"],
+                  "memory_backflow_exception":["G5-X6-T3"]
+              }
+          }
+          (cdir/"cohort_index.json").write_text(json.dumps(out,indent=2,sort_keys=True)+"\n")
+          idx_raw=(cdir/"cohort_index.json").read_bytes()
+          seal={
+              "schema":"stage2-gpt56sol-same-xt-cohort-seal-v1",
+              "state":"SEALED",
+              "cohort_count":21,
+              "source_population_state":pop["state"],
+              "source_validated_audit_count":pop["validated_audit_count"],
+              "source_population_seal_sha256":pop["audit_index_sha256"],
+              "cohort_index_sha256":hashlib.sha256(idx_raw).hexdigest(),
+              "cell_level_verdicts_modified":False,
+              "boundary_cells_imputed":False,
+              "semantic_synthesis_complete":True,
+              "next_stage":"LAYER_B_C_AND_LAYER_A_C_COMPARISON"
+          }
+          (cdir/"cohort_seal.json").write_text(json.dumps(seal,indent=2,sort_keys=True)+"\n")
+          print(json.dumps({"status":"PASS","cohorts":21,"structural":dict(structural)},sort_keys=True))
+          PY
+
+      - name: Commit cohort index and seal
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/cohort_synthesis"
+          git config user.name "stage2-layerc-cohort-seal"
+          git config user.email "stage2-layerc-cohort-seal@users.noreply.github.com"
+          git add "$ROOT/cohort_index.json" "$ROOT/cohort_seal.json"
+          if git diff --cached --quiet; then
+            echo "Nothing new to seal."
+            exit 0
+          fi
+          git commit -m "Seal GPT-5.6 Sol Layer-C 21-cohort synthesis"
+          git push origin HEAD:stage2-gpt56sol-full-context-audit-results-v1
