@@ -27,7 +27,98 @@ env:
   B_EVIDENCE_ROOT: stage2/replication_v2/G4/engineering_B_v1
 
 jobs:
+  claim-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      execution_claim_sha: ${{ steps.claim.outputs.execution_claim_sha }}
+    steps:
+      - name: Checkout active control gate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: gate
+          fetch-depth: 1
+
+      - name: Fail closed because canonical G4 first-attempt run is already reserved
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=Path("gate/configs/stage2_g4_engineering_b_attempt_consumption_latch_v1.json")
+          g=json.loads(p.read_text())
+          assert g["state"]=="CANONICAL_FIRST_ATTEMPT_RUN_ACTIVE_NO_RELAUNCH"
+          assert g["canonical_first_attempt_workflow_run"]==36310474950
+          assert g["relaunch_authorized"] is False
+          assert g["automatic_retry_authorized"] is False
+          current=int(os.environ["GITHUB_RUN_ID"])
+          if current != g["canonical_first_attempt_workflow_run"]:
+              raise SystemExit(f"FAIL_CLOSED: G4 first-attempt slots are reserved to canonical run {g['canonical_first_attempt_workflow_run']}; current run {current} is not authorized")
+          PY
+
+      - name: Checkout exact irreversible group claim
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.INPUT_CLAIM_SHA }}
+          path: evidence
+          fetch-depth: 0
+
+      - name: Atomically claim G4 execution window before any provider call
+        id: claim
+        env:
+          LAUNCH_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C evidence rev-parse HEAD)" = "$INPUT_CLAIM_SHA"
+          REMOTE="$(git -C evidence ls-remote origin "refs/heads/$EVIDENCE_BRANCH" | awk '{print $1}')"
+          test "$REMOTE" = "$INPUT_CLAIM_SHA"
+          CLAIM_PATH="evidence/$B_EVIDENCE_ROOT/control/execution_claim.json"
+          test ! -e "$CLAIM_PATH"
+          export CLAIM_PATH LAUNCH_HEAD_SHA RUN_ATTEMPT
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          expected=[
+              "X2-T1","X2-T2","X2-T3",
+              "X4-T1","X4-T2","X4-T3",
+              "X5-T1","X5-T2","X5-T3",
+              "X7-T1","X7-T2","X7-T3",
+          ]
+          claim={
+              "schema":"stage2-engineering-b-run-execution-claim-v1",
+              "state":"ATOMICALLY_CLAIMED_BEFORE_ANY_PROVIDER_CALL",
+              "group_id":"G4",
+              "phase":"ENGINEERING_B_ONE_SHOT_PAIRED_REPAIR_V1",
+              "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
+              "workflow_run_attempt":int(os.environ["RUN_ATTEMPT"]),
+              "launch_head_sha":os.environ["LAUNCH_HEAD_SHA"],
+              "input_group_claim_sha":os.environ["INPUT_CLAIM_SHA"],
+              "claimed_cells":expected,
+              "attempt_index_by_cell":1,
+              "created_before_provider_calls":True,
+              "receipt_absence_is_not_authorization":True,
+              "automatic_retry":False,
+              "provider_calls_before_claim":0,
+          }
+          p=Path(os.environ["CLAIM_PATH"])
+          p.parent.mkdir(parents=True,exist_ok=True)
+          p.write_text(json.dumps(claim,indent=2,sort_keys=True)+"\n")
+          PY
+          git -C evidence config user.name "stage2-g4-engineering-b-execution-claim"
+          git -C evidence config user.email "stage2-g4-engineering-b-execution-claim@users.noreply.github.com"
+          git -C evidence add "$B_EVIDENCE_ROOT/control/execution_claim.json"
+          git -C evidence commit -m "control: atomically claim G4 Engineering-B execution [run $GITHUB_RUN_ID attempt $RUN_ATTEMPT]"
+          git -C evidence push origin "HEAD:$EVIDENCE_BRANCH"
+          SHA="$(git -C evidence rev-parse HEAD)"
+          echo "execution_claim_sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "PASS: G4 execution window atomically claimed at $SHA before provider calls"
+
   paired-b:
+    needs: claim-run
     runs-on: ubuntu-latest
     timeout-minutes: 240
     strategy:
@@ -77,6 +168,13 @@ jobs:
           path: evidence-claim
           fetch-depth: 1
 
+      - name: Checkout exact atomic run execution claim
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.claim-run.outputs.execution_claim_sha }}
+          path: execution-claim
+          fetch-depth: 1
+
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
@@ -87,12 +185,15 @@ jobs:
           SYS: ${{ matrix.system }}
           TASK: ${{ matrix.task }}
           SOURCE_A_WORKFLOW_RUN: ${{ matrix.source_run }}
+          EXECUTION_CLAIM_SHA: ${{ needs.claim-run.outputs.execution_claim_sha }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
         shell: bash
         run: |
           set -euo pipefail
           test "$(git -C control rev-parse HEAD)" = "$B_CODE_SHA"
           test "$(git -C a-evidence rev-parse HEAD)" = "$SOURCE_A_EVIDENCE_SHA"
           test "$(git -C evidence-claim rev-parse HEAD)" = "$INPUT_CLAIM_SHA"
+          test "$(git -C execution-claim rev-parse HEAD)" = "$EXECUTION_CLAIM_SHA"
           python - <<'PY'
           import json, os, subprocess
           from pathlib import Path
@@ -132,6 +233,18 @@ jobs:
           assert cfg["authorization"]["G5_B"] is False
 
           claim=json.loads(Path("evidence-claim/stage2/replication_v2/G4/engineering_B_v1/control/group_claim.json").read_text())
+          execution_claim=json.loads(Path("execution-claim/stage2/replication_v2/G4/engineering_B_v1/control/execution_claim.json").read_text())
+          assert execution_claim["schema"]=="stage2-engineering-b-run-execution-claim-v1"
+          assert execution_claim["state"]=="ATOMICALLY_CLAIMED_BEFORE_ANY_PROVIDER_CALL"
+          assert execution_claim["group_id"]=="G4"
+          assert execution_claim["workflow_run_id"]==int(os.environ["GITHUB_RUN_ID"])
+          assert execution_claim["workflow_run_attempt"]==int(os.environ["RUN_ATTEMPT"])
+          assert execution_claim["input_group_claim_sha"]==os.environ["INPUT_CLAIM_SHA"]
+          assert execution_claim["claimed_cells"]==expected
+          assert execution_claim["attempt_index_by_cell"]==1
+          assert execution_claim["created_before_provider_calls"] is True
+          assert execution_claim["receipt_absence_is_not_authorization"] is True
+          assert cell in execution_claim["claimed_cells"]
           assert claim["state"]=="IRREVERSIBLY_CLAIMED_BEFORE_ANY_B_PROVIDER_CALL"
           assert claim["authorization_issue"]==312
           assert claim["group_id"]=="G4"
@@ -222,23 +335,37 @@ jobs:
           rm -rf /tmp/stage2-x7-study
           (cd control && python -m stage2.study_assets.validate --probe X7 --out-root /tmp/stage2-x7-study)
 
-      - name: Verify provider credential and unconsumed first-attempt path
+      - name: Verify provider credential and execution-claim ownership
         env:
           GH_TOKEN: ${{ github.token }}
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           SYS: ${{ matrix.system }}
           TASK: ${{ matrix.task }}
+          EXECUTION_CLAIM_SHA: ${{ needs.claim-run.outputs.execution_claim_sha }}
         shell: bash
         run: |
           set -euo pipefail
           test -n "$DEEPSEEK_API_KEY"
           CELL="$SYS-$TASK"
+          REMOTE="$(git -C execution-claim ls-remote origin "refs/heads/$EVIDENCE_BRANCH" | awk '{print $1}')"
+          test "$REMOTE" = "$EXECUTION_CLAIM_SHA"
+          export CELL
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=Path("execution-claim/stage2/replication_v2/G4/engineering_B_v1/control/execution_claim.json")
+          c=json.loads(p.read_text())
+          assert c["workflow_run_id"]==int(os.environ["GITHUB_RUN_ID"])
+          assert c["created_before_provider_calls"] is True
+          assert c["receipt_absence_is_not_authorization"] is True
+          assert os.environ["CELL"] in c["claimed_cells"]
+          PY
           PATH_ON_BRANCH="$B_EVIDENCE_ROOT/cells/$CELL/attempt_receipt.json"
           if gh api "repos/$GITHUB_REPOSITORY/contents/$PATH_ON_BRANCH?ref=$EVIDENCE_BRANCH" >/dev/null 2>&1; then
-            echo "FAIL: $CELL first B attempt already exists; no second stochastic attempt is allowed"
+            echo "FAIL: frozen receipt already exists for $CELL; execution claim does not authorize a second attempt"
             exit 42
           fi
-          echo "PASS: credential present and $CELL first-attempt slot is unconsumed"
+          echo "PASS: credential present and this workflow owns the atomic G4 execution claim for $CELL"
 
       - name: Execute exactly one provider-backed G4 Engineering-B attempt
         id: execute
@@ -295,6 +422,7 @@ jobs:
           TASK: ${{ matrix.task }}
           SOURCE_A_WORKFLOW_RUN: ${{ matrix.source_run }}
           RUNNER_EXIT_CODE: ${{ steps.execute.outputs.runner_exit_code }}
+          EXECUTION_CLAIM_SHA: ${{ needs.claim-run.outputs.execution_claim_sha }}
         shell: bash
         run: |
           set -euo pipefail
@@ -321,6 +449,7 @@ jobs:
               "source_A_evidence_sha":os.environ["SOURCE_A_EVIDENCE_SHA"],
               "source_A_workflow_run":int(os.environ["SOURCE_A_WORKFLOW_RUN"]),
               "input_claim_sha":os.environ["INPUT_CLAIM_SHA"],
+              "execution_claim_sha":os.environ.get("EXECUTION_CLAIM_SHA"),
               "workflow_run_id":int(os.environ["GITHUB_RUN_ID"]),
               "runner_exit_code":int(os.environ.get("RUNNER_EXIT_CODE") or -999),
               "seal_present":seal is not None,
@@ -378,27 +507,39 @@ jobs:
           if-no-files-found: error
 
   freeze:
-    needs: paired-b
+    needs: [claim-run, paired-b]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - name: Checkout exact claimed evidence branch state
+      - name: Checkout exact atomic execution-claim state
         uses: actions/checkout@v4
         with:
-          ref: ${{ env.INPUT_CLAIM_SHA }}
+          ref: ${{ needs.claim-run.outputs.execution_claim_sha }}
           path: evidence
           fetch-depth: 0
 
-      - name: Verify evidence branch has not advanced since irreversible claim
+      - name: Verify evidence branch remains at this run's execution claim
+        env:
+          EXECUTION_CLAIM_SHA: ${{ needs.claim-run.outputs.execution_claim_sha }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
         shell: bash
         run: |
           set -euo pipefail
-          test "$(git -C evidence rev-parse HEAD)" = "$INPUT_CLAIM_SHA"
+          test "$(git -C evidence rev-parse HEAD)" = "$EXECUTION_CLAIM_SHA"
           REMOTE="$(git -C evidence ls-remote origin "refs/heads/$EVIDENCE_BRANCH" | awk '{print $1}')"
-          test "$REMOTE" = "$INPUT_CLAIM_SHA"
+          test "$REMOTE" = "$EXECUTION_CLAIM_SHA"
           test ! -e "evidence/$B_EVIDENCE_ROOT/group_index.json"
-          echo "PASS: evidence branch is still exactly at the pre-provider group claim"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          c=json.loads(Path("evidence/stage2/replication_v2/G4/engineering_B_v1/control/execution_claim.json").read_text())
+          assert c["workflow_run_id"]==int(os.environ["GITHUB_RUN_ID"])
+          assert c["workflow_run_attempt"]==int(os.environ["RUN_ATTEMPT"])
+          assert c["input_group_claim_sha"]==os.environ["INPUT_CLAIM_SHA"]
+          assert c["created_before_provider_calls"] is True
+          PY
+          echo "PASS: evidence branch remains exactly at this run's pre-provider execution claim"
 
       - name: Download all 12 first-attempt artifacts
         uses: actions/download-artifact@v4
@@ -431,6 +572,11 @@ jobs:
           claim=json.loads((root/"stage2/replication_v2/G4/engineering_B_v1/control/group_claim.json").read_text())
           assert claim["state"]=="IRREVERSIBLY_CLAIMED_BEFORE_ANY_B_PROVIDER_CALL"
           assert claim["claimed_cells"]==expected
+          execution_claim=json.loads((root/"stage2/replication_v2/G4/engineering_B_v1/control/execution_claim.json").read_text())
+          assert execution_claim["state"]=="ATOMICALLY_CLAIMED_BEFORE_ANY_PROVIDER_CALL"
+          assert execution_claim["workflow_run_id"]==int(os.environ["GITHUB_RUN_ID"])
+          assert execution_claim["input_group_claim_sha"]==os.environ["INPUT_CLAIM_SHA"]
+          assert execution_claim["claimed_cells"]==expected
           receipts=[]
           success=[]
           failed=[]
@@ -515,6 +661,10 @@ jobs:
               "source_A_workflow_runs":claim["source_A_workflow_runs"],
               "source_A_cell_workflow_run":claim["source_A_cell_workflow_run"],
               "input_claim_sha":os.environ["INPUT_CLAIM_SHA"],
+              "execution_claim_sha":execution_claim.get("launch_head_sha") and os.popen("git -C "+str(root)+" rev-parse HEAD").read().strip(),
+              "execution_claim_workflow_run":execution_claim["workflow_run_id"],
+              "execution_claim_required":True,
+              "receipt_absence_is_authorization":False,
               "expected_cells":expected,
               "preserved_cells":expected,
               "preserved_count":12,

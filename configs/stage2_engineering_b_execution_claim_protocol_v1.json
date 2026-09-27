@@ -1,0 +1,71 @@
+{
+  "schema": "stage2-engineering-b-execution-claim-protocol-v1",
+  "version": "1.0",
+  "date": "2026-09-27",
+  "status": "FROZEN_FROM_G4_FORWARD",
+  "purpose": "Close the post-provider/pre-freeze re-entry window exposed by the G3 duplicate-execution incident without altering canonical G3 evidence.",
+  "applies_to": [
+    "G4",
+    "G5",
+    "ANY_LATER_ENGINEERING_B_GROUP"
+  ],
+  "invariants": {
+    "one_B_per_eligible_cell": true,
+    "first_stochastic_attempt_only": true,
+    "automatic_scientific_retry": false,
+    "receipt_absence_is_not_authorization": true,
+    "execution_claim_required_before_any_provider_call": true,
+    "execution_claim_is_group_scoped": true,
+    "evidence_branch_fast_forward_from_exact_preclaim_required": true,
+    "workflow_rerun_after_claim_must_fail_closed_before_provider": true,
+    "failed_first_attempt_must_be_preserved": true
+  },
+  "state_machine": [
+    "FROZEN_GROUP_PRECLAIM",
+    "ATOMIC_RUN_EXECUTION_CLAIM",
+    "PROVIDER_BACKED_FIRST_ATTEMPTS",
+    "ARTIFACT_PRESERVATION",
+    "GROUP_FREEZE",
+    "PAIRED_SEMANTIC_AUDIT"
+  ],
+  "execution_claim_required_fields": [
+    "schema",
+    "state",
+    "group_id",
+    "phase",
+    "workflow_run_id",
+    "workflow_run_attempt",
+    "launch_head_sha",
+    "input_group_claim_sha",
+    "claimed_cells",
+    "attempt_index_by_cell",
+    "created_before_provider_calls",
+    "receipt_absence_is_not_authorization"
+  ],
+  "fail_closed_conditions": [
+    "evidence branch no longer equals frozen preclaim SHA before execution claim",
+    "execution_claim.json already exists",
+    "atomic push of execution claim is rejected",
+    "matrix job cannot verify exact execution-claim commit",
+    "workflow run id or run attempt does not match execution claim"
+  ],
+  "provenance": {
+    "motivating_incident_path": "stage2/replication_v2/G3/engineering_B_v1/control/duplicate_execution_incident_v1.json",
+    "canonical_G3_source_run": 36309205795,
+    "excluded_duplicate_run": 36309645952
+  },
+  "transition": {
+    "G4": {
+      "canonical_first_attempt_workflow_run": 36310474950,
+      "canonical_run_started_before_protocol_merge": true,
+      "relaunch_authorized": false,
+      "guard": "configs/stage2_g4_engineering_b_attempt_consumption_latch_v1.json",
+      "if_freeze_fails": "ARTIFACT_ONLY_RECOVERY_ZERO_PROVIDER_RERUN",
+      "atomic_execution_claim_applies_to_canonical_run": false,
+      "atomic_execution_claim_applies_to_any_new_G4_launch": "FAIL_CLOSED_BY_CONSUMPTION_LATCH"
+    },
+    "G5_and_later": {
+      "atomic_execution_claim_required_before_any_provider_call": true
+    }
+  }
+}

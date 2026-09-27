@@ -1,0 +1,92 @@
+{
+  "schema": "stage2-g3-engineering-b-duplicate-execution-incident-v1",
+  "version": "1.0",
+  "date": "2026-09-27",
+  "status": "FROZEN_PROTOCOL_INCIDENT_CANONICAL_EVIDENCE_UNCHANGED",
+  "group_id": "G3",
+  "phase": "ENGINEERING_B_ONE_SHOT_PAIRED_REPAIR_V1",
+  "canonical_first_attempt": {
+    "workflow_run": 36309205795,
+    "expected_cells": [
+      "X2-T1",
+      "X2-T2",
+      "X2-T3",
+      "X4-T1",
+      "X4-T2",
+      "X4-T3",
+      "X5-T1",
+      "X5-T2",
+      "X5-T3",
+      "X7-T1",
+      "X7-T2",
+      "X7-T3"
+    ],
+    "executed_provider_backed_cells": 12,
+    "frozen_evidence_branch": "stage2-g3-engineering-b-evidence-v1",
+    "frozen_evidence_commit": "9d50bedb9564b31da5e92eecf2d6330a24d2373c",
+    "recovery_freeze_workflow_run": 36309941935,
+    "recovery_execution_policy": "ARTIFACT_ONLY_ZERO_SCIENTIFIC_RERUN"
+  },
+  "out_of_protocol_duplicate_execution": {
+    "workflow_run": 36309645952,
+    "repeated_matrix_population": [
+      "X2-T1",
+      "X2-T2",
+      "X2-T3",
+      "X4-T1",
+      "X4-T2",
+      "X4-T3",
+      "X5-T1",
+      "X5-T2",
+      "X5-T3",
+      "X7-T1",
+      "X7-T2",
+      "X7-T3"
+    ],
+    "duplicate_provider_executed_cells": [
+      "X2-T1",
+      "X2-T2",
+      "X2-T3",
+      "X4-T1",
+      "X4-T2",
+      "X5-T1"
+    ],
+    "duplicate_provider_executed_count": 6,
+    "fail_closed_before_provider_cells": [
+      "X4-T3",
+      "X5-T2",
+      "X5-T3",
+      "X7-T1",
+      "X7-T2",
+      "X7-T3"
+    ],
+    "fail_closed_before_provider_count": 6,
+    "disposition": "EXCLUDED_DUPLICATE_OUT_OF_PROTOCOL",
+    "allowed_in_paired_effect_denominator": false,
+    "allowed_to_replace_canonical_first_attempt": false,
+    "allowed_to_modify_frozen_G3_evidence": false
+  },
+  "root_cause": {
+    "class": "ATTEMPT_CONSUMPTION_LATCH_AFTER_FREEZE_WINDOW",
+    "description": "The pre-provider guard treated absence of a frozen attempt_receipt on the evidence branch as an unconsumed attempt slot. After the original 12 provider-backed attempts had executed but before their artifacts were successfully frozen, a second workflow could re-enter the same cells.",
+    "scientific_data_corruption": false,
+    "reason": "The canonical G3 evidence branch was recovered exclusively from the original 12-cell run 36309205795; duplicate-run artifacts were not promoted into canonical evidence."
+  },
+  "corrective_action": {
+    "required_from_group": "G4",
+    "protocol": "ATOMIC_RUN_EXECUTION_CLAIM_BEFORE_ANY_PROVIDER_CALL",
+    "claim_scope": "WHOLE_GROUP_12_CELLS",
+    "claim_target": "engineering_B evidence branch",
+    "claim_rule": "The evidence branch must atomically advance from the frozen pre-provider group-claim SHA to a workflow-run execution-claim commit before matrix jobs may start.",
+    "duplicate_or_rerun_rule": "Any later workflow or rerun that cannot atomically create the execution claim must fail closed before provider execution.",
+    "receipt_absence_is_authorization": false,
+    "automatic_scientific_retry": false
+  },
+  "accounting": {
+    "canonical_G3_B_attempts": 12,
+    "out_of_protocol_duplicate_provider_executions": 6,
+    "canonical_evidence_attempts": 12,
+    "canonical_B_reruns": 0,
+    "incident_disclosed": true
+  }
+}
