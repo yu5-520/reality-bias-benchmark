@@ -48,9 +48,11 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-        with: {ref: ${{ github.sha }}}
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-python@v5
-        with: {python-version: "3.10"}
+        with:
+          python-version: "3.10"
       - name: Bind pinned MetaGPT
         run: |
           set -euo pipefail
@@ -63,16 +65,21 @@ jobs:
           python -m pip install -q --no-deps -e upstream
       - run: python -m stage2.r7_prospective_v1.execution_readiness_preflight --system X2 --out-root readiness_x2
       - uses: actions/upload-artifact@v4
-        with: {name: g1-reconcile-x2-${{ github.run_id }}, path: readiness_x2, retention-days: 30}
+        with:
+          name: g1-reconcile-x2-${{ github.run_id }}
+          path: readiness_x2
+          retention-days: 30
 
   x4:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-        with: {ref: ${{ github.sha }}}
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-python@v5
-        with: {python-version: "3.11"}
+        with:
+          python-version: "3.11"
       - name: Bind exact MCP
         run: |
           set -euo pipefail
@@ -87,28 +94,38 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}
         run: upstream/.venv/bin/python -m stage2.r7_prospective_v1.execution_readiness_preflight --system X4 --out-root readiness_x4
       - uses: actions/upload-artifact@v4
-        with: {name: g1-reconcile-x4-${{ github.run_id }}, path: readiness_x4, retention-days: 30}
+        with:
+          name: g1-reconcile-x4-${{ github.run_id }}
+          path: readiness_x4
+          retention-days: 30
 
   x5:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-        with: {ref: ${{ github.sha }}}
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-python@v5
-        with: {python-version: "3.11"}
+        with:
+          python-version: "3.11"
       - run: python -m stage2.r7_prospective_v1.execution_readiness_preflight --system X5 --out-root readiness_x5
       - uses: actions/upload-artifact@v4
-        with: {name: g1-reconcile-x5-${{ github.run_id }}, path: readiness_x5, retention-days: 30}
+        with:
+          name: g1-reconcile-x5-${{ github.run_id }}
+          path: readiness_x5
+          retention-days: 30
 
   x6:
     runs-on: ubuntu-latest
     timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
-        with: {ref: ${{ github.sha }}}
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-python@v5
-        with: {python-version: "3.10"}
+        with:
+          python-version: "3.10"
       - name: Bind exact MemoryBank
         run: |
           set -euo pipefail
@@ -118,19 +135,28 @@ jobs:
           python -m pip install -q 'torch==2.0.1+cpu' --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -q 'numpy==1.24.4' 'pydantic==1.10.13' 'huggingface-hub==0.14.1' 'tokenizers==0.13.3' 'transformers==4.28.0' 'faiss-cpu==1.7.4' 'scipy==1.10.1' 'scikit-learn==1.3.2' 'nltk==3.9.1' 'Pillow==10.4.0' 'unstructured==0.6.10' 'langchain==0.0.146'
           python -m pip install -q --no-deps 'sentence-transformers==2.2.2'
-      - env: {TOKENIZERS_PARALLELISM: "false", HF_HUB_OFFLINE: "1", TRANSFORMERS_OFFLINE: "1"}
+      - name: Run X6 zero-provider wrapper preflight
+        env:
+          TOKENIZERS_PARALLELISM: "false"
+          HF_HUB_OFFLINE: "1"
+          TRANSFORMERS_OFFLINE: "1"
         run: python -m stage2.r7_prospective_v1.execution_readiness_preflight --system X6 --out-root readiness_x6 --upstream-root upstream
       - uses: actions/upload-artifact@v4
-        with: {name: g1-reconcile-x6-${{ github.run_id }}, path: readiness_x6, retention-days: 30}
+        with:
+          name: g1-reconcile-x6-${{ github.run_id }}
+          path: readiness_x6
+          retention-days: 30
 
   x7:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-        with: {ref: ${{ github.sha }}}
+        with:
+          ref: ${{ github.sha }}
       - uses: actions/setup-python@v5
-        with: {python-version: "3.11"}
+        with:
+          python-version: "3.11"
       - name: Bind exact LongLLMLingua
         run: |
           set -euo pipefail
@@ -140,10 +166,15 @@ jobs:
           python -m pip install -q torch --index-url https://download.pytorch.org/whl/cpu
           python -m pip install -q 'transformers==4.44.2' 'accelerate>=0.33,<1' tiktoken nltk numpy tokenizers safetensors
           python -m pip install -q --no-deps -e upstream
-      - env: {TOKENIZERS_PARALLELISM: "false"}
+      - name: Run X7 zero-provider wrapper preflight
+        env:
+          TOKENIZERS_PARALLELISM: "false"
         run: python -m stage2.r7_prospective_v1.execution_readiness_preflight --system X7 --out-root readiness_x7
       - uses: actions/upload-artifact@v4
-        with: {name: g1-reconcile-x7-${{ github.run_id }}, path: readiness_x7, retention-days: 30}
+        with:
+          name: g1-reconcile-x7-${{ github.run_id }}
+          path: readiness_x7
+          retention-days: 30
 
   freeze:
     runs-on: ubuntu-latest
