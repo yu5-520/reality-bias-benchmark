@@ -1,0 +1,33 @@
+{
+  "schema": "stage2-g4-engineering-b-attempt-consumption-latch-v1",
+  "version": "1.0",
+  "date": "2026-09-27",
+  "state": "CANONICAL_FIRST_ATTEMPT_RUN_ACTIVE_NO_RELAUNCH",
+  "group_id": "G4",
+  "phase": "ENGINEERING_B_ONE_SHOT_PAIRED_REPAIR_V1",
+  "canonical_first_attempt_workflow_run": 36310474950,
+  "launch_pr": 315,
+  "launch_head_sha": "7701f8c06f52afd3aa21f42dc9ce2e69202d342c",
+  "input_group_claim_sha": "5213f92b3934b5a441314e16e7d71d4fa9cb0e3b",
+  "attempt_slots_reserved": [
+    "X2-T1",
+    "X2-T2",
+    "X2-T3",
+    "X4-T1",
+    "X4-T2",
+    "X4-T3",
+    "X5-T1",
+    "X5-T2",
+    "X5-T3",
+    "X7-T1",
+    "X7-T2",
+    "X7-T3"
+  ],
+  "relaunch_authorized": false,
+  "automatic_retry_authorized": false,
+  "if_freeze_fails": "ARTIFACT_ONLY_RECOVERY_FROM_CANONICAL_RUN_ZERO_PROVIDER_RERUN",
+  "transition_note": "G4 canonical first-attempt execution started under the previously merged launch-v2 workflow before the atomic execution-claim hardening PR was merged. This latch reserves the whole G4 first-attempt population to that canonical workflow run and makes every later G4 launch fail closed before provider execution.",
+  "scientific_selection_changed": false,
+  "package_or_parent_changed": false,
+  "canonical_evidence_pending": true
+}
