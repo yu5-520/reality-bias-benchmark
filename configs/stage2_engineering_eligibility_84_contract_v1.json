@@ -1,0 +1,66 @@
+{
+  "schema": "stage2-engineering-eligibility-84-contract-v1",
+  "version": "1.0",
+  "date": "2026-09-27",
+  "status": "FROZEN_BEFORE_84_CELL_ELIGIBILITY_FREEZE",
+  "population": {
+    "groups": [
+      "G2",
+      "G3",
+      "G4",
+      "G5"
+    ],
+    "systems": [
+      "X1",
+      "X2",
+      "X3",
+      "X4",
+      "X5",
+      "X6",
+      "X7"
+    ],
+    "tasks": [
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "natural_cells": 84
+  },
+  "source_policy": {
+    "source": "PROSPECTIVELY_FROZEN_MONITOR_CHECKPOINT_PACKAGE_PIPELINE_ONLY",
+    "semantic_audit_used": false,
+    "cpr_labels_used": false,
+    "layer_c_used": false,
+    "posthoc_warning_tuning": false,
+    "package_selection": "EARLIEST_COMPLETE_PACKAGE_BY_PREFIX_SEQUENCE_THEN_PACKAGE_ID"
+  },
+  "complete_package_gate": "COMPLETE_FOR_STRUCTURED_REPAIR",
+  "eligibility_outcomes": [
+    "ELIGIBLE_FOR_ONE_B",
+    "NO_PROSPECTIVE_PACKAGE",
+    "LINEAGE_GAP_BLOCKED",
+    "PARENT_RECONSTRUCTION_BLOCKED",
+    "NATIVE_CAPABILITY_BLOCKED",
+    "SAFETY_OR_PROTOCOL_BLOCKED",
+    "OBSERVABILITY_ONLY_NON_INTERVENABLE"
+  ],
+  "one_B_per_eligible_cell": true,
+  "same_parent_checkpoint_required": true,
+  "full_native_restore_required": true,
+  "no_natural_rerun": true,
+  "no_resampling": true,
+  "no_semantic_backfill": true,
+  "no_framework_or_protocol_patch": true,
+  "foreign_state_policy": {
+    "rag-hit": "IMMUTABLE_FROZEN_RAG_CORPUS_RECOMPUTABLE",
+    "compression-output": "RECOMPUTABLE_FROM_FROZEN_COMPRESSOR_AND_PARENT_HOST_CONTEXT",
+    "memory-state": "FROZEN_ARCHIVE_BYTES_AND_HASH_REQUIRED"
+  },
+  "execution_authorization": {
+    "eligibility_freeze": true,
+    "active_B": false,
+    "subject_provider_calls": false,
+    "paid_evaluator_calls": false,
+    "repair_calls": false
+  }
+}
