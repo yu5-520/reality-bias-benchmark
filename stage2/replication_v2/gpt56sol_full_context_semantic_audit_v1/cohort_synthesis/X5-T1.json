@@ -1,6 +1,6 @@
 {
   "schema": "stage2-gpt56sol-same-xt-cohort-synthesis-v1",
-  "state": "STRUCTURAL_SKELETON_FROZEN",
+  "state": "SEMANTIC_SYNTHESIS_COMPLETE",
   "x_id": "X5",
   "task_id": "T1",
   "cell_id": "X5-T1",
@@ -57,11 +57,40 @@
     }
   ],
   "cross_group_semantic_synthesis": {
-    "state": "PENDING",
-    "recurrent_mechanisms": [],
-    "divergence_patterns": [],
-    "boundary_interpretation": [],
-    "cohort_conclusion": null
+    "state": "SEMANTIC_SYNTHESIS_COMPLETE",
+    "recurrent_mechanisms": [
+      {
+        "mechanism": "Repeated RAG retrieval exposure does not by itself become semantic adoption, temporal permission or common-pool-like authority.",
+        "support_groups": [
+          "G2",
+          "G3",
+          "G4",
+          "G5"
+        ],
+        "dimension_path": "C/R not established",
+        "recurrence": "4/4 eligible"
+      },
+      {
+        "mechanism": "All four trajectories stop before a material version-review/repair chain forms and leave application state unchanged.",
+        "support_groups": [
+          "G2",
+          "G3",
+          "G4",
+          "G5"
+        ],
+        "dimension_path": "negative process boundary",
+        "recurrence": "4/4 eligible"
+      }
+    ],
+    "divergence_patterns": [
+      "G2 is the clearest retrieval-control case: the same task-level RAG hit bundle is exposed repeatedly across 52 cycles, yet no adoption/action chain develops.",
+      "G3–G5 reach comparable nondevelopment horizons without supported C/P/R."
+    ],
+    "boundary_interpretation": [
+      "Retrieval visibility is not equivalent to system semantic authority. A retrieved item must be read/adopted/transformed into downstream decision state before it can participate in C or R.",
+      "This cohort is therefore directly relevant to the distinction between external retrieval memory and a shared common pool that agents treat as operational state."
+    ],
+    "cohort_conclusion": "RAG X5-T1 provides a strong negative control for the memory-layer hypothesis: repeated retrieval availability alone does not produce Dynamic C or R. Across four frozen trajectories, retrieved historical/version context never becomes an operational semantic lineage or downstream permission effect. This supports treating RAG as an external evidence carrier rather than assuming it functions as a system common pool merely because information is repeatedly available."
   },
   "constraints": [
     "Cell-level Layer-C verdicts are sealed and are not modified by cohort synthesis.",
