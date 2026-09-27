@@ -53,26 +53,26 @@ jobs:
       - name: Checkout active control plane
         uses: actions/checkout@v4
         with:
-          ref: \${{ env.CONTROL_BRANCH }}
+          ref: ${{ env.CONTROL_BRANCH }}
           path: control
           fetch-depth: 1
 
       - name: Checkout exact frozen scientific code
         uses: actions/checkout@v4
         with:
-          ref: \${{ env.SCIENCE_SHA }}
+          ref: ${{ env.SCIENCE_SHA }}
           path: science
           fetch-depth: 1
 
       - uses: actions/setup-python@v5
         with:
-          python-version: \${{ matrix.python }}
+          python-version: ${{ matrix.python }}
 
       - name: Verify authorization and Phase-A-only geometry
         env:
-          GH_TOKEN: \${{ github.token }}
-          SYS: \${{ matrix.system }}
-          TASK: \${{ matrix.task }}
+          GH_TOKEN: ${{ github.token }}
+          SYS: ${{ matrix.system }}
+          TASK: ${{ matrix.task }}
         shell: bash
         run: |
           set -euo pipefail
@@ -197,7 +197,7 @@ jobs:
 
       - name: Verify subject credential before irreversible claim
         env:
-          DEEPSEEK_API_KEY: \${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         shell: bash
         run: |
           set -euo pipefail
@@ -207,9 +207,9 @@ jobs:
       - name: Irrevocably claim first prospective attempt
         id: claim
         env:
-          GH_TOKEN: \${{ github.token }}
-          SYS: \${{ matrix.system }}
-          TASK: \${{ matrix.task }}
+          GH_TOKEN: ${{ github.token }}
+          SYS: ${{ matrix.system }}
+          TASK: ${{ matrix.task }}
         shell: bash
         run: |
           set -euo pipefail
@@ -233,9 +233,9 @@ jobs:
         id: execute
         if: steps.claim.outputs.claimed == 'true'
         env:
-          DEEPSEEK_API_KEY: \${{ secrets.DEEPSEEK_API_KEY }}
-          SYS: \${{ matrix.system }}
-          TASK: \${{ matrix.task }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          SYS: ${{ matrix.system }}
+          TASK: ${{ matrix.task }}
         shell: bash
         run: |
           set -uo pipefail
@@ -300,10 +300,10 @@ jobs:
         id: package
         if: always() && steps.claim.outputs.claimed == 'true'
         env:
-          SYS: \${{ matrix.system }}
-          TASK: \${{ matrix.task }}
-          CLAIM_TAG: \${{ steps.claim.outputs.claim_tag }}
-          RUNNER_EXIT_CODE: \${{ steps.execute.outputs.runner_exit_code }}
+          SYS: ${{ matrix.system }}
+          TASK: ${{ matrix.task }}
+          CLAIM_TAG: ${{ steps.claim.outputs.claim_tag }}
+          RUNNER_EXIT_CODE: ${{ steps.execute.outputs.runner_exit_code }}
         shell: bash
         run: |
           set -euo pipefail
@@ -374,7 +374,7 @@ jobs:
         if: always() && steps.claim.outputs.claimed == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: stage2-r7-g1-\${{ matrix.system }}-\${{ matrix.task }}-\${{ github.run_id }}
+          name: stage2-r7-g1-${{ matrix.system }}-${{ matrix.task }}-${{ github.run_id }}
           path: /tmp/stage2-r7-g1-artifact/
           retention-days: 90
           if-no-files-found: error
@@ -384,7 +384,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "\${{ steps.package.outputs.packaged }}" = true
+          test "${{ steps.package.outputs.packaged }}" = true
           echo "PASS: Phase A preserved exactly one claimed attempt; no B and no semantic audit executed"
 
   phase-a-freeze:
@@ -396,20 +396,20 @@ jobs:
       - name: Checkout evidence branch
         uses: actions/checkout@v4
         with:
-          ref: \${{ env.EVIDENCE_BRANCH }}
+          ref: ${{ env.EVIDENCE_BRANCH }}
           path: evidence
           fetch-depth: 1
 
       - name: Download all Phase-A cell artifacts
         uses: actions/download-artifact@v4
         with:
-          pattern: stage2-r7-g1-*-\${{ github.run_id }}
+          pattern: stage2-r7-g1-*-${{ github.run_id }}
           path: /tmp/stage2-r7-g1-downloaded
           merge-multiple: true
 
       - name: Freeze 15 first attempts and deterministic B-selection index
         env:
-          GH_TOKEN: \${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
