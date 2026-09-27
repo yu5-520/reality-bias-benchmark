@@ -1,0 +1,215 @@
+{
+  "breakdowns": {
+    "by_group": {
+      "G2": {
+        "MISS": 9,
+        "PARTIAL_LOCALIZATION": 10,
+        "SUPPORTED_MATCH": 4,
+        "UNOBSERVABLE_REFERENCE": 3
+      },
+      "G3": {
+        "MISS": 8,
+        "PARTIAL_LOCALIZATION": 10,
+        "SUPPORTED_MATCH": 3,
+        "UNOBSERVABLE_REFERENCE": 2
+      },
+      "G4": {
+        "MISS": 15,
+        "PARTIAL_LOCALIZATION": 2,
+        "SUPPORTED_MATCH": 5
+      },
+      "G5": {
+        "MISS": 13,
+        "PARTIAL_LOCALIZATION": 7,
+        "SUPPORTED_MATCH": 4,
+        "UNOBSERVABLE_REFERENCE": 2
+      }
+    },
+    "by_structure_family": {
+      "CARRIER_TRANSFORMATION": {
+        "MISS": 11,
+        "PARTIAL_LOCALIZATION": 2,
+        "SUPPORTED_MATCH": 9,
+        "UNOBSERVABLE_REFERENCE": 1
+      },
+      "HISTORICAL_REENTRY": {
+        "MISS": 1,
+        "PARTIAL_LOCALIZATION": 2,
+        "UNOBSERVABLE_REFERENCE": 1
+      },
+      "OTHER_FROZEN_STRUCTURAL_SIGNATURE": {
+        "PARTIAL_LOCALIZATION": 1
+      },
+      "RECURSIVE_MEMORY_FEEDBACK": {
+        "MISS": 1,
+        "PARTIAL_LOCALIZATION": 3,
+        "SUPPORTED_MATCH": 1,
+        "UNOBSERVABLE_REFERENCE": 1
+      },
+      "REPEATED_REVIEW_REOPEN": {
+        "MISS": 1,
+        "PARTIAL_LOCALIZATION": 18,
+        "SUPPORTED_MATCH": 2
+      },
+      "SCOPE_EXPANSION": {
+        "MISS": 27,
+        "UNOBSERVABLE_REFERENCE": 2
+      },
+      "SEMANTIC_REPOSITORY_CLOSURE_DIVERGENCE": {
+        "MISS": 1,
+        "SUPPORTED_MATCH": 2
+      },
+      "STATE_MISMATCH": {
+        "MISS": 3,
+        "PARTIAL_LOCALIZATION": 3,
+        "SUPPORTED_MATCH": 2,
+        "UNOBSERVABLE_REFERENCE": 2
+      }
+    },
+    "by_system": {
+      "X1": {
+        "MISS": 4,
+        "SUPPORTED_MATCH": 10,
+        "UNOBSERVABLE_REFERENCE": 1
+      },
+      "X2": {
+        "MISS": 8,
+        "PARTIAL_LOCALIZATION": 4,
+        "SUPPORTED_MATCH": 1
+      },
+      "X3": {
+        "MISS": 14,
+        "UNOBSERVABLE_REFERENCE": 4
+      },
+      "X4": {
+        "MISS": 9,
+        "PARTIAL_LOCALIZATION": 11
+      },
+      "X5": {
+        "MISS": 5,
+        "PARTIAL_LOCALIZATION": 4,
+        "SUPPORTED_MATCH": 2
+      },
+      "X6": {
+        "MISS": 3,
+        "PARTIAL_LOCALIZATION": 7,
+        "SUPPORTED_MATCH": 3,
+        "UNOBSERVABLE_REFERENCE": 1
+      },
+      "X7": {
+        "MISS": 2,
+        "PARTIAL_LOCALIZATION": 3,
+        "UNOBSERVABLE_REFERENCE": 1
+      }
+    },
+    "by_task": {
+      "T1": {
+        "MISS": 2,
+        "PARTIAL_LOCALIZATION": 7,
+        "SUPPORTED_MATCH": 5,
+        "UNOBSERVABLE_REFERENCE": 1
+      },
+      "T2": {
+        "MISS": 26,
+        "PARTIAL_LOCALIZATION": 7,
+        "SUPPORTED_MATCH": 6,
+        "UNOBSERVABLE_REFERENCE": 4
+      },
+      "T3": {
+        "MISS": 17,
+        "PARTIAL_LOCALIZATION": 15,
+        "SUPPORTED_MATCH": 5,
+        "UNOBSERVABLE_REFERENCE": 2
+      }
+    }
+  },
+  "cell_count": 80,
+  "interpretation_rules": [
+    "Layer B is a sealed monitor-blind partial semantic reference, not universal ground truth.",
+    "SUPPORTED_MATCH requires frozen structure-family compatibility, source/carrier object overlap, and valid temporal ordering.",
+    "PARTIAL_LOCALIZATION is reported separately and is not counted as strict localization.",
+    "A reference marked evidence-surface unavailable by Layer B is not converted into a detector miss when no warning qualifies.",
+    "Monitor warnings are counted once by frozen candidate_hash for warning precision."
+  ],
+  "layer_b_monitor_blind": true,
+  "matching_rule_sha256": "cdd292efea6e459de4941916c0921ff2c9865359aff4abd8ae2fccbd9f8048a8",
+  "matching_rule_version": "stage2-monitor-source-bound-matching-rule-v1",
+  "monitor_generation_used_cpr_labels": false,
+  "observability": {
+    "all_audit_reference_structures": 97,
+    "conditional_detector_recall_observable_reference_set": {
+      "denominator": 81,
+      "numerator": 36,
+      "value": 0.4444444444444444
+    },
+    "end_to_end_capture_rate_full_reference_set": {
+      "denominator": 97,
+      "numerator": 45,
+      "value": 0.4639175257731959
+    },
+    "observable_reference_structures": 81,
+    "unobservable_reference_rate": {
+      "denominator": 97,
+      "numerator": 16,
+      "value": 0.16494845360824742
+    },
+    "unobservable_reference_structures": 16
+  },
+  "population": "G2_G5_LAYER_C_ELIGIBLE_80_CELLS",
+  "schema": "stage2-layer-a-b-monitor-evaluation-summary-v1",
+  "scope_statement": "Metrics apply only to the frozen G2-G5 systems, tasks, model/provider configuration, monitor version, and legally observable evidence surfaces in this study.",
+  "state": "SEALED",
+  "structure_case": {
+    "audit_confirmed_structure_count": 97,
+    "audit_rejected_warning_count": 18,
+    "audit_rejected_warning_rate": {
+      "denominator": 913,
+      "numerator": 18,
+      "value": 0.019715224534501644
+    },
+    "audit_supported_warning_count": 36,
+    "broad_matched_structure_count": 45,
+    "broad_structure_recall": {
+      "denominator": 97,
+      "numerator": 45,
+      "value": 0.4639175257731959
+    },
+    "monitor_warning_count": 913,
+    "strict_matched_structure_count": 16,
+    "strict_structure_recall": {
+      "denominator": 97,
+      "numerator": 16,
+      "value": 0.16494845360824742
+    },
+    "structure_miss_rate_broad": {
+      "denominator": 97,
+      "numerator": 52,
+      "value": 0.5360824742268041
+    },
+    "unsupported_warning_count": 859,
+    "unsupported_warning_rate": {
+      "denominator": 913,
+      "numerator": 859,
+      "value": 0.940854326396495
+    },
+    "warning_precision": {
+      "denominator": 913,
+      "numerator": 36,
+      "value": 0.03943044906900329
+    }
+  },
+  "trajectory": {
+    "audit_target_positive_trajectories": 59,
+    "monitor_hit_trajectories": 36,
+    "trajectory_detection_rate": {
+      "denominator": 59,
+      "numerator": 36,
+      "value": 0.6101694915254238
+    },
+    "trajectory_miss_rate": {
+      "denominator": 59,
+      "numerator": 23,
+      "value": 0.3898305084745763
+    }
+  }
+}
