@@ -99,14 +99,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "audit/$OUTPUT_ROOT/packets_v2_v2"
-          PYTHONPATH="$GITHUB_WORKSPACE/audit" python audit/arena/build_stage2_r7_g1_ab_semantic_packets_v2.py             --evidence-root evidence/stage2/r7_g1_v1             --config audit/configs/stage2_r7_g1_ab_paired_semantic_audit_v1.json             --out "audit/$OUTPUT_ROOT/packets_v2_v2"
+          mkdir -p "audit/$OUTPUT_ROOT/packets_v2"
+          PYTHONPATH="$GITHUB_WORKSPACE/audit" python audit/arena/build_stage2_r7_g1_ab_semantic_packets_v2.py             --evidence-root evidence/stage2/r7_g1_v1             --config audit/configs/stage2_r7_g1_ab_paired_semantic_audit_v1.json             --out "audit/$OUTPUT_ROOT/packets_v2"
 
       - name: Validate packet population and isolation
         shell: bash
         run: |
           set -euo pipefail
-          PYTHONPATH="$GITHUB_WORKSPACE/audit" python audit/scripts/validate_stage2_r7_g1_ab_semantic_audit_v2.py             --packets "audit/$OUTPUT_ROOT/packets_v2_v2"
+          PYTHONPATH="$GITHUB_WORKSPACE/audit" python audit/scripts/validate_stage2_r7_g1_ab_semantic_audit_v2.py             --packets "audit/$OUTPUT_ROOT/packets_v2"
 
       - name: Freeze packets append-only on audit branch
         shell: bash
@@ -114,7 +114,7 @@ jobs:
           set -euo pipefail
           git -C audit config user.name "stage2-r7-g1-ab-audit-bot"
           git -C audit config user.email "stage2-r7-g1-ab-audit@users.noreply.github.com"
-          git -C audit add "$OUTPUT_ROOT/packets"
+          git -C audit add "$OUTPUT_ROOT/packets_v2"
           git -C audit commit -m "audit: freeze 12 balanced R7 G1 same-parent A-B semantic packets v2 [run $GITHUB_RUN_ID]"
           git -C audit push origin HEAD:stage2-r7-g1-ab-semantic-audit-v1
 
