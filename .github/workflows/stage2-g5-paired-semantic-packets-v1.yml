@@ -63,7 +63,7 @@ jobs:
           assert issue["state"]=="open"
           assert issue["user"]["login"]=="yu5-520"
           assert issue["title"]=="STAGE2 G5 A-B PAIRED PROCESS-SEMANTIC AUDIT AUTHORIZATION"
-          assert "valid_paired_cells=X2-T1,X2-T2,X2-T3,X4-T1,X4-T2,X4-T3,X5-T1,X5-T3,X7-T1,X7-T2,X7-T3" in issue["body"]
+          assert "valid_paired_cells=X2-T1,X2-T2,X2-T3,X4-T1,X4-T3,X5-T1,X5-T2,X5-T3,X7-T1,X7-T2,X7-T3" in issue["body"]
           assert "source_readiness_boundary_cells=X4-T2" in issue["body"]
           print("PASS: G5 paired-audit authorization bound")
           PY
