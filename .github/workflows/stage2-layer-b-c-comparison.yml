@@ -1,0 +1,237 @@
+name: Stage-II Layer B-C Comparison
+
+on:
+  push:
+    branches:
+      - stage2-gpt56sol-full-context-audit-results-v1
+    paths:
+      - ".github/workflows/stage2-layer-b-c-comparison.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  compare-b-c:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: stage2-layer-b-c-comparison
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Layer-C result branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-gpt56sol-full-context-audit-results-v1
+          fetch-depth: 0
+
+      - name: Checkout sealed Layer-B reference
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-semantic-audit-reference-v1
+          path: _layer_b_reference
+          fetch-depth: 1
+
+      - name: Build 80-cell B-C crosswalk
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+          from collections import Counter, defaultdict
+
+          croot=Path("stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1")
+          broot=Path("_layer_b_reference/stage2/replication_v2/semantic_audit_reference_v1/audit")
+          out=croot/"layer_b_c_comparison"
+          out.mkdir(parents=True,exist_ok=True)
+
+          cseal=json.loads((croot/"population_seal.json").read_text())
+          cindex=json.loads((croot/"audit_index.json").read_text())
+          bindex=json.loads((broot/"reference_set_index.json").read_text())
+          assert cseal["state"]=="SEALED"
+          assert cseal["validated_audit_count"]==80
+          assert bindex["status"]=="SEALED_MONITOR_BLIND_REFERENCE_SET"
+          assert bindex["cell_count"]==84
+          assert bindex["monitor_blind"] is True
+          assert bindex["monitor_runtime_bundle_read"] is False
+
+          positive={"SUPPORTED","SUPPORTED_CANDIDATE"}
+          rank={"SUPPORTED":4,"SUPPORTED_CANDIDATE":3,"NEGATIVE_BOUNDARY":2,"NOT_ESTABLISHED":1}
+          dims=("C","P","R")
+          records=[]
+          class_counts=Counter()
+          by_x=defaultdict(Counter)
+          by_t=defaultdict(Counter)
+          b_pos=Counter()
+          c_pos=Counter()
+          recovery=Counter()
+          overbreadth=Counter()
+          exact_status=Counter()
+          coverage=Counter()
+
+          for a in cindex["audits"]:
+              full=a["full_id"]
+              group, x, t=full.split("-")
+              cell=f"{x}-{t}"
+              cf=croot/a["audit_path"]
+              bf=broot/"cell_audits"/f"{full}.json"
+              assert bf.exists(), full
+              c=json.loads(cf.read_text())
+              b=json.loads(bf.read_text())
+              assert b["group_id"]==group and b["cell_id"]==cell
+              assert b["monitor_blind"] is True and b["monitor_runtime_bundle_read"] is False
+              bdim={d:[] for d in dims}
+              for rr in b["reference_records"]:
+                  for d in rr.get("cpr_dimensions") or []:
+                      if d in bdim:
+                          bdim[d].append(rr["claim_status"])
+              bstatus={}
+              for d in dims:
+                  vals=bdim[d]
+                  bstatus[d]=max(vals,key=lambda s:rank.get(s,0)) if vals else "NO_EXPLICIT_DIMENSION_CLAIM"
+              cstatus={}
+              for ev in c["cpr_events"]:
+                  cstatus[ev["dimension"]]=ev["status"]
+              assert set(cstatus)==set(dims), full
+
+              surface_limited=(
+                  b["cell_summary"].get("audit_coverage")!="FULL"
+                  or any(rr.get("evidence_surface_available") is False for rr in b["reference_records"])
+              )
+              coverage["PARTIAL_OR_LIMITED" if surface_limited else "FULL"]+=1
+              comp={}
+              for d in dims:
+                  bs,cs=bstatus[d],cstatus[d]
+                  bp=bs in positive
+                  cp=cs in positive
+                  if bp: b_pos[d]+=1
+                  if cp: c_pos[d]+=1
+                  if bs==cs: exact_status[d]+=1
+                  if bp and cp:
+                      if bs=="SUPPORTED_CANDIDATE" and cs=="SUPPORTED":
+                          klass="C_DEEPENS_B_CANDIDATE"
+                      elif bs=="SUPPORTED" and cs=="SUPPORTED_CANDIDATE":
+                          klass="C_DOWNGRADES_B_SUPPORT"
+                      else:
+                          klass="B_C_POSITIVE_AGREEMENT"
+                  elif (not bp) and cp:
+                      klass="C_FULL_CONTEXT_RECOVERY_FROM_LIMITED_B" if surface_limited else "C_ONLY_POSITIVE"
+                      recovery[d]+=1
+                  elif bp and (not cp):
+                      klass="B_STRUCTURAL_POSITIVE_NOT_SUSTAINED_AS_CPR"
+                      overbreadth[d]+=1
+                  else:
+                      klass="B_C_NONPOSITIVE_AGREEMENT"
+                  comp[d]={"layer_b_status":bs,"layer_c_status":cs,"comparison_class":klass}
+                  class_counts[f"{d}:{klass}"]+=1
+                  by_x[x][f"{d}:{klass}"]+=1
+                  by_t[t][f"{d}:{klass}"]+=1
+
+              b_families=Counter(rr["structure_family"] for rr in b["reference_records"])
+              rec={
+                  "schema":"stage2-layer-b-c-cell-comparison-v1",
+                  "full_id":full,
+                  "group_id":group,
+                  "cell_id":cell,
+                  "x_id":x,
+                  "task_id":t,
+                  "layer_b":{
+                      "audit_manifest_sha256":b["audit_manifest_sha256"],
+                      "packet_sha256":b["packet_sha256"],
+                      "audit_coverage":b["cell_summary"].get("audit_coverage"),
+                      "reference_count":len(b["reference_records"]),
+                      "positive_structure_count":b["cell_summary"].get("positive_structure_count"),
+                      "negative_boundary_count":b["cell_summary"].get("negative_boundary_count"),
+                      "explicit_dimension_status":bstatus,
+                      "structure_family_counts":dict(sorted(b_families.items())),
+                      "has_limited_evidence_surface":surface_limited
+                  },
+                  "layer_c":{
+                      "audit_sha256":a["audit_sha256"],
+                      "input_packet_sha256":a["input_packet_sha256"],
+                      "dimension_status":cstatus,
+                      "dimensions_present":a["dimensions_present"],
+                      "topology_class":a["topology_class"]
+                  },
+                  "dimension_comparison":comp,
+                  "layer_c_positive_not_layer_b_positive":[d for d in dims if cstatus[d] in positive and bstatus[d] not in positive],
+                  "layer_b_positive_not_layer_c_positive":[d for d in dims if bstatus[d] in positive and cstatus[d] not in positive],
+                  "positive_agreement_dimensions":[d for d in dims if bstatus[d] in positive and cstatus[d] in positive]
+              }
+              p=out/"cells"/f"{full}.json"
+              p.parent.mkdir(exist_ok=True)
+              p.write_text(json.dumps(rec,indent=2,sort_keys=True)+"\n")
+              records.append({
+                  "full_id":full,
+                  "comparison_path":str(p.relative_to(croot)),
+                  "comparison_sha256":hashlib.sha256(p.read_bytes()).hexdigest(),
+                  "layer_b_positive_not_layer_c_positive":rec["layer_b_positive_not_layer_c_positive"],
+                  "layer_c_positive_not_layer_b_positive":rec["layer_c_positive_not_layer_b_positive"],
+                  "positive_agreement_dimensions":rec["positive_agreement_dimensions"],
+                  "layer_c_topology_class":a["topology_class"],
+                  "layer_b_limited_surface":surface_limited
+              })
+
+          assert len(records)==80
+          summary={
+              "schema":"stage2-layer-b-c-comparison-index-v1",
+              "state":"SEALED",
+              "population":"LAYER_C_80_ELIGIBLE_CELLS",
+              "layer_b_role":"WITHIN_STUDY_MONITOR_BLIND_PARTIAL_SEMANTIC_REFERENCE",
+              "layer_c_role":"FULL_CONTEXT_PROCESS_MECHANISM_RECONSTRUCTION",
+              "layer_b_reference_set_sha256":hashlib.sha256((broot/"reference_set_index.json").read_bytes()).hexdigest(),
+              "layer_c_population_seal_sha256":cseal["audit_index_sha256"],
+              "cell_count":80,
+              "layer_b_coverage_counts":dict(coverage),
+              "explicit_positive_dimension_counts":{
+                  "layer_b":dict(b_pos),
+                  "layer_c":dict(c_pos)
+              },
+              "layer_c_recovery_counts_by_dimension":dict(recovery),
+              "layer_b_structural_positive_not_sustained_counts_by_dimension":dict(overbreadth),
+              "exact_status_agreement_counts_by_dimension":dict(exact_status),
+              "comparison_class_counts":dict(sorted(class_counts.items())),
+              "by_system":{k:dict(sorted(v.items())) for k,v in sorted(by_x.items())},
+              "by_task":{k:dict(sorted(v.items())) for k,v in sorted(by_t.items())},
+              "interpretation_rules":[
+                  "This is a layer-role comparison, not an accuracy score with Layer C declared universal ground truth.",
+                  "Layer B explicit CPR dimension claims are compared only when the sealed Layer-B record explicitly lists that dimension.",
+                  "Layer-C recovery means fuller evidence supports a CPR dimension not positively established by Layer B; it does not imply Layer B made an error when its evidence surface was limited.",
+                  "Layer-B structural positive not sustained as CPR means the partial structural signature did not meet Layer-C full-process permission criteria; it is not automatically a false warning.",
+                  "The four Layer-C boundary-excluded cells are not imputed into this 80-cell comparison."
+              ],
+              "cells":records
+          }
+          (out/"comparison_index.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n")
+          seal={
+              "schema":"stage2-layer-b-c-comparison-seal-v1",
+              "state":"SEALED",
+              "cell_count":80,
+              "layer_b_monitor_blind":True,
+              "layer_c_monitor_blind":True,
+              "layer_b_reference_population":84,
+              "layer_c_eligible_population":80,
+              "boundary_cells_imputed":False,
+              "comparison_index_sha256":hashlib.sha256((out/"comparison_index.json").read_bytes()).hexdigest(),
+              "next_stage":"MECHANISM_SYNTHESIS_THEN_LAYER_A_C_COMPARISON"
+          }
+          (out/"comparison_seal.json").write_text(json.dumps(seal,indent=2,sort_keys=True)+"\n")
+          print(json.dumps({
+              "status":"PASS",
+              "cells":80,
+              "B_positive":dict(b_pos),
+              "C_positive":dict(c_pos),
+              "C_recovery":dict(recovery),
+              "B_not_sustained":dict(overbreadth)
+          },sort_keys=True))
+          PY
+
+      - name: Commit B-C comparison
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_b_c_comparison"
+          git config user.name "stage2-layer-b-c"
+          git config user.email "stage2-layer-b-c@users.noreply.github.com"
+          git add "$ROOT"
+          git commit -m "Seal Stage-II Layer B-C 80-cell comparison"
+          git push origin HEAD:stage2-gpt56sol-full-context-audit-results-v1
