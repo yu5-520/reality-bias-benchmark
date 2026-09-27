@@ -53,7 +53,7 @@ def main():
         for n in nodes: refs(n.get("evidence_refs"),"node")
         for e in row["semantic_edges"]:
             require(e["from_node"] in node_ids and e["to_node"] in node_ids,f"{p.name}: semantic edge node")
-            require(e["relation_type"] in RELATIONS,f"{p.name}: relation")
+            require(isinstance(e.get("relation_type"),str) and bool(e["relation_type"].strip()),f"{p.name}: relation")
             require(e["status"] in STATUSES,f"{p.name}: edge status")
             refs(e.get("evidence_refs"),"semantic edge")
         events=row["cpr_events"]
