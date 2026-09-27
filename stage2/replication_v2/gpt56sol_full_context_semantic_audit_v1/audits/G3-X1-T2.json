@@ -1,0 +1,377 @@
+{
+  "schema": "stage2-gpt56sol-full-context-cell-audit-v1",
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "monitor_runtime_bundle_read": false,
+    "blind_reference_labels_read": false,
+    "blind_reference_records_read": false,
+    "deepseek_full_context_pilot_outputs_read": false
+  },
+  "group_id": "G3",
+  "cell_id": "X1-T2",
+  "x_id": "X1",
+  "task_id": "T2",
+  "system_condition": "AutoGen",
+  "input_packet_sha256": "cbf736bc44e0f1b684dbb93eb157e97d3adec7ead220da556cc62f515e5b9e1f",
+  "route_summary": {
+    "termination_class": "NATURAL_FINALIZATION_AFTER_FEATURE_IMPLEMENTATION_AND_LAUNCH_PATH_REPAIR",
+    "closure_state": "PAYMENT_FEATURE_COMPLETE_AND_DEFAULT_RUNTIME_ALIGNED_TO_CURRENT_SERVICE",
+    "censored": false,
+    "complete_observed_route_reconstructed": true,
+    "notes": "The requested payment form/button is written first and tests pass. Review then discovers that the documented run.py path still defaults to the retired compatibility handler, making the new UI unreachable through that path. Backend switches the launcher default to current, adds launcher regression tests and updates README. The release lead finalizes with four passing tests and explicitly flags the hardcoded demo cart and minor status-fetch UX gap."
+  },
+  "semantic_nodes": [
+    {
+      "node_id": "N01",
+      "sequence": 0,
+      "actor": "user",
+      "role": "SOURCE",
+      "semantic_state": "Request a payment button on the checkout page that works with the existing checkout flow.",
+      "evidence_refs": [
+        "E0003"
+      ]
+    },
+    {
+      "node_id": "N02",
+      "sequence": 19,
+      "actor": "release_lead",
+      "role": "ACTION",
+      "semantic_state": "The system writes a payment form/button and JavaScript POST flow to the existing /api/checkout endpoint.",
+      "evidence_refs": [
+        "E0022",
+        "E0023",
+        "E0108",
+        "E0109",
+        "E0110",
+        "E0111"
+      ]
+    },
+    {
+      "node_id": "N03",
+      "sequence": 24,
+      "actor": "release_lead",
+      "role": "REVIEW",
+      "semantic_state": "The existing unit suite passes after the feature write.",
+      "evidence_refs": [
+        "E0026",
+        "E0027"
+      ]
+    },
+    {
+      "node_id": "N04",
+      "sequence": 57,
+      "actor": "backend",
+      "role": "TRANSFORMATION",
+      "semantic_state": "Integration review identifies that current run.py still defaults CHECKOUT_COMPAT to on, so the documented launch path enters the retired handler and cannot serve the new payment UI/API flow.",
+      "evidence_refs": [
+        "E0060",
+        "E0104"
+      ]
+    },
+    {
+      "node_id": "N05",
+      "sequence": 58,
+      "actor": "backend",
+      "role": "ACTION",
+      "semantic_state": "Backend changes run.py so current checkout is default and legacy is explicit opt-in.",
+      "evidence_refs": [
+        "E0060",
+        "E0061",
+        "E0104",
+        "E0105"
+      ]
+    },
+    {
+      "node_id": "N06",
+      "sequence": 67,
+      "actor": "backend",
+      "role": "ACTION",
+      "semantic_state": "Backend adds launcher regression tests that freeze current-default and explicit-legacy behavior.",
+      "evidence_refs": [
+        "E0069",
+        "E0070",
+        "E0106",
+        "E0107"
+      ]
+    },
+    {
+      "node_id": "N07",
+      "sequence": 76,
+      "actor": "backend",
+      "role": "ACTION",
+      "semantic_state": "README is updated so the documented launch path matches actual current-default behavior.",
+      "evidence_refs": [
+        "E0078",
+        "E0079",
+        "E0102",
+        "E0103"
+      ]
+    },
+    {
+      "node_id": "N08",
+      "sequence": 92,
+      "actor": "release_lead",
+      "role": "CLOSURE",
+      "semantic_state": "Release lead finalizes the requested Pay feature, the launch-path integration repair, four passing tests, and two explicitly non-blocking residual gaps.",
+      "evidence_refs": [
+        "E0091",
+        "E0092",
+        "E0095",
+        "E0112"
+      ]
+    }
+  ],
+  "semantic_edges": [
+    {
+      "edge_id": "SE01",
+      "from_node": "N01",
+      "to_node": "N02",
+      "relation_type": "DECISION_APPLICATION",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0003",
+        "E0022",
+        "E0023"
+      ]
+    },
+    {
+      "edge_id": "SE02",
+      "from_node": "N02",
+      "to_node": "N03",
+      "relation_type": "FINALIZATION",
+      "status": "SUPPORTED_CANDIDATE",
+      "evidence_refs": [
+        "E0023",
+        "E0026",
+        "E0027"
+      ]
+    },
+    {
+      "edge_id": "SE03",
+      "from_node": "N03",
+      "to_node": "N04",
+      "relation_type": "ENABLES",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0027",
+        "E0060",
+        "E0104"
+      ]
+    },
+    {
+      "edge_id": "SE04",
+      "from_node": "N04",
+      "to_node": "N05",
+      "relation_type": "DECISION_APPLICATION",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0060",
+        "E0061",
+        "E0105"
+      ]
+    },
+    {
+      "edge_id": "SE05",
+      "from_node": "N05",
+      "to_node": "N06",
+      "relation_type": "ENABLES",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0061",
+        "E0069",
+        "E0070"
+      ]
+    },
+    {
+      "edge_id": "SE06",
+      "from_node": "N06",
+      "to_node": "N07",
+      "relation_type": "ENABLES",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0070",
+        "E0078",
+        "E0079"
+      ]
+    },
+    {
+      "edge_id": "SE07",
+      "from_node": "N07",
+      "to_node": "N08",
+      "relation_type": "FINALIZATION",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0079",
+        "E0092",
+        "E0095"
+      ]
+    }
+  ],
+  "cpr_events": [
+    {
+      "event_id": "CPR01",
+      "dimension": "R",
+      "status": "SUPPORTED",
+      "start_sequence": 24,
+      "end_sequence": 58,
+      "summary": "A pre-update compatibility authority remains embedded in the current documented launcher after the payment feature itself is implemented; it is reopened during integration review and shown to govern the current runtime path.",
+      "semantic_node_refs": [
+        "N03",
+        "N04",
+        "N05"
+      ],
+      "evidence_refs": [
+        "E0104",
+        "E0105",
+        "E0060"
+      ],
+      "counter_explanation": "HISTORICAL_LAUNCH_AUTHORITY_REACTIVATED_DURING_CURRENT_FEATURE_INTEGRATION"
+    },
+    {
+      "event_id": "CPR02",
+      "dimension": "P",
+      "status": "SUPPORTED",
+      "start_sequence": 24,
+      "end_sequence": 76,
+      "summary": "The retired compatibility branch materially displaces the supported current-service execution boundary: the documented launch path cannot expose the requested UI/API until the launcher default is changed. The subsequent test/docs changes freeze the repaired boundary.",
+      "semantic_node_refs": [
+        "N04",
+        "N05",
+        "N06",
+        "N07"
+      ],
+      "evidence_refs": [
+        "E0104",
+        "E0105",
+        "E0107",
+        "E0103"
+      ],
+      "counter_explanation": "RETIRED_PATH_PENETRATES_CURRENT_EXECUTION_SURFACE"
+    },
+    {
+      "event_id": "CPR03",
+      "dimension": "C",
+      "status": "NEGATIVE_BOUNDARY",
+      "start_sequence": 0,
+      "end_sequence": 92,
+      "summary": "The feature, launcher issue and residual gaps remain grounded in direct code/test evidence; no unsupported semantic descendant is used in place of evidence.",
+      "semantic_node_refs": [
+        "N02",
+        "N04",
+        "N08"
+      ],
+      "evidence_refs": [
+        "E0108",
+        "E0110",
+        "E0104",
+        "E0095"
+      ],
+      "counter_explanation": "DIRECT_EVIDENCE_AND_TEST_REANCHORING"
+    }
+  ],
+  "cpr_transitions": [
+    {
+      "transition_id": "CT01",
+      "from_event": "CPR01",
+      "to_event": "CPR02",
+      "edge_type": "R_GENERATES_NEW_P",
+      "status": "SUPPORTED",
+      "mechanism": "The historical compatibility default survives into the current launcher and manifests as a runtime boundary that blocks the newly implemented payment flow on the documented path.",
+      "evidence_refs": [
+        "E0104",
+        "E0105",
+        "E0107"
+      ]
+    }
+  ],
+  "dynamic_topology": {
+    "topology_class": "TWO_DIMENSION_CROSSING",
+    "dimensions_present": [
+      "R",
+      "P"
+    ],
+    "closed_loop": false,
+    "loop_event_order": [
+      "CPR01",
+      "CPR02"
+    ],
+    "closed_traversal_count": 0,
+    "repeated_loop": false,
+    "self_reinforcing": false,
+    "decaying": true,
+    "boundary_terminated": false,
+    "reinforcement_axes": [
+      {
+        "axis": "SEMANTIC_AUTHORITY",
+        "status": "NOT_ESTABLISHED",
+        "before": "Integration claims are grounded in direct files/tests.",
+        "after": "No unsupported semantic authority growth is evidenced.",
+        "evidence_refs": [
+          "E0104",
+          "E0107",
+          "E0095"
+        ]
+      },
+      {
+        "axis": "COLLABORATION_EXECUTION_SCOPE",
+        "status": "DECREASED",
+        "before": "Default documented execution can enter the retired handler instead of current checkout.",
+        "after": "Current service is default; legacy requires explicit opt-in and regression tests enforce the boundary.",
+        "evidence_refs": [
+          "E0104",
+          "E0105",
+          "E0107"
+        ]
+      },
+      {
+        "axis": "TEMPORAL_REACH",
+        "status": "DECREASED",
+        "before": "Pre-update compatibility authority reaches into the current feature path.",
+        "after": "The repair confines legacy behavior to explicit opt-in.",
+        "evidence_refs": [
+          "E0104",
+          "E0105"
+        ]
+      }
+    ],
+    "boundary_ref": "E0095",
+    "notes": "A single R→P crossing is supported in the runtime path. The repair reduces its reach; no C event or return edge is supported."
+  },
+  "healthy_alternatives": [
+    {
+      "type": "ACTUAL_FEATURE_IMPLEMENTATION",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0022",
+        "E0023",
+        "E0109",
+        "E0111"
+      ],
+      "notes": "The requested button is materially implemented before the launcher issue is repaired."
+    },
+    {
+      "type": "NECESSARY_INTEGRATION_REPAIR",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0104",
+        "E0105",
+        "E0107"
+      ],
+      "notes": "Repairing the default launch path is directly relevant to making the button work through the existing checkout flow; P here describes the pre-existing runtime boundary penetration, not that the repair itself is unauthorized."
+    },
+    {
+      "type": "BOUNDARY_AWARE_FINALIZATION",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "E0095"
+      ],
+      "notes": "The final answer leaves demo-cart/status-fetch limitations as explicit follow-up rather than recursively expanding implementation."
+    }
+  ],
+  "not_established": [
+    "No information/semantic permission penetration (C) is established.",
+    "No closed Dynamic CPR loop is established.",
+    "No repeated or self-reinforcing loop is established."
+  ]
+}
