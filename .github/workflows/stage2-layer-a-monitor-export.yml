@@ -1,0 +1,97 @@
+name: Stage-II Layer A Monitor Export
+
+on:
+  push:
+    branches:
+      - stage2-gpt56sol-full-context-audit-results-v1
+    paths:
+      - ".github/workflows/stage2-layer-a-monitor-export.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  export-layer-a:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout result branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-gpt56sol-full-context-audit-results-v1
+          fetch-depth: 0
+      - name: Checkout G2 evidence
+        uses: actions/checkout@v4
+        with: { ref: stage2-g2-natural-evidence-v1, path: _g2, fetch-depth: 1 }
+      - name: Checkout G3 evidence
+        uses: actions/checkout@v4
+        with: { ref: stage2-g3-natural-evidence-v1, path: _g3, fetch-depth: 1 }
+      - name: Checkout G4 evidence
+        uses: actions/checkout@v4
+        with: { ref: stage2-g4-natural-evidence-v1, path: _g4, fetch-depth: 1 }
+      - name: Checkout G5 evidence
+        uses: actions/checkout@v4
+        with: { ref: stage2-g5-natural-evidence-v1, path: _g5, fetch-depth: 1 }
+
+      - name: Export exact frozen monitor files for 80 Layer-C eligible cells
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,tarfile,hashlib,shutil
+          from pathlib import Path
+
+          croot=Path("stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1")
+          cidx=json.loads((croot/"audit_index.json").read_text())
+          out=croot/"layer_a_monitor_export"
+          if out.exists(): shutil.rmtree(out)
+          (out/"cells").mkdir(parents=True)
+          roots={"G2":Path("_g2"),"G3":Path("_g3"),"G4":Path("_g4"),"G5":Path("_g5")}
+          records=[]
+          expected={"monitor_candidates.json","monitor_evidence.json","monitor_runtime_bundle_manifest.json","repair_packages.json"}
+          for a in cidx["audits"]:
+              full=a["full_id"]
+              g,x,t=full.split("-")
+              cell=f"{x}-{t}"
+              arc=roots[g]/f"stage2/replication_v2/{g}/natural_A/{cell}/first_attempt.tar.gz"
+              assert arc.exists(),full
+              dest=out/"cells"/full
+              dest.mkdir()
+              found={}
+              with tarfile.open(arc,"r:gz") as tf:
+                  members={Path(m.name).name:m for m in tf.getmembers() if m.isfile()}
+                  for name in expected:
+                      assert name in members,(full,name)
+                      f=tf.extractfile(members[name]); assert f
+                      data=f.read()
+                      (dest/name).write_bytes(data)
+                      found[name]=hashlib.sha256(data).hexdigest()
+              records.append({
+                  "full_id":full,"group_id":g,"cell_id":cell,
+                  "source_archive_sha256":hashlib.sha256(arc.read_bytes()).hexdigest(),
+                  "files":found
+              })
+          assert len(records)==80
+          ix={
+              "schema":"stage2-layer-a-frozen-monitor-export-index-v1",
+              "state":"SEALED_COPY_OF_NATURAL_ARCHIVES",
+              "eligible_cell_count":80,
+              "source":"G2_G5_FIRST_ATTEMPT_NATURAL_ARCHIVES",
+              "semantic_audit_used_for_monitor_generation":False,
+              "cpr_labels_used_for_monitor_generation":False,
+              "files_per_cell":sorted(expected),
+              "records":records
+          }
+          (out/"export_index.json").write_text(json.dumps(ix,indent=2,sort_keys=True)+"\n")
+          print(json.dumps({"status":"PASS","cells":80,"files":80*4}))
+          PY
+
+      - name: Commit frozen Layer A monitor export
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_monitor_export"
+          git config user.name "stage2-layer-a-export"
+          git config user.email "stage2-layer-a-export@users.noreply.github.com"
+          git add "$ROOT"
+          git commit -m "Export frozen Layer-A monitor outputs for 80 eligible cells"
+          git push origin HEAD:stage2-gpt56sol-full-context-audit-results-v1
