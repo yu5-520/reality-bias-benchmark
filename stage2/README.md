@@ -1,21 +1,25 @@
 # Stage-II
 
-**Current forward track: frozen natural block -> formal semantic closure -> monitor benchmark -> G2-G5 engineering batches.**
+**Current forward track: frozen natural block -> semantic/monitor block sealed -> 84-cell engineering eligibility -> G2-G5 engineering batches.**
 
 Canonical plan:
 
-`docs/R_Plan_v7.49.md`
+`docs/R_Plan_v7.50.md`
 
 ## Current scientific state
 
 Current frozen forward state:
 
 - G2-G5 Natural A: **84/84 sealed**;
-- DeepSeek monitor-blind semantic reference: **sealed**;
-- formal GPT-5.6 Sol Layer-C contract/input boundary: **frozen**;
+- DeepSeek monitor-blind Layer-B reference: **sealed**;
+- GPT-5.6 Sol formal Layer-C: **80/80 eligible cells sealed**;
+- same-X/T Layer-C cohort synthesis: **21/21 sealed**;
+- Layer B↔C mechanism comparison: **sealed**;
+- primary Layer A↔B prospective monitor benchmark: **sealed**;
+- explanatory Layer A↔C full-context localization comparison: **sealed**;
 - StageII-R7-G1 prospective paired-repair group: **closed and sealed**;
 - R7-G1 paired population: **12/12 audited and synthesized**;
-- R7-G1 X6-T1/T2/T3: **fail-closed boundary observations**, not repair-failure samples.
+- next gate: **84-cell G2-G5 engineering eligibility freeze**.
 
 The R7-G1 engineering cohort is distinct from the original 21-cell natural G1 discovery/calibration matrix.
 
@@ -70,6 +74,14 @@ Engineering locality/efficacy addendum:
 Machine-readable R7-G1 closure registry:
 
 `configs/stage2_r7_g1_closure_registry_v1.json`
+
+Post-audit semantic/monitor closure:
+
+`docs/reports/2026-09-27/StageII_Post_Audit_Semantic_and_Monitor_Benchmark_Closure_v1.md`
+
+Machine-readable post-audit closure registry:
+
+`configs/stage2_post_audit_closure_registry_v1.json`
 
 ## Canonical forward protocols
 
@@ -296,17 +308,22 @@ Full report:
 
 ## Next gate
 
-R7-G1 is closed. Do not rerun it.
+The post-natural semantic and monitor block is sealed.
 
-The forward main-track gate is:
+Do not rerun Natural A, Layer B, Layer C, or R7-G1.
 
-1. complete and seal the formal GPT-5.6 Sol Layer-C result set under the frozen reviewer-independence contract;
-2. complete the Experimental General Chapter cross-group semantic synthesis;
-3. join the independently sealed monitor outputs and semantic references;
-4. freeze the primary within-study prospective monitor benchmark;
-5. freeze G2-G5 engineering eligibility;
-6. execute engineering B by group batch: `G2 -> G3 -> G4 -> G5`;
-7. perform per-batch paired process-semantic audit;
-8. perform final cross-group R7 repair-response synthesis.
+The next operation is the complete **84-cell engineering eligibility ledger**. It must classify every G2-G5 natural cell using only the prospectively frozen monitor/localization/checkpoint/package pipeline into an explicit state such as:
 
-No G2-G5 Natural-A rerun is required. No R7-G1 rerun is permitted by the closure plan.
+- eligible for one B;
+- no prospective package;
+- lineage gap blocked;
+- parent reconstruction blocked;
+- native capability blocked;
+- safety/protocol blocked;
+- observability-only / non-intervenable boundary.
+
+The semantic audits may validate or explain the ledger after freeze, but they may not create a primary repair package that the prospective monitor did not produce.
+
+After the 84-cell eligibility ledger is sealed:
+
+`G2 B -> freeze/audit -> G3 B -> freeze/audit -> G4 B -> freeze/audit -> G5 B -> freeze/audit -> final cross-group R7 synthesis`.
