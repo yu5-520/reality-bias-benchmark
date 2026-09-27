@@ -1,0 +1,81 @@
+{
+  "schema": "stage2-g5-engineering-b-zero-call-preflight-closure-v1",
+  "version": "1.0",
+  "date": "2026-09-27",
+  "state": "SEALED_11_PASS_PLUS_1_CANONICAL_SOURCE_BOUNDARY",
+  "group_id": "G5",
+  "authorization_issue": 322,
+  "workflow_run": 36312043862,
+  "mode": "ZERO_EXTERNAL_PROVIDER_CALL_FULL_CONTINUATION_PREFLIGHT",
+  "expected_eligibility_cells": [
+    "X2-T1",
+    "X2-T2",
+    "X2-T3",
+    "X4-T1",
+    "X4-T2",
+    "X4-T3",
+    "X5-T1",
+    "X5-T2",
+    "X5-T3",
+    "X7-T1",
+    "X7-T2",
+    "X7-T3"
+  ],
+  "passed_cells": [
+    "X2-T1",
+    "X2-T2",
+    "X2-T3",
+    "X4-T1",
+    "X4-T3",
+    "X5-T1",
+    "X5-T2",
+    "X5-T3",
+    "X7-T1",
+    "X7-T2",
+    "X7-T3"
+  ],
+  "passed_count": 11,
+  "source_boundary_cells": [
+    "X4-T2"
+  ],
+  "source_boundaries": {
+    "X4-T2": {
+      "class": "CANONICAL_NATURAL_A_MISSING_SEAL",
+      "natural_A_workflow_run": 36251144204,
+      "natural_A_first_attempt_preserved": true,
+      "natural_A_runner_exit_code": 1,
+      "natural_A_seal_present": false,
+      "preflight_failure": "FileNotFoundError: extracted canonical Natural-A archive has no A/seal.json",
+      "failure_stage": "BEFORE_FAKE_PROVIDER_REPAIR_CONTINUATION",
+      "provider_calls": 0,
+      "scientific_repair_actions": 0,
+      "natural_A_rerun_allowed": false,
+      "fabricated_seal_allowed": false,
+      "stochastic_prefix_replay_allowed": false,
+      "active_B_authorized": false,
+      "role": "ACTIVE_B_EXECUTION_READINESS_BOUNDARY_NOT_B_EFFECT_SAMPLE"
+    }
+  },
+  "scientific_accounting": {
+    "external_subject_provider_calls": 0,
+    "scientific_repair_actions": 0,
+    "natural_A_reruns": 0,
+    "B_attempts_consumed": 0,
+    "paid_evaluator_calls": 0
+  },
+  "eligibility_accounting": {
+    "frozen_structural_eligibility_rows": 12,
+    "eligibility_file_unchanged": true,
+    "active_B_execution_ready_cells": 11,
+    "execution_readiness_boundary_cells": 1,
+    "note": "The frozen 12-row eligibility result is retained. X4-T2 is excluded only at the later active execution-readiness gate because its canonical Natural-A first attempt lacks the required seal."
+  },
+  "independence": {
+    "G4_semantic_audit_used_to_create_boundary": false,
+    "G4_semantic_audit_may_modify_G5_selection": false,
+    "package_selection_changed": false,
+    "parent_checkpoint_selection_changed": false,
+    "repair_rule_changed": false
+  },
+  "next_gate": "AUTHORIZE_EXACTLY_11_G5_ENGINEERING_B_FIRST_ATTEMPTS_WITH_ATOMIC_PRE_PROVIDER_EXECUTION_CLAIM"
+}
