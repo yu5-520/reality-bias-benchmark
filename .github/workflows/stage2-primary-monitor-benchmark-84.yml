@@ -3,7 +3,7 @@ name: Stage-II Primary 84-Cell Monitor Benchmark
 on:
   push:
     branches:
-      - stage2-post-audit-closure-v1
+      - main
     paths:
       - ".github/workflows/stage2-primary-monitor-benchmark-84.yml"
       - "scripts/build_stage2_primary_monitor_benchmark_84_v1.py"
@@ -19,7 +19,7 @@ jobs:
       group: stage2-primary-monitor-benchmark-84
       cancel-in-progress: false
     steps:
-      - name: Checkout post-audit closure branch
+      - name: Checkout post-audit result branch
         uses: actions/checkout@v4
         with:
           ref: stage2-post-audit-closure-v1
