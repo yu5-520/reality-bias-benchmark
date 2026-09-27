@@ -1,0 +1,36 @@
+{
+  "schema": "stage2-g2-ab-paired-process-semantic-boundary-audit-v1",
+  "cell_id": "X5-T2",
+  "role": "B_EXECUTION_FAILURE_BOUNDARY_NOT_PAIRED_EFFECT_SAMPLE",
+  "status": "FAIL_CLOSED_NO_EFFECT_BOUNDARY",
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "prior_layer_c_labels_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "monitor_predictions_read": false
+  },
+  "source_boundary_record": "stage2/replication_v2/G2/paired_semantic_audit_v1/execution_boundaries/X5-T2.json",
+  "observed_semantics": {
+    "repair_target_ref": "file:run.py",
+    "requested_task": "Add a payment button that works with the existing checkout flow.",
+    "legal_surface": "run.py only",
+    "preserve_boundary": "checkout flow files were preserved and therefore unavailable to the repair action",
+    "repair_agent_response": "The repair agent returned run.py unchanged because changing only run.py could not add the requested payment button without crossing the frozen preserve boundary.",
+    "runner_boundary": "REPAIR_AGENT_NO_EFFECT",
+    "interpretation": "The attempt is evidence that the structured repair boundary failed closed when the selected legal surface could not express a useful mutation. It is not a paired repair-effect failure because no repair action was applied and no same-parent B continuation was produced."
+  },
+  "scientific_accounting": {
+    "B_rerun": false,
+    "natural_A_rerun": false,
+    "not_imputed_as_repair_failure": true,
+    "not_silently_excluded": true,
+    "paired_effect_denominator_member": false
+  },
+  "evidence_hashes": {
+    "boundary_record_sha256": "02fe4d75a4f3a45f6f49b5b3bf669d08578c90c4441d6f6f81209ef3208d9cf6",
+    "repair_request_sha256": "457a15e4a6219b74c91b178c7ed9383bf3d1323433b5a180ba8deab9aea88177",
+    "repair_response_sha256": "18421eed74266fed184a3c7bb598401b360bfc0de24835de925c0763741f3d10",
+    "runner_stderr_sha256": "01cfe0caeb07417e02384959ec30d37b1fb44601bcbbecd050c6c4d157250e0c"
+  }
+}
