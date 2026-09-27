@@ -529,8 +529,11 @@ async def run_one(
         a_root = Path(td) / "A"
         _extract_a_archive(a_archive, a_root)
         a_seal = json.loads((a_root / "seal.json").read_text())
-        if a_seal.get("scientific_code_sha") != SCIENCE_SHA:
+        a_meta = json.loads((a_root / "control" / "attempt_metadata.json").read_text())
+        if a_meta.get("scientific_code_sha") != SCIENCE_SHA:
             raise RuntimeError("A science SHA mismatch")
+        if a_meta.get("seal_present") is not True or a_meta.get("provider_mode") != "SUBJECT":
+            raise RuntimeError("A archive metadata does not bind a valid provider-backed scientific seal")
         package = _selected_package(
             a_root, selection_row["package_id"], selection_row["package_hash"]
         )
