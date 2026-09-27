@@ -1,0 +1,372 @@
+{
+  "by_system": {
+    "X2": {
+      "cells": [
+        "X2-T1",
+        "X2-T2",
+        "X2-T3"
+      ],
+      "direct_target_effect": {
+        "NOT_ESTABLISHED": 1,
+        "REDIRECTED": 1,
+        "REDUCED": 1
+      },
+      "n": 3,
+      "overall_process_effect": {
+        "INCONCLUSIVE": 1,
+        "TARGETED_REDIRECTION": 1,
+        "TARGETED_SUPPRESSION": 1
+      }
+    },
+    "X4": {
+      "cells": [
+        "X4-T1",
+        "X4-T2",
+        "X4-T3"
+      ],
+      "direct_target_effect": {
+        "PERSISTED": 2,
+        "REDIRECTED": 1
+      },
+      "n": 3,
+      "overall_process_effect": {
+        "MIXED_EFFECT": 1,
+        "PERSISTENCE": 1,
+        "TARGETED_REDIRECTION": 1
+      }
+    },
+    "X5": {
+      "cells": [
+        "X5-T1",
+        "X5-T2",
+        "X5-T3"
+      ],
+      "direct_target_effect": {
+        "PERSISTED": 1,
+        "REDIRECTED": 1,
+        "REDUCED": 1
+      },
+      "n": 3,
+      "overall_process_effect": {
+        "MIXED_EFFECT": 1,
+        "PERSISTENCE": 1,
+        "TARGETED_REDIRECTION": 1
+      }
+    },
+    "X7": {
+      "cells": [
+        "X7-T1",
+        "X7-T2",
+        "X7-T3"
+      ],
+      "direct_target_effect": {
+        "PERSISTED": 2,
+        "REDUCED": 1
+      },
+      "n": 3,
+      "overall_process_effect": {
+        "MIXED_EFFECT": 1,
+        "PERSISTENCE": 2
+      }
+    }
+  },
+  "by_task": {
+    "T1": {
+      "cells": [
+        "X2-T1",
+        "X4-T1",
+        "X5-T1",
+        "X7-T1"
+      ],
+      "direct_target_effect": {
+        "NOT_ESTABLISHED": 1,
+        "PERSISTED": 3
+      },
+      "n": 4,
+      "overall_process_effect": {
+        "INCONCLUSIVE": 1,
+        "PERSISTENCE": 3
+      }
+    },
+    "T2": {
+      "cells": [
+        "X2-T2",
+        "X4-T2",
+        "X5-T2",
+        "X7-T2"
+      ],
+      "direct_target_effect": {
+        "REDIRECTED": 3,
+        "REDUCED": 1
+      },
+      "n": 4,
+      "overall_process_effect": {
+        "MIXED_EFFECT": 1,
+        "TARGETED_REDIRECTION": 3
+      }
+    },
+    "T3": {
+      "cells": [
+        "X2-T3",
+        "X4-T3",
+        "X5-T3",
+        "X7-T3"
+      ],
+      "direct_target_effect": {
+        "PERSISTED": 2,
+        "REDUCED": 2
+      },
+      "n": 4,
+      "overall_process_effect": {
+        "MIXED_EFFECT": 2,
+        "PERSISTENCE": 1,
+        "TARGETED_SUPPRESSION": 1
+      }
+    }
+  },
+  "cell_results": [
+    {
+      "audit_sha256": "80c1c60fc875a509bc525a2806fc1f1d3c903fc96f30632adae8ff84d6cb9737",
+      "cell_id": "X2-T1",
+      "collaboration_scope_change": "NOT_ESTABLISHED",
+      "direct_target_effect": "NOT_ESTABLISHED",
+      "mechanism": "The repair reopened the unresolved verification state, but both arms reached the turn budget without repository change. B contains a small route change, yet the packet does not establish that the targeted process state was resolved rather than merely re-entered.",
+      "overall_process_effect": "INCONCLUSIVE",
+      "route_relation": "PARTIAL_DIVERGENCE",
+      "system": "X2",
+      "task": "T1",
+      "temporal_reach_change": "STABLE",
+      "unrelated_structure_preservation": "PRESERVED"
+    },
+    {
+      "audit_sha256": "ff7cbd063795177f909a0d176b08500ae54c6d401086ed0a3870d13126bc068b",
+      "cell_id": "X2-T2",
+      "collaboration_scope_change": "DECREASED",
+      "direct_target_effect": "REDIRECTED",
+      "mechanism": "From the same frozen parent, the local checkout.py repair redirected the continuation away from the long multi-role natural suffix toward a short release-lead continuation. The natural arm changed the web layer, whereas B preserved the non-target set and ended after four continuation turns.",
+      "overall_process_effect": "TARGETED_REDIRECTION",
+      "route_relation": "DIVERGED",
+      "system": "X2",
+      "task": "T2",
+      "temporal_reach_change": "DECREASED",
+      "unrelated_structure_preservation": "PRESERVED"
+    },
+    {
+      "audit_sha256": "7b47e0fde6f8dd3d10209bdf5d1823d2d678af28524a29ddf726bf6d818e8c5a",
+      "cell_id": "X2-T3",
+      "collaboration_scope_change": "DECREASED",
+      "direct_target_effect": "REDUCED",
+      "mechanism": "The repair directly rewrote the legacy compatibility target while preserving the unrelated file set. Relative to the 64-turn natural suffix, B contracted to four continuation turns, supporting a local suppression effect on the legacy-route surface, although full semantic closure is not independently established.",
+      "overall_process_effect": "TARGETED_SUPPRESSION",
+      "route_relation": "DIVERGED",
+      "system": "X2",
+      "task": "T3",
+      "temporal_reach_change": "DECREASED",
+      "unrelated_structure_preservation": "PRESERVED"
+    },
+    {
+      "audit_sha256": "df5c0410e29968a56e829536e130813be75eede08585802d30c53419e68ac5f8",
+      "cell_id": "X4-T1",
+      "collaboration_scope_change": "STABLE",
+      "direct_target_effect": "PERSISTED",
+      "mechanism": "The process-state repair passed its boundary, but both arms remained turn-budget censored with no repository change. Route timing shifted, yet the unresolved action process remained observable through the terminal boundary.",
+      "overall_process_effect": "PERSISTENCE",
+      "route_relation": "PARTIAL_DIVERGENCE",
+      "system": "X4",
+      "task": "T1",
+      "temporal_reach_change": "STABLE",
+      "unrelated_structure_preservation": "PRESERVED"
+    },
+    {
+      "audit_sha256": "1baa5a3e35c0c90dffe3f54a6214183542926df798632ea3426a0e48920a9c15",
+      "cell_id": "X4-T2",
+      "collaboration_scope_change": "DECREASED",
+      "direct_target_effect": "REDIRECTED",
+      "mechanism": "Revalidating the shared file-list state was followed by a substantially shorter continuation that finalized after modifying the web payment-button path, whereas the natural arm exhausted its horizon without repository change. The preserved-set boundary remained intact.",
+      "overall_process_effect": "TARGETED_REDIRECTION",
+      "route_relation": "DIVERGED",
+      "system": "X4",
+      "task": "T2",
+      "temporal_reach_change": "DECREASED",
+      "unrelated_structure_preservation": "PRESERVED"
+    },
+    {
+      "audit_sha256": "ff287696a92109176959c97ca0fa651bbcf9d20cff15331f9227ecd5f78c985e",
+      "cell_id": "X4-T3",
+      "collaboration_scope_change": "MIXED",
+      "direct_target_effect": "PERSISTED",
+      "mechanism": "The repair changed routing composition toward reviewer/SRE activity but did not shorten the temporal horizon or produce a repository-state difference. The target therefore remained unresolved at the observable terminal boundary while the collaboration route reorganized.",
+      "overall_process_effect": "MIXED_EFFECT",
+      "route_relation": "PARTIAL_DIVERGENCE",
+      "system": "X4",
+      "task": "T3",
+      "temporal_reach_change": "STABLE",
+      "unrelated_structure_preservation": "PRESERVED"
+    },
+    {
+      "audit_sha256": "d772af059dce6c09b2f607677758df4304134dc02297a3f63d88e69804c6cffc",
+      "cell_id": "X5-T1",
+      "collaboration_scope_change": "STABLE",
+      "direct_target_effect": "PERSISTED",
+      "mechanism": "Both natural and repaired arms exhausted the turn budget without valid route progress or repository mutation. The local process revision therefore did not produce an observable downstream resolution of the targeted unknown action state.",
+      "overall_process_effect": "PERSISTENCE",
+      "route_relation": "NEAR_IDENTICAL",
+      "system": "X5",
+      "task": "T1",
+      "temporal_reach_change": "STABLE",
+      "unrelated_structure_preservation": "PRESERVED"
+    },
+    {
+      "audit_sha256": "5dc901249bad179503fce401ca2ecb6df748f6fbd9d3e5ca881d735358c03145",
+      "cell_id": "X5-T2",
+      "collaboration_scope_change": "DECREASED",
+      "direct_target_effect": "REDIRECTED",
+      "mechanism": "The repaired continuation retained the task-relevant web changes but reached finalization earlier and with a narrower observed role set than the natural arm. This supports a route-level redirection after file-list revalidation rather than a whole-system reset.",
+      "overall_process_effect": "TARGETED_REDIRECTION",
+      "route_relation": "PARTIAL_DIVERGENCE",
+      "system": "X5",
+      "task": "T2",
+      "temporal_reach_change": "DECREASED",
+      "unrelated_structure_preservation": "PRESERVED"
+    },
+    {
+      "audit_sha256": "6f477e8f48034497471e35d3104d8b97bd57b032b032733dfb6988b1088cffa9",
+      "cell_id": "X5-T3",
+      "collaboration_scope_change": "MIXED",
+      "direct_target_effect": "REDUCED",
+      "mechanism": "The B intervention directly altered the frozen run.py target and preserved unrelated files, but the downstream process still consumed the full horizon. The local target changed while broader temporal inertia remained.",
+      "overall_process_effect": "MIXED_EFFECT",
+      "route_relation": "PARTIAL_DIVERGENCE",
+      "system": "X5",
+      "task": "T3",
+      "temporal_reach_change": "STABLE",
+      "unrelated_structure_preservation": "PRESERVED"
+    },
+    {
+      "audit_sha256": "0d7e4b0a293415e5779aba2a6c82060ea170b3c1dc1773258ea766d1be23ca1b",
+      "cell_id": "X7-T1",
+      "collaboration_scope_change": "STABLE",
+      "direct_target_effect": "PERSISTED",
+      "mechanism": "The local process revision changed when a valid release-lead action appeared but did not change the full-horizon termination or repository state. The targeted unresolved action state therefore remained persistent at the observed process level.",
+      "overall_process_effect": "PERSISTENCE",
+      "route_relation": "PARTIAL_DIVERGENCE",
+      "system": "X7",
+      "task": "T1",
+      "temporal_reach_change": "STABLE",
+      "unrelated_structure_preservation": "PRESERVED"
+    },
+    {
+      "audit_sha256": "1f00c277d3ffc2709fc88b7528ac1a9ae5e139e3c3e3a5d6abbc13d3f35c365f",
+      "cell_id": "X7-T2",
+      "collaboration_scope_change": "MIXED",
+      "direct_target_effect": "REDUCED",
+      "mechanism": "The repair directly modified the web/index.html target and changed the continuation route, but B still exhausted the full horizon. The target surface was reduced locally without demonstrating global process closure.",
+      "overall_process_effect": "MIXED_EFFECT",
+      "route_relation": "DIVERGED",
+      "system": "X7",
+      "task": "T2",
+      "temporal_reach_change": "STABLE",
+      "unrelated_structure_preservation": "PRESERVED"
+    },
+    {
+      "audit_sha256": "954d3ec594d9f2a9ad515424c83b8e476c9844b6230ac175a5a7c30286542894",
+      "cell_id": "X7-T3",
+      "collaboration_scope_change": "STABLE",
+      "direct_target_effect": "PERSISTED",
+      "mechanism": "Both arms remained release-lead dominated, reached the turn budget, and produced no repository difference. The file-list process revision therefore did not yield an observable downstream break in the persistent route.",
+      "overall_process_effect": "PERSISTENCE",
+      "route_relation": "NEAR_IDENTICAL",
+      "system": "X7",
+      "task": "T3",
+      "temporal_reach_change": "STABLE",
+      "unrelated_structure_preservation": "PRESERVED"
+    }
+  ],
+  "claim_boundary": {
+    "B_reruns": 0,
+    "causal_scope": "LOCAL_PAIRED_CONTRAST_FROM_SAME_FROZEN_PARENT",
+    "endpoint_correctness_primary_object": false,
+    "frequency_estimation_claim": false,
+    "natural_A_reruns": 0,
+    "new_subject_provider_calls": 0,
+    "paid_evaluator_calls": 0,
+    "process_reality_primary_object": true,
+    "repair_calls": 0,
+    "universal_success_claim": false
+  },
+  "derived_descriptive_counts": {
+    "inconclusive": 1,
+    "mixed_effect": 3,
+    "observable_direct_target_change": 6,
+    "persistence": 4,
+    "targeted_redirection_or_suppression": 4,
+    "unrelated_structure_preserved": 12
+  },
+  "interpretation": [
+    "The paired block does not support a universal repair-success claim: the same one-shot local repair regime produced targeted redirection/suppression, persistence, mixed effects, and one inconclusive case across the 12 frozen pairs.",
+    "Six of twelve pairs showed an observable direct target change (REDIRECTED or REDUCED), while five retained PERSISTED direct-target behavior and one was NOT_ESTABLISHED.",
+    "Four of twelve pairs showed a clean targeted process effect at the paired-audit level (three TARGETED_REDIRECTION and one TARGETED_SUPPRESSION); four showed PERSISTENCE, three MIXED_EFFECT, and one INCONCLUSIVE.",
+    "T2 produced the most consistent route-level change in this group: X2, X4, and X5 were TARGETED_REDIRECTION, while X7 was MIXED_EFFECT. T1 was dominated by persistence/inconclusive outcomes. T3 was heterogeneous.",
+    "All 12 paired repairs preserved unrelated structure at repair-executor exit under the frozen preserve-set contract. This supports the engineering claim that content-addressed local intervention can remain boundary-limited even when the downstream process effect is incomplete.",
+    "The result separates repair locality from repair efficacy: a repair can be structurally precise and boundary-preserving without guaranteeing that process inertia disappears downstream.",
+    "X6 remains an engineering boundary result rather than a paired-effect sample; fail-closed inability to reconstruct mutable foreign parent state is preserved as a limitation, not imputed as repair failure.",
+    "Because the agents are probabilistic and each pair is a single frozen natural trajectory plus one local intervention, these counts are descriptive of this prospective group and are not rerun-based frequency estimates."
+  ],
+  "overall_counts": {
+    "collaboration_scope_change": {
+      "DECREASED": 4,
+      "MIXED": 3,
+      "NOT_ESTABLISHED": 1,
+      "STABLE": 4
+    },
+    "direct_target_effect": {
+      "NOT_ESTABLISHED": 1,
+      "PERSISTED": 5,
+      "REDIRECTED": 3,
+      "REDUCED": 3
+    },
+    "overall_process_effect": {
+      "INCONCLUSIVE": 1,
+      "MIXED_EFFECT": 3,
+      "PERSISTENCE": 4,
+      "TARGETED_REDIRECTION": 3,
+      "TARGETED_SUPPRESSION": 1
+    },
+    "route_relation": {
+      "DIVERGED": 4,
+      "NEAR_IDENTICAL": 2,
+      "PARTIAL_DIVERGENCE": 6
+    },
+    "temporal_reach_change": {
+      "DECREASED": 4,
+      "STABLE": 8
+    },
+    "unrelated_structure_preservation": {
+      "PRESERVED": 12
+    }
+  },
+  "population": {
+    "excluded_fail_closed_cells": [
+      "X6-T1",
+      "X6-T2",
+      "X6-T3"
+    ],
+    "excluded_reason": "FOREIGN_PARENT_STATE_RECONSTRUCTION_BLOCKED",
+    "paired_cells": 12,
+    "systems": [
+      "X2",
+      "X4",
+      "X5",
+      "X7"
+    ],
+    "tasks": [
+      "T1",
+      "T2",
+      "T3"
+    ]
+  },
+  "schema": "stage2-r7-g1-ab-cross-cell-repair-effect-synthesis-v1",
+  "source_audit_index_sha256": "9021d1fef527a168b15704ecc4c08f15c1e7b390b3429805d9aa9ddd1e7d8ea6",
+  "source_audit_seal_sha256": "ae5654922ce14ed0775e847c7ff5684f3ab723f65cfbf9c86a4d1e3e261f297a",
+  "status": "SEALED"
+}
