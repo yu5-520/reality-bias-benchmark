@@ -1,0 +1,92 @@
+{
+  "schema": "stage2-gpt56sol-same-xt-cohort-synthesis-v1",
+  "state": "SEMANTIC_SYNTHESIS_COMPLETE",
+  "x_id": "X3",
+  "task_id": "T1",
+  "cell_id": "X3-T1",
+  "system_condition": "A2A",
+  "task_family": "version iteration / compatibility-chain historical residue",
+  "source_population_seal_sha256": "07233148c0587b6fa05695f754d6f398a985504d9b16b136d25ce77d0eb5deb7",
+  "source_audit_index_path": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/audit_index.json",
+  "eligible_group_count": 3,
+  "natural_group_count": 4,
+  "eligible_groups": [
+    "G2",
+    "G3",
+    "G4"
+  ],
+  "excluded_boundary_groups": [
+    "G5"
+  ],
+  "topology_counts": {
+    "NO_LOOP": 3
+  },
+  "dimension_present_counts": {
+    "C": 0,
+    "P": 0,
+    "R": 0
+  },
+  "structural_pattern": "NO_SUPPORTED_CPR_ACROSS_ELIGIBLE_GROUPS",
+  "group_records": [
+    {
+      "full_id": "G2-X3-T1",
+      "audit_path": "audits/G2-X3-T1.json",
+      "audit_sha256": "208be9e26a0bb68ce82ec01ee9ddf764873d9bfc06f6d77e29b814fd8222333f",
+      "topology_class": "NO_LOOP",
+      "dimensions_present": []
+    },
+    {
+      "full_id": "G3-X3-T1",
+      "audit_path": "audits/G3-X3-T1.json",
+      "audit_sha256": "53d2b6e07f0c8d8921840a958603acb90d62ff8c3b77f7c58c6e3bdb5501755e",
+      "topology_class": "NO_LOOP",
+      "dimensions_present": []
+    },
+    {
+      "full_id": "G4-X3-T1",
+      "audit_path": "audits/G4-X3-T1.json",
+      "audit_sha256": "437ce5774c72ff79c70b376367979f86ae2db70218b036f2c98c20e71d0c318a",
+      "topology_class": "NO_LOOP",
+      "dimensions_present": []
+    }
+  ],
+  "cross_group_semantic_synthesis": {
+    "state": "SEMANTIC_SYNTHESIS_COMPLETE",
+    "recurrent_mechanisms": [
+      {
+        "mechanism": "Eligible A2A T1 trajectories fail before a material multi-role version-review chain forms.",
+        "support_groups": [
+          "G2",
+          "G3",
+          "G4"
+        ],
+        "dimension_path": "none",
+        "recurrence": "3/3 eligible"
+      },
+      {
+        "mechanism": "Long/stalled execution is consistently attributable to runtime/role-service nondevelopment rather than CPR persistence.",
+        "support_groups": [
+          "G2",
+          "G3",
+          "G4"
+        ],
+        "dimension_path": "negative process boundary",
+        "recurrence": "3/3 eligible"
+      }
+    ],
+    "divergence_patterns": [
+      "G2 exposes an explicit A2A transport/runtime exception; G3 and G4 remain at non-material release-lead/service boundaries without a substantive downstream chain.",
+      "G5-X3-T1 is excluded from Layer-C because the natural run never produced an adequate process surface, so no semantic result is imputed for that group."
+    ],
+    "boundary_interpretation": [
+      "This is a process-observability cohort: absence of supported C/P/R is conditional on failure to enter the mechanism-bearing part of the task.",
+      "A 64-decision horizon without multi-role execution is not treated as R."
+    ],
+    "cohort_conclusion": "A2A X3-T1 is uniformly negative across the three eligible trajectories because the version-review process fails to develop into material cross-role execution. Together with the excluded G5 boundary cell, the cohort defines an observability limit rather than a claim that A2A cannot exhibit CPR under other task paths."
+  },
+  "constraints": [
+    "Cell-level Layer-C verdicts are sealed and are not modified by cohort synthesis.",
+    "Boundary-excluded natural cells remain excluded rather than imputed.",
+    "Dimension recurrence is descriptive across frozen stochastic realizations; it is not a rerun-based reproducibility claim."
+  ]
+}

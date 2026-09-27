@@ -1,0 +1,55 @@
+{
+  "schema": "stage2-gpt56sol-full-context-formal-review-seal-v1",
+  "status": "SEALED",
+  "sealed_population": "G2_G5_80_ELIGIBLE",
+  "reviewer": "GPT-5.6 Sol",
+  "execution_mode": "CHATGPT_NATIVE_REASONING",
+  "formal_review_count": 80,
+  "group_counts": {
+    "G2": 21,
+    "G3": 20,
+    "G4": 21,
+    "G5": 18
+  },
+  "natural_population_count": 84,
+  "excluded_boundary_cells": [
+    "G3-X6-T2",
+    "G5-X3-T1",
+    "G5-X4-T2",
+    "G5-X6-T2"
+  ],
+  "formal_review_index_git_blob_sha": "b7f160b5a52659eda14907fa26ed28409d5b5e2a",
+  "formal_review_tree_sha": "46dbe03a7b6333bc952b2f9113cbdbcb68679482",
+  "inputs_tree_sha": "52b6e08505a62ec8ef813aa149b34a559aa689e3",
+  "packet_index_git_blob_sha": "6ff192002cee9fcd5381385ffabbeea6fd5081f6",
+  "formal_input_freeze_git_blob_sha": "434ee03a0f12ed93456a560be8ece0aa704fe44d",
+  "sealed_from_parent_commit_sha": "5dd5c88ff0207bfab318485d404a5f63f8b7ba8f",
+  "preseal_validation": {
+    "status": "PASS",
+    "validated_cell_count": 80,
+    "checks": [
+      "input_packet_sha256_matches_frozen_packet",
+      "all_evidence_refs_resolve_within_cell_packet",
+      "supported_dimensions_match_dynamic_topology_dimensions",
+      "transition_event_endpoints_resolve",
+      "reviewer_independence_flags_remain_false"
+    ],
+    "group_results": {
+      "G2": "21/21 PASS",
+      "G3": "20/20 eligible PASS",
+      "G4": "21/21 PASS",
+      "G5": "18/18 eligible PASS"
+    }
+  },
+  "independence": {
+    "monitor_runtime_bundle_read": false,
+    "blind_reference_labels_read": false,
+    "blind_reference_records_read": false,
+    "deepseek_full_context_pilot_outputs_read": false,
+    "monitor_evaluation": false,
+    "repair_calls": 0,
+    "subject_reruns": 0
+  },
+  "post_seal_rule": "Cell-level Layer-C verdicts are immutable inputs to same-X/T synthesis. Any later correction must be versioned as a new Layer-C set rather than silently editing this sealed set.",
+  "next_stage": "21 same-X/T cohort syntheses"
+}

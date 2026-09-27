@@ -1,0 +1,77 @@
+{
+  "schema": "stage2-post-audit-closure-registry-v1",
+  "date": "2026-09-27",
+  "status": "SEALED",
+  "population": {
+    "natural_A": 84,
+    "layer_b_reference": 84,
+    "layer_c_eligible": 80,
+    "layer_c_boundary_exclusions": [
+      "G3-X6-T2",
+      "G5-X3-T1",
+      "G5-X4-T2",
+      "G5-X6-T2"
+    ]
+  },
+  "layer_c": {
+    "reviewer": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "formal_review_count": 80,
+    "formal_seal_commit": "59250da361d044d0019457a1807bb05f2e1f693d",
+    "cohort_count": 21,
+    "cohort_seal_commit": "47ff898d1ed74307f1e76691c60ad182ed7e65c4",
+    "topology_counts": {
+      "NO_LOOP": 66,
+      "TWO_DIMENSION_CROSSING": 13,
+      "TRI_DIMENSION_OPEN_CHAIN": 1
+    },
+    "dimension_presence": {
+      "C": 13,
+      "P": 14,
+      "R": 13
+    }
+  },
+  "layer_b_c": {
+    "seal_commit": "84bb00164d7c91c6c9ef11cb9f7713462e02dd64",
+    "compared_cells": 80,
+    "full_context_recovery": {
+      "C": 6,
+      "P": 6,
+      "R": 10
+    },
+    "b_structural_positive_not_sustained": {
+      "C": 22,
+      "P": 30,
+      "R": 21
+    }
+  },
+  "layer_a_b_primary_monitor_benchmark": {
+    "seal_commit": "9c4442971f0ee088e9a9d6a2cbe76bb055d10292",
+    "target_positive_trajectories": 59,
+    "monitor_hit_trajectories": 36,
+    "audit_confirmed_structures": 97,
+    "broad_matched_structures": 45,
+    "strict_matched_structures": 16,
+    "observable_reference_structures": 81,
+    "conditionally_detected_observable_structures": 36,
+    "monitor_warnings": 913,
+    "supported_warnings": 36,
+    "rejected_warnings": 18,
+    "unsupported_warnings": 859
+  },
+  "layer_a_c_full_context_comparison": {
+    "seal_commit": "11b37b161151096be96ed0ead44c50cba77d128e",
+    "positive_trajectories": 25,
+    "monitor_localized_trajectories": 21,
+    "positive_cpr_events": 40,
+    "strict_core_localized_events": 22,
+    "broad_localized_events": 32
+  },
+  "independence": {
+    "natural_reruns": 0,
+    "repair_calls_during_post_audit_closure": 0,
+    "monitor_generation_used_cpr_labels": false,
+    "audit_miss_backfill_into_primary_repair": false
+  },
+  "next_gate": "G2_G5_84_CELL_ENGINEERING_ELIGIBILITY_FREEZE"
+}
