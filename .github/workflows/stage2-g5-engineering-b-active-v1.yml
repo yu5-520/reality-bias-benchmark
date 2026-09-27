@@ -247,7 +247,7 @@ jobs:
           assert binding["repair_anchor_ref"]==row["selected_repair_anchor_ref"]
 
           issue=json.loads(subprocess.check_output([
-              "gh","api",f'repos/{os.environ["GITHUB_REPOSITORY"]}/issues/312'
+              "gh","api",f'repos/{os.environ["GITHUB_REPOSITORY"]}/issues/326'
           ],text=True))
           assert issue["user"]["login"]=="yu5-520"
           assert issue["state"]=="open"
@@ -265,7 +265,7 @@ jobs:
               "max_total_B_provider_calls=675",
           ]:
               assert needle in body
-          print("PASS: exact G5 active-B authorization and irreversible 12-cell claim")
+          print("PASS: exact G5 active-B authorization and irreversible 11-cell claim")
           PY
 
       - name: Bind exact X2 MetaGPT environment
@@ -518,7 +518,7 @@ jobs:
           PY
           echo "PASS: evidence branch remains exactly at this run's pre-provider execution claim"
 
-      - name: Download all 12 first-attempt artifacts
+      - name: Download all 11 first-attempt artifacts
         uses: actions/download-artifact@v4
         with:
           github-token: ${{ github.token }}
@@ -693,7 +693,7 @@ jobs:
           git -C evidence config user.email "stage2-g5-engineering-b-evidence@users.noreply.github.com"
           git -C evidence add "$B_EVIDENCE_ROOT"
           git -C evidence diff --cached --quiet && { echo "FAIL: no G5 B freeze output"; exit 50; }
-          git -C evidence commit -m "evidence: freeze G5 12-cell first Engineering-B attempts [run $GITHUB_RUN_ID]"
+          git -C evidence commit -m "evidence: freeze G5 11-cell first Engineering-B attempts [run $GITHUB_RUN_ID]"
           git -C evidence push origin "HEAD:$EVIDENCE_BRANCH"
           echo "frozen=true" >> "$GITHUB_OUTPUT"
 
