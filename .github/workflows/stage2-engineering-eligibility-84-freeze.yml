@@ -1,0 +1,93 @@
+name: Stage-II 84-Cell Engineering Eligibility Freeze
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "configs/stage2_engineering_eligibility_84_launch_v1.json"
+
+permissions:
+  contents: write
+
+jobs:
+  freeze-eligibility:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: stage2-engineering-eligibility-84
+      cancel-in-progress: false
+    steps:
+      - name: Checkout eligibility result branch
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-engineering-eligibility-84-results-v1
+          fetch-depth: 0
+
+      - name: Checkout G2 natural evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g2-natural-evidence-v1
+          path: _g2
+          fetch-depth: 1
+
+      - name: Checkout G3 natural evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g3-natural-evidence-v1
+          path: _g3
+          fetch-depth: 1
+
+      - name: Checkout G4 natural evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g4-natural-evidence-v1
+          path: _g4
+          fetch-depth: 1
+
+      - name: Checkout G5 natural evidence
+        uses: actions/checkout@v4
+        with:
+          ref: stage2-g5-natural-evidence-v1
+          path: _g5
+          fetch-depth: 1
+
+      - name: Build complete 84-cell engineering eligibility ledger
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/build_stage2_engineering_eligibility_84_v1.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path("stage2/replication_v2/engineering_eligibility_84_v1")
+          ledger=json.loads((root/"eligibility_ledger.json").read_text())
+          seal=json.loads((root/"eligibility_seal.json").read_text())
+          assert ledger["state"]=="SEALED"
+          assert ledger["cell_count"]==84
+          assert len(ledger["cells"])==84
+          assert seal["state"]=="SEALED" and seal["cell_count"]==84
+          assert seal["B_executed"] is False
+          assert ledger["semantic_audit_used"] is False
+          assert ledger["layer_c_used"] is False
+          assert sum(ledger["outcome_counts"].values())==84
+          for g in ("G2","G3","G4","G5"):
+              idx=json.loads((root/f"{g}_b_selection_index.json").read_text())
+              assert idx["state"]=="FROZEN_ELIGIBILITY_NOT_B_AUTHORIZATION"
+              assert idx["B_authorized"] is False
+          print("ENGINEERING_ELIGIBILITY_84_GATE=PASS")
+          PY
+
+      - name: Freeze eligibility outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="stage2/replication_v2/engineering_eligibility_84_v1"
+          git config user.name "stage2-engineering-eligibility"
+          git config user.email "stage2-engineering-eligibility@users.noreply.github.com"
+          git add "$ROOT"
+          if git diff --cached --quiet; then
+            echo "No eligibility output change to commit."
+            exit 0
+          fi
+          git commit -m "Seal Stage-II 84-cell engineering eligibility ledger"
+          git push origin HEAD:stage2-engineering-eligibility-84-results-v1
