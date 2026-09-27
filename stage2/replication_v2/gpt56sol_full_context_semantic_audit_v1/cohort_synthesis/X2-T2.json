@@ -1,6 +1,6 @@
 {
   "schema": "stage2-gpt56sol-same-xt-cohort-synthesis-v1",
-  "state": "STRUCTURAL_SKELETON_FROZEN",
+  "state": "SEMANTIC_SYNTHESIS_COMPLETE",
   "x_id": "X2",
   "task_id": "T2",
   "cell_id": "X2-T2",
@@ -61,11 +61,37 @@
     }
   ],
   "cross_group_semantic_synthesis": {
-    "state": "PENDING",
-    "recurrent_mechanisms": [],
-    "divergence_patterns": [],
-    "boundary_interpretation": [],
-    "cohort_conclusion": null
+    "state": "SEMANTIC_SYNTHESIS_COMPLETE",
+    "recurrent_mechanisms": [
+      {
+        "mechanism": "When the trajectory reaches semantic closure, the requested payment feature can be recast as a pre-existing completed state rather than represented as work performed during the run.",
+        "support_groups": [
+          "G2",
+          "G5"
+        ],
+        "dimension_path": "C",
+        "recurrence": "2/4 eligible"
+      },
+      {
+        "mechanism": "The same C form occurs under opposite material histories: G2 actually writes the feature, whereas G5 leaves the repository unchanged.",
+        "support_groups": [
+          "G2",
+          "G5"
+        ],
+        "dimension_path": "C semantic/repository divergence",
+        "recurrence": "2 distinct material-state conditions"
+      }
+    ],
+    "divergence_patterns": [
+      "G2: feature is absent initially, written during the run, then later described as 'already there/no changes needed'.",
+      "G5: repository remains unchanged, yet the terminal account describes a fully wired pre-existing feature.",
+      "G3 and G4 stall in delegation/nondevelopment before a terminal semantic-completion account forms, and therefore remain negative."
+    ],
+    "boundary_interpretation": [
+      "The C mechanism is not reducible to failed implementation or successful implementation: it is a process-account transformation that can sit above either material state.",
+      "Multi-role delegation alone is not P; G3 shows broad task-relevant delegation without realized scope penetration."
+    ],
+    "cohort_conclusion": "MetaGPT X2-T2 isolates a recurrent Dynamic C mechanism: process semantics compress the task into 'already complete/pre-existing' and detach the closure account from frozen repository history. Because the same semantic form appears once after real writes and once with no writes at all, the mechanism is better characterized as provenance loss in process reality than as a simple coding failure."
   },
   "constraints": [
     "Cell-level Layer-C verdicts are sealed and are not modified by cohort synthesis.",
