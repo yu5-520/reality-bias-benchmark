@@ -1,0 +1,57 @@
+{
+  "schema": "stage2-r7-g1-phase-b-zero-call-continuation-preflight-seal-v1",
+  "status": "PASS_12_OF_12_FULL_RESTORE_REPAIR_CONTINUATION",
+  "workflow_run_id": 36298772109,
+  "workflow_url": "https://github.com/yu5-520/reality-bias-benchmark/actions/runs/36298772109",
+  "b_code_sha": "2dcfbd46551842bb96a7ea295f69adcdc2abd745",
+  "input_evidence_sha": "9d2e568274cada672501b08515476a61ab92e4bc",
+  "ready_cells": [
+    "X2-T1",
+    "X2-T2",
+    "X2-T3",
+    "X4-T1",
+    "X4-T2",
+    "X4-T3",
+    "X5-T1",
+    "X5-T2",
+    "X5-T3",
+    "X7-T1",
+    "X7-T2",
+    "X7-T3"
+  ],
+  "blocked_cells": [
+    {
+      "cell_id": "X6-T1",
+      "reason": "FOREIGN_PARENT_STATE_RECONSTRUCTION_BLOCKED"
+    },
+    {
+      "cell_id": "X6-T2",
+      "reason": "FOREIGN_PARENT_STATE_RECONSTRUCTION_BLOCKED"
+    },
+    {
+      "cell_id": "X6-T3",
+      "reason": "FOREIGN_PARENT_STATE_RECONSTRUCTION_BLOCKED"
+    }
+  ],
+  "cells_passed": 12,
+  "cells_failed": 0,
+  "same_parent_restore": true,
+  "one_local_repair_boundary": true,
+  "native_continuation_path": true,
+  "repair_executor_exit": true,
+  "post_repair_monitor_mode": "WATCH_ONLY",
+  "post_repair_additional_repair_packages": 0,
+  "fake_provider_only": true,
+  "external_provider_calls": 0,
+  "scientific_repair_actions": 0,
+  "semantic_audit_used": false,
+  "cpr_labels_used": false,
+  "natural_A_reruns": 0,
+  "x6_provider_calls": 0,
+  "interpretation": [
+    "All 12 execution-ready cells passed the complete same-parent restore -> one local repair -> repair-executor exit -> native continuation -> WATCH_ONLY observation path.",
+    "The preflight used only a local fake provider and made zero external provider calls; it produced no scientific B evidence.",
+    "X6 remains fail-closed because its selected historical MemoryBank parent state cannot be reconstructed from frozen A evidence.",
+    "This seal is a technical execution-readiness prerequisite and does not itself authorize or count a provider-backed Repair B trajectory."
+  ]
+}
