@@ -4,7 +4,7 @@
 
 Canonical plan:
 
-`docs/R_Plan_v7.52.md`
+`docs/R_Plan_v7.53.md`
 
 ## Current scientific state
 
@@ -21,7 +21,10 @@ Current frozen forward state:
 - R7-G1 paired population: **12/12 audited and synthesized**;
 - 84-cell G2-G5 engineering eligibility: **sealed** — 48 eligible / 12 no package / 24 parent blocked;
 - exact eligible geometry: **G2=12, G3=12, G4=12, G5=12**;
-- next gate: **G2 Engineering-B authorization for the 12 frozen eligible cells only**.
+- G2 Engineering-B first attempts: **12/12 preserved; 11 valid pairs + 1 execution boundary**;
+- G2 paired process-semantic audit: **11/11 valid pairs + 1 boundary sealed and synthesized**;
+- G3 Engineering-B: **active authorization launched from frozen pre-audit selection**;
+- pipeline rule: **audit Gi may overlap execute Gi+1; audit output may not modify Gi+1 frozen execution**.
 
 The R7-G1 engineering cohort is distinct from the original 21-cell natural G1 discovery/calibration matrix.
 
@@ -93,6 +96,10 @@ Machine-readable engineering eligibility closure registry:
 
 `configs/stage2_engineering_eligibility_84_closure_registry_v1.json`
 
+G2 paired repair-effect child report:
+
+`docs/reports/2026-09-27/StageII_G2_Paired_Repair_Effect_Child_Report_v1.md`
+
 ## Canonical forward protocols
 
 Execution/evaluation policy:
@@ -140,7 +147,7 @@ The forward order is:
 9. join frozen monitor outputs to the frozen audit reference set;
 10. compute primary within-study prospective monitoring performance;
 11. freeze 84-cell engineering eligibility — **completed: 48 eligible / 12 no package / 24 parent blocked**;
-12. authorize and run engineering B in G2, then G3, G4, G5 batches;
+12. authorize and run engineering B in G2, G3, G4, G5 batches; post-B semantic audit of group Gi may overlap the already-frozen execution of Gi+1;
 13. synthesize the Engineering General Chapter.
 
 No active B is allowed before the full 84-trajectory natural block and the primary independent audit/monitor-evaluation block are frozen.
@@ -314,25 +321,25 @@ Full report:
 
 ## Next gate
 
-The complete 84-cell engineering eligibility ledger is sealed.
+G2 is closed through paired semantic synthesis.
 
-Frozen eligibility geometry:
+Frozen G2 result:
 
-- X2/X4/X5/X7 × T1-T3 × G2-G5 = **48 ELIGIBLE_FOR_ONE_B**;
-- X3 × T1-T3 × G2-G5 = **12 NO_PROSPECTIVE_PACKAGE**;
-- X1 × T1-T3 × G2-G5 = **12 PARENT_RECONSTRUCTION_BLOCKED**;
-- X6 × T1-T3 × G2-G5 = **12 PARENT_RECONSTRUCTION_BLOCKED** due frozen mutable foreign-state reconstruction.
+- first B attempts preserved: **12/12**;
+- valid same-parent paired contrasts: **11**;
+- execution boundary: **X5-T2**;
+- direct target changed: **7/11**;
+- clean targeted suppression/redirection: **2/11**;
+- unrelated structure preserved: **11/11**.
 
-No B has been executed by the eligibility freeze.
+G3 has independently frozen its package/checkpoint selection and passed the 12/12 zero-call continuation preflight. Its active-B batch may run while G2 closure is promoted.
 
-The next operation is a separate **G2 Engineering-B authorization** for exactly:
+The engineering pipeline is now:
 
-`G2 X2/X4/X5/X7 × T1/T2/T3 = 12 cells`.
+`audit G2 || execute G3`  
+`audit G3 || execute G4`  
+`audit G4 || execute G5`
 
-G2 X1, X3 and X6 receive zero B calls under the primary protocol.
+A previous group's semantic findings may enter later synthesis, but may not change the next group's already-frozen package selection, repair rule, parent checkpoint, or execution geometry.
 
-After G2 B is frozen:
-
-`G2 paired audit -> G2 synthesis -> G3 authorization`.
-
-No Natural-A, Layer-B, Layer-C, R7-G1, primary monitor benchmark, or eligibility rerun is required.
+G4 zero-call preflight may be prepared while G3 B runs. G4 active B remains separately gated until G3 first attempts are frozen.
