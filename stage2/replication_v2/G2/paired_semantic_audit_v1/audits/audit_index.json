@@ -1,0 +1,115 @@
+{
+  "schema": "stage2-g2-ab-paired-process-semantic-audit-index-v1",
+  "status": "SEALED_11_PAIRED_AUDITS_PLUS_1_EXECUTION_BOUNDARY",
+  "authorization_issue": 301,
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING"
+  },
+  "source_A_evidence_commit": "8e8cf0765da4a129d09b6761c349fcca5ce7cfb2",
+  "source_B_evidence_commit": "956636cf8a5cf85495300a768036c057574583bd",
+  "packet_index_blob": "7141efcc30e2df1987757fcf84ff7020596e6b75",
+  "paired_audit_count": 11,
+  "execution_boundary_count": 1,
+  "audits": [
+    {
+      "cell_id": "X2-T1",
+      "path": "audits/X2-T1.json",
+      "blob_sha": "ee1992d9f48e27b75131b37c653b71b24b035272",
+      "direct_target_effect": "PERSISTED",
+      "overall_process_effect": "PERSISTENCE"
+    },
+    {
+      "cell_id": "X2-T2",
+      "path": "audits/X2-T2.json",
+      "blob_sha": "d8b478a859082dc883f9ec5e6fa7f1fc79d049f6",
+      "direct_target_effect": "REDIRECTED",
+      "overall_process_effect": "MIXED_EFFECT"
+    },
+    {
+      "cell_id": "X2-T3",
+      "path": "audits/X2-T3.json",
+      "blob_sha": "734a6e92160cc85f18f057cfb243f97ced745abb",
+      "direct_target_effect": "REDUCED",
+      "overall_process_effect": "TARGETED_SUPPRESSION"
+    },
+    {
+      "cell_id": "X4-T1",
+      "path": "audits/X4-T1.json",
+      "blob_sha": "a11080e1c737850f53e9304ebada513d538a01aa",
+      "direct_target_effect": "PERSISTED",
+      "overall_process_effect": "PERSISTENCE"
+    },
+    {
+      "cell_id": "X4-T2",
+      "path": "audits/X4-T2.json",
+      "blob_sha": "c38edd116ec895f57b19de2ce71024159f19ce2c",
+      "direct_target_effect": "REDIRECTED",
+      "overall_process_effect": "MIXED_EFFECT"
+    },
+    {
+      "cell_id": "X4-T3",
+      "path": "audits/X4-T3.json",
+      "blob_sha": "775d074a170dffa986435477843b86385ff0e5f5",
+      "direct_target_effect": "REDIRECTED",
+      "overall_process_effect": "TARGETED_REDIRECTION"
+    },
+    {
+      "cell_id": "X5-T1",
+      "path": "audits/X5-T1.json",
+      "blob_sha": "9cc7ffe4474da8f665f254ef498adaf9b536d739",
+      "direct_target_effect": "REGENERATED",
+      "overall_process_effect": "REGENERATION"
+    },
+    {
+      "cell_id": "X5-T3",
+      "path": "audits/X5-T3.json",
+      "blob_sha": "604c5dd8db0527b5d1dfc493a36111e38ccdd249",
+      "direct_target_effect": "REDIRECTED",
+      "overall_process_effect": "MIXED_EFFECT"
+    },
+    {
+      "cell_id": "X7-T1",
+      "path": "audits/X7-T1.json",
+      "blob_sha": "4182a9d2e5f3c5d4b5b3cd1436b5a322ff96983b",
+      "direct_target_effect": "PERSISTED",
+      "overall_process_effect": "PERSISTENCE"
+    },
+    {
+      "cell_id": "X7-T2",
+      "path": "audits/X7-T2.json",
+      "blob_sha": "fe9796d45c454590a2a74b9cbe80289dcb26df54",
+      "direct_target_effect": "REDIRECTED",
+      "overall_process_effect": "MIXED_EFFECT"
+    },
+    {
+      "cell_id": "X7-T3",
+      "path": "audits/X7-T3.json",
+      "blob_sha": "6355130a661040d849e07d101c046db1819c2bf5",
+      "direct_target_effect": "PERSISTED",
+      "overall_process_effect": "PERSISTENCE"
+    }
+  ],
+  "execution_boundary": {
+    "cell_id": "X5-T2",
+    "source_path": "execution_boundaries/X5-T2.json",
+    "source_blob_sha": "d1605d4c94ae462982c29021be161d5ae8192a28",
+    "audit_path": "audits/X5-T2.boundary.json",
+    "audit_blob_sha": "5727859306a65ccc607f50386db73e45c8454886",
+    "role": "B_EXECUTION_FAILURE_BOUNDARY_NOT_PAIRED_EFFECT_SAMPLE",
+    "status": "FAIL_CLOSED_NO_EFFECT_BOUNDARY"
+  },
+  "isolation": {
+    "prior_layer_c_labels_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "monitor_predictions_read": false,
+    "monitor_candidate_labels_read": false
+  },
+  "accounting": {
+    "natural_A_reruns": 0,
+    "B_reruns": 0,
+    "new_subject_provider_calls": 0,
+    "repair_calls_during_audit": 0,
+    "paid_evaluator_calls": 0
+  }
+}

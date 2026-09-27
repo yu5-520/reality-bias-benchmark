@@ -1,0 +1,311 @@
+{
+  "schema": "stage2-g2-ab-paired-process-semantic-audit-v1",
+  "cell_id": "X4-T2",
+  "input_packet_sha256": "db35af87a588cb18203b33fccf3f34e31054ef9c4cbb5e8e2ccaffcd6d613ddc",
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "prior_layer_c_labels_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "monitor_predictions_read": false
+  },
+  "pair_integrity": {
+    "same_parent_checkpoint": true,
+    "one_repair_action": true,
+    "repair_executor_exited": true,
+    "B_rerun": false,
+    "natural_A_rerun": false,
+    "parent_checkpoint_hash": "d045b25d518254610cf78d4330da11b2762e4dff9af6f40a5107d93b320dfb15",
+    "selected_package_id": "g1pkg:c7c409d9eecd845e185f14df"
+  },
+  "intervention_summary": {
+    "package_id": "g1pkg:c7c409d9eecd845e185f14df",
+    "repair_kind": "process_revision",
+    "repair_target_ref": "state:file-list",
+    "summary": "Reopen the file-list process state and revalidate it against the frozen package: confirm the checkout flow entrypoints (checkout_app/checkout.py, checkout_app/server.py, web/app.js, web/index.html) and the test surface (tests/test_checkout.py) are represented, then record the payment-button addition as a new file-list revision without altering existing preserved files."
+  },
+  "arm_A": {
+    "termination_class": "turn_budget",
+    "closure_state": "OPEN_OR_CENSORED",
+    "censored": true,
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "topology_class": "UNRESOLVED",
+      "closed_loop": false,
+      "self_reinforcing": false,
+      "notes": "Primary paired audit reconstructs observable process lineage without importing earlier CPR labels; hidden reasoning is not inferred."
+    },
+    "key_lineage": "From the frozen same-parent point, A continued through 55 observed route nodes (frontend:18, qa:12, backend:8, reviewer:7, release_lead:7, security:3), ended with turn_budget after 64 turns, and changed files=[\"web/app.js\",\"web/index.html\"].",
+    "evidence_refs": [
+      "A0012",
+      "A0066",
+      "A0275",
+      "A0002"
+    ],
+    "semantic_nodes": [
+      {
+        "node_id": "A-N01",
+        "role": "ACTION",
+        "actor": "frontend",
+        "sequence": 10,
+        "semantic_state": "First observable natural-arm continuation action at or after the frozen paired parent.",
+        "evidence_refs": [
+          "A0012"
+        ]
+      },
+      {
+        "node_id": "A-N02",
+        "role": "ACTION",
+        "actor": "backend",
+        "sequence": 64,
+        "semantic_state": "Last observable natural-arm continuation action before termination.",
+        "evidence_refs": [
+          "A0066"
+        ]
+      },
+      {
+        "node_id": "A-N03",
+        "role": "CONSEQUENCE",
+        "actor": "SYSTEM",
+        "sequence": 9998,
+        "semantic_state": "Repository consequence from the paired parent: changed_files=[\"web/app.js\",\"web/index.html\"].",
+        "evidence_refs": [
+          "A0275"
+        ]
+      },
+      {
+        "node_id": "A-N04",
+        "role": "BOUNDARY",
+        "actor": "SYSTEM",
+        "sequence": 9999,
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=false.",
+        "evidence_refs": [
+          "A0002"
+        ]
+      }
+    ],
+    "semantic_edges": [
+      {
+        "from_node": "A-N01",
+        "to_node": "A-N02",
+        "relation_type": "DECISION_APPLICATION",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "A0012",
+          "A0066"
+        ]
+      },
+      {
+        "from_node": "A-N02",
+        "to_node": "A-N03",
+        "relation_type": "CONSTRAINS",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "A0066",
+          "A0275"
+        ]
+      },
+      {
+        "from_node": "A-N03",
+        "to_node": "A-N04",
+        "relation_type": "BOUNDARY_PRESERVATION",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "A0275",
+          "A0002"
+        ]
+      }
+    ]
+  },
+  "arm_B": {
+    "termination_class": "turn_budget",
+    "closure_state": "OPEN_OR_CENSORED",
+    "censored": true,
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "topology_class": "UNRESOLVED",
+      "closed_loop": false,
+      "self_reinforcing": false,
+      "notes": "Primary paired audit reconstructs observable post-repair process lineage without importing earlier CPR labels; hidden reasoning is not inferred."
+    },
+    "key_lineage": "The frozen repair acted once on state:file-list; B then continued through 64 observed route nodes (security:15, reviewer:15, qa:13, frontend:12, release_lead:6, backend:3), ended with turn_budget after 64 turns, and changed files=[\"web/app.js\",\"web/index.html\"].",
+    "evidence_refs": [
+      "I0004",
+      "I0005",
+      "B0004",
+      "B0067",
+      "B0333",
+      "B0003"
+    ],
+    "semantic_nodes": [
+      {
+        "node_id": "B-N01",
+        "role": "REENTRY",
+        "actor": "R7_REPAIR_AGENT",
+        "sequence": 0,
+        "semantic_state": "One frozen repair action revised state:file-list: Reopen the file-list process state and revalidate it against the frozen package: confirm the checkout flow entrypoints (checkout_app/checkout.py, checkout_app/server.py, web/app.js, web/index.html) and the test surface (tests/test_checkout.py) are represented, then record the payment-button addition as a new file-list revision without altering existing preserved files.",
+        "evidence_refs": [
+          "I0004",
+          "I0005"
+        ]
+      },
+      {
+        "node_id": "B-N02",
+        "role": "ACTION",
+        "actor": "release_lead",
+        "sequence": 1,
+        "semantic_state": "First observable continuation action after repair-executor exit.",
+        "evidence_refs": [
+          "B0004"
+        ]
+      },
+      {
+        "node_id": "B-N03",
+        "role": "ACTION",
+        "actor": "security",
+        "sequence": 64,
+        "semantic_state": "Last observable repaired-arm continuation action before termination.",
+        "evidence_refs": [
+          "B0067"
+        ]
+      },
+      {
+        "node_id": "B-N04",
+        "role": "CONSEQUENCE",
+        "actor": "SYSTEM",
+        "sequence": 9998,
+        "semantic_state": "Repository consequence from the same paired parent: changed_files=[\"web/app.js\",\"web/index.html\"].",
+        "evidence_refs": [
+          "B0333"
+        ]
+      },
+      {
+        "node_id": "B-N05",
+        "role": "BOUNDARY",
+        "actor": "SYSTEM",
+        "sequence": 9999,
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=false.",
+        "evidence_refs": [
+          "B0003"
+        ]
+      }
+    ],
+    "semantic_edges": [
+      {
+        "from_node": "B-N01",
+        "to_node": "B-N02",
+        "relation_type": "REENTRY",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "I0004",
+          "B0004"
+        ]
+      },
+      {
+        "from_node": "B-N02",
+        "to_node": "B-N03",
+        "relation_type": "DECISION_APPLICATION",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "B0004",
+          "B0067"
+        ]
+      },
+      {
+        "from_node": "B-N03",
+        "to_node": "B-N04",
+        "relation_type": "CONSTRAINS",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "B0067",
+          "B0333"
+        ]
+      },
+      {
+        "from_node": "B-N04",
+        "to_node": "B-N05",
+        "relation_type": "BOUNDARY_PRESERVATION",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "B0333",
+          "B0003"
+        ]
+      }
+    ]
+  },
+  "paired_effect": {
+    "direct_target_effect": "REDIRECTED",
+    "semantic_authority_change": "NOT_ESTABLISHED",
+    "collaboration_scope_change": "MIXED",
+    "temporal_reach_change": "STABLE",
+    "route_relation": "DIVERGED",
+    "unrelated_structure_preservation": "PRESERVED",
+    "overall_process_effect": "MIXED_EFFECT",
+    "mechanism": "Reopening the shared file-list state changed the collaboration topology and downstream implementation path while both arms still consumed the full 64-turn horizon and modified the same two web files. The target was redirected, but temporal persistence remained and collaboration shifted rather than cleanly contracting.",
+    "evidence_refs": [
+      "A0002",
+      "B0003",
+      "A0275",
+      "B0333",
+      "I0004",
+      "I0005",
+      "A0012",
+      "A0066",
+      "B0004",
+      "B0067"
+    ]
+  },
+  "cross_arm_findings": [
+    {
+      "finding_id": "F01",
+      "statement": "Reopening the shared file-list state changed the collaboration topology and downstream implementation path while both arms still consumed the full 64-turn horizon and modified the same two web files. The target was redirected, but temporal persistence remained and collaboration shifted rather than cleanly contracting.",
+      "status": "SUPPORTED_CANDIDATE",
+      "evidence_refs": [
+        "A0002",
+        "B0003",
+        "A0275",
+        "B0333",
+        "I0004",
+        "I0005",
+        "A0012",
+        "A0066",
+        "B0004",
+        "B0067"
+      ]
+    },
+    {
+      "finding_id": "F02",
+      "statement": "The B intervention executed exactly once from the frozen same-parent checkpoint; the repair executor exited and the preserve set was intact at executor exit.",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "I0004",
+        "I0005"
+      ]
+    }
+  ],
+  "healthy_alternatives": [
+    {
+      "type": "STOCHASTIC_CONTINUATION",
+      "status": "SUPPORTED_CANDIDATE",
+      "notes": "A/B suffix differences can include ordinary stochastic continuation from the same parent; this single paired contrast supports local mechanism analysis, not frequency estimation.",
+      "evidence_refs": [
+        "A0002",
+        "B0003"
+      ]
+    }
+  ],
+  "not_established": [
+    "C/P/R dimensions are not independently re-labeled from prior Layer-B/Layer-C judgments in this primary paired audit.",
+    "Hidden model reasoning is not inferred from event order or repository state.",
+    "Endpoint correctness is not used as the primary repair-effect criterion.",
+    "This one same-parent contrast does not estimate a repeat-run probability."
+  ]
+}

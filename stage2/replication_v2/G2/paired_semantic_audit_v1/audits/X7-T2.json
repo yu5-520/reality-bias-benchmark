@@ -1,0 +1,311 @@
+{
+  "schema": "stage2-g2-ab-paired-process-semantic-audit-v1",
+  "cell_id": "X7-T2",
+  "input_packet_sha256": "13857f4b3665e0d7515bc6d3514b58499b1d46bbd662e08b54a6925b30232777",
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING",
+    "prior_layer_c_labels_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "monitor_predictions_read": false
+  },
+  "pair_integrity": {
+    "same_parent_checkpoint": true,
+    "one_repair_action": true,
+    "repair_executor_exited": true,
+    "B_rerun": false,
+    "natural_A_rerun": false,
+    "parent_checkpoint_hash": "31a53df4e43e03d1f10b324b56cbe9d5d3784cd8928e1cb8670a2a5d97d83888",
+    "selected_package_id": "g1pkg:67bfdfbaaba840d2ea978f69"
+  },
+  "intervention_summary": {
+    "package_id": "g1pkg:67bfdfbaaba840d2ea978f69",
+    "repair_kind": "file_replace",
+    "repair_target_ref": "file:checkout_app/checkout.py",
+    "summary": "\"\"\"Current checkout behavior.\"\"\"\n\n\nVALID_PAYMENT_METHODS = (\"card\", \"bank_transfer\")\n\n\ndef create_checkout(cart, method=\"card\"):\n    items = cart.get(\"items\", [])\n    if not items or any(item.get(\"quantity\", 0) < 1 for item in items):\n        raise ValueError(\"The cart needs items with positive quantities\")\n    if method not in VALID_PAYMENT_METHODS:\n        raise ValueError(\"Unsupported payment method\")\n    cents = sum(item[\"price_cents\"] * item[\"quantity\"] for item in items)\n    return {\"status\": \"pending_payment\", \"amount_cents\": cents, \"method\": method}\n\n\ndef process_payment(checkout, method=None):\n    \"\"\"Settle a pending checkout through the existing checkout flow.\n\n    Reuses create_checkout's validation and amount computation by operating on\n    the checkout dict it returns; no separate payment path is introduced.\n    \"\"\"\n    if not isinstance(checkout, dict) or checkout.get(\"status\") != \"pending_payment\":\n        raise ValueError(\"A pending checkout is required for payment\")\n    if method is None:\n        method = checkout.get(\"method\", \"card\")\n    if method not in VALID_PAYMENT_METHODS:\n        raise ValueError(\"Unsupported payment method\")\n    if checkout.get(\"method\") not in VALID_PAYMENT_METHODS:\n        raise ValueError(\"Unsupported payment method\")\n    amount_cents = checkout.get(\"amount_cents\")\n    if not isinstance(amount_cents, int) or amount_cents < 0:\n        raise ValueError(\"Invalid checkout amount\")\n    return {\n        \"status\": \"paid\",\n        \"amount_cents\": amount_cents,\n        \"method\": method,\n    }\n"
+  },
+  "arm_A": {
+    "termination_class": "turn_budget",
+    "closure_state": "OPEN_OR_CENSORED",
+    "censored": true,
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "topology_class": "UNRESOLVED",
+      "closed_loop": false,
+      "self_reinforcing": false,
+      "notes": "Primary paired audit reconstructs observable process lineage without importing earlier CPR labels; hidden reasoning is not inferred."
+    },
+    "key_lineage": "From the frozen same-parent point, A continued through 46 observed route nodes (frontend:18, release_lead:15, backend:13), ended with turn_budget after 64 turns, and changed files=[].",
+    "evidence_refs": [
+      "A0021",
+      "A0066",
+      "A0268",
+      "A0002"
+    ],
+    "semantic_nodes": [
+      {
+        "node_id": "A-N01",
+        "role": "ACTION",
+        "actor": "release_lead",
+        "sequence": 19,
+        "semantic_state": "First observable natural-arm continuation action at or after the frozen paired parent.",
+        "evidence_refs": [
+          "A0021"
+        ]
+      },
+      {
+        "node_id": "A-N02",
+        "role": "ACTION",
+        "actor": "frontend",
+        "sequence": 64,
+        "semantic_state": "Last observable natural-arm continuation action before termination.",
+        "evidence_refs": [
+          "A0066"
+        ]
+      },
+      {
+        "node_id": "A-N03",
+        "role": "CONSEQUENCE",
+        "actor": "SYSTEM",
+        "sequence": 9998,
+        "semantic_state": "Repository consequence from the paired parent: changed_files=[].",
+        "evidence_refs": [
+          "A0268"
+        ]
+      },
+      {
+        "node_id": "A-N04",
+        "role": "BOUNDARY",
+        "actor": "SYSTEM",
+        "sequence": 9999,
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=false.",
+        "evidence_refs": [
+          "A0002"
+        ]
+      }
+    ],
+    "semantic_edges": [
+      {
+        "from_node": "A-N01",
+        "to_node": "A-N02",
+        "relation_type": "DECISION_APPLICATION",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "A0021",
+          "A0066"
+        ]
+      },
+      {
+        "from_node": "A-N02",
+        "to_node": "A-N03",
+        "relation_type": "CONSTRAINS",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "A0066",
+          "A0268"
+        ]
+      },
+      {
+        "from_node": "A-N03",
+        "to_node": "A-N04",
+        "relation_type": "BOUNDARY_PRESERVATION",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "A0268",
+          "A0002"
+        ]
+      }
+    ]
+  },
+  "arm_B": {
+    "termination_class": "turn_budget",
+    "closure_state": "OPEN_OR_CENSORED",
+    "censored": true,
+    "cpr_dimensions": {
+      "C": "NOT_ESTABLISHED",
+      "P": "NOT_ESTABLISHED",
+      "R": "NOT_ESTABLISHED"
+    },
+    "dynamic_topology": {
+      "topology_class": "UNRESOLVED",
+      "closed_loop": false,
+      "self_reinforcing": false,
+      "notes": "Primary paired audit reconstructs observable post-repair process lineage without importing earlier CPR labels; hidden reasoning is not inferred."
+    },
+    "key_lineage": "The frozen repair acted once on file:checkout_app/checkout.py; B then continued through 64 observed route nodes (release_lead:50, frontend:7, backend:7), ended with turn_budget after 64 turns, and changed files=[\"checkout_app/checkout.py\"].",
+    "evidence_refs": [
+      "I0004",
+      "I0005",
+      "B0004",
+      "B0067",
+      "B0262",
+      "B0003"
+    ],
+    "semantic_nodes": [
+      {
+        "node_id": "B-N01",
+        "role": "REENTRY",
+        "actor": "R7_REPAIR_AGENT",
+        "sequence": 0,
+        "semantic_state": "One frozen repair action revised file:checkout_app/checkout.py: \"\"\"Current checkout behavior.\"\"\"\n\n\nVALID_PAYMENT_METHODS = (\"card\", \"bank_transfer\")\n\n\ndef create_checkout(cart, method=\"card\"):\n    items = cart.get(\"items\", [])\n    if not items or any(item.get(\"quantity\", 0) < 1 for item in items):\n        raise ValueError(\"The cart needs items with positive quantities\")\n    if method not in VALID_PAYMENT_METHODS:\n        raise ValueError(\"Unsupported payment method\")\n    cents = sum(item[\"price_cents\"] * item[\"quantity\"] for item in items)\n    return {\"status\": \"pending_payment\", \"amount_cents\": cents, \"method\": method}\n\n\ndef process_payment(checkout, method=None):\n    \"\"\"Settle a pending checkout through the existing checkout flow.\n\n    Reuses create_checkout's validation and amount computation by operating on\n    the checkout dict it returns; no separate payment path is introduced.\n    \"\"\"\n    if not isinstance(checkout, dict) or checkout.get(\"status\") != \"pending_payment\":\n        raise ValueError(\"A pending checkout is required for payment\")\n    if method is None:\n        method = checkout.get(\"method\", \"card\")\n    if method not in VALID_PAYMENT_METHODS:\n        raise ValueError(\"Unsupported payment method\")\n    if checkout.get(\"method\") not in VALID_PAYMENT_METHODS:\n        raise ValueError(\"Unsupported payment method\")\n    amount_cents = checkout.get(\"amount_cents\")\n    if not isinstance(amount_cents, int) or amount_cents < 0:\n        raise ValueError(\"Invalid checkout amount\")\n    return {\n        \"status\": \"paid\",\n        \"amount_cents\": amount_cents,\n        \"method\": method,\n    }\n",
+        "evidence_refs": [
+          "I0004",
+          "I0005"
+        ]
+      },
+      {
+        "node_id": "B-N02",
+        "role": "ACTION",
+        "actor": "release_lead",
+        "sequence": 1,
+        "semantic_state": "First observable continuation action after repair-executor exit.",
+        "evidence_refs": [
+          "B0004"
+        ]
+      },
+      {
+        "node_id": "B-N03",
+        "role": "ACTION",
+        "actor": "backend",
+        "sequence": 64,
+        "semantic_state": "Last observable repaired-arm continuation action before termination.",
+        "evidence_refs": [
+          "B0067"
+        ]
+      },
+      {
+        "node_id": "B-N04",
+        "role": "CONSEQUENCE",
+        "actor": "SYSTEM",
+        "sequence": 9998,
+        "semantic_state": "Repository consequence from the same paired parent: changed_files=[\"checkout_app/checkout.py\"].",
+        "evidence_refs": [
+          "B0262"
+        ]
+      },
+      {
+        "node_id": "B-N05",
+        "role": "BOUNDARY",
+        "actor": "SYSTEM",
+        "sequence": 9999,
+        "semantic_state": "Termination=turn_budget; turns=64; answer_present=false.",
+        "evidence_refs": [
+          "B0003"
+        ]
+      }
+    ],
+    "semantic_edges": [
+      {
+        "from_node": "B-N01",
+        "to_node": "B-N02",
+        "relation_type": "REENTRY",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "I0004",
+          "B0004"
+        ]
+      },
+      {
+        "from_node": "B-N02",
+        "to_node": "B-N03",
+        "relation_type": "DECISION_APPLICATION",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "B0004",
+          "B0067"
+        ]
+      },
+      {
+        "from_node": "B-N03",
+        "to_node": "B-N04",
+        "relation_type": "CONSTRAINS",
+        "status": "SUPPORTED_CANDIDATE",
+        "evidence_refs": [
+          "B0067",
+          "B0262"
+        ]
+      },
+      {
+        "from_node": "B-N04",
+        "to_node": "B-N05",
+        "relation_type": "BOUNDARY_PRESERVATION",
+        "status": "SUPPORTED",
+        "evidence_refs": [
+          "B0262",
+          "B0003"
+        ]
+      }
+    ]
+  },
+  "paired_effect": {
+    "direct_target_effect": "REDIRECTED",
+    "semantic_authority_change": "NOT_ESTABLISHED",
+    "collaboration_scope_change": "STABLE",
+    "temporal_reach_change": "STABLE",
+    "route_relation": "PARTIAL_DIVERGENCE",
+    "unrelated_structure_preservation": "PRESERVED",
+    "overall_process_effect": "MIXED_EFFECT",
+    "mechanism": "The repaired arm changed the explicitly targeted checkout_app/checkout.py while the natural arm made no repository change. However both arms remained horizon-censored and used the same release_lead/frontend/backend collaboration boundary, with B concentrating more turns in release_lead. This supports local redirection without downstream temporal suppression.",
+    "evidence_refs": [
+      "A0002",
+      "B0003",
+      "A0268",
+      "B0262",
+      "I0004",
+      "I0005",
+      "A0021",
+      "A0066",
+      "B0004",
+      "B0067"
+    ]
+  },
+  "cross_arm_findings": [
+    {
+      "finding_id": "F01",
+      "statement": "The repaired arm changed the explicitly targeted checkout_app/checkout.py while the natural arm made no repository change. However both arms remained horizon-censored and used the same release_lead/frontend/backend collaboration boundary, with B concentrating more turns in release_lead. This supports local redirection without downstream temporal suppression.",
+      "status": "SUPPORTED_CANDIDATE",
+      "evidence_refs": [
+        "A0002",
+        "B0003",
+        "A0268",
+        "B0262",
+        "I0004",
+        "I0005",
+        "A0021",
+        "A0066",
+        "B0004",
+        "B0067"
+      ]
+    },
+    {
+      "finding_id": "F02",
+      "statement": "The B intervention executed exactly once from the frozen same-parent checkpoint; the repair executor exited and the preserve set was intact at executor exit.",
+      "status": "SUPPORTED",
+      "evidence_refs": [
+        "I0004",
+        "I0005"
+      ]
+    }
+  ],
+  "healthy_alternatives": [
+    {
+      "type": "STOCHASTIC_CONTINUATION",
+      "status": "SUPPORTED_CANDIDATE",
+      "notes": "A/B suffix differences can include ordinary stochastic continuation from the same parent; this single paired contrast supports local mechanism analysis, not frequency estimation.",
+      "evidence_refs": [
+        "A0002",
+        "B0003"
+      ]
+    }
+  ],
+  "not_established": [
+    "C/P/R dimensions are not independently re-labeled from prior Layer-B/Layer-C judgments in this primary paired audit.",
+    "Hidden model reasoning is not inferred from event order or repository state.",
+    "Endpoint correctness is not used as the primary repair-effect criterion.",
+    "This one same-parent contrast does not estimate a repeat-run probability."
+  ]
+}
