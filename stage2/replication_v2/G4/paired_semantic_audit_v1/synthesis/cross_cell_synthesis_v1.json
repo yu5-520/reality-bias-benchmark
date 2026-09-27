@@ -1,0 +1,106 @@
+{
+  "schema": "stage2-g4-ab-paired-repair-effect-synthesis-v1",
+  "status": "SEALED",
+  "group_id": "G4",
+  "paired_effect_denominator": 11,
+  "execution_boundary_count": 1,
+  "counts": {
+    "direct_target_effect": {
+      "PERSISTED": 5,
+      "REDIRECTED": 4,
+      "REDUCED": 1,
+      "REGENERATED": 1
+    },
+    "overall_process_effect": {
+      "PERSISTENCE": 5,
+      "MIXED_EFFECT": 3,
+      "TARGETED_SUPPRESSION": 1,
+      "TARGETED_REDIRECTION": 1,
+      "REGENERATION": 1
+    },
+    "unrelated_structure_preservation": {
+      "PRESERVED": 11
+    }
+  },
+  "derived": {
+    "direct_target_changed": 6,
+    "clean_targeted_redirection_or_suppression": 2,
+    "persistence": 5,
+    "mixed_effect": 3,
+    "regeneration": 1,
+    "preserve_unrelated_structure": 11
+  },
+  "task_family_pattern": {
+    "T1": {
+      "paired_cells": [
+        "X2-T1",
+        "X4-T1",
+        "X5-T1",
+        "X7-T1"
+      ],
+      "effects": [
+        "PERSISTENCE",
+        "PERSISTENCE",
+        "PERSISTENCE",
+        "PERSISTENCE"
+      ],
+      "summary": "All four valid T1 pairs preserved the unresolved/invalid process pattern after one local process-state revision; none produced a repository consequence or closure."
+    },
+    "T2": {
+      "paired_cells": [
+        "X2-T2",
+        "X4-T2",
+        "X7-T2"
+      ],
+      "effects": [
+        "MIXED_EFFECT",
+        "REGENERATION",
+        "MIXED_EFFECT"
+      ],
+      "execution_boundary": "X5-T2",
+      "summary": "T2 separated into two route-redirection cases, one regeneration case, and one fail-closed no-effect boundary. X4-T2 is the strongest regeneration case: the natural arm finalized at 19 turns, while the repaired arm reopened into 64 turns."
+    },
+    "T3": {
+      "paired_cells": [
+        "X2-T3",
+        "X4-T3",
+        "X5-T3",
+        "X7-T3"
+      ],
+      "effects": [
+        "TARGETED_SUPPRESSION",
+        "TARGETED_REDIRECTION",
+        "MIXED_EFFECT",
+        "PERSISTENCE"
+      ],
+      "summary": "T3 again showed the broadest response range, from clean historical-path suppression/redirection through mixed continuation to persistence."
+    }
+  },
+  "boundary_finding": {
+    "cell_id": "X5-T2",
+    "status": "FAIL_CLOSED_NO_EFFECT_BOUNDARY",
+    "statement": "The frozen repair agent returned run.py byte-identically on the only authorized surface; the runner stopped with REPAIR_AGENT_NO_EFFECT. The first attempt is preserved and excluded from the paired-effect denominator without retry."
+  },
+  "interpretation": [
+    "G4 again separates locality from efficacy: all 11 valid interventions preserved unrelated structure, while only two produced clean targeted suppression/redirection.",
+    "T1 is uniformly persistent in this group, showing that a single process-state revision did not overcome the dominant unresolved/invalid continuation patterns.",
+    "X4-T2 demonstrates regeneration: a naturally finalized trajectory was reopened into a longer multi-role continuation after the local repair.",
+    "X5-T2 demonstrates the complementary fail-closed boundary: the system refused to manufacture a mutation when the authorized target produced no actual change.",
+    "The result supports one-shot repair accounting rather than retries designed to obtain a preferred downstream outcome."
+  ],
+  "claim_boundary": {
+    "causal_scope": "LOCAL_PAIRED_CONTRAST_FROM_SAME_FROZEN_PARENT",
+    "frequency_estimation_claim": false,
+    "universal_success_claim": false,
+    "endpoint_correctness_primary": false,
+    "process_reality_primary": true,
+    "execution_boundary_not_in_denominator": true
+  },
+  "accounting": {
+    "natural_A_reruns": 0,
+    "B_reruns": 0,
+    "new_subject_provider_calls_during_audit": 0,
+    "repair_calls_during_audit": 0,
+    "paid_evaluator_calls": 0
+  }
+}
