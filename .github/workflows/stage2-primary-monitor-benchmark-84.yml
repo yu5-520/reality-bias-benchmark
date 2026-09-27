@@ -9,6 +9,12 @@ on:
       - ".github/workflows/stage2-primary-monitor-benchmark-84.yml"
       - "scripts/build_stage2_primary_monitor_benchmark_84_v1.py"
       - "configs/stage2_monitor_source_bound_matching_rule_v1.json"
+      - "configs/stage2_primary_monitor_benchmark_84_launch_v1.json"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "configs/stage2_primary_monitor_benchmark_84_launch_v1.json"
 
 permissions:
   contents: write
