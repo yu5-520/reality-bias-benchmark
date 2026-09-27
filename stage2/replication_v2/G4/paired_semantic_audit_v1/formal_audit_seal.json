@@ -1,0 +1,86 @@
+{
+  "schema": "stage2-g4-ab-paired-process-semantic-audit-seal-v1",
+  "state": "SEALED",
+  "group_id": "G4",
+  "authorization_issue": 320,
+  "reviewer": {
+    "model": "GPT-5.6 Sol",
+    "execution_mode": "CHATGPT_NATIVE_REASONING"
+  },
+  "population": {
+    "attempted_B_cells": 12,
+    "valid_same_parent_pairs": 11,
+    "execution_boundary_cells": [
+      "X5-T2"
+    ],
+    "paired_effect_denominator": 11
+  },
+  "source": {
+    "A_evidence_commit": "21c34d6260513090ea52ebe63a53114d5e70a809",
+    "B_evidence_commit": "69fc52675dcb3bea7164e4cc5f291226e2a07d58",
+    "B_workflow_run": 36310474950,
+    "packet_freeze_workflow_run": 36312081897,
+    "packet_freeze_commit": "3a676e128f7b3af670a9ccd55d68125e00a014fa",
+    "audit_index_blob": "1e1bc334566642a5a7da2d775435d6027b37981f",
+    "synthesis_json_blob": "2d763fa9f526948f210d283646fcab90fc7885a7",
+    "synthesis_report_blob": "569187ce8e1d7670b7f3ae097e5d9ee3d1d3bf28",
+    "execution_boundary_audit_blob": "ef558405fec6b5a0cc22dcffc878666f8f75fa15"
+  },
+  "audit_blobs": {
+    "X2-T1": "cade2d2b7c699cafae8eb1c1fdfb84a9724ccb4a",
+    "X2-T2": "70d31bb58a05cc0bd7b0529af55eed7602582a95",
+    "X2-T3": "dc50e1b3367abb4343172d90240d9440bc8aa41f",
+    "X4-T1": "007c06dafb2d87bb612782ea471393ec2f9cb714",
+    "X4-T2": "efd3f2713ccf5472032f97d9524cbea6459f314c",
+    "X4-T3": "4e4438e89e20d18cf970251cab5686d860eb773a",
+    "X5-T1": "8a6546f8f6c2bb6b6fc559ad217fc4da537c2cc0",
+    "X5-T3": "79a562185023768df727446af94677ef69905f26",
+    "X7-T1": "9715197ddb7f1fc1e73beac1314c8b77bb2a19ff",
+    "X7-T2": "124ae2c3abdce588da21e09eb49304a730f28208",
+    "X7-T3": "dd5ace212b33212c74bf3005c0e3e42467a0a896"
+  },
+  "frozen_counts": {
+    "direct_target_effect": {
+      "PERSISTED": 5,
+      "REDIRECTED": 4,
+      "REDUCED": 1,
+      "REGENERATED": 1
+    },
+    "overall_process_effect": {
+      "PERSISTENCE": 5,
+      "MIXED_EFFECT": 3,
+      "TARGETED_SUPPRESSION": 1,
+      "TARGETED_REDIRECTION": 1,
+      "REGENERATION": 1
+    },
+    "unrelated_structure_preserved": 11,
+    "execution_boundary_count": 1
+  },
+  "execution_boundary": {
+    "cell_id": "X5-T2",
+    "class": "REPAIR_AGENT_NO_EFFECT_ON_FROZEN_LEGAL_SURFACE",
+    "role": "B_EXECUTION_FAILURE_BOUNDARY_NOT_PAIRED_EFFECT_SAMPLE",
+    "B_rerun": false,
+    "not_imputed_as_repair_failure": true
+  },
+  "independence": {
+    "prior_group_paired_audit_labels_read": false,
+    "prior_layer_c_labels_read": false,
+    "prior_layer_b_reference_labels_read": false,
+    "monitor_predictions_read": false,
+    "natural_A_reruns": 0,
+    "B_reruns": 0,
+    "new_subject_provider_calls_during_audit": 0,
+    "repair_calls_during_audit": 0,
+    "paid_evaluator_calls": 0
+  },
+  "claim_boundary": {
+    "causal_scope": "LOCAL_PAIRED_CONTRAST_FROM_SAME_FROZEN_PARENT",
+    "frequency_estimation_claim": false,
+    "universal_success_claim": false,
+    "endpoint_correctness_primary": false,
+    "process_reality_primary": true,
+    "execution_boundary_not_in_paired_effect_denominator": true
+  },
+  "next_gate": "G4_AUDIT_CLOSURE_AND_G5_ENGINEERING_B_EXECUTION"
+}
