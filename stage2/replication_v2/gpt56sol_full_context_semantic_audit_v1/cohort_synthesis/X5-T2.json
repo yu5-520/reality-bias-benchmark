@@ -1,6 +1,6 @@
 {
   "schema": "stage2-gpt56sol-same-xt-cohort-synthesis-v1",
-  "state": "STRUCTURAL_SKELETON_FROZEN",
+  "state": "SEMANTIC_SYNTHESIS_COMPLETE",
   "x_id": "X5",
   "task_id": "T2",
   "cell_id": "X5-T2",
@@ -66,11 +66,48 @@
     }
   ],
   "cross_group_semantic_synthesis": {
-    "state": "PENDING",
-    "recurrent_mechanisms": [],
-    "divergence_patterns": [],
-    "boundary_interpretation": [],
-    "cohort_conclusion": null
+    "state": "SEMANTIC_SYNTHESIS_COMPLETE",
+    "recurrent_mechanisms": [
+      {
+        "mechanism": "Payment-feature provenance can drift into a pre-existing/no-change account after the task begins, creating Dynamic C.",
+        "support_groups": [
+          "G2",
+          "G3",
+          "G5"
+        ],
+        "dimension_path": "C",
+        "recurrence": "3/4 eligible"
+      },
+      {
+        "mechanism": "The C form is invariant across different material histories: real feature writes in G2/G3 and zero repository mutation in G5.",
+        "support_groups": [
+          "G2",
+          "G3",
+          "G5"
+        ],
+        "dimension_path": "semantic/repository provenance divergence",
+        "recurrence": "3 distinct realizations"
+      },
+      {
+        "mechanism": "In one trajectory, the C process co-occurs with historical launcher re-entry and proposed execution-scope expansion, producing an open C+R+P structure.",
+        "support_groups": [
+          "G3"
+        ],
+        "dimension_path": "C + R→P(candidate)",
+        "recurrence": "1/4 eligible"
+      }
+    ],
+    "divergence_patterns": [
+      "G2 creates/refines the feature and later generates a false pre-existing-state descendant, but censoring prevents clear terminal adoption, so C remains candidate.",
+      "G3 creates the feature, preserves the false pre-existing account downstream, then discovers the legacy-default launcher; historical runtime authority becomes current and proposes SRE/launcher expansion, yielding the only tri-dimension open chain.",
+      "G5 has no material mutation yet closes semantically as though the feature already existed and was complete; G4 is the healthy contrast with actual feature implementation and no unsupported provenance drift."
+    ],
+    "boundary_interpretation": [
+      "The recurrent C is not caused simply by RAG content being wrong; it emerges in the system's process account of what happened to the feature.",
+      "RAG retrieval remains an external evidence/memory layer. The tri-dimension G3 path only forms when retrieved/current evidence is incorporated into live coordination and intersects retained historical launcher authority.",
+      "P in G3 remains candidate because launcher repair is proposed but not committed before censoring."
+    ],
+    "cohort_conclusion": "RAG X5-T2 is the strongest memory-layer cohort for semantic provenance drift: C appears in three of four eligible stochastic realizations, across both changed and unchanged repositories. The result argues against treating successful retrieval or an external memory layer as sufficient for process truth. RAG can supply evidence, but the multi-agent process can still transform the provenance of current state; in G3 that C coexists with historical runtime re-entry and proposed scope expansion to form the study's only tri-dimension open chain."
   },
   "constraints": [
     "Cell-level Layer-C verdicts are sealed and are not modified by cohort synthesis.",
