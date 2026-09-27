@@ -33,6 +33,31 @@ jobs:
     outputs:
       execution_claim_sha: ${{ steps.claim.outputs.execution_claim_sha }}
     steps:
+      - name: Checkout active control gate
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: gate
+          fetch-depth: 1
+
+      - name: Fail closed because canonical G4 first-attempt run is already reserved
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=Path("gate/configs/stage2_g4_engineering_b_attempt_consumption_latch_v1.json")
+          g=json.loads(p.read_text())
+          assert g["state"]=="CANONICAL_FIRST_ATTEMPT_RUN_ACTIVE_NO_RELAUNCH"
+          assert g["canonical_first_attempt_workflow_run"]==36310474950
+          assert g["relaunch_authorized"] is False
+          assert g["automatic_retry_authorized"] is False
+          current=int(os.environ["GITHUB_RUN_ID"])
+          if current != g["canonical_first_attempt_workflow_run"]:
+              raise SystemExit(f"FAIL_CLOSED: G4 first-attempt slots are reserved to canonical run {g['canonical_first_attempt_workflow_run']}; current run {current} is not authorized")
+          PY
+
       - name: Checkout exact irreversible group claim
         uses: actions/checkout@v4
         with:
