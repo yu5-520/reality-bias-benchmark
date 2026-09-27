@@ -1,0 +1,244 @@
+name: Stage-II G3 Engineering-B Freeze Recovery
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "configs/stage2_g3_engineering_b_freeze_recovery_launch_v1.json"
+
+permissions:
+  actions: read
+  contents: write
+  issues: write
+
+concurrency:
+  group: stage2-g3-engineering-b-freeze-recovery-v1
+  cancel-in-progress: false
+
+env:
+  GROUP_ID: G3
+  AUTH_ISSUE: "304"
+  SOURCE_B_RUN_ID: "36309205795"
+  B_CODE_SHA: ab98ab0b0e5a1ec7edace744472a63e8bdb0990b
+  SOURCE_A_EVIDENCE_SHA: 858796145d912562cf8ef889b4d4083175d1f21e
+  SOURCE_A_SCIENCE_SHA: b4f1441a48b2bc6a2c61035311419fc4509e8913
+  SOURCE_A_WORKFLOW_RUN: "36242414243"
+  INPUT_CLAIM_SHA: 4f2632d4a14816ccea19027062bd7cc97140dd74
+  EVIDENCE_BRANCH: stage2-g3-engineering-b-evidence-v1
+  B_EVIDENCE_ROOT: stage2/replication_v2/G3/engineering_B_v1
+
+jobs:
+  recover-freeze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout exact irreversible evidence claim
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.INPUT_CLAIM_SHA }}
+          path: evidence
+          fetch-depth: 0
+
+      - name: Verify no scientific rerun and evidence branch unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C evidence rev-parse HEAD)" = "$INPUT_CLAIM_SHA"
+          REMOTE="$(git -C evidence ls-remote origin "refs/heads/$EVIDENCE_BRANCH" | awk '{print $1}')"
+          test "$REMOTE" = "$INPUT_CLAIM_SHA"
+          test ! -e "evidence/$B_EVIDENCE_ROOT/group_index.json"
+          echo "PASS: recovery begins from the exact pre-provider claim; no B rerun"
+
+      - name: Download the 12 immutable first-attempt artifacts from the original B run
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ env.SOURCE_B_RUN_ID }}
+          pattern: stage2-g3-b-*-${{ env.SOURCE_B_RUN_ID }}
+          path: /tmp/stage2-g3-b-source
+          merge-multiple: true
+
+      - name: Validate artifacts and freeze without executing B again
+        id: freeze
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ROOT="$GITHUB_WORKSPACE/evidence"
+          export DL="/tmp/stage2-g3-b-source"
+          python - <<'PY'
+          import hashlib,json,os,shutil,tarfile,tempfile
+          from pathlib import Path
+
+          root=Path(os.environ["ROOT"])
+          dl=Path(os.environ["DL"])
+          expected=[
+              "X2-T1","X2-T2","X2-T3",
+              "X4-T1","X4-T2","X4-T3",
+              "X5-T1","X5-T2","X5-T3",
+              "X7-T1","X7-T2","X7-T3",
+          ]
+          claim=json.loads((root/"stage2/replication_v2/G3/engineering_B_v1/control/group_claim.json").read_text())
+          assert claim["state"]=="IRREVERSIBLY_CLAIMED_BEFORE_ANY_B_PROVIDER_CALL"
+          assert claim["claimed_cells"]==expected
+          assert claim["preclaim_total_B_provider_calls"]==0
+          assert claim["preclaim_B_stochastic_attempts_consumed"]==0
+
+          receipts=[]
+          success=[]
+          failed=[]
+          known_calls=0
+          for cell in expected:
+              src=dl/cell
+              rp=src/"attempt_receipt.json"
+              arc=src/"first_B_attempt.tar.gz"
+              shp=src/"first_B_attempt.tar.gz.sha256"
+              assert rp.is_file(), f"{cell}: missing receipt"
+              assert arc.is_file(), f"{cell}: missing archive"
+              assert shp.is_file(), f"{cell}: missing sha"
+
+              r=json.loads(rp.read_text())
+              assert r["schema"]=="stage2-g3-engineering-b-first-attempt-receipt-v1"
+              assert r["group_id"]=="G3"
+              assert r["cell_id"]==cell
+              assert r["attempt_index"]==1
+              assert r["authorization_issue"]==304
+              assert r["b_code_sha"]==os.environ["B_CODE_SHA"]
+              assert r["source_A_evidence_sha"]==os.environ["SOURCE_A_EVIDENCE_SHA"]
+              assert r["source_A_workflow_run"]==int(os.environ["SOURCE_A_WORKFLOW_RUN"])
+              assert r["input_claim_sha"]==os.environ["INPUT_CLAIM_SHA"]
+              assert r["workflow_run_id"]==int(os.environ["SOURCE_B_RUN_ID"])
+              assert r["preserved"] is True
+              assert r["scientific_success_not_inferred"] is True
+              assert r["no_automatic_retry"] is True
+
+              observed=hashlib.sha256(arc.read_bytes()).hexdigest()
+              assert observed==r["archive_sha256"]
+              assert shp.read_text().split()[0]==observed
+
+              if r["runner_exit_code"]==0:
+                  assert r["seal_present"] is True
+                  assert r["seal_status"]=="REPAIR_B_FROZEN"
+                  assert r["repair_action_count"]==1
+                  assert r["repair_agent_calls"]==1
+                  assert r["same_parent_checkpoint"] is True
+                  assert r["repair_executor_exited"] is True
+                  assert r["post_repair_monitor_mode"]=="WATCH_ONLY"
+                  assert r["post_repair_repair_packages"]==0
+                  with tempfile.TemporaryDirectory() as td:
+                      t=Path(td)
+                      with tarfile.open(arc,"r:gz") as tf:
+                          tf.extractall(t)
+                      seal=json.loads((t/"seal.json").read_text())
+                      assert seal["schema"]=="stage2-engineering-paired-repair-b-seal-v1"
+                      assert seal["status"]=="REPAIR_B_FROZEN"
+                      assert seal["group_id"]=="G3"
+                      assert seal["cell_id"]==cell
+                      assert seal["source_A_workflow_run"]==int(os.environ["SOURCE_A_WORKFLOW_RUN"])
+                      assert seal["source_A_science_sha"]==os.environ["SOURCE_A_SCIENCE_SHA"]
+                      assert seal["repair_action_count"]==1
+                      assert seal["repair_agent_calls"]==1
+                      assert seal["same_parent_checkpoint"] is True
+                      assert seal["semantic_audit_used"] is False
+                      assert seal["cpr_labels_used"] is False
+                      assert seal["repair_executor_exited"] is True
+                      assert seal["post_repair_monitor_mode"]=="WATCH_ONLY"
+                      assert seal["post_repair_repair_packages"]==0
+                  success.append(cell)
+                  known_calls += int(r["total_B_provider_calls"])
+              else:
+                  failed.append(cell)
+
+              dest=root/os.environ["B_EVIDENCE_ROOT"]/"cells"/cell
+              assert not dest.exists(), f"{cell}: evidence already exists"
+              dest.mkdir(parents=True)
+              shutil.copy2(arc,dest/"first_B_attempt.tar.gz")
+              shutil.copy2(shp,dest/"first_B_attempt.tar.gz.sha256")
+              shutil.copy2(rp,dest/"attempt_receipt.json")
+              receipts.append(r)
+
+          assert len(receipts)==12
+          group={
+              "schema":"stage2-g3-engineering-b-group-index-v1",
+              "state":"FROZEN_FIRST_B_ATTEMPTS",
+              "group_id":"G3",
+              "phase":"ENGINEERING_B_ONE_SHOT_PAIRED_REPAIR_V1",
+              "authorization_issue":304,
+              "source_workflow_run":int(os.environ["SOURCE_B_RUN_ID"]),
+              "freeze_recovery_workflow_run":int(os.environ["GITHUB_RUN_ID"]),
+              "freeze_recovery_only":True,
+              "b_code_sha":os.environ["B_CODE_SHA"],
+              "source_A_evidence_sha":os.environ["SOURCE_A_EVIDENCE_SHA"],
+              "source_A_workflow_run":int(os.environ["SOURCE_A_WORKFLOW_RUN"]),
+              "input_claim_sha":os.environ["INPUT_CLAIM_SHA"],
+              "expected_cells":expected,
+              "preserved_cells":expected,
+              "preserved_count":12,
+              "successful_B_cells":success,
+              "successful_B_count":len(success),
+              "failed_B_cells":failed,
+              "failed_B_count":len(failed),
+              "one_B_per_cell":True,
+              "automatic_retries":0,
+              "known_successful_total_B_provider_calls":known_calls,
+              "provider_call_accounting_complete":len(failed)==0,
+              "repair_executor_exit_required":True,
+              "post_repair_monitor_mode":"WATCH_ONLY",
+              "semantic_audit_execution":"NOT_EXECUTED",
+              "semantic_audit_gate":"OPEN_AFTER_ALL_B_FROZEN",
+              "paid_evaluator_calls":0,
+              "natural_A_reruns":0,
+              "B_reruns":0,
+              "blocked_or_no_package_B_calls":0,
+              "receipts":receipts,
+          }
+          gp=root/os.environ["B_EVIDENCE_ROOT"]/"group_index.json"
+          gp.write_text(json.dumps(group,indent=2,sort_keys=True)+"\n")
+          seal={
+              "schema":"stage2-g3-engineering-b-group-seal-v1",
+              "state":"SEALED_FIRST_B_ATTEMPTS",
+              "group_id":"G3",
+              "preserved_count":12,
+              "successful_B_count":len(success),
+              "failed_B_count":len(failed),
+              "B_reruns":0,
+              "natural_A_reruns":0,
+              "freeze_recovery_only":True,
+              "source_workflow_run":int(os.environ["SOURCE_B_RUN_ID"]),
+              "semantic_audit_used_during_B":False,
+              "paid_evaluator_calls":0,
+              "next_gate":"G3_PAIRED_PROCESS_SEMANTIC_AUDIT",
+              "group_index_sha256":hashlib.sha256(gp.read_bytes()).hexdigest(),
+          }
+          (root/os.environ["B_EVIDENCE_ROOT"]/"group_seal.json").write_text(json.dumps(seal,indent=2,sort_keys=True)+"\n")
+          print(json.dumps({"preserved":12,"successful":len(success),"failed":len(failed),"known_successful_total_B_provider_calls":known_calls},sort_keys=True))
+          PY
+
+          git -C evidence config user.name "stage2-g3-engineering-b-evidence"
+          git -C evidence config user.email "stage2-g3-engineering-b-evidence@users.noreply.github.com"
+          git -C evidence add "$B_EVIDENCE_ROOT"
+          git -C evidence diff --cached --quiet && { echo "FAIL: no G3 B recovery freeze output"; exit 50; }
+          git -C evidence commit -m "evidence: recover-freeze G3 12-cell first Engineering-B attempts [source run $SOURCE_B_RUN_ID]"
+          git -C evidence push origin "HEAD:$EVIDENCE_BRANCH"
+          echo "frozen=true" >> "$GITHUB_OUTPUT"
+
+      - name: Report recovered freeze
+        if: steps.freeze.outputs.frozen == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          SUMMARY="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          g=json.loads(Path("evidence/stage2/replication_v2/G3/engineering_B_v1/group_index.json").read_text())
+          print(
+              f"G3 first B attempts recovered from immutable artifacts and frozen without rerun: "
+              f"preserved={g['preserved_count']}/12, successful={g['successful_B_count']}, failed={g['failed_B_count']}, "
+              f"B reruns=0, Natural-A reruns=0. Source B workflow={g['source_workflow_run']}."
+          )
+          PY
+          )"
+          gh issue comment "$AUTH_ISSUE" --repo "$GITHUB_REPOSITORY" --body "$SUMMARY"
