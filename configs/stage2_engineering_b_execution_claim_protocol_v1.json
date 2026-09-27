@@ -53,5 +53,19 @@
     "motivating_incident_path": "stage2/replication_v2/G3/engineering_B_v1/control/duplicate_execution_incident_v1.json",
     "canonical_G3_source_run": 36309205795,
     "excluded_duplicate_run": 36309645952
+  },
+  "transition": {
+    "G4": {
+      "canonical_first_attempt_workflow_run": 36310474950,
+      "canonical_run_started_before_protocol_merge": true,
+      "relaunch_authorized": false,
+      "guard": "configs/stage2_g4_engineering_b_attempt_consumption_latch_v1.json",
+      "if_freeze_fails": "ARTIFACT_ONLY_RECOVERY_ZERO_PROVIDER_RERUN",
+      "atomic_execution_claim_applies_to_canonical_run": false,
+      "atomic_execution_claim_applies_to_any_new_G4_launch": "FAIL_CLOSED_BY_CONSUMPTION_LATCH"
+    },
+    "G5_and_later": {
+      "atomic_execution_claim_required_before_any_provider_call": true
+    }
   }
 }
