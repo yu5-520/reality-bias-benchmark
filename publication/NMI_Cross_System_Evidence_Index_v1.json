@@ -3,7 +3,7 @@
   "version": "1.0",
   "date_utc": "2026-09-28",
   "scientific_evidence_base_commit": "26b617f1630c318aea404c56cd65d90b6075c322",
-  "note": "Publication-facing locator only. This index adds no subject runs, semantic labels, monitor outputs, repair executions, or scientific evidence.",
+  "note": "Publication-facing locator only. This index adds no subject runs, semantic labels, monitor outputs, repair executions, or scientific evidence. Chronology correction adds append-only derived packets and suspends publication use of affected legacy judgments pending re-review.",
   "stage2_frozen_inputs": {
     "task_registry": "stage2/tasks.json",
     "role_registry": "stage2/roles.json",
@@ -29,8 +29,8 @@
   "prospective_monitor": {
     "structural_rules": "configs/stage2_r7_structural_monitor_rules_v1.json",
     "evaluation_protocol": "configs/stage2_monitor_evaluation_protocol_v1.json",
-    "layer_a_b_primary_summary": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_b_monitor_evaluation_v1/evaluation_summary.json",
-    "layer_a_b_seal": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_b_monitor_evaluation_v1/evaluation_seal.json",
+    "layer_a_b_primary_summary": "stage2/replication_v2/primary_monitor_benchmark_84_v1/evaluation_summary.json",
+    "layer_a_b_seal": "stage2/replication_v2/primary_monitor_benchmark_84_v1/benchmark_seal.json",
     "layer_a_c_secondary_summary": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_c_monitor_comparison_v1/comparison_summary.json",
     "layer_a_c_seal": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_c_monitor_comparison_v1/comparison_seal.json"
   },
@@ -65,7 +65,7 @@
       "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_b_c_comparison/mechanism_synthesis.json"
     ],
     "fig4": [
-      "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_b_monitor_evaluation_v1/evaluation_summary.json",
+      "stage2/replication_v2/primary_monitor_benchmark_84_v1/evaluation_summary.json",
       "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/layer_a_c_monitor_comparison_v1/comparison_summary.json",
       "stage2/replication_v2/engineering_eligibility_84_v1/eligibility_seal.json",
       "stage2/replication_v2/engineering_cross_group_g2_g5_v1/summary.json"
@@ -74,5 +74,13 @@
   "frozen_raw_release_stage1": {
     "tag": "frozen-raw-evidence-v1",
     "target_commit": "df6082c841f2a0b21b770d71d4526b3c396204fc"
+  },
+  "chronology_correction": {
+    "summary": "stage2/replication_v2/chronology_correction_v1/summary.json",
+    "report": "docs/reports/2026-09-30/StageII_Frozen_Chronology_Correction_Report.md",
+    "publication_status": "HOLD_AFFECTED_DERIVED_CLAIMS_PENDING_SEMANTIC_REVIEW",
+    "raw_evidence_modified": false,
+    "new_subject_runs": 0,
+    "legacy_semantic_labels_rebound_to_new_packets": false
   }
 }

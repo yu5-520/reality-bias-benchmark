@@ -9,6 +9,11 @@ import tarfile
 from pathlib import Path
 from typing import Any
 
+if __package__ in (None, ""):
+    from checkpoint_chronology import ordered_checkpoints
+else:
+    from arena.checkpoint_chronology import ordered_checkpoints
+
 SYSTEMS={"X2":"MetaGPT","X4":"MCP","X5":"RAG","X7":"LongLLMLingua"}
 TASKS={
     "T1":"version iteration / compatibility-chain historical residue",
@@ -106,17 +111,7 @@ def row_sequence(row,fallback):
     return fallback
 
 def checkpoint_manifests(ar,mm,prefix):
-    out=[]
-    for name in mm:
-        if not name.startswith(prefix) or not name.endswith("/manifest.json"):
-            continue
-        try: obj=read_json(ar,mm,name)
-        except Exception: continue
-        if not isinstance(obj,dict) or "application_file_hashes" not in obj:
-            continue
-        seq=obj.get("model_decision_sequence")
-        out.append((seq if isinstance(seq,int) else -1,name,obj))
-    return sorted(out,key=lambda x:(x[0],x[1]))
+    return ordered_checkpoints(ar,mm,prefix)
 
 def app_snapshot(ar,mm,manifest_path,rel):
     name=manifest_path.rsplit("/manifest.json",1)[0]+"/application/"+rel
@@ -261,8 +256,8 @@ def main():
         add("P","G5/engineering_B_v1/group_index.json",
             {k:gidx.get(k) for k in ("state","source_workflow_run","b_code_sha","one_B_per_cell","automatic_retries","post_repair_monitor_mode","semantic_audit_gate")},
             "PAIR_PROVENANCE",sha256=stable_hash(gidx))
-        add("A",str(a_dir/"attempt_receipt.json"),a_receipt,"A_ATTEMPT_RECEIPT")
-        add("B",str(b_dir/"attempt_receipt.json"),b_receipt,"B_ATTEMPT_RECEIPT")
+        add("A",f"stage2/replication_v2/G5/natural_A/{cell}/attempt_receipt.json",a_receipt,"A_ATTEMPT_RECEIPT")
+        add("B",f"stage2/replication_v2/G5/engineering_B_v1/cells/{cell}/attempt_receipt.json",b_receipt,"B_ATTEMPT_RECEIPT")
 
         with tarfile.open(fileobj=io.BytesIO(a_arc),mode="r:gz") as aa, tarfile.open(fileobj=io.BytesIO(b_arc),mode="r:gz") as ba:
             am=members(aa); bm=members(ba)
@@ -281,9 +276,10 @@ def main():
                         notes="Posthoc-visible intervention package; selection was frozen before B without semantic audit.")
             parent_ref=add("P","A:"+parent_path,parent,"SAME_PARENT_CHECKPOINT",
                            sequence=parent.get("model_decision_sequence"),sha256=parent_hash)
-            parent_seq=parent.get("model_decision_sequence")
-            if not isinstance(parent_seq,int): parent_seq=package.get("prefix_sequence")
-            if not isinstance(parent_seq,int): parent_seq=0
+            parent_order=next(row[2]["_chronology"] for row in checkpoint_manifests(aa,am,"checkpoints/") if row[2]["checkpoint_hash"]==parent_hash)
+            if parent_order["clock"]!="model_decision_sequence":
+                raise RuntimeError("Natural-A parent requires a frozen ledger decision clock")
+            parent_seq=parent_order["sequence"]
 
             a_result=read_json(aa,am,"natural_A_result.json")
             a_summary={k:v for k,v in a_result.items() if k not in ("history","trace")}
@@ -292,7 +288,7 @@ def main():
             for i,row in enumerate(route_rows(a_result),1):
                 seq=row_sequence(row,i)
                 a_route_refs.append(add("A",f"natural_A_result.json#route[{i}]",row,"A_ROUTE_NODE",sequence=seq,
-                                        notes="POST_PARENT" if seq>=parent_seq else "PRE_PARENT_CONTEXT"))
+                                        notes="FROZEN_A_ROUTE_CONTEXT_PARENT_BOUND_BY_CHECKPOINT_HASH"))
 
             required_b=("repair_request.json","repair_response.json","repair_action.json","repair_boundary_result.json","post_repair_result.json","seal.json")
             for name in required_b:
@@ -336,13 +332,14 @@ def main():
                     "final_manifest_path":manifest_path,
                     "final_checkpoint_hash":manifest.get("checkpoint_hash"),
                     "final_event_ref":manifest.get("event_ref"),
-                    "final_sequence":manifest.get("model_decision_sequence"),
+                    "final_sequence":manifest["_chronology"]["sequence"],
+                    "final_chronology":manifest["_chronology"],
                     "changed_files":changed,
                     "hash_transitions":{k:{"parent":parent_files.get(k),"final":final_files.get(k)} for k in changed},
                     "snapshots":snaps,
                 }
                 add(arm,f"{manifest_path}#repository_diff",repo_diff[label],f"{arm}_REPOSITORY_DIFF",
-                    sequence=manifest.get("model_decision_sequence"),sha256=manifest.get("checkpoint_hash"))
+                    sequence=manifest["_chronology"]["sequence"],sha256=manifest.get("checkpoint_hash"))
 
             packet={
                 "schema":"stage2-g5-ab-process-semantic-packet-v1",

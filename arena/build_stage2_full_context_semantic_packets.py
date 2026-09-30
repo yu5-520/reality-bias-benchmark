@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse, hashlib, io, json, tarfile
+import argparse
+import gzip, hashlib, io, json, tarfile
 from pathlib import Path
+
+if __package__ in (None, ""):
+    from checkpoint_chronology import ordered_checkpoints
+else:
+    from arena.checkpoint_chronology import ordered_checkpoints
 
 FORBIDDEN=(
     "monitor_evidence","monitor_candidates","repair_packages","runtime_bridge",
@@ -85,7 +91,7 @@ def build_packet(group,cell,cell_dir):
       "route_index":[],
       "repository_state":None
     }
-    with tarfile.open(fileobj=io.BytesIO(arc),mode="r:gz") as ar:
+    with tarfile.open(fileobj=io.BytesIO(gzip.decompress(arc)),mode="r:") as ar:
         members=member_map(ar)
         if "audit_raw_bundle_manifest.json" not in members:
             raise RuntimeError(f"{group}/{cell}: no legal audit_raw_bundle_manifest")
@@ -151,26 +157,21 @@ def build_packet(group,cell,cell_dir):
                 break
 
         # First/last persisted application-state comparison with changed file texts where available.
-        cps=[]
-        for p in allowed:
-            if p.startswith("checkpoints/") and p.endswith("/manifest.json"):
-                raw=read(ar,members,p); _,obj=parse(raw)
-                if isinstance(obj,dict) and isinstance(obj.get("application_file_hashes"),dict):
-                    cps.append((obj.get("model_decision_sequence",0),p,obj))
+        cps=ordered_checkpoints(ar,members,allowed=allowed)
         if cps:
-            cps.sort(key=lambda z:(z[0] if isinstance(z[0],int) else 0,z[1]))
             first,last=cps[0],cps[-1]; a,b=first[2]["application_file_hashes"],last[2]["application_file_hashes"]
             changed=sorted(k for k in set(a)|set(b) if a.get(k)!=b.get(k))
             state={"first_manifest":first[1],"last_manifest":last[1],
                    "first_event_ref":first[2].get("event_ref"),"last_event_ref":last[2].get("event_ref"),
+                   "first_chronology":first[2]["_chronology"],"last_chronology":last[2]["_chronology"],
                    "changed_files":changed,
                    "hash_transitions":{k:{"before":a.get(k),"after":b.get(k)} for k in changed},
                    "changed_file_snapshots":[]}
             for rel in changed[:24]:
-                candidates=[p for p in allowed if p.endswith("/application/"+rel)]
-                candidates=sorted(candidates)
-                if not candidates: continue
-                for label,pp in (("earliest",candidates[0]),("latest",candidates[-1])):
+                endpoints=(("earliest",first),("latest",last))
+                for label,endpoint in endpoints:
+                    pp=endpoint[1].rsplit("/manifest.json",1)[0]+"/application/"+rel
+                    if pp not in allowed: continue
                     raw=read(ar,members,pp); text,_=parse(raw)
                     if text is not None and len(raw)<=65536:
                         ref=add(pp,clip(text,5000),sha=allowed[pp]["sha256"],kind="PERSISTED_FILE_SNAPSHOT")

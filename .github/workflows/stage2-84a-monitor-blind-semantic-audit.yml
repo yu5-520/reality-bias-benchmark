@@ -74,7 +74,9 @@ jobs:
           PY
 
   execute-audit:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Frozen reference: offline chronology corrections must not replay paid audits.
+    # A future evaluator study requires a new explicit authorization/workflow.
+    if: ${{ false }}
     needs: offline-preflight
     runs-on: ubuntu-latest
     timeout-minutes: 360

@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import argparse, hashlib, io, json, tarfile
+import argparse
+import gzip, hashlib, io, json, tarfile
 from pathlib import Path
+
+if __package__ in (None, ""):
+    from checkpoint_chronology import ordered_checkpoints
+else:
+    from arena.checkpoint_chronology import ordered_checkpoints
 
 FORBIDDEN = (
     "monitor_evidence","monitor_candidates","repair_packages","runtime_bridge",
@@ -69,7 +75,7 @@ def build_packet(group,cell,cell_dir):
         "evidence":[],
         "route_index":[],
     }
-    with tarfile.open(fileobj=io.BytesIO(arc),mode="r:gz") as ar:
+    with tarfile.open(fileobj=io.BytesIO(gzip.decompress(arc)),mode="r:") as ar:
         members=member_map(ar)
         if "audit_raw_bundle_manifest.json" not in members:
             packet["audit_manifest_missing"]=True
@@ -151,22 +157,19 @@ def build_packet(group,cell,cell_dir):
                 break
 
         # Repository-state change summary from first/last checkpoint manifests.
-        checkpoint_manifests=[p for p in allowed if p.startswith("checkpoints/") and p.endswith("/manifest.json")]
-        cp_rows=[]
-        for p in checkpoint_manifests:
-            raw=read_member(ar,members,p); _,obj=parse(raw)
-            if isinstance(obj,dict) and isinstance(obj.get("application_file_hashes"),dict):
-                cp_rows.append((obj.get("model_decision_sequence",0),p,obj))
+        cp_rows=ordered_checkpoints(ar,members,allowed=allowed)
         if cp_rows:
-            cp_rows.sort(key=lambda x:(x[0] if isinstance(x[0],int) else 0,x[1]))
             first,last=cp_rows[0],cp_rows[-1]
             a,b=first[2]["application_file_hashes"],last[2]["application_file_hashes"]
             changed=sorted(k for k in set(a)|set(b) if a.get(k)!=b.get(k))
-            add(first[1],{
+            state={
                 "derived_from":[first[1],last[1]],"first_event_ref":first[2].get("event_ref"),
                 "last_event_ref":last[2].get("event_ref"),"changed_files":changed,
+                "first_chronology":first[2]["_chronology"],"last_chronology":last[2]["_chronology"],
                 "first_hashes":{k:a.get(k) for k in changed},"last_hashes":{k:b.get(k) for k in changed}
-            },sha=allowed[first[1]]["sha256"])
+            }
+            packet["repository_state"]=state
+            add(first[1],state,sha=allowed[first[1]]["sha256"])
 
         packet["evidence"]=items
     packet["packet_sha256"]=""
