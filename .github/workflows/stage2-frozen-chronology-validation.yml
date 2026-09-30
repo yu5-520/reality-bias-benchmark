@@ -7,6 +7,8 @@ on:
       - 'arena/build_stage2*packets*.py'
       - 'scripts/*stage2*chronology*.py'
       - 'stage2/replication_v2/chronology_correction_v1/**'
+      - 'stage2/replication_v2/chronology_semantic_review_v1/**'
+      - 'reviews/stage2_chronology_correction_review_protocol_v1.md'
       - '.github/workflows/stage2-frozen-chronology-validation.yml'
 permissions:
   contents: read
@@ -23,3 +25,4 @@ jobs:
         run: |
           python -m unittest arena.tests.test_checkpoint_chronology
           python scripts/validate_stage2_chronology_correction.py
+          python scripts/validate_stage2_chronology_semantic_review.py

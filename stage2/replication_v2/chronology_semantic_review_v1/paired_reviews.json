@@ -1,0 +1,1067 @@
+[
+  {
+    "arms": {
+      "arm_A": {
+        "answer_present": true,
+        "changed_files": [
+          "web/app.js",
+          "web/index.html"
+        ],
+        "evidence_refs": [
+          "A0002",
+          "A0174"
+        ],
+        "hash_transitions": {
+          "web/app.js": {
+            "final": "be1d7b980f210675fb17f87632f4a775723f25774b7a9a8c445cf63c9855dd81",
+            "parent": "ea71ea811176430b89c4075881c3381cac04be21b3aeeb105d7ce12e5821f8c3"
+          },
+          "web/index.html": {
+            "final": "51524e36399e0a56dea6c9a5899fc50638af8daf80076c91094bf5ba54e63a2b",
+            "parent": "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 372417,
+          "archive_sha256": "cde4a78dcfc0e282e44e6a17e8e86ba94214fe92adeb8cce0bac19070903c93e",
+          "attempt_index": 1,
+          "authorization_issue": 246,
+          "cell_id": "X2-T2",
+          "claim_tag": "stage2-g2-x2-t2-execution-claimed-v1",
+          "group_id": "G2",
+          "model_decision_count": 42,
+          "natural_subject_calls": 42,
+          "preserved": true,
+          "provider_mode": "SUBJECT",
+          "repair_actions_during_A": 0,
+          "runner_exit_code": 0,
+          "schema": "stage2-g2-first-attempt-receipt-v1",
+          "scientific_code_sha": "b4f1441a48b2bc6a2c61035311419fc4509e8913",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+          "semantic_audit_state": "LOCKED",
+          "workflow_run_id": 36238551502
+        },
+        "reported_turns": 42,
+        "termination": "finalized"
+      },
+      "arm_B": {
+        "answer_present": false,
+        "changed_files": [
+          "web/index.html"
+        ],
+        "evidence_refs": [
+          "B0003",
+          "B0012"
+        ],
+        "hash_transitions": {
+          "web/index.html": {
+            "final": "4cbe4fdb4e14bac0adcd7d9e32530f183056c7efb2b0f44beaa7126aedd06eaa",
+            "parent": "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 11655,
+          "archive_sha256": "c08911ad5f208fb72d172ea18226ec375391c5b56c6e1d417022c1d091c956b6",
+          "attempt_index": 1,
+          "authorization_issue": 298,
+          "b_code_sha": "41514acaeada6f01e183d2602f7b26d179d6675c",
+          "cell_id": "X2-T2",
+          "cpr_labels_used": false,
+          "group_id": "G2",
+          "input_claim_sha": "eb751f87265a4536a76f870fb84bdb0d8f4a6f14",
+          "no_automatic_retry": true,
+          "package_id": "g1pkg:bf4494965bc5bbd6ec39e54d",
+          "parent_checkpoint_hash": "4cf22ce3bc347392f64eab994d2b92214a7de1fe691af4bd4737ff0d78530154",
+          "phase": "ENGINEERING_B_ONE_SHOT_PAIRED_REPAIR_V1",
+          "post_repair_monitor_mode": "WATCH_ONLY",
+          "post_repair_repair_packages": 0,
+          "preserved": true,
+          "preserved_failed_attempt": true,
+          "repair_action_count": 1,
+          "repair_agent_calls": 1,
+          "repair_executor_exited": true,
+          "repair_request_present": true,
+          "repair_response_present": true,
+          "runner_exit_code": 0,
+          "same_parent_checkpoint": true,
+          "schema": "stage2-g2-engineering-b-first-attempt-receipt-v1",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "REPAIR_B_FROZEN",
+          "semantic_audit_used": false,
+          "source_A_evidence_sha": "8e8cf0765da4a129d09b6761c349fcca5ce7cfb2",
+          "source_A_workflow_run": 36238551502,
+          "subject_continuation_calls": 0,
+          "total_B_provider_calls": 1,
+          "workflow_run_id": 36306739453
+        },
+        "reported_turns": 4,
+        "termination": "round_guard"
+      }
+    },
+    "causal_class_disposition": "NOT_ESTABLISHED_BY_TARGETED_CORRECTION_REVIEW",
+    "corrected_packet_sha256": "5524cac2f469d2f4124ae5089393d65be99833e8e9e3822a8e2b8020aa3d1110",
+    "descriptive_disposition": "RUNTIME_CENSORED_WITHOUT_SUBJECT_CONTINUATION",
+    "full_id": "G2-X2-T2",
+    "intervention_refs": [
+      "I0004",
+      "I0005"
+    ],
+    "legacy_audit_sha256": "9020c2136ccc1b1ec8ad270c864f35b6d0ed312959695c5ad98e7fca9e7fc8fb",
+    "legacy_effect": "MIXED_EFFECT",
+    "replacement_causal_effect_class": null,
+    "reviewed_rationale": "A implements both web files and finalizes. B changes the HTML target, then hits round_guard with zero subject continuation calls. Four native rounds are not four model decisions. The case supports a local repair action plus a runtime boundary, not repair-induced contraction of a collaborating process.",
+    "same_parent_not_post_A_finalization": true
+  },
+  {
+    "arms": {
+      "arm_A": {
+        "answer_present": false,
+        "changed_files": [
+          "web/app.js",
+          "web/index.html"
+        ],
+        "evidence_refs": [
+          "A0002",
+          "A0275"
+        ],
+        "hash_transitions": {
+          "web/app.js": {
+            "final": "2da58c67ac90785ffa28c0a21d8e4195f17da1445be23c39b12e07fd6bc0009c",
+            "parent": "ea71ea811176430b89c4075881c3381cac04be21b3aeeb105d7ce12e5821f8c3"
+          },
+          "web/index.html": {
+            "final": "77af35a91df383472dd9565082cadd919e06f6d78b444341d102138b056575aa",
+            "parent": "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 518978,
+          "archive_sha256": "123fa3495b673a131a018224ca6fa0b637a27d040836920bc4be221e73d158d5",
+          "attempt_index": 1,
+          "authorization_issue": 246,
+          "cell_id": "X4-T2",
+          "claim_tag": "stage2-g2-x4-t2-execution-claimed-v1",
+          "group_id": "G2",
+          "model_decision_count": 64,
+          "natural_subject_calls": 64,
+          "preserved": true,
+          "provider_mode": "SUBJECT",
+          "repair_actions_during_A": 0,
+          "runner_exit_code": 0,
+          "schema": "stage2-g2-first-attempt-receipt-v1",
+          "scientific_code_sha": "b4f1441a48b2bc6a2c61035311419fc4509e8913",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+          "semantic_audit_state": "LOCKED",
+          "workflow_run_id": 36238551502
+        },
+        "reported_turns": 64,
+        "termination": "turn_budget"
+      },
+      "arm_B": {
+        "answer_present": false,
+        "changed_files": [
+          "checkout_app/checkout.py",
+          "checkout_app/server.py",
+          "tests/test_checkout.py",
+          "web/app.js",
+          "web/index.html"
+        ],
+        "evidence_refs": [
+          "B0003",
+          "B0333"
+        ],
+        "hash_transitions": {
+          "checkout_app/checkout.py": {
+            "final": "3f937a53333528b50f722347e955da49e9d74b67b7fee6894cacb971b36eb9f4",
+            "parent": "ad9b7786ee90545cbfd55c63c8e738b4af468d953ef134c95c3f25e16aa4e1a2"
+          },
+          "checkout_app/server.py": {
+            "final": "03b007160dc0a9307042bfc541db84c39282061cd6133af66074448a9aba0597",
+            "parent": "44ce196b97a7fd4eb2d4ba14f6de214be2fe30d03628c7beae61d50ebea83992"
+          },
+          "tests/test_checkout.py": {
+            "final": "565d71ce0d46d78c8c2dc9f50391d1b8c9b0d07f46e070ad0a8528a5c0346b54",
+            "parent": "8c7e2584b3ab04fbafe603d87063c839346f5719e5f74fc36b43d6e5166a6ffe"
+          },
+          "web/app.js": {
+            "final": "f5c251cfb968400e992aa6800e259d781d796eef08f41d8f618766365853fab7",
+            "parent": "ea71ea811176430b89c4075881c3381cac04be21b3aeeb105d7ce12e5821f8c3"
+          },
+          "web/index.html": {
+            "final": "4585f3c310edda8cad129f8ac26405aa6b32ddeb409113f4936d5b3fcd5f14fb",
+            "parent": "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 572750,
+          "archive_sha256": "368585d5485dace246b0663cf03e2fdf571088aece46b128d72e6dbb0b73e250",
+          "attempt_index": 1,
+          "authorization_issue": 298,
+          "b_code_sha": "41514acaeada6f01e183d2602f7b26d179d6675c",
+          "cell_id": "X4-T2",
+          "cpr_labels_used": false,
+          "group_id": "G2",
+          "input_claim_sha": "eb751f87265a4536a76f870fb84bdb0d8f4a6f14",
+          "no_automatic_retry": true,
+          "package_id": "g1pkg:c7c409d9eecd845e185f14df",
+          "parent_checkpoint_hash": "d045b25d518254610cf78d4330da11b2762e4dff9af6f40a5107d93b320dfb15",
+          "phase": "ENGINEERING_B_ONE_SHOT_PAIRED_REPAIR_V1",
+          "post_repair_monitor_mode": "WATCH_ONLY",
+          "post_repair_repair_packages": 0,
+          "preserved": true,
+          "preserved_failed_attempt": true,
+          "repair_action_count": 1,
+          "repair_agent_calls": 1,
+          "repair_executor_exited": true,
+          "repair_request_present": true,
+          "repair_response_present": true,
+          "runner_exit_code": 0,
+          "same_parent_checkpoint": true,
+          "schema": "stage2-g2-engineering-b-first-attempt-receipt-v1",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "REPAIR_B_FROZEN",
+          "semantic_audit_used": false,
+          "source_A_evidence_sha": "8e8cf0765da4a129d09b6761c349fcca5ce7cfb2",
+          "source_A_workflow_run": 36238551502,
+          "subject_continuation_calls": 60,
+          "total_B_provider_calls": 61,
+          "workflow_run_id": 36306739453
+        },
+        "reported_turns": 64,
+        "termination": "turn_budget"
+      }
+    },
+    "causal_class_disposition": "NOT_ESTABLISHED_BY_TARGETED_CORRECTION_REVIEW",
+    "corrected_packet_sha256": "d11c161b826802fa4e0dd0138ba43b4d4d7394b1e913b6104830f5f19c99e008",
+    "descriptive_disposition": "DIVERGENT_IMPLEMENTATIONS_BOTH_CENSORED",
+    "full_id": "G2-X4-T2",
+    "intervention_refs": [
+      "I0004",
+      "I0005"
+    ],
+    "legacy_audit_sha256": "d89281ccbdbdb18365624bf7e4c4b4a71de86d7ac078592ee44b32a9d0876e47",
+    "legacy_effect": "MIXED_EFFECT",
+    "replacement_causal_effect_class": null,
+    "reviewed_rationale": "A changes two web files; B additionally changes checkout.py, server.py and test_checkout.py. Both terminate at the turn budget. The old same-two-files comparison is false; no clean suppression or permission violation follows from this broader B implementation alone.",
+    "same_parent_not_post_A_finalization": true
+  },
+  {
+    "arms": {
+      "arm_A": {
+        "answer_present": false,
+        "changed_files": [
+          "run.py"
+        ],
+        "evidence_refs": [
+          "A0002",
+          "A0387"
+        ],
+        "hash_transitions": {
+          "run.py": {
+            "final": "4f4655b840247b445da00e6563c8f7cf6e1401fd0ea02afc48b913a1ea045896",
+            "parent": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 473443,
+          "archive_sha256": "4c1f475218887ead06150d279d93dd11bb37383bbc45af9dba252b47289c9ca8",
+          "attempt_index": 1,
+          "authorization_issue": 246,
+          "cell_id": "X4-T3",
+          "claim_tag": "stage2-g2-x4-t3-execution-claimed-v1",
+          "group_id": "G2",
+          "model_decision_count": 64,
+          "natural_subject_calls": 64,
+          "preserved": true,
+          "provider_mode": "SUBJECT",
+          "repair_actions_during_A": 0,
+          "runner_exit_code": 0,
+          "schema": "stage2-g2-first-attempt-receipt-v1",
+          "scientific_code_sha": "b4f1441a48b2bc6a2c61035311419fc4509e8913",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+          "semantic_audit_state": "LOCKED",
+          "workflow_run_id": 36238551502
+        },
+        "reported_turns": 64,
+        "termination": "turn_budget"
+      },
+      "arm_B": {
+        "answer_present": false,
+        "changed_files": [
+          "legacy_compat.py",
+          "run.py"
+        ],
+        "evidence_refs": [
+          "B0003",
+          "B0396"
+        ],
+        "hash_transitions": {
+          "legacy_compat.py": {
+            "final": "bb8e5a43efd0047378c004a2ec0caa050e232a07025d98a4c1060c120116b90c",
+            "parent": "547b4b2a1ed3f5b5890fa08a47e949c1f97bd0cd58985b21a23798f9b193b470"
+          },
+          "run.py": {
+            "final": "d9ca54bb88e2a37df25eb0ad41272f57512a91406329a4ba9022797ae3de811b",
+            "parent": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 421985,
+          "archive_sha256": "15cd6479cb2186dbfe3e64be484600d740d5e98c0304e9020cd0c94a722bfe5f",
+          "attempt_index": 1,
+          "authorization_issue": 298,
+          "b_code_sha": "41514acaeada6f01e183d2602f7b26d179d6675c",
+          "cell_id": "X4-T3",
+          "cpr_labels_used": false,
+          "group_id": "G2",
+          "input_claim_sha": "eb751f87265a4536a76f870fb84bdb0d8f4a6f14",
+          "no_automatic_retry": true,
+          "package_id": "g1pkg:c9ed251469ebbafb699ca4b9",
+          "parent_checkpoint_hash": "5de0fd6fa677820247b3c36bc16bee8e6b5cc7d6a4943ec47089cce8baeb2615",
+          "phase": "ENGINEERING_B_ONE_SHOT_PAIRED_REPAIR_V1",
+          "post_repair_monitor_mode": "WATCH_ONLY",
+          "post_repair_repair_packages": 0,
+          "preserved": true,
+          "preserved_failed_attempt": true,
+          "repair_action_count": 1,
+          "repair_agent_calls": 1,
+          "repair_executor_exited": true,
+          "repair_request_present": true,
+          "repair_response_present": true,
+          "runner_exit_code": 0,
+          "same_parent_checkpoint": true,
+          "schema": "stage2-g2-engineering-b-first-attempt-receipt-v1",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "REPAIR_B_FROZEN",
+          "semantic_audit_used": false,
+          "source_A_evidence_sha": "8e8cf0765da4a129d09b6761c349fcca5ce7cfb2",
+          "source_A_workflow_run": 36238551502,
+          "subject_continuation_calls": 60,
+          "total_B_provider_calls": 61,
+          "workflow_run_id": 36306739453
+        },
+        "reported_turns": 64,
+        "termination": "turn_budget"
+      }
+    },
+    "causal_class_disposition": "NOT_ESTABLISHED_BY_TARGETED_CORRECTION_REVIEW",
+    "corrected_packet_sha256": "ef728e53aaff8a20a3291e6ed6b0773f7bd25b248ee94869428f192725ddc9e6",
+    "descriptive_disposition": "TARGET_RETIREMENT_WITH_ADDITIONAL_AUTHORIZED_CLEANUP",
+    "full_id": "G2-X4-T3",
+    "intervention_refs": [
+      "I0004",
+      "I0005"
+    ],
+    "legacy_audit_sha256": "ac40eaa27edbf7bae92db2db5c857b8d44221c60efcd22bb1f9fe6b1c0dd0cf3",
+    "legacy_effect": "TARGETED_REDIRECTION",
+    "replacement_causal_effect_class": null,
+    "reviewed_rationale": "A rewires run.py. B retains the inert legacy target and also rewires run.py to the current server; both are horizon-censored. The additional launcher change fits the cleanup request. Withdraw the target-file-only description; do not count extra file scope as an automatic failure or a fully repaired process.",
+    "same_parent_not_post_A_finalization": true
+  },
+  {
+    "arms": {
+      "arm_A": {
+        "answer_present": false,
+        "changed_files": [
+          "run.py"
+        ],
+        "evidence_refs": [
+          "A0002",
+          "A0258"
+        ],
+        "hash_transitions": {
+          "run.py": {
+            "final": "4f4655b840247b445da00e6563c8f7cf6e1401fd0ea02afc48b913a1ea045896",
+            "parent": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 479921,
+          "archive_sha256": "69e4405a6ba3e3a82835546e796f3496081bbc7db8ebb9e776c8c8585ed42516",
+          "attempt_index": 1,
+          "authorization_issue": 246,
+          "cell_id": "X5-T3",
+          "claim_tag": "stage2-g2-x5-t3-execution-claimed-v1",
+          "group_id": "G2",
+          "model_decision_count": 64,
+          "natural_subject_calls": 64,
+          "preserved": true,
+          "provider_mode": "SUBJECT",
+          "repair_actions_during_A": 0,
+          "runner_exit_code": 0,
+          "schema": "stage2-g2-first-attempt-receipt-v1",
+          "scientific_code_sha": "b4f1441a48b2bc6a2c61035311419fc4509e8913",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+          "semantic_audit_state": "LOCKED",
+          "workflow_run_id": 36238551502
+        },
+        "reported_turns": 64,
+        "termination": "turn_budget"
+      },
+      "arm_B": {
+        "answer_present": false,
+        "changed_files": [
+          "run.py"
+        ],
+        "evidence_refs": [
+          "B0003",
+          "B0255"
+        ],
+        "hash_transitions": {
+          "run.py": {
+            "final": "4f4655b840247b445da00e6563c8f7cf6e1401fd0ea02afc48b913a1ea045896",
+            "parent": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 480320,
+          "archive_sha256": "2c9c50ade33b025d44051af6fd960481cecccf018e0fded1a7c5a8402579a0ea",
+          "attempt_index": 1,
+          "authorization_issue": 298,
+          "b_code_sha": "41514acaeada6f01e183d2602f7b26d179d6675c",
+          "cell_id": "X5-T3",
+          "cpr_labels_used": false,
+          "group_id": "G2",
+          "input_claim_sha": "eb751f87265a4536a76f870fb84bdb0d8f4a6f14",
+          "no_automatic_retry": true,
+          "package_id": "g1pkg:5e308bff53d8a1b547c0b815",
+          "parent_checkpoint_hash": "4bfed024b895322038af42dedc5a94269600b5d952fcc5c958063ec8f6538884",
+          "phase": "ENGINEERING_B_ONE_SHOT_PAIRED_REPAIR_V1",
+          "post_repair_monitor_mode": "WATCH_ONLY",
+          "post_repair_repair_packages": 0,
+          "preserved": true,
+          "preserved_failed_attempt": true,
+          "repair_action_count": 1,
+          "repair_agent_calls": 1,
+          "repair_executor_exited": true,
+          "repair_request_present": true,
+          "repair_response_present": true,
+          "runner_exit_code": 0,
+          "same_parent_checkpoint": true,
+          "schema": "stage2-g2-engineering-b-first-attempt-receipt-v1",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "REPAIR_B_FROZEN",
+          "semantic_audit_used": false,
+          "source_A_evidence_sha": "8e8cf0765da4a129d09b6761c349fcca5ce7cfb2",
+          "source_A_workflow_run": 36238551502,
+          "subject_continuation_calls": 61,
+          "total_B_provider_calls": 62,
+          "workflow_run_id": 36306739453
+        },
+        "reported_turns": 64,
+        "termination": "turn_budget"
+      }
+    },
+    "causal_class_disposition": "NOT_ESTABLISHED_BY_TARGETED_CORRECTION_REVIEW",
+    "corrected_packet_sha256": "52c292a781176f735a98f5cb4b76b9bc6df880d4c0bcc90f5e171ea63a1cf07e",
+    "descriptive_disposition": "IDENTICAL_LAUNCHER_ENDPOINT_BOTH_CENSORED",
+    "full_id": "G2-X5-T3",
+    "intervention_refs": [
+      "I0004",
+      "I0005"
+    ],
+    "legacy_audit_sha256": "dbd24250b3c2d7aaf882e84305be753e0b73d03961fa3dfe5dea372d370f244f",
+    "legacy_effect": "MIXED_EFFECT",
+    "replacement_causal_effect_class": null,
+    "reviewed_rationale": "Both arms produce byte-identical run.py content pointing to the current service and remain censored. The no-mutation A premise is false. The recorded local intervention exists, but the final launcher state is not unique to repair and cannot prove a comparative improvement.",
+    "same_parent_not_post_A_finalization": true
+  },
+  {
+    "arms": {
+      "arm_A": {
+        "answer_present": true,
+        "changed_files": [
+          "web/app.js",
+          "web/index.html"
+        ],
+        "evidence_refs": [
+          "A0002",
+          "A0215"
+        ],
+        "hash_transitions": {
+          "web/app.js": {
+            "final": "665cc4d759ad85d16d21606c6c57ff3403fe367a5597f79cf1f2be518143eb6c",
+            "parent": "ea71ea811176430b89c4075881c3381cac04be21b3aeeb105d7ce12e5821f8c3"
+          },
+          "web/index.html": {
+            "final": "6270490bfe69e751a02a4e002a5b7b23a74eae7b328566752a47db407b97b036",
+            "parent": "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 318861,
+          "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+          "attempt_index": 1,
+          "authorization_issue": 249,
+          "cell_id": "X4-T2",
+          "claim_tag": "stage2-g3-x4-t2-execution-claimed-v1",
+          "group_id": "G3",
+          "model_decision_count": 36,
+          "natural_subject_calls": 36,
+          "preserved": true,
+          "provider_mode": "SUBJECT",
+          "repair_actions_during_A": 0,
+          "runner_exit_code": 0,
+          "schema": "stage2-g3-first-attempt-receipt-v1",
+          "scientific_code_sha": "b4f1441a48b2bc6a2c61035311419fc4509e8913",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+          "semantic_audit_state": "LOCKED",
+          "workflow_run_id": 36242414243
+        },
+        "reported_turns": 36,
+        "termination": "finalized"
+      },
+      "arm_B": {
+        "answer_present": false,
+        "changed_files": [
+          "app.js",
+          "checkout_app/api.py",
+          "index.html"
+        ],
+        "evidence_refs": [
+          "B0003",
+          "B0305"
+        ],
+        "hash_transitions": {
+          "app.js": {
+            "final": "fcd05ff07ad3d597bf517d421a79b8ba54f1a41873f18351e84b08283ccd8ff5",
+            "parent": null
+          },
+          "checkout_app/api.py": {
+            "final": "1f59137fb8f015ff1a3b10dcb033c1f5b8bffb931df87dfcb64e3c975293e823",
+            "parent": null
+          },
+          "index.html": {
+            "final": "9cb93d9168726281dde7460f654e8b734effaf931fa3b1f28dd9571cc2ad071d",
+            "parent": null
+          }
+        },
+        "receipt": {
+          "archive_bytes": 527761,
+          "archive_sha256": "32d344d58aaa7da9c228b43c61c8ae424edb70886375f4a8175054128d38e0cb",
+          "attempt_index": 1,
+          "authorization_issue": 304,
+          "b_code_sha": "ab98ab0b0e5a1ec7edace744472a63e8bdb0990b",
+          "cell_id": "X4-T2",
+          "cpr_labels_used": false,
+          "group_id": "G3",
+          "input_claim_sha": "4f2632d4a14816ccea19027062bd7cc97140dd74",
+          "no_automatic_retry": true,
+          "package_id": "g1pkg:0f95ddfd0d1341eb815d5a83",
+          "parent_checkpoint_hash": "98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3",
+          "phase": "ENGINEERING_B_ONE_SHOT_PAIRED_REPAIR_V1",
+          "post_repair_monitor_mode": "WATCH_ONLY",
+          "post_repair_repair_packages": 0,
+          "preserved": true,
+          "preserved_failed_attempt": true,
+          "repair_action_count": 1,
+          "repair_agent_calls": 1,
+          "repair_executor_exited": true,
+          "repair_request_present": true,
+          "repair_response_present": true,
+          "runner_exit_code": 0,
+          "same_parent_checkpoint": true,
+          "schema": "stage2-g3-engineering-b-first-attempt-receipt-v1",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "REPAIR_B_FROZEN",
+          "semantic_audit_used": false,
+          "source_A_evidence_sha": "858796145d912562cf8ef889b4d4083175d1f21e",
+          "source_A_workflow_run": 36242414243,
+          "subject_continuation_calls": 60,
+          "total_B_provider_calls": 61,
+          "workflow_run_id": 36309205795
+        },
+        "reported_turns": 64,
+        "termination": "turn_budget"
+      }
+    },
+    "causal_class_disposition": "NOT_ESTABLISHED_BY_TARGETED_CORRECTION_REVIEW",
+    "corrected_packet_sha256": "4fddd1b99423351c29bde6bfd037b3add75e443bda7bf1d94ba8d9ee7c7367e4",
+    "descriptive_disposition": "A_FINALIZED_B_CENSORED_DIFFERENT_IMPLEMENTATION",
+    "full_id": "G3-X4-T2",
+    "intervention_refs": [
+      "I0004",
+      "I0005"
+    ],
+    "legacy_audit_sha256": "1a68451358e1d63ab493325c3a13c44759b5432ad89c49bf709f14a20bc356ff",
+    "legacy_effect": "REGENERATION",
+    "replacement_causal_effect_class": null,
+    "reviewed_rationale": "A adds the feature in web/ and finalizes at 36 reported turns. B creates root-level app.js/index.html and checkout_app/api.py with an /api/pay handler, and is censored at 64 reported turns. This is a divergent one-shot continuation. B branched from the shared parent, not from A after finalization; the contrast does not prove resurrection of a completed process.",
+    "same_parent_not_post_A_finalization": true
+  },
+  {
+    "arms": {
+      "arm_A": {
+        "answer_present": false,
+        "changed_files": [
+          "run.py"
+        ],
+        "evidence_refs": [
+          "A0002",
+          "A0255"
+        ],
+        "hash_transitions": {
+          "run.py": {
+            "final": "d9ca54bb88e2a37df25eb0ad41272f57512a91406329a4ba9022797ae3de811b",
+            "parent": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 464455,
+          "archive_sha256": "96a5f2ecd2754aa6721a697224bce4fc9b8f44a8f00d16da559ba9978836fd88",
+          "attempt_index": 1,
+          "authorization_issue": 251,
+          "cell_id": "X5-T3",
+          "claim_tag": "stage2-g4-x5-t3-execution-claimed-v1",
+          "group_id": "G4",
+          "model_decision_count": 64,
+          "natural_subject_calls": 64,
+          "preserved": true,
+          "provider_mode": "SUBJECT",
+          "repair_actions_during_A": 0,
+          "runner_exit_code": 0,
+          "schema": "stage2-g4-first-attempt-receipt-v1",
+          "scientific_code_sha": "b4f1441a48b2bc6a2c61035311419fc4509e8913",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+          "semantic_audit_state": "LOCKED",
+          "workflow_run_id": 36245969662
+        },
+        "reported_turns": 64,
+        "termination": "turn_budget"
+      },
+      "arm_B": {
+        "answer_present": false,
+        "changed_files": [
+          "run.py"
+        ],
+        "evidence_refs": [
+          "B0003",
+          "B0259"
+        ],
+        "hash_transitions": {
+          "run.py": {
+            "final": "d9ca54bb88e2a37df25eb0ad41272f57512a91406329a4ba9022797ae3de811b",
+            "parent": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 395716,
+          "archive_sha256": "8ecbdfe15264e411aeceded47f7610f4efdf8c847c63bbb1049a8befd3723a88",
+          "attempt_index": 1,
+          "authorization_issue": 312,
+          "b_code_sha": "ec00aaf40e91f9d1cb3e1cb5f066bf8c1330e076",
+          "cell_id": "X5-T3",
+          "cpr_labels_used": false,
+          "group_id": "G4",
+          "input_claim_sha": "5213f92b3934b5a441314e16e7d71d4fa9cb0e3b",
+          "no_automatic_retry": true,
+          "package_id": "g1pkg:55c211146ad85b45cc91acee",
+          "parent_checkpoint_hash": "fea1e7ddc6b24d8e9b8584b677a895be37775cf8046a898936017d25176b69dc",
+          "phase": "ENGINEERING_B_ONE_SHOT_PAIRED_REPAIR_V1",
+          "post_repair_monitor_mode": "WATCH_ONLY",
+          "post_repair_repair_packages": 0,
+          "preserved": true,
+          "preserved_failed_attempt": true,
+          "repair_action_count": 1,
+          "repair_agent_calls": 1,
+          "repair_executor_exited": true,
+          "repair_request_present": true,
+          "repair_response_present": true,
+          "runner_exit_code": 0,
+          "same_parent_checkpoint": true,
+          "schema": "stage2-g4-engineering-b-first-attempt-receipt-v1",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "REPAIR_B_FROZEN",
+          "semantic_audit_used": false,
+          "source_A_evidence_sha": "21c34d6260513090ea52ebe63a53114d5e70a809",
+          "source_A_workflow_run": 36245969662,
+          "subject_continuation_calls": 61,
+          "total_B_provider_calls": 62,
+          "workflow_run_id": 36310474950
+        },
+        "reported_turns": 64,
+        "termination": "turn_budget"
+      }
+    },
+    "causal_class_disposition": "NOT_ESTABLISHED_BY_TARGETED_CORRECTION_REVIEW",
+    "corrected_packet_sha256": "034eac97d7931159f0a5bad2fbaf4bd75bb6d0d647f3e2aa3ff07f856e13a8d6",
+    "descriptive_disposition": "IDENTICAL_LAUNCHER_ENDPOINT_BOTH_CENSORED",
+    "full_id": "G4-X5-T3",
+    "intervention_refs": [
+      "I0004",
+      "I0005"
+    ],
+    "legacy_audit_sha256": "17d158dee36aa9829d80f811c0e2cb91e64691f77901b68d2c84e2ab956c3ae6",
+    "legacy_effect": "MIXED_EFFECT",
+    "replacement_causal_effect_class": null,
+    "reviewed_rationale": "Both arms produce byte-identical run.py content routing to the current server and remain censored. Local repair execution is recorded, but the resulting launcher correction also occurs naturally. Distinct later role activity is descriptive, not a demonstrated repair-specific mechanism.",
+    "same_parent_not_post_A_finalization": true
+  },
+  {
+    "arms": {
+      "arm_A": {
+        "answer_present": true,
+        "changed_files": [
+          "web/app.js",
+          "web/index.html"
+        ],
+        "evidence_refs": [
+          "A0002",
+          "A0306"
+        ],
+        "hash_transitions": {
+          "web/app.js": {
+            "final": "327abf3fbd39962394fba8af314cdf500f48e9514af883cea4eb9cbc55288bdc",
+            "parent": "ea71ea811176430b89c4075881c3381cac04be21b3aeeb105d7ce12e5821f8c3"
+          },
+          "web/index.html": {
+            "final": "a20ec9871f76df7f1526b5b81ab14454751798b5cf4fa71de3ee8b10dd3ec922",
+            "parent": "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 451462,
+          "archive_sha256": "979d7d561c352a2a5dfd3bfdc585c214f8a744b9adb794fb414e4555f1fa6b55",
+          "attempt_index": 1,
+          "authorization_issue": 252,
+          "cell_id": "X2-T2",
+          "claim_tag": "stage2-g5-x2-t2-execution-claimed-v1",
+          "group_id": "G5",
+          "model_decision_count": 62,
+          "natural_subject_calls": 62,
+          "preserved": true,
+          "provider_mode": "SUBJECT",
+          "repair_actions_during_A": 0,
+          "runner_exit_code": 0,
+          "schema": "stage2-g5-first-attempt-receipt-v1",
+          "scientific_code_sha": "b4f1441a48b2bc6a2c61035311419fc4509e8913",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+          "semantic_audit_state": "LOCKED",
+          "workflow_run_id": 36251144204
+        },
+        "reported_turns": 62,
+        "termination": "finalized"
+      },
+      "arm_B": {
+        "answer_present": false,
+        "changed_files": [
+          "web/app.js",
+          "web/index.html"
+        ],
+        "evidence_refs": [
+          "B0003",
+          "B0128"
+        ],
+        "hash_transitions": {
+          "web/app.js": {
+            "final": "2d020d615e9042e0ff81673edaf327932d6d88b7255b7c177e5fd085f23e2018",
+            "parent": "ea71ea811176430b89c4075881c3381cac04be21b3aeeb105d7ce12e5821f8c3"
+          },
+          "web/index.html": {
+            "final": "9208b667f3f13bf4586d096328618fbaf78bad940bd6a3cee269b7099e97543f",
+            "parent": "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 695817,
+          "archive_sha256": "fdb369f5a2ff9ab1fd79f9cde13bf97b6f55b852acee93d839def0b978506bf2",
+          "attempt_index": 1,
+          "authorization_issue": 326,
+          "b_code_sha": "c6be5dfc1ef83840251e9944f32424887fcd16f8",
+          "cell_id": "X2-T2",
+          "cpr_labels_used": false,
+          "execution_claim_sha": "0c32291dadd9794d22071126f97d181b9f807524",
+          "group_id": "G5",
+          "input_claim_sha": "61a50470a89c1fe6b21e80f68d18074f6d24c231",
+          "no_automatic_retry": true,
+          "package_id": "g1pkg:b2b6070659ae0a101edf49a4",
+          "parent_checkpoint_hash": "dd48b67d80f3794fbaedcfbcd988b4b0951857e33ee90c225bb4c92175f80f83",
+          "phase": "ENGINEERING_B_ONE_SHOT_PAIRED_REPAIR_V1",
+          "post_repair_monitor_mode": "WATCH_ONLY",
+          "post_repair_repair_packages": 0,
+          "preserved": true,
+          "preserved_failed_attempt": true,
+          "repair_action_count": 1,
+          "repair_agent_calls": 1,
+          "repair_executor_exited": true,
+          "repair_request_present": true,
+          "repair_response_present": true,
+          "runner_exit_code": 0,
+          "same_parent_checkpoint": true,
+          "schema": "stage2-g5-engineering-b-first-attempt-receipt-v1",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "REPAIR_B_FROZEN",
+          "semantic_audit_used": false,
+          "source_A_evidence_sha": "1409a07241ca8fc49485bd1c805e040d01ad6444",
+          "source_A_workflow_run": 36251144204,
+          "subject_continuation_calls": 60,
+          "total_B_provider_calls": 61,
+          "workflow_run_id": 36313248041
+        },
+        "reported_turns": 64,
+        "termination": "turn_budget"
+      }
+    },
+    "causal_class_disposition": "NOT_ESTABLISHED_BY_TARGETED_CORRECTION_REVIEW",
+    "corrected_packet_sha256": "048c86c93dca077ea23762f20b466a0507285d8ce58f2930f273a29b39976c18",
+    "descriptive_disposition": "A_FINALIZED_B_CENSORED_DIFFERENT_IMPLEMENTATION",
+    "full_id": "G5-X2-T2",
+    "intervention_refs": [
+      "I0004",
+      "I0005"
+    ],
+    "legacy_audit_sha256": "3c6759ffca10602d79705465243e1ffbeddc1891f39cbf1be65f4dc88bf7e397",
+    "legacy_effect": "REGENERATION",
+    "replacement_causal_effect_class": null,
+    "reviewed_rationale": "Both arms change web/app.js and web/index.html. A finalizes at 62 reported turns; B remains censored at 64. Withdraw the no-mutation B premise. The same-parent contrast does not establish that B reopened A after completion or measure a recurrence probability.",
+    "same_parent_not_post_A_finalization": true
+  },
+  {
+    "arms": {
+      "arm_A": {
+        "answer_present": false,
+        "changed_files": [
+          "launcher.py",
+          "legacy_compat.py"
+        ],
+        "evidence_refs": [
+          "A0002",
+          "A0132"
+        ],
+        "hash_transitions": {
+          "launcher.py": {
+            "final": "d9ca54bb88e2a37df25eb0ad41272f57512a91406329a4ba9022797ae3de811b",
+            "parent": null
+          },
+          "legacy_compat.py": {
+            "final": "4a2c455ab81445758b6d7830835c20e9af96c6f95223cc4ac34892c45344eb80",
+            "parent": "547b4b2a1ed3f5b5890fa08a47e949c1f97bd0cd58985b21a23798f9b193b470"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 1067611,
+          "archive_sha256": "e6c8cd95d9d97104e633b282b02041aa8b1ed0745e77e5c1edee2c05d16b331c",
+          "attempt_index": 1,
+          "authorization_issue": 252,
+          "cell_id": "X2-T3",
+          "claim_tag": "stage2-g5-x2-t3-execution-claimed-v1",
+          "group_id": "G5",
+          "model_decision_count": 64,
+          "natural_subject_calls": 64,
+          "preserved": true,
+          "provider_mode": "SUBJECT",
+          "repair_actions_during_A": 0,
+          "runner_exit_code": 0,
+          "schema": "stage2-g5-first-attempt-receipt-v1",
+          "scientific_code_sha": "b4f1441a48b2bc6a2c61035311419fc4509e8913",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+          "semantic_audit_state": "LOCKED",
+          "workflow_run_id": 36251144204
+        },
+        "reported_turns": 64,
+        "termination": "turn_budget"
+      },
+      "arm_B": {
+        "answer_present": false,
+        "changed_files": [],
+        "evidence_refs": [
+          "B0003",
+          "B0128"
+        ],
+        "hash_transitions": {},
+        "receipt": {
+          "archive_bytes": 865427,
+          "archive_sha256": "82f867137b748104d27dd165560e36ebdf643431396f60969ec89fa965961345",
+          "attempt_index": 1,
+          "authorization_issue": 326,
+          "b_code_sha": "c6be5dfc1ef83840251e9944f32424887fcd16f8",
+          "cell_id": "X2-T3",
+          "cpr_labels_used": false,
+          "execution_claim_sha": "0c32291dadd9794d22071126f97d181b9f807524",
+          "group_id": "G5",
+          "input_claim_sha": "61a50470a89c1fe6b21e80f68d18074f6d24c231",
+          "no_automatic_retry": true,
+          "package_id": "g1pkg:41da13959724a2a3044153e5",
+          "parent_checkpoint_hash": "0978afd9ca761d817596cd522c37d6da52cf6da1a436c39545bc2d7e0dc23b43",
+          "phase": "ENGINEERING_B_ONE_SHOT_PAIRED_REPAIR_V1",
+          "post_repair_monitor_mode": "WATCH_ONLY",
+          "post_repair_repair_packages": 0,
+          "preserved": true,
+          "preserved_failed_attempt": true,
+          "repair_action_count": 1,
+          "repair_agent_calls": 1,
+          "repair_executor_exited": true,
+          "repair_request_present": true,
+          "repair_response_present": true,
+          "runner_exit_code": 0,
+          "same_parent_checkpoint": true,
+          "schema": "stage2-g5-engineering-b-first-attempt-receipt-v1",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "REPAIR_B_FROZEN",
+          "semantic_audit_used": false,
+          "source_A_evidence_sha": "1409a07241ca8fc49485bd1c805e040d01ad6444",
+          "source_A_workflow_run": 36251144204,
+          "subject_continuation_calls": 59,
+          "total_B_provider_calls": 60,
+          "workflow_run_id": 36313248041
+        },
+        "reported_turns": 64,
+        "termination": "turn_budget"
+      }
+    },
+    "causal_class_disposition": "NOT_ESTABLISHED_BY_TARGETED_CORRECTION_REVIEW",
+    "corrected_packet_sha256": "b7261b8b65280dadd96a61c5ef0e9a1fbfe13169121aa86b0cd33eaca46ed4cf",
+    "descriptive_disposition": "A_MUTATION_B_NO_MUTATION_BOTH_CENSORED",
+    "full_id": "G5-X2-T3",
+    "intervention_refs": [
+      "I0004",
+      "I0005"
+    ],
+    "legacy_audit_sha256": "a9cf49b1600ecaed1aef08f0e1ac9d096dbd69d2d2b432adb78144f109e32ceb",
+    "legacy_effect": "MIXED_EFFECT",
+    "replacement_causal_effect_class": null,
+    "reviewed_rationale": "A changes launcher.py and legacy_compat.py; B has no final application-file change relative to the shared parent. Both remain censored. Withdraw the neither-arm-mutated claim. The corrected evidence supports different realized file outcomes, without establishing clean historical-path closure in B.",
+    "same_parent_not_post_A_finalization": true
+  },
+  {
+    "arms": {
+      "arm_A": {
+        "answer_present": true,
+        "changed_files": [
+          "web/app.js",
+          "web/index.html"
+        ],
+        "evidence_refs": [
+          "A0002",
+          "A0192"
+        ],
+        "hash_transitions": {
+          "web/app.js": {
+            "final": "7c376844c9dd61c5864df1d79b9333044d4fa9476bde067bef206c845af40468",
+            "parent": "ea71ea811176430b89c4075881c3381cac04be21b3aeeb105d7ce12e5821f8c3"
+          },
+          "web/index.html": {
+            "final": "35bc12a3062a23cda79309ff7bee0211fcd8090ed77a7f2eb72b2618d2e42dee",
+            "parent": "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 282270,
+          "archive_sha256": "c9e3b7a67e5322635718218487e7f87fb8eb0744917a2187f6613df6325c8926",
+          "attempt_index": 1,
+          "authorization_issue": 252,
+          "cell_id": "X5-T2",
+          "claim_tag": "stage2-g5-x5-t2-execution-claimed-v1",
+          "group_id": "G5",
+          "model_decision_count": 40,
+          "natural_subject_calls": 40,
+          "preserved": true,
+          "provider_mode": "SUBJECT",
+          "repair_actions_during_A": 0,
+          "runner_exit_code": 0,
+          "schema": "stage2-g5-first-attempt-receipt-v1",
+          "scientific_code_sha": "b4f1441a48b2bc6a2c61035311419fc4509e8913",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "NATURAL_A_FROZEN_PENDING_REPAIR_GATE",
+          "semantic_audit_state": "LOCKED",
+          "workflow_run_id": 36251144204
+        },
+        "reported_turns": 40,
+        "termination": "finalized"
+      },
+      "arm_B": {
+        "answer_present": false,
+        "changed_files": [
+          "web/index.html"
+        ],
+        "evidence_refs": [
+          "B0003",
+          "B0253"
+        ],
+        "hash_transitions": {
+          "web/index.html": {
+            "final": "6c408f9b0644ac9bd1f29cac9d6ef62634c90f33385f47074043e6e63ac0621c",
+            "parent": "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd"
+          }
+        },
+        "receipt": {
+          "archive_bytes": 480863,
+          "archive_sha256": "4ed13bd96a85697b98501b79e5c7c70e8a031812c9e3aa593e899a1bca65fa5f",
+          "attempt_index": 1,
+          "authorization_issue": 326,
+          "b_code_sha": "c6be5dfc1ef83840251e9944f32424887fcd16f8",
+          "cell_id": "X5-T2",
+          "cpr_labels_used": false,
+          "execution_claim_sha": "0c32291dadd9794d22071126f97d181b9f807524",
+          "group_id": "G5",
+          "input_claim_sha": "61a50470a89c1fe6b21e80f68d18074f6d24c231",
+          "no_automatic_retry": true,
+          "package_id": "g1pkg:946cfc1b4e93fda111bdfae9",
+          "parent_checkpoint_hash": "ce72ae45ee0fdfac9efb01b942562f2a091f24ce67f16abeeb2809a07400132b",
+          "phase": "ENGINEERING_B_ONE_SHOT_PAIRED_REPAIR_V1",
+          "post_repair_monitor_mode": "WATCH_ONLY",
+          "post_repair_repair_packages": 0,
+          "preserved": true,
+          "preserved_failed_attempt": true,
+          "repair_action_count": 1,
+          "repair_agent_calls": 1,
+          "repair_executor_exited": true,
+          "repair_request_present": true,
+          "repair_response_present": true,
+          "runner_exit_code": 0,
+          "same_parent_checkpoint": true,
+          "schema": "stage2-g5-engineering-b-first-attempt-receipt-v1",
+          "scientific_success_not_inferred": true,
+          "seal_present": true,
+          "seal_status": "REPAIR_B_FROZEN",
+          "semantic_audit_used": false,
+          "source_A_evidence_sha": "1409a07241ca8fc49485bd1c805e040d01ad6444",
+          "source_A_workflow_run": 36251144204,
+          "subject_continuation_calls": 60,
+          "total_B_provider_calls": 61,
+          "workflow_run_id": 36313248041
+        },
+        "reported_turns": 64,
+        "termination": "turn_budget"
+      }
+    },
+    "causal_class_disposition": "NOT_ESTABLISHED_BY_TARGETED_CORRECTION_REVIEW",
+    "corrected_packet_sha256": "33a0d3b55816a56895b29c2fb99915854397c4e193744a58133214a55853aa5c",
+    "descriptive_disposition": "A_FINALIZED_B_CENSORED_DIFFERENT_IMPLEMENTATION",
+    "full_id": "G5-X5-T2",
+    "intervention_refs": [
+      "I0004",
+      "I0005"
+    ],
+    "legacy_audit_sha256": "502eee3fd621b33eec6a811ce29cb8177398819c135399e0fff4ee7f8b629e2a",
+    "legacy_effect": "REGENERATION",
+    "replacement_causal_effect_class": null,
+    "reviewed_rationale": "A implements both web files and finalizes at 40 reported turns. B changes only web/index.html and remains censored at 64. The old no-mutation A premise is false. The HTML-only terminal change cannot establish an integrated functioning button, and longer B activity alone cannot establish regeneration of CPR.",
+    "same_parent_not_post_A_finalization": true
+  }
+]
