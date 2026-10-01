@@ -342,6 +342,7 @@ def main() -> None:
     task_counts = defaultdict(Counter)
     no_positive_candidate_counts = []
     corrected_event_overlays = 0
+    old_warning_hashes: set[str] = set()
 
     tracemalloc.start()
     for group in GROUPS:
@@ -378,6 +379,12 @@ def main() -> None:
                 for row in frozen_old
                 if isinstance(row.get("object_ref"), str) and row.get("object_ref")
             })
+            for row in frozen_old:
+                warning_id = row.get("candidate_hash")
+                if isinstance(warning_id, str) and warning_id:
+                    old_warning_hashes.add(warning_id)
+                else:
+                    old_warning_hashes.add(json_hash({"full_id": full_id, "candidate": row}))
             new_refs = [row["object_ref"] for row in candidates]
             multi_version = sum(
                 1 for node in snapshot["nodes"]
@@ -498,7 +505,7 @@ def main() -> None:
             totals["direct_edges"] += direct_edges
             totals["unknown_edges"] += unknown_edges
             totals["multi_version_objects"] += multi_version
-            totals["old_warnings"] += len(frozen_old)
+            totals["old_candidate_records"] += len(frozen_old)
             totals["old_unique_objects"] += len(old_refs)
             totals["new_candidates"] += len(candidates)
             totals["reference_positive_events"] += len(positive_events)
@@ -507,7 +514,7 @@ def main() -> None:
             totals["new_localized"] += new_localized
             for bucket in (group_counts[group], system_counts[cell.split("-")[0]], task_counts[cell.split("-")[1]]):
                 bucket["cells"] += 1
-                bucket["old_warnings"] += len(frozen_old)
+                bucket["old_candidate_records"] += len(frozen_old)
                 bucket["new_candidates"] += len(candidates)
                 bucket["reference_positive_events"] += len(positive_events)
                 bucket["old_localized"] += old_localized
@@ -536,9 +543,10 @@ def main() -> None:
 
     if totals["cells"] != 84:
         raise RuntimeError(f"expected 84 cells, got {totals['cells']}")
-    if totals["old_warnings"] != old_warning_expected:
+    old_unique_warning_count = len(old_warning_hashes)
+    if old_unique_warning_count != old_warning_expected:
         raise RuntimeError(
-            f"old monitor warning binding changed: {totals['old_warnings']} != {old_warning_expected}"
+            f"old monitor unique-warning binding changed: {old_unique_warning_count} != {old_warning_expected}"
         )
 
     def fraction(num: int, den: int) -> dict[str, Any]:
@@ -566,11 +574,12 @@ def main() -> None:
             "semantic_dependency_edges_generated_without_review": 0,
         },
         "inspection_load": {
-            "old_monitor_warning_count": totals["old_warnings"],
-            "old_monitor_unique_object_count": totals["old_unique_objects"],
+            "old_monitor_candidate_record_count": totals["old_candidate_records"],
+            "old_monitor_unique_warning_count": old_unique_warning_count,
+            "old_monitor_unique_object_count_sum_by_cell": totals["old_unique_objects"],
             "enhanced_candidate_object_count": totals["new_candidates"],
-            "enhanced_candidate_vs_old_warning_ratio": fraction(
-                totals["new_candidates"], totals["old_warnings"]
+            "enhanced_candidate_vs_old_unique_warning_ratio": fraction(
+                totals["new_candidates"], old_unique_warning_count
             ),
         },
         "reference_localization_proxy": {
@@ -664,8 +673,9 @@ def main() -> None:
         "",
         "## Old monitor versus enhanced graph inspection load",
         "",
-        f"- frozen old monitor warnings: **{totals['old_warnings']}**;",
-        f"- unique old monitor object refs: **{totals['old_unique_objects']}**;",
+        f"- frozen old monitor candidate records: **{totals['old_candidate_records']}**;",
+        f"- frozen old monitor unique warning IDs: **{old_unique_warning_count}**;",
+        f"- old monitor unique object refs summed within cells: **{totals['old_unique_objects']}**;",
         f"- enhanced graph inspection candidate objects: **{totals['new_candidates']}**.",
         "",
         "The enhanced candidate count is an inspection-object count, not an alert-accuracy estimate.",
@@ -724,7 +734,8 @@ def main() -> None:
 
     print("P2_EVIDENCE_GRAPH_REPLAY=PASS")
     print("CELLS=84")
-    print("OLD_WARNINGS=" + str(totals["old_warnings"]))
+    print("OLD_CANDIDATE_RECORDS=" + str(totals["old_candidate_records"]))
+    print("OLD_UNIQUE_WARNINGS=" + str(old_unique_warning_count))
     print("NEW_CANDIDATES=" + str(totals["new_candidates"]))
     print("REFERENCE_POSITIVE_EVENTS=" + str(totals["reference_positive_events"]))
     print("OLD_LOCALIZED=" + str(totals["old_localized"]))
