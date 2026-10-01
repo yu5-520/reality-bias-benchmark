@@ -1,0 +1,53 @@
+{
+  "schema": "RB-STAGE2-ENHANCED-EXTERNAL-MONITOR-CONTRACT-v1",
+  "version": "1.0",
+  "status": "IMPLEMENTATION_BASELINE",
+  "mode": "EXTERNAL_READ_MOSTLY",
+  "dependencies": {
+    "source_lineage_rules": "configs/source_lineage_rules_v0.1.json",
+    "relation_evidence_schema": "schemas/process_integrity_relation_evidence_v0.2.schema.json",
+    "semantic_lineage_closure_schema": "schemas/semantic_lineage_closure_v0.1.schema.json",
+    "chronology_module": "arena/checkpoint_chronology.py",
+    "runtime_event_adapter": "stage2/r7_prospective_v1/runtime_event_adapter.py",
+    "repair_boundary_watcher": "stage2/r7_prospective_v1/repair_boundary_watcher.py",
+    "checkpoint_controller": "stage2/r7_checkpoint_v1/controller.py"
+  },
+  "monitor_laws": {
+    "studied_framework_protocols_unchanged": true,
+    "framework_private_state_access_forbidden": true,
+    "external_registry_required": false,
+    "monitor_may_rewrite_native_messages": false,
+    "monitor_may_schedule_agents": false,
+    "monitor_may_grant_mutation_authority": false,
+    "temporal_proximity_does_not_establish_dependency": true,
+    "text_similarity_does_not_establish_dependency": true,
+    "same_hash_does_not_establish_causal_dependency": true,
+    "unknown_relations_remain_unknown": true,
+    "observation_authority_does_not_confer_mutation_authority": true,
+    "graph_reachability_does_not_confer_repair_eligibility": true
+  },
+  "route_repair_laws": {
+    "history_is_immutable": true,
+    "same_parent_checkpoint_required": true,
+    "full_native_restore_required_for_active_repair": true,
+    "repairable_route_is_diagnosis_intersection_supported_lineage_intersection_authorized_scope": true,
+    "preserve_set_is_fail_closed": true,
+    "native_interfaces_only": true,
+    "repair_executor_exits_before_post_repair_watch": true,
+    "post_repair_monitor_is_watch_only": true,
+    "no_retry_to_manufacture_success": true
+  },
+  "edge_statuses": [
+    "SUPPORTED",
+    "CANDIDATE",
+    "UNKNOWN",
+    "REJECTED"
+  ],
+  "first_round_execution": {
+    "offline_graph_replay_before_paid_calls": true,
+    "max_repair_cases": 4,
+    "arms_per_case": 2,
+    "max_new_repair_continuations": 8,
+    "additional_retry_for_success_forbidden": true
+  }
+}

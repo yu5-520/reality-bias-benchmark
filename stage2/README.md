@@ -361,3 +361,10 @@ Machine-readable synthesis:
 No additional G2-G5 experimental rerun is required by the final engineering synthesis.
 
 The next work item is to connect the frozen engineering chapter with the Stage-II experimental general chapter, natural-emergence evidence, monitor benchmark, semantic-lineage evidence, and the cross-system paper narrative.
+
+## Enhanced external monitor and route repair
+
+The additive enhanced-monitor prototype is implemented under stage2/monitor_enhancement/ and stage2/route_repair/.
+It remains external/read-mostly, keeps studied framework protocols unchanged, and separates observation, diagnosis and mutation authority.
+Canonical boundary: configs/stage2_enhanced_external_monitor_contract_v1.json.
+Protocol: docs/protocols/StageII_Enhanced_External_Monitor_and_Route_Repair_v1_0.md.

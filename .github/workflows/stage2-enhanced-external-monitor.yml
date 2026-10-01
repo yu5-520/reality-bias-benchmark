@@ -1,0 +1,28 @@
+name: Stage-II enhanced external monitor
+
+on:
+  push:
+    paths:
+      - "stage2/monitor_enhancement/**"
+      - "stage2/route_repair/**"
+      - "configs/stage2_enhanced_external_monitor_contract_v1.json"
+      - "docs/protocols/StageII_Enhanced_External_Monitor_and_Route_Repair_v1_0.md"
+      - ".github/workflows/stage2-enhanced-external-monitor.yml"
+  pull_request:
+    paths:
+      - "stage2/monitor_enhancement/**"
+      - "stage2/route_repair/**"
+      - "configs/stage2_enhanced_external_monitor_contract_v1.json"
+      - "docs/protocols/StageII_Enhanced_External_Monitor_and_Route_Repair_v1_0.md"
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run enhanced monitor and route-repair unit tests
+        run: |
+          python -m unittest stage2.monitor_enhancement.tests.test_evidence_graph stage2.route_repair.tests.test_route_repair
