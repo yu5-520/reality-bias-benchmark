@@ -1,0 +1,65 @@
+{
+  "schema": "RB-STAGE2-P2-EVIDENCE-GRAPH-CLOSURE-v1",
+  "version": "1.0",
+  "status": "P2_COMPLETE_GRAPH_LAYER_SUPPORTED_SELECTOR_NOT_PROMOTED",
+  "result_commit": "f22ff35944883b4c30d3e2f757cbd743ad9512fd",
+  "result_root": "stage2/replication_v2/enhanced_monitor_p2_v1",
+  "summary_hash": "cc02813627bcc9e94baa1165cb79027f7526a79a2ae0d6e7a4e3e51d48163597",
+  "manifest_hash": "8618ecde261d4239e976c329434664b73ad76777ad5bb634306d1bf6cc825c79",
+  "execution": {
+    "frozen_natural_trajectories": 84,
+    "natural_reruns": 0,
+    "provider_calls": 0,
+    "evaluator_calls": 0,
+    "repair_calls": 0
+  },
+  "graph_result": {
+    "normalized_event_count": 1092,
+    "node_count": 2243,
+    "edge_count": 2348,
+    "direct_provenance_edge_count": 2286,
+    "unknown_relation_edge_count": 62,
+    "multi_version_object_count": 62,
+    "supported_edges_without_evidence": 0,
+    "semantic_dependency_edges_generated_without_review": 0
+  },
+  "inspection_result": {
+    "old_monitor_candidate_record_count": 996,
+    "old_monitor_unique_warning_count": 955,
+    "enhanced_candidate_object_count": 62
+  },
+  "localization_proxy": {
+    "corrected_event_overlays_applied": 65,
+    "enhanced_candidate_object_localized": {
+      "denominator": 33,
+      "numerator": 12,
+      "value": 0.36363636363636365
+    },
+    "graph_object_resolved": {
+      "denominator": 33,
+      "numerator": 25,
+      "value": 0.7575757575757576
+    },
+    "metric_scope": "OBJECT_REFERENCE_LOCALIZATION_PROXY_ONLY",
+    "old_monitor_object_localized": {
+      "denominator": 33,
+      "numerator": 20,
+      "value": 0.6060606060606061
+    },
+    "positive_reference_event_count": 33,
+    "reference_layer": "FROZEN_FULL_CONTEXT_REVIEW_WITH_TARGETED_CHRONOLOGY_STATUS_OVERLAY",
+    "replaces_primary_monitor_benchmark": false
+  },
+  "decision": {
+    "graph_layer": "SUPPORTED_FOR_NEXT_ENGINEERING_USE",
+    "candidate_selector": "RETAIN_AS_INSPECTION_FILTER_NOT_PRIMARY_DETECTOR",
+    "old_monitor": "RETAIN_AS_FROZEN_BASELINE",
+    "p3_route_repair": "NOT_AUTHORIZED_BY_P2_ALONE",
+    "rationale": [
+      "The graph resolves more positive-reference objects than the old monitor localization proxy while sharply reducing the inspection candidate set.",
+      "The current enhanced candidate selector localizes fewer positive-reference events than the old monitor, so it is not promoted as a replacement detector.",
+      "Route maps remain observation-only and preserve unknown relations instead of manufacturing semantic dependency.",
+      "Any active route repair still requires same-parent FULL_NATIVE checkpoint eligibility and frozen authorization."
+    ]
+  }
+}

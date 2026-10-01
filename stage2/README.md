@@ -368,3 +368,16 @@ The additive enhanced-monitor prototype is implemented under stage2/monitor_enha
 It remains external/read-mostly, keeps studied framework protocols unchanged, and separates observation, diagnosis and mutation authority.
 Canonical boundary: configs/stage2_enhanced_external_monitor_contract_v1.json.
 Protocol: docs/protocols/StageII_Enhanced_External_Monitor_and_Route_Repair_v1_0.md.
+
+## P2 enhanced Evidence Graph closure
+
+P2 offline replay is complete and sealed at `stage2/replication_v2/enhanced_monitor_p2_v1/`.
+
+- population: 84/84 frozen G2-G5 Natural A trajectories; 0 natural reruns; 0 provider/evaluator/repair calls;
+- graph: 1,092 normalized events, 2,243 nodes, 2,348 edges, 62 explicitly UNKNOWN reuse/dependency edges;
+- inspection load: 955 frozen old-monitor unique warnings versus 62 enhanced graph candidate objects;
+- object-reference localization proxy: full graph 25/33, old monitor 20/33, current enhanced candidate selector 12/33;
+- disposition: Evidence Graph layer advances; the 62-object selector remains an inspection filter and does not replace the frozen old monitor;
+- P3/P4 active repair is not authorized by P2 alone.
+
+Machine-readable closure: `configs/stage2_p2_evidence_graph_replay_closure_v1.json`.
