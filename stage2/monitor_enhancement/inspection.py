@@ -43,15 +43,19 @@ def bounded_route(
     *,
     max_depth: int = 8,
     statuses: Iterable[str] = ("SUPPORTED", "CANDIDATE", "UNKNOWN"),
+    relation_types: Iterable[str] | None = None,
 ) -> dict[str, Any]:
     """Return a downstream route while preserving edge epistemic status."""
     if max_depth < 0:
         raise ValueError("max_depth must be non-negative")
     allowed = set(statuses)
+    allowed_relations = set(relation_types) if relation_types is not None else None
     nodes = {node["ref"]: node for node in graph.get("nodes") or []}
     adjacency: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for edge in graph.get("edges") or []:
-        if edge.get("status") in allowed:
+        if edge.get("status") in allowed and (
+            allowed_relations is None or edge.get("relation_type") in allowed_relations
+        ):
             adjacency[edge["source_ref"]].append(edge)
     seeds = list(dict.fromkeys(seed_refs))
     missing = sorted(ref for ref in seeds if ref not in nodes)
@@ -79,6 +83,9 @@ def bounded_route(
         "seed_refs": seeds,
         "max_depth": max_depth,
         "included_statuses": sorted(allowed),
+        "included_relation_types": (
+            sorted(allowed_relations) if allowed_relations is not None else None
+        ),
         "nodes": selected_nodes,
         "edges": sorted(selected_edges.values(), key=lambda row: row["edge_id"]),
         "depth_by_ref": dict(sorted(depth.items())),

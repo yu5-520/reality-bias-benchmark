@@ -95,15 +95,27 @@ class EvidenceGraph:
                 ("visibility_scopes", row.get("visibility_scope")),
             ):
                 _append_unique(node, field, value)
+            relation_type = (
+                "EVENT_WRITES_OBJECT" if ref in written else "EVENT_OBSERVES_OBJECT"
+            )
             self.add_edge(
                 {
                     "source_ref": "event:" + str(event_ref),
                     "destination_ref": ref,
-                    "relation_type": (
-                        "EVENT_WRITES_OBJECT" if ref in written else "EVENT_OBSERVES_OBJECT"
-                    ),
+                    "relation_type": relation_type,
                     "status": "SUPPORTED",
                     "basis": "DIRECT_RUNTIME_RECORD",
+                    "evidence_refs": [row["evidence_ref"]],
+                }
+            )
+            # Reverse provenance is a query edge, not a causal edge.
+            self.add_edge(
+                {
+                    "source_ref": ref,
+                    "destination_ref": "event:" + str(event_ref),
+                    "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+                    "status": "SUPPORTED",
+                    "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
                     "evidence_refs": [row["evidence_ref"]],
                 }
             )

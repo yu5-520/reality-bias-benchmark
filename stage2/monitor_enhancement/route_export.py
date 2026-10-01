@@ -8,6 +8,17 @@ from stage2.monitor_enhancement.inspection import bounded_route
 from stage2.r7_checkpoint_v1.common import digest
 
 
+DEFAULT_REPAIR_SUPPORT_RELATIONS = {
+    "ADOPTED_AS_DECISION_PREMISE",
+    "INHERITED_INTO_STATE_OR_ACTION",
+    "PROPAGATED_TO_DESCENDANT",
+    "SOURCE_REPLACED",
+    "AUTHORITY_TRANSITION",
+    "REVISION_OF_TARGET_LINEAGE",
+    "DECISION_APPLICATION",
+}
+
+
 def _node_capability(ref: str, authorized: set[str], preserve: set[str], unresolved: bool) -> str:
     if ref in preserve:
         return "PRESERVE"
@@ -28,7 +39,11 @@ def export_route_map(
 ) -> dict[str, Any]:
     route = bounded_route(graph, seed_refs, max_depth=max_depth)
     supported_route = bounded_route(
-        graph, seed_refs, max_depth=max_depth, statuses=("SUPPORTED",)
+        graph,
+        seed_refs,
+        max_depth=max_depth,
+        statuses=("SUPPORTED",),
+        relation_types=DEFAULT_REPAIR_SUPPORT_RELATIONS,
     )
     authorized = set(authorized_write_refs)
     preserve = set(preserve_refs)

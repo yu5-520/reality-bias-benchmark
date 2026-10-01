@@ -1,0 +1,76 @@
+{
+  "schema": "RB-STAGE2-P2-EVIDENCE-GRAPH-REPLAY-CONTRACT-v1",
+  "version": "1.0",
+  "status": "FROZEN_BEFORE_P2_REPLAY",
+  "population": {
+    "groups": [
+      "G2",
+      "G3",
+      "G4",
+      "G5"
+    ],
+    "cells_per_group": 21,
+    "total_natural_trajectories": 84,
+    "g1_role": "CALIBRATION_ONLY_NOT_IN_P2_POOLED_METRICS"
+  },
+  "inputs": {
+    "frozen_natural_pattern": "stage2/replication_v2/{group}/natural_A/{cell}/first_attempt.tar.gz",
+    "old_monitor_candidates_member": "monitor_candidates.json",
+    "corrected_chronology_observations": "stage2/replication_v2/chronology_semantic_review_v1/frozen_observations.jsonl.gz",
+    "full_context_reference_dir": "stage2/replication_v2/gpt56sol_full_context_semantic_audit_v1/formal_review",
+    "targeted_status_corrections": "stage2/replication_v2/chronology_semantic_review_v1/semantic_reviews.json",
+    "primary_old_monitor_summary": "stage2/replication_v2/primary_monitor_benchmark_84_v1/evaluation_summary.json"
+  },
+  "graph_build": {
+    "semantic_audit_used_as_graph_input": false,
+    "cpr_labels_used_as_graph_input": false,
+    "model_calls": 0,
+    "event_object_edges": "SUPPORTED_DIRECT_RECORD_ONLY",
+    "reverse_provenance_edges": "SUPPORTED_QUERY_INDEX_NOT_CAUSAL",
+    "repeated_object_dependency": "UNKNOWN_REQUIRES_SEMANTIC_REVIEW",
+    "temporal_proximity_is_dependency": false,
+    "same_hash_is_causal_dependency": false,
+    "text_similarity_is_causal_dependency": false
+  },
+  "candidate_rules": {
+    "emit_if_any": [
+      "MULTI_EVENT_REUSE",
+      "MULTI_ACTOR_EXPOSURE",
+      "LONG_SPAN_REENTRY",
+      "MULTI_VERSION_STATE",
+      "IMMUTABLE_CARRIER_REUSE",
+      "WRITE_AND_LATER_OBSERVATION"
+    ],
+    "minimum_multi_event_count": 3,
+    "minimum_reentry_span_events": 4,
+    "no_posthoc_threshold_tuning": true,
+    "candidate_means_defect": false
+  },
+  "evaluation": {
+    "layer": "SEPARATE_AFTER_GRAPH_FREEZE",
+    "positive_statuses": [
+      "SUPPORTED",
+      "SUPPORTED_CANDIDATE"
+    ],
+    "object_token_min_length": 4,
+    "metric_name": "OBJECT_REFERENCE_LOCALIZATION_PROXY",
+    "replaces_primary_monitor_benchmark": false,
+    "targeted_corrections_apply_only_to_reviewed_event_keys": true,
+    "unreviewed_historical_labels_are_not_promoted_to_corrected_labels": true
+  },
+  "priority_route_maps": [
+    "G3-X4-T2",
+    "G3-X1-T3",
+    "G5-X6-T3",
+    "G2-X3-T2",
+    "G4-X3-T2",
+    "G2-X5-T2"
+  ],
+  "output_root": "stage2/replication_v2/enhanced_monitor_p2_v1",
+  "execution": {
+    "natural_reruns": 0,
+    "provider_calls": 0,
+    "evaluator_calls": 0,
+    "repair_calls": 0
+  }
+}

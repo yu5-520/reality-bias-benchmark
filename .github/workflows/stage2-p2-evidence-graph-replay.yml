@@ -1,0 +1,48 @@
+name: Stage-II P2 Evidence Graph Replay
+
+on:
+  push:
+    paths:
+      - "scripts/run_stage2_p2_evidence_graph_replay_v1.py"
+      - "configs/stage2_p2_evidence_graph_replay_v1.json"
+      - "stage2/monitor_enhancement/evidence_graph.py"
+      - "stage2/monitor_enhancement/inspection.py"
+      - "stage2/monitor_enhancement/route_export.py"
+      - ".github/workflows/stage2-p2-evidence-graph-replay.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stage2-p2-evidence-graph-replay
+  cancel-in-progress: false
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate enhanced monitor primitives
+        run: |
+          python -m unittest stage2.monitor_enhancement.tests.test_evidence_graph stage2.route_repair.tests.test_route_repair
+      - name: Run P2 offline replay
+        run: |
+          rm -rf stage2/replication_v2/enhanced_monitor_p2_v1
+          python scripts/run_stage2_p2_evidence_graph_replay_v1.py --out stage2/replication_v2/enhanced_monitor_p2_v1
+      - name: Freeze P2 results in repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add stage2/replication_v2/enhanced_monitor_p2_v1
+          if git diff --cached --quiet; then
+            echo "No P2 result changes to commit."
+            exit 0
+          fi
+          git commit -m "Freeze P2 offline Evidence Graph replay results"
+          git pull --rebase origin main
+          git push origin HEAD:main
