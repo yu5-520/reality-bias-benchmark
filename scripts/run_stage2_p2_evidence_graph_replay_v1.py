@@ -621,11 +621,12 @@ def main() -> None:
     }
     summary["summary_hash"] = json_hash(summary)
 
-    with gzip.open(out / "evidence_graphs.jsonl.gz", "wb", mtime=0) as stream:
-        for row in graph_rows:
-            stream.write(
-                json.dumps(row, ensure_ascii=False, sort_keys=True).encode("utf-8") + b"\n"
-            )
+    with (out / "evidence_graphs.jsonl.gz").open("wb") as raw_stream:
+        with gzip.GzipFile(fileobj=raw_stream, mode="wb", mtime=0) as stream:
+            for row in graph_rows:
+                stream.write(
+                    json.dumps(row, ensure_ascii=False, sort_keys=True).encode("utf-8") + b"\n"
+                )
     write_jsonl(out / "candidate_objects.jsonl", candidate_records)
     write_jsonl(out / "localization_proxy.jsonl", audit_rows)
     (out / "cell_summary.json").write_text(
