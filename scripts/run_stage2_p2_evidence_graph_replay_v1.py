@@ -14,9 +14,13 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import sys
 import time
 import tracemalloc
 from typing import Any
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 import scripts.run_stage2_r7_structural_monitor_v1 as legacy
 from stage2.monitor_enhancement.evidence_graph import EvidenceGraph
@@ -24,7 +28,6 @@ from stage2.monitor_enhancement.inspection import inspect_graph
 from stage2.monitor_enhancement.observation_adapter import adapt_structural_event
 from stage2.monitor_enhancement.route_export import export_route_map
 
-ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = ROOT / "configs/stage2_p2_evidence_graph_replay_v1.json"
 GROUPS = ("G2", "G3", "G4", "G5")
 CELLS = tuple(f"X{x}-T{t}" for x in range(1, 8) for t in range(1, 4))
