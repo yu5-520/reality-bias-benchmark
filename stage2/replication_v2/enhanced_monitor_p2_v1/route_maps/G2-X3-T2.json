@@ -1,0 +1,690 @@
+{
+  "authorized_write_refs": [],
+  "depth_by_ref": {
+    "event:G2-X3-T2:X3-T2:struct:0001:initial": 1,
+    "event:G2-X3-T2:X3-T2:struct:0006:initial": 1,
+    "event:G2-X3-T2:X3-T2:struct:0011:initial": 1,
+    "event:G2-X3-T2:chron:0:initial:README.md": 1,
+    "event:G2-X3-T2:chron:0:initial:run.py": 1,
+    "event:G2-X3-T2:chron:0:initial:web/app.js": 1,
+    "event:G2-X3-T2:chron:1:after:README.md": 1,
+    "event:G2-X3-T2:chron:1:after:run.py": 1,
+    "event:G2-X3-T2:chron:1:after:web/app.js": 1,
+    "file:README.md": 0,
+    "file:run.py": 0,
+    "file:web/app.js": 0
+  },
+  "edges": [
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:web/app.js",
+      "edge_id": "edge:0153b82aaa0c2a2570f5f49b",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:web/app.js"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X3-T2:chron:0:initial:web/app.js",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X3-T2:chron:0:initial:README.md",
+      "edge_id": "edge:09098dc78f4c955ea3b38124",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:README.md"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:README.md",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X3-T2:chron:0:initial:web/app.js",
+      "edge_id": "edge:1e9f8dce6e620188204625ec",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:web/app.js"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:web/app.js",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:run.py",
+      "edge_id": "edge:1ea657ac413840d15c3b359f",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:run.py"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X3-T2:chron:0:initial:run.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X3-T2:X3-T2:struct:0011:initial",
+      "edge_id": "edge:1f099e0836c52e5bc099aaef",
+      "evidence_refs": [
+        "G2-X3-T2:normalized:a8305904118e2d785820df679088cffcd766e917f94df33471f818266379e20b:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:web/app.js",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "STRUCTURAL_REUSE_REQUIRES_SEMANTIC_REVIEW",
+      "destination_ref": "event:G2-X3-T2:chron:1:after:run.py",
+      "edge_id": "edge:2b0b26229da1e92988602ace",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:run.py",
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:run.py",
+        "G2-X3-T2:normalized:ae278dfebd75a3d39009afa71772d177dadfc3a1dc6b1b6a9b61bee264796b28:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "REUSE_DEPENDENCY_UNRESOLVED",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:run.py",
+      "status": "UNKNOWN"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X3-T2:X3-T2:struct:0006:initial",
+      "edge_id": "edge:2c988c9eecb4bd145689d655",
+      "evidence_refs": [
+        "G2-X3-T2:normalized:ae278dfebd75a3d39009afa71772d177dadfc3a1dc6b1b6a9b61bee264796b28:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:run.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:README.md",
+      "edge_id": "edge:2ebe164d9e78a5b4bce6ddca",
+      "evidence_refs": [
+        "G2-X3-T2:normalized:bce2065ffa725943f067368657aa249b3920cb7415eaea5ccbd508b84ef4f75a:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X3-T2:X3-T2:struct:0001:initial",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:README.md",
+      "edge_id": "edge:546268b501c83de40a8ab5f2",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:README.md"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X3-T2:chron:0:initial:README.md",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:run.py",
+      "edge_id": "edge:586dfb3573423b290d8a370b",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:run.py"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X3-T2:chron:1:after:run.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:run.py",
+      "edge_id": "edge:5fc90cc3b4ab88da981588be",
+      "evidence_refs": [
+        "G2-X3-T2:normalized:ae278dfebd75a3d39009afa71772d177dadfc3a1dc6b1b6a9b61bee264796b28:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X3-T2:X3-T2:struct:0006:initial",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:README.md",
+      "edge_id": "edge:70dc3516c7ae30b99bc67131",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:README.md"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X3-T2:chron:1:after:README.md",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "STRUCTURAL_REUSE_REQUIRES_SEMANTIC_REVIEW",
+      "destination_ref": "event:G2-X3-T2:chron:1:after:web/app.js",
+      "edge_id": "edge:77330c99871c8fb5c09f563b",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:web/app.js",
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:web/app.js",
+        "G2-X3-T2:normalized:a8305904118e2d785820df679088cffcd766e917f94df33471f818266379e20b:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "REUSE_DEPENDENCY_UNRESOLVED",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:web/app.js",
+      "status": "UNKNOWN"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:web/app.js",
+      "edge_id": "edge:817f01c85d62703b1ec23dc7",
+      "evidence_refs": [
+        "G2-X3-T2:normalized:a8305904118e2d785820df679088cffcd766e917f94df33471f818266379e20b:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X3-T2:X3-T2:struct:0011:initial",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X3-T2:chron:1:after:web/app.js",
+      "edge_id": "edge:a1e86f2259c996eba96cb429",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:web/app.js"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:web/app.js",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X3-T2:chron:1:after:README.md",
+      "edge_id": "edge:a2696ec4ad32e8069efec177",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:README.md"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:README.md",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X3-T2:chron:1:after:run.py",
+      "edge_id": "edge:c130d34991482faa4da40e07",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:run.py"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:run.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:web/app.js",
+      "edge_id": "edge:cfc9f67e61a3cf8d660344a7",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:web/app.js"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X3-T2:chron:1:after:web/app.js",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "STRUCTURAL_REUSE_REQUIRES_SEMANTIC_REVIEW",
+      "destination_ref": "event:G2-X3-T2:chron:1:after:README.md",
+      "edge_id": "edge:daf5ed249bfe178b4f74259c",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:README.md",
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:README.md",
+        "G2-X3-T2:normalized:bce2065ffa725943f067368657aa249b3920cb7415eaea5ccbd508b84ef4f75a:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "REUSE_DEPENDENCY_UNRESOLVED",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:README.md",
+      "status": "UNKNOWN"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X3-T2:chron:0:initial:run.py",
+      "edge_id": "edge:e05116c5042a69a3ae07fcea",
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:run.py"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:run.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X3-T2:X3-T2:struct:0001:initial",
+      "edge_id": "edge:fb3ebb488e16efa8ac01007b",
+      "evidence_refs": [
+        "G2-X3-T2:normalized:bce2065ffa725943f067368657aa249b3920cb7415eaea5ccbd508b84ef4f75a:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:README.md",
+      "status": "SUPPORTED"
+    }
+  ],
+  "graph_hash": "8d0893b031bb19a2a31875c1f0124adf5cf3c9974532845461aa6cf7a917dbd5",
+  "laws": {
+    "diagnosis_precedes_scope_intersection": true,
+    "graph_reachability_is_not_repair_eligibility": true,
+    "observation_authority_is_not_mutation_authority": true
+  },
+  "nodes": [
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X3-T2:X3-T2:struct:0001:initial"
+      ],
+      "evidence_refs": [
+        "G2-X3-T2:normalized:bce2065ffa725943f067368657aa249b3920cb7415eaea5ccbd508b84ef4f75a:initial"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X3-T2:X3-T2:struct:0001:initial",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        1
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "INITIAL"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X3-T2:X3-T2:struct:0006:initial"
+      ],
+      "evidence_refs": [
+        "G2-X3-T2:normalized:ae278dfebd75a3d39009afa71772d177dadfc3a1dc6b1b6a9b61bee264796b28:initial"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X3-T2:X3-T2:struct:0006:initial",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        6
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "INITIAL"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X3-T2:X3-T2:struct:0011:initial"
+      ],
+      "evidence_refs": [
+        "G2-X3-T2:normalized:a8305904118e2d785820df679088cffcd766e917f94df33471f818266379e20b:initial"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X3-T2:X3-T2:struct:0011:initial",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        11
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "INITIAL"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X3-T2:chron:0:initial:README.md"
+      ],
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:README.md"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X3-T2:chron:0:initial:README.md",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:0:initial"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X3-T2:chron:0:initial:run.py"
+      ],
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:run.py"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X3-T2:chron:0:initial:run.py",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:0:initial"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X3-T2:chron:0:initial:web/app.js"
+      ],
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:web/app.js"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X3-T2:chron:0:initial:web/app.js",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:0:initial"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X3-T2:chron:1:after:README.md"
+      ],
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:README.md"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X3-T2:chron:1:after:README.md",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        44
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:44"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X3-T2:chron:1:after:run.py"
+      ],
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:run.py"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X3-T2:chron:1:after:run.py",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        44
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:44"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X3-T2:chron:1:after:web/app.js"
+      ],
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:web/app.js"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X3-T2:chron:1:after:web/app.js",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        44
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:44"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [
+        "11fe60236b048a9794f3441196c886f2ba9c52cf0bfd3dff95975a908aa99f12",
+        "e6844f5e01a8ec651bd20709f0482166681b7cf3211fffeef8e464397e727945"
+      ],
+      "event_refs": [
+        "G2-X3-T2:X3-T2:struct:0001:initial",
+        "G2-X3-T2:chron:0:initial:README.md",
+        "G2-X3-T2:chron:1:after:README.md"
+      ],
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:README.md",
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:README.md",
+        "G2-X3-T2:normalized:bce2065ffa725943f067368657aa249b3920cb7415eaea5ccbd508b84ef4f75a:initial"
+      ],
+      "field_paths": [],
+      "node_type": "OBSERVED_OBJECT",
+      "ref": "file:README.md",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0,
+        1,
+        44
+      ],
+      "supported_reachable": true,
+      "unresolved": false,
+      "versions": [
+        "INITIAL",
+        "checkpoint:0:initial",
+        "checkpoint:44"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [
+        "37fcf1ff1abd8816676eb38297e83b0003cb965313ec15dee26c8c799b311f51",
+        "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39"
+      ],
+      "event_refs": [
+        "G2-X3-T2:X3-T2:struct:0006:initial",
+        "G2-X3-T2:chron:0:initial:run.py",
+        "G2-X3-T2:chron:1:after:run.py"
+      ],
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:run.py",
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:run.py",
+        "G2-X3-T2:normalized:ae278dfebd75a3d39009afa71772d177dadfc3a1dc6b1b6a9b61bee264796b28:initial"
+      ],
+      "field_paths": [],
+      "node_type": "OBSERVED_OBJECT",
+      "ref": "file:run.py",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0,
+        44,
+        6
+      ],
+      "supported_reachable": true,
+      "unresolved": false,
+      "versions": [
+        "INITIAL",
+        "checkpoint:0:initial",
+        "checkpoint:44"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [
+        "ea71ea811176430b89c4075881c3381cac04be21b3aeeb105d7ce12e5821f8c3",
+        "fbce7cfed68aeb73ff4b4efbb7a48898bac6a8fda39f7674e561e1ce7aa0358a"
+      ],
+      "event_refs": [
+        "G2-X3-T2:X3-T2:struct:0011:initial",
+        "G2-X3-T2:chron:0:initial:web/app.js",
+        "G2-X3-T2:chron:1:after:web/app.js"
+      ],
+      "evidence_refs": [
+        "G2-X3-T2:chron:checkpoints/5fc5239843e15f0a7e5975df6632103528ea6e9f50612f397843beed697cb5e3/manifest.json:909770c593f5ccd82e48a38b68efb49a7a0d1508adee24dc27461639a9eac858:initial:web/app.js",
+        "G2-X3-T2:chron:checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/manifest.json:5e3698bbafc525ac3eebeb4a529ad014a1040e2eed772a6802a8309e311bd622:after:web/app.js",
+        "G2-X3-T2:normalized:a8305904118e2d785820df679088cffcd766e917f94df33471f818266379e20b:initial"
+      ],
+      "field_paths": [],
+      "node_type": "OBSERVED_OBJECT",
+      "ref": "file:web/app.js",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0,
+        11,
+        44
+      ],
+      "supported_reachable": true,
+      "unresolved": false,
+      "versions": [
+        "INITIAL",
+        "checkpoint:0:initial",
+        "checkpoint:44"
+      ],
+      "visibility_scopes": []
+    }
+  ],
+  "out_of_route_preserve_refs": [],
+  "preserve_refs": [],
+  "route_map_hash": "e4b57b927b2aa107f9ebbcc489daf3cd135269cb378058ecb8fd6e1d909591f3",
+  "schema": "RB-STAGE2-ENHANCED-ROUTE-MAP-v1",
+  "seed_refs": [
+    "file:README.md",
+    "file:run.py",
+    "file:web/app.js"
+  ],
+  "supported_reachable_refs": [
+    "file:README.md",
+    "file:run.py",
+    "file:web/app.js"
+  ],
+  "unknown_refs": [],
+  "visible_preserve_refs": [],
+  "visible_refs": [
+    "event:G2-X3-T2:X3-T2:struct:0001:initial",
+    "event:G2-X3-T2:X3-T2:struct:0006:initial",
+    "event:G2-X3-T2:X3-T2:struct:0011:initial",
+    "event:G2-X3-T2:chron:0:initial:README.md",
+    "event:G2-X3-T2:chron:0:initial:run.py",
+    "event:G2-X3-T2:chron:0:initial:web/app.js",
+    "event:G2-X3-T2:chron:1:after:README.md",
+    "event:G2-X3-T2:chron:1:after:run.py",
+    "event:G2-X3-T2:chron:1:after:web/app.js",
+    "file:README.md",
+    "file:run.py",
+    "file:web/app.js"
+  ]
+}

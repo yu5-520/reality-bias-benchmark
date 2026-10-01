@@ -1,0 +1,591 @@
+{
+  "authorized_write_refs": [],
+  "depth_by_ref": {
+    "event:G2-X5-T2:X5-T2:struct:0011:initial": 1,
+    "event:G2-X5-T2:X5-T2:struct:0012:initial": 1,
+    "event:G2-X5-T2:chron:0:initial:web/app.js": 1,
+    "event:G2-X5-T2:chron:0:initial:web/index.html": 1,
+    "event:G2-X5-T2:chron:1:after:web/app.js": 1,
+    "event:G2-X5-T2:chron:1:after:web/index.html": 1,
+    "event:G2-X5-T2:chron:2:after:web/app.js": 1,
+    "event:G2-X5-T2:chron:2:after:web/index.html": 1,
+    "file:web/app.js": 0,
+    "file:web/index.html": 0
+  },
+  "edges": [
+    {
+      "basis": "STRUCTURAL_REUSE_REQUIRES_SEMANTIC_REVIEW",
+      "destination_ref": "event:G2-X5-T2:chron:2:after:web/index.html",
+      "edge_id": "edge:0e4757f5c96c482cc92282b6",
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/35556fb4394ac9678f1aecb56bc7ae5178d969566fc6860b9335dd3fdcefcb32/manifest.json:d5930d44705a9b92edeb64ebe7c8d0f8d61c6558a5a9e9da0d1209d7e71ff735:initial:web/index.html",
+        "G2-X5-T2:chron:checkpoints/87948afa15a7645758d6c6b7c3f2f0c6995077165848135a83637eebd737f75a/manifest.json:85a1091d5d583df2ac7ec101145c2862cc43e1db23a2368a94dbea050d1d61e9:after:web/index.html",
+        "G2-X5-T2:chron:checkpoints/ab1b739be09450a3da361bced165f44800e4d49965a2cc2dd35e333349c9d2f4/manifest.json:125b560afb819cb114b5cbf05df53781d8f5ebe32e388cb2f08eb0a0c447b164:after:web/index.html",
+        "G2-X5-T2:normalized:3e9a2cffd6f209758a36528d361b0974d1387a5f631bcab14f3dff1b4b92555a:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "REUSE_DEPENDENCY_UNRESOLVED",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:web/index.html",
+      "status": "UNKNOWN"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X5-T2:chron:0:initial:web/index.html",
+      "edge_id": "edge:11045745e3e9c61d6b8cc385",
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/35556fb4394ac9678f1aecb56bc7ae5178d969566fc6860b9335dd3fdcefcb32/manifest.json:d5930d44705a9b92edeb64ebe7c8d0f8d61c6558a5a9e9da0d1209d7e71ff735:initial:web/index.html"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:web/index.html",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X5-T2:chron:2:after:web/index.html",
+      "edge_id": "edge:22e901665aab2f17867dd15a",
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/ab1b739be09450a3da361bced165f44800e4d49965a2cc2dd35e333349c9d2f4/manifest.json:125b560afb819cb114b5cbf05df53781d8f5ebe32e388cb2f08eb0a0c447b164:after:web/index.html"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:web/index.html",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:web/app.js",
+      "edge_id": "edge:478217bf42b3c239ff5207b4",
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/ab1b739be09450a3da361bced165f44800e4d49965a2cc2dd35e333349c9d2f4/manifest.json:125b560afb819cb114b5cbf05df53781d8f5ebe32e388cb2f08eb0a0c447b164:after:web/app.js"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X5-T2:chron:2:after:web/app.js",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X5-T2:chron:1:after:web/app.js",
+      "edge_id": "edge:4d72329417cb09c655a9a7fd",
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/87948afa15a7645758d6c6b7c3f2f0c6995077165848135a83637eebd737f75a/manifest.json:85a1091d5d583df2ac7ec101145c2862cc43e1db23a2368a94dbea050d1d61e9:after:web/app.js"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:web/app.js",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:web/app.js",
+      "edge_id": "edge:5814130a3e120e1a03d0f340",
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/87948afa15a7645758d6c6b7c3f2f0c6995077165848135a83637eebd737f75a/manifest.json:85a1091d5d583df2ac7ec101145c2862cc43e1db23a2368a94dbea050d1d61e9:after:web/app.js"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X5-T2:chron:1:after:web/app.js",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X5-T2:X5-T2:struct:0011:initial",
+      "edge_id": "edge:66122df731e5b1b546d9b245",
+      "evidence_refs": [
+        "G2-X5-T2:normalized:729f7be6994cedebc12ca2b7139828f83d4412285b45c4b6b97fe422f421d27f:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:web/app.js",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X5-T2:chron:0:initial:web/app.js",
+      "edge_id": "edge:67687449ec22c60b753947da",
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/35556fb4394ac9678f1aecb56bc7ae5178d969566fc6860b9335dd3fdcefcb32/manifest.json:d5930d44705a9b92edeb64ebe7c8d0f8d61c6558a5a9e9da0d1209d7e71ff735:initial:web/app.js"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:web/app.js",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X5-T2:chron:2:after:web/app.js",
+      "edge_id": "edge:7e3054918b799f22803227c8",
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/ab1b739be09450a3da361bced165f44800e4d49965a2cc2dd35e333349c9d2f4/manifest.json:125b560afb819cb114b5cbf05df53781d8f5ebe32e388cb2f08eb0a0c447b164:after:web/app.js"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:web/app.js",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:web/app.js",
+      "edge_id": "edge:83f727dc2954ec2517633f7a",
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/35556fb4394ac9678f1aecb56bc7ae5178d969566fc6860b9335dd3fdcefcb32/manifest.json:d5930d44705a9b92edeb64ebe7c8d0f8d61c6558a5a9e9da0d1209d7e71ff735:initial:web/app.js"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X5-T2:chron:0:initial:web/app.js",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:web/index.html",
+      "edge_id": "edge:8462377ce2de2decacebabb2",
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/ab1b739be09450a3da361bced165f44800e4d49965a2cc2dd35e333349c9d2f4/manifest.json:125b560afb819cb114b5cbf05df53781d8f5ebe32e388cb2f08eb0a0c447b164:after:web/index.html"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X5-T2:chron:2:after:web/index.html",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:web/index.html",
+      "edge_id": "edge:93de13173fabc75c6ef4eaa8",
+      "evidence_refs": [
+        "G2-X5-T2:normalized:3e9a2cffd6f209758a36528d361b0974d1387a5f631bcab14f3dff1b4b92555a:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X5-T2:X5-T2:struct:0012:initial",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:web/index.html",
+      "edge_id": "edge:ab8bde3932d10632975ec261",
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/35556fb4394ac9678f1aecb56bc7ae5178d969566fc6860b9335dd3fdcefcb32/manifest.json:d5930d44705a9b92edeb64ebe7c8d0f8d61c6558a5a9e9da0d1209d7e71ff735:initial:web/index.html"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X5-T2:chron:0:initial:web/index.html",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:web/index.html",
+      "edge_id": "edge:b249a4b64a0de50b17adee55",
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/87948afa15a7645758d6c6b7c3f2f0c6995077165848135a83637eebd737f75a/manifest.json:85a1091d5d583df2ac7ec101145c2862cc43e1db23a2368a94dbea050d1d61e9:after:web/index.html"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X5-T2:chron:1:after:web/index.html",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:web/app.js",
+      "edge_id": "edge:b426fd691056ee0057c66dfd",
+      "evidence_refs": [
+        "G2-X5-T2:normalized:729f7be6994cedebc12ca2b7139828f83d4412285b45c4b6b97fe422f421d27f:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G2-X5-T2:X5-T2:struct:0011:initial",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X5-T2:chron:1:after:web/index.html",
+      "edge_id": "edge:ba39d76e501f061267f3c0da",
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/87948afa15a7645758d6c6b7c3f2f0c6995077165848135a83637eebd737f75a/manifest.json:85a1091d5d583df2ac7ec101145c2862cc43e1db23a2368a94dbea050d1d61e9:after:web/index.html"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:web/index.html",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G2-X5-T2:X5-T2:struct:0012:initial",
+      "edge_id": "edge:c4f6ec0338a97c7b7a619d5f",
+      "evidence_refs": [
+        "G2-X5-T2:normalized:3e9a2cffd6f209758a36528d361b0974d1387a5f631bcab14f3dff1b4b92555a:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:web/index.html",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "STRUCTURAL_REUSE_REQUIRES_SEMANTIC_REVIEW",
+      "destination_ref": "event:G2-X5-T2:chron:2:after:web/app.js",
+      "edge_id": "edge:f9de1b7fda4cfc37d33f163e",
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/35556fb4394ac9678f1aecb56bc7ae5178d969566fc6860b9335dd3fdcefcb32/manifest.json:d5930d44705a9b92edeb64ebe7c8d0f8d61c6558a5a9e9da0d1209d7e71ff735:initial:web/app.js",
+        "G2-X5-T2:chron:checkpoints/87948afa15a7645758d6c6b7c3f2f0c6995077165848135a83637eebd737f75a/manifest.json:85a1091d5d583df2ac7ec101145c2862cc43e1db23a2368a94dbea050d1d61e9:after:web/app.js",
+        "G2-X5-T2:chron:checkpoints/ab1b739be09450a3da361bced165f44800e4d49965a2cc2dd35e333349c9d2f4/manifest.json:125b560afb819cb114b5cbf05df53781d8f5ebe32e388cb2f08eb0a0c447b164:after:web/app.js",
+        "G2-X5-T2:normalized:729f7be6994cedebc12ca2b7139828f83d4412285b45c4b6b97fe422f421d27f:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "REUSE_DEPENDENCY_UNRESOLVED",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:web/app.js",
+      "status": "UNKNOWN"
+    }
+  ],
+  "graph_hash": "cb0fce978f738e2233601606b0698517898840cf7771a9fa4e89e1bb8991fbd4",
+  "laws": {
+    "diagnosis_precedes_scope_intersection": true,
+    "graph_reachability_is_not_repair_eligibility": true,
+    "observation_authority_is_not_mutation_authority": true
+  },
+  "nodes": [
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X5-T2:X5-T2:struct:0011:initial"
+      ],
+      "evidence_refs": [
+        "G2-X5-T2:normalized:729f7be6994cedebc12ca2b7139828f83d4412285b45c4b6b97fe422f421d27f:initial"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X5-T2:X5-T2:struct:0011:initial",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        11
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "INITIAL"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X5-T2:X5-T2:struct:0012:initial"
+      ],
+      "evidence_refs": [
+        "G2-X5-T2:normalized:3e9a2cffd6f209758a36528d361b0974d1387a5f631bcab14f3dff1b4b92555a:initial"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X5-T2:X5-T2:struct:0012:initial",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        12
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "INITIAL"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X5-T2:chron:0:initial:web/app.js"
+      ],
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/35556fb4394ac9678f1aecb56bc7ae5178d969566fc6860b9335dd3fdcefcb32/manifest.json:d5930d44705a9b92edeb64ebe7c8d0f8d61c6558a5a9e9da0d1209d7e71ff735:initial:web/app.js"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X5-T2:chron:0:initial:web/app.js",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:0:initial"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X5-T2:chron:0:initial:web/index.html"
+      ],
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/35556fb4394ac9678f1aecb56bc7ae5178d969566fc6860b9335dd3fdcefcb32/manifest.json:d5930d44705a9b92edeb64ebe7c8d0f8d61c6558a5a9e9da0d1209d7e71ff735:initial:web/index.html"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X5-T2:chron:0:initial:web/index.html",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:0:initial"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X5-T2:chron:1:after:web/app.js"
+      ],
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/87948afa15a7645758d6c6b7c3f2f0c6995077165848135a83637eebd737f75a/manifest.json:85a1091d5d583df2ac7ec101145c2862cc43e1db23a2368a94dbea050d1d61e9:after:web/app.js"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X5-T2:chron:1:after:web/app.js",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        18
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:18"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X5-T2:chron:1:after:web/index.html"
+      ],
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/87948afa15a7645758d6c6b7c3f2f0c6995077165848135a83637eebd737f75a/manifest.json:85a1091d5d583df2ac7ec101145c2862cc43e1db23a2368a94dbea050d1d61e9:after:web/index.html"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X5-T2:chron:1:after:web/index.html",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        18
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:18"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X5-T2:chron:2:after:web/app.js"
+      ],
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/ab1b739be09450a3da361bced165f44800e4d49965a2cc2dd35e333349c9d2f4/manifest.json:125b560afb819cb114b5cbf05df53781d8f5ebe32e388cb2f08eb0a0c447b164:after:web/app.js"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X5-T2:chron:2:after:web/app.js",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        28
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:28"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G2-X5-T2:chron:2:after:web/index.html"
+      ],
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/ab1b739be09450a3da361bced165f44800e4d49965a2cc2dd35e333349c9d2f4/manifest.json:125b560afb819cb114b5cbf05df53781d8f5ebe32e388cb2f08eb0a0c447b164:after:web/index.html"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G2-X5-T2:chron:2:after:web/index.html",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        28
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:28"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [
+        "1787b89ac5c794e58df797ceefdf63b042ca2e77c806b5210c5394f8886f91ad",
+        "62b2d8b58b3781f7784bba3babd124cdb57df6690b08e76d5a82f800a69ea90b",
+        "ea71ea811176430b89c4075881c3381cac04be21b3aeeb105d7ce12e5821f8c3"
+      ],
+      "event_refs": [
+        "G2-X5-T2:X5-T2:struct:0011:initial",
+        "G2-X5-T2:chron:0:initial:web/app.js",
+        "G2-X5-T2:chron:1:after:web/app.js",
+        "G2-X5-T2:chron:2:after:web/app.js"
+      ],
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/35556fb4394ac9678f1aecb56bc7ae5178d969566fc6860b9335dd3fdcefcb32/manifest.json:d5930d44705a9b92edeb64ebe7c8d0f8d61c6558a5a9e9da0d1209d7e71ff735:initial:web/app.js",
+        "G2-X5-T2:chron:checkpoints/87948afa15a7645758d6c6b7c3f2f0c6995077165848135a83637eebd737f75a/manifest.json:85a1091d5d583df2ac7ec101145c2862cc43e1db23a2368a94dbea050d1d61e9:after:web/app.js",
+        "G2-X5-T2:chron:checkpoints/ab1b739be09450a3da361bced165f44800e4d49965a2cc2dd35e333349c9d2f4/manifest.json:125b560afb819cb114b5cbf05df53781d8f5ebe32e388cb2f08eb0a0c447b164:after:web/app.js",
+        "G2-X5-T2:normalized:729f7be6994cedebc12ca2b7139828f83d4412285b45c4b6b97fe422f421d27f:initial"
+      ],
+      "field_paths": [],
+      "node_type": "OBSERVED_OBJECT",
+      "ref": "file:web/app.js",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0,
+        11,
+        18,
+        28
+      ],
+      "supported_reachable": true,
+      "unresolved": false,
+      "versions": [
+        "INITIAL",
+        "checkpoint:0:initial",
+        "checkpoint:18",
+        "checkpoint:28"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [
+        "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd",
+        "9208b667f3f13bf4586d096328618fbaf78bad940bd6a3cee269b7099e97543f",
+        "db8d55e86a4d9ca19dfe7180c1ec1b4e467d06fa5355ae6e5949b3dfcdf804aa"
+      ],
+      "event_refs": [
+        "G2-X5-T2:X5-T2:struct:0012:initial",
+        "G2-X5-T2:chron:0:initial:web/index.html",
+        "G2-X5-T2:chron:1:after:web/index.html",
+        "G2-X5-T2:chron:2:after:web/index.html"
+      ],
+      "evidence_refs": [
+        "G2-X5-T2:chron:checkpoints/35556fb4394ac9678f1aecb56bc7ae5178d969566fc6860b9335dd3fdcefcb32/manifest.json:d5930d44705a9b92edeb64ebe7c8d0f8d61c6558a5a9e9da0d1209d7e71ff735:initial:web/index.html",
+        "G2-X5-T2:chron:checkpoints/87948afa15a7645758d6c6b7c3f2f0c6995077165848135a83637eebd737f75a/manifest.json:85a1091d5d583df2ac7ec101145c2862cc43e1db23a2368a94dbea050d1d61e9:after:web/index.html",
+        "G2-X5-T2:chron:checkpoints/ab1b739be09450a3da361bced165f44800e4d49965a2cc2dd35e333349c9d2f4/manifest.json:125b560afb819cb114b5cbf05df53781d8f5ebe32e388cb2f08eb0a0c447b164:after:web/index.html",
+        "G2-X5-T2:normalized:3e9a2cffd6f209758a36528d361b0974d1387a5f631bcab14f3dff1b4b92555a:initial"
+      ],
+      "field_paths": [],
+      "node_type": "OBSERVED_OBJECT",
+      "ref": "file:web/index.html",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0,
+        12,
+        18,
+        28
+      ],
+      "supported_reachable": true,
+      "unresolved": false,
+      "versions": [
+        "INITIAL",
+        "checkpoint:0:initial",
+        "checkpoint:18",
+        "checkpoint:28"
+      ],
+      "visibility_scopes": []
+    }
+  ],
+  "out_of_route_preserve_refs": [],
+  "preserve_refs": [],
+  "route_map_hash": "d128be4950540e12e245820b301287ac6749c3b7a0b6188a57a75c0f71669c20",
+  "schema": "RB-STAGE2-ENHANCED-ROUTE-MAP-v1",
+  "seed_refs": [
+    "file:web/app.js",
+    "file:web/index.html"
+  ],
+  "supported_reachable_refs": [
+    "file:web/app.js",
+    "file:web/index.html"
+  ],
+  "unknown_refs": [],
+  "visible_preserve_refs": [],
+  "visible_refs": [
+    "event:G2-X5-T2:X5-T2:struct:0011:initial",
+    "event:G2-X5-T2:X5-T2:struct:0012:initial",
+    "event:G2-X5-T2:chron:0:initial:web/app.js",
+    "event:G2-X5-T2:chron:0:initial:web/index.html",
+    "event:G2-X5-T2:chron:1:after:web/app.js",
+    "event:G2-X5-T2:chron:1:after:web/index.html",
+    "event:G2-X5-T2:chron:2:after:web/app.js",
+    "event:G2-X5-T2:chron:2:after:web/index.html",
+    "file:web/app.js",
+    "file:web/index.html"
+  ]
+}

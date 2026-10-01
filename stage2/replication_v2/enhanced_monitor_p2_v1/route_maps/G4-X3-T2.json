@@ -1,0 +1,690 @@
+{
+  "authorized_write_refs": [],
+  "depth_by_ref": {
+    "event:G4-X3-T2:X3-T2:struct:0001:initial": 1,
+    "event:G4-X3-T2:X3-T2:struct:0003:initial": 1,
+    "event:G4-X3-T2:X3-T2:struct:0004:initial": 1,
+    "event:G4-X3-T2:chron:0:initial:README.md": 1,
+    "event:G4-X3-T2:chron:0:initial:checkout_app/checkout.py": 1,
+    "event:G4-X3-T2:chron:0:initial:checkout_app/server.py": 1,
+    "event:G4-X3-T2:chron:1:after:README.md": 1,
+    "event:G4-X3-T2:chron:1:after:checkout_app/checkout.py": 1,
+    "event:G4-X3-T2:chron:1:after:checkout_app/server.py": 1,
+    "file:README.md": 0,
+    "file:checkout_app/checkout.py": 0,
+    "file:checkout_app/server.py": 0
+  },
+  "edges": [
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:checkout_app/checkout.py",
+      "edge_id": "edge:047bec88a0421d80d3c039da",
+      "evidence_refs": [
+        "G4-X3-T2:normalized:ac4b2d714e9c7f60360eb27a2d83a86cc5809d90c741ad63c49cfc2d97f5e79c:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G4-X3-T2:X3-T2:struct:0003:initial",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G4-X3-T2:chron:0:initial:README.md",
+      "edge_id": "edge:18f18f87549c1d62315f07f7",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:README.md"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:README.md",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:README.md",
+      "edge_id": "edge:25633484430cb3f5b3f49bc5",
+      "evidence_refs": [
+        "G4-X3-T2:normalized:bce2065ffa725943f067368657aa249b3920cb7415eaea5ccbd508b84ef4f75a:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G4-X3-T2:X3-T2:struct:0001:initial",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:checkout_app/checkout.py",
+      "edge_id": "edge:342de45705314c0656067247",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:checkout_app/checkout.py"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G4-X3-T2:chron:0:initial:checkout_app/checkout.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "STRUCTURAL_REUSE_REQUIRES_SEMANTIC_REVIEW",
+      "destination_ref": "event:G4-X3-T2:chron:1:after:README.md",
+      "edge_id": "edge:39a25106f9aa88ddb113ecc5",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:README.md",
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:README.md",
+        "G4-X3-T2:normalized:bce2065ffa725943f067368657aa249b3920cb7415eaea5ccbd508b84ef4f75a:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "REUSE_DEPENDENCY_UNRESOLVED",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:README.md",
+      "status": "UNKNOWN"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:checkout_app/server.py",
+      "edge_id": "edge:3aecf4b6ec128b2553ca5332",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:checkout_app/server.py"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G4-X3-T2:chron:1:after:checkout_app/server.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G4-X3-T2:chron:1:after:README.md",
+      "edge_id": "edge:3e05aef670c18b46f5ef87c1",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:README.md"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:README.md",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G4-X3-T2:X3-T2:struct:0004:initial",
+      "edge_id": "edge:481fe27d3631825d70cacdcf",
+      "evidence_refs": [
+        "G4-X3-T2:normalized:5d8e8f65599dd92c8a4d7ab9c1c5b24d5118797b94b51f3b6a137b96e07fde59:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:checkout_app/server.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G4-X3-T2:chron:1:after:checkout_app/checkout.py",
+      "edge_id": "edge:560d3a9d769af86c814ba664",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:checkout_app/checkout.py"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:checkout_app/checkout.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:checkout_app/checkout.py",
+      "edge_id": "edge:635ac2f705713c24295bd6f1",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:checkout_app/checkout.py"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G4-X3-T2:chron:1:after:checkout_app/checkout.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G4-X3-T2:X3-T2:struct:0003:initial",
+      "edge_id": "edge:63d6d7cf17a2529d6e0ae76e",
+      "evidence_refs": [
+        "G4-X3-T2:normalized:ac4b2d714e9c7f60360eb27a2d83a86cc5809d90c741ad63c49cfc2d97f5e79c:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:checkout_app/checkout.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G4-X3-T2:chron:0:initial:checkout_app/checkout.py",
+      "edge_id": "edge:72e534588c8ae33fa65513a9",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:checkout_app/checkout.py"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:checkout_app/checkout.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:README.md",
+      "edge_id": "edge:73641c9812ac7ef38c43cd3f",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:README.md"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G4-X3-T2:chron:0:initial:README.md",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "STRUCTURAL_REUSE_REQUIRES_SEMANTIC_REVIEW",
+      "destination_ref": "event:G4-X3-T2:chron:1:after:checkout_app/server.py",
+      "edge_id": "edge:7cd6836ba95fb841a4159038",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:checkout_app/server.py",
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:checkout_app/server.py",
+        "G4-X3-T2:normalized:5d8e8f65599dd92c8a4d7ab9c1c5b24d5118797b94b51f3b6a137b96e07fde59:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "REUSE_DEPENDENCY_UNRESOLVED",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:checkout_app/server.py",
+      "status": "UNKNOWN"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G4-X3-T2:chron:1:after:checkout_app/server.py",
+      "edge_id": "edge:8608ac45aa2a88829dcf6be7",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:checkout_app/server.py"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:checkout_app/server.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:checkout_app/server.py",
+      "edge_id": "edge:8bb7b66760f193edf2075367",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:checkout_app/server.py"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G4-X3-T2:chron:0:initial:checkout_app/server.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "STRUCTURAL_REUSE_REQUIRES_SEMANTIC_REVIEW",
+      "destination_ref": "event:G4-X3-T2:chron:1:after:checkout_app/checkout.py",
+      "edge_id": "edge:91c4b27b814eec5d88a86586",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:checkout_app/checkout.py",
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:checkout_app/checkout.py",
+        "G4-X3-T2:normalized:ac4b2d714e9c7f60360eb27a2d83a86cc5809d90c741ad63c49cfc2d97f5e79c:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "REUSE_DEPENDENCY_UNRESOLVED",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:checkout_app/checkout.py",
+      "status": "UNKNOWN"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G4-X3-T2:X3-T2:struct:0001:initial",
+      "edge_id": "edge:b8aeb5f5fd57bf3614cd78e5",
+      "evidence_refs": [
+        "G4-X3-T2:normalized:bce2065ffa725943f067368657aa249b3920cb7415eaea5ccbd508b84ef4f75a:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:README.md",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:checkout_app/server.py",
+      "edge_id": "edge:dd2247bab40ee7a4c4345ff0",
+      "evidence_refs": [
+        "G4-X3-T2:normalized:5d8e8f65599dd92c8a4d7ab9c1c5b24d5118797b94b51f3b6a137b96e07fde59:initial"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G4-X3-T2:X3-T2:struct:0004:initial",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD_REVERSE_INDEX",
+      "destination_ref": "event:G4-X3-T2:chron:0:initial:checkout_app/server.py",
+      "edge_id": "edge:ec6f41f85863f24d0fe137f9",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:checkout_app/server.py"
+      ],
+      "judgment_version": null,
+      "relation_type": "OBJECT_EVIDENCED_BY_EVENT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "file:checkout_app/server.py",
+      "status": "SUPPORTED"
+    },
+    {
+      "basis": "DIRECT_RUNTIME_RECORD",
+      "destination_ref": "file:README.md",
+      "edge_id": "edge:ecf36d6ee9c3622ee42f8bef",
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:README.md"
+      ],
+      "judgment_version": null,
+      "relation_type": "EVENT_OBSERVES_OBJECT",
+      "semantic_scope_status": "UNRESOLVED",
+      "semantic_use_status": "UNRESOLVED",
+      "source_ref": "event:G4-X3-T2:chron:1:after:README.md",
+      "status": "SUPPORTED"
+    }
+  ],
+  "graph_hash": "71732c04fcbe4aed4874a4df3b72262cd446c4f80ae1ffeb9657c80d74e14929",
+  "laws": {
+    "diagnosis_precedes_scope_intersection": true,
+    "graph_reachability_is_not_repair_eligibility": true,
+    "observation_authority_is_not_mutation_authority": true
+  },
+  "nodes": [
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G4-X3-T2:X3-T2:struct:0001:initial"
+      ],
+      "evidence_refs": [
+        "G4-X3-T2:normalized:bce2065ffa725943f067368657aa249b3920cb7415eaea5ccbd508b84ef4f75a:initial"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G4-X3-T2:X3-T2:struct:0001:initial",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        1
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "INITIAL"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G4-X3-T2:X3-T2:struct:0003:initial"
+      ],
+      "evidence_refs": [
+        "G4-X3-T2:normalized:ac4b2d714e9c7f60360eb27a2d83a86cc5809d90c741ad63c49cfc2d97f5e79c:initial"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G4-X3-T2:X3-T2:struct:0003:initial",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        3
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "INITIAL"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G4-X3-T2:X3-T2:struct:0004:initial"
+      ],
+      "evidence_refs": [
+        "G4-X3-T2:normalized:5d8e8f65599dd92c8a4d7ab9c1c5b24d5118797b94b51f3b6a137b96e07fde59:initial"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G4-X3-T2:X3-T2:struct:0004:initial",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        4
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "INITIAL"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G4-X3-T2:chron:0:initial:README.md"
+      ],
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:README.md"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G4-X3-T2:chron:0:initial:README.md",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:0:initial"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G4-X3-T2:chron:0:initial:checkout_app/checkout.py"
+      ],
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:checkout_app/checkout.py"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G4-X3-T2:chron:0:initial:checkout_app/checkout.py",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:0:initial"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G4-X3-T2:chron:0:initial:checkout_app/server.py"
+      ],
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:checkout_app/server.py"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G4-X3-T2:chron:0:initial:checkout_app/server.py",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:0:initial"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G4-X3-T2:chron:1:after:README.md"
+      ],
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:README.md"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G4-X3-T2:chron:1:after:README.md",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        52
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:52"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G4-X3-T2:chron:1:after:checkout_app/checkout.py"
+      ],
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:checkout_app/checkout.py"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G4-X3-T2:chron:1:after:checkout_app/checkout.py",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        52
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:52"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [],
+      "event_refs": [
+        "G4-X3-T2:chron:1:after:checkout_app/server.py"
+      ],
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:checkout_app/server.py"
+      ],
+      "field_paths": [],
+      "node_type": "EVENT",
+      "ref": "event:G4-X3-T2:chron:1:after:checkout_app/server.py",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        52
+      ],
+      "supported_reachable": false,
+      "unresolved": false,
+      "versions": [
+        "checkpoint:52"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [
+        "11fe60236b048a9794f3441196c886f2ba9c52cf0bfd3dff95975a908aa99f12",
+        "b9cd1c99129ea624e8d03b0217bbff3b22c201dc1cdd200c20be23bd4ea3a53e"
+      ],
+      "event_refs": [
+        "G4-X3-T2:X3-T2:struct:0001:initial",
+        "G4-X3-T2:chron:0:initial:README.md",
+        "G4-X3-T2:chron:1:after:README.md"
+      ],
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:README.md",
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:README.md",
+        "G4-X3-T2:normalized:bce2065ffa725943f067368657aa249b3920cb7415eaea5ccbd508b84ef4f75a:initial"
+      ],
+      "field_paths": [],
+      "node_type": "OBSERVED_OBJECT",
+      "ref": "file:README.md",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0,
+        1,
+        52
+      ],
+      "supported_reachable": true,
+      "unresolved": false,
+      "versions": [
+        "INITIAL",
+        "checkpoint:0:initial",
+        "checkpoint:52"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [
+        "9c2dd5580854f1357e9c4f2976262541ddb3c717451a3ec4f99e7c5d280ec5d8",
+        "ad9b7786ee90545cbfd55c63c8e738b4af468d953ef134c95c3f25e16aa4e1a2"
+      ],
+      "event_refs": [
+        "G4-X3-T2:X3-T2:struct:0003:initial",
+        "G4-X3-T2:chron:0:initial:checkout_app/checkout.py",
+        "G4-X3-T2:chron:1:after:checkout_app/checkout.py"
+      ],
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:checkout_app/checkout.py",
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:checkout_app/checkout.py",
+        "G4-X3-T2:normalized:ac4b2d714e9c7f60360eb27a2d83a86cc5809d90c741ad63c49cfc2d97f5e79c:initial"
+      ],
+      "field_paths": [],
+      "node_type": "OBSERVED_OBJECT",
+      "ref": "file:checkout_app/checkout.py",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0,
+        3,
+        52
+      ],
+      "supported_reachable": true,
+      "unresolved": false,
+      "versions": [
+        "INITIAL",
+        "checkpoint:0:initial",
+        "checkpoint:52"
+      ],
+      "visibility_scopes": []
+    },
+    {
+      "actors": [
+        "SYSTEM"
+      ],
+      "content_hashes": [
+        "44ce196b97a7fd4eb2d4ba14f6de214be2fe30d03628c7beae61d50ebea83992",
+        "c388a455c0ca08210b73400ea4af28d662cf087e5ef3040ca35b77e5413d1b9b"
+      ],
+      "event_refs": [
+        "G4-X3-T2:X3-T2:struct:0004:initial",
+        "G4-X3-T2:chron:0:initial:checkout_app/server.py",
+        "G4-X3-T2:chron:1:after:checkout_app/server.py"
+      ],
+      "evidence_refs": [
+        "G4-X3-T2:chron:checkpoints/838d561ad7e40b68e44fbdd9f57e274116e64cf7cc74d2e556876c05a928d5e3/manifest.json:0867928173b772145de94d3a86cf526465f13b24427f7f75072a96c2b2363af9:after:checkout_app/server.py",
+        "G4-X3-T2:chron:checkpoints/d3d01bb1c7979917db8f9a23f53f715ef06557f911308cdd89d1d6a1b4282364/manifest.json:e476e91be093899aee717b898b1ae630d0e07449277b6bf2d1781cfc7a2a94ac:initial:checkout_app/server.py",
+        "G4-X3-T2:normalized:5d8e8f65599dd92c8a4d7ab9c1c5b24d5118797b94b51f3b6a137b96e07fde59:initial"
+      ],
+      "field_paths": [],
+      "node_type": "OBSERVED_OBJECT",
+      "ref": "file:checkout_app/server.py",
+      "route_capability": "OBSERVE_ONLY",
+      "sequences": [
+        0,
+        4,
+        52
+      ],
+      "supported_reachable": true,
+      "unresolved": false,
+      "versions": [
+        "INITIAL",
+        "checkpoint:0:initial",
+        "checkpoint:52"
+      ],
+      "visibility_scopes": []
+    }
+  ],
+  "out_of_route_preserve_refs": [],
+  "preserve_refs": [],
+  "route_map_hash": "9337165c022a9e6b04c5ba4fe1ddf5f0f06226db4660dbd0334a0acd07f828fe",
+  "schema": "RB-STAGE2-ENHANCED-ROUTE-MAP-v1",
+  "seed_refs": [
+    "file:README.md",
+    "file:checkout_app/checkout.py",
+    "file:checkout_app/server.py"
+  ],
+  "supported_reachable_refs": [
+    "file:README.md",
+    "file:checkout_app/checkout.py",
+    "file:checkout_app/server.py"
+  ],
+  "unknown_refs": [],
+  "visible_preserve_refs": [],
+  "visible_refs": [
+    "event:G4-X3-T2:X3-T2:struct:0001:initial",
+    "event:G4-X3-T2:X3-T2:struct:0003:initial",
+    "event:G4-X3-T2:X3-T2:struct:0004:initial",
+    "event:G4-X3-T2:chron:0:initial:README.md",
+    "event:G4-X3-T2:chron:0:initial:checkout_app/checkout.py",
+    "event:G4-X3-T2:chron:0:initial:checkout_app/server.py",
+    "event:G4-X3-T2:chron:1:after:README.md",
+    "event:G4-X3-T2:chron:1:after:checkout_app/checkout.py",
+    "event:G4-X3-T2:chron:1:after:checkout_app/server.py",
+    "file:README.md",
+    "file:checkout_app/checkout.py",
+    "file:checkout_app/server.py"
+  ]
+}
