@@ -1,0 +1,35 @@
+{
+  "schema": "RB-STAGE2-P2-EVIDENCE-GRAPH-REPLAY-CONTRACT-v2",
+  "status": "FROZEN_BEFORE_RECOVERY_REPLAY",
+  "source_bindings": {
+    "path": "stage2/replication_v2/enhanced_monitor_p2_v1/cell_summary.json",
+    "sha256": "e0b789e61457cca43d4204bd5d093e4364ad2014ace71e08a98ec0d790edb203"
+  },
+  "corrected_reference": {
+    "path": "stage2/replication_v2/chronology_semantic_review_v1/semantic_reviews.json",
+    "sha256": "d42dddc99887f92fc4ddd3011dc62ca63234fc38f31fe5ce907f46c157203ed6"
+  },
+  "candidate_rules": {
+    "minimum_events": 3,
+    "minimum_span": 4
+  },
+  "priority_route_maps": [
+    "G3-X4-T2",
+    "G3-X1-T3",
+    "G5-X6-T3",
+    "G2-X3-T2",
+    "G4-X3-T2",
+    "G2-X5-T2"
+  ],
+  "execution": {
+    "natural_reruns": 0,
+    "provider_calls": 0,
+    "evaluator_calls": 0,
+    "repair_calls": 0
+  },
+  "scope": "RETROSPECTIVE_EXTERNAL_CAPTURE_AND_CHECKPOINT_EVIDENCE",
+  "semantic_audit_used_as_graph_input": false,
+  "candidate_means_defect": false,
+  "clock_policy": "PRODUCER_LOCAL_ONLY_NO_GLOBAL_ORDER",
+  "missing_evidence": "FAIL_CLOSED_WITH_EXPLICIT_RECEIPT_BOUND_EXCEPTIONS"
+}

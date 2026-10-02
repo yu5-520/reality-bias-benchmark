@@ -19,6 +19,7 @@ def _blank_node(ref: str, node_type: str) -> dict[str, Any]:
     return {
         "ref": ref,
         "node_type": node_type,
+        "observation_ids": [],
         "event_refs": [],
         "evidence_refs": [],
         "sequences": [],
@@ -52,6 +53,8 @@ class EvidenceGraph:
         self._nodes: dict[str, dict[str, Any]] = {}
         self._edges: list[dict[str, Any]] = []
         self._edge_ids: set[str] = set()
+        self._observations = {}
+        self._edge_by_id = {}
 
     def _node(self, ref: str, node_type: str = "UNRESOLVED_REF") -> dict[str, Any]:
         if not isinstance(ref, str) or not ref:
@@ -69,9 +72,17 @@ class EvidenceGraph:
         row = copy.deepcopy(dict(observation))
         if row.get("schema") != "RB-STAGE2-ENHANCED-OBSERVATION-v1":
             raise EvidenceGraphError("observation schema invalid")
+        observation_id = row.get("observation_id") or "obs:" + digest(row)
+        row["observation_id"] = observation_id
+        if observation_id in self._observations:
+            if self._observations[observation_id] != row:
+                raise EvidenceGraphError("observation identity rebound")
+            return
+        self._observations[observation_id] = row
         event_ref = row.get("event_ref")
         event_node = self._node("event:" + str(event_ref), "EVENT")
         for field, value in (
+            ("observation_ids", observation_id),
             ("event_refs", event_ref),
             ("evidence_refs", row.get("evidence_ref")),
             ("sequences", row.get("native_sequence")),
@@ -85,7 +96,8 @@ class EvidenceGraph:
         for ref in row.get("object_refs") or []:
             node = self._node(ref, "OBSERVED_OBJECT")
             for field, value in (
-                ("event_refs", event_ref),
+                ("observation_ids", observation_id),
+            ("event_refs", event_ref),
                 ("evidence_refs", row.get("evidence_ref")),
                 ("sequences", row.get("native_sequence")),
                 ("versions", row.get("version")),
@@ -95,7 +107,7 @@ class EvidenceGraph:
                 ("visibility_scopes", row.get("visibility_scope")),
             ):
                 _append_unique(node, field, value)
-            relation_type = (
+            relation_type = row.get("object_relation") or (
                 "EVENT_WRITES_OBJECT" if ref in written else "EVENT_OBSERVES_OBJECT"
             )
             self.add_edge(
@@ -151,10 +163,11 @@ class EvidenceGraph:
         }
         edge_id = row.get("relation_id") or "edge:" + digest(material)[:24]
         if edge_id in self._edge_ids:
-            return copy.deepcopy(next(item for item in self._edges if item["edge_id"] == edge_id))
+            return copy.deepcopy(self._edge_by_id[edge_id])
         edge = {"edge_id": edge_id, **material}
         self._edges.append(edge)
         self._edge_ids.add(edge_id)
+        self._edge_by_id[edge_id] = edge
         return copy.deepcopy(edge)
 
     def add_relation_evidence(self, relation: Mapping[str, Any]) -> dict[str, Any]:
@@ -196,6 +209,7 @@ class EvidenceGraph:
         for ref in sorted(self._nodes):
             row = copy.deepcopy(self._nodes[ref])
             for field in (
+                "observation_ids",
                 "event_refs",
                 "evidence_refs",
                 "sequences",
@@ -205,7 +219,7 @@ class EvidenceGraph:
                 "field_paths",
                 "visibility_scopes",
             ):
-                row[field] = sorted(row[field], key=lambda value: str(value))
+                row[field] = sorted(row[field]) if field == "sequences" else sorted(row[field], key=str)
             nodes.append(row)
         edges = sorted(
             copy.deepcopy(self._edges),
@@ -218,6 +232,7 @@ class EvidenceGraph:
         )
         payload = {
             "schema": self.SCHEMA,
+            "observations": [copy.deepcopy(self._observations[k]) for k in sorted(self._observations)],
             "nodes": nodes,
             "edges": edges,
             "contradictions": self.contradictions(),
