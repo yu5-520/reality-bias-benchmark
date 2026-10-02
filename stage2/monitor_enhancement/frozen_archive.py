@@ -242,7 +242,7 @@ class NativeArchive:
                     raise ArchiveError('checkpoint native state hash mismatch')
                 for holder, messages in state.get('inbox', {}).items():
                     for i, message in enumerate(messages):
-                        self.emit(native, message, sequence=seq, clock=clock, kind='CHECKPOINT_INBOX_MESSAGE',
+                        self.payload(native, message, sequence=seq, clock=clock, kind='CHECKPOINT_INBOX_MESSAGE',
                                   ref='snapshot-message:' + digest(message),
                                   pointer='/inbox/' + pointer_token(holder) + '/' + str(i),
                                   actor=message.get('from', 'UNKNOWN'), source_kind='CHECKPOINT_SNAPSHOT',
