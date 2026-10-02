@@ -72,6 +72,28 @@ class NativeReplayTest(unittest.TestCase):
             a=self.archive({'natural_A_result.json':invalid},'G5-X4-T1')
             with self.assertRaises(ArchiveError):a.mcp()
 
+    def test_checkpoints_bind_version_clock_and_actual_file_bytes(self):
+        files = {}; ledger = []
+        for version, seq, value in [('z-first', 2, b'old'), ('a-second', 10, b'new')]:
+            manifest = {'checkpoint_hash': version, 'event_ref': f'host:turn:{seq}:post',
+                        'application_file_hashes': {'web/app.js': digest(value)},
+                        'native_state_sha256': digest({'inbox': {'coder': [{'from': 'reviewer', 'content': 'check web/app.js'}]}})}
+            files[f'checkpoints/{version}/manifest.json'] = manifest
+            files[f'checkpoints/{version}/application/web/app.js'] = value
+            files[f'checkpoints/{version}/native_state.json'] = {'inbox': {'coder': [{'from': 'reviewer', 'content': 'check web/app.js'}]}}
+            ledger.append({'checkpoint_hash': version, 'event_ref': manifest['event_ref'], 'model_decision_sequence': seq})
+        files['checkpoint_ledger.json'] = {'checkpoints': ledger}
+        ar = self.archive(files); ar.checkpoints(); ar.verify_observations()
+        states = [r for r in ar.observations if r['event_kind'] == 'CHECKPOINT_FILE_STATE']
+        self.assertEqual([(r['version'], r['native_sequence'], r['content_hash']) for r in states],
+                         [('z-first', 2, digest(b'old')), ('a-second', 10, digest(b'new'))])
+        mentions = [r for r in ar.observations if r['event_kind'] == 'CHECKPOINT_INBOX_MESSAGE' and r['text_span']]
+        self.assertEqual(len(mentions), 2)
+        self.assertEqual(mentions[0]['field_path'], '/inbox/coder/0/content')
+        self.assertTrue(all(r['source_kind'] == 'CHECKPOINT_SNAPSHOT' for r in mentions))
+        files['checkpoints/a-second/application/web/app.js'] = b'corrupt'
+        with self.assertRaises(ArchiveError): self.archive(files).checkpoints()
+
     def test_missing_relation_evidence_level_is_unknown(self):
         row=adapt_relation_evidence({'relation_id':'r','source_ref':'a','destination_ref':'b','relation_type':'reuse','evidence_refs':['e']})
         self.assertEqual(row['status'],'UNKNOWN')

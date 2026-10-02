@@ -25,4 +25,5 @@ jobs:
           python-version: "3.11"
       - name: Run enhanced monitor and route-repair unit tests
         run: |
-          python -m unittest stage2.monitor_enhancement.tests.test_evidence_graph stage2.route_repair.tests.test_route_repair
+          python -m unittest discover -s stage2/monitor_enhancement/tests -v
+          python -m unittest discover -s stage2/route_repair/tests -v

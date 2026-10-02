@@ -1,3 +1,5 @@
+> Current replay correction: use [P2 native evidence replay v2](StageII_P2_Replay_Correction_v2.md). The v1 graph promotion and localization comparison are withdrawn; prior frozen files remain historical evidence.
+
 # Stage-II Enhanced External Evidence-Graph Monitor and Route-Repair Protocol v1.0
 
 Status: implementation baseline. This protocol adds a public research prototype only. It does not change frozen natural trajectories, historical R7 outputs, studied framework protocols, or existing evidence.
