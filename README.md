@@ -1,5 +1,7 @@
 > P2 replay correction: the v1 graph promotion and localization comparison are withdrawn. See [native evidence replay correction](docs/protocols/StageII_P2_Replay_Correction_v2.md). Frozen v1 files remain historical evidence.
 
+> Current monitoring/repair engineering: [system contract and automatic offline coordinator](docs/protocols/StageII_Monitor_and_Repair_System.md). Native writes and verification are coordinated automatically from an inspected manual/scripted proposal; autonomous diagnosis, native continuation and semantic repair effectiveness remain pending.
+
 # reality-bias-benchmark
 
 Open research repository for the **Reality Bias** programme and the first-paper **Process Reality** mechanism study in multi-agent AI systems.

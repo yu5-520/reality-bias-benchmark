@@ -1,5 +1,7 @@
 # Complete node-route repair: replacement design
 
+The current system contract and automatic offline coordinator are documented in [External monitoring and its attached repair system](StageII_Monitor_and_Repair_System.md). Execution success now remains a pending state until native continuation and independent semantic/authority evaluation are available. This replaces ad hoc integration orchestration as the active offline path; sealed earlier checks remain reproduction fixtures.
+
 Status: source-context preparation, an offline field-bounded application branch, and a source-based manual application/current-host-answer coordinated branch are implemented. Complete plans are recorded before the first write, with field restrictions, dependencies, native receipts and full graph capture. Agent-generated semantic diagnosis/planning, message or private-state bindings, native agent continuation, branch promotion and a fair live comparison are not ready. Live execution remains disabled. Machine-readable state: `configs/stage2_node_route_repair_design_v1.json`.
 
 The source-based integration is a manual engineering check on one copied frozen checkout. It identifies captured frontend changes versus a contradictory terminal account, and separately checks a conditional alternate launcher. The documented direct service route works before repair. Unknown historical launcher use and downstream semantic adoption remain unknown. See [source-based branch report](../reports/2026-10-03_Source_Based_Application_Host_Branch.md).

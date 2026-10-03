@@ -12,6 +12,9 @@ on:
       - 'configs/stage2_node_route_repair_design_v1.json'
       - 'scripts/check_stage2_route_planning_session.py'
       - 'stage2/replication_v2/route_planning_session_integration_v1/**'
+      - 'configs/stage2_monitor_repair_system_v1.json'
+      - 'scripts/check_stage2_monitor_repair_system.py'
+      - 'stage2/replication_v2/monitor_repair_system_integration_v1/**'
       - 'scripts/check_stage2_source_based_host_branch.py'
       - 'scripts/validate_stage2_source_based_host_branch.py'
       - 'stage2/replication_v2/source_based_host_branch_integration_v1/**'
@@ -77,6 +80,9 @@ jobs:
       - name: Verify historical attempts against archived execution sources
         run: |
           python scripts/validate_stage2_terminal_route_first_attempt.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs"
+      - name: Verify automatic offline coordination and continuation pending gate
+        run: |
+          python scripts/check_stage2_monitor_repair_system.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/monitor-repair-system" --compare-frozen
       - name: Retain offline preparation
         if: always()
         uses: actions/upload-artifact@v4
@@ -89,5 +95,6 @@ jobs:
             ${{ runner.temp }}/field-branch-native
             ${{ runner.temp }}/source-based-host-branch
             ${{ runner.temp }}/route-planning-session
+            ${{ runner.temp }}/monitor-repair-system
           retention-days: 90
           if-no-files-found: error

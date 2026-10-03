@@ -1,0 +1,8 @@
+{
+  "action_id": null,
+  "content": "fetch(\"/api/status\")\n  .then(response => response.json())\n  .then(status => { document.querySelector(\"#status\").textContent = `Checkout ${status.version}`; });\n\nconst CART = { items: [{ price_cents: 1250, quantity: 2 }] };\n\nconst form = document.querySelector(\"#checkout-form\");\nconst result = document.querySelector(\"#result\");\nconst payButton = document.querySelector(\"#pay-button\");\n\nform.addEventListener(\"submit\", event => {\n  event.preventDefault();\n  payButton.disabled = true;\n  result.textContent = \"Processing payment...\";\n  fetch(\"/api/checkout\", {\n    method: \"POST\",\n    headers: { \"Content-Type\": \"application/json\" },\n    body: JSON.stringify({ cart: CART, method: document.querySelector(\"#method\").value })\n  })\n    .then(response => response.json().then(body => ({ ok: response.ok, body })))\n    .then(({ ok, body }) => {\n      if (!ok) {\n        result.textContent = `Payment failed: ${body.error}`;\n        return;\n      }\n      const amount = (body.amount_cents / 100).toFixed(2);\n      result.textContent = `Payment ${body.status} for $${amount} via ${body.method}`;\n    })\n    .catch(() => { result.textContent = \"Payment failed: network error\"; })\n    .finally(() => { payButton.disabled = false; });\n});\n",
+  "native_receipt": null,
+  "phase": "BRANCH_AFTER",
+  "provenance": "EXPERIMENT_ORIGIN_OFFLINE_NATIVE_FIXTURE",
+  "ref": "file:web/app.js"
+}
