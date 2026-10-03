@@ -1,6 +1,8 @@
 # Complete node-route repair: replacement design
 
-Status: source-context preparation is implemented and verified offline; route diagnosis, the coordinated plan executor and enhanced before/during/after observation are not ready. Live execution is disabled. Machine-readable state: `configs/stage2_node_route_repair_design_v1.json`.
+Status: source-context preparation and an offline field-bounded native application branch are implemented. Coordinated actions, field restrictions, execution ordering, version checks and enhanced full graph capture have mechanical integration receipts. Evidence-grounded semantic diagnosis, process-state/message native bindings, native agent continuation, branch promotion and a fair live comparison are not ready. Live execution remains disabled. Machine-readable state: `configs/stage2_node_route_repair_design_v1.json`.
+
+Implementation details and verified limits: [Field-bounded branch repair](StageII_Field_Bounded_Branch_Repair.md). The new executor replaces local-package execution for this offline branch path; it does not route plans through the legacy terminal revision harness. It makes no model call and imports no private product code.
 
 ## Correction of the previous attempt
 
@@ -53,6 +55,8 @@ Before the first action, verify the parent, current versions, task scope, availa
 
 Native access helpers may be reused where they preserve the studied interface. The old intervention strategy must not be reused as a fallback. A single process-account instruction may be one justified action in a larger plan; it cannot stand in for the entire route plan by default. FULL_NATIVE restoration remains a prerequisite for live native continuation.
 
+The implemented offline application path uses a separate host-held field policy and compiles ordered, exact operations. It copies the terminal application into a new branch, preserves the historical graph and archive, executes through `HostCheckout.write_file`, and records both successful and failed writes. JSON operations replace existing scalar leaves; text operations replace one exact source-bound span per object. Multiple JSON leaves in one object require explicit ordering and projected intermediate file hashes. This is application-state integration, not proof of historical pressure-point resumption, semantic repair success, native model continuation or concurrent isolation.
+
 ### 4. Keep the enhanced monitor attached throughout
 
 Capture the graph before repair, native actions and state changes during repair, and the complete graph after the repair agent exits. The monitor remains external and read-only; the repair executor performs authorized writes through native interfaces. The upgraded evidence adapter must ingest the new native captures and preserve their source/version/clock bindings. The old structural watcher can supply a historical comparison, but cannot be presented as the complete enhanced monitor.
@@ -71,10 +75,10 @@ Freeze cases, methods, budgets and outcome rules after offline integration check
 | --- | --- | --- |
 | Complete graph and source/version navigation | Implemented for the two frozen preparation cases | Exact source catalog and hash/version checks |
 | Route-level semantic diagnosis | Missing | Native-source witnesses with unknown relations retained |
-| Coordinated multi-node plan | Missing | Source-bound plan, dependencies and postconditions |
-| Native plan executor | Missing | Zero-model integration of supported plan actions and failures |
-| Enhanced monitoring before/during/after | Missing | Captured native actions ingested into the enhanced graph |
-| Complete post-repair route comparison | Missing | Full graph and semantic/state comparison artifacts |
+| Coordinated multi-node plan | Offline application operation compiler implemented; semantic plan generation missing | Source-based diagnosis and semantic dependency decisions |
+| Native plan executor | Offline application branch implemented for JSON leaves and exact text spans | Additional native state/message bindings and model continuation |
+| Enhanced monitoring before/during/after | Offline application branch capture implemented | Entire continued native agent run capture |
+| Complete post-repair route comparison | Full graph preservation and mechanical state comparison implemented | Independent semantic/authority comparison after actual repair |
 | Fair cases, methods and budget freeze | Not frozen | Both methods ready under the original task scope |
 
 Implement these missing parts in this order. Source preparation is not readiness to spend model calls, and scripted tests are not semantic repair results. No private product registry, deployment fabric or repair implementation is exposed by this public design.
