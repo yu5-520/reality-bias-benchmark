@@ -1,6 +1,8 @@
 > Current replay correction: use [P2 native evidence replay v2](StageII_P2_Replay_Correction_v2.md). The v1 graph promotion and localization comparison are withdrawn; prior frozen files remain historical evidence.
 
-> Current bounded repair entrypoint: [Terminal node-graph repair v1](StageII_Terminal_Node_Graph_Repair_v1.md). Its two-case, four-arm terminal-phase specification supersedes this document's generic first-round scope. Full observation indexing remains separate from authority; historical R7 midrun interventions are unchanged.
+> Current repair design: [Complete node-route repair](StageII_Complete_Node_Route_Repair_Design.md). The terminal harness below is historical and its live entrypoint is disabled; it did not implement the intended route-level method.
+
+> Historical, disabled terminal harness: [Terminal node-graph repair v1](StageII_Terminal_Node_Graph_Repair_v1.md). Its two-case, four-arm terminal-phase specification was a diagnostic harness and does not define the current route-repair method. Full observation indexing remains separate from authority; historical R7 midrun interventions are unchanged.
 
 # Stage-II Enhanced External Evidence-Graph Monitor and Route-Repair Protocol v1.0
 

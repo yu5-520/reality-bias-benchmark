@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Historical terminal harness preflight only; live route repair is not ready."""
+"""Run the frozen LOCAL/GRAPH terminal comparison; no original subject reruns."""
 import argparse,json,os,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
@@ -13,9 +13,6 @@ def main():
     p.add_argument('--out',type=Path,required=True)
     p.add_argument('--execute',action='store_true')
     a=p.parse_args();out=a.out.resolve()
-    if a.execute:
-        print('BLOCKED_INCOMPLETE_NODE_ROUTE_REPAIR_DESIGN: historical diagnostic harness is not the planned route repair executor')
-        return 2
     if out.exists():p.error('use a fresh output directory; attempts cannot be overwritten')
     out.mkdir(parents=True)
     config_path=ROOT/'configs/stage2_terminal_route_repair_first_round_v1.json'

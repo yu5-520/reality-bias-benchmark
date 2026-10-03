@@ -1,5 +1,7 @@
 # Terminal node-graph repair: actual first-attempt results
 
+> Design correction: these are premature diagnostic-harness records, not first attempts of the intended complete node-route repair method. The graph only supplemented diagnosis, while the proposed action was restricted to the legacy local process revision. The coordinated route plan, native plan executor and enhanced full post-repair graph were absent. Keep all records; do not interpret these outcomes as a test of the intended method. See [design correction](2026-10-03_Node_Route_Repair_Design_Correction.md).
+
 The frozen two-case, four-arm comparison completed with 21 live provider calls and no repair actions. The A2A preservation decisions were supported by inspected terminal source files. Neither MCP arm repaired the remaining process-account contradiction. These results do not establish graph-guided repair efficacy or a graph advantage.
 
 Execution commit: `7348e20ecbf6720150fcfc81fe07a5b49ec3a30c`. Workflow: [37097781266](https://github.com/yu5-520/reality-bias-benchmark/actions/runs/37097781266). Complete artifact: [11264897469](https://github.com/yu5-520/reality-bias-benchmark/actions/runs/37097781266/artifacts/11264897469). Its ZIP SHA-256 is `540b6f712b001d08891fb00bbf829c0db6fbd22cbee3dbc41067bdd0343fa515`. Permanent results and the complete compressed request/response/query trace are in `stage2/replication_v2/terminal_route_repair_first_attempt_v1/`.

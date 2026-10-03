@@ -1,5 +1,7 @@
 # Terminal node-graph repair: frozen first round
 
+> Correction: this historical harness did not implement the planned complete node-route repair method. Its live entrypoint is disabled. Its 21 calls are retained as a premature diagnostic trial, not a node-route repair evaluation. Use the [replacement design](StageII_Complete_Node_Route_Repair_Design.md) and its explicit readiness gates.
+
 Status: protocol and engineering preflight frozen before live model execution, 3 October 2026. Machine-readable specification: `configs/stage2_terminal_route_repair_first_round_v1.json`.
 
 Execution record: [actual first-attempt results](../reports/2026-10-03_Terminal_Node_Graph_Repair_First_Attempt.md). Four branches consumed 21 calls and performed no repairs. These results establish neither repair efficacy nor graph advantage; no active branch was repeated.

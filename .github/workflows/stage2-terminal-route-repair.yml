@@ -1,4 +1,4 @@
-name: Stage-II Terminal Node-Graph Repair
+name: Historical diagnostic harness offline preflight
 
 on:
   push:
@@ -8,16 +8,12 @@ on:
       - 'scripts/*stage2*terminal*route*.py'
       - 'configs/stage2_terminal_route_repair_first_round_v1.json'
       - '.github/workflows/stage2-terminal-route-repair.yml'
+      - 'scripts/prepare_stage2_node_route_context.py'
+      - 'configs/stage2_node_route_repair_design_v1.json'
   workflow_dispatch:
-    inputs:
-      execute:
-        description: 'Execute the frozen two-case / four-arm model comparison once'
-        type: boolean
-        default: false
 
 permissions:
   contents: read
-  actions: read
 
 concurrency:
   group: stage2-terminal-route-repair-first-round
@@ -54,65 +50,20 @@ jobs:
       - name: Verify the native host bridge with a scripted response
         run: |
           python scripts/check_stage2_terminal_route_native_bridge.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/terminal-bridge"
-      - name: Bind frozen active authorization and reject repeated execution
-        if: >-
-          github.actor == 'yu5-520' &&
-          ((github.event_name == 'workflow_dispatch' && inputs.execute) ||
-          (github.event_name == 'push' && contains(github.event.head_commit.message, '[run terminal route repair]')))
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Prepare complete node-route context without repair calls
         run: |
-          python - <<'PY'
-          import hashlib,io,json,os,subprocess,zipfile
-          p='configs/stage2_terminal_route_repair_first_round_v1.json'
-          c=json.load(open(p))
-          assert os.environ['GITHUB_RUN_ATTEMPT']=='1', 'workflow reruns cannot repeat this first attempt'
-          assert [x['full_id'] for x in c['cases']]==['G3-X4-T2','G2-X3-T2']
-          assert c['arms']==['LOCAL','GRAPH'] and c['max_cases']==2 and c['max_arms']==4
-          assert c['limits']['max_agent_calls']==6 and c['limits']['max_post_repair_calls']==4
-          assert c['no_subject_reruns'] and c['no_provider_or_format_retry']
-          config_hash=hashlib.sha256(open(p,'rb').read()).hexdigest()
-          name='terminal-route-active-'+config_hash
-          pages=json.loads(subprocess.check_output(['gh','api','--paginate','--slurp',
-              'repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/artifacts?per_page=100'],text=True))
-          artifacts=[a for page in pages for a in page['artifacts'] if a['name']==name]
-          for artifact in artifacts:
-              assert not artifact['expired'], 'cannot verify expired prior attempt'
-              raw=subprocess.check_output(['gh','api','repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/artifacts/'+str(artifact['id'])+'/zip'])
-              with zipfile.ZipFile(io.BytesIO(raw)) as z:
-                  assert not any(n.startswith('terminal-active/') for n in z.namelist()), 'active first attempt already retained; no success retry'
-              print('Prior environment-only boundary retained:', artifact['id'])
-          with open(os.environ['GITHUB_ENV'],'a') as f:f.write('ACTIVE_ARTIFACT_NAME='+name+'\n')
-          PY
-      - name: Install exact original MCP SDK for native reads/tests
-        if: env.ACTIVE_ARTIFACT_NAME != ''
+          python scripts/prepare_stage2_node_route_context.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/node-route-context"
+      - name: Verify historical attempts against archived execution sources
         run: |
-          git clone -q https://github.com/modelcontextprotocol/python-sdk upstream
-          git -C upstream checkout -q f1b6589088534632fef92238ee9750951e3c0185
-          test "$(git -C upstream rev-parse HEAD)" = f1b6589088534632fef92238ee9750951e3c0185
-          python -m pip install -q uv
-          (cd upstream && uv sync --frozen --no-default-groups)
-          echo "MCP_PYTHON=$GITHUB_WORKSPACE/upstream/.venv/bin/python" >> "$GITHUB_ENV"
-      - name: Verify the original MCP read interface before model calls
-        if: env.ACTIVE_ARTIFACT_NAME != ''
-        run: |
-          PYTHONPATH="$GITHUB_WORKSPACE" "$MCP_PYTHON" -m stage2.native_v7.x4_mcp.client_call --checkout "$RUNNER_TEMP/terminal-preflight/G3-X4-T2-LOCAL/checkout" --tool list_files --arguments-json '{}' --observer-root "$RUNNER_TEMP/terminal-mcp-interface-probe" --capture-prefix zero-call-list
-      - name: Execute four first-attempt arms
-        if: env.ACTIVE_ARTIFACT_NAME != ''
-        env:
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: |
-          "$MCP_PYTHON" scripts/run_stage2_terminal_route_repair.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/terminal-active" --execute
-      - name: Retain preflight and active first attempts
+          python scripts/validate_stage2_terminal_route_first_attempt.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs"
+      - name: Retain offline preparation
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ACTIVE_ARTIFACT_NAME || format('terminal-route-preflight-{0}', github.sha) }}
+          name: node-route-context-${{ github.sha }}
           path: |
             ${{ runner.temp }}/terminal-preflight
-            ${{ runner.temp }}/terminal-active
-            ${{ runner.temp }}/terminal-graphs
             ${{ runner.temp }}/terminal-bridge
-            ${{ runner.temp }}/terminal-mcp-interface-probe
+            ${{ runner.temp }}/node-route-context
           retention-days: 90
           if-no-files-found: error

@@ -69,7 +69,16 @@ class BudgetedProvider:
 
 
 def build_provider():
-    raise RuntimeError('HISTORICAL_LOCAL_REVISION_HARNESS_LIVE_EXECUTION_DISABLED')
+    if not os.environ.get('DEEPSEEK_API_KEY'):raise RuntimeError('DEEPSEEK_API_KEY_UNAVAILABLE')
+    from arena.providers import DeepSeekArenaProvider
+    subject=json.loads((ROOT/'stage2/subject.json').read_text())
+    config=json.loads((ROOT/subject['source_config']).read_text())
+    for key in ['provider','model_alias','expected_model_version','subject']:
+        if config[key]!=subject[key]:raise ValueError('subject binding drift')
+    config=copy.deepcopy(config)
+    # The adapter counts attempts, rather than additional retries.
+    config['transport']['max_retries']=1;config['json_format_retries']=1
+    return DeepSeekArenaProvider(config),config
 
 
 def agent_diagnosis(provider, access, parent, case, files, terminal_record):

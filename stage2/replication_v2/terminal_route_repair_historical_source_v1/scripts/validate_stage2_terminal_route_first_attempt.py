@@ -7,17 +7,6 @@ from stage2.route_repair.terminal import FrozenGraphAccess,validate_terminal_dec
 
 def read(p):return json.loads(Path(p).read_text())
 
-def frozen_source_bytes(name, expected):
-    current=ROOT/name
-    if current.exists() and hashlib.sha256(current.read_bytes()).hexdigest()==expected:
-        return current.read_bytes()
-    index=read(ROOT/'stage2/replication_v2/terminal_route_repair_historical_source_v1/source_index.json')
-    row=index['files'].get(name)
-    if row and row['sha256']==expected:
-        archived=(ROOT/row['path']).read_bytes()
-        if hashlib.sha256(archived).hexdigest()==expected:return archived
-    raise AssertionError('frozen source unavailable or hash drift: '+name)
-
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source-root',type=Path,required=True)
@@ -26,11 +15,11 @@ def main():
     args=parser.parse_args();r=args.result_root
     seal=read(r/'seal.json')
     for name,sha in seal['files'].items():
-        assert hashlib.sha256(frozen_source_bytes(name,sha)).hexdigest()==sha, name
+        assert hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==sha, name
     config=read(r/'frozen_case_config.json');summary=read(r/'summary.json')
     assert config==read(ROOT/'configs/stage2_terminal_route_repair_first_round_v1.json')
     for name,sha in read(r/'run_binding.json')['implementation_sha256'].items():
-        assert hashlib.sha256(frozen_source_bytes(name,sha)).hexdigest()==sha, name
+        assert hashlib.sha256((ROOT/name).read_bytes()).hexdigest()==sha, name
     with gzip.open(r/'full_model_query_trace.json.gz') as f:traces=json.load(f)['files']
     assert summary['mode']=='ACTIVE' and len(summary['arms'])==4
     calls=0;queries=0;bindings=[]
