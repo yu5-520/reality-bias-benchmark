@@ -1,0 +1,114 @@
+name: Node-route repair offline integration
+
+on:
+  push:
+    branches: [fix/p2-native-evidence-replay]
+    paths:
+      - 'stage2/route_repair/**'
+      - 'scripts/*stage2*terminal*route*.py'
+      - 'configs/stage2_terminal_route_repair_first_round_v1.json'
+      - '.github/workflows/stage2-terminal-route-repair.yml'
+      - 'scripts/prepare_stage2_node_route_context.py'
+      - 'configs/stage2_node_route_repair_design_v1.json'
+      - 'scripts/check_stage2_route_planning_session.py'
+      - 'stage2/replication_v2/route_planning_session_integration_v1/**'
+      - 'configs/stage2_monitor_repair_system_v1.json'
+      - 'scripts/check_stage2_monitor_repair_system.py'
+      - 'stage2/replication_v2/monitor_repair_system_integration_v1/**'
+      - 'scripts/check_stage2_independent_repair_review.py'
+      - 'configs/stage2_independent_repair_review_v1.json'
+      - 'stage2/replication_v2/independent_repair_review_preparation_v1/**'
+      - 'scripts/check_stage2_native_continuation_authority.py'
+      - 'configs/stage2_native_continuation_authority_v1.json'
+      - 'stage2/replication_v2/native_continuation_authority_integration_v1/**'
+      - 'scripts/check_stage2_source_based_host_branch.py'
+      - 'scripts/validate_stage2_source_based_host_branch.py'
+      - 'stage2/replication_v2/source_based_host_branch_integration_v1/**'
+      - 'scripts/check_stage2_field_branch_native.py'
+      - 'scripts/validate_stage2_field_branch_integration.py'
+      - 'stage2/monitor_enhancement/snapshot_append.py'
+      - 'stage2/replication_v2/field_branch_native_integration_v1/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stage2-terminal-route-repair-first-round
+  cancel-in-progress: false
+
+jobs:
+  terminal-repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify boundaries and unit checks
+        run: python -m unittest discover -s stage2/route_repair/tests -v
+      - name: Materialize the two frozen source archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          for g in 2 3; do
+            commit=$(python -c "import json; print(json.load(open('configs/stage2_g${g}_ab_paired_semantic_audit_v1.json'))['source']['natural_A_evidence_commit'])")
+            mkdir -p "$RUNNER_TEMP/sources/G${g}A"
+            git cat-file -e "$commit^{commit}" || git fetch origin "$commit"
+            git archive "$commit" "stage2/replication_v2/G${g}/natural_A" | tar -x -C "$RUNNER_TEMP/sources/G${g}A"
+          done
+          python scripts/materialize_stage2_terminal_route_graphs.py --source-root "$RUNNER_TEMP/sources" --out "$RUNNER_TEMP/terminal-graphs"
+      - name: Run zero-call preflight
+        run: |
+          python scripts/run_stage2_terminal_route_repair.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/terminal-preflight"
+          python -c "import json,os; s=json.load(open(os.environ['RUNNER_TEMP']+'/terminal-preflight/summary.json')); assert s['provider_calls']==0 and len(s['arms'])==4 and all(x['status']=='PASS' for x in s['arms'])"
+      - name: Verify the native host bridge with a scripted response
+        run: |
+          python scripts/check_stage2_terminal_route_native_bridge.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/terminal-bridge"
+      - name: Prepare complete node-route context without repair calls
+        run: |
+          python scripts/prepare_stage2_node_route_context.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/node-route-context"
+      - name: Verify field-bounded native branch and enhanced full graphs
+        run: |
+          python -m unittest discover -s stage2/monitor_enhancement/tests -v
+          python scripts/check_stage2_field_branch_native.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/field-branch-native"
+          python scripts/validate_stage2_field_branch_integration.py --reproduced "$RUNNER_TEMP/field-branch-native"
+      - name: Verify source-based application and current host answer coordination
+        run: |
+          python scripts/check_stage2_source_based_host_branch.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/source-based-host-branch"
+          python scripts/validate_stage2_source_based_host_branch.py --reproduced "$RUNNER_TEMP/source-based-host-branch"
+      - name: Verify inspected-source route proposal compilation
+        run: |
+          python scripts/check_stage2_route_planning_session.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/route-planning-session" --compare-frozen
+      - name: Verify historical attempts against archived execution sources
+        run: |
+          python scripts/validate_stage2_terminal_route_first_attempt.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs"
+      - name: Verify automatic offline coordination and continuation pending gate
+        run: |
+          python scripts/check_stage2_monitor_repair_system.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/monitor-repair-system" --compare-frozen
+      - name: Verify independent read-only review preparation without invoking a reviewer
+        run: |
+          python scripts/check_stage2_independent_repair_review.py --source-root "$RUNNER_TEMP/sources" --out "$RUNNER_TEMP/independent-repair-review" --compare-frozen
+      - name: Verify nonterminal native host restore and automatic proposal authority
+        run: |
+          python scripts/check_stage2_native_continuation_authority.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/native-continuation-authority" --compare-frozen
+      - name: Retain offline preparation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-route-context-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/terminal-preflight
+            ${{ runner.temp }}/terminal-bridge
+            ${{ runner.temp }}/node-route-context
+            ${{ runner.temp }}/field-branch-native
+            ${{ runner.temp }}/source-based-host-branch
+            ${{ runner.temp }}/route-planning-session
+            ${{ runner.temp }}/monitor-repair-system
+            ${{ runner.temp }}/independent-repair-review
+            ${{ runner.temp }}/native-continuation-authority
+          retention-days: 90
+          if-no-files-found: error

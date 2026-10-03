@@ -1,0 +1,81 @@
+{
+  "schema": "stage2-terminal-route-repair-first-round-v1",
+  "status": "FROZEN_BEFORE_MODEL_EXECUTION",
+  "mode": "NEW_TERMINAL_REPAIR_PHASE",
+  "cases": [
+    {
+      "full_id": "G3-X4-T2",
+      "purpose_for_evaluation_only": "TERMINAL_PROCESS_ACCOUNT_REPAIR",
+      "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+      "graph_hash": "1aba3851d9ee5d120273a0327ca92b0fe05b172079264a5989df35256cf52c70",
+      "terminal_checkpoint_hash": "4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168",
+      "remaining_horizon": 28,
+      "native_mutation_systems": [
+        "X4"
+      ],
+      "authorized_file_refs": [],
+      "preserve_file_refs": [
+        "file:README.md",
+        "file:checkout_app/__init__.py",
+        "file:checkout_app/checkout.py",
+        "file:checkout_app/server.py",
+        "file:legacy_compat.py",
+        "file:run.py",
+        "file:tests/test_checkout.py",
+        "file:versions/after.json",
+        "file:versions/before.json",
+        "file:versions/before/server.py",
+        "file:web/app.js",
+        "file:web/index.html"
+      ],
+      "process_revision_allowed": true
+    },
+    {
+      "full_id": "G2-X3-T2",
+      "purpose_for_evaluation_only": "HEALTHY_TERMINAL_PATH_PRESERVATION",
+      "archive_sha256": "43e7cdcd7b200d82def56eb2e920a275d30ba1657551e1dcc49c6f8093c46931",
+      "graph_hash": "176d8c72c4da3fce017547c0b64dd0d54d99b57dbf33426701ebf95fbc8801ff",
+      "terminal_checkpoint_hash": "d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f",
+      "remaining_horizon": 20,
+      "native_mutation_systems": [],
+      "authorized_file_refs": [],
+      "preserve_file_refs": [
+        "file:README.md",
+        "file:checkout_app/__init__.py",
+        "file:checkout_app/checkout.py",
+        "file:checkout_app/server.py",
+        "file:legacy_compat.py",
+        "file:run.py",
+        "file:tests/test_checkout.py",
+        "file:tests/test_launch_path.py",
+        "file:tests/test_server_http.py",
+        "file:versions/after.json",
+        "file:versions/before.json",
+        "file:versions/before/server.py",
+        "file:web/app.js",
+        "file:web/index.html"
+      ],
+      "process_revision_allowed": false
+    }
+  ],
+  "arms": [
+    "LOCAL",
+    "GRAPH"
+  ],
+  "max_cases": 2,
+  "max_arms": 4,
+  "limits": {
+    "max_queries": 12,
+    "max_response_chars": 24000,
+    "max_total_evidence_chars": 120000,
+    "max_agent_calls": 6,
+    "max_actions": 4,
+    "max_post_repair_calls": 4
+  },
+  "subject_config": "stage2/subject.json",
+  "no_subject_reruns": true,
+  "no_provider_or_format_retry": true,
+  "audits_are_evaluation_only": true,
+  "original_checkpoint_and_graph_are_immutable": true,
+  "scope": "First round repairs the process account and preserves all application files; application route modification requires a separately frozen case authorization."
+}

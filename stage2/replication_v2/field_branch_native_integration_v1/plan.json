@@ -1,0 +1,155 @@
+{
+  "actions": [
+    {
+      "action_id": "fixture_json",
+      "before_file_hash": "d9a43382138922db1762bedbb42d4926139302ff202ec877f6176f374c78738b",
+      "before_value_hash": "12ae7f53d9b3cd2a4aac690034338e45cbf8dd2780d1f03752704b4b900a59cb",
+      "depends_on": [],
+      "expected_output_hash": "09a517078b0543ec41a0cf3f523697358d61bf33a779807eba651750bdd62dfa",
+      "kind": "JSON_LEAF_REPLACE",
+      "pointer": "/checkout_endpoint",
+      "preserve_invariant": {
+        "after_value_hash": "0e3137d694cc693bba68dea8eed1599f9dceadced7f779c3316f25663da8dcb3",
+        "before_value_hash": "12ae7f53d9b3cd2a4aac690034338e45cbf8dd2780d1f03752704b4b900a59cb",
+        "field_path": "/checkout_endpoint",
+        "formatting_preserved": false,
+        "preserve_measure": "ALL_OTHER_JSON_VALUES"
+      },
+      "reason": "Mechanical leaf-write check only; not a finding or semantic repair.",
+      "target_ref": "file:versions/after.json",
+      "value": "/api/checkout-OFFLINE-FIXTURE"
+    },
+    {
+      "action_id": "fixture_text",
+      "before_file_hash": "665cc4d759ad85d16d21606c6c57ff3403fe367a5597f79cf1f2be518143eb6c",
+      "before_value_hash": "c03dae247d6db136af74e0e6237836b954720073ab27e535b2df70b7d8d91610",
+      "depends_on": [
+        "fixture_json"
+      ],
+      "end": 530,
+      "expected_output_hash": "22653e0193b02ba41c29a69a05008f088207446c2a54a3fe624457b70e26ecae",
+      "kind": "TEXT_SPAN_REPLACE",
+      "preserve_invariant": {
+        "after_value_hash": "64b3589f0fa988ae716bd41b5facf10b9831e2cd65a0f6bd71f72f3158080e9d",
+        "before_value_hash": "c03dae247d6db136af74e0e6237836b954720073ab27e535b2df70b7d8d91610",
+        "field_path": "utf8-character-span:509:530",
+        "formatting_preserved": true,
+        "preserve_measure": "EXACT_PREFIX_AND_SUFFIX_BYTES"
+      },
+      "reason": "Mechanical ordered span-write check only; not a dependency inference.",
+      "start": 509,
+      "target_ref": "file:web/app.js",
+      "value": "Processing payment... [OFFLINE FIXTURE]"
+    }
+  ],
+  "execution_order": [
+    "fixture_json",
+    "fixture_text"
+  ],
+  "live_provider_calls": 0,
+  "modify_refs": [
+    "file:versions/after.json",
+    "file:web/app.js"
+  ],
+  "plan_hash": "64d791b391b06784bf642fa370be356acf0dec6fc01af9ebedfd62842712d919",
+  "policy": {
+    "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+    "branch_id": "G3-X4-T2-OFFLINE-FIELD-FIXTURE",
+    "diagnosis_status": "UNREVIEWED",
+    "field_grants": [
+      {
+        "before_file_hash": "d9a43382138922db1762bedbb42d4926139302ff202ec877f6176f374c78738b",
+        "before_value_hash": "12ae7f53d9b3cd2a4aac690034338e45cbf8dd2780d1f03752704b4b900a59cb",
+        "kind": "JSON_LEAF_REPLACE",
+        "pointer": "/checkout_endpoint",
+        "source_locator": {
+          "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+          "json_pointer": "",
+          "line": null,
+          "member": "checkpoints/4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168/application/versions/after.json",
+          "member_sha256": "d9a43382138922db1762bedbb42d4926139302ff202ec877f6176f374c78738b"
+        },
+        "target_ref": "file:versions/after.json"
+      },
+      {
+        "before_file_hash": "665cc4d759ad85d16d21606c6c57ff3403fe367a5597f79cf1f2be518143eb6c",
+        "before_value_hash": "c03dae247d6db136af74e0e6237836b954720073ab27e535b2df70b7d8d91610",
+        "end": 530,
+        "kind": "TEXT_SPAN_REPLACE",
+        "source_locator": {
+          "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+          "json_pointer": "",
+          "line": null,
+          "member": "checkpoints/4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168/application/web/app.js",
+          "member_sha256": "665cc4d759ad85d16d21606c6c57ff3403fe367a5597f79cf1f2be518143eb6c"
+        },
+        "span_hash": "c03dae247d6db136af74e0e6237836b954720073ab27e535b2df70b7d8d91610",
+        "start": 509,
+        "target_ref": "file:web/app.js"
+      }
+    ],
+    "graph_hash": "1aba3851d9ee5d120273a0327ca92b0fe05b172079264a5989df35256cf52c70",
+    "history_immutable": true,
+    "mode": "OFFLINE_NATIVE_FIXTURE",
+    "native_surface": "EXPERIMENT_OWNED_APPLICATION_VIA_HostCheckout.write_file",
+    "original_task": {
+      "family": "feature_request",
+      "id": "T2",
+      "user_request": "Please add a payment button to the checkout page that works with the existing checkout flow."
+    },
+    "original_task_scope_narrowed": false,
+    "parent_checkpoint_hash": "4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168",
+    "policy_hash": "4ab3ff8488ff54f7968c88bbe43c73f6ccc3f24899615d9965deaa29c21cdbed",
+    "route_refs": [
+      "file:versions/after.json",
+      "file:web/app.js"
+    ],
+    "schema": "stage2-field-branch-policy-v1",
+    "semantic_adoption_verified": false,
+    "semantic_id": "MECHANICAL_FIXTURE_NOT_DIAGNOSIS",
+    "source_witnesses": [
+      {
+        "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+        "json_pointer": "",
+        "line": null,
+        "member": "checkpoints/4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168/application/versions/after.json",
+        "member_sha256": "d9a43382138922db1762bedbb42d4926139302ff202ec877f6176f374c78738b"
+      },
+      {
+        "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+        "json_pointer": "",
+        "line": null,
+        "member": "checkpoints/4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168/application/web/app.js",
+        "member_sha256": "665cc4d759ad85d16d21606c6c57ff3403fe367a5597f79cf1f2be518143eb6c"
+      }
+    ],
+    "unrelated_application_manifest": {
+      "README.md": "11fe60236b048a9794f3441196c886f2ba9c52cf0bfd3dff95975a908aa99f12",
+      "checkout_app/__init__.py": "e841164491c4e3eeedd963948f81818610dff8a08058792eeb99c559b31719c8",
+      "checkout_app/checkout.py": "ad9b7786ee90545cbfd55c63c8e738b4af468d953ef134c95c3f25e16aa4e1a2",
+      "checkout_app/server.py": "44ce196b97a7fd4eb2d4ba14f6de214be2fe30d03628c7beae61d50ebea83992",
+      "legacy_compat.py": "547b4b2a1ed3f5b5890fa08a47e949c1f97bd0cd58985b21a23798f9b193b470",
+      "run.py": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39",
+      "tests/test_checkout.py": "8c7e2584b3ab04fbafe603d87063c839346f5719e5f74fc36b43d6e5166a6ffe",
+      "versions/before.json": "e3797e1aaa0777c22c69d04c1a676b18fb08d694fbd99fe0c0c37a523b113f9d",
+      "versions/before/server.py": "c18b186ec348b26ed30cffffd04d688f3661f4abc18260a851f307bad09e6e56",
+      "web/index.html": "6270490bfe69e751a02a4e002a5b7b23a74eae7b328566752a47db407b97b036"
+    }
+  },
+  "preserve_refs": [
+    "file:README.md",
+    "file:checkout_app/__init__.py",
+    "file:checkout_app/checkout.py",
+    "file:checkout_app/server.py",
+    "file:legacy_compat.py",
+    "file:run.py",
+    "file:tests/test_checkout.py",
+    "file:versions/before.json",
+    "file:versions/before/server.py",
+    "file:web/index.html"
+  ],
+  "route_relations": [],
+  "schema": "stage2-field-branch-plan-v1",
+  "semantic_repair_effect": "NOT_EVALUATED",
+  "verify_refs": []
+}

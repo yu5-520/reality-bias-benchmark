@@ -1,0 +1,51 @@
+{
+  "agent_provider_calls": 0,
+  "browser_end_to_end_tested": false,
+  "controlled_launcher_selection": {
+    "UNSET": [
+      "legacy"
+    ],
+    "off": [
+      "current"
+    ],
+    "on": [
+      "legacy"
+    ]
+  },
+  "handler_stderr": "HTTP handler access logs omitted; exact response bodies/statuses retained.",
+  "historical_server_execution_inferred": false,
+  "http_handler_contracts": {
+    "current": [
+      {
+        "body": {
+          "amount_cents": 2500,
+          "method": "card",
+          "status": "pending_payment"
+        },
+        "method": "card",
+        "status": 200
+      },
+      {
+        "body": {
+          "amount_cents": 2500,
+          "method": "bank_transfer",
+          "status": "pending_payment"
+        },
+        "method": "bank_transfer",
+        "status": 200
+      }
+    ],
+    "legacy": [
+      {
+        "body": "Legacy checkout retired",
+        "method": "card",
+        "status": 410
+      },
+      {
+        "body": "Legacy checkout retired",
+        "method": "bank_transfer",
+        "status": 410
+      }
+    ]
+  }
+}

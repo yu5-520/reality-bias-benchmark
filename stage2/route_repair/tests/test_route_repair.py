@@ -148,6 +148,16 @@ class RouteRepairTest(unittest.TestCase):
         self.assertEqual(plan["pending_verification_refs"], ["file:b.py"])
         self.assertEqual(plan["repair_gate_status"], "NO_AUTHORIZED_REPAIR_ROUTE")
 
+    def test_no_repair_never_invokes_native_executor(self):
+        def forbidden_executor(request):
+            self.fail("no-action decision invoked executor")
+        session = RouteRepairSession(plan=self.plan(), preserve_hashes={"file:c.py":"same"},
+            native_executor=forbidden_executor, preserve_hash_provider=lambda:{"file:c.py":"same"})
+        result=session.execute({"decision":"NO_REPAIR_NEEDED","reason":"Inspected route is healthy",
+            "modify_refs":[],"preserve_refs":["file:c.py"],"verify_refs":["file:a.py"],"reason_by_ref":{}})
+        self.assertEqual(result["native_action_receipts"],[])
+        self.assertTrue(result["repair_executor_exited"])
+
 
 if __name__ == "__main__":
     unittest.main()
