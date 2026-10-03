@@ -4,6 +4,8 @@ The unit of engineering is the monitoring system with its attached repair system
 
 Machine-readable requirements: `configs/stage2_monitor_repair_system_v1.json`. Implementation: `stage2/route_repair/offline_system.py`, `system_contract.py`, `recovery_journal.py`.
 
+The separate [independent post-repair review interface](StageII_Independent_Post_Repair_Review.md) now provides complete raw-evidence access, exact read witnesses, host-held reviewer binding and report/outcome validation. Actual semantic review remains pending until native continuation exists. Frozen system integration outputs retain their original pending state.
+
 ## Responsibility and boundaries
 
 | Component | Responsibility | Does not establish |
