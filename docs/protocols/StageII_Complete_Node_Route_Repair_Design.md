@@ -1,6 +1,8 @@
 # Complete node-route repair: replacement design
 
-Status: source-context preparation and an offline field-bounded native application branch are implemented. Coordinated actions, field restrictions, execution ordering, version checks and enhanced full graph capture have mechanical integration receipts. Evidence-grounded semantic diagnosis, process-state/message native bindings, native agent continuation, branch promotion and a fair live comparison are not ready. Live execution remains disabled. Machine-readable state: `configs/stage2_node_route_repair_design_v1.json`.
+Status: source-context preparation, an offline field-bounded application branch, and a source-based manual application/current-host-answer coordinated branch are implemented. Complete plans are recorded before the first write, with field restrictions, dependencies, native receipts and full graph capture. Agent-generated semantic diagnosis/planning, message or private-state bindings, native agent continuation, branch promotion and a fair live comparison are not ready. Live execution remains disabled. Machine-readable state: `configs/stage2_node_route_repair_design_v1.json`.
+
+The source-based integration is a manual engineering check on one copied frozen checkout. It identifies captured frontend changes versus a contradictory terminal account, and separately checks a conditional alternate launcher. The documented direct service route works before repair. Unknown historical launcher use and downstream semantic adoption remain unknown. See [source-based branch report](../reports/2026-10-03_Source_Based_Application_Host_Branch.md).
 
 Implementation details and verified limits: [Field-bounded branch repair](StageII_Field_Bounded_Branch_Repair.md). The new executor replaces local-package execution for this offline branch path; it does not route plans through the legacy terminal revision harness. It makes no model call and imports no private product code.
 
@@ -74,10 +76,10 @@ Freeze cases, methods, budgets and outcome rules after offline integration check
 | Requirement | Current state | Evidence needed before live execution |
 | --- | --- | --- |
 | Complete graph and source/version navigation | Implemented for the two frozen preparation cases | Exact source catalog and hash/version checks |
-| Route-level semantic diagnosis | Missing | Native-source witnesses with unknown relations retained |
-| Coordinated multi-node plan | Offline application operation compiler implemented; semantic plan generation missing | Source-based diagnosis and semantic dependency decisions |
-| Native plan executor | Offline application branch implemented for JSON leaves and exact text spans | Additional native state/message bindings and model continuation |
-| Enhanced monitoring before/during/after | Offline application branch capture implemented | Entire continued native agent run capture |
+| Route-level semantic diagnosis | One source-based manual candidate; agent diagnosis missing | Native-source witnesses with unknown relations retained |
+| Coordinated multi-node plan | Manual application/current-answer plan and application compiler implemented; agent plan generation missing | Source-based diagnosis and semantic dependency decisions |
+| Native plan executor | Application fields and experiment-owned current host answer implemented offline | Message/private-state boundaries and model continuation |
+| Enhanced monitoring before/during/after | Application, route probes and current-host branch capture implemented | Entire continued native agent run capture |
 | Complete post-repair route comparison | Full graph preservation and mechanical state comparison implemented | Independent semantic/authority comparison after actual repair |
 | Fair cases, methods and budget freeze | Not frozen | Both methods ready under the original task scope |
 

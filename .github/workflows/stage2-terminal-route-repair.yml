@@ -10,6 +10,9 @@ on:
       - '.github/workflows/stage2-terminal-route-repair.yml'
       - 'scripts/prepare_stage2_node_route_context.py'
       - 'configs/stage2_node_route_repair_design_v1.json'
+      - 'scripts/check_stage2_source_based_host_branch.py'
+      - 'scripts/validate_stage2_source_based_host_branch.py'
+      - 'stage2/replication_v2/source_based_host_branch_integration_v1/**'
       - 'scripts/check_stage2_field_branch_native.py'
       - 'scripts/validate_stage2_field_branch_integration.py'
       - 'stage2/monitor_enhancement/snapshot_append.py'
@@ -62,6 +65,10 @@ jobs:
           python -m unittest discover -s stage2/monitor_enhancement/tests -v
           python scripts/check_stage2_field_branch_native.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/field-branch-native"
           python scripts/validate_stage2_field_branch_integration.py --reproduced "$RUNNER_TEMP/field-branch-native"
+      - name: Verify source-based application and current host answer coordination
+        run: |
+          python scripts/check_stage2_source_based_host_branch.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/source-based-host-branch"
+          python scripts/validate_stage2_source_based_host_branch.py --reproduced "$RUNNER_TEMP/source-based-host-branch"
       - name: Verify historical attempts against archived execution sources
         run: |
           python scripts/validate_stage2_terminal_route_first_attempt.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs"
@@ -75,5 +82,6 @@ jobs:
             ${{ runner.temp }}/terminal-bridge
             ${{ runner.temp }}/node-route-context
             ${{ runner.temp }}/field-branch-native
+            ${{ runner.temp }}/source-based-host-branch
           retention-days: 90
           if-no-files-found: error
