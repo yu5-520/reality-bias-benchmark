@@ -63,7 +63,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           python - <<'PY'
-          import hashlib,json,os,subprocess
+          import hashlib,io,json,os,subprocess,zipfile
           p='configs/stage2_terminal_route_repair_first_round_v1.json'
           c=json.load(open(p))
           assert os.environ['GITHUB_RUN_ATTEMPT']=='1', 'workflow reruns cannot repeat this first attempt'
@@ -75,8 +75,13 @@ jobs:
           name='terminal-route-active-'+config_hash
           pages=json.loads(subprocess.check_output(['gh','api','--paginate','--slurp',
               'repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/artifacts?per_page=100'],text=True))
-          artifacts=[a['name'] for page in pages for a in page['artifacts']]
-          assert name not in artifacts, 'first attempt already retained; no success retry'
+          artifacts=[a for page in pages for a in page['artifacts'] if a['name']==name]
+          for artifact in artifacts:
+              assert not artifact['expired'], 'cannot verify expired prior attempt'
+              raw=subprocess.check_output(['gh','api','repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/artifacts/'+str(artifact['id'])+'/zip'])
+              with zipfile.ZipFile(io.BytesIO(raw)) as z:
+                  assert not any(n.startswith('terminal-active/') for n in z.namelist()), 'active first attempt already retained; no success retry'
+              print('Prior environment-only boundary retained:', artifact['id'])
           with open(os.environ['GITHUB_ENV'],'a') as f:f.write('ACTIVE_ARTIFACT_NAME='+name+'\n')
           PY
       - name: Install exact original MCP SDK for native reads/tests
@@ -84,13 +89,20 @@ jobs:
         run: |
           git clone -q https://github.com/modelcontextprotocol/python-sdk upstream
           git -C upstream checkout -q f1b6589088534632fef92238ee9750951e3c0185
-          python -m pip install -q -e ./upstream
+          test "$(git -C upstream rev-parse HEAD)" = f1b6589088534632fef92238ee9750951e3c0185
+          python -m pip install -q uv
+          (cd upstream && uv sync --frozen --no-default-groups)
+          echo "MCP_PYTHON=$GITHUB_WORKSPACE/upstream/.venv/bin/python" >> "$GITHUB_ENV"
+      - name: Verify the original MCP read interface before model calls
+        if: env.ACTIVE_ARTIFACT_NAME != ''
+        run: |
+          PYTHONPATH="$GITHUB_WORKSPACE" "$MCP_PYTHON" -m stage2.native_v7.x4_mcp.client_call --checkout "$RUNNER_TEMP/terminal-preflight/G3-X4-T2-LOCAL/checkout" --tool list_files --arguments-json '{}' --observer-root "$RUNNER_TEMP/terminal-mcp-interface-probe" --capture-prefix zero-call-list
       - name: Execute four first-attempt arms
         if: env.ACTIVE_ARTIFACT_NAME != ''
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
-          python scripts/run_stage2_terminal_route_repair.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/terminal-active" --execute
+          "$MCP_PYTHON" scripts/run_stage2_terminal_route_repair.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/terminal-active" --execute
       - name: Retain preflight and active first attempts
         if: always()
         uses: actions/upload-artifact@v4
@@ -101,5 +113,6 @@ jobs:
             ${{ runner.temp }}/terminal-active
             ${{ runner.temp }}/terminal-graphs
             ${{ runner.temp }}/terminal-bridge
+            ${{ runner.temp }}/terminal-mcp-interface-probe
           retention-days: 90
           if-no-files-found: error

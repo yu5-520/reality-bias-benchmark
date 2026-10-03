@@ -19,3 +19,5 @@ The first live workflow is capped at four branches and 32 provider calls, with n
 Protocol: [Terminal node-graph repair](../protocols/StageII_Terminal_Node_Graph_Repair_v1.md).
 
 Permanent receipts: `stage2/replication_v2/terminal_route_repair_preflight_v1/`. `seal.json` binds each compact receipt and active implementation file; `run_binding.json` binds the preflight entrypoint, case config and implementation. Live first attempts will be retained separately and require an evidence-based outcome comparison.
+
+The first cloud workflow (37097617725) independently reproduced all four preflight branches and the native scripted bridge. SDK installation then failed before the active CLI started: plain pip could not resolve the SDK workspace's development-version mcp-types package. Artifact 11264797418 was downloaded and checked: it contains no terminal-active files and no live provider calls. The environment correction restores the original locked workspace installation, with the identical SDK commit. This zero-call infrastructure boundary is retained in cloud_environment_boundary.json and is not a repair attempt or a success retry.

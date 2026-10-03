@@ -41,7 +41,7 @@ The public implementation does not contain the private product registry or repai
 
 Two cases, two arms per case, four attempts. Each diagnosis has at most six provider calls. Only an authorized MCP repair can consume up to four additional continuation calls, also bounded by the original remaining horizon. Maximum across all arms: 32 live calls. No transport or JSON-format retries, no success retries, no automatic subject reruns, and no overwrite of an existing output directory. Failed provider requests count as attempts.
 
-The workflow checks the frozen configuration, rejects workflow reruns and rejects a previously retained active artifact for the same configuration. Active execution requires the explicit commit marker `[run terminal route repair]` or an execute-enabled manual dispatch by the repository owner. Failed first attempts are retained alongside successful attempts. Missing credentials produce a zero-call boundary rather than changing providers or models.
+The workflow checks the frozen configuration, rejects workflow reruns and rejects a previously retained artifact containing an active attempt for the same configuration. Active execution requires the explicit commit marker `[run terminal route repair]` or an execute-enabled manual dispatch by the repository owner. Failed first attempts are retained alongside successful attempts. Missing credentials produce a zero-call boundary rather than changing providers or models. An environment-only artifact with no `terminal-active/` files can precede a corrected first execution; its archive is inspected and retained, rather than deleted or bypassed. The frozen MCP SDK is installed with its original workspace lock using `uv sync --frozen --no-default-groups`.
 
 ## Outcomes and interpretation
 
