@@ -63,3 +63,7 @@ Route repair: stage2/route_repair/plan.py and runner.py.
 Frozen machine-readable boundary: configs/stage2_enhanced_external_monitor_contract_v1.json.
 
 The implementation is additive. Existing Stage-I and Stage-II monitor, lineage, checkpoint and repair code remains the historical/reproduction baseline.
+
+## 9. Monitoring stages and current audit comparison
+
+Runtime observation and terminal frozen verification form complementary stages of the monitoring design. Candidate objects feed the observation graph; route-map-assisted repair is not one repair per candidate. Complete available observation maps support diagnosis without conferring write authority or proving all semantic edges. The [dual-audit comparison](../reports/2026-10-03_Enhanced_Monitor_Dual_Audit_Comparison.md) records the tested retrospective gains, including the A2A application case, and separates these from unmeasured live performance and future route-repair outcomes.

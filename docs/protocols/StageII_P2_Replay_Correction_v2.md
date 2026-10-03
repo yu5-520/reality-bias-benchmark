@@ -24,7 +24,7 @@ Two evidence boundaries are retained: G5-X4-T1 has no MCP calls but a complete i
 
 New graphs and structural inspection candidates are fixed before loading any semantic review. The 65 targeted corrected reviews are evaluated separately by status. Only exact relative file paths in the corrected rationale enter the file-mention proxy. Generic words, legacy counter-explanations and uncorrected historical positive denominators are excluded. A missing file mention is not a detector miss. Node-level detection accuracy requires separately defined node-level reference labels.
 
-This analysis establishes evidence ingestion and traceability, not detector superiority, live latency, automatic CPR judgement, or complete-route repair efficacy. Candidate counts are inspection workload units, not defect counts. Existing primary monitor and local repair experiments retain their original scope.
+This analysis establishes evidence ingestion and traceability, not detector superiority, live latency, automatic CPR judgement, or complete-route repair efficacy. Candidate counts are object-level inputs to inspection and graph construction, not defect counts, measured human workload, or numbers of repairs. Route-map-assisted repair uses the connected evidence map to select justified changes. Existing primary monitor and local repair experiments retain their original scope.
 
 ## Reproduce
 
@@ -43,3 +43,7 @@ The replay requires a fresh output directory. Source bindings are pinned by SHA2
 ## Recovery provenance
 
 The prior unpublished local correction was removed during workspace maintenance. This implementation was reconstructed from the recorded correction requirements against public base commit `237cfa2516c57f8be3a78365e0089e8967e79830`. Prior local commit identities and validation receipts are not reused. This recovery run creates its own implementation binding, results and validation receipt.
+
+## Dual-audit comparison
+
+The post-hoc comparison against both original semantic audits is recorded in [the dual-audit report](../reports/2026-10-03_Enhanced_Monitor_Dual_Audit_Comparison.md). It separately reports historical baseline recovery, conservative retrospective object localization, targeted chronology corrections and node associations. Runtime observation and terminal frozen verification are complementary stages; retrospective coverage does not establish prospective warning latency.
