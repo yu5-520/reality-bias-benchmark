@@ -18,6 +18,9 @@ on:
       - 'scripts/check_stage2_independent_repair_review.py'
       - 'configs/stage2_independent_repair_review_v1.json'
       - 'stage2/replication_v2/independent_repair_review_preparation_v1/**'
+      - 'scripts/check_stage2_native_continuation_authority.py'
+      - 'configs/stage2_native_continuation_authority_v1.json'
+      - 'stage2/replication_v2/native_continuation_authority_integration_v1/**'
       - 'scripts/check_stage2_source_based_host_branch.py'
       - 'scripts/validate_stage2_source_based_host_branch.py'
       - 'stage2/replication_v2/source_based_host_branch_integration_v1/**'
@@ -89,6 +92,9 @@ jobs:
       - name: Verify independent read-only review preparation without invoking a reviewer
         run: |
           python scripts/check_stage2_independent_repair_review.py --source-root "$RUNNER_TEMP/sources" --out "$RUNNER_TEMP/independent-repair-review" --compare-frozen
+      - name: Verify nonterminal native host restore and automatic proposal authority
+        run: |
+          python scripts/check_stage2_native_continuation_authority.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/native-continuation-authority" --compare-frozen
       - name: Retain offline preparation
         if: always()
         uses: actions/upload-artifact@v4
@@ -103,5 +109,6 @@ jobs:
             ${{ runner.temp }}/route-planning-session
             ${{ runner.temp }}/monitor-repair-system
             ${{ runner.temp }}/independent-repair-review
+            ${{ runner.temp }}/native-continuation-authority
           retention-days: 90
           if-no-files-found: error

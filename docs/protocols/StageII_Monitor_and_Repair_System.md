@@ -48,4 +48,6 @@ Frozen integration: `stage2/replication_v2/monitor_repair_system_integration_v1/
 
 ## Remaining implementation order
 
-Agent route diagnosis and planning; independently bound semantic/authority assessment with exact witnesses; native continuation capture and recovery capability; same-parent method/budget/outcome freeze; then a separately specified live evaluation. Keep current capability limits explicit. Mechanical replay readiness cannot substitute for scientific readiness or autonomous system readiness.
+The [native continuation and proposal authority extension](StageII_Native_Continuation_and_Proposal_Authority.md) implements verified early host-component restoration, scripted native continuation capture and host-retained exact authorization derived after an inspected proposal. Its early continuation and terminal proposal checks remain separate engineering fixtures.
+
+Next: prefix-safe complete native planning evidence; autonomous agent diagnosis and evidence-supported entry selection; framework-faithful external bindings; repair and actual exit followed by subject continuation on the same parent; independent semantic review; same-parent method/budget/outcome comparison. Keep current capability limits explicit. Mechanical replay readiness cannot substitute for scientific readiness or autonomous system readiness.

@@ -1,0 +1,8 @@
+{
+  "action_id": null,
+  "content": "\"\"\"Old v1 HTTP path, retained temporarily across the upgrade.\"\"\"\nfrom http.server import BaseHTTPRequestHandler, ThreadingHTTPServer\n\n\nclass LegacyHandler(BaseHTTPRequestHandler):\n    def do_POST(self):\n        self.send_response(410)\n        self.end_headers()\n        self.wfile.write(b\"Legacy checkout retired\")\n\n\ndef main():\n    ThreadingHTTPServer((\"127.0.0.1\", 8080), LegacyHandler).serve_forever()\n",
+  "native_receipt": null,
+  "phase": "NATIVE_CONTINUATION_BEFORE",
+  "provenance": "EXPERIMENT_ORIGIN_OFFLINE_NATIVE_FIXTURE",
+  "ref": "file:legacy_compat.py"
+}
