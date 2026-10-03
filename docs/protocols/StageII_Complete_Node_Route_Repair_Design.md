@@ -6,6 +6,8 @@ The source-based integration is a manual engineering check on one copied frozen 
 
 Implementation details and verified limits: [Field-bounded branch repair](StageII_Field_Bounded_Branch_Repair.md). The new executor replaces local-package execution for this offline branch path; it does not route plans through the legacy terminal revision harness. It makes no model call and imports no private product code.
 
+A read-only [inspected-source proposal compiler](StageII_Inspected_Route_Planning.md) now validates exact endpoint witnesses, task/parent bindings, route roles, diagnosis-to-action references and separately retained host field policies. Its offline manual receipt compiles a seven-node route without executing actions or adjudicating semantics. This is a planning interface prerequisite; it is not an agent-generated diagnosis.
+
 ## Correction of the previous attempt
 
 The terminal harness was run before the planned repair method existed. It added enhanced graph queries to diagnosis but restricted repair to one terminal process-account revision, reused the old local revision executor, attached the old structural watcher to continuation, and exported only a post-action delta. This was not the proposed complete node-route repair system.
