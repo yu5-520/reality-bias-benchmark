@@ -1,5 +1,7 @@
 > Current replay correction: use [P2 native evidence replay v2](StageII_P2_Replay_Correction_v2.md). The v1 graph promotion and localization comparison are withdrawn; prior frozen files remain historical evidence.
 
+> Current bounded repair entrypoint: [Terminal node-graph repair v1](StageII_Terminal_Node_Graph_Repair_v1.md). Its two-case, four-arm terminal-phase specification supersedes this document's generic first-round scope. Full observation indexing remains separate from authority; historical R7 midrun interventions are unchanged.
+
 # Stage-II Enhanced External Evidence-Graph Monitor and Route-Repair Protocol v1.0
 
 Status: implementation baseline. This protocol adds a public research prototype only. It does not change frozen natural trajectories, historical R7 outputs, studied framework protocols, or existing evidence.
