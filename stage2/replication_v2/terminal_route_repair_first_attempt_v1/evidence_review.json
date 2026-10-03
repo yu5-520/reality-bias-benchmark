@@ -1,0 +1,104 @@
+{
+  "application_checks": {
+    "G2-X3-T2": {
+      "scope": "frozen existing checkout/launcher/HTTP tests; offline after model execution",
+      "tests_passed": 8
+    },
+    "G3-X4-T2": {
+      "scope": "frozen existing checkout unit tests only; does not validate final process account",
+      "tests_passed": 2
+    }
+  },
+  "arms": [
+    {
+      "application_preserved": true,
+      "arm": "GRAPH",
+      "calls": 6,
+      "full_id": "G2-X3-T2",
+      "invalid_queries": 3,
+      "native_actions": 0,
+      "query_attempts": 12,
+      "returned_evidence_chars": 16505,
+      "returned_model_aliases": [
+        "deepseek-flash"
+      ],
+      "usage": {
+        "completion_tokens": 1443,
+        "prompt_tokens": 35938,
+        "total_tokens": 37381
+      }
+    },
+    {
+      "application_preserved": true,
+      "arm": "LOCAL",
+      "calls": 5,
+      "full_id": "G2-X3-T2",
+      "invalid_queries": 3,
+      "native_actions": 0,
+      "query_attempts": 11,
+      "returned_evidence_chars": 18177,
+      "returned_model_aliases": [
+        "deepseek-flash"
+      ],
+      "usage": {
+        "completion_tokens": 1318,
+        "prompt_tokens": 27877,
+        "total_tokens": 29195
+      }
+    },
+    {
+      "application_preserved": true,
+      "arm": "GRAPH",
+      "calls": 4,
+      "full_id": "G3-X4-T2",
+      "invalid_queries": 2,
+      "native_actions": 0,
+      "query_attempts": 7,
+      "returned_evidence_chars": 37259,
+      "returned_model_aliases": [
+        "deepseek-flash"
+      ],
+      "usage": {
+        "completion_tokens": 387,
+        "prompt_tokens": 28350,
+        "total_tokens": 28737
+      }
+    },
+    {
+      "application_preserved": true,
+      "arm": "LOCAL",
+      "calls": 6,
+      "full_id": "G3-X4-T2",
+      "invalid_queries": 4,
+      "native_actions": 0,
+      "query_attempts": 9,
+      "returned_evidence_chars": 15785,
+      "returned_model_aliases": [
+        "deepseek-flash"
+      ],
+      "usage": {
+        "completion_tokens": 176,
+        "prompt_tokens": 24065,
+        "total_tokens": 24241
+      }
+    }
+  ],
+  "artifact_id": 11264897469,
+  "artifact_sha256": "540b6f712b001d08891fb00bbf829c0db6fbd22cbee3dbc41067bdd0343fa515",
+  "calls": 21,
+  "conclusions": {
+    "G2-X3-T2-GRAPH": "evidence-supported NO_REPAIR_NEEDED including corrected launcher default; no mutation",
+    "G2-X3-T2-LOCAL": "evidence-supported NO_REPAIR_NEEDED; no mutation",
+    "G3-X4-T2-GRAPH": "UNRESOLVED; source-retrieval navigation failed despite source availability; process-account contradiction not repaired",
+    "G3-X4-T2-LOCAL": "NO_DECISION_WITHIN_CALL_BUDGET; process-account contradiction not repaired"
+  },
+  "execution_commit": "7348e20ecbf6720150fcfc81fe07a5b49ec3a30c",
+  "graph_advantage_established": false,
+  "model_version_scope": "Frozen configuration specifies DeepSeek-V4.1-Flash; responses identify deepseek-flash; exact backend revision not independently attested.",
+  "native_actions": 0,
+  "repair_efficacy_established": false,
+  "run_id": 37097781266,
+  "schema": "terminal-route-first-attempt-evidence-review-v1",
+  "scope": "EXPLORATORY_OFFLINE_REVIEW_NOT_INDEPENDENT_BLIND_SEMANTIC_AUDIT",
+  "subject_reruns": 0
+}

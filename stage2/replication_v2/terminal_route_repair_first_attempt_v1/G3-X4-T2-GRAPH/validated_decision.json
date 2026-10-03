@@ -1,0 +1,13 @@
+{
+  "actions": [],
+  "decision": "UNRESOLVED",
+  "decision_hash": "7ee68148a002c16a3050a0b65b4c374e3279922c5faa1bdf00563dbbd9c4b892",
+  "evidence": [
+    {
+      "member": "natural_A_result.json",
+      "sha256": "493dfa57180450791b0a25c144bb70238a979d94998f00724eab237cd08e8311"
+    }
+  ],
+  "parent_checkpoint_hash": "4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168",
+  "reason": "The terminal evidence (natural_A_result.json) claims the payment button already exists in web/index.html and web/app.js and that no changes were needed. However, reading the actual member contents failed: read_member returned 'source member absent' for both web/index.html and web/app.js, even though they are listed in application_file_hashes and appear as file: nodes in the graph. The graph nodes confirm these objects exist (with content_hashes matching the application_file_hashes and many observation/event edges), but their content cannot be retrieved here, so the claim that the button and wiring are present and functional cannot be verified from cited evidence. The availability of the source contents is required to confirm whether the implemented functionality is complete or whether a repair is needed; without it the question of whether a defect exists remains unresolved."
+}

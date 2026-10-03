@@ -2,6 +2,8 @@
 
 Status: protocol and engineering preflight frozen before live model execution, 3 October 2026. Machine-readable specification: `configs/stage2_terminal_route_repair_first_round_v1.json`.
 
+Execution record: [actual first-attempt results](../reports/2026-10-03_Terminal_Node_Graph_Repair_First_Attempt.md). Four branches consumed 21 calls and performed no repairs. These results establish neither repair efficacy nor graph advantage; no active branch was repeated.
+
 ## Question and experimental unit
 
 Does access to a complete, source-bound observation graph help an agent distinguish a remaining process-account contradiction from a historical problem that is already resolved? The unit is a new repair attempt from a frozen terminal checkpoint. This is an engineering feasibility comparison, not an estimate of general repair efficacy.

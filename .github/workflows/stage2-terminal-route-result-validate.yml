@@ -1,0 +1,37 @@
+name: Terminal node-graph first-attempt result validation
+
+on:
+  push:
+    branches: [fix/p2-native-evidence-replay]
+    paths:
+      - 'stage2/replication_v2/terminal_route_repair_first_attempt_v1/**'
+      - 'scripts/validate_stage2_terminal_route_first_attempt.py'
+      - '.github/workflows/stage2-terminal-route-result-validate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Rebuild pinned two-case evidence and verify retained queries
+        shell: bash
+        run: |
+          set -euo pipefail
+          for g in 2 3; do
+            commit=$(python -c "import json; print(json.load(open('configs/stage2_g${g}_ab_paired_semantic_audit_v1.json'))['source']['natural_A_evidence_commit'])")
+            mkdir -p "$RUNNER_TEMP/sources/G${g}A"
+            git cat-file -e "$commit^{commit}" || git fetch origin "$commit"
+            git archive "$commit" "stage2/replication_v2/G${g}/natural_A" | tar -x -C "$RUNNER_TEMP/sources/G${g}A"
+          done
+          python scripts/materialize_stage2_terminal_route_graphs.py --source-root "$RUNNER_TEMP/sources" --out "$RUNNER_TEMP/graphs"
+          python scripts/validate_stage2_terminal_route_first_attempt.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/graphs"
