@@ -1,0 +1,4 @@
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"mcp","version":"0.1.0"},"_meta":{}}}
+{"jsonrpc":"2.0","method":"notifications/initialized"}
+{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{"_meta":{}}}
+{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"write_file","arguments":{"content":"\"\"\"Service launcher from the previous release.\"\"\"\nimport os\nfrom checkout_app.server import main as current_main\nfrom legacy_compat import main as legacy_main\n\n\ndef main():\n    if os.getenv(\"CHECKOUT_COMPAT\", \"off\") == \"on\":\n        legacy_main()\n    else:\n        current_main()\n\n\nif __name__ == \"__main__\":\n    main()\n","path":"run.py"},"_meta":{}}}

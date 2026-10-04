@@ -1,0 +1,59 @@
+{
+  "automatic_paid_reviewer": false,
+  "automatic_replay": false,
+  "classification": "OFFLINE_PROVIDER_CAPTURE_AND_PHASE_GATE_PREFLIGHT_NOT_LIVE_TRIAL",
+  "http_capture_contract": {
+    "credentials_in_artifacts": false,
+    "headers": "NON_SECRET_CONTENT_TYPE_AND_ACCEPT_ONLY",
+    "request_body": "EXACT_BYTES_BEFORE_DISPATCH",
+    "response_body": "EXACT_BYTES_BEFORE_DECODE",
+    "timeout_seconds": 60
+  },
+  "live_planning_enabled": false,
+  "live_subject_enabled": false,
+  "model_version_rule": "CONFIGURED_VERSION_IS_NOT_BACKEND_VERSION_PROOF",
+  "planning": {
+    "actor_id": "BOUND_PLANNING_ACTOR",
+    "format_retry_enabled": false,
+    "max_logical_calls": 16,
+    "max_transport_attempts": 16,
+    "model_config": "arena/config/model_deepseek_v0.2.json",
+    "parameter_section": "subject",
+    "transport_retry_enabled": false
+  },
+  "real_exit_rule": "HOST_VERIFIED_ACTUAL_PROVIDER_PLANNING_AND_COMPLETED_NATIVE_ACTIONS_NOT_ACTOR_JSON",
+  "release_rule": "PLANNING_CLOSED_AND_NATIVE_POSTCONDITIONS_PASSED_AND_PARENT_STATE_PRESERVED",
+  "remaining_gates": [
+    "LIVE_HTTP_TRANSPORT_DRIVER_WITH_PER_ATTEMPT_CAPTURE",
+    "LIVE_PLANNING_SESSION_USING_BOUND_EXCHANGE_SOURCE",
+    "EVIDENCE_SUPPORTED_SEMANTIC_ENTRY_SELECTION",
+    "HOST_VERIFIED_ACTUAL_REPAIR_AGENT_EXIT",
+    "LIVE_SUBJECT_CONTINUATION_USING_BOUND_EXCHANGE_SOURCE",
+    "INDEPENDENT_SEMANTIC_REVIEW"
+  ],
+  "same_parent_config": "configs/stage2_same_parent_native_mcp_v1.json",
+  "schema": "stage2-bound-provider-phase-config-v1",
+  "source_hashes": {
+    "adapters/deepseek_chat.py": "8acc6549716b3dea3441eb19cd7cd35ced4b8c33b1ee0d5151634a0bda4dd424",
+    "arena/config/model_deepseek_v0.2.json": "fe7bbafda1c4c12b1d1f5dca963d1a45cbe503713aaa486fac09f569d1b5f8c5",
+    "arena/providers.py": "c38a2f8611b6556a7b6e36457bdda842b20718dfd461442b75425224cfeac21b",
+    "stage2/native_v7/software_host_v1.py": "e2fa8a869c22529dfa6c62662b3b9d957b2c8b3cf04a291df5a0a3a6374cc4f0",
+    "stage2/native_v7/x4_mcp/client_call.py": "8f21f8fbff5e3cf1b3bb59d50202fa0ef5ca8bf3b1cb3370e66795b43dcfe3ae",
+    "stage2/native_v7/x4_mcp/runner.py": "e982518260fe1921fd07f62aeb3983c4a5dc6502e3b3884cb2f34dcd8ef90945",
+    "stage2/native_v7/x4_mcp/server.py": "44ade580261f44b39a5c1f1ae7312beab4e8e2bdd2baa2649d9997afbd522ae1",
+    "stage2/native_v7/x4_mcp/wire_proxy.py": "a80b6ff5541a99fe2883ccfa9c5a2d982dfeb20a25f6e911b55c2a7daaa82c41",
+    "stage2/r7_prospective_v1/engineering_b_runner.py": "067ed53a030fe6604be005e254c3f48878ae20f6f4d53fdc5bc35f667468ad06",
+    "stage2/roles.json": "8a7845c97df430d17b57747d4becdc18ebdde81625b53e82a3d371417fc6eb15",
+    "stage2/subject.json": "b0858d05e539b851f75d615ceb7738c34400a422190a685796df1811e4a7cd3b",
+    "stage2/tasks.json": "81997dd53acae570ae37d14d26229ef479a10ae9fcdae57b9f837b574490d15b"
+  },
+  "subject": {
+    "binding_file": "stage2/subject.json",
+    "format_retry_enabled": false,
+    "max_logical_calls": "ORIGINAL_PARENT_REMAINING_HORIZON",
+    "max_transport_attempts": "ORIGINAL_PARENT_REMAINING_HORIZON",
+    "model_config": "arena/config/model_deepseek_v0.2.json",
+    "parameter_section": "subject",
+    "transport_retry_enabled": false
+  }
+}

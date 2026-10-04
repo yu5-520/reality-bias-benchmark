@@ -21,6 +21,10 @@ on:
       - 'scripts/check_stage2_native_continuation_authority.py'
       - 'configs/stage2_native_continuation_authority_v1.json'
       - 'stage2/replication_v2/native_continuation_authority_integration_v1/**'
+      - 'scripts/check_stage2_provider_phase.py'
+      - 'configs/stage2_bound_provider_phase_v1.json'
+      - 'configs/stage2_monitor_repair_active.json'
+      - 'stage2/replication_v2/bound_provider_phase_preflight_v1/**'
       - 'scripts/check_stage2_read_only_planning_entry.py'
       - 'configs/stage2_read_only_planning_entry_v1.json'
       - 'stage2/replication_v2/read_only_planning_entry_integration_v1/**'
@@ -118,6 +122,9 @@ jobs:
       - name: Verify read-only planning protocol and same-parent MCP host entry
         run: |
           "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_read_only_planning_entry.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/read-only-planning-entry" --compare-frozen
+      - name: Verify frozen provider profiles and explicit native repair release phases
+        run: |
+          "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_provider_phase.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/bound-provider-phase" --compare-frozen
       - name: Retain offline preparation
         if: always()
         uses: actions/upload-artifact@v4
@@ -135,5 +142,6 @@ jobs:
             ${{ runner.temp }}/native-continuation-authority
             ${{ runner.temp }}/same-parent-native-mcp
             ${{ runner.temp }}/read-only-planning-entry
+            ${{ runner.temp }}/bound-provider-phase
           retention-days: 90
           if-no-files-found: error

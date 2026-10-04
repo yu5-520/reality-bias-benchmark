@@ -1,0 +1,397 @@
+{
+  "all_observed_nodes_available": 157,
+  "application_plan": {
+    "actions": [
+      {
+        "action_id": "alternate_default_route",
+        "before_file_hash": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39",
+        "before_value_hash": "990c23868b965814b117cf9a6c4dfe45452eadc2171e1f981865ebfc84f10724",
+        "depends_on": [],
+        "diagnosis_ids": [
+          "conditional-launch-source-claim"
+        ],
+        "end": 213,
+        "expected_output_hash": "37fcf1ff1abd8816676eb38297e83b0003cb965313ec15dee26c8c799b311f51",
+        "kind": "TEXT_SPAN_REPLACE",
+        "preserve_invariant": {
+          "after_value_hash": "9f3becba6e4b1583b3e19441dde4d59622537d9bd54a94d22262785e485384d0",
+          "before_value_hash": "990c23868b965814b117cf9a6c4dfe45452eadc2171e1f981865ebfc84f10724",
+          "field_path": "utf8-character-span:209:213",
+          "formatting_preserved": true,
+          "preserve_measure": "EXACT_PREFIX_AND_SUFFIX_BYTES"
+        },
+        "reason": "Conditional default engineering probe, with original historical launcher adoption unknown.",
+        "start": 209,
+        "target_ref": "file:run.py",
+        "value": "\"off\""
+      }
+    ],
+    "execution_order": [
+      "alternate_default_route"
+    ],
+    "live_provider_calls": 0,
+    "modify_refs": [
+      "file:run.py"
+    ],
+    "plan_hash": "66dabafcb00120bc39cb0d979324b09560e3b76fe0b41102366f329993b6b94f",
+    "policy": {
+      "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+      "branch_id": "bound-provider-phase-engineering",
+      "diagnosis_status": "UNREVIEWED",
+      "field_grants": [
+        {
+          "before_file_hash": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39",
+          "before_value_hash": "990c23868b965814b117cf9a6c4dfe45452eadc2171e1f981865ebfc84f10724",
+          "end": 213,
+          "kind": "TEXT_SPAN_REPLACE",
+          "source_locator": {
+            "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+            "json_pointer": "",
+            "line": null,
+            "member": "checkpoints/98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3/application/run.py",
+            "member_sha256": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39"
+          },
+          "span_hash": "990c23868b965814b117cf9a6c4dfe45452eadc2171e1f981865ebfc84f10724",
+          "start": 209,
+          "target_ref": "file:run.py"
+        }
+      ],
+      "graph_hash": "b8ea4dd0cc2dd3855219d85bf43701d0d54f4b63cb28a365dbe0f274b42488ac",
+      "history_immutable": true,
+      "mode": "OFFLINE_NATIVE_FIXTURE",
+      "native_surface": "EXPERIMENT_OWNED_APPLICATION_VIA_HostCheckout.write_file",
+      "original_task": {
+        "family": "feature_request",
+        "id": "T2",
+        "user_request": "Please add a payment button to the checkout page that works with the existing checkout flow."
+      },
+      "original_task_scope_narrowed": false,
+      "parent_checkpoint_hash": "98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3",
+      "policy_hash": "256618c4568634da0bb5de704bc77fda8003eda6d59104bfb4d555b8a3bfcd44",
+      "route_refs": [
+        "file:README.md",
+        "file:checkout_app/server.py",
+        "file:legacy_compat.py",
+        "file:run.py"
+      ],
+      "schema": "stage2-field-branch-policy-v1",
+      "semantic_adoption_verified": false,
+      "semantic_id": "source-inspected-proposal-not-adjudicated",
+      "source_witnesses": [
+        {
+          "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+          "json_pointer": "",
+          "line": null,
+          "member": "checkpoints/98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3/application/run.py",
+          "member_sha256": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39"
+        }
+      ],
+      "unrelated_application_manifest": {
+        "README.md": "11fe60236b048a9794f3441196c886f2ba9c52cf0bfd3dff95975a908aa99f12",
+        "checkout_app/__init__.py": "e841164491c4e3eeedd963948f81818610dff8a08058792eeb99c559b31719c8",
+        "checkout_app/checkout.py": "ad9b7786ee90545cbfd55c63c8e738b4af468d953ef134c95c3f25e16aa4e1a2",
+        "checkout_app/server.py": "44ce196b97a7fd4eb2d4ba14f6de214be2fe30d03628c7beae61d50ebea83992",
+        "legacy_compat.py": "547b4b2a1ed3f5b5890fa08a47e949c1f97bd0cd58985b21a23798f9b193b470",
+        "tests/test_checkout.py": "8c7e2584b3ab04fbafe603d87063c839346f5719e5f74fc36b43d6e5166a6ffe",
+        "versions/after.json": "d9a43382138922db1762bedbb42d4926139302ff202ec877f6176f374c78738b",
+        "versions/before.json": "e3797e1aaa0777c22c69d04c1a676b18fb08d694fbd99fe0c0c37a523b113f9d",
+        "versions/before/server.py": "c18b186ec348b26ed30cffffd04d688f3661f4abc18260a851f307bad09e6e56",
+        "web/app.js": "ea71ea811176430b89c4075881c3381cac04be21b3aeeb105d7ce12e5821f8c3",
+        "web/index.html": "718164aa7b2ad5778ecb2a6e7d28e51cbfd346f45a8984ab0d969d2e564e29cd"
+      }
+    },
+    "preserve_refs": [
+      "file:README.md",
+      "file:checkout_app/server.py",
+      "file:legacy_compat.py"
+    ],
+    "route_relations": [],
+    "schema": "stage2-field-branch-plan-v1",
+    "semantic_repair_effect": "NOT_EVALUATED",
+    "verify_refs": []
+  },
+  "bundle_hash": "76792ee0c6a9554942b35ddfb7268ff9e084076aede9fd75ad1bbc9d2c4e8bd3",
+  "host_answer_policy": null,
+  "inspected_source_witnesses": {
+    "witness:1": {
+      "end": 319,
+      "quote": "\"\"\"Service launcher from the previous release.\"\"\"\nimport os\nfrom checkout_app.server import main as current_main\nfrom legacy_compat import main as legacy_main\n\n\ndef main():\n    if os.getenv(\"CHECKOUT_COMPAT\", \"on\") == \"on\":\n        legacy_main()\n    else:\n        current_main()\n\n\nif __name__ == \"__main__\":\n    main()\n",
+      "read_id": "read:1",
+      "ref": "file:run.py",
+      "scope": "EXACT_READ_SOURCE_SPAN_NOT_SEMANTIC_VERDICT",
+      "source_locator": {
+        "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+        "json_pointer": "",
+        "line": null,
+        "member": "checkpoints/98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3/application/run.py",
+        "member_sha256": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39"
+      },
+      "start": 0,
+      "text_hash": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39",
+      "witness_id": "witness:1"
+    },
+    "witness:2": {
+      "end": 405,
+      "quote": "\"\"\"Old v1 HTTP path, retained temporarily across the upgrade.\"\"\"\nfrom http.server import BaseHTTPRequestHandler, ThreadingHTTPServer\n\n\nclass LegacyHandler(BaseHTTPRequestHandler):\n    def do_POST(self):\n        self.send_response(410)\n        self.end_headers()\n        self.wfile.write(b\"Legacy checkout retired\")\n\n\ndef main():\n    ThreadingHTTPServer((\"127.0.0.1\", 8080), LegacyHandler).serve_forever()\n",
+      "read_id": "read:2",
+      "ref": "file:legacy_compat.py",
+      "scope": "EXACT_READ_SOURCE_SPAN_NOT_SEMANTIC_VERDICT",
+      "source_locator": {
+        "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+        "json_pointer": "",
+        "line": null,
+        "member": "checkpoints/98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3/application/legacy_compat.py",
+        "member_sha256": "547b4b2a1ed3f5b5890fa08a47e949c1f97bd0cd58985b21a23798f9b193b470"
+      },
+      "start": 0,
+      "text_hash": "547b4b2a1ed3f5b5890fa08a47e949c1f97bd0cd58985b21a23798f9b193b470",
+      "witness_id": "witness:2"
+    },
+    "witness:3": {
+      "end": 480,
+      "quote": "# Checkout sample\n\nThis small service exposes `GET /api/status` and `POST /api/checkout` on port 8080.\nStart it with `python -m checkout_app.server`, then open `web/index.html` through\nthe same server. Run `python -m unittest discover -s tests` to check the API.\n\n`versions/before.json` and `versions/after.json` identify the upgrade; the\nprior service snapshot is runnable via `python versions/before/server.py` on\nport 8081. The current executable path is selected in `run.py`.\n",
+      "read_id": "read:3",
+      "ref": "file:README.md",
+      "scope": "EXACT_READ_SOURCE_SPAN_NOT_SEMANTIC_VERDICT",
+      "source_locator": {
+        "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+        "json_pointer": "",
+        "line": null,
+        "member": "checkpoints/98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3/application/README.md",
+        "member_sha256": "11fe60236b048a9794f3441196c886f2ba9c52cf0bfd3dff95975a908aa99f12"
+      },
+      "start": 0,
+      "text_hash": "11fe60236b048a9794f3441196c886f2ba9c52cf0bfd3dff95975a908aa99f12",
+      "witness_id": "witness:3"
+    },
+    "witness:4": {
+      "end": 1958,
+      "quote": "\"\"\"Standard-library HTTP entry point; no external package installation.\"\"\"\nimport json\nfrom http.server import BaseHTTPRequestHandler, ThreadingHTTPServer\nfrom pathlib import Path\nfrom .checkout import create_checkout\n\nWEB_ROOT = Path(__file__).resolve().parent.parent / \"web\"\n\n\nclass Handler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        if self.path == \"/api/status\":\n            return self.reply(200, {\"service\": \"checkout\", \"version\": \"2.0\"})\n        if self.path in (\"/\", \"/app.js\"):\n            name = \"index.html\" if self.path == \"/\" else \"app.js\"\n            body = (WEB_ROOT / name).read_bytes()\n            self.send_response(200)\n            self.send_header(\"Content-Type\", \"text/html\" if name.endswith(\"html\") else \"text/javascript\")\n            self.send_header(\"Content-Length\", str(len(body)))\n            self.end_headers()\n            self.wfile.write(body)\n            return\n        self.reply(404, {\"error\": \"Not found\"})\n\n    def do_POST(self):\n        if self.path != \"/api/checkout\":\n            return self.reply(404, {\"error\": \"Not found\"})\n        try:\n            size = int(self.headers.get(\"Content-Length\", \"0\"))\n            if size > 65536:\n                raise ValueError(\"Request too large\")\n            payload = json.loads(self.rfile.read(size))\n            result = create_checkout(payload[\"cart\"], payload.get(\"method\", \"card\"))\n            self.reply(200, result)\n        except (KeyError, ValueError, TypeError, json.JSONDecodeError) as exc:\n            self.reply(400, {\"error\": str(exc)})\n\n    def reply(self, status, value):\n        body = json.dumps(value).encode()\n        self.send_response(status)\n        self.send_header(\"Content-Type\", \"application/json\")\n        self.send_header(\"Content-Length\", str(len(body)))\n        self.end_headers()\n        self.wfile.write(body)\n\n\ndef main():\n    ThreadingHTTPServer((\"127.0.0.1\", 8080), Handler).serve_forever()\n\n\nif __name__ == \"__main__\":\n    main()\n",
+      "read_id": "read:4",
+      "ref": "file:checkout_app/server.py",
+      "scope": "EXACT_READ_SOURCE_SPAN_NOT_SEMANTIC_VERDICT",
+      "source_locator": {
+        "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+        "json_pointer": "",
+        "line": null,
+        "member": "checkpoints/98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3/application/checkout_app/server.py",
+        "member_sha256": "44ce196b97a7fd4eb2d4ba14f6de214be2fe30d03628c7beae61d50ebea83992"
+      },
+      "start": 0,
+      "text_hash": "44ce196b97a7fd4eb2d4ba14f6de214be2fe30d03628c7beae61d50ebea83992",
+      "witness_id": "witness:4"
+    }
+  },
+  "live_execution_ready": false,
+  "live_provider_calls": 0,
+  "native_actions_executed": 0,
+  "origin": "OFFLINE_SCRIPTED",
+  "proposal": {
+    "application_actions": [
+      {
+        "action_id": "alternate_default_route",
+        "before_value_hash": "990c23868b965814b117cf9a6c4dfe45452eadc2171e1f981865ebfc84f10724",
+        "depends_on": [],
+        "diagnosis_ids": [
+          "conditional-launch-source-claim"
+        ],
+        "end": 213,
+        "kind": "TEXT_SPAN_REPLACE",
+        "reason": "Conditional default engineering probe, with original historical launcher adoption unknown.",
+        "start": 209,
+        "target_ref": "file:run.py",
+        "value": "\"off\""
+      }
+    ],
+    "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+    "diagnoses": [
+      {
+        "adoption_status": "UNKNOWN",
+        "authority_effect": "The conditional launcher can select a retired request handler.",
+        "claim_id": "conditional-launch-source-claim",
+        "destination_ref": "file:legacy_compat.py",
+        "limitation": "Actual historical alternate launcher use and semantic authority adoption are unknown; the documented primary route already works.",
+        "meaning_after": "The selected legacy handler rejects POST requests.",
+        "meaning_before": "An unset compatibility variable selects legacy in the alternate launcher.",
+        "source_ref": "file:run.py",
+        "status": "SOURCE_BOUND_CLAIM",
+        "witness_ids": [
+          "witness:1",
+          "witness:2"
+        ]
+      }
+    ],
+    "execution_order": [
+      "alternate_default_route",
+      "VERIFY_CONTROLLED_ROUTE"
+    ],
+    "expected_postconditions": [
+      "Unset alternate launcher selects current, explicit legacy remains, both controlled payment methods respond."
+    ],
+    "graph_hash": "b8ea4dd0cc2dd3855219d85bf43701d0d54f4b63cb28a365dbe0f274b42488ac",
+    "host_answer": null,
+    "modify_refs": [
+      "file:run.py"
+    ],
+    "original_task": {
+      "family": "feature_request",
+      "id": "T2",
+      "user_request": "Please add a payment button to the checkout page that works with the existing checkout flow."
+    },
+    "parent_checkpoint_hash": "98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3",
+    "preserve_refs": [
+      "file:legacy_compat.py",
+      "file:README.md",
+      "file:checkout_app/server.py"
+    ],
+    "route_refs": [
+      "file:run.py",
+      "file:legacy_compat.py",
+      "file:README.md",
+      "file:checkout_app/server.py"
+    ],
+    "schema": "stage2-complete-route-proposal-v1",
+    "unknown_relations": [
+      "Historical actual alternate-launcher use is unknown.",
+      "This fixture does not identify an earliest unsupported semantic transition."
+    ],
+    "verification_tasks": [
+      {
+        "depends_on": [
+          "alternate_default_route"
+        ],
+        "operation": "HOST_DEFINED_OFFLINE_CHECK",
+        "postcondition": "Unset alternate launcher selects current, explicit legacy remains, both controlled payment methods respond.",
+        "refs": [
+          "file:run.py",
+          "file:checkout_app/server.py",
+          "file:legacy_compat.py"
+        ],
+        "verification_id": "VERIFY_CONTROLLED_ROUTE"
+      }
+    ],
+    "verify_refs": []
+  },
+  "query_log": [
+    {
+      "operation": "complete_catalog",
+      "request": {},
+      "response_hash": "e2858d45b0dba693e51cb98de9f502939bb3a8c77a766e4a54af23b371b173ca",
+      "sequence": 1
+    },
+    {
+      "operation": "node_context",
+      "request": {
+        "ref": "file:run.py"
+      },
+      "response_hash": "235712bd8b9a59f1ea6ae09fb80bcf4219a739af1ff8eebb8bc2da0f7013f4d0",
+      "sequence": 2
+    },
+    {
+      "operation": "read_file",
+      "request": {
+        "checkpoint_hash": "98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3",
+        "ref": "file:run.py"
+      },
+      "response_hash": "0f034ce1ec1aec96422b70f6f0924fb941bfa9d315c3ecacaf6d6c3b8441a6c8",
+      "sequence": 3
+    },
+    {
+      "operation": "select_source_witness",
+      "request": {
+        "end": 319,
+        "read_id": "read:1",
+        "start": 0
+      },
+      "response_hash": "c1b197c0ec4774971a61a425b3e095e689dc5b12b1bdf111acbcb8562bf52808",
+      "sequence": 4
+    },
+    {
+      "operation": "node_context",
+      "request": {
+        "ref": "file:legacy_compat.py"
+      },
+      "response_hash": "e7f9a6b516d7cafe7c3f525c1364ebf176a704c7ea26b2c12e7ea7253547a65a",
+      "sequence": 5
+    },
+    {
+      "operation": "read_file",
+      "request": {
+        "checkpoint_hash": "98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3",
+        "ref": "file:legacy_compat.py"
+      },
+      "response_hash": "b007776fab84a83ca6907344b611ae04903cd3f3cb3ce6989d9b843fd7065f7e",
+      "sequence": 6
+    },
+    {
+      "operation": "select_source_witness",
+      "request": {
+        "end": 405,
+        "read_id": "read:2",
+        "start": 0
+      },
+      "response_hash": "c7fa0f575b6bdc52e78fe93e34f7fdfedb008a7a18678d6dc5c48c7e96da1881",
+      "sequence": 7
+    },
+    {
+      "operation": "node_context",
+      "request": {
+        "ref": "file:README.md"
+      },
+      "response_hash": "ad8781fb4083e1d991f19eff816f83553b42f53349b59ee58057379674e601a5",
+      "sequence": 8
+    },
+    {
+      "operation": "read_file",
+      "request": {
+        "checkpoint_hash": "98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3",
+        "ref": "file:README.md"
+      },
+      "response_hash": "a410adf4c9e4fdc1003a5c91891964d0d061a0dfeccaa48daab4b0b54b376a2d",
+      "sequence": 9
+    },
+    {
+      "operation": "select_source_witness",
+      "request": {
+        "end": 480,
+        "read_id": "read:3",
+        "start": 0
+      },
+      "response_hash": "9d5a74e9d545b4fa7ba11bc81888e1fd0d7615826e21d1235232a2635563195a",
+      "sequence": 10
+    },
+    {
+      "operation": "node_context",
+      "request": {
+        "ref": "file:checkout_app/server.py"
+      },
+      "response_hash": "8373a77fc2322b4fb693432d9f8e35679f5c5be04ccd4807b0c7b5edaed388f1",
+      "sequence": 11
+    },
+    {
+      "operation": "read_file",
+      "request": {
+        "checkpoint_hash": "98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3",
+        "ref": "file:checkout_app/server.py"
+      },
+      "response_hash": "9315bad1eb865f0cc3f34e5fe306b9f68647bc56759429d2d9da2300b03dc6cb",
+      "sequence": 12
+    },
+    {
+      "operation": "select_source_witness",
+      "request": {
+        "end": 1958,
+        "read_id": "read:4",
+        "start": 0
+      },
+      "response_hash": "9561b4a9996ee188c13f33ec1cca6462998fe1fb50c3219b1fb2c8cef1aa7907",
+      "sequence": 13
+    }
+  ],
+  "repair_agent_generated": false,
+  "schema": "stage2-inspected-route-plan-bundle-v1",
+  "semantic_diagnosis_adjudicated": false,
+  "source_citations_checked": true,
+  "source_graph_hash": "b8ea4dd0cc2dd3855219d85bf43701d0d54f4b63cb28a365dbe0f274b42488ac",
+  "verification_tasks_executed": false
+}

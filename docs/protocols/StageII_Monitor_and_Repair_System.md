@@ -1,5 +1,6 @@
 # External monitoring and its attached repair system
 
+> Current execution entry: [provider-bound native phases](StageII_Bound_Provider_and_Native_Phases.md), registered in `configs/stage2_monitor_repair_active.json`. Frozen predecessor implementations below remain reproducible; no current fallback invokes their one-call dispatchers.
 The unit of engineering is the monitoring system with its attached repair system. Safety, effectiveness, automation and reuse are separate requirements of one closed operation, not four names for a successful write. The active offline coordinator is `OfflineRouteRepairSystem`; previous integration scripts remain frozen reproduction fixtures. The coordinator uses the existing native field and current-host bindings directly. It does not invoke the historical local revision harness.
 
 Machine-readable requirements: `configs/stage2_monitor_repair_system_v1.json`. Implementation: `stage2/route_repair/offline_system.py`, `system_contract.py`, `recovery_journal.py`.

@@ -1,5 +1,6 @@
 # Read-only planning protocol and same-parent host entry
 
+> This is the sealed predecessor protocol. The current [provider-bound phased entry](StageII_Bound_Provider_and_Native_Phases.md) replaces its one-call dispatcher for current work; it retains this implementation only for frozen reproduction.
 This stage implements the planning tool conversation and host dispatch boundary. It is an **offline scripted engineering test**, not an autonomous planning experiment or evidence of semantic repair effectiveness. No model or paid reviewer is called, and no frozen natural experiment is rerun.
 
 The unchanged prefix context exposes every observed node and every readable source in the verified early prefix. It excludes later checkpoints, terminal answers, retrospective audit verdicts and unrecorded historical provider exchanges. The current native binding is X4 MCP at the pinned nonterminal parent; general support for arbitrary systems or checkpoints is not established.
