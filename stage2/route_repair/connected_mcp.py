@@ -19,6 +19,7 @@ from stage2.route_repair.connected_provider import freeze_connected_bindings, Co
 from stage2.route_repair.connected_planning import ConnectedPlanningSession, ConnectedAuthorization
 from stage2.route_repair.recovery_journal import RecoveryJournal
 from stage2.route_repair.system_contract import build_system_contract, assess_continuation, read_capture_member
+from stage2.route_repair.native_message import apply_message_policy
 
 
 class ConnectedMCPCheckout(MCPCheckoutProxy):
@@ -139,7 +140,8 @@ class ConnectedMCPBranch(PhasedMCPBranch):
         require(planning._source._profile == bindings['profiles']['planning']
                 and planning._source._transport is transport, 'CONNECTED_PLANNING_TRANSPORT_IDENTITY_DRIFT')
         bundle = authorization.bundle
-        require(bundle['host_answer_policy'] is None and bundle['application_plan'] is not None, 'NONTERMINAL_MCP_APPLICATION_BINDING_REQUIRED')
+        require(bundle['host_answer_policy'] is None and (bundle['application_plan'] is not None
+                or bundle.get('host_message_policy') is not None), 'NONTERMINAL_MCP_NATIVE_BINDING_REQUIRED')
         for task in bundle['proposal']['verification_tasks']:
             binding = verifiers.get(task['verification_id'])
             require(binding is not None and callable(binding.get('run'))
@@ -162,6 +164,7 @@ class ConnectedMCPBranch(PhasedMCPBranch):
         state = self.parent['state']; self.host = SoftwareEngineeringHost(task_id=state['task_id'], checkout=self.root,
                     provider=self.source, max_turns=1, max_actions=state['max_actions'])
         self.host.max_turns = state['max_turns']; self.adapter = SoftwareHostCheckpointAdapter(); self.adapter.load_state(self.host, state)
+        self._expected_host_state = copy.deepcopy(state)
         self.host.checkout = ConnectedMCPCheckout(self.root, self)
         self.contract = build_system_contract(bundle, context.graph)
         self.contract.pop('contract_hash'); self.contract['live_execution_enabled'] = bindings['transport_binding']['live']
@@ -204,7 +207,7 @@ class ConnectedMCPBranch(PhasedMCPBranch):
     def _verify_parent_host(self):
         require(self._bindings == freeze_connected_bindings(self.context, self._repo_root, self._transport), 'PHASED_PROVIDER_SOURCE_DRIFT')
         self.authorization.revalidate(self.bundle)
-        require(self.adapter.save_state(self.host) == self.parent['state'], 'PHASED_REPAIR_MUTATED_PARENT_HOST')
+        require(self.adapter.save_state(self.host) == self._expected_host_state, 'PHASED_REPAIR_MUTATED_PARENT_HOST')
         require(file_tree_manifest(self.root) == self.expected, 'PHASED_APPLICATION_DRIFT')
         require(digest(Path(self.context.access.archive.name).read_bytes()) == self.context.case['archive_sha256'], 'PHASED_ARCHIVE_DRIFT')
 
@@ -225,7 +228,7 @@ class ConnectedMCPBranch(PhasedMCPBranch):
             save(self.out / 'branch_intent.json', {'parent_checkpoint_hash': self.context.parent_checkpoint_hash,
                 'bundle_hash': self.bundle['bundle_hash'], 'bindings_hash': self._bindings['bindings_hash'],
                 'replay_authorized': False})
-            for action in self.bundle['application_plan']['actions']:
+            for action in (self.bundle['application_plan'] or {}).get('actions', []):
                 self._verify_parent_host()
                 require(set(action.get('depends_on', [])) <= set(self._completed), 'PHASED_REPAIR_DEPENDENCY_REQUIRED')
                 path = action['target_ref'][5:]
@@ -245,6 +248,18 @@ class ConnectedMCPBranch(PhasedMCPBranch):
                 require(actual == output, 'PHASED_NATIVE_WRITE_POSTCONDITION_FAILED')
                 self.expected[path] = digest(actual.encode()); self._verify_parent_host()
                 self._completed.append(action['action_id'])
+            policy = self.bundle.get('host_message_policy')
+            if policy:
+                self._verify_parent_host()
+                action = policy['action']
+                require(set(action['depends_on']) <= set(self._completed), 'PHASED_MESSAGE_DEPENDENCY_REQUIRED')
+                self.journal.intent(action['action_id'], action['target_ref'],
+                    policy['before_state_hash'], policy['after_state_hash'])
+                self._expected_host_state, receipt = apply_message_policy(self.context, self.host,
+                    self.adapter, self.root, policy, self.observer)
+                self._actions.append(receipt); save(self.out / 'native_repair_receipts.json', self._actions)
+                self.journal.complete(action['action_id'], receipt['after_hash'], receipt)
+                self._completed.append(action['action_id']); self._verify_parent_host()
             for task in self.bundle['proposal']['verification_tasks']:
                 require(set(task['depends_on']) <= set(self._completed), 'PHASED_VERIFICATION_DEPENDENCY_REQUIRED')
                 before = file_tree_manifest(self.root)
@@ -276,7 +291,10 @@ class ConnectedMCPBranch(PhasedMCPBranch):
             live = self._bindings['transport_binding']['live'] and planning._source.provider_calls > 0
             self._release = seal({'schema': 'stage2-connected-host-release-v1',
                 'planning_outcome_hash': planning.outcome['outcome_hash'], 'authorization_hash': self.authorization.receipt['authorization_hash'],
-                'completed_steps': self._completed, 'parent_host_state_preserved': True,
+                'completed_steps': self._completed,
+                'parent_host_state_preserved': self._expected_host_state == self.parent['state'],
+                'unrelated_host_fields_preserved': True,
+                'authorized_host_message_policy_hash': (self.bundle.get('host_message_policy') or {}).get('policy_hash'),
                 'provider_bindings_hash': self._bindings['bindings_hash'], 'tools_revoked': True,
                 'actual_repair_agent_exit': live, 'origin': self._bindings['transport_binding']['origin'],
                 'exit_asserted_by': 'HOST_AFTER_NATIVE_COMPLETION_NOT_ACTOR_JSON',
@@ -304,7 +322,7 @@ class ConnectedMCPBranch(PhasedMCPBranch):
                 result = await _resume_host(self.host, boundary)
             except TrialHorizonReached:
                 censored = True
-                result = {'trial_censor': 'FOUR_RETURNED_NATIVE_TURNS', 'native_stop_reason': self.host.stop_reason,
+                result = {'trial_censor': 'PRE_FROZEN_RETURNED_NATIVE_TURN_LIMIT', 'native_stop_reason': self.host.stop_reason,
                           'remaining_horizon': self.host.max_turns - len(self.host.history)}
             self.observer.capture('native:closure', stable_json_bytes(result).decode(),
                     'NATIVE_CENSOR' if censored or self.host.stop_reason not in {'finalized', 'queue_exhausted'} else 'NATIVE_CLOSURE')

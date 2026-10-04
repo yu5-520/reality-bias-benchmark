@@ -24,6 +24,10 @@ on:
       - 'scripts/run_stage2_connected_repair.py'
       - 'scripts/check_stage2_connected_repair.py'
       - 'configs/stage2_connected_provider_v1.json'
+      - 'configs/stage2_connected_mechanism_v1.json'
+      - 'scripts/check_stage2_message_repair.py'
+      - 'scripts/review_stage2_connected_repair.py'
+      - 'stage2/replication_v2/pending_message_repair_v1/**'
       - 'stage2/replication_v2/connected_http_mcp_preflight_v1/**'
       - 'scripts/check_stage2_provider_phase.py'
       - 'configs/stage2_bound_provider_phase_v1.json'
@@ -58,6 +62,9 @@ jobs:
   terminal-repair:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: .historical-route-repair
     steps:
       - uses: actions/checkout@v4
         with:
@@ -65,7 +72,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Retain historical reproduction sources
+        working-directory: .
+        run: git worktree add --detach "$GITHUB_WORKSPACE/.historical-route-repair" d1507b1711efc02ece3168d31e9a03dfc8575922
       - name: Verify boundaries and unit checks
+        working-directory: .
         run: python -m unittest discover -s stage2/route_repair/tests -v
       - name: Materialize the two frozen source archives
         shell: bash
@@ -148,6 +159,10 @@ jobs:
         run: |
           python scripts/validate_stage2_chronology_semantic_review.py
           python scripts/prepare_stage2_paper_alignment.py --source-root "$RUNNER_TEMP/sources" --out "$RUNNER_TEMP/paper-alignment" --compare-frozen
+      - name: Verify active exact message repair through native closure
+        working-directory: .
+        run: |
+          "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_message_repair.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/message-repair" --compare-frozen
           "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/run_stage2_connected_repair.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/paper-entry-preflight"
       - name: Retain offline preparation
         if: always()
@@ -170,5 +185,6 @@ jobs:
             ${{ runner.temp }}/connected-http-mcp
             ${{ runner.temp }}/paper-alignment
             ${{ runner.temp }}/paper-entry-preflight
+            ${{ runner.temp }}/message-repair
           retention-days: 90
           if-no-files-found: error

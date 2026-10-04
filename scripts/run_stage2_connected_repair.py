@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from stage2.native_v7.software_host_v1 import TASKS
 from stage2.route_repair.branch_fields import require, save, seal
 from stage2.route_repair.prefix_context import PrefixMCPContext
-from stage2.route_repair.connected_provider import DeepSeekHTTPTransport, LoopbackHTTPTransport, ConnectedExchangeSource, freeze_connected_bindings
+from stage2.route_repair.connected_provider import DeepSeekHTTPTransport, LoopbackHTTPTransport, ConnectedExchangeSource, freeze_connected_bindings, connected_config, MECHANISM_CONFIG
 from stage2.route_repair.connected_planning import ConnectedPlanningSession, freeze_connected_envelope
 from stage2.route_repair.connected_mcp import ConnectedPlanningRepairEntry
 from stage2.route_repair.mcp_same_parent import verify_mcp_environment, decode_repair_tool_result
@@ -24,14 +24,17 @@ from stage2.route_repair.system_contract import read_capture_member
 from stage2.route_repair.paper_alignment import load_contract, assess_mechanism_entry
 
 
-def load_context(source_root):
+def load_context(source_root, purpose='engineering'):
     native = json.loads((ROOT / 'configs/stage2_same_parent_native_mcp_v1.json').read_bytes())
     config = json.loads((ROOT / 'configs/stage2_connected_provider_v1.json').read_bytes())
     require(config['frozen_parent_checkpoint'] == native['parent_checkpoint_hash'], 'CONNECTED_FROZEN_PARENT_DRIFT')
     case = next(c for c in json.loads((ROOT / 'configs/stage2_terminal_route_repair_first_round_v1.json').read_bytes())['cases']
                 if c['full_id'] == native['full_id'])
+    if purpose == 'mechanism':
+        config = json.loads((ROOT / MECHANISM_CONFIG).read_bytes())
     return PrefixMCPContext(source_root / 'G3A/stage2/replication_v2/G3/natural_A/X4-T2/first_attempt.tar.gz',
-          full_id=case['full_id'], archive_sha256=case['archive_sha256'], parent_checkpoint_hash=native['parent_checkpoint_hash'])
+          full_id=case['full_id'], archive_sha256=case['archive_sha256'],
+          parent_checkpoint_hash=config['frozen_parent_checkpoint'], retain_failed_reads=purpose == 'mechanism')
 
 
 def prepare_review(context, branch):
@@ -48,9 +51,13 @@ def prepare_review(context, branch):
 async def execute(context, transport, out, sdk_root, protocol_root):
     bindings = freeze_connected_bindings(context, ROOT, transport)
     save(out / 'provider_bindings.json', bindings); save(out / 'prefix_receipt.json', context.prefix_receipt)
-    native = json.loads((ROOT / 'configs/stage2_same_parent_native_mcp_v1.json').read_bytes())
-    envelope = freeze_connected_envelope(context, TASKS['T2'], writable_refs=['file:' + p for p in context.parent['files'] if not p.startswith('tests/')],
-          branch_id='connected-first-attempt', max_actions=native['max_actions'], max_value_bytes=native['max_value_bytes'])
+    config_path, config = connected_config(context, ROOT)
+    mechanism = config_path == MECHANISM_CONFIG
+    native = config if mechanism else json.loads((ROOT / 'configs/stage2_same_parent_native_mcp_v1.json').read_bytes())
+    envelope = freeze_connected_envelope(context, TASKS['T2'],
+          writable_refs=[] if mechanism else ['file:' + p for p in context.parent['files'] if not p.startswith('tests/')],
+          message_fields=config.get('message_fields'), branch_id='connected-first-attempt',
+          max_actions=native['max_actions'], max_value_bytes=native['max_value_bytes'])
     # Fixed native test command, fixed original test-file scope. The actor cannot
     # supply a checker, command or passing result. Test absence blocks release.
     test_refs = sorted('file:' + p for p in context.parent['files'] if p.startswith('tests/') and p.endswith('.py'))
@@ -81,17 +88,19 @@ def main():
     p.add_argument('--purpose', choices=['mechanism', 'engineering'], default='mechanism')
     p.add_argument('--execute', action='store_true'); args = p.parse_args()
     require(not args.out.exists(), 'FRESH_CONNECTED_TRIAL_OUTPUT_REQUIRED_NO_REPLAY')
-    context = load_context(args.source_root)
+    context = load_context(args.source_root, args.purpose)
     try:
         verify_mcp_environment(args.sdk_root, args.protocol_root)
         contract = load_contract(ROOT)
-        mechanism = assess_mechanism_entry(context, contract)
+        trial = json.loads((ROOT / MECHANISM_CONFIG).read_bytes()) if args.purpose == 'mechanism' else None
+        mechanism = assess_mechanism_entry(context, contract, trial_config=trial)
         if not args.execute:
             bindings = freeze_connected_bindings(context, ROOT, LoopbackHTTPTransport(18081))
             summary = seal({'schema': 'stage2-connected-trial-preflight-v1', 'provider_calls': 0,
                 'credentials_read': False, 'credential_available': bool(os.environ.get('DEEPSEEK_API_KEY', '').strip()),
                 'parent_checkpoint_hash': context.parent_checkpoint_hash, 'remaining_horizon': context.parent['manifest']['remaining_horizon'],
-                'planning_limit': 16, 'subject_trial_limit': 4, 'native_ceiling': context.parent['state']['max_turns'],
+                'planning_limit': bindings['profiles']['planning']['max_logical_calls'],
+                'subject_trial_limit': bindings['profiles']['subject']['max_logical_calls'], 'native_ceiling': context.parent['state']['max_turns'],
                 'execution_armed': False, 'repair_success': False, 'automatic_paid_reviewer': False,
                 'trial_purpose': args.purpose, 'mechanism_entry': mechanism,
                 'transport_binding': 'PLANNED_HTTPS_ENDPOINT_NOT_A_PROVIDER_CALL'}, 'preflight_hash')

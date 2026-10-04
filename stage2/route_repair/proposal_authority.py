@@ -13,11 +13,13 @@ from stage2.route_repair.branch_fields import (
     require, seal, verify_seal, exact_path, build_branch_policy, pointer_parts,
 )
 from stage2.route_repair.native_host_branch import build_host_answer_policy
+from stage2.route_repair.native_message import message_source, build_message_policy
 from stage2.route_repair.offline_system import revalidate_bundle, OfflineRouteRepairSystem
 
 
 def freeze_task_envelope(context, original_task, *, writable_refs, branch_id,
-                         max_actions, max_value_bytes, host_answer_allowed=False):
+                         max_actions, max_value_bytes, host_answer_allowed=False,
+                         message_fields=None):
     """Called by the host before handing evidence to a planning actor.
 
     The caller must decide task capabilities independently. File membership and
@@ -35,8 +37,10 @@ def freeze_task_envelope(context, original_task, *, writable_refs, branch_id,
     for ref in refs:
         path = exact_path(ref)
         require(path in context.files_by_checkpoint[cp], 'ENVELOPE_FILE_NOT_IN_PARENT')
-    require(refs or host_answer_allowed, 'EMPTY_TASK_CAPABILITIES')
-    return seal({'schema': 'stage2-task-capability-envelope-v1',
+    fields = sorted(set(message_fields or []))
+    for field in fields: message_source(context, field)
+    require(refs or host_answer_allowed or fields, 'EMPTY_TASK_CAPABILITIES')
+    row = {'schema': 'stage2-task-capability-envelope-v1',
         'mode': 'OFFLINE_ONLY', 'original_task': copy.deepcopy(original_task),
         'branch_id': branch_id, 'graph_hash': context.graph['graph_hash'],
         'archive_sha256': context.case['archive_sha256'], 'parent_checkpoint_hash': cp,
@@ -45,7 +49,9 @@ def freeze_task_envelope(context, original_task, *, writable_refs, branch_id,
         'max_value_bytes': max_value_bytes,
         'native_surface': 'EXPERIMENT_OWNED_APPLICATION_VIA_HostCheckout.write_file',
         'fixed_before_diagnosis': True, 'replacement_values_prescribed': False,
-        'semantic_truth_certified': False, 'foreign_state_writable': False}, 'envelope_hash')
+        'semantic_truth_certified': False, 'foreign_state_writable': False}
+    if fields: row['message_fields'] = fields
+    return seal(row, 'envelope_hash')
 
 
 class ProposalAuthorityCompiler:
@@ -55,7 +61,8 @@ class ProposalAuthorityCompiler:
         require(envelope == freeze_task_envelope(context, envelope['original_task'],
             writable_refs=envelope['writable_refs'], branch_id=envelope['branch_id'],
             max_actions=envelope['max_actions'], max_value_bytes=envelope['max_value_bytes'],
-            host_answer_allowed=envelope['host_answer_allowed']), 'ENVELOPE_REVALIDATION_FAILED')
+            host_answer_allowed=envelope['host_answer_allowed'],
+            message_fields=envelope.get('message_fields')), 'ENVELOPE_REVALIDATION_FAILED')
         self.context = context
         self._envelope = copy.deepcopy(envelope)
         self._compiled = False
@@ -68,7 +75,9 @@ class ProposalAuthorityCompiler:
         e = self._envelope
         actions = proposal['application_actions']
         host_action = proposal.get('host_answer')
-        require(0 < len(actions) + bool(host_action) <= e['max_actions'], 'PROPOSAL_ACTION_BUDGET')
+        message = proposal.get('host_message')
+        require(not (host_action and message), 'INCOMPATIBLE_TERMINAL_AND_PENDING_MESSAGE')
+        require(0 < len(actions) + bool(host_action) + bool(message) <= e['max_actions'], 'PROPOSAL_ACTION_BUDGET')
         require(not host_action or e['host_answer_allowed'], 'HOST_ANSWER_CAPABILITY_MISSING')
         grants, evidence = [], []
         for action in actions:
@@ -110,6 +119,17 @@ class ProposalAuthorityCompiler:
             host_policy = build_host_answer_policy(self.context, original_task=session.task,
                 answer=host_action['value'], evidence=[w['source_locator'] for w in current],
                 depends_on=host_action['depends_on'])
+        if message:
+            require(message['field_path'] in e.get('message_fields', []), 'MESSAGE_OUTSIDE_TASK_ENVELOPE')
+            require(isinstance(message['value'], str) and len(message['value'].encode()) <= e['max_value_bytes'],
+                    'PROPOSAL_VALUE_BUDGET')
+            _, _, _, locator = message_source(self.context, message['field_path'])
+            current = [w for w in session.witnesses.values() if w['ref'] == 'state:host_parent'
+                and w['source_locator'] == locator and w['start'] == 0
+                and w['end'] == len(session.reads[w['read_id']]['text'])]
+            require(current, 'CURRENT_MESSAGE_WITNESS_REQUIRED')
+            host_policy = build_message_policy(self.context, original_task=session.task,
+                action=message, evidence=[w['source_locator'] for w in current])
         bundle = session.compile(proposal, trusted_application_policy=application_policy,
                                  trusted_host_policy=host_policy)
         # Reconstruct reads and witnesses from native sources; the actor cannot
@@ -132,7 +152,7 @@ class BoundProposalAuthorization:
             'application_policy_hash': (application_policy or {}).get('policy_hash'),
             'host_policy_hash': (host_policy or {}).get('policy_hash'),
             'exact_actions_hash': digest(bundle['application_plan']['actions'] if bundle['application_plan'] else []),
-            'exact_host_answer_hash': digest(host_policy['value']) if host_policy else None,
+            'exact_host_answer_hash': digest(host_policy['value']) if host_policy and 'value' in host_policy else None,
             'execution_order': copy.deepcopy(bundle['proposal']['execution_order']),
             'permission_source': 'PRE_DIAGNOSIS_HOST_TASK_CAPABILITIES',
             'exact_values_frozen_after_proposal': True, 'semantic_claims_grant_extra_permissions': False,

@@ -10,6 +10,7 @@ from stage2.r7_checkpoint_v1.common import digest
 from stage2.native_v7.software_host_v1 import TASKS
 from stage2.route_repair.branch_fields import require, seal, verify_seal, compile_branch_plan
 from stage2.route_repair.native_host_branch import host_source, build_host_answer_policy
+from stage2.route_repair.native_message import message_source, build_message_policy
 
 
 class RoutePlanningSession:
@@ -54,6 +55,11 @@ class RoutePlanningSession:
         require(isinstance(state['answer'],str),'CURRENT_ANSWER_TEXT_REQUIRED')
         return self._read('current_host_answer',{},'state:terminal',state['answer'],
             {**locator,'json_pointer':'/answer'})
+
+    def message(self, field_path):
+        state, role, index, locator = message_source(self.context, field_path)
+        return self._read('current_pending_message', {'field_path': field_path},
+            'state:host_parent', state['inbox'][role][index]['content'], locator)
 
     def observation(self, observation_id, ref):
         row=self.context.observation_source(observation_id)
@@ -103,8 +109,10 @@ class RoutePlanningSession:
             require({claim['source_ref'],claim['destination_ref']}<=refs,'DIAGNOSIS_ENDPOINT_WITNESS_REQUIRED')
         require(proposal['unknown_relations'] and proposal['expected_postconditions'], 'UNCERTAINTY_AND_POSTCONDITIONS_REQUIRED')
         app_actions=proposal['application_actions'];host_action=proposal.get('host_answer')
+        message=proposal.get('host_message')
+        require(not (host_action and message), 'INCOMPATIBLE_TERMINAL_AND_PENDING_MESSAGE')
         by_claim={c['claim_id']:c for c in claims}
-        for action in [*app_actions,*([host_action] if host_action else [])]:
+        for action in [*app_actions,*([host_action] if host_action else []),*([message] if message else [])]:
             ids=action['diagnosis_ids']
             require(ids and set(ids)<=seen,'ACTION_DIAGNOSIS_NOT_BOUND')
             require(all(by_claim[x]['status']!='UNKNOWN' for x in ids),'UNKNOWN_CLAIM_CANNOT_JUSTIFY_ACTION')
@@ -113,8 +121,12 @@ class RoutePlanningSession:
                     'ACTION_OUTSIDE_DIAGNOSED_ENDPOINTS')
         targets={a['target_ref'] for a in app_actions}
         if host_action:targets.add('state:terminal')
+        if message:targets.add('state:host_parent')
         require(targets==groups[0],'MODIFY_ACTION_COVERAGE_MISMATCH')
         action_ids=[a['action_id'] for a in app_actions]
+        if message:
+            require(set(message['depends_on']) <= set(action_ids), 'MESSAGE_DEPENDENCY_NOT_ORDERED')
+            action_ids.append(message['action_id'])
         verification_ids=[v['verification_id'] for v in proposal['verification_tasks']]
         all_ids=action_ids+verification_ids+(['host_answer'] if host_action else [])
         require(len(all_ids)==len(set(all_ids)),'DUPLICATE_COORDINATED_STEP_ID')
@@ -131,7 +143,7 @@ class RoutePlanningSession:
         if app_actions:
             require(trusted_application_policy is not None,'SEPARATE_HOST_APPLICATION_POLICY_REQUIRED')
             require(trusted_application_policy['original_task']==self.task,'HOST_APPLICATION_TASK_DRIFT')
-            require(targets-{'state:terminal'}<=set(trusted_application_policy['route_refs']), 'APPLICATION_OUTSIDE_HOST_ROUTE')
+            require(targets-{'state:terminal','state:host_parent'}<=set(trusted_application_policy['route_refs']), 'APPLICATION_OUTSIDE_HOST_ROUTE')
             app_plan=compile_branch_plan(self.context,trusted_application_policy,app_actions,
                 preserve_refs=groups[1],verify_refs=groups[2])
         if host_action:
@@ -143,7 +155,11 @@ class RoutePlanningSession:
             canonical=build_host_answer_policy(self.context,original_task=self.task,answer=host_action['value'],
                 evidence=trusted_host_policy['source_witnesses'],depends_on=host_action['depends_on'])
             require(canonical==trusted_host_policy,'HOST_ANSWER_SOURCE_REVALIDATION_FAILED')
-        return seal({'schema':'stage2-inspected-route-plan-bundle-v1','origin':self.origin,
+        if message:
+            require(trusted_host_policy is not None, 'SEPARATE_HOST_MESSAGE_POLICY_REQUIRED')
+            require(trusted_host_policy == build_message_policy(self.context, original_task=self.task,
+                action=message, evidence=trusted_host_policy['source_witnesses']), 'HOST_MESSAGE_SOURCE_REVALIDATION_FAILED')
+        row = {'schema':'stage2-inspected-route-plan-bundle-v1','origin':self.origin,
             'proposal':copy.deepcopy(proposal),'application_plan':app_plan,
             'host_answer_policy':copy.deepcopy(trusted_host_policy) if host_action else None,
             'inspected_source_witnesses':copy.deepcopy(self.witnesses),'query_log':copy.deepcopy(self.query_log),
@@ -151,4 +167,6 @@ class RoutePlanningSession:
             'all_observed_nodes_available':len(self.context.graph['nodes']),
             'source_citations_checked':True,'semantic_diagnosis_adjudicated':False,
             'verification_tasks_executed':False,'native_actions_executed':0,
-            'repair_agent_generated':False,'live_provider_calls':0,'live_execution_ready':False},'bundle_hash')
+            'repair_agent_generated':False,'live_provider_calls':0,'live_execution_ready':False}
+        if message: row['host_message_policy'] = copy.deepcopy(trusted_host_policy)
+        return seal(row,'bundle_hash')

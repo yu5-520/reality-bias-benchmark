@@ -9,6 +9,9 @@ from stage2.route_repair.planning_session import RoutePlanningSession
 from stage2.route_repair.proposal_authority import ProposalAuthorityCompiler, freeze_task_envelope
 from stage2.route_repair.offline_system import revalidate_bundle
 from stage2.route_repair.connected_provider import ConnectedExchangeSource
+from stage2.route_repair.native_message import ATTRIBUTION
+
+CONNECTED_TOOLS = {**TOOLS, 'message': ['field_path']}
 
 
 def freeze_connected_envelope(context, original_task, **capabilities):
@@ -27,7 +30,7 @@ def mechanical_envelope(envelope):
 
 
 OUTPUT_SCHEMA = {
-    'tool': {'kind': 'TOOL', 'name': 'catalog|node|file|observation|witness', 'arguments': 'exact named tool arguments'},
+    'tool': {'kind': 'TOOL', 'name': 'catalog|node|file|message|observation|witness', 'arguments': 'exact named tool arguments'},
     'no_action': {'kind': 'FINAL', 'decision': 'UNRESOLVED|NO_REPAIR_NEEDED', 'reason': 'scoped explanation',
                   'inspected_refs': [], 'witness_ids': [], 'unknown_relations': ['remaining uncertainty']},
     'repair': {'kind': 'FINAL', 'decision': 'REPAIR', 'proposal': {
@@ -40,6 +43,14 @@ OUTPUT_SCHEMA = {
                        'meaning_before': 'source-supported statement', 'meaning_after': 'source-supported statement',
                        'authority_effect': 'claimed effect', 'limitation': 'uncertainty', 'witness_ids': []}],
         'unknown_relations': [], 'expected_postconditions': [], 'host_answer': None,
+        'host_message': {'action_id': 'unique id or omit host_message for file repair',
+            'target_ref': 'state:host_parent', 'kind': 'PENDING_MESSAGE_REPLACE',
+            'field_path': 'exact task_capabilities.message_fields pointer',
+            'before_value_hash': 'sha256 of UTF-8 current message',
+            'start': 'character offset of unsupported clause', 'end': 'exclusive clause offset',
+            'before_span_hash': 'sha256 of UTF-8 original clause', 'replacement': 'source-qualified replacement clause',
+            'value': ATTRIBUTION + 'source-qualified correction; do not invent process or adoption',
+            'depends_on': [], 'diagnosis_ids': []},
         'application_actions': [{'action_id': 'unique id', 'target_ref': 'writable and inspected file ref',
             'kind': 'TEXT_SPAN_REPLACE|JSON_LEAF_REPLACE', 'start': 'text character offset', 'end': 'exclusive offset',
             'pointer': 'JSON pointer (JSON_LEAF_REPLACE only; omit start/end)',
@@ -102,13 +113,19 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
              'actor_origin': p['transport_binding']['origin'], 'parent_checkpoint_hash': context.parent_checkpoint_hash,
              'graph_hash': context.graph['graph_hash'], 'envelope_hash': envelope['envelope_hash'],
              'profile_hash': p['profile_hash'], 'max_calls': p['max_logical_calls'], 'max_response_bytes': 1_000_000,
-             'provider_calls_enabled': p['transport_binding']['live'], 'tools': copy.deepcopy(TOOLS),
+             'provider_calls_enabled': p['transport_binding']['live'], 'tools': copy.deepcopy(CONNECTED_TOOLS),
              'verification_capabilities_hash': digest(verification_capabilities), 'planning_exit_is_repair_exit': False}, 'binding_hash')
         self._envelope = copy.deepcopy(envelope); self._retained_binding = copy.deepcopy(self._binding)
         self._messages = []; self._transcript = []
         self._started = False; self._closed = False; self._authorization = None; self._outcome = None
         self._source._gate = lambda: self._started and not self._closed
         _json(self.out / 'binding.json', self._binding); _json(self.out / 'task_envelope.json', envelope)
+
+    def tool(self, name, arguments):
+        if name != 'message': return super().tool(name, arguments)
+        require(not self._closed and self._started, 'PLANNING_TOOLS_REVOKED')
+        require(type(arguments) is dict and set(arguments) == {'field_path'}, 'EXACT_PLANNING_TOOL_ARGUMENTS_REQUIRED')
+        return self._session.message(**arguments)
 
     async def run(self):
         require(not self._started, 'PLANNING_FIRST_ATTEMPT_ALREADY_STARTED')
@@ -124,12 +141,17 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
                         'Return exactly one TOOL with name and arguments, or FINAL with decision. REPAIR supplies a '
                         'stage2-complete-route-proposal-v1: task/graph/archive/parent bindings, route refs classified as '
                         'modify/preserve/verify, diagnoses with inspected endpoint witnesses and adoption UNKNOWN or NOT_ESTABLISHED, '
-                        'unknown_relations, expected_postconditions, application_actions, host_answer null, '
+                        'unknown_relations, expected_postconditions, application_actions, host_answer null, optional host_message. '
+                        'A message action must replace only a preauthorized pending content field, begin with the exact '
+                        'repair attribution in output_schema, and cite the current message plus actual prefix sources. '
+                        'Supply exact start/end and before_span_hash, replacement, and value equal to attribution plus '
+                        'original text before start plus replacement plus original text after end. Preserve unrelated message text. '
+                        'Keep original task scope; distinguish failed reads, observed writes and unknown adoption. '
                         'verification_tasks and execution_order. NO_REPAIR_NEEDED or UNRESOLVED supplies reason, inspected_refs, '
                         'witness_ids and unknown_relations. No-action decisions are scoped claims, not semantic certification. '
                         'Task capability membership does not itself justify a repair. No native writes or arbitrary commands are tools.',
                     'output_schema': OUTPUT_SCHEMA, 'verification_capabilities': self._verification_capabilities,
-                    'tools': TOOLS, 'messages': copy.deepcopy(self._messages)}
+                    'tools': CONNECTED_TOOLS, 'messages': copy.deepcopy(self._messages)}
                 self._capture(sequence, 'request', request)
                 calls += 1
                 response = await self._actor.complete(copy.deepcopy(request))

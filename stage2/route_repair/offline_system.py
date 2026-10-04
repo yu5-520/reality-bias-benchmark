@@ -30,6 +30,8 @@ def revalidate_bundle(context, bundle, application_policy, host_policy):
             session.file(request['ref'], request['checkpoint_hash'])
         elif operation == 'current_host_answer':
             session.current_answer()
+        elif operation == 'current_pending_message':
+            session.message(request['field_path'])
         elif operation == 'observation_source':
             session.observation(request['observation_id'], request['ref'])
         elif operation == 'select_source_witness':

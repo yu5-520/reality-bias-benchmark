@@ -17,6 +17,18 @@ from stage2.route_repair.planning_actor import _json, _persist
 from stage2.route_repair.provider_capture import freeze_provider_bindings
 
 CONFIG = 'configs/stage2_connected_provider_v1.json'
+MECHANISM_CONFIG = 'configs/stage2_connected_mechanism_v1.json'
+
+
+def connected_config(context, root):
+    mechanism = json.loads((Path(root) / MECHANISM_CONFIG).read_bytes())
+    if context.parent_checkpoint_hash == mechanism['frozen_parent_checkpoint']:
+        require(len(context.parent['state']['history']) == mechanism['parent_native_sequence']
+                and context.parent['manifest']['remaining_horizon'] == mechanism['subject_trial_max_calls'],
+                'MECHANISM_PARENT_WINDOW_DRIFT')
+        return MECHANISM_CONFIG, mechanism
+    config = json.loads((Path(root) / CONFIG).read_bytes())
+    return CONFIG, config
 
 
 class DeepSeekHTTPTransport:
@@ -91,9 +103,11 @@ def _send(connection, endpoint, raw, out, maximum, private_headers):
 
 def freeze_connected_bindings(context, root, transport):
     base = freeze_provider_bindings(context, root)
-    raw = (Path(root) / CONFIG).read_bytes(); config = json.loads(raw)
+    config_path, config = connected_config(context, root)
+    raw = (Path(root) / config_path).read_bytes()
     require(config['schema'] == 'stage2-connected-provider-config-v1'
-            and config['planning_max_calls'] == 16 and config['subject_trial_max_calls'] == 4
+            and config['planning_max_calls'] == 16 and (config['subject_trial_max_calls'] == 4
+                or (config_path == MECHANISM_CONFIG and config['subject_trial_max_calls'] == 49))
             and config['automatic_paid_reviewer'] is False and config['automatic_replay'] is False,
             'CONNECTED_PROVIDER_CONFIG_DRIFT')
     binding = transport_binding(transport); profiles = {}

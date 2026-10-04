@@ -118,7 +118,7 @@ def build_review_material(root):
             'case_routes.json': routes, 'summary.json': summary}
 
 
-def assess_mechanism_entry(context, contract):
+def assess_mechanism_entry(context, contract, *, trial_config=None):
     """Inspect only the runtime prefix. No retrospective review is passed here.
 
     Current executor grants application-file writes only. Native host message
@@ -146,6 +146,22 @@ def assess_mechanism_entry(context, contract):
     blockers.extend(['NATIVE_REPAIR_CLAIM_CARRIER_BINDING_NOT_IMPLEMENTED',
                      'PREFIX_SEMANTIC_ENTRY_ADJUDICATION_NOT_IMPLEMENTED',
                      'MECHANISM_OBSERVATION_WINDOW_NOT_FROZEN'])
+    bound = False
+    if trial_config is not None and context.parent_checkpoint_hash == trial_config['frozen_parent_checkpoint']:
+        from stage2.route_repair.proposal_authority import freeze_task_envelope
+        from stage2.native_v7.software_host_v1 import TASKS
+        require(trial_config['subject_trial_max_calls'] == context.parent['manifest']['remaining_horizon']
+                and len(state['history']) == trial_config['parent_native_sequence']
+                and trial_config['automatic_replay'] is False
+                and trial_config['application_writes_allowed'] is False, 'MECHANISM_FROZEN_WINDOW_DRIFT')
+        freeze_task_envelope(context, TASKS[state['task_id']], writable_refs=[],
+            message_fields=trial_config['message_fields'], branch_id='mechanism-capability-check',
+            max_actions=trial_config['max_actions'], max_value_bytes=trial_config['max_value_bytes'])
+        bound = True
+        # Readiness here authorizes a hypothesis trial. The planning actor must
+        # inspect and justify its proposal; neither regex nor readiness certifies
+        # a semantic transition, detection outcome or earliest causal entry.
+        blockers = [] if changed and carriers else ['TARGET_TRANSITION_NOT_SUPPORTED_BY_AVAILABLE_PREFIX']
     return seal({'schema': 'stage2-paper-mechanism-entry-assessment-v1',
         'full_id': context.case['full_id'], 'archive_sha256': context.case['archive_sha256'],
         'parent_checkpoint_hash': context.parent_checkpoint_hash,
@@ -157,7 +173,7 @@ def assess_mechanism_entry(context, contract):
             if r.get('tool_result_status') == 'RETURNED_READ_ERROR'],
         'lexical_candidate_is_semantic_diagnosis': False,
         'native_host_message_action_exists': True,
-        'native_repair_claim_carrier_binding_implemented': False,
-        'repair_entry_ready': False, 'blockers': blockers,
+        'native_repair_claim_carrier_binding_implemented': bound,
+        'repair_entry_ready': bound and not blockers, 'blockers': blockers,
         'future_evidence_used': False, 'provider_calls': 0,
         'engineering_fixture_is_mechanism_repair': False}, 'assessment_hash')
