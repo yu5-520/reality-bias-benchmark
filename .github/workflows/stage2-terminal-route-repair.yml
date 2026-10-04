@@ -26,6 +26,8 @@ on:
       - 'configs/stage2_connected_provider_v1.json'
       - 'configs/stage2_connected_mechanism_v1.json'
       - 'scripts/check_stage2_message_repair.py'
+      - 'scripts/validate_stage2_message_followup_evidence.py'
+      - 'stage2/replication_v2/message_corrected_contract_followup_v1/**'
       - 'scripts/review_stage2_connected_repair.py'
       - 'stage2/replication_v2/pending_message_repair_v1/**'
       - 'stage2/replication_v2/connected_http_mcp_preflight_v1/**'
@@ -78,6 +80,9 @@ jobs:
       - name: Verify boundaries and unit checks
         working-directory: .
         run: python -m unittest discover -s stage2/route_repair/tests -v
+      - name: Verify retained live follow-up without provider dispatch
+        working-directory: .
+        run: python scripts/validate_stage2_message_followup_evidence.py
       - name: Materialize the two frozen source archives
         shell: bash
         run: |

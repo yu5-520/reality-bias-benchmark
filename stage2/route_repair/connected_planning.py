@@ -11,7 +11,25 @@ from stage2.route_repair.offline_system import revalidate_bundle
 from stage2.route_repair.connected_provider import ConnectedExchangeSource
 from stage2.route_repair.native_message import ATTRIBUTION
 
-CONNECTED_TOOLS = {**TOOLS, 'message': ['field_path']}
+CONNECTED_TOOLS = {**TOOLS, 'message': ['field_path'], 'span': ['read_id', 'quote']}
+
+TOOL_CONTRACTS = {
+    'catalog': {'purpose': 'Complete prefix index and locators; no source content is read and no witness is selected.',
+        'arguments': {}, 'next_reads': ['node(ref)', 'file(ref, checkpoint_hash)', 'message(field_path)']},
+    'node': {'purpose': 'Inspect node metadata, version locators and observation IDs; not source-content evidence.',
+        'arguments': {'ref': 'exact catalog node ref'}},
+    'file': {'purpose': 'Read actual file content at an available prefix checkpoint; omission selects the parent version.',
+        'arguments': {'ref': 'file:path', 'checkpoint_hash': 'optional exact prefix checkpoint hash'}},
+    'message': {'purpose': 'Read actual pending message content, including fields absent from the catalog file list.',
+        'arguments': {'field_path': 'exact pointer listed in task_capabilities.message_fields'}},
+    'observation': {'purpose': 'Read actual archived observation bytes/text; ref must belong to that observation.',
+        'arguments': {'observation_id': 'ID from node metadata', 'ref': 'one bound node ref'}},
+    'witness': {'purpose': 'Select an exact source span after reading it; returns quote, offsets, text_hash and span_hash.',
+        'arguments': {'read_id': 'host-returned read ID', 'start': 'integer inclusive character offset',
+                      'end': 'integer exclusive character offset; text_length selects the complete read'}},
+    'span': {'purpose': 'Select a unique exact quote from an already read source; host returns witness offsets and span_hash.',
+        'arguments': {'read_id': 'host-returned read ID', 'quote': 'exact nonempty source substring; ambiguous quotes fail'}},
+}
 
 # A single root object, rather than named wrappers around message examples.
 # The API still captures json_object bytes unchanged; host validation remains
@@ -54,7 +72,7 @@ def mechanical_envelope(envelope):
 
 
 OUTPUT_SCHEMA = {
-    'tool': {'kind': 'TOOL', 'name': 'catalog|node|file|message|observation|witness', 'arguments': 'exact named tool arguments'},
+    'tool': {'kind': 'TOOL', 'name': '|'.join(CONNECTED_TOOLS), 'arguments': 'exact named tool arguments'},
     'no_action': {'kind': 'FINAL', 'decision': 'UNRESOLVED|NO_REPAIR_NEEDED', 'reason': 'scoped explanation',
                   'inspected_refs': [], 'witness_ids': [], 'unknown_relations': ['remaining uncertainty']},
     'repair': {'kind': 'FINAL', 'decision': 'REPAIR', 'proposal': {
@@ -70,9 +88,9 @@ OUTPUT_SCHEMA = {
         'host_message': {'action_id': 'unique id or omit host_message for file repair',
             'target_ref': 'state:host_parent', 'kind': 'PENDING_MESSAGE_REPLACE',
             'field_path': 'exact task_capabilities.message_fields pointer',
-            'before_value_hash': 'sha256 of UTF-8 current message',
+            'before_value_hash': 'text_hash returned by the current message read; never invent or calculate a hash',
             'start': 'character offset of unsupported clause', 'end': 'exclusive clause offset',
-            'before_span_hash': 'sha256 of UTF-8 original clause', 'replacement': 'source-qualified replacement clause',
+            'before_span_hash': 'span_hash returned by the selected original-clause witness', 'replacement': 'source-qualified replacement clause',
             'value': ATTRIBUTION + 'source-qualified correction; do not invent process or adoption',
             'depends_on': [], 'diagnosis_ids': []},
         'application_actions': [{'action_id': 'unique id', 'target_ref': 'writable and inspected file ref',
@@ -146,10 +164,26 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
         _json(self.out / 'binding.json', self._binding); _json(self.out / 'task_envelope.json', envelope)
 
     def tool(self, name, arguments):
+        if name == 'span':
+            require(not self._closed and self._started, 'PLANNING_TOOLS_REVOKED')
+            require(type(arguments) is dict and set(arguments) == {'read_id', 'quote'},
+                    'EXACT_PLANNING_TOOL_ARGUMENTS_REQUIRED')
+            return self._session.span(**arguments)
         if name != 'message': return super().tool(name, arguments)
         require(not self._closed and self._started, 'PLANNING_TOOLS_REVOKED')
         require(type(arguments) is dict and set(arguments) == {'field_path'}, 'EXACT_PLANNING_TOOL_ARGUMENTS_REQUIRED')
         return self._session.message(**arguments)
+
+    def source_read_state(self):
+        """Host-owned progress; listing a source cannot turn it into a read."""
+        return {'metadata_inspected_refs': sorted(self._session.inspected_nodes),
+            'actual_source_reads': [{k: copy.deepcopy(r[k]) for k in
+                ['read_id', 'ref', 'text_hash', 'text_length']} for r in self._session.reads.values()],
+            'selected_witnesses': [{k: copy.deepcopy(w[k]) for k in
+                ['witness_id', 'read_id', 'ref', 'start', 'end', 'span_hash']} for w in self._session.witnesses.values()],
+            'pending_message_sources': [{'field_path': p, 'ref': 'state:host_parent', 'read_tool': 'message'}
+                for p in self._envelope.get('message_fields', [])],
+            'catalog_is_source_read': False, 'source_evidence_grants_write_permission': False}
 
     async def run(self):
         require(not self._started, 'PLANNING_FIRST_ATTEMPT_ALREADY_STARTED')
@@ -163,6 +197,15 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
                     'task_capabilities': self._envelope,
                     'instructions': ROOT_MESSAGE_INSTRUCTION +
                         'Inspect the complete available prefix using read-only tools. No future evidence is available. '
+                        'Catalog and node metadata are navigation, not file/message reads or selected witnesses. '
+                        'Use tool_contracts and the host-owned source_read_state to choose actual reads. '
+                        'An available pending message is read with message(field_path), even if it is absent from the file index. '
+                        'Assess process-account consistency and authority as well as original task progression: '
+                        'functionality or recorded file writes alone cannot certify that a pending process claim needs no repair. '
+                        'Do not presume any inconsistency or adoption before reading its sources. '
+                        'Copy version hashes and offsets from read/witness results; span selects a unique exact quote. '
+                        'NO_REPAIR_NEEDED requires actual selected witnesses covering every inspected_ref in its declared scope. '
+                        'UNRESOLVED may declare empty inspected_refs/witness_ids when no source was read; do not invent inspection. '
                         'Return exactly one TOOL with name and arguments, or FINAL with decision. REPAIR supplies a '
                         'stage2-complete-route-proposal-v1: task/graph/archive/parent bindings, route refs classified as '
                         'modify/preserve/verify, diagnoses with inspected endpoint witnesses and adoption UNKNOWN or NOT_ESTABLISHED, '
@@ -177,7 +220,10 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
                         'Task capability membership does not itself justify a repair. No native writes or arbitrary commands are tools.',
                     'response_contract': RESPONSE_CONTRACT,
                     'output_schema': OUTPUT_SCHEMA, 'verification_capabilities': self._verification_capabilities,
-                    'tools': CONNECTED_TOOLS, 'messages': copy.deepcopy(self._messages)}
+                    'tools': CONNECTED_TOOLS, 'tool_contracts': TOOL_CONTRACTS,
+                    'source_read_state': self.source_read_state(),
+                    'remaining_responses_including_this': self._binding['max_calls'] - sequence + 1,
+                    'messages': copy.deepcopy(self._messages)}
                 self._capture(sequence, 'request', request)
                 calls += 1
                 response = await self._actor.complete(copy.deepcopy(request))

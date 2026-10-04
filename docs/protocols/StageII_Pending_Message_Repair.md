@@ -134,7 +134,7 @@ No alias conversion, permission widening, paid resampling or reclassification of
 the failed trial is performed. Two regression tests cover the captured failure
 and a valid read-only root message. The original delivery seal is reproduced
 from its head-96 source tree; current prompt behavior has its own CI execution
-receipt. Real model acceptance of the clarified contract remains unmeasured.
+receipt. The separately registered follow-up below measures acceptance of the clarified root grammar without establishing repair efficacy.
 
 ## Separately registered clarified-contract follow-up
 
@@ -152,3 +152,27 @@ The passed delivery check is reused as an exact-tree CI prerequisite. Only
 the zero-call immutable-entry check is repeated before dispatch. Semantic
 review is source-bound and read-only, without an automatically paid evaluator;
 any root analysis is non-blind and must be identified as such.
+
+## Captured follow-up and source-read interface result
+
+Run `37210176711` at head `77a98a567870391c8689c83882a16c8de8f6e0dd`
+made two planning calls. The first used `kind` correctly and queried the catalog.
+The second declared `NO_REPAIR_NEEDED` while listing ten unread refs and no
+selected witness. The host rejected it with `NO_ACTION_SOURCE_NOT_INSPECTED`.
+No native branch, repair or subject continuation was created. The unchanged
+original artifact is sealed under
+`stage2/replication_v2/message_corrected_contract_followup_v1/`; its analysis
+explains the source limits and does not classify this as an accepted no-repair
+result. No automatic additional model trial is scheduled.
+
+The current request now includes exact tool semantics and host-owned actual
+read/witness state. Catalog and node navigation cannot masquerade as source
+inspection; the pending message tool is explicitly discoverable. Read results
+supply character lengths, and selected witnesses supply source-derived span
+hashes. A read-only `span(read_id, quote)` selector accepts only an exact unique
+quote in an already read source, resolves offsets mechanically and records the
+ordinary replayable witness operation. The compiler re-reads sources and rejects
+forged witness values. Native write scope and no-action source requirements are
+unchanged. The current scripted delivery uses 16 planning calls including a
+selected clause witness; the original 15-call seal is still reproduced from its
+original implementation tree.

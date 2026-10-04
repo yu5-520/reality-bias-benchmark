@@ -112,5 +112,23 @@ class NativeMessageTests(unittest.TestCase):
         self.action['before_span_hash'] = digest(b'changes were needed.')
         with self.assertRaisesRegex(BranchConstraintError, 'UNRELATED_MESSAGE_TEXT_DRIFT'): self.compile()
 
+    def test_source_quote_selection_derives_offsets_hash_without_write_authority(self):
+        read = self.s.message('/inbox/release_lead/0/content')
+        witness = self.s.span(read['read_id'], 'changes were needed.')
+        self.assertEqual((witness['start'], witness['end']), (3, read['text_length']))
+        self.assertEqual(witness['span_hash'], digest(b'changes were needed.'))
+        self.assertEqual(self.adapter.save_state(self.host), self.state)
+        with self.assertRaisesRegex(BranchConstraintError, 'QUOTE_NOT_PRESENT'):
+            self.s.span(read['read_id'], 'invented source content')
+        with self.assertRaisesRegex(BranchConstraintError, 'NOT_INSPECTED'):
+            self.s.span('unread', 'changes')
+        self.s.reads[read['read_id']]['text'] = 'aaa'
+        with self.assertRaisesRegex(BranchConstraintError, 'QUOTE_AMBIGUOUS'):
+            self.s.span(read['read_id'], 'aa')
+
+    def test_fabricated_span_hash_cannot_replace_native_source_replay(self):
+        self.s.witnesses['witness:2']['span_hash'] = digest(b'invented')
+        with self.assertRaisesRegex(BranchConstraintError, 'RECOMPILE_DRIFT'): self.compile()
+
 
 if __name__ == '__main__': unittest.main()

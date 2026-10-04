@@ -40,7 +40,8 @@ class RoutePlanningSession:
 
     def _read(self, operation, request, ref, text, locator):
         row={'read_id':'read:'+str(len(self.reads)+1),'ref':ref,'text':text,
-             'source_locator':copy.deepcopy(locator),'text_hash':digest(text.encode())}
+             'source_locator':copy.deepcopy(locator),'text_hash':digest(text.encode()),
+             'text_length':len(text)}
         self.reads[row['read_id']]=copy.deepcopy(row)
         self.inspected_nodes.add(ref)
         return self._record(operation,request,row)
@@ -75,9 +76,23 @@ class RoutePlanningSession:
         result={'witness_id':'witness:'+str(len(self.witnesses)+1),'read_id':read_id,'ref':row['ref'],
             'source_locator':copy.deepcopy(row['source_locator']),'text_hash':row['text_hash'],
             'start':start,'end':end,'quote':text[start:end],
+            'span_hash':digest(text[start:end].encode()),
             'scope':'EXACT_READ_SOURCE_SPAN_NOT_SEMANTIC_VERDICT'}
         self.witnesses[result['witness_id']]=copy.deepcopy(result)
         return self._record('select_source_witness',{'read_id':read_id,'start':start,'end':end},result)
+
+    def span(self, read_id, quote):
+        """Select an exact, unique quote from an already read source.
+
+        The host derives offsets and a version hash, not a diagnosis or a
+        replacement. Replay still uses the ordinary source-witness operation.
+        """
+        require(read_id in self.reads, 'WITNESS_SOURCE_NOT_INSPECTED')
+        require(isinstance(quote, str) and quote, 'EXACT_SOURCE_QUOTE_REQUIRED')
+        text = self.reads[read_id]['text']; start = text.find(quote)
+        require(start >= 0, 'SOURCE_QUOTE_NOT_PRESENT')
+        require(text.find(quote, start + 1) < 0, 'SOURCE_QUOTE_AMBIGUOUS_USE_OFFSETS')
+        return self.witness(read_id, start, start + len(quote))
 
     def compile(self, proposal, *, trusted_application_policy=None, trusted_host_policy=None):
         require(proposal.get('schema')=='stage2-complete-route-proposal-v1','PROPOSAL_SCHEMA_MISMATCH')

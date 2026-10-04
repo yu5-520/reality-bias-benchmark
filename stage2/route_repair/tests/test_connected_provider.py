@@ -3,6 +3,7 @@ import copy
 import json
 import os
 import unittest
+import zipfile
 from pathlib import Path
 from unittest.mock import patch
 from types import SimpleNamespace
@@ -254,6 +255,46 @@ class ConnectedProviderTests(unittest.TestCase):
             self.assertEqual(result['state'], 'COMPLETED')
             self.assertEqual(result['tool_queries'], 1)
             self.assertEqual(result['actor_calls'], 2)
+
+    def test_captured_catalog_only_no_repair_stays_rejected_without_replay(self):
+        pack = ROOT / 'stage2/replication_v2/message_corrected_contract_followup_v1/evidence.zip'
+        with zipfile.ZipFile(pack) as archive:
+            prefix = 'mechanism-corrected-contract-followup/planning_http/'
+            contents = [json.loads(archive.read(prefix + f'{n:04d}/response.bin'))
+                ['choices'][0]['message']['content'] for n in [1, 2]]
+        with FixtureHTTPServer([fixture_reply(c) for c in contents]) as server:
+            planning = self.planner(server)
+            with self.assertRaisesRegex(BranchConstraintError, 'NO_ACTION_SOURCE_NOT_INSPECTED'):
+                asyncio.run(planning.run())
+            self.assertEqual(planning.outcome['actor_calls'], 2)
+            self.assertEqual(planning.outcome['tool_queries'], 1)
+            self.assertIsNone(planning._authorization)
+            second = json.loads(json.loads(server.requests[1])['messages'][1]['content'])
+            self.assertEqual(second['source_read_state']['actual_source_reads'], [])
+            self.assertEqual(second['source_read_state']['selected_witnesses'], [])
+            self.assertFalse(second['source_read_state']['catalog_is_source_read'])
+            self.assertIn('pending message', second['tool_contracts']['message']['purpose'])
+            with self.assertRaisesRegex(BranchConstraintError, 'TOOLS_REVOKED'):
+                planning.tool('span', {'read_id': 'read:1', 'quote': 'invented'})
+
+    def test_host_progress_tracks_actual_read_and_source_selected_hash(self):
+        from stage2.r7_checkpoint_v1.common import digest
+        text = self.c.read_file('file:b.py')['content']
+        rows = [fixture_reply(json.dumps({'kind': 'TOOL', 'name': 'file', 'arguments': {'ref': 'file:b.py'}})),
+                fixture_reply(json.dumps({'kind': 'TOOL', 'name': 'span', 'arguments': {'read_id': 'read:1', 'quote': text}})),
+                fixture_reply(final())]
+        with FixtureHTTPServer(rows) as server:
+            planning = self.planner(server); asyncio.run(planning.run())
+            requests = [json.loads(json.loads(raw)['messages'][1]['content']) for raw in server.requests]
+        self.assertEqual(requests[0]['source_read_state']['actual_source_reads'], [])
+        actual = requests[1]['source_read_state']['actual_source_reads'][0]
+        self.assertEqual(actual['text_hash'], digest(text.encode()))
+        self.assertEqual(actual['text_length'], len(text))
+        witness = requests[2]['source_read_state']['selected_witnesses'][0]
+        self.assertEqual(witness['span_hash'], actual['text_hash'])
+        self.assertEqual((witness['start'], witness['end']), (0, len(text)))
+        self.assertEqual([r['remaining_responses_including_this'] for r in requests], [16, 15, 14])
+        self.assertEqual(planning._session.query_log[-1]['operation'], 'select_source_witness')
 
     def test_late_process_log_changes_cannot_mutate_retained_wire_snapshots(self):
         from stage2.route_repair.connected_mcp import ConnectedMCPCheckout
