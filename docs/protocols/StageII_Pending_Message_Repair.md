@@ -218,3 +218,15 @@ The captured trial's semantic interpretation, source reading and witness
 selection remain separate findings. Historical and latest runtime delivery
 checks use their own original code trees; invalid live replies are never aliased
 or silently completed by the host.
+
+## Final-interface acceptance registration
+
+The renewed instruction at 2026-10-05 04:20:30 Asia/Shanghai registers one
+complete acceptance trial of exact implementation `4cb473b76c566c9011367b3019475fff57253a00`,
+verified by CI `37215546721`. The new immutable request binds all three prior
+failed attempts and the current critical source hashes. Model parameters,
+parent checkpoint, one-message capability, 16 planning / 49 subject limits,
+native ceiling 64 and application-write prohibition are unchanged. The workflow
+reuses the successful exact-tree CI, performs the zero-call immutable-entry
+check and retains every response or partial failure. Spent requests remain
+unchanged; no automatic rerun or paid evaluator is enabled.
