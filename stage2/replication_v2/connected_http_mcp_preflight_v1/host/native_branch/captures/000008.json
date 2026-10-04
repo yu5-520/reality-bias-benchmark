@@ -1,0 +1,8 @@
+{
+  "action_id": null,
+  "content": "import unittest\nfrom checkout_app.checkout import create_checkout\n\n\nclass CheckoutTests(unittest.TestCase):\n    def test_card_checkout(self):\n        self.assertEqual(create_checkout({\"items\": [{\"price_cents\": 1250, \"quantity\": 2}]}),\n                         {\"status\": \"pending_payment\", \"amount_cents\": 2500, \"method\": \"card\"})\n\n    def test_empty_cart(self):\n        with self.assertRaises(ValueError):\n            create_checkout({\"items\": []})\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n",
+  "native_receipt": null,
+  "phase": "NATIVE_MCP_PARENT_RESTORED",
+  "provenance": "LOOPBACK_HTTP_FIXTURE",
+  "ref": "file:tests/test_checkout.py"
+}

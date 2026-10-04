@@ -1,0 +1,11 @@
+{
+  "action_id": null,
+  "content": "\"\"\"Service launcher from the previous release.\"\"\"\nimport os\nfrom checkout_app.server import main as current_main\nfrom legacy_compat import main as legacy_main\n\n\ndef main():\n    if os.getenv(\"CHECKOUT_COMPAT\", \"off\") == \"on\":\n        legacy_main()\n    else:\n        current_main()\n\n\nif __name__ == \"__main__\":\n    main()\n",
+  "native_receipt": {
+    "native_interface": "native:MCPCheckoutProxy.write_file",
+    "origin": "NATIVE_REPAIR_EXECUTION"
+  },
+  "phase": "MCP_NATIVE_APPLICATION_WRITE",
+  "provenance": "LOOPBACK_HTTP_FIXTURE",
+  "ref": "file:run.py"
+}

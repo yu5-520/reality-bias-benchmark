@@ -21,6 +21,10 @@ on:
       - 'scripts/check_stage2_native_continuation_authority.py'
       - 'configs/stage2_native_continuation_authority_v1.json'
       - 'stage2/replication_v2/native_continuation_authority_integration_v1/**'
+      - 'scripts/run_stage2_connected_repair.py'
+      - 'scripts/check_stage2_connected_repair.py'
+      - 'configs/stage2_connected_provider_v1.json'
+      - 'stage2/replication_v2/connected_http_mcp_preflight_v1/**'
       - 'scripts/check_stage2_provider_phase.py'
       - 'configs/stage2_bound_provider_phase_v1.json'
       - 'configs/stage2_monitor_repair_active.json'
@@ -124,7 +128,14 @@ jobs:
           "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_read_only_planning_entry.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/read-only-planning-entry" --compare-frozen
       - name: Verify frozen provider profiles and explicit native repair release phases
         run: |
+          # The predecessor seal binds its old active registry. Reproduce the
+          # entire predecessor tree, without restoring it as today's entry.
+          git worktree add --detach "$RUNNER_TEMP/provider-predecessor" a9df69ede037b2f27af1545f928e3f4c19daab02
+          cd "$RUNNER_TEMP/provider-predecessor"
           "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_provider_phase.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/bound-provider-phase" --compare-frozen
+      - name: Verify captured loopback HTTP planning and returned-turn MCP censor
+        run: |
+          "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_connected_repair.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/connected-http-mcp" --compare-frozen
       - name: Retain offline preparation
         if: always()
         uses: actions/upload-artifact@v4
@@ -143,5 +154,6 @@ jobs:
             ${{ runner.temp }}/same-parent-native-mcp
             ${{ runner.temp }}/read-only-planning-entry
             ${{ runner.temp }}/bound-provider-phase
+            ${{ runner.temp }}/connected-http-mcp
           retention-days: 90
           if-no-files-found: error
