@@ -176,3 +176,14 @@ forged witness values. Native write scope and no-action source requirements are
 unchanged. The current scripted delivery uses 16 planning calls including a
 selected clause witness; the original 15-call seal is still reproduced from its
 original implementation tree.
+
+## Renewed source-read-contract trial
+
+The source-read correction passed exact-head integration CI `37210936192` at
+`e97180d0bc8be45b312337adde76a3f1f3ed9bf4`; enhanced-monitor validation also
+passed. The renewed user instruction at 2026-10-04 23:48:26 Asia/Shanghai
+authorizes one separately registered source-read-contract trial. Its new
+request binds this successful implementation, all four critical source hashes
+and both preserved failures. The old workflow requests remain spent and
+unchanged. The new workflow enforces one run, the same 16/49 limits and parent,
+no application writes, no natural rerun and no automatic paid evaluator.
