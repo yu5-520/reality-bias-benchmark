@@ -21,6 +21,9 @@ on:
       - 'scripts/check_stage2_native_continuation_authority.py'
       - 'configs/stage2_native_continuation_authority_v1.json'
       - 'stage2/replication_v2/native_continuation_authority_integration_v1/**'
+      - 'scripts/check_stage2_same_parent_native_mcp.py'
+      - 'configs/stage2_same_parent_native_mcp_v1.json'
+      - 'stage2/replication_v2/same_parent_native_mcp_integration_v1/**'
       - 'scripts/check_stage2_source_based_host_branch.py'
       - 'scripts/validate_stage2_source_based_host_branch.py'
       - 'stage2/replication_v2/source_based_host_branch_integration_v1/**'
@@ -95,6 +98,20 @@ jobs:
       - name: Verify nonterminal native host restore and automatic proposal authority
         run: |
           python scripts/check_stage2_native_continuation_authority.py --source-root "$RUNNER_TEMP/sources" --graph-root "$RUNNER_TEMP/terminal-graphs" --out "$RUNNER_TEMP/native-continuation-authority" --compare-frozen
+      - name: Bind the unchanged frozen official MCP runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/modelcontextprotocol/python-sdk "$RUNNER_TEMP/same-parent-mcp-sdk"
+          git -C "$RUNNER_TEMP/same-parent-mcp-sdk" checkout -q f1b6589088534632fef92238ee9750951e3c0185
+          git clone -q https://github.com/modelcontextprotocol/modelcontextprotocol "$RUNNER_TEMP/same-parent-mcp-protocol"
+          git -C "$RUNNER_TEMP/same-parent-mcp-protocol" checkout -q 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          python -m pip install -q uv
+          cd "$RUNNER_TEMP/same-parent-mcp-sdk"
+          uv sync --frozen --no-default-groups --python "$(command -v python)"
+      - name: Verify prefix-safe same-parent MCP repair and scripted continuation
+        run: |
+          "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_same_parent_native_mcp.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/same-parent-native-mcp" --compare-frozen
       - name: Retain offline preparation
         if: always()
         uses: actions/upload-artifact@v4
@@ -110,5 +127,6 @@ jobs:
             ${{ runner.temp }}/monitor-repair-system
             ${{ runner.temp }}/independent-repair-review
             ${{ runner.temp }}/native-continuation-authority
+            ${{ runner.temp }}/same-parent-native-mcp
           retention-days: 90
           if-no-files-found: error

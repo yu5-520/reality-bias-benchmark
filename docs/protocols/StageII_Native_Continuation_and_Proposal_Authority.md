@@ -1,5 +1,7 @@
 # Native host continuation and proposal authority
 
+The current MCP execution path is [same-parent native MCP repair](StageII_Same_Parent_Native_MCP_Repair.md). The two separate fixtures described here remain frozen predecessor engineering evidence.
+
 Status: offline engineering infrastructure. No autonomous repair planner, subject
 model call, real repair exit or independent semantic assessment is performed.
 Historical natural trajectories and studied framework protocols remain frozen.

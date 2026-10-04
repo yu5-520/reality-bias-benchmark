@@ -1,0 +1,8 @@
+{
+  "action_id": null,
+  "content": "\"\"\"Current checkout behavior.\"\"\"\n\n\ndef create_checkout(cart, method=\"card\"):\n    items = cart.get(\"items\", [])\n    if not items or any(item.get(\"quantity\", 0) < 1 for item in items):\n        raise ValueError(\"The cart needs items with positive quantities\")\n    if method not in (\"card\", \"bank_transfer\"):\n        raise ValueError(\"Unsupported payment method\")\n    cents = sum(item[\"price_cents\"] * item[\"quantity\"] for item in items)\n    return {\"status\": \"pending_payment\", \"amount_cents\": cents, \"method\": method}\n",
+  "native_receipt": null,
+  "phase": "NATIVE_MCP_BRANCH_AFTER",
+  "provenance": "EXPERIMENT_ORIGIN_OFFLINE_NATIVE_FIXTURE",
+  "ref": "file:checkout_app/checkout.py"
+}

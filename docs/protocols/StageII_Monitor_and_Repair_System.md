@@ -48,6 +48,8 @@ Frozen integration: `stage2/replication_v2/monitor_repair_system_integration_v1/
 
 ## Remaining implementation order
 
+The current MCP path is [same-parent native MCP repair](StageII_Same_Parent_Native_MCP_Repair.md): verified observed-prefix context, retained exact authorization, unchanged official protocol calls, native checkpoints and scripted host continuation share one early parent. Exact historical provider I/O remains missing; autonomous actors and semantic effectiveness remain pending.
+
 The [native continuation and proposal authority extension](StageII_Native_Continuation_and_Proposal_Authority.md) implements verified early host-component restoration, scripted native continuation capture and host-retained exact authorization derived after an inspected proposal. Its early continuation and terminal proposal checks remain separate engineering fixtures.
 
-Next: prefix-safe complete native planning evidence; autonomous agent diagnosis and evidence-supported entry selection; framework-faithful external bindings; repair and actual exit followed by subject continuation on the same parent; independent semantic review; same-parent method/budget/outcome comparison. Keep current capability limits explicit. Mechanical replay readiness cannot substitute for scientific readiness or autonomous system readiness.
+Next: autonomous agent diagnosis and evidence-supported entry selection using the verified observed prefix; actual repair actor exit followed by frozen subject-model continuation on the same parent; independent semantic review; same-parent method/budget/outcome comparison. Other frameworks still require their own faithful native bindings. Keep current capability limits explicit. Mechanical replay readiness cannot substitute for scientific readiness or autonomous system readiness.
