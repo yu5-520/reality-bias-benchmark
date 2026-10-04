@@ -1,6 +1,6 @@
 > P2 replay correction: the v1 graph promotion and localization comparison are withdrawn. See [native evidence replay correction](docs/protocols/StageII_P2_Replay_Correction_v2.md). Frozen v1 files remain historical evidence.
 
-> Current monitoring/repair engineering: [same-parent native MCP integration](docs/protocols/StageII_Same_Parent_Native_MCP_Repair.md), with [system contract and offline coordination](docs/protocols/StageII_Monitor_and_Repair_System.md). Verified prefix evidence, proposal-derived exact constraints, official MCP writes, host checks and scripted native continuation now share one early parent. Autonomous planning, actual agent exit, subject-model continuation and independent semantic effectiveness remain pending.
+> Current monitoring/repair engineering: [read-only planning protocol and host entry](docs/protocols/StageII_Read_Only_Planning_Entry.md), [same-parent native MCP integration](docs/protocols/StageII_Same_Parent_Native_MCP_Repair.md), with [system contract and offline coordination](docs/protocols/StageII_Monitor_and_Repair_System.md). Verified prefix evidence, a bounded read-only planning conversation, proposal-derived exact constraints, official MCP writes, host checks and scripted native continuation now share one early parent. Scoped no-repair, unresolved evidence and failed attempts are retained without repair dispatch. Autonomous planning, actual agent exit, subject-model continuation and independent semantic effectiveness remain pending.
 
 # reality-bias-benchmark
 

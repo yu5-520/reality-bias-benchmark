@@ -1,5 +1,6 @@
 # Same-parent native MCP repair and observed-prefix planning
 
+> The [read-only planning entry](StageII_Read_Only_Planning_Entry.md) now exercises the tool conversation and host dispatch boundary above this unchanged sealed integration. Its planning actor remains scripted; live planning, actual agent exit and semantic effectiveness are pending.
 Status: offline engineering. This is the current supported MCP integration path.
 It joins a verified early native parent, observed-prefix source queries, exact
 post-proposal authorization, official MCP application writes, host checks,

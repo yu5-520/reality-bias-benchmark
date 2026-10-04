@@ -21,6 +21,9 @@ on:
       - 'scripts/check_stage2_native_continuation_authority.py'
       - 'configs/stage2_native_continuation_authority_v1.json'
       - 'stage2/replication_v2/native_continuation_authority_integration_v1/**'
+      - 'scripts/check_stage2_read_only_planning_entry.py'
+      - 'configs/stage2_read_only_planning_entry_v1.json'
+      - 'stage2/replication_v2/read_only_planning_entry_integration_v1/**'
       - 'scripts/check_stage2_same_parent_native_mcp.py'
       - 'configs/stage2_same_parent_native_mcp_v1.json'
       - 'stage2/replication_v2/same_parent_native_mcp_integration_v1/**'
@@ -112,6 +115,9 @@ jobs:
       - name: Verify prefix-safe same-parent MCP repair and scripted continuation
         run: |
           "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_same_parent_native_mcp.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/same-parent-native-mcp" --compare-frozen
+      - name: Verify read-only planning protocol and same-parent MCP host entry
+        run: |
+          "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_read_only_planning_entry.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/read-only-planning-entry" --compare-frozen
       - name: Retain offline preparation
         if: always()
         uses: actions/upload-artifact@v4
@@ -128,5 +134,6 @@ jobs:
             ${{ runner.temp }}/independent-repair-review
             ${{ runner.temp }}/native-continuation-authority
             ${{ runner.temp }}/same-parent-native-mcp
+            ${{ runner.temp }}/read-only-planning-entry
           retention-days: 90
           if-no-files-found: error
