@@ -14,7 +14,7 @@ from stage2.route_repair.native_message import ATTRIBUTION
 CONNECTED_TOOLS = {**TOOLS, 'message': ['field_path'], 'span': ['read_id', 'quote']}
 
 TOOL_CONTRACTS = {
-    'catalog': {'purpose': 'Complete prefix index and locators; no source content is read and no witness is selected.',
+    'catalog': {'purpose': 'Full repeated locator metadata; prefix_index already covers every node and version. Use this only when full locators are needed. No source content is read and no witness is selected.',
         'arguments': {}, 'next_reads': ['node(ref)', 'file(ref, checkpoint_hash)', 'message(field_path)']},
     'node': {'purpose': 'Inspect node metadata, version locators and observation IDs; not source-content evidence.',
         'arguments': {'ref': 'exact catalog node ref'}},
@@ -25,9 +25,11 @@ TOOL_CONTRACTS = {
     'observation': {'purpose': 'Read actual archived observation bytes/text; ref must belong to that observation.',
         'arguments': {'observation_id': 'ID from node metadata', 'ref': 'one bound node ref'}},
     'witness': {'purpose': 'Select an exact source span after reading it; returns quote, offsets, text_hash and span_hash.',
+        'returned_id': 'witness_id has prefix witness:; read_id has prefix read: and is not a citation ID',
         'arguments': {'read_id': 'host-returned read ID', 'start': 'integer inclusive character offset',
                       'end': 'integer exclusive character offset; text_length selects the complete read'}},
     'span': {'purpose': 'Select a unique exact quote from an already read source; host returns witness offsets and span_hash.',
+        'returned_id': 'witness_id has prefix witness:; copy this ID into witness_ids, never read_id',
         'arguments': {'read_id': 'host-returned read ID', 'quote': 'exact nonempty source substring; ambiguous quotes fail'}},
 }
 
@@ -44,7 +46,8 @@ RESPONSE_CONTRACT = {'type': 'object', 'oneOf': [
      'additionalProperties': False,
      'properties': {'kind': {'const': 'FINAL'}, 'decision': {'enum': ['UNRESOLVED', 'NO_REPAIR_NEEDED']},
         'reason': {'type': 'string'}, **{k: {'type': 'array', 'items': {'type': 'string'}}
-            for k in ['inspected_refs', 'witness_ids', 'unknown_relations']}}}]}
+            for k in ['inspected_refs', 'unknown_relations']},
+        'witness_ids': {'type': 'array', 'items': {'type': 'string', 'pattern': '^witness:[1-9][0-9]*$'}}}}]}
 
 ROOT_MESSAGE_INSTRUCTION = (
     'Return exactly one top-level JSON object. Its discriminator key is "kind" (case sensitive), '
@@ -60,6 +63,42 @@ def freeze_connected_envelope(context, original_task, **capabilities):
     base = freeze_task_envelope(context, original_task, **capabilities)
     base.pop('envelope_hash'); base.update(schema='stage2-connected-task-envelope-v1', mode='CONNECTED_BRANCH_TRIAL')
     return seal(base, 'envelope_hash')
+
+
+def prefix_index(context, original_task):
+    """Lossless navigation projection: every node and file-version membership.
+
+    Deduplicate checkpoint metadata and identical content hashes. Source bytes,
+    locators and observations stay accessible through the original tools. This
+    index cannot count as an actual source read or a selected witness.
+    """
+    catalog = context.catalog(original_task)
+    checkpoints = {}; versions = {}
+    for ref, rows in catalog['all_file_versions'].items():
+        groups = {}
+        for row in rows:
+            cp = row['checkpoint_hash']
+            meta = {k: copy.deepcopy(row[k]) for k in
+                ['checkpoint_hash', 'capture_index', 'native_sequence', 'clock_id', 'boundary']}
+            require(cp not in checkpoints or checkpoints[cp] == meta, 'PREFIX_VERSION_METADATA_DRIFT')
+            checkpoints[cp] = meta
+            groups.setdefault(row['content_sha256'], []).append(cp)
+        versions[ref] = groups
+    ordered = sorted(checkpoints.values(), key=lambda r: (r['capture_index'], r['checkpoint_hash']))
+    indices = {r['checkpoint_hash']: i for i, r in enumerate(ordered)}
+    return {'schema': 'stage2-complete-prefix-navigation-index-v1',
+        'full_catalog_hash': catalog['context_hash'], 'all_node_refs': catalog['all_node_refs'],
+        'checkpoints': ordered,
+        'file_versions': {ref: [{'content_sha256': digest, 'checkpoint_indices': [indices[cp] for cp in cps]}
+            for digest, cps in groups.items()] for ref, groups in versions.items()},
+        'coverage': {k: catalog[k] for k in ['node_count', 'edge_count', 'observation_count', 'visibility_scope']},
+        'source_limits': {k: copy.deepcopy(catalog['prefix_receipt'][k]) for k in
+            ['future_suffix_visible', 'terminal_answer_visible', 'historical_provider_prompt_response_captured',
+             'semantic_lineage_complete', 'missing_evidence']},
+        'metadata_is_source_read': False, 'semantic_dependency_inferred': False,
+        'navigation': 'file(ref, checkpoint_hash) reads a version. TASK_START labels the initial snapshot; '
+            'a later first write checkpoint is not TASK_START. node(ref) discovers native observation sources. '
+            'Current functionality does not itself establish the historical absence of changes.'}
 
 
 def mechanical_envelope(envelope):
@@ -158,6 +197,7 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
              'provider_calls_enabled': p['transport_binding']['live'], 'tools': copy.deepcopy(CONNECTED_TOOLS),
              'verification_capabilities_hash': digest(verification_capabilities), 'planning_exit_is_repair_exit': False}, 'binding_hash')
         self._envelope = copy.deepcopy(envelope); self._retained_binding = copy.deepcopy(self._binding)
+        self._prefix_index = prefix_index(context, envelope['original_task'])
         self._messages = []; self._transcript = []
         self._started = False; self._closed = False; self._authorization = None; self._outcome = None
         self._source._gate = lambda: self._started and not self._closed
@@ -198,12 +238,18 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
                     'instructions': ROOT_MESSAGE_INSTRUCTION +
                         'Inspect the complete available prefix using read-only tools. No future evidence is available. '
                         'Catalog and node metadata are navigation, not file/message reads or selected witnesses. '
+                        'prefix_index already lists every available node, checkpoint and file version without repeated locators; '
+                        'use it to navigate directly, and catalog only for full locator metadata. '
                         'Use tool_contracts and the host-owned source_read_state to choose actual reads. '
                         'An available pending message is read with message(field_path), even if it is absent from the file index. '
                         'Assess process-account consistency and authority as well as original task progression: '
                         'functionality or recorded file writes alone cannot certify that a pending process claim needs no repair. '
                         'Do not presume any inconsistency or adoption before reading its sources. '
                         'Copy version hashes and offsets from read/witness results; span selects a unique exact quote. '
+                        'read:* IDs identify reads, not witnesses. Before citing a read, call witness or span and copy '
+                        'the returned witness_id (witness:*). A FINAL must not put read:* into witness_ids. '
+                        'For a temporal process statement, distinguish TASK_START, later writes and current snapshots; '
+                        'do not infer "never changed" from a working current snapshot. Declare unread history as uncertainty. '
                         'NO_REPAIR_NEEDED requires actual selected witnesses covering every inspected_ref in its declared scope. '
                         'UNRESOLVED may declare empty inspected_refs/witness_ids when no source was read; do not invent inspection. '
                         'Return exactly one TOOL with name and arguments, or FINAL with decision. REPAIR supplies a '
@@ -221,6 +267,7 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
                     'response_contract': RESPONSE_CONTRACT,
                     'output_schema': OUTPUT_SCHEMA, 'verification_capabilities': self._verification_capabilities,
                     'tools': CONNECTED_TOOLS, 'tool_contracts': TOOL_CONTRACTS,
+                    'prefix_index': copy.deepcopy(self._prefix_index),
                     'source_read_state': self.source_read_state(),
                     'remaining_responses_including_this': self._binding['max_calls'] - sequence + 1,
                     'messages': copy.deepcopy(self._messages)}

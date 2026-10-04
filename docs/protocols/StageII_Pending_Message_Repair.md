@@ -187,3 +187,34 @@ request binds this successful implementation, all four critical source hashes
 and both preserved failures. The old workflow requests remain spent and
 unchanged. The new workflow enforces one run, the same 16/49 limits and parent,
 no application writes, no natural rerun and no automatic paid evaluator.
+
+## Captured source-read trial and typed navigation result
+
+Run `37214544344`, head `15d0d75acd69162458a6d80159508e884e27df36`,
+made seven planning calls and five actual content reads: the pending message,
+current HTML/JavaScript, HTML at native checkpoint 10 and the original tests.
+The final no-repair claim put four `read:*` IDs in `witness_ids` without invoking
+any witness selection. It failed closed with `NO_ACTION_SOURCE_NOT_INSPECTED`.
+No native branch or post-exit observation exists. The original 86-member ZIP is
+sealed under `stage2/replication_v2/message_source_read_contract_trial_v1/`.
+Its validator checks all bytes and can replay the separate non-blind prefix
+analysis against the immutable archive; that analysis is not a post-repair
+independent review. Both earlier failures remain unchanged.
+
+The current contract now explicitly distinguishes read IDs from witness IDs,
+provides literal returned-ID semantics and a witness-ID pattern, and explains
+that a current working feature does not establish a history of no modification.
+A complete `prefix_index` deduplicates locator metadata while retaining every
+node and file/checkpoint/content-hash membership. It labels TASK_START separately
+from later native checkpoints. The verified navigation representation is 31,803
+bytes versus the original catalog's 184,134 bytes, with all 563 nodes and 192
+file-version memberships preserved. Full locators, graph relations and original
+source bytes remain accessible through the original tools, without a depth cutoff.
+The index itself does not count as reading or witnessing source content.
+
+This corrects discoverability and protocol burden. It does not certify that a
+model will reconstruct historical process semantics or generate a valid repair.
+The captured trial's semantic interpretation, source reading and witness
+selection remain separate findings. Historical and latest runtime delivery
+checks use their own original code trees; invalid live replies are never aliased
+or silently completed by the host.

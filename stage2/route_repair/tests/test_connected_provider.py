@@ -296,6 +296,41 @@ class ConnectedProviderTests(unittest.TestCase):
         self.assertEqual([r['remaining_responses_including_this'] for r in requests], [16, 15, 14])
         self.assertEqual(planning._session.query_log[-1]['operation'], 'select_source_witness')
 
+    def test_read_id_cannot_be_used_as_no_repair_witness_after_actual_read(self):
+        invalid = {'kind': 'FINAL', 'decision': 'NO_REPAIR_NEEDED', 'reason': 'Unselected read is not a witness.',
+            'inspected_refs': ['file:b.py'], 'witness_ids': ['read:1'], 'unknown_relations': ['Uninspected process history.']}
+        rows = [fixture_reply(json.dumps({'kind': 'TOOL', 'name': 'file', 'arguments': {'ref': 'file:b.py'}})),
+                fixture_reply(json.dumps(invalid))]
+        with FixtureHTTPServer(rows) as server:
+            planning = self.planner(server)
+            with self.assertRaisesRegex(BranchConstraintError, 'NO_ACTION_SOURCE_NOT_INSPECTED'):
+                asyncio.run(planning.run())
+        self.assertEqual(len(planning._session.reads), 1)
+        self.assertEqual(planning._session.witnesses, {})
+        self.assertIsNone(planning._authorization)
+        self.assertEqual(planning.outcome['actor_calls'], 2)
+
+    def test_navigation_projection_keeps_every_node_and_file_version_without_source_reads(self):
+        from stage2.route_repair.connected_planning import prefix_index
+        original = self.c.catalog(self.fixture.host.task)
+        index = prefix_index(self.c, self.fixture.host.task)
+        self.assertEqual(index['all_node_refs'], original['all_node_refs'])
+        for ref, rows in original['all_file_versions'].items():
+            expected = sorted((r['checkpoint_hash'], r['content_sha256']) for r in rows)
+            recovered = sorted((index['checkpoints'][i]['checkpoint_hash'], group['content_sha256'])
+                for group in index['file_versions'][ref] for i in group['checkpoint_indices'])
+            self.assertEqual(recovered, expected)
+        self.assertFalse(index['metadata_is_source_read'])
+        self.assertFalse(index['source_limits']['future_suffix_visible'])
+        with FixtureHTTPServer([fixture_reply(final())]) as server:
+            planning = self.planner(server); asyncio.run(planning.run())
+            request = json.loads(json.loads(server.requests[0])['messages'][1]['content'])
+        self.assertEqual(request['prefix_index'], index)
+        self.assertEqual(request['source_read_state']['actual_source_reads'], [])
+        self.assertIn('witness:', request['tool_contracts']['span']['returned_id'])
+        no_action = request['response_contract']['oneOf'][2]['properties']
+        self.assertEqual(no_action['witness_ids']['items']['pattern'], '^witness:[1-9][0-9]*$')
+
     def test_late_process_log_changes_cannot_mutate_retained_wire_snapshots(self):
         from stage2.route_repair.connected_mcp import ConnectedMCPCheckout
         from stage2.r7_checkpoint_v1.common import digest
