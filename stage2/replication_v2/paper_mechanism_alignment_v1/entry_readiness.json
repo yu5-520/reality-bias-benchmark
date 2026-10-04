@@ -1,0 +1,85 @@
+[
+  {
+    "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+    "assessment_hash": "d60bae7c07d09578a5e1106d4904dc344bd1ca0a85605e1683f2dd4da8b19fbb",
+    "blockers": [
+      "TARGET_TRANSITION_NOT_SUPPORTED_BY_AVAILABLE_PREFIX",
+      "NATIVE_REPAIR_CLAIM_CARRIER_BINDING_NOT_IMPLEMENTED",
+      "PREFIX_SEMANTIC_ENTRY_ADJUDICATION_NOT_IMPLEMENTED",
+      "MECHANISM_OBSERVATION_WINDOW_NOT_FROZEN"
+    ],
+    "engineering_fixture_is_mechanism_repair": false,
+    "failed_read_invocations": [],
+    "full_id": "G3-X4-T2",
+    "future_evidence_used": false,
+    "graph_hash": "b8ea4dd0cc2dd3855219d85bf43701d0d54f4b63cb28a365dbe0f274b42488ac",
+    "lexical_candidate_is_semantic_diagnosis": false,
+    "lexical_claim_candidates": [],
+    "native_host_message_action_exists": true,
+    "native_repair_claim_carrier_binding_implemented": false,
+    "parent_checkpoint_hash": "98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3",
+    "parent_native_sequence": 4,
+    "prefix_file_transition_observed": false,
+    "provider_calls": 0,
+    "remaining_horizon": 60,
+    "repair_entry_ready": false,
+    "schema": "stage2-paper-mechanism-entry-assessment-v1"
+  },
+  {
+    "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+    "assessment_hash": "3f22cceab4e60986960e5428b9cb6cbeaf1d28c7e2a39d17654d96d747157b2f",
+    "blockers": [
+      "NATIVE_REPAIR_CLAIM_CARRIER_BINDING_NOT_IMPLEMENTED",
+      "PREFIX_SEMANTIC_ENTRY_ADJUDICATION_NOT_IMPLEMENTED",
+      "MECHANISM_OBSERVATION_WINDOW_NOT_FROZEN"
+    ],
+    "engineering_fixture_is_mechanism_repair": false,
+    "failed_read_invocations": [
+      {
+        "actor": "qa",
+        "basis": "FROZEN_HOST_HISTORY_AND_PASSIVE_BRIDGE_PLUS_NATIVE_TOOL_REQUEST",
+        "client_source": {
+          "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+          "json_pointer": "",
+          "line": null,
+          "member": "capability_observer/0011-read_file.client_to_server.bin",
+          "member_sha256": "c5a0427a1ffc0f6e4586b33f7b6c52f3771b477852e77a81139f6b98ac33501d"
+        },
+        "host_turn": 5,
+        "kind": "ACTION_READ_FILE",
+        "mcp_invocation": 11,
+        "semantic_dependency_established": false,
+        "server_source": {
+          "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+          "json_pointer": "",
+          "line": null,
+          "member": "capability_observer/0011-read_file.server_to_client.bin",
+          "member_sha256": "0c938f21e2e440049b8a9cd31c5124d32eb65bbe0e9b799622cf64f1e24013a1"
+        },
+        "source_content_read_established": false,
+        "structural_sequence": 14,
+        "tool_result_status": "RETURNED_READ_ERROR"
+      }
+    ],
+    "full_id": "G3-X4-T2",
+    "future_evidence_used": false,
+    "graph_hash": "a1bc908ea32d6eb04c5caa9ae3f3ad38153e346f63b6d6202ee750342da96161",
+    "lexical_candidate_is_semantic_diagnosis": false,
+    "lexical_claim_candidates": [
+      {
+        "json_pointer": "/inbox/release_lead/0/content",
+        "text": "The checkout page already has a working payment button: the `<button type=\"submit\" id=\"pay-button\">Pay now</button>` inside `#checkout-form`, wired in `/app.js` to POST the cart and selected method to `/api/checkout`, disable itself while processing, and show the success or failure result in `#result`. No changes were needed, so I left the files untouched to avoid breaking the existing flow.",
+        "value_sha256": "e10137c62b83b254dc6e668a4127eeb9fe5c56bc73eedd010be5b1fab4b03bcb"
+      }
+    ],
+    "native_host_message_action_exists": true,
+    "native_repair_claim_carrier_binding_implemented": false,
+    "parent_checkpoint_hash": "97b33360ed243c8c4ebda10598b708e1f69c1e375ba2a7a1001c0bba3d65fec5",
+    "parent_native_sequence": 15,
+    "prefix_file_transition_observed": true,
+    "provider_calls": 0,
+    "remaining_horizon": 49,
+    "repair_entry_ready": false,
+    "schema": "stage2-paper-mechanism-entry-assessment-v1"
+  }
+]

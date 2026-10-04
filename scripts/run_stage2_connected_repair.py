@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Execute a single captured provider trial on the frozen nonterminal MCP parent.
 
-Default is zero-call preflight. --execute uses DEEPSEEK_API_KEY in memory. Failed
-or censored trials are never replayed. A paid independent reviewer is not invoked.
+Default is a mechanism preflight. --purpose engineering explicitly selects the
+transport/application trial, which cannot establish paper-mechanism repair.
+Failed or censored trials are never replayed. No paid reviewer is invoked.
 """
 import argparse
 import asyncio
@@ -20,6 +21,7 @@ from stage2.route_repair.connected_mcp import ConnectedPlanningRepairEntry
 from stage2.route_repair.mcp_same_parent import verify_mcp_environment, decode_repair_tool_result
 from stage2.route_repair.independent_review import RepairReviewContext
 from stage2.route_repair.system_contract import read_capture_member
+from stage2.route_repair.paper_alignment import load_contract, assess_mechanism_entry
 
 
 def load_context(source_root):
@@ -76,11 +78,14 @@ async def execute(context, transport, out, sdk_root, protocol_root):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     for name in ['source-root', 'sdk-root', 'protocol-root', 'out']: p.add_argument('--'+name, required=True, type=Path)
+    p.add_argument('--purpose', choices=['mechanism', 'engineering'], default='mechanism')
     p.add_argument('--execute', action='store_true'); args = p.parse_args()
     require(not args.out.exists(), 'FRESH_CONNECTED_TRIAL_OUTPUT_REQUIRED_NO_REPLAY')
     context = load_context(args.source_root)
     try:
         verify_mcp_environment(args.sdk_root, args.protocol_root)
+        contract = load_contract(ROOT)
+        mechanism = assess_mechanism_entry(context, contract)
         if not args.execute:
             bindings = freeze_connected_bindings(context, ROOT, LoopbackHTTPTransport(18081))
             summary = seal({'schema': 'stage2-connected-trial-preflight-v1', 'provider_calls': 0,
@@ -88,8 +93,11 @@ def main():
                 'parent_checkpoint_hash': context.parent_checkpoint_hash, 'remaining_horizon': context.parent['manifest']['remaining_horizon'],
                 'planning_limit': 16, 'subject_trial_limit': 4, 'native_ceiling': context.parent['state']['max_turns'],
                 'execution_armed': False, 'repair_success': False, 'automatic_paid_reviewer': False,
+                'trial_purpose': args.purpose, 'mechanism_entry': mechanism,
                 'transport_binding': 'PLANNED_HTTPS_ENDPOINT_NOT_A_PROVIDER_CALL'}, 'preflight_hash')
             save(args.out / 'preflight.json', summary); print(json.dumps(summary)); return
+        if args.purpose == 'mechanism':
+            require(mechanism['repair_entry_ready'], 'PAPER_MECHANISM_ENTRY_BLOCKED:' + ','.join(mechanism['blockers']))
         # A missing credential fails before directories, requests or model attempts.
         transport = DeepSeekHTTPTransport()
         # The bound driver retains its key; application subprocesses do not

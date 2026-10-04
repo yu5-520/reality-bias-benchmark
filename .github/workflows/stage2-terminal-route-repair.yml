@@ -28,6 +28,9 @@ on:
       - 'scripts/check_stage2_provider_phase.py'
       - 'configs/stage2_bound_provider_phase_v1.json'
       - 'configs/stage2_monitor_repair_active.json'
+      - 'configs/stage2_paper_mechanism_contract_v1.json'
+      - 'scripts/prepare_stage2_paper_alignment.py'
+      - 'stage2/replication_v2/paper_mechanism_alignment_v1/**'
       - 'stage2/replication_v2/bound_provider_phase_preflight_v1/**'
       - 'scripts/check_stage2_read_only_planning_entry.py'
       - 'configs/stage2_read_only_planning_entry_v1.json'
@@ -122,9 +125,12 @@ jobs:
           uv sync --frozen --no-default-groups --python "$(command -v python)"
       - name: Verify prefix-safe same-parent MCP repair and scripted continuation
         run: |
+          git worktree add --detach "$RUNNER_TEMP/connected-predecessor" c5c6516a1646690cdf600f1794f4eee138c5c9fd
+          cd "$RUNNER_TEMP/connected-predecessor"
           "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_same_parent_native_mcp.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/same-parent-native-mcp" --compare-frozen
       - name: Verify read-only planning protocol and same-parent MCP host entry
         run: |
+          cd "$RUNNER_TEMP/connected-predecessor"
           "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_read_only_planning_entry.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/read-only-planning-entry" --compare-frozen
       - name: Verify frozen provider profiles and explicit native repair release phases
         run: |
@@ -135,7 +141,14 @@ jobs:
           "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_provider_phase.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/bound-provider-phase" --compare-frozen
       - name: Verify captured loopback HTTP planning and returned-turn MCP censor
         run: |
+          # Its seal binds the engineering entry and registry before the paper gate.
+          cd "$RUNNER_TEMP/connected-predecessor"
           "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_connected_repair.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/connected-http-mcp" --compare-frozen
+      - name: Verify corrected paper reference partitions and native prefix readiness
+        run: |
+          python scripts/validate_stage2_chronology_semantic_review.py
+          python scripts/prepare_stage2_paper_alignment.py --source-root "$RUNNER_TEMP/sources" --out "$RUNNER_TEMP/paper-alignment" --compare-frozen
+          "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/run_stage2_connected_repair.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/paper-entry-preflight"
       - name: Retain offline preparation
         if: always()
         uses: actions/upload-artifact@v4
@@ -155,5 +168,7 @@ jobs:
             ${{ runner.temp }}/read-only-planning-entry
             ${{ runner.temp }}/bound-provider-phase
             ${{ runner.temp }}/connected-http-mcp
+            ${{ runner.temp }}/paper-alignment
+            ${{ runner.temp }}/paper-entry-preflight
           retention-days: 90
           if-no-files-found: error

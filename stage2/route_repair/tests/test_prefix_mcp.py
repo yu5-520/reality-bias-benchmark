@@ -65,12 +65,12 @@ class PrefixMCPTests(unittest.TestCase):
         for c in self.contexts: c.close()
         self.tmp.cleanup()
 
-    def context(self):
+    def context(self, *, retain_failed_reads=False):
         with tarfile.open(self.path, 'w:gz') as stream:
             for name, raw in self.members.items():
                 item = tarfile.TarInfo(name); item.size = len(raw); stream.addfile(item, io.BytesIO(raw))
         c = PrefixMCPContext(self.path, full_id='FIXTURE-X4-T2', archive_sha256=digest(self.path.read_bytes()),
-                             parent_checkpoint_hash=self.cp)
+                             parent_checkpoint_hash=self.cp, retain_failed_reads=retain_failed_reads)
         self.contexts.append(c); return c
 
     def authorization(self, c):
@@ -144,6 +144,17 @@ class PrefixMCPTests(unittest.TestCase):
         rows = copy.deepcopy(self.rows); rows[-1]['model_decision_sequence'] = 0
         self.members['checkpoint_ledger.json'] = json.dumps({'checkpoints': rows}).encode()
         with self.assertRaisesRegex(BranchConstraintError, 'LEDGER_CLOCK_INVALID'): self.context()
+
+    def test_explicit_failed_read_retention_does_not_establish_read_content(self):
+        member = 'capability_observer/0001-read_file.server_to_client.bin'
+        row = json.loads(self.members[member]); row['result']['isError'] = True
+        row['result']['content'] = [{'text': 'Error executing tool read_file'}]
+        self.members[member] = json.dumps(row).encode()
+        c = self.context(retain_failed_reads=True)
+        invocation = c.prefix_receipt['invocation_membership_bindings'][0]
+        self.assertEqual(invocation['tool_result_status'], 'RETURNED_READ_ERROR')
+        self.assertFalse(invocation['source_content_read_established'])
+        self.assertFalse(invocation['semantic_dependency_established'])
 
     def test_native_result_decoder_is_repair_only_and_requires_exact_wrapper(self):
         self.assertEqual(decode_repair_tool_result({'result': json.dumps('native file')}, str), 'native file')

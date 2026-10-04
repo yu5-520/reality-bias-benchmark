@@ -2,6 +2,13 @@
 
 The current entry is `ConnectedPlanningRepairEntry` in `configs/stage2_monitor_repair_active.json`. It accepts a host-bound provider planning session and returns after native repair, before host release. It has no legacy fallback. Older sealed implementations remain reproducible on their own frozen trees.
 
+The executable now defaults to paper-mechanism preflight. Its frozen checkpoint
+4 does not yet contain the paper's write-to-no-change-account transition. A
+mechanism `--execute` is blocked before transport construction. Explicit
+`--purpose engineering` selects the existing application/transport trial and
+does not establish mechanism repair. The current contract and readiness evidence
+are described in `StageII_Paper_Mechanism_Alignment.md`.
+
 ## Implemented behavior
 
 `connected_provider.py` adds a one-attempt HTTPS transport for the frozen DeepSeek endpoint and a separate loopback socket fixture. The model alias, parameters, original task, framework source hashes and native parent come from retained host bindings. Credentials exist only in memory. Each request body is durably recorded before dispatch; status, non-secret headers and each response chunk are recorded before decoding. HTTP failures, malformed replies, incomplete bodies, model-name drift and uncertain transport failures close the source without retry or budget refund. Native model content remains unchanged, including malformed action JSON. A configured or reported model name does not verify backend identity. `provider_calls` counts live HTTP dispatch attempts, not confirmed successful inference; historical provider-attempt counts remain unknown.
@@ -38,6 +45,14 @@ python scripts/run_stage2_connected_repair.py \
   --out /absolute/fresh/preflight
 ```
 
-With the already configured credential, `--execute` starts one new captured derived trial in another fresh output directory. It does not reread future trajectory material or rerun the frozen natural experiment. The operator does not prescribe a fix: the provider may return REPAIR, a scoped NO_REPAIR_NEEDED or UNRESOLVED. The host offers only the original native test suite as the engineering checker, excludes its test files from the repair write envelope and refuses an absent suite. The transport retains the provider key in memory; the executable entry removes it from the environment inherited by application subprocesses. This is an application permission boundary, not an OS sandbox. Bytecode generation is disabled for this process environment to avoid introducing cache files into the branch; native framework and command sources are unchanged.
+With the configured credential, `--purpose engineering --execute` selects one
+new captured engineering trial in a fresh directory. This is distinct from the
+currently blocked paper-mechanism trial. It does not reread future trajectory
+material or rerun the frozen natural experiment. The provider may return REPAIR,
+a scoped NO_REPAIR_NEEDED or UNRESOLVED. The host offers only the original native
+test suite as the engineering checker, excludes its test files from repair writes
+and refuses an absent suite. The transport retains its key in memory; application
+subprocesses do not inherit it. This is an application permission boundary, not
+an OS sandbox. Framework and command sources remain unchanged.
 
 There is no automatic paid launch on push, no format resampling, no continuation restart, no promotion and no automatic paid evaluation. The available connector in this session has no workflow-dispatch operation; a real provider run cannot be claimed from the passing offline workflow.

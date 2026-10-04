@@ -12,7 +12,7 @@ from collections import defaultdict
 from types import SimpleNamespace
 
 from stage2.r7_checkpoint_v1.common import digest
-from stage2.native_v7.software_host_v1 import TASKS
+from stage2.native_v7.software_host_v1 import TASKS, ROLES
 from stage2.monitor_enhancement.frozen_archive import NativeArchive
 from stage2.monitor_enhancement.evidence_graph import EvidenceGraph
 from stage2.route_repair.native_continuation import load_host_parent, continuation_blocker
@@ -23,8 +23,27 @@ TOOLS = {'ACTION_LIST_FILES': 'list_files', 'ACTION_READ_FILE': 'read_file',
 WIRE = re.compile(r'capability_observer/(\d+)-(.+)\.(client_to_server|server_to_client|server_stderr)\.bin')
 
 
+def validate_finalize_handoff(turn, row, position, action_count, post_state):
+    """Only a last-action specialist handoff can occur in a resumable prefix.
+
+    The unchanged host breaks its action loop at every finalize. Its coordinator
+    finalizes the run; a specialist instead appends a result to that coordinator.
+    Declared actions after finalize are therefore not observable executed actions.
+    """
+    entry = ROLES['entry_agent']
+    require(turn['role'] != entry and position == action_count - 1
+            and row['object_refs'] == ['state:finalize:' + turn['role']],
+            'PREFIX_FINALIZE_ACTION_AMBIGUITY')
+    require(post_state['stop_reason'] is None and post_state['queue']
+            and post_state['queue'][-1] == entry
+            and post_state['inbox'][entry]
+            and post_state['inbox'][entry][-1].get('from') == turn['role'],
+            'PREFIX_FINALIZE_HANDOFF_NOT_OBSERVED')
+
+
 class PrefixMCPContext:
-    def __init__(self, archive, *, full_id, archive_sha256, parent_checkpoint_hash):
+    def __init__(self, archive, *, full_id, archive_sha256, parent_checkpoint_hash,
+                 retain_failed_reads=False):
         require(full_id.split('-')[1] == 'X4', 'PREFIX_BINDING_ONLY_SUPPORTS_NATIVE_MCP_HOST')
         self._archive = NativeArchive(archive, full_id, archive_sha256)
         ar = self._archive
@@ -40,7 +59,7 @@ class PrefixMCPContext:
             # rejected actions whose native execution cannot be inferred.
             require(all(h['valid'] is True and type(h['actions']) is int and h['actions'] >= 0
                         for h in state['history']), 'AMBIGUOUS_PREFIX_ENVELOPE_MEMBERSHIP')
-            native_rows, annotations, allowed_cp = [], [], set()
+            native_rows, annotations, allowed_cp, native_states = [], [], set(), {}
             previous = -1
             for row in whole_ledger['checkpoints']:
                 seq = row['model_decision_sequence']
@@ -54,6 +73,8 @@ class PrefixMCPContext:
                     require(row['boundary'] != 'TERMINAL' and p['state']['stop_reason'] is None,
                             'EARLY_PREFIX_CONTAINS_TERMINAL_OR_STOPPED_STATE')
                     native_rows.append(copy.deepcopy(row)); allowed_cp.add(cp)
+                    require(seq not in native_states, 'PREFIX_DUPLICATE_NATIVE_CAPTURE')
+                    native_states[seq] = p['state']
                 else:
                     require(row['boundary'] == 'FIRST_MONITOR_REPAIR_ELIGIBLE_POINT',
                             'PREFIX_UNSUPPORTED_LEDGER_ANNOTATION')
@@ -71,9 +92,8 @@ class PrefixMCPContext:
                 for index, row in enumerate(rows, cursor):
                     require(row['sequence'] == index + 1 and row['actor'] == turn['role']
                             and row['kind'].startswith('ACTION_'), 'PREFIX_HOST_BRIDGE_CORRESPONDENCE_MISMATCH')
-                    # A finalize may stop before remaining actions run. A prefix
-                    # with such an envelope is not supported by this binding.
-                    require(row['kind'] != 'ACTION_FINALIZE', 'PREFIX_FINALIZE_ACTION_AMBIGUITY')
+                    if row['kind'] == 'ACTION_FINALIZE':
+                        validate_finalize_handoff(turn, row, index - cursor, len(rows), native_states[turn['turn']])
                     binding = {'structural_sequence': index + 1, 'host_turn': turn['turn'],
                                'actor': turn['role'], 'kind': row['kind']}
                     if row['kind'] in TOOLS:
@@ -100,8 +120,14 @@ class PrefixMCPContext:
                         'PREFIX_MCP_INVOCATION_AMBIGUITY')
                 call = calls[0]
                 replies = [r for r in incoming if r.get('id') == call['id']]
-                require(len(replies) == 1 and 'result' in replies[0] and 'error' not in replies[0]
-                        and not replies[0]['result'].get('isError', False), 'PREFIX_MCP_TOOL_RESULT_NOT_ESTABLISHED')
+                require(len(replies) == 1 and 'result' in replies[0] and 'error' not in replies[0],
+                        'PREFIX_MCP_TOOL_RESULT_NOT_ESTABLISHED')
+                require(type(replies[0]['result']) is dict
+                        and type(replies[0]['result'].get('isError', False)) is bool,
+                        'PREFIX_MCP_TOOL_RESULT_NOT_ESTABLISHED')
+                tool_error = replies[0]['result'].get('isError', False)
+                require(not tool_error or (retain_failed_reads and tool == 'read_file'),
+                        'PREFIX_MCP_TOOL_RESULT_NOT_ESTABLISHED')
                 if tool in {'read_file', 'write_file'}:
                     require(row['object_refs'] == ['file:' + call['params']['arguments']['path']],
                             'PREFIX_MCP_PATH_BINDING_MISMATCH')
@@ -111,6 +137,9 @@ class PrefixMCPContext:
                     'server_source': ar.source(pair['server_to_client'][0]),
                     'basis': 'FROZEN_HOST_HISTORY_AND_PASSIVE_BRIDGE_PLUS_NATIVE_TOOL_REQUEST',
                     'semantic_dependency_established': False})
+                if tool_error:
+                    invocations[-1].update(tool_result_status='RETURNED_READ_ERROR',
+                                           source_content_read_established=False)
 
             allowed = {'checkpoint_ledger.json', 'monitor_evidence.json'}
             for name in ar.members:
