@@ -21,3 +21,10 @@ postconditions; new raw exchange bytes can differ without rewriting this seal.
 See `docs/protocols/StageII_Pending_Message_Repair.md` for live execution and
 independent source-query review entries. The previous paper-alignment and other
 historical seals remain unchanged and run against their original source trees.
+
+The live first attempt at commit `96acfc60` made one planning provider call and
+failed the type/kind root-message boundary before source queries or native writes.
+`first_attempt_observation.json` separately retains hash-bound projections from
+the original CI artifact. The three original sealed files remain unchanged.
+Current root-contract clarification is regression-tested without another paid
+attempt; CI reproduces this delivery seal from its original implementation tree.

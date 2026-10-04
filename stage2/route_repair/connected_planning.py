@@ -13,6 +13,30 @@ from stage2.route_repair.native_message import ATTRIBUTION
 
 CONNECTED_TOOLS = {**TOOLS, 'message': ['field_path']}
 
+# A single root object, rather than named wrappers around message examples.
+# The API still captures json_object bytes unchanged; host validation remains
+# exact and does not coerce a model's type/kind spelling or resample a reply.
+RESPONSE_CONTRACT = {'type': 'object', 'oneOf': [
+    {'type': 'object', 'required': ['kind', 'name', 'arguments'], 'additionalProperties': False,
+     'properties': {'kind': {'const': 'TOOL'}, 'name': {'enum': list(CONNECTED_TOOLS)},
+                    'arguments': {'type': 'object'}}},
+    {'type': 'object', 'required': ['kind', 'decision', 'proposal'], 'additionalProperties': False,
+     'properties': {'kind': {'const': 'FINAL'}, 'decision': {'const': 'REPAIR'}, 'proposal': {'type': 'object'}}},
+    {'type': 'object', 'required': ['kind', 'decision', 'reason', 'inspected_refs', 'witness_ids', 'unknown_relations'],
+     'additionalProperties': False,
+     'properties': {'kind': {'const': 'FINAL'}, 'decision': {'enum': ['UNRESOLVED', 'NO_REPAIR_NEEDED']},
+        'reason': {'type': 'string'}, **{k: {'type': 'array', 'items': {'type': 'string'}}
+            for k in ['inspected_refs', 'witness_ids', 'unknown_relations']}}}]}
+
+ROOT_MESSAGE_INSTRUCTION = (
+    'Return exactly one top-level JSON object. Its discriminator key is "kind" (case sensitive), '
+    'with value "TOOL" or "FINAL". A tool response is exactly '
+    '{"kind":"TOOL","name":"catalog","arguments":{}} with the chosen tool name and arguments. '
+    'A repair response is exactly {"kind":"FINAL","decision":"REPAIR","proposal":{...}}. '
+    'A no-action response has kind, decision, reason, inspected_refs, witness_ids, unknown_relations. '
+    'Use response_contract for the root object; output_schema contains descriptions of alternatives, '
+    'not wrapper keys to return. A top-level "type" field is invalid. ')
+
 
 def freeze_connected_envelope(context, original_task, **capabilities):
     base = freeze_task_envelope(context, original_task, **capabilities)
@@ -137,7 +161,8 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
                 request = {'schema': 'stage2-connected-planning-request-v1',
                     'binding': self._binding, 'original_task': self._envelope['original_task'],
                     'task_capabilities': self._envelope,
-                    'instructions': 'Inspect the complete available prefix using read-only tools. No future evidence is available. '
+                    'instructions': ROOT_MESSAGE_INSTRUCTION +
+                        'Inspect the complete available prefix using read-only tools. No future evidence is available. '
                         'Return exactly one TOOL with name and arguments, or FINAL with decision. REPAIR supplies a '
                         'stage2-complete-route-proposal-v1: task/graph/archive/parent bindings, route refs classified as '
                         'modify/preserve/verify, diagnoses with inspected endpoint witnesses and adoption UNKNOWN or NOT_ESTABLISHED, '
@@ -150,6 +175,7 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
                         'verification_tasks and execution_order. NO_REPAIR_NEEDED or UNRESOLVED supplies reason, inspected_refs, '
                         'witness_ids and unknown_relations. No-action decisions are scoped claims, not semantic certification. '
                         'Task capability membership does not itself justify a repair. No native writes or arbitrary commands are tools.',
+                    'response_contract': RESPONSE_CONTRACT,
                     'output_schema': OUTPUT_SCHEMA, 'verification_capabilities': self._verification_capabilities,
                     'tools': CONNECTED_TOOLS, 'messages': copy.deepcopy(self._messages)}
                 self._capture(sequence, 'request', request)

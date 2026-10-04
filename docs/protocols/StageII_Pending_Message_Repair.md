@@ -109,3 +109,29 @@ validator checks provenance and completeness; it does not establish semantic
 truth or a universal effectiveness rate. The previous paper-alignment artifacts
 and historical integration seals remain unchanged and are reproduced from their
 original code trees.
+
+## Observed first live attempt and interface correction
+
+Run `37205090807` at head `96acfc60970109591f08213fd26a3ca2cc0ff23f`
+dispatched exactly one planning call. The provider returned a complete response
+whose content was `{"type":"TOOL","name":"message","arguments":{"field_path":"/inbox/release_lead/0/content"}}`
+(the retained content includes its original spaces). The planner required the
+root discriminator `kind`, so it closed with
+`EXACT_READ_ONLY_TOOL_MESSAGE_REQUIRED` before any source query, repair action
+or subject call. No authorization, actual repair-agent exit or semantic result
+was produced. The full failed artifact remains available as artifact `11304078695`.
+
+Read-only inspection run `37205267797` downloaded that original artifact without
+calling a provider. `first_attempt_observation.json` records source hashes and
+job-log projections; it does not pretend to reconstruct the original raw bytes.
+The initial instructions' implicit discriminator is a plausible contributor to
+this format mismatch, not proof of its cause.
+
+The current planner now supplies an explicit, closed root `response_contract`
+and literal examples using case-sensitive `kind`. Its strict parser still rejects
+the historical `type` response, preserves it unchanged and closes after one call.
+No alias conversion, permission widening, paid resampling or reclassification of
+the failed trial is performed. Two regression tests cover the captured failure
+and a valid read-only root message. The original delivery seal is reproduced
+from its head-96 source tree; current prompt behavior has its own CI execution
+receipt. Real model acceptance of the clarified contract remains unmeasured.

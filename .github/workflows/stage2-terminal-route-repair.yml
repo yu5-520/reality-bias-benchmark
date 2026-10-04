@@ -162,7 +162,11 @@ jobs:
       - name: Verify active exact message repair through native closure
         working-directory: .
         run: |
+          git worktree add --detach "$RUNNER_TEMP/message-repair-predecessor" 96acfc60970109591f08213fd26a3ca2cc0ff23f
+          cd "$RUNNER_TEMP/message-repair-predecessor"
           "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_message_repair.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/message-repair" --compare-frozen
+          cd "$GITHUB_WORKSPACE"
+          "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/check_stage2_message_repair.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/current-message-repair"
           "$RUNNER_TEMP/same-parent-mcp-sdk/.venv/bin/python" scripts/run_stage2_connected_repair.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/same-parent-mcp-sdk" --protocol-root "$RUNNER_TEMP/same-parent-mcp-protocol" --out "$RUNNER_TEMP/paper-entry-preflight"
       - name: Retain offline preparation
         if: always()
@@ -186,5 +190,6 @@ jobs:
             ${{ runner.temp }}/paper-alignment
             ${{ runner.temp }}/paper-entry-preflight
             ${{ runner.temp }}/message-repair
+            ${{ runner.temp }}/current-message-repair
           retention-days: 90
           if-no-files-found: error

@@ -226,6 +226,35 @@ class ConnectedProviderTests(unittest.TestCase):
             with self.assertRaisesRegex(BranchConstraintError,'BINDING_MUTATED'): asyncio.run(planning.run())
             self.assertEqual(server.requests,[])
 
+    def test_retained_first_attempt_type_spelling_stays_rejected_without_replay(self):
+        # Actual first-attempt content from the captured model response. Preserve
+        # this failure; a clearer prompt must not silently convert it to a tool.
+        content = '{"type": "TOOL", "name": "message", "arguments": {"field_path": "/inbox/release_lead/0/content"}}'
+        with FixtureHTTPServer([fixture_reply(content), fixture_reply(final())]) as server:
+            planning = self.planner(server)
+            with self.assertRaisesRegex(BranchConstraintError, 'EXACT_READ_ONLY_TOOL_MESSAGE_REQUIRED'):
+                asyncio.run(planning.run())
+            self.assertEqual(server.position, 1)
+            self.assertEqual(planning.outcome['tool_queries'], 0)
+            self.assertEqual(planning.outcome['native_actions_executed'], 0)
+            self.assertEqual(planning.outcome['state'], 'FAILED')
+            self.assertTrue(planning.outcome['tools_revoked'])
+            response = json.loads((planning._source.out / '0001/response.bin').read_bytes())
+            self.assertEqual(response['choices'][0]['message']['content'], content)
+
+    def test_root_contract_and_literal_kind_example_match_the_read_only_parser(self):
+        catalog = json.dumps({'kind': 'TOOL', 'name': 'catalog', 'arguments': {}})
+        with FixtureHTTPServer([fixture_reply(catalog), fixture_reply(final())]) as server:
+            planning = self.planner(server); result = asyncio.run(planning.run())
+            request = json.loads(server.requests[0])
+            host_request = json.loads(request['messages'][1]['content'])
+            self.assertIn('"kind":"TOOL"', host_request['instructions'])
+            self.assertEqual(host_request['response_contract']['oneOf'][0]['required'], ['kind', 'name', 'arguments'])
+            self.assertFalse(host_request['response_contract']['oneOf'][0]['additionalProperties'])
+            self.assertEqual(result['state'], 'COMPLETED')
+            self.assertEqual(result['tool_queries'], 1)
+            self.assertEqual(result['actor_calls'], 2)
+
     def test_late_process_log_changes_cannot_mutate_retained_wire_snapshots(self):
         from stage2.route_repair.connected_mcp import ConnectedMCPCheckout
         from stage2.r7_checkpoint_v1.common import digest
