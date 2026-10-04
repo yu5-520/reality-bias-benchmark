@@ -135,3 +135,20 @@ the failed trial is performed. Two regression tests cover the captured failure
 and a valid read-only root message. The original delivery seal is reproduced
 from its head-96 source tree; current prompt behavior has its own CI execution
 receipt. Real model acceptance of the clarified contract remains unmeasured.
+
+## Separately registered clarified-contract follow-up
+
+The renewed continuation instruction on 2026-10-04 authorizes one separately
+registered trial of the clarified contract.
+`configs/stage2_message_corrected_contract_followup_v1.json` binds successful
+CI run `37205662944` and its exact implementation tree, the original failed
+attempt and artifact hash, the unchanged prefix and intervention scope, and
+the original 16/49 call limits. The new workflow verifies these bindings and
+rejects any earlier run or GitHub rerun of this trial. This is an explicitly
+changed-interface follow-up, not a resampling or replacement of the failed
+original request. Its complete response and partial failure are retained.
+
+The passed delivery check is reused as an exact-tree CI prerequisite. Only
+the zero-call immutable-entry check is repeated before dispatch. Semantic
+review is source-bound and read-only, without an automatically paid evaluator;
+any root analysis is non-blind and must be identified as such.
