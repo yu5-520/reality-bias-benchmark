@@ -1,103 +1,23 @@
-name: Single first repair-efficacy contrast
+name: Sealed first repair-efficacy contrast
 
 on:
-  push:
-    branches: [fix/p2-native-evidence-replay]
-    paths:
-      - 'configs/stage2_repair_efficacy_first_contrast_v1.json'
   workflow_dispatch:
 
 permissions:
   contents: read
-  actions: read
-
-concurrency:
-  group: stage2-repair-efficacy-first-contrast-v1
-  cancel-in-progress: false
 
 jobs:
-  enhanced-b-first-attempt:
-    if: github.run_attempt == 1
+  sealed-record:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Enforce one B attempt and frozen no-rerun contract
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Verify sealed canonical result without provider calls
         run: |
           python - <<'PY'
-          import json, os, subprocess
+          import json
           c=json.load(open('configs/stage2_repair_efficacy_first_contrast_v1.json'))
-          assert c['status']=='FROZEN_BEFORE_SINGLE_B_EXECUTION'
-          assert c['execution']['execute_B_once'] is True
-          assert c['execution']['natural_A_reruns']==0
-          assert c['execution']['local_A_reruns']==0
-          assert c['execution']['automatic_replay'] is False
-          assert c['arm_A_local_repair']['rerun'] is False
-          assert c['arm_B_enhanced_route_repair']['b_rerun'] is False
-          repo=os.environ['GITHUB_REPOSITORY']
-          run=json.loads(subprocess.check_output(['gh','api',f"repos/{repo}/actions/runs/{os.environ['GITHUB_RUN_ID']}"]))
-          pages=subprocess.check_output(['gh','api','--paginate','--slurp',f"repos/{repo}/actions/workflows/{run['workflow_id']}/runs?per_page=100"])
-          earlier=[r for p in json.loads(pages) for r in p['workflow_runs'] if r['id']<run['id']]
-          assert not earlier, 'REPAIR_EFFICACY_B_ALREADY_REGISTERED_NO_REPLAY'
+          assert c['status']=='B_CAPTURED_SOURCE_BOUND_COMPARISON_SEALED'
+          assert c['execution']['actual_B_workflow_run']==37349337495
+          print(json.dumps({'sealed':True,'canonical_run':37349337495,
+                            'result':c['result']['overall_process_effect']}))
           PY
-
-      - name: Materialize immutable G3 natural archive
-        run: |
-          set -euo pipefail
-          commit=$(python -c "import json; print(json.load(open('configs/stage2_repair_efficacy_first_contrast_v1.json'))['case']['natural_A_evidence_commit'])")
-          mkdir -p "$RUNNER_TEMP/sources/G3A"
-          git cat-file -e "$commit^{commit}" || git fetch origin "$commit"
-          git archive "$commit" stage2/replication_v2/G3/natural_A | tar -x -C "$RUNNER_TEMP/sources/G3A"
-
-      - name: Bind unchanged official MCP sources and runtime
-        run: |
-          set -euo pipefail
-          git clone -q https://github.com/modelcontextprotocol/python-sdk "$RUNNER_TEMP/mcp-sdk"
-          git -C "$RUNNER_TEMP/mcp-sdk" checkout -q f1b6589088534632fef92238ee9750951e3c0185
-          git clone -q https://github.com/modelcontextprotocol/modelcontextprotocol "$RUNNER_TEMP/mcp-protocol"
-          git -C "$RUNNER_TEMP/mcp-protocol" checkout -q 5f5440bb26a62e2cf3440b92da5a667efa03b267
-          python -m pip install -q uv
-          cd "$RUNNER_TEMP/mcp-sdk"
-          uv sync --frozen --no-default-groups --python "$(command -v python)"
-
-      - name: Verify same-parent contrast and frozen enhanced plan without provider calls
-        run: |
-          "$RUNNER_TEMP/mcp-sdk/.venv/bin/python" scripts/run_stage2_repair_efficacy_first_contrast.py             --source-root "$RUNNER_TEMP/sources"             --sdk-root "$RUNNER_TEMP/mcp-sdk"             --protocol-root "$RUNNER_TEMP/mcp-protocol"             --out "$RUNNER_TEMP/repair-efficacy-preflight"
-
-      - name: Execute the single enhanced-B branch
-        env:
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-        run: |
-          "$RUNNER_TEMP/mcp-sdk/.venv/bin/python" scripts/run_stage2_repair_efficacy_first_contrast.py             --source-root "$RUNNER_TEMP/sources"             --sdk-root "$RUNNER_TEMP/mcp-sdk"             --protocol-root "$RUNNER_TEMP/mcp-protocol"             --out "$RUNNER_TEMP/repair-efficacy-b-first-attempt"             --execute
-
-      - name: Print retained efficacy receipt
-        if: always()
-        run: |
-          python - <<'PY'
-          import json, os, pathlib
-          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'repair-efficacy-b-first-attempt'
-          for rel in ['preflight.json','native_branch/efficacy_receipt.json','native_branch/continuation_assessment.json']:
-              p=root/rel
-              if p.exists():
-                  print(json.dumps({'source':rel,'value':json.loads(p.read_bytes())},ensure_ascii=False))
-          PY
-
-      - name: Retain first-attempt evidence including partial failures
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: repair-efficacy-first-contrast-${{ github.sha }}
-          path: |
-            ${{ runner.temp }}/repair-efficacy-preflight
-            ${{ runner.temp }}/repair-efficacy-b-first-attempt
-          retention-days: 90
-          if-no-files-found: warn

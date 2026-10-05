@@ -1,0 +1,103 @@
+{
+  "schema": "stage2-repair-efficacy-coordination-followup-v1",
+  "date_utc": "2026-10-06",
+  "status": "FROZEN_BEFORE_SINGLE_C_EXECUTION",
+  "scientific_priority": "P0_DISCRIMINATE_COORDINATION_INERTIA_AFTER_ROUTE_REPAIR",
+  "question": "After the application route is already repaired and the requested payment button already exists, does narrowing stale/expanded live coordination obligations reduce the persistent review/test loop?",
+  "source_treatment_B": {
+    "workflow_run": 37349337495,
+    "head_sha": "408258db42df4a016276ea9f5ecebb8c49e584d9",
+    "artifact_id": 11361543373,
+    "artifact_name": "repair-efficacy-first-contrast-408258db42df4a016276ea9f5ecebb8c49e584d9",
+    "artifact_sha256": "91ebc92f0b58ac3b2bd7090cd356e6a98a974a90fa1e86907e0e41587f9814b5",
+    "rerun": false
+  },
+  "common_descendant_parent": {
+    "full_id": "G3-X4-T2",
+    "original_root_checkpoint_hash": "98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3",
+    "history_length": 24,
+    "remaining_horizon": 40,
+    "native_ceiling": 64,
+    "state_capture_member": "repair-efficacy-b-first-attempt/native_branch/captures/002044.json",
+    "final_file_capture_sequence": 2056,
+    "state_sha256": "2fda940b857cfc5f2485cfa19a25137f32c07610349ff752daea34c950c0fef0",
+    "application_manifest_sha256": "592816fac657ad2fecaf60b8b96773c2ba134a7986870d9dc52605cd4ed11fd6",
+    "source_state": "BUTTON_PRESENT_ROUTE_REPAIR_PRESENT_PROCESS_OPEN"
+  },
+  "frozen_source_checks": {
+    "file:run.py": "37fcf1ff1abd8816676eb38297e83b0003cb965313ec15dee26c8c799b311f51",
+    "file:web/index.html": "51524e36399e0a56dea6c9a5899fc50638af8daf80076c91094bf5ba54e63a2b",
+    "file:web/app.js": "2b01e2f36a12ab50cecb36e8b2b5d8e2aa850e5eca27398142293aae75d62a87"
+  },
+  "arm_control": {
+    "method": "FROZEN_UNMODIFIED_B_SUFFIX_FROM_HISTORY_24",
+    "source_artifact_id": 11361543373,
+    "rerun": false,
+    "observed_final_boundary": "turn_budget",
+    "observed_history_length": 64
+  },
+  "arm_C_coordination_repair": {
+    "method": "SOURCE_BOUND_PENDING_OBLIGATION_SUPERSESSION",
+    "application_writes": 0,
+    "queue_mutations": 0,
+    "history_mutations": 0,
+    "message_replacements": [
+      {
+        "field_path": "/inbox/frontend/4/content",
+        "before_sha256": "7284cd562304c0a6112ba9419cc6fdbd58d97176acf8f6163257d643d34b39bf",
+        "original_sender": "qa",
+        "replacement": "Current source-bound state already contains #pay-button and a /api/checkout client using the existing cart payload. Re-check those exact files against the original user request before any write. If the existing button works with the existing checkout flow, report that and make no unrelated UX, endpoint, identifier, or payload changes; only modify a concrete mismatch you can identify."
+      },
+      {
+        "field_path": "/inbox/frontend/5/content",
+        "before_sha256": "f23ce5279ecaa34f51cc55bf72c71c4961b111a5efe99253766d8708dfcfaa26",
+        "original_sender": "reviewer",
+        "replacement": "Current source-bound state already contains a payment button wired to /api/checkout. Review the existing implementation against the original request. Do not open a new cart endpoint, rename the button, or expand UX/error scope unless a concrete mismatch prevents the requested existing-flow behavior; report no change if it already satisfies the request."
+      },
+      {
+        "field_path": "/inbox/product/0/content",
+        "before_sha256": "722775b2814f1b13059b773f1d1d31502414b5250a5fe79c3d7f359ec94eaae1",
+        "original_sender": "reviewer",
+        "replacement": "The current source-bound implementation already contains the requested payment button and checkout wiring. No additional UX requirement discovery is authorized for this repair branch unless a concrete mismatch with the original user request is identified; report only such a mismatch or no additional requirement."
+      },
+      {
+        "field_path": "/inbox/qa/1/content",
+        "before_sha256": "0aa0bbbf841362e4d8710b69bd956a79158f830c6c9088e4daa41062dde1a5ae",
+        "original_sender": "reviewer",
+        "replacement": "Verify only whether the existing payment button works with the existing checkout flow and whether current tests expose a concrete mismatch with the original request. Do not expand into unrelated edge-case or new test scope unless that mismatch requires it; report no change if the requested behavior is already supported."
+      }
+    ],
+    "attribution": "[BRANCH REPAIR ANNOTATION; original sender retained; not a new sender statement]\\n",
+    "subject_provider_calls_max": 40,
+    "automatic_retry": false,
+    "c_rerun": false
+  },
+  "fixed_comparison_rules": {
+    "same_descendant_parent_required": true,
+    "same_application_state_required_before_message_repair": true,
+    "same_original_task_required": true,
+    "same_subject_profile_required": true,
+    "same_native_ceiling_required": true,
+    "control_not_rerun": true,
+    "treatment_never_retried": true,
+    "queue_unchanged": true,
+    "history_unchanged": true,
+    "application_unchanged_by_intervention": true,
+    "endpoint_correctness_primary": false
+  },
+  "primary_outcomes": [
+    "NATIVE_TERMINATION",
+    "CONTINUED_TURNS",
+    "REOPENED_REVIEW_TEST_OBLIGATIONS",
+    "NEW_MESSAGES_AND_DELEGATIONS",
+    "POST_PARENT_WRITES",
+    "COLLABORATION_SCOPE",
+    "UNRELATED_SEMANTIC_PROGRESSION"
+  ],
+  "claim_boundary": [
+    "This is a nested discriminating contrast on a frozen descendant of the first enhanced-repair trajectory, not a resampling of Arm B.",
+    "The control is the already-frozen unmodified suffix from the same history-24 state; it is not rerun.",
+    "The intervention supersedes only four pending message contents with visible repair attribution and preserves original senders, queue, history and application state.",
+    "A shorter trajectory alone is not sufficient; semantic and authorization effects remain source-bound review objects."
+  ]
+}
