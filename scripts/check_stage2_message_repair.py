@@ -19,6 +19,7 @@ from stage2.route_repair.branch_fields import require, save, seal, BranchConstra
 from stage2.route_repair.planning_session import RoutePlanningSession
 from stage2.route_repair.native_message import ATTRIBUTION
 from stage2.route_repair.http_fixture import FixtureHTTPServer, fixture_reply
+from stage2.route_repair.source_navigation import version_handle
 from stage2.route_repair.connected_provider import LoopbackHTTPTransport
 from stage2.monitor_enhancement.snapshot_append import AppendOnlyEvidenceGraph
 from stage2.route_repair.branch_fields import verify_seal
@@ -103,8 +104,14 @@ def run(args):
         session, proposal = scripted_proposal(context)
         names = {'complete_catalog': 'catalog', 'node_context': 'node', 'read_file': 'file',
             'current_pending_message': 'message', 'observation_source': 'observation', 'select_source_witness': 'witness'}
-        contents = [json.dumps({'kind': 'TOOL', 'name': names[q['operation']], 'arguments': q['request']})
-                    for q in session.query_log]
+        contents = []
+        for q in session.query_log:
+            tool, arguments = names[q['operation']], q['request']
+            if q['operation'] == 'read_file':
+                ref = arguments['ref']
+                row = next(r for r in context.file_versions[ref] if r['checkpoint_hash'] == arguments['checkpoint_hash'])
+                tool, arguments = 'read_version', {'version_handle': version_handle(context, ref, row)}
+            contents.append(json.dumps({'kind': 'TOOL', 'name': tool, 'arguments': arguments}))
         contents.append(json.dumps({'kind': 'FINAL', 'decision': 'REPAIR', 'proposal': proposal}))
         require(len(contents) <= 16, 'MESSAGE_FIXTURE_PLANNING_BUDGET')
         # Five original queued roles run before the coordinator. Their normal
@@ -174,7 +181,7 @@ def run(args):
             and not p.name.endswith('.pyc')}
         (args.out / 'evidence.json.gz').write_bytes(gzip.compress(stable_json_bytes(packed), mtime=0))
         sources = ['stage2/route_repair/' + n + '.py' for n in ['native_message', 'proposal_authority',
-            'planning_session', 'offline_system', 'connected_planning', 'connected_mcp', 'connected_provider', 'prefix_context']]
+            'planning_session', 'offline_system', 'connected_planning', 'connected_mcp', 'connected_provider', 'prefix_context', 'source_navigation']]
         sources += ['scripts/check_stage2_message_repair.py', 'scripts/run_stage2_connected_repair.py',
             'configs/stage2_connected_mechanism_v1.json']
         receipt = seal({'schema': 'stage2-pending-message-repair-seal-v1',

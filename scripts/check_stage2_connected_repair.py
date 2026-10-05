@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from stage2.r7_checkpoint_v1.common import digest, stable_json_bytes
 from stage2.route_repair.branch_fields import require, save, seal, BranchConstraintError
+from stage2.route_repair.source_navigation import version_handle
 from stage2.route_repair.connected_provider import CONFIG, LoopbackHTTPTransport, ConnectedExchangeSource, freeze_connected_bindings
 from stage2.route_repair.connected_planning import ConnectedPlanningSession, freeze_connected_envelope
 from stage2.route_repair.connected_mcp import ConnectedPlanningRepairEntry
@@ -34,8 +35,14 @@ def main():
     try:
         scripted, proposal, _=scripted_proposal(context)
         names={'complete_catalog':'catalog','node_context':'node','read_file':'file','observation_source':'observation','select_source_witness':'witness'}
-        contents=[json.dumps({'kind':'TOOL','name':names[q['operation']],'arguments':q['request']},ensure_ascii=False,sort_keys=True)
-                  for q in scripted.query_log]
+        contents = []
+        for q in scripted.query_log:
+            tool, arguments = names[q['operation']], q['request']
+            if q['operation'] == 'read_file':
+                ref = arguments['ref']
+                row = next(r for r in context.file_versions[ref] if r['checkpoint_hash'] == arguments['checkpoint_hash'])
+                tool, arguments = 'read_version', {'version_handle': version_handle(context, ref, row)}
+            contents.append(json.dumps({'kind': 'TOOL', 'name': tool, 'arguments': arguments}))
         contents += [json.dumps({'kind':'FINAL','decision':'REPAIR','proposal':proposal},ensure_ascii=False,sort_keys=True)]
         # Four native read turns deliberately keep the queue open. Horizon censor
         # occurs at the fourth returned turn; the fifth role is never popped.
@@ -103,7 +110,7 @@ def main():
             'independent_review_invoked':False,'frozen_natural_experiments_rerun':False},'summary_hash')
         save(args.out/'summary.json',summary)
         deps=json.loads((ROOT/'stage2/replication_v2/bound_provider_phase_preflight_v1/seal.json').read_bytes())['implementation_hashes']
-        for name in ['stage2/route_repair/connected_provider.py','stage2/route_repair/connected_planning.py',
+        for name in ['stage2/route_repair/source_navigation.py','stage2/route_repair/connected_provider.py','stage2/route_repair/connected_planning.py',
             'stage2/route_repair/connected_mcp.py','stage2/route_repair/http_fixture.py',
             'scripts/run_stage2_connected_repair.py','scripts/check_stage2_connected_repair.py']:
             deps[name]=digest((ROOT/name).read_bytes())

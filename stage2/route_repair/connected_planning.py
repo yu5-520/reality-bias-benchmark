@@ -10,16 +10,22 @@ from stage2.route_repair.proposal_authority import ProposalAuthorityCompiler, fr
 from stage2.route_repair.offline_system import revalidate_bundle
 from stage2.route_repair.connected_provider import ConnectedExchangeSource
 from stage2.route_repair.native_message import ATTRIBUTION
+from stage2.route_repair.branch_fields import BranchConstraintError
+from stage2.route_repair.source_navigation import SourceNavigation, version_handle, classify_query_error
 
-CONNECTED_TOOLS = {**TOOLS, 'message': ['field_path'], 'span': ['read_id', 'quote']}
+CONNECTED_TOOLS = {**{k: v for k, v in TOOLS.items() if k != 'file'},
+    'versions': ['ref', 'at'], 'read_version': ['version_handle'],
+    'message': ['field_path'], 'span': ['read_id', 'quote']}
 
 TOOL_CONTRACTS = {
     'catalog': {'purpose': 'Full repeated locator metadata; prefix_index already covers every node and version. Use this only when full locators are needed. No source content is read and no witness is selected.',
-        'arguments': {}, 'next_reads': ['node(ref)', 'file(ref, checkpoint_hash)', 'message(field_path)']},
+        'arguments': {}, 'next_reads': ['node(ref)', 'versions(ref, at)', 'read_version(version_handle)', 'message(field_path)']},
     'node': {'purpose': 'Inspect node metadata, version locators and observation IDs; not source-content evidence.',
         'arguments': {'ref': 'exact catalog node ref'}},
-    'file': {'purpose': 'Read actual file content at an available prefix checkpoint; omission selects the parent version.',
-        'arguments': {'ref': 'file:path', 'checkpoint_hash': 'optional exact prefix checkpoint hash'}},
+    'versions': {'purpose': 'Resolve only observed file versions; TASK_START never substitutes a later snapshot. Returns handles, not source evidence.',
+        'arguments': {'ref': 'exact file node ref', 'at': 'optional ALL, TASK_START or PARENT'}},
+    'read_version': {'purpose': 'Read exact bytes using a host-issued version_handle from prefix_index or versions; do not construct hashes or combine paths and checkpoints.',
+        'arguments': {'version_handle': 'copy one host-issued version: handle'}},
     'message': {'purpose': 'Read actual pending message content, including fields absent from the catalog file list.',
         'arguments': {'field_path': 'exact pointer listed in task_capabilities.message_fields'}},
     'observation': {'purpose': 'Read actual archived observation bytes/text; ref must belong to that observation.',
@@ -86,17 +92,18 @@ def prefix_index(context, original_task):
         versions[ref] = groups
     ordered = sorted(checkpoints.values(), key=lambda r: (r['capture_index'], r['checkpoint_hash']))
     indices = {r['checkpoint_hash']: i for i, r in enumerate(ordered)}
-    return {'schema': 'stage2-complete-prefix-navigation-index-v1',
+    return {'schema': 'stage2-complete-prefix-navigation-index-v2',
         'full_catalog_hash': catalog['context_hash'], 'all_node_refs': catalog['all_node_refs'],
         'checkpoints': ordered,
-        'file_versions': {ref: [{'content_sha256': digest, 'checkpoint_indices': [indices[cp] for cp in cps]}
+        'file_versions': {ref: [{'content_sha256': digest, 'checkpoint_indices': [indices[cp] for cp in cps],
+            'version_handles': [version_handle(context, ref, {'checkpoint_hash': cp, 'content_sha256': digest}) for cp in cps]}
             for digest, cps in groups.items()] for ref, groups in versions.items()},
         'coverage': {k: catalog[k] for k in ['node_count', 'edge_count', 'observation_count', 'visibility_scope']},
         'source_limits': {k: copy.deepcopy(catalog['prefix_receipt'][k]) for k in
             ['future_suffix_visible', 'terminal_answer_visible', 'historical_provider_prompt_response_captured',
              'semantic_lineage_complete', 'missing_evidence']},
         'metadata_is_source_read': False, 'semantic_dependency_inferred': False,
-        'navigation': 'file(ref, checkpoint_hash) reads a version. TASK_START labels the initial snapshot; '
+        'navigation': 'version_handles and checkpoint_indices are parallel arrays. read_version(version_handle) reads exact bytes. versions(ref, at) resolves ALL, TASK_START or PARENT. TASK_START labels the initial snapshot; '
             'a later first write checkpoint is not TASK_START. node(ref) discovers native observation sources. '
             'Current functionality does not itself establish the historical absence of changes.'}
 
@@ -198,21 +205,46 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
              'verification_capabilities_hash': digest(verification_capabilities), 'planning_exit_is_repair_exit': False}, 'binding_hash')
         self._envelope = copy.deepcopy(envelope); self._retained_binding = copy.deepcopy(self._binding)
         self._prefix_index = prefix_index(context, envelope['original_task'])
+        self._navigation = SourceNavigation(context)
+        self._query_failures = []
         self._messages = []; self._transcript = []
         self._started = False; self._closed = False; self._authorization = None; self._outcome = None
         self._source._gate = lambda: self._started and not self._closed
         _json(self.out / 'binding.json', self._binding); _json(self.out / 'task_envelope.json', envelope)
 
     def tool(self, name, arguments):
-        if name == 'span':
-            require(not self._closed and self._started, 'PLANNING_TOOLS_REVOKED')
-            require(type(arguments) is dict and set(arguments) == {'read_id', 'quote'},
-                    'EXACT_PLANNING_TOOL_ARGUMENTS_REQUIRED')
-            return self._session.span(**arguments)
-        if name != 'message': return super().tool(name, arguments)
         require(not self._closed and self._started, 'PLANNING_TOOLS_REVOKED')
-        require(type(arguments) is dict and set(arguments) == {'field_path'}, 'EXACT_PLANNING_TOOL_ARGUMENTS_REQUIRED')
-        return self._session.message(**arguments)
+        require(name in CONNECTED_TOOLS, 'READ_ONLY_PLANNING_TOOL_REQUIRED')
+        required = set(CONNECTED_TOOLS[name]) - ({'at'} if name == 'versions' else set())
+        require(type(arguments) is dict and required <= set(arguments) <= set(CONNECTED_TOOLS[name]),
+                'EXACT_PLANNING_TOOL_ARGUMENTS_REQUIRED')
+        if name == 'versions':
+            require(all(isinstance(v, str) for v in arguments.values()), 'EXACT_PLANNING_TOOL_ARGUMENTS_REQUIRED')
+            return self._navigation.versions(**arguments)
+        if name == 'read_version':
+            return self._navigation.read(self._session, arguments['version_handle'])
+        if name in {'span', 'message'}:
+            return getattr(self._session, name)(**arguments)
+        return super().tool(name, arguments)
+
+    def query(self, name, arguments, sequence):
+        try:
+            return self.tool(name, arguments)
+        except BranchConstraintError as exc:
+            category, recoverable = classify_query_error(str(exc))
+            receipt = seal({'schema': 'stage2-planning-query-failure-v1',
+                'binding_hash': self._binding['binding_hash'], 'sequence': sequence,
+                'tool': name, 'arguments_hash': digest(arguments), 'error_code': str(exc),
+                'category': category, 'recoverable_in_same_session': recoverable,
+                'remaining_responses': self._binding['max_calls'] - sequence,
+                'source_content_returned': False, 'authority_expanded': False,
+                'next_action': 'CORRECT_QUERY_WITHIN_EXISTING_BUDGET' if recoverable else 'STOP'}, 'receipt_hash')
+            self._query_failures.append(receipt)
+            self._capture(sequence, 'query-failure', receipt)
+            if not recoverable:
+                raise
+            return {'status': 'QUERY_REJECTED', 'failure_receipt': receipt,
+                    'guidance': 'Use exact host-returned handles and read IDs. For quotes use an exact unique substring or witness offsets. No automatic retry or alias conversion occurred.'}
 
     def source_read_state(self):
         """Host-owned progress; listing a source cannot turn it into a read."""
@@ -223,7 +255,9 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
                 ['witness_id', 'read_id', 'ref', 'start', 'end', 'span_hash']} for w in self._session.witnesses.values()],
             'pending_message_sources': [{'field_path': p, 'ref': 'state:host_parent', 'read_tool': 'message'}
                 for p in self._envelope.get('message_fields', [])],
-            'catalog_is_source_read': False, 'source_evidence_grants_write_permission': False}
+            'catalog_is_source_read': False, 'source_evidence_grants_write_permission': False,
+            'evidence_flow': ['versions or prefix_index', 'read_version or message or observation', 'span or witness', 'FINAL'],
+            'citation_rule': 'Only selected_witnesses.witness_id is a citation. Reads are not citations.'}
 
     async def run(self):
         require(not self._started, 'PLANNING_FIRST_ATTEMPT_ALREADY_STARTED')
@@ -245,6 +279,9 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
                         'Assess process-account consistency and authority as well as original task progression: '
                         'functionality or recorded file writes alone cannot certify that a pending process claim needs no repair. '
                         'Do not presume any inconsistency or adoption before reading its sources. '
+                        'Use read_version with a host-issued handle; the old file(ref, checkpoint_hash) tool is not available. '
+                        'A QUERY_REJECTED result permits a corrected query only within the original remaining budget; '
+                        'access-boundary and integrity failures still close the session. '
                         'Copy version hashes and offsets from read/witness results; span selects a unique exact quote. '
                         'read:* IDs identify reads, not witnesses. Before citing a read, call witness or span and copy '
                         'the returned witness_id (witness:*). A FINAL must not put read:* into witness_ids. '
@@ -293,7 +330,7 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
                     break
                 require(set(payload) == {'kind', 'name', 'arguments'} and payload['kind'] == 'TOOL',
                         'EXACT_READ_ONLY_TOOL_MESSAGE_REQUIRED')
-                result = self.tool(payload['name'], payload['arguments'])
+                result = self.query(payload['name'], payload['arguments'], sequence)
                 self._capture(sequence, 'tool-result', result)
                 self._messages.append({'role': 'tool', 'name': payload['name'], 'result': result})
             require(final is not None, 'PLANNING_CALL_BUDGET_EXHAUSTED')
@@ -316,6 +353,7 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
             raise
         finally:
             self._closed = True
+            _json(self.out / 'query_failures.json', self._query_failures)
             _json(self.out / 'query_log.json', self._session.query_log)
             _json(self.out / 'witnesses.json', self._session.witnesses)
             _json(self.out / 'transcript.json', self._transcript)

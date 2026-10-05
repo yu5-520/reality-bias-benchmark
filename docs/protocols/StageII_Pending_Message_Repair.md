@@ -230,3 +230,58 @@ native ceiling 64 and application-write prohibition are unchanged. The workflow
 reuses the successful exact-tree CI, performs the zero-call immutable-entry
 check and retains every response or partial failure. Spent requests remain
 unchanged; no automatic rerun or paid evaluator is enabled.
+
+## Final-interface acceptance outcome and active source-navigation replacement
+
+Run `37231964981` at `c1b9b80a31c10e661cafb6bb1ba99b2f47eead24`
+completed on 2026-10-05 04:24 Asia/Shanghai with two provider responses and
+`FILE_VERSION_OUTSIDE_VERIFIED_PREFIX`. Its retained outcome reports zero
+native repair actions, no proposal and no repair-agent exit. Artifact
+`11314621407` retains the original bytes (ZIP SHA256
+`d28b12bbbe3b8b56580cf78766674529f50bf47d5449333ee7148c6c6b600292`).
+The earlier statement that the final interface was unmeasured is superseded by
+this failed trial. The failure is not an accepted no-repair or efficacy result.
+
+The current connected planner replaces actor-facing `file(ref, checkpoint_hash)`
+with `versions(ref, at)` and `read_version(version_handle)`. Handles bind the
+archive, parent, graph, object, checkpoint and content hash. The complete prefix
+index exposes a handle for every original file-version membership; ALL,
+TASK_START and PARENT select observed versions without earliest/latest fallback.
+Internal exact `read_file` records remain the canonical source-replay format and
+historical frozen implementations remain unchanged. They are not an active
+compatibility tool exposed to the planning actor.
+
+Reading still cannot create a witness. `span(read_id, quote)` is the preferred
+citation entry; ambiguous quotes require explicit `witness` offsets. The host
+records source spans; the actor retains responsibility for semantic judgments.
+No host alias converts `read:*` to `witness:*`, and invalid final decisions still
+close the session.
+
+Only an explicit allowlist of argument/selector/quote errors returns a retained
+`QUERY_REJECTED` receipt. Correction consumes the original session's remaining
+calls. Unknown handles, out-of-prefix access, hash drift, unknown failures,
+transport failures and invalid final submissions remain terminal. No rejected
+query returns source content or creates authority. No automatic HTTP retry,
+additional session, paid evaluator or live experiment is scheduled.
+
+The read-only `Source navigation frozen failure replay` workflow downloads the
+original failed ZIP, checks its exact hash, repeats only its original source
+queries against the immutable natural prefix, and verifies all host-issued
+handles for the requested known object. It preserves the original responses and
+outcome. Its output is interface regression evidence, not a new model trial.
+
+The active scripted message integration uses the new handles through the
+unchanged MCP and native continuation path. Its current seal also binds
+`source_navigation.py`; historical seals are verified at historical code trees.
+
+Local validation of this replacement (2026-10-05): 203 route-repair tests and
+12 enhanced-monitor tests passed. All 192 observed prefix file versions were
+read through host-issued handles and matched their frozen content hashes. The
+third trial's original sealed bytes and non-blind source queries validated with
+zero new provider calls. The current scripted official-MCP integration used 16
+planning exchanges, one attributed message write, zero application writes and
+six subject exchanges, finalized at history 21, and preserved original sender,
+unrelated fields/files and the natural archive. It used the pinned official SDK
+and protocol with Python 3.12 locally. No live-model efficacy was measured.
+The fourth trial ZIP inspection is prepared for the read-only Actions workflow;
+it has not yet run in this local checkout.

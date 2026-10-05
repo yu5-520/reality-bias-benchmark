@@ -11,6 +11,7 @@ from types import SimpleNamespace
 from stage2.route_repair.branch_fields import BranchConstraintError, seal
 from stage2.route_repair.connected_provider import DeepSeekHTTPTransport, LoopbackHTTPTransport, ConnectedExchangeSource, freeze_connected_bindings
 from stage2.route_repair.connected_planning import ConnectedPlanningSession, freeze_connected_envelope
+from stage2.route_repair.source_navigation import version_handle, SourceNavigation
 from stage2.route_repair.connected_mcp import ConnectedMCPBranch, ConnectedPlanningRepairEntry
 from stage2.route_repair.http_fixture import FixtureHTTPServer, fixture_reply
 from stage2.route_repair.tests import test_prefix_mcp as prefix_fixture
@@ -46,7 +47,15 @@ class ConnectedProviderTests(unittest.TestCase):
         bundle = self.fixture.authorization(self.c).bundle; proposal = bundle['proposal']
         proposal['verification_tasks'] = [{**self.cap, 'depends_on': ['a1']}]; proposal['execution_order'].append('v1')
         if alter: alter(proposal)
-        return [fixture_reply(r['content']) for r in tools_from_queries(bundle['query_log'])] + [
+        replies = []
+        for r in tools_from_queries(bundle['query_log']):
+            payload = json.loads(r['content'])
+            if payload['name'] == 'file':
+                args = payload['arguments']; ref = args['ref']
+                row = next(v for v in self.c.file_versions[ref] if v['checkpoint_hash'] == args['checkpoint_hash'])
+                payload = {'kind': 'TOOL', 'name': 'read_version', 'arguments': {'version_handle': version_handle(self.c, ref, row)}}
+            replies.append(fixture_reply(json.dumps(payload)))
+        return replies + [
             fixture_reply(json.dumps({'kind':'FINAL','decision':'REPAIR','proposal':proposal}))]
 
     def branch(self, planning, verifier=lambda root: {'passed': True}):
@@ -215,7 +224,7 @@ class ConnectedProviderTests(unittest.TestCase):
             self.assertIsNone(branch._release); self.assertEqual(branch.source.calls,0)
 
     def test_future_source_and_binding_injection_are_blocked_without_second_attempt(self):
-        payload=json.dumps({'kind':'TOOL','name':'file','arguments':{'ref':'file:a.json','checkpoint_hash':self.fixture.future_cp}})
+        payload=json.dumps({'kind':'TOOL','name':'read_version','arguments':{'version_handle':'version:'+self.fixture.future_cp}})
         with FixtureHTTPServer([fixture_reply(payload)]) as server:
             planning=self.planner(server)
             with self.assertRaisesRegex(BranchConstraintError,'OUTSIDE_VERIFIED_PREFIX'): asyncio.run(planning.run())
@@ -280,7 +289,7 @@ class ConnectedProviderTests(unittest.TestCase):
     def test_host_progress_tracks_actual_read_and_source_selected_hash(self):
         from stage2.r7_checkpoint_v1.common import digest
         text = self.c.read_file('file:b.py')['content']
-        rows = [fixture_reply(json.dumps({'kind': 'TOOL', 'name': 'file', 'arguments': {'ref': 'file:b.py'}})),
+        rows = [fixture_reply(json.dumps({'kind': 'TOOL', 'name': 'read_version', 'arguments': {'version_handle': SourceNavigation(self.c).versions('file:b.py', 'PARENT')['versions'][0]['version_handle']}})),
                 fixture_reply(json.dumps({'kind': 'TOOL', 'name': 'span', 'arguments': {'read_id': 'read:1', 'quote': text}})),
                 fixture_reply(final())]
         with FixtureHTTPServer(rows) as server:
@@ -299,7 +308,7 @@ class ConnectedProviderTests(unittest.TestCase):
     def test_read_id_cannot_be_used_as_no_repair_witness_after_actual_read(self):
         invalid = {'kind': 'FINAL', 'decision': 'NO_REPAIR_NEEDED', 'reason': 'Unselected read is not a witness.',
             'inspected_refs': ['file:b.py'], 'witness_ids': ['read:1'], 'unknown_relations': ['Uninspected process history.']}
-        rows = [fixture_reply(json.dumps({'kind': 'TOOL', 'name': 'file', 'arguments': {'ref': 'file:b.py'}})),
+        rows = [fixture_reply(json.dumps({'kind': 'TOOL', 'name': 'read_version', 'arguments': {'version_handle': SourceNavigation(self.c).versions('file:b.py', 'PARENT')['versions'][0]['version_handle']}})),
                 fixture_reply(json.dumps(invalid))]
         with FixtureHTTPServer(rows) as server:
             planning = self.planner(server)
@@ -330,6 +339,83 @@ class ConnectedProviderTests(unittest.TestCase):
         self.assertIn('witness:', request['tool_contracts']['span']['returned_id'])
         no_action = request['response_contract']['oneOf'][2]['properties']
         self.assertEqual(no_action['witness_ids']['items']['pattern'], '^witness:[1-9][0-9]*$')
+
+    def test_handles_distinguish_equal_content_at_different_times_and_bind_parent(self):
+        nav = SourceNavigation(self.c)
+        rows = nav.versions('file:b.py')['versions']
+        self.assertEqual(len({r['content_sha256'] for r in rows}), 1)
+        self.assertEqual(len({r['version_handle'] for r in rows}), 2)
+        changed = copy.copy(self.c); changed.parent_checkpoint_hash = 'other-parent'
+        other = SourceNavigation(changed)
+        self.assertFalse(set(nav._versions) & set(other._versions))
+        session = __import__('stage2.route_repair.planning_session', fromlist=['RoutePlanningSession']).RoutePlanningSession(self.c, self.fixture.host.task)
+        self.assertEqual(nav.read(session, rows[0]['version_handle'])['text'], 'x=1\n')
+        with self.assertRaisesRegex(BranchConstraintError, 'OUTSIDE_VERIFIED_PREFIX'):
+            other.read(session, rows[0]['version_handle'])
+
+    def test_initial_absence_never_falls_back_to_later_file(self):
+        changed = copy.copy(self.c)
+        changed.file_versions = copy.deepcopy(self.c.file_versions)
+        changed.file_versions['file:b.py'] = [r for r in changed.file_versions['file:b.py'] if r['boundary'] != 'TASK_START']
+        result = SourceNavigation(changed).versions('file:b.py', 'TASK_START')
+        self.assertEqual(result['status'], 'VERSION_ABSENT')
+        self.assertEqual(result['versions'], [])
+
+    def test_content_corruption_fails_before_source_read_and_no_second_call(self):
+        handle = SourceNavigation(self.c).versions('file:b.py', 'PARENT')['versions'][0]['version_handle']
+        content = json.dumps({'kind': 'TOOL', 'name': 'read_version', 'arguments': {'version_handle': handle}})
+        original = self.c.read_file
+        def corrupt(*args):
+            row = original(*args); row['content'] = 'corrupted'; return row
+        with FixtureHTTPServer([fixture_reply(content), fixture_reply(final())]) as server:
+            planning = self.planner(server)
+            with patch.object(self.c, 'read_file', side_effect=corrupt):
+                with self.assertRaisesRegex(BranchConstraintError, 'VERSION_CONTENT_HASH_MISMATCH'):
+                    asyncio.run(planning.run())
+        self.assertEqual(server.position, 1)
+        self.assertFalse(planning._session.reads)
+        self.assertEqual(planning._query_failures[0]['category'], 'SOURCE_INTEGRITY')
+        self.assertFalse(planning._query_failures[0]['recoverable_in_same_session'])
+
+    def test_invalid_query_can_be_corrected_in_same_budget_without_fabricated_evidence(self):
+        def tool(name, arguments): return fixture_reply(json.dumps({'kind': 'TOOL', 'name': name, 'arguments': arguments}))
+        handle = SourceNavigation(self.c).versions('file:b.py', 'PARENT')['versions'][0]['version_handle']
+        rows = [tool('versions', {'ref': 'file:b.py', 'at': 'latest'}),
+                tool('read_version', {'version_handle': handle}),
+                tool('span', {'read_id': 'read:1', 'quote': 'absent'}),
+                tool('span', {'read_id': 'read:1', 'quote': 'x=1'}), fixture_reply(final())]
+        with FixtureHTTPServer(rows) as server:
+            planning = self.planner(server); outcome = asyncio.run(planning.run())
+        self.assertEqual(outcome['actor_calls'], 5)
+        self.assertEqual(len(planning._session.reads), 1)
+        self.assertEqual(len(planning._session.witnesses), 1)
+        self.assertEqual([r['remaining_responses'] for r in planning._query_failures], [15, 13])
+        self.assertTrue(all(r['recoverable_in_same_session'] for r in planning._query_failures))
+        self.assertEqual(planning._session.query_log[-1]['operation'], 'select_source_witness')
+        self.assertIsNone(planning._authorization)
+        self.assertEqual(outcome['provider_calls'], 0)
+
+    def test_recoverable_errors_do_not_extend_budget_or_resample_session(self):
+        bad = fixture_reply(json.dumps({'kind': 'TOOL', 'name': 'versions', 'arguments': {}}))
+        with FixtureHTTPServer([bad] * 17) as server:
+            planning = self.planner(server)
+            with self.assertRaisesRegex(BranchConstraintError, 'PLANNING_CALL_BUDGET_EXHAUSTED'):
+                asyncio.run(planning.run())
+        self.assertEqual(server.position, 16)
+        self.assertEqual(len(planning._query_failures), 16)
+        self.assertFalse(planning._session.reads)
+        with self.assertRaisesRegex(BranchConstraintError, 'ALREADY_STARTED'):
+            asyncio.run(planning.run())
+
+    def test_old_file_interface_is_removed_from_active_planner(self):
+        content = json.dumps({'kind': 'TOOL', 'name': 'file', 'arguments': {'ref': 'file:b.py'}})
+        with FixtureHTTPServer([fixture_reply(content), fixture_reply(final())]) as server:
+            planning = self.planner(server)
+            with self.assertRaisesRegex(BranchConstraintError, 'READ_ONLY_PLANNING_TOOL_REQUIRED'):
+                asyncio.run(planning.run())
+        self.assertEqual(server.position, 1)
+        self.assertNotIn('file', planning._binding['tools'])
+        self.assertFalse(planning._session.reads)
 
     def test_late_process_log_changes_cannot_mutate_retained_wire_snapshots(self):
         from stage2.route_repair.connected_mcp import ConnectedMCPCheckout
