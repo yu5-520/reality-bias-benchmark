@@ -88,3 +88,14 @@
 活动接口现直接把已有能力边界写清：`application_actions` 只能使用 `task_capabilities.writable_refs`；当该列表为空时必须为 `[]`。在本轮 `max_actions=1` 的 pending-message 分支中，`host_message` 是唯一写动作，验证任务依赖 `host_message.action_id`。旧 v2 FINAL 原样离线回放必须以明确的 connected-shape 错误拒绝，不能静默转换。
 
 v2 还留下一个独立的模型证据选择缺口：它读取了 parent 的 `web/index.html`、`web/app.js` 和 TASK_START 的 `web/index.html`，但只选择了当前消息的 `witness:1`。其唯一 diagnosis 以 `file:web/index.html` 为 destination，却没有对应 selected witness。即使机械删除重复的 application action 并修正执行依赖，仍不能生成有效 SOURCE_BOUND_CLAIM；读过不等于引用。该点继续保留为模型侧证据选择问题，不再扩张字段基础设施。
+
+
+## field-link v3 与字段线收口
+
+第三次 provider-bearing 单次试验 `37324115903`（head `f55cf0e2`，artifact `11350259380`）发生在 v1/v2 冻结回归和完整 Node-route 离线链均通过之后。此前一次 v3 workflow `37323705618` 因工作流将历史目录误写为 `replication_v3` 而在 provider 前失败；其 Execute 步骤为 skipped、provider calls 为 0，因此只作为 zero-dispatch 工作流故障保留，不计作模型试验。
+
+真正的 v3 first attempt 只进行了两次 provider 响应：第一次正确调用 `message(field_path)` 读取当前 pending message；第二次直接提交 FINAL/REPAIR。其动作结构已经完全符合当前连接约束：`application_actions=[]`，仅使用 `host_message`；replacement 不含宿主 attribution；验证任务依赖 `MSG_REPAIR_1`；execution_order 为 `MSG_REPAIR_1 → VERIFY_NATIVE_TESTS`。因此 v1 的完整 value 重复生产问题与 v2 的重复 application action 问题均未再出现。
+
+失败点为 `CURRENT_MESSAGE_WITNESS_REQUIRED`。query log 只有一次 current message read，witness ledger 为 `{}`。模型没有调用 `witness` 或 `span`，同时 diagnosis 使用 `SOURCE_BOUND_CLAIM`、source_ref=`state:host_parent`、destination_ref=`file:web/index.html`，但 `witness_ids=[]`。更重要的是，模型自己的 limitation 明确写明当前文件内容“were not verified ... only the message text was read”，却仍然生成 repair proposal。这一失败已经不能由 read/witness 身份、版本时间、消息 value 拼装或动作表述歧义解释。
+
+因此字段链接工程在此收口。当前活动接口已经做到：身份边界明确、时间边界明确、消息值单一生产者、写权限直接来自冻结 capability、读与引用严格分离、错误 FINAL fail-closed。v3 剩余问题归类为模型的证据选择与工具使用判断，而不是字段基础设施缺失。仓库不因该失败增加统一注册表、额外兼容层、自动 read→witness 转换或 v4 重采样。若以后研究如何让模型更可靠地遵守证据选择要求，应作为新的模型/策略干预实验单独立项，而不是继续修改本轮字段链接基线。
