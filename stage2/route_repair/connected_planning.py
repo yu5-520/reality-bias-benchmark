@@ -198,7 +198,7 @@ class ConnectedAuthorization:
 
 
 class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
-    def __init__(self, context, envelope, source, out, *, verification_capabilities):
+    def __init__(self, context, envelope, source, out, *, verification_capabilities, instruction_suffix=''):
         require(type(source) is ConnectedExchangeSource and source._profile['role'] == 'planning'
                 and source.calls == 0, 'FRESH_CONNECTED_PLANNING_SOURCE_REQUIRED')
         p = source._profile
@@ -210,13 +210,19 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
         self._source = source; self._actor = _RequestAdapter(source)
         self._verification_capabilities = copy.deepcopy(verification_capabilities)
         require(type(verification_capabilities) is list and verification_capabilities, 'HOST_VERIFICATION_CAPABILITIES_REQUIRED')
+        require(type(instruction_suffix) is str and len(instruction_suffix.encode()) <= 4096,
+                'PLANNING_INSTRUCTION_SUFFIX_BOUND_REQUIRED')
+        self._instruction_suffix = instruction_suffix
         self.out = Path(out); require(not self.out.exists(), 'FRESH_PLANNING_SESSION_REQUIRED'); self.out.mkdir(parents=True)
-        self._binding = seal({'schema': 'stage2-connected-planning-binding-v1', 'actor_id': p['actor_id'],
+        binding = {'schema': 'stage2-connected-planning-binding-v1', 'actor_id': p['actor_id'],
              'actor_origin': p['transport_binding']['origin'], 'parent_checkpoint_hash': context.parent_checkpoint_hash,
              'graph_hash': context.graph['graph_hash'], 'envelope_hash': envelope['envelope_hash'],
              'profile_hash': p['profile_hash'], 'max_calls': p['max_logical_calls'], 'max_response_bytes': 1_000_000,
              'provider_calls_enabled': p['transport_binding']['live'], 'tools': copy.deepcopy(CONNECTED_TOOLS),
-             'verification_capabilities_hash': digest(verification_capabilities), 'planning_exit_is_repair_exit': False}, 'binding_hash')
+             'verification_capabilities_hash': digest(verification_capabilities), 'planning_exit_is_repair_exit': False}
+        if instruction_suffix:
+            binding['experimental_instruction_suffix_hash'] = digest(instruction_suffix)
+        self._binding = seal(binding, 'binding_hash')
         self._envelope = copy.deepcopy(envelope); self._retained_binding = copy.deepcopy(self._binding)
         self._prefix_index = prefix_index(context, envelope['original_task'])
         self._navigation = SourceNavigation(context)
@@ -330,7 +336,8 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
                         'Keep original task scope; distinguish failed reads, observed writes and unknown adoption. '
                         'verification_tasks and execution_order. NO_REPAIR_NEEDED or UNRESOLVED supplies reason, inspected_refs, '
                         'witness_ids and unknown_relations. No-action decisions are scoped claims, not semantic certification. '
-                        'Task capability membership does not itself justify a repair. No native writes or arbitrary commands are tools.',
+                        'Task capability membership does not itself justify a repair. No native writes or arbitrary commands are tools.'
+                        + ((' ' + self._instruction_suffix) if self._instruction_suffix else ''),
                     'response_contract': RESPONSE_CONTRACT,
                     'output_schema': OUTPUT_SCHEMA, 'verification_capabilities': self._verification_capabilities,
                     'tools': CONNECTED_TOOLS, 'tool_contracts': TOOL_CONTRACTS,

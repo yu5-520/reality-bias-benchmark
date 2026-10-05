@@ -10,8 +10,9 @@ from types import SimpleNamespace
 
 from stage2.route_repair.branch_fields import BranchConstraintError, seal
 from stage2.route_repair.connected_provider import DeepSeekHTTPTransport, LoopbackHTTPTransport, ConnectedExchangeSource, freeze_connected_bindings
-from stage2.route_repair.connected_planning import ConnectedPlanningSession, freeze_connected_envelope
+from stage2.route_repair.connected_planning import ConnectedPlanningSession, freeze_connected_envelope, CONNECTED_TOOLS
 from stage2.route_repair.source_navigation import version_handle, SourceNavigation
+from stage2.r7_checkpoint_v1.common import digest
 from stage2.route_repair.connected_mcp import ConnectedMCPBranch, ConnectedPlanningRepairEntry
 from stage2.route_repair.http_fixture import FixtureHTTPServer, fixture_reply
 from stage2.route_repair.tests import test_prefix_mcp as prefix_fixture
@@ -251,6 +252,21 @@ class ConnectedProviderTests(unittest.TestCase):
             self.assertTrue(planning.outcome['tools_revoked'])
             response = json.loads((planning._source.out / '0001/response.bin').read_bytes())
             self.assertEqual(response['choices'][0]['message']['content'], content)
+
+    def test_instruction_suffix_is_bound_and_only_appended_to_planning_instructions(self):
+        suffix = ('EVIDENCE-SELECTION CONTRAST: FINAL is forbidden until the current message and every '
+                  'source_ref/destination_ref used by a SOURCE_BOUND_CLAIM have selected witness:* citations.')
+        with FixtureHTTPServer([fixture_reply(final())]) as server:
+            source = self.source(server, role='planning', name='suffix-http')
+            planning = ConnectedPlanningSession(self.c, self.envelope, source, self.root/'suffix-planning',
+                verification_capabilities=[self.cap], instruction_suffix=suffix)
+            asyncio.run(planning.run())
+        request = json.loads(server.requests[0])
+        self.assertTrue(request['messages'][0]['content'].endswith(suffix))
+        host_request = json.loads(request['messages'][1]['content'])
+        self.assertTrue(host_request['instructions'].endswith(suffix))
+        self.assertEqual(planning._binding['experimental_instruction_suffix_hash'], digest(suffix))
+        self.assertEqual(planning._binding['tools'], CONNECTED_TOOLS)
 
     def test_root_contract_and_literal_kind_example_match_the_read_only_parser(self):
         catalog = json.dumps({'kind': 'TOOL', 'name': 'catalog', 'arguments': {}})

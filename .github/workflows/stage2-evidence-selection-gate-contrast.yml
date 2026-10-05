@@ -1,0 +1,96 @@
+name: One-shot evidence-selection gate contrast
+
+on:
+  push:
+    branches: [fix/p2-native-evidence-replay]
+    paths: ['configs/stage2_evidence_selection_gate_contrast_v1.json']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: stage2-evidence-selection-gate-contrast-v1
+  cancel-in-progress: false
+
+jobs:
+  planning-contrast:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify frozen A arm and one-shot B authorization
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,subprocess
+          request=json.load(open('configs/stage2_evidence_selection_gate_contrast_v1.json'))
+          assert request['execute_single_trial'] is True
+          for flag in ['automatic_replay','natural_reruns','automatic_paid_reviewer','repair_dispatch','subject_dispatch']:
+              assert request[flag] is False
+          baseline=request['baseline']
+          repo=os.environ['GITHUB_REPOSITORY']
+          def api(path): return json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/{path}']))
+          run=api(f"actions/runs/{baseline['run_id']}")
+          assert run['conclusion']=='failure' and run['head_sha']==baseline['head_sha']
+          assert baseline['failure']=='CURRENT_MESSAGE_WITNESS_REQUIRED'
+          implementation=request['verified_implementation']
+          ci=api(f"actions/runs/{implementation['successful_ci_run']}")
+          assert ci['conclusion']=='success' and ci['head_sha']==implementation['remote_commit']
+          assert subprocess.check_output(['git','rev-parse',implementation['remote_commit']+'^{tree}']).decode().strip()==implementation['tree']
+          subprocess.check_call(['git','merge-base','--is-ancestor',implementation['remote_commit'],'HEAD'])
+          allowed=['configs/stage2_evidence_selection_gate_contrast_v1.json']
+          changes=subprocess.check_output(['git','diff','--name-only',implementation['remote_commit'],'HEAD']).decode().splitlines()
+          assert set(changes)<=set(allowed), 'VERIFIED_IMPLEMENTATION_CHANGED'
+          current=api(f"actions/runs/{os.environ['GITHUB_RUN_ID']}")
+          assert current['run_attempt']==1
+          pages=subprocess.check_output(['gh','api','--paginate','--slurp',
+              f"repos/{repo}/actions/workflows/{current['workflow_id']}/runs?per_page=100"])
+          earlier=[r for p in json.loads(pages) for r in p['workflow_runs'] if r['id']<current['id']]
+          assert not earlier, 'EVIDENCE_SELECTION_CONTRAST_ALREADY_REGISTERED_NO_REPLAY'
+          assert hashlib.sha256(request['instruction_suffix'].encode()).hexdigest()==request['instruction_suffix_sha256']
+          print(json.dumps({'baseline_retained':True,'single_b_registered':True,'repair_dispatch':False}))
+          PY
+      - name: Materialize immutable natural prefix archive
+        run: |
+          set -euo pipefail
+          commit=$(python -c "import json; print(json.load(open('configs/stage2_g3_ab_paired_semantic_audit_v1.json'))['source']['natural_A_evidence_commit'])")
+          mkdir -p "$RUNNER_TEMP/sources/G3A"
+          git cat-file -e "$commit^{commit}" || git fetch origin "$commit"
+          git archive "$commit" stage2/replication_v2/G3/natural_A | tar -x -C "$RUNNER_TEMP/sources/G3A"
+      - name: Zero-call contrast preflight
+        run: |
+          python scripts/run_stage2_evidence_selection_contrast.py --source-root "$RUNNER_TEMP/sources" --out "$RUNNER_TEMP/evidence-gate-preflight"
+      - name: Execute one planning-only B attempt
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python scripts/run_stage2_evidence_selection_contrast.py --source-root "$RUNNER_TEMP/sources" --out "$RUNNER_TEMP/evidence-gate-b" --execute
+      - name: Show frozen B result
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'evidence-gate-b'
+          for name in ['summary.json','planning/outcome.json','planning/decision.json','planning/query_log.json','planning/witnesses.json']:
+              p=root/name
+              if p.exists(): print(json.dumps({'source':name,'value':json.loads(p.read_bytes())},ensure_ascii=False))
+          PY
+      - name: Retain B evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-selection-gate-contrast-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/evidence-gate-preflight
+            ${{ runner.temp }}/evidence-gate-b
+          retention-days: 90
+          if-no-files-found: warn
