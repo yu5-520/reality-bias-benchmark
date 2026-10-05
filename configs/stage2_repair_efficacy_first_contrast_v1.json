@@ -1,0 +1,110 @@
+{
+  "schema": "stage2-repair-efficacy-first-contrast-v1",
+  "date_utc": "2026-10-06",
+  "status": "FROZEN_BEFORE_SINGLE_B_EXECUTION",
+  "scientific_priority": "P0_REPAIR_METHOD_EFFICACY",
+  "question": "Does a prefix-only source-bound route repair produce a better downstream process trajectory than the already-frozen local process revision from the same G3-X4-T2 parent?",
+  "case": {
+    "full_id": "G3-X4-T2",
+    "cell_id": "X4-T2",
+    "task_id": "T2",
+    "parent_checkpoint_hash": "98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3",
+    "parent_native_sequence": 4,
+    "remaining_horizon": 60,
+    "native_ceiling": 64,
+    "natural_A_evidence_commit": "858796145d912562cf8ef889b4d4083175d1f21e",
+    "natural_A_workflow_run": 36242414243
+  },
+  "arm_A_local_repair": {
+    "source": "stage2/replication_v2/G3/paired_semantic_audit_v1/audits/X4-T2.json",
+    "canonical_workflow_run": 36309205795,
+    "repair_evidence_commit": "9d50bedb9564b31da5e92eecf2d6330a24d2373c",
+    "selected_package_id": "g1pkg:0f95ddfd0d1341eb815d5a83",
+    "method": "R7_LOCAL_PROCESS_REVISION",
+    "repair_kind": "process_revision",
+    "repair_target_ref": "state:file-list",
+    "rerun": false,
+    "frozen_direct_target_effect": "REGENERATED",
+    "frozen_overall_process_effect": "REGENERATION",
+    "frozen_termination_class": "turn_budget",
+    "frozen_changed_files": [
+      "app.js",
+      "checkout_app/api.py",
+      "index.html"
+    ]
+  },
+  "arm_B_enhanced_route_repair": {
+    "method": "PREFIX_ONLY_SOURCE_BOUND_ROUTE_REPAIR",
+    "plan_origin": "FROZEN_OFFLINE_MANUAL_PREFIX_INSPECTION",
+    "plan_builder": "scripts/check_stage2_same_parent_native_mcp.py::scripted_proposal",
+    "complete_prefix_graph_visible": true,
+    "future_suffix_visible": false,
+    "prior_semantic_labels_visible": false,
+    "planning_provider_calls": 0,
+    "modify_refs": [
+      "file:run.py"
+    ],
+    "route_refs": [
+      "file:run.py",
+      "file:legacy_compat.py",
+      "file:README.md",
+      "file:checkout_app/server.py"
+    ],
+    "max_actions": 8,
+    "max_value_bytes": 65536,
+    "subject_provider_calls_max": 60,
+    "subject_model_continuation": "ORIGINAL_FROZEN_SUBJECT_PROFILE",
+    "automatic_retry": false,
+    "b_rerun": false,
+    "paid_reviewer": false,
+    "semantic_effect_requires_independent_review": true
+  },
+  "comparison": {
+    "same_parent_required": true,
+    "same_original_task_required": true,
+    "same_subject_profile_required": true,
+    "same_native_ceiling_required": true,
+    "same_remaining_horizon_required": true,
+    "primary_endpoints": [
+      "DIRECT_TARGET_EFFECT",
+      "OVERALL_PROCESS_EFFECT",
+      "ROUTE_RELATION",
+      "COLLABORATION_SCOPE_CHANGE",
+      "TEMPORAL_REACH_CHANGE",
+      "UNRELATED_STRUCTURE_PRESERVATION"
+    ],
+    "semantic_review_questions": [
+      "OLD_INFORMATION_AUTHORITY",
+      "OLD_TASK_PERMISSION",
+      "HISTORICAL_REENTRY",
+      "TRANSFORMED_DESCENDANTS",
+      "UNRELATED_SEMANTIC_PROGRESSION",
+      "PROCESS_ACCOUNT_CONSISTENCY"
+    ],
+    "endpoint_correctness_primary": false
+  },
+  "priority_override": {
+    "autonomous_planner_required_for_this_contrast": false,
+    "evidence_selection_gate_blocks_this_contrast": false,
+    "seven_framework_repair_reuse_required": false,
+    "automatic_recovery_required": false,
+    "new_monitor_validation_required": false,
+    "new_field_infrastructure_required": false
+  },
+  "execution": {
+    "runner": "scripts/run_stage2_repair_efficacy_first_contrast.py",
+    "workflow": ".github/workflows/stage2-repair-efficacy-first-contrast.yml",
+    "execute_B_once": true,
+    "natural_A_reruns": 0,
+    "local_A_reruns": 0,
+    "automatic_replay": false,
+    "automatic_paid_evaluator": false,
+    "freeze_B_outcome_whether_success_failure_censor_or_native_boundary": true
+  },
+  "claim_boundary": [
+    "This first contrast tests method-level downstream process effect in one same-parent case; it is not a universal repair-success estimate.",
+    "Arm B uses a frozen prefix-only source-bound manual route plan so autonomous planning reliability is not a treatment variable.",
+    "The route plan contains an unknown historical-adoption relation; independent review must retain that uncertainty.",
+    "A successful native write or passing engineering check is not repair efficacy."
+  ]
+}
