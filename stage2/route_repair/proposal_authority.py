@@ -13,7 +13,7 @@ from stage2.route_repair.branch_fields import (
     require, seal, verify_seal, exact_path, build_branch_policy, pointer_parts,
 )
 from stage2.route_repair.native_host_branch import build_host_answer_policy
-from stage2.route_repair.native_message import message_source, build_message_policy
+from stage2.route_repair.native_message import message_source, build_message_policy, materialize_message_action
 from stage2.route_repair.offline_system import revalidate_bundle, OfflineRouteRepairSystem
 
 
@@ -69,6 +69,7 @@ class ProposalAuthorityCompiler:
 
     def compile(self, session, proposal):
         require(not self._compiled, 'ENVELOPE_PROPOSAL_ALREADY_FROZEN')
+        proposal = copy.deepcopy(proposal)
         require(session.context is self.context and session.task == self._envelope['original_task'],
                 'PLANNING_SESSION_BINDING_MISMATCH')
         # Do not trust writable_refs or an envelope returned by the actor.
@@ -76,6 +77,9 @@ class ProposalAuthorityCompiler:
         actions = proposal['application_actions']
         host_action = proposal.get('host_answer')
         message = proposal.get('host_message')
+        if message:
+            message = materialize_message_action(self.context, message)
+            proposal['host_message'] = message
         require(not (host_action and message), 'INCOMPATIBLE_TERMINAL_AND_PENDING_MESSAGE')
         require(0 < len(actions) + bool(host_action) + bool(message) <= e['max_actions'], 'PROPOSAL_ACTION_BUDGET')
         require(not host_action or e['host_answer_allowed'], 'HOST_ANSWER_CAPABILITY_MISSING')

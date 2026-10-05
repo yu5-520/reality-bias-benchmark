@@ -31,6 +31,28 @@ def message_source(context, field_path):
     return state, role, index, {**context.locator(member), 'json_pointer': field_path}
 
 
+def materialize_message_action(context, action):
+    """Derive the complete pending-message value from one actor-selected span.
+
+    The planner proposes only the source-bound replacement. The host owns
+    attribution and preservation of every byte outside the selected span.
+    """
+    require('value' not in action, 'MESSAGE_DERIVED_VALUE_MUST_BE_OMITTED')
+    row = copy.deepcopy(action)
+    state, role, index, _ = message_source(context, row['field_path'])
+    before = state['inbox'][role][index]['content']
+    require(row['before_value_hash'] == digest(before.encode()), 'MESSAGE_VERSION_DRIFT')
+    start, end = row['start'], row['end']
+    require(type(start) is int and type(end) is int and 0 <= start < end <= len(before),
+            'MESSAGE_EXACT_SPAN_REQUIRED')
+    require(row['before_span_hash'] == digest(before[start:end].encode()), 'MESSAGE_SPAN_VERSION_DRIFT')
+    replacement = row['replacement']
+    require(isinstance(replacement, str) and replacement, 'MESSAGE_REPLACEMENT_TEXT_REQUIRED')
+    require(not replacement.startswith(ATTRIBUTION), 'MESSAGE_REPLACEMENT_MUST_EXCLUDE_ATTRIBUTION')
+    row['value'] = ATTRIBUTION + before[:start] + replacement + before[end:]
+    return row
+
+
 def build_message_policy(context, *, original_task, action, evidence):
     state, role, index, locator = message_source(context, action['field_path'])
     require(original_task == TASKS[state['task_id']], 'MESSAGE_ORIGINAL_TASK_DRIFT')

@@ -9,7 +9,6 @@ from stage2.route_repair.planning_session import RoutePlanningSession
 from stage2.route_repair.proposal_authority import ProposalAuthorityCompiler, freeze_task_envelope
 from stage2.route_repair.offline_system import revalidate_bundle
 from stage2.route_repair.connected_provider import ConnectedExchangeSource
-from stage2.route_repair.native_message import ATTRIBUTION
 from stage2.route_repair.branch_fields import BranchConstraintError
 from stage2.route_repair.source_navigation import SourceNavigation, classify_query_error
 
@@ -124,15 +123,16 @@ OUTPUT_SCHEMA = {
         'diagnoses': [{'claim_id': 'unique id', 'source_ref': 'inspected ref', 'destination_ref': 'inspected ref',
                        'status': 'UNKNOWN|CANDIDATE|SOURCE_BOUND_CLAIM', 'adoption_status': 'UNKNOWN|NOT_ESTABLISHED',
                        'meaning_before': 'source-supported statement', 'meaning_after': 'source-supported statement',
-                       'authority_effect': 'claimed effect', 'limitation': 'uncertainty', 'witness_ids': []}],
+                       'authority_effect': 'claimed effect', 'limitation': 'uncertainty',
+                       'witness_ids': ['selected witness:* IDs covering both source_ref and destination_ref']}],
         'unknown_relations': [], 'expected_postconditions': [], 'host_answer': None,
         'host_message': {'action_id': 'unique id or omit host_message for file repair',
             'target_ref': 'state:host_parent', 'kind': 'PENDING_MESSAGE_REPLACE',
             'field_path': 'exact task_capabilities.message_fields pointer',
             'before_value_hash': 'text_hash returned by the current message read; never invent or calculate a hash',
             'start': 'character offset of unsupported clause', 'end': 'exclusive clause offset',
-            'before_span_hash': 'span_hash returned by the selected original-clause witness', 'replacement': 'source-qualified replacement clause',
-            'value': ATTRIBUTION + 'source-qualified correction; do not invent process or adoption',
+            'before_span_hash': 'span_hash returned by the selected original-clause witness',
+            'replacement': 'source-qualified replacement for only the selected original span; omit attribution and full message value',
             'depends_on': [], 'diagnosis_ids': []},
         'application_actions': [{'action_id': 'unique id', 'target_ref': 'writable and inspected file ref',
             'kind': 'TEXT_SPAN_REPLACE|JSON_LEAF_REPLACE', 'start': 'text character offset', 'end': 'exclusive offset',
@@ -299,11 +299,13 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
                         'stage2-complete-route-proposal-v1: task/graph/archive/parent bindings, route refs classified as '
                         'modify/preserve/verify, diagnoses with inspected endpoint witnesses and adoption UNKNOWN or NOT_ESTABLISHED, '
                         'unknown_relations, expected_postconditions, application_actions, host_answer null, optional host_message. '
-                        'A message action must replace only a preauthorized pending content field, begin with the exact '
-                        'repair attribution in output_schema, and cite the current message plus actual prefix sources. '
-                        'Select a witness for the complete current message (start=0, end=text_length) and for the replaced clause. '
-                        'Supply exact start/end and before_span_hash, replacement, and value equal to attribution plus '
-                        'original text before start plus replacement plus original text after end. Preserve unrelated message text. '
+                        'Every diagnosis must cite selected witness:* IDs covering both source_ref and destination_ref; raw read:* IDs '
+                        'or uncited reads are insufficient. A message action must replace only a preauthorized pending content field '
+                        'and cite the current message plus actual prefix sources. The host prepends the fixed repair attribution; '
+                        'do not include that attribution in replacement. Select a witness for the complete current message '
+                        '(start=0, end=text_length) and for the replaced clause. Supply exact start/end, before_span_hash and '
+                        'replacement only. Do not return a full message value; the host derives value from the frozen current '
+                        'message, selected span, replacement and attribution, preserving unrelated message text. '
                         'Keep original task scope; distinguish failed reads, observed writes and unknown adoption. '
                         'verification_tasks and execution_order. NO_REPAIR_NEEDED or UNRESOLVED supplies reason, inspected_refs, '
                         'witness_ids and unknown_relations. No-action decisions are scoped claims, not semantic certification. '
