@@ -79,3 +79,12 @@
 3. 即使只做上述接口职责投影，原 `claim-2` 与 `claim-3` 仍没有任何 `witness:*`。这是冻结输出中的模型证据选择缺口，不再归因于字段身份、版本时间或消息值拼装。
 
 该回归已接入现有 Node-route 离线工作流；不新增注册层、兼容层、自然重跑或付费评价。
+
+
+## field-link v2 冻结回归
+
+第二次单次试验 `37314310759`（head `f684bd03`，artifact `11347431060`）证明上一轮的消息值生产断点已经消失：模型不再提交完整 `host_message.value`，replacement 也不再重复 attribution。新的第一失败点是 `PROPOSAL_ACTION_BUDGET`。冻结 FINAL 同时提交了一个针对 `state:host_parent` 的 `application_actions[A1]` 和一个 `host_message[M1]`，而本轮预冻结能力明确为 `writable_refs=[]`、`message_fields=[/inbox/release_lead/0/content]`、`max_actions=1`。因此这不是需要增加字段，而是同一消息修复被生产成两个动作表述。
+
+活动接口现直接把已有能力边界写清：`application_actions` 只能使用 `task_capabilities.writable_refs`；当该列表为空时必须为 `[]`。在本轮 `max_actions=1` 的 pending-message 分支中，`host_message` 是唯一写动作，验证任务依赖 `host_message.action_id`。旧 v2 FINAL 原样离线回放必须以明确的 connected-shape 错误拒绝，不能静默转换。
+
+v2 还留下一个独立的模型证据选择缺口：它读取了 parent 的 `web/index.html`、`web/app.js` 和 TASK_START 的 `web/index.html`，但只选择了当前消息的 `witness:1`。其唯一 diagnosis 以 `file:web/index.html` 为 destination，却没有对应 selected witness。即使机械删除重复的 application action 并修正执行依赖，仍不能生成有效 SOURCE_BOUND_CLAIM；读过不等于引用。该点继续保留为模型侧证据选择问题，不再扩张字段基础设施。

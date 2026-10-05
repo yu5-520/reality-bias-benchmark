@@ -126,7 +126,7 @@ OUTPUT_SCHEMA = {
                        'authority_effect': 'claimed effect', 'limitation': 'uncertainty',
                        'witness_ids': ['selected witness:* IDs covering both source_ref and destination_ref']}],
         'unknown_relations': [], 'expected_postconditions': [], 'host_answer': None,
-        'host_message': {'action_id': 'unique id or omit host_message for file repair',
+        'host_message': {'action_id': 'unique id or omit host_message for file repair; when present and max_actions=1 this is the sole write action',
             'target_ref': 'state:host_parent', 'kind': 'PENDING_MESSAGE_REPLACE',
             'field_path': 'exact task_capabilities.message_fields pointer',
             'before_value_hash': 'text_hash returned by the current message read; never invent or calculate a hash',
@@ -134,7 +134,8 @@ OUTPUT_SCHEMA = {
             'before_span_hash': 'span_hash returned by the selected original-clause witness',
             'replacement': 'source-qualified replacement for only the selected original span; omit attribution and full message value',
             'depends_on': [], 'diagnosis_ids': []},
-        'application_actions': [{'action_id': 'unique id', 'target_ref': 'writable and inspected file ref',
+        'application_actions': [{'action_id': 'unique id; use only for task_capabilities.writable_refs; MUST be [] when writable_refs is empty',
+            'target_ref': 'writable and inspected application file ref; never state:host_parent',
             'kind': 'TEXT_SPAN_REPLACE|JSON_LEAF_REPLACE', 'start': 'text character offset', 'end': 'exclusive offset',
             'pointer': 'JSON pointer (JSON_LEAF_REPLACE only; omit start/end)',
             'before_value_hash': 'sha256 of exact replaced bytes or canonical JSON leaf', 'value': 'proposed replacement',
@@ -143,6 +144,22 @@ OUTPUT_SCHEMA = {
             'operation': 'copy host capability operation', 'refs': ['copy host capability refs'],
             'postcondition': 'copy host capability postcondition', 'depends_on': ['preceding action_id']}],
         'execution_order': ['action_id in execution order', 'verification_id after actions']}}}
+
+
+def validate_connected_repair_shape(envelope, proposal):
+    """Expose existing connected-branch capability boundaries before compilation."""
+    actions = proposal['application_actions']
+    message = proposal.get('host_message')
+    if not envelope['writable_refs']:
+        require(actions == [], 'CONNECTED_APPLICATION_ACTIONS_NOT_AUTHORIZED')
+    if message:
+        require(message['field_path'] in envelope.get('message_fields', []),
+                'CONNECTED_MESSAGE_FIELD_NOT_AUTHORIZED')
+        if envelope['max_actions'] == 1:
+            require(actions == [], 'CONNECTED_MESSAGE_IS_SOLE_ACTION')
+        for task in proposal['verification_tasks']:
+            require(message['action_id'] in task.get('depends_on', []),
+                    'CONNECTED_MESSAGE_VERIFICATION_DEPENDENCY_REQUIRED')
 
 
 class ConnectedAuthorization:
@@ -300,7 +317,11 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
                         'modify/preserve/verify, diagnoses with inspected endpoint witnesses and adoption UNKNOWN or NOT_ESTABLISHED, '
                         'unknown_relations, expected_postconditions, application_actions, host_answer null, optional host_message. '
                         'Every diagnosis must cite selected witness:* IDs covering both source_ref and destination_ref; raw read:* IDs '
-                        'or uncited reads are insufficient. A message action must replace only a preauthorized pending content field '
+                        'or uncited reads are insufficient. If you read an endpoint that will appear in a diagnosis, select its witness '
+                        'before FINAL; a read_version result alone is not a citation. application_actions may target only refs listed in '
+                        'task_capabilities.writable_refs. When writable_refs is empty, application_actions MUST be []. A pending message '
+                        'repair uses host_message as the sole write action when max_actions=1; never duplicate it as an application action. '
+                        'Its verification task depends_on host_message.action_id. A message action must replace only a preauthorized pending content field '
                         'and cite the current message plus actual prefix sources. The host prepends the fixed repair attribution; '
                         'do not include that attribution in replacement. Select a witness for the complete current message '
                         '(start=0, end=text_length) and for the replaced clause. Supply exact start/end, before_span_hash and '
@@ -348,6 +369,7 @@ class ConnectedPlanningSession(ReadOnlyPlanningActorSession):
             self._closed = True
             _json(self.out / 'decision.json', final)
             if final['decision'] == 'REPAIR':
+                validate_connected_repair_shape(self._envelope, final['proposal'])
                 require(final['proposal']['verification_tasks'], 'CONNECTED_HOST_VERIFICATION_REQUIRED')
                 for task in final['proposal']['verification_tasks']:
                     require(any(all(task.get(k) == cap[k] for k in ['verification_id', 'operation', 'refs', 'postcondition'])
