@@ -93,7 +93,7 @@ def scripted_proposal(context):
         'expected_postconditions': ['Attributed correction delivered through the original inbox; unrelated state retained.'],
         'application_actions': [], 'host_answer': None, 'host_message': action,
         'verification_tasks': [cap], 'execution_order': [action['action_id'], cap['verification_id']]}
-    return session, proposal
+    return session, proposal, expected_value
 
 
 def run(args):
@@ -101,7 +101,7 @@ def run(args):
     os.environ['PYTHONDONTWRITEBYTECODE'] = '1'
     context = load_context(args.source_root, 'mechanism')
     try:
-        session, proposal = scripted_proposal(context)
+        session, proposal, expected_value = scripted_proposal(context)
         names = {'complete_catalog': 'catalog', 'node_context': 'node', 'read_file': 'file',
             'current_pending_message': 'message', 'observation_source': 'observation', 'select_source_witness': 'witness'}
         contents = []
