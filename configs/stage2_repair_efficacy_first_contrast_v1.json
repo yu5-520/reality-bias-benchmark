@@ -1,7 +1,7 @@
 {
   "schema": "stage2-repair-efficacy-first-contrast-v1",
   "date_utc": "2026-10-06",
-  "status": "FROZEN_BEFORE_SINGLE_B_EXECUTION",
+  "status": "B_CAPTURED_SOURCE_BOUND_COMPARISON_SEALED",
   "scientific_priority": "P0_REPAIR_METHOD_EFFICACY",
   "question": "Does a prefix-only source-bound route repair produce a better downstream process trajectory than the already-frozen local process revision from the same G3-X4-T2 parent?",
   "case": {
@@ -99,12 +99,25 @@
     "local_A_reruns": 0,
     "automatic_replay": false,
     "automatic_paid_evaluator": false,
-    "freeze_B_outcome_whether_success_failure_censor_or_native_boundary": true
+    "freeze_B_outcome_whether_success_failure_censor_or_native_boundary": true,
+    "actual_B_workflow_run": 37349337495,
+    "actual_B_artifact_id": 11361543373,
+    "actual_B_artifact_sha256": "91ebc92f0b58ac3b2bd7090cd356e6a98a974a90fa1e86907e0e41587f9814b5"
   },
   "claim_boundary": [
     "This first contrast tests method-level downstream process effect in one same-parent case; it is not a universal repair-success estimate.",
     "Arm B uses a frozen prefix-only source-bound manual route plan so autonomous planning reliability is not a treatment variable.",
-    "The route plan contains an unknown historical-adoption relation; independent review must retain that uncertainty.",
+    "The route plan contains an unknown historical-adoption relation; source-bound comparison must retain that uncertainty.",
     "A successful native write or passing engineering check is not repair efficacy."
-  ]
+  ],
+  "result": {
+    "machine_summary": "stage2/replication_v2/repair_efficacy_first_contrast_v1/summary.json",
+    "report": "docs/reports/2026-10-06_Repair_Efficacy_First_Contrast.md",
+    "overall_process_effect": "MIXED_EFFECT",
+    "mechanism_class": "LOCALITY_IMPROVED_TEMPORAL_AND_COORDINATION_INERTIA_PERSIST",
+    "temporal_reach_change": "STABLE_AT_NATIVE_CEILING",
+    "mutation_breadth_vs_local": "REDUCED",
+    "route_relation": "DIVERGED",
+    "next_gate": "SELECT_AT_MOST_ONE_MINIMAL_DISCRIMINATING_FOLLOWUP_AFTER_FREEZE"
+  }
 }

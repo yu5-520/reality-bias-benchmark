@@ -1,6 +1,6 @@
 # Stage II first repair-efficacy contrast
 
-Status: **FROZEN BEFORE THE SINGLE ENHANCED-B EXECUTION**.
+Status: **B CAPTURED — SOURCE-BOUND COMPARISON SEALED**.
 
 This protocol overrides engineering-completeness sequencing for the paper experiment. The enhanced monitor has already been evaluated; the present scientific question is whether the enhanced repair method changes downstream process behavior more effectively than the historical local/package method.
 
@@ -10,68 +10,51 @@ The first case is `G3-X4-T2` at native sequence 4, parent checkpoint
 `98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3`.
 The original task, subject configuration, native ceiling 64 and remaining horizon 60 are fixed.
 
-Arm A is not rerun. It is the canonical frozen local repair from workflow `36309205795`,
-package `g1pkg:0f95ddfd0d1341eb815d5a83`. That intervention reopened the local file-list
-process state and the sealed paired audit classified the downstream result as `REGENERATION`:
-the repaired suffix expanded to the turn budget and changed `app.js`,
-`checkout_app/api.py` and `index.html`.
+Arm A was not rerun. It is the canonical frozen local repair from workflow `36309205795`,
+package `g1pkg:0f95ddfd0d1341eb815d5a83`. Its sealed paired audit classified the downstream result as `REGENERATION`.
 
-Arm B is the only new branch. It uses the already implemented sequence-4
-`PrefixMCPContext`, complete prefix evidence graph and source-bound native MCP route repair.
-The plan is frozen from prefix-only source inspection before this execution. It changes the
-conditional alternate launcher default in `run.py` from legacy-on to current-off while
-preserving explicit compatibility mode and the documented direct route. Historical actual
-use of the alternate launcher remains unknown and is retained as uncertainty.
+Arm B was executed exactly once in workflow `37349337495`. It used the sequence-4
+`PrefixMCPContext`, complete prefix evidence graph and a frozen prefix-only source-bound native MCP route repair. No planning model was used and there was no retry. The original subject system then consumed all 60 remaining calls and reached the unchanged turn-64 ceiling.
 
-## 2. What is deliberately *not* required
+## 2. Frozen first result
 
-Autonomous diagnosis/planning is not part of this efficacy treatment. The evidence-selection
-gate contrast, generic planner reliability, seven-system repair reuse, automatic recovery and
-additional field infrastructure do not block this experiment.
+Arm B preserved its intended `run.py` route correction, reduced subject writes from 5 to 2 relative to the local arm, avoided the local arm's added `checkout_app/api.py`, security-role work and delegation actions, and shifted activity toward QA/review.
 
-This separation is intentional. Otherwise the treatment would combine graph quality, planning
-reliability, tool-use compliance and repair method in one comparison. Here the repair plan is
-source-bound and frozen, so the new observation concerns the downstream effect of the repair
-method itself.
+It did **not** reduce temporal reach: both arms reached turn 64. Pre-existing QA/reviewer/frontend obligations were already present at the common parent and remained live after the application repair. Even after later agents recognized that the payment feature already existed, review/test work was repeatedly reopened.
 
-## 3. Execution rule
+The frozen paired classification is therefore:
 
-Only Arm B is executed:
+**MIXED_EFFECT — locality improved, temporal and coordination inertia persisted.**
 
-`same parent -> frozen route repair -> repair executor exit -> original subject continuation -> enhanced external monitoring -> independent semantic/authority review`
+Machine-readable result:
+`stage2/replication_v2/repair_efficacy_first_contrast_v1/summary.json`.
 
-There is no Natural-A rerun, no Arm-A rerun, no automatic retry and no paid reviewer.
-The subject retains the original 64-turn ceiling and all 60 calls remaining at the parent.
-The B result is frozen whether it finalizes, reaches the ceiling, fails at a native boundary
-or produces an unfavorable trajectory.
+Human-readable analysis:
+`docs/reports/2026-10-06_Repair_Efficacy_First_Contrast.md`.
 
-The repair executor may perform the already frozen one-file route action and its host-defined
-controlled verification. Passing that verification is not efficacy. Efficacy is evaluated only
-from the continued process.
+## 3. What is deliberately not required
 
-## 4. Primary comparison
+Autonomous diagnosis/planning is not part of this efficacy treatment. The evidence-selection gate contrast, generic planner reliability, seven-system repair reuse, automatic recovery and additional field infrastructure do not block this experiment.
 
-The independent review compares Arm B with the already sealed Arm A on:
+This separation is intentional. Otherwise the treatment would combine graph quality, planning reliability, tool-use compliance and repair method in one comparison.
 
-- direct target effect and overall process effect;
-- route divergence, collaboration-scope change and temporal reach;
-- preservation of unrelated process structure;
-- old C/P authority after continuation, historical re-entry and transformed descendants;
-- process-account consistency and independent reconstruction.
+## 4. Outcome boundary
 
-Endpoint correctness is secondary. A write, test pass, final answer or shorter route cannot
-alone establish repair success.
+A successful native write or host verification is not repair success. Endpoint correctness remains secondary. The scientific result is the complete continued process and its comparison with the already frozen local-repair suffix.
 
-## 5. Paper boundary
+The current source-bound comparison does not infer hidden reasoning and does not independently relabel CPR dimensions merely from role counts. It records the observed persistence/re-entry of live task and collaboration obligations as a mechanism candidate for the frozen CPR framework.
 
-This is a single same-parent method contrast chosen because the historical local intervention
-already exhibits a strong regeneration outcome. It does not estimate repeat-run probability
-or universal repair effectiveness. If the enhanced route repair is cleaner, equivalent, worse
-or blocked, that first-attempt outcome is retained. Additional cases are selected only after
-this result is interpreted.
+## 5. No replay
 
-Machine-readable contract:
-`configs/stage2_repair_efficacy_first_contrast_v1.json`.
+Natural-A reruns: **0**.  
+Local-control reruns: **0**.  
+Enhanced-treatment retries: **0**.  
+Planning-provider calls for B: **0**.
 
-Runner:
-`scripts/run_stage2_repair_efficacy_first_contrast.py`.
+The first B result is sealed whether favorable or unfavorable. A later follow-up, if scientifically needed, must be a separately frozen discriminating method contrast rather than a retry.
+
+## 6. Next gate
+
+Do not resume field/registry/planner construction.
+
+The next question is narrower: whether a method that addresses the **live inherited coordination/task-obligation path**, in addition to the already corrected application route, can reduce the persistent review/test loop while preserving unrelated semantic progress.
