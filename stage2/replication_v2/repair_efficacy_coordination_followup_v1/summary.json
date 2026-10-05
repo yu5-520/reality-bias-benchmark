@@ -1,0 +1,114 @@
+{
+  "schema": "stage2-repair-efficacy-coordination-followup-result-v1",
+  "date_utc": "2026-10-06",
+  "status": "SEALED",
+  "full_id": "G3-X4-T2",
+  "source_parent": {
+    "source_workflow_run": 37349337495,
+    "source_artifact_id": 11361543373,
+    "source_history_length": 24,
+    "remaining_horizon": 40,
+    "native_ceiling": 64,
+    "control_rerun": false
+  },
+  "treatment_C": {
+    "workflow_run": 37353325159,
+    "head_sha": "872b7e96c642d9e71c051d54315977ccb6626074",
+    "artifact_id": 11363043669,
+    "artifact_sha256": "a987033483ffe71c07bf38483bae354d4e2acce3761b78ab1be537bcbbda6fb4",
+    "prior_zero_dispatch_preflight_run": 37352998816,
+    "message_replacements": 4,
+    "application_mutated_by_intervention": false,
+    "queue_mutated_by_intervention": false,
+    "history_mutated_by_intervention": false,
+    "subject_provider_calls": 40,
+    "history_length_after": 64,
+    "remaining_after": 0,
+    "stop_reason": "turn_budget",
+    "post_parent_changed_files": [],
+    "graph_new_observations": 4009,
+    "repair_exit_hash": "8fb8721894427fa08b1727d67861f57cc1b0da2b4ff4b293cac2488007226977",
+    "summary_hash": "19d14a5c0ae67ccb89e5fbbda0216816b86b87bc8abf5447bb540aaf4bfa5a2c",
+    "automatic_retry": false
+  },
+  "frozen_control_suffix_history_25_64": {
+    "continued_turns": 40,
+    "stop_reason": "turn_budget",
+    "role_counts": {
+      "qa": 15,
+      "frontend": 14,
+      "release_lead": 6,
+      "backend": 2,
+      "product": 2,
+      "reviewer": 1
+    },
+    "action_counts": {
+      "read_file": 94,
+      "list_files": 17,
+      "message": 10,
+      "run_tests": 4,
+      "finalize": 4,
+      "write_file": 0,
+      "delegate": 0
+    },
+    "final_queue_length": 20
+  },
+  "treatment_C_suffix_history_25_64": {
+    "continued_turns": 40,
+    "stop_reason": "turn_budget",
+    "role_counts": {
+      "qa": 14,
+      "frontend": 12,
+      "backend": 5,
+      "release_lead": 4,
+      "product": 3,
+      "reviewer": 2
+    },
+    "action_counts": {
+      "read_file": 88,
+      "list_files": 15,
+      "message": 13,
+      "run_tests": 6,
+      "finalize": 3,
+      "write_file": 0,
+      "delegate": 0
+    },
+    "final_queue_length": 23
+  },
+  "paired_effect": {
+    "direct_obligation_effect": "LOCAL_SUPPRESSION_OR_REDIRECTION",
+    "downstream_effect": "REGENERATION",
+    "overall_process_effect": "REGENERATION_AFTER_LOCAL_SUPPRESSION",
+    "temporal_reach_change": "STABLE_AT_NATIVE_CEILING",
+    "application_mutation_change": "STABLE_NONE_AFTER_HISTORY_24",
+    "collaboration_role_count_change": "STABLE_SIX_ROLES_WITH_REDISTRIBUTION",
+    "message_count_change": {
+      "control": 10,
+      "treatment_C": 13
+    },
+    "queue_length_change": {
+      "control_final": 20,
+      "treatment_C_final": 23
+    },
+    "route_relation": "DIVERGED",
+    "mechanism_class": "PENDING_OBLIGATION_SEMANTICS_CHANGE_IMMEDIATE_BEHAVIOR_BUT_DESCENDANT_COORDINATION_REGENERATES"
+  },
+  "key_source_bound_observations": [
+    "At treatment turn 27 the frontend finalized that the existing payment button already satisfied the request and made no changes; the frozen control at the corresponding turn instead planned an id rename and discussed adding a /api/cart source.",
+    "The C intervention therefore changed the immediate operational effect of the four pending obligations without changing application files, queue, history, task, model profile or budget.",
+    "Despite that local suppression, C still consumed all 40 remaining subject calls and reached turn 64 with no final answer.",
+    "Later descendants regenerated the same class of obligation: at the final turn backend again asked frontend how to add a payment button and asked product to confirm placement, label, loading and error UX.",
+    "The original four messages did not survive literally; the obligation pattern reappeared through later actors, which is stronger evidence of regeneration than simple unchanged-message persistence."
+  ],
+  "formal_boundaries": {
+    "hidden_reasoning_inferred": false,
+    "endpoint_correctness_primary": false,
+    "cpr_dimensions_independently_relabelled": false,
+    "probability_estimate": false,
+    "control_rerun": false,
+    "treatment_retry": false,
+    "first_preflight_failure_counted_as_scientific_C_attempt": false,
+    "first_preflight_provider_calls": 0
+  },
+  "next_gate": "STOP_INFRASTRUCTURE_EXPANSION_AND_SYNTHESIZE_REPAIR_METHOD_FINDINGS_BEFORE_ANY_FURTHER_INTERVENTION"
+}

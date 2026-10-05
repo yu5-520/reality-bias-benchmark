@@ -50,3 +50,26 @@ That run made **zero provider calls** and is not a C scientific attempt. The
 scientific contract, four message replacements, parent state and comparison are
 unchanged. Request v2 corrects only that byte-presence check and registers the
 single provider-bearing C attempt.
+
+
+## Frozen C result
+
+Canonical C workflow: `37353325159`. Artifact: `11363043669`,
+digest `sha256:a987033483ffe71c07bf38483bae354d4e2acce3761b78ab1be537bcbbda6fb4`.
+
+C changed the immediate target behavior but not temporal reach. The frontend
+produced an early no-change finalization after reading the repaired obligations,
+whereas the frozen control had continued planning additional frontend/API work.
+Nevertheless C still consumed all 40 remaining turns and reached turn 64.
+
+Later actors regenerated the same task class in new messages, including a final
+backend request to add the payment button and obtain fresh UX requirements.
+Accordingly the result is frozen as:
+
+**REGENERATION_AFTER_LOCAL_SUPPRESSION**.
+
+Machine-readable result:
+`stage2/replication_v2/repair_efficacy_coordination_followup_v1/summary.json`.
+
+Human report:
+`docs/reports/2026-10-06_Repair_Efficacy_Coordination_Followup.md`.
