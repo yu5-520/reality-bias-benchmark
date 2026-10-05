@@ -38,10 +38,6 @@
 
 本次到此收口：静态检索、直接链接、冻结回放，以及活动生产端/消费端的单一字段职责。不增加注册层，也不自动登记新试验。
 
-## 冻结失败回归
-
-`#37300920836` 的原始失败 artifact 保持为权威原件；仓库只保存一个最小、可校验的静态投影。该投影固定原 run/artifact/head、原 outcome/decision/query_log/witnesses/final response 的 SHA256、原始 pending message、host_message 以及 diagnosis→witness 分布。回归测试直接调用当前运行时，要求旧 action 原样先被 `MESSAGE_DERIVED_VALUE_MUST_BE_OMITTED` 拒绝；仅移除旧 `value` 后仍被 `MESSAGE_REPLACEMENT_MUST_EXCLUDE_ATTRIBUTION` 拒绝。机械消除这两处接口重复后，`claim-2/claim-3` 仍无 selected witness，因此不得把冻结失败自动迁移为成功，也不得补造证据。
-
 ## e55d5c3 检索计数（整理基线）
 
 范围：活动规划链路及其直接调用的 8 个模块。下表按 AST 中完全匹配字段名的字符串常量计数，包含读写、校验和说明，不代表独立字段定义数量；历史证据不参与计数。
