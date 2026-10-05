@@ -59,8 +59,14 @@ jobs:
           assert run['run_attempt']==1
           pages=subprocess.check_output(['gh','api','--paginate','--slurp',f"repos/{repo}/actions/workflows/{run['workflow_id']}/runs?per_page=100"])
           earlier=[r for p in json.loads(pages) for r in p['workflow_runs'] if r['id']<run['id']]
-          assert not earlier, 'FIELD_LINK_V3_TRIAL_ALREADY_REGISTERED_NO_REPLAY'
-          print(json.dumps({'trial_id':request['trial_id'],'implementation_ci':'PASS','prior_failure_retained':True,'single_trial_registered':True}))
+          allowed_zero={x['run_id']:x for x in request.get('zero_dispatch_workflow_failures',[])}
+          assert {r['id'] for r in earlier}==set(allowed_zero), 'UNREGISTERED_V3_WORKFLOW_ATTEMPT'
+          for prior in earlier:
+              jobs=api(f"actions/runs/{prior['id']}/jobs")['jobs']
+              execute=[s for j in jobs for s in j.get('steps',[]) if s['name']=='Execute one field-link-v3 branch trial with retained provider bytes']
+              assert len(execute)==1 and execute[0]['conclusion']=='skipped', 'V3_PROVIDER_DISPATCH_ALREADY_STARTED_NO_REPLAY'
+              assert prior['head_sha']==allowed_zero[prior['id']]['head_sha']
+          print(json.dumps({'trial_id':request['trial_id'],'implementation_ci':'PASS','prior_failure_retained':True,'zero_dispatch_failures_retained':sorted(allowed_zero),'single_provider_trial_registered':True}))
           PY
       - name: Materialize immutable natural prefix archive
         run: |
@@ -68,7 +74,7 @@ jobs:
           commit=$(python -c "import json; print(json.load(open('configs/stage2_g3_ab_paired_semantic_audit_v1.json'))['source']['natural_A_evidence_commit'])")
           mkdir -p "$RUNNER_TEMP/sources/G3A"
           git cat-file -e "$commit^{commit}" || git fetch origin "$commit"
-          git archive "$commit" stage2/replication_v3/G3/natural_A | tar -x -C "$RUNNER_TEMP/sources/G3A"
+          git archive "$commit" stage2/replication_v2/G3/natural_A | tar -x -C "$RUNNER_TEMP/sources/G3A"
       - name: Bind unchanged official MCP sources and runtime
         run: |
           set -euo pipefail
