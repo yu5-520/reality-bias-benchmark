@@ -15,7 +15,7 @@
 | `field_path` | 宿主 task_capabilities.message_fields | message_source、message、授权编译器使用同一路径；进度明确完整当前消息证据要求 |
 | `before_value_hash` | 当前消息 read.text_hash | 消息替换前值校验 |
 | `before_span_hash/replacement/start/end` | 选中原句的 witness.span_hash，加模型提出的替换内容 | native_message 校验原句和局部替换；不自动扩展到整条消息 |
-| `value` | attribution + 原文前缀 + replacement + 原文后缀 | native_message 验证完整目标值，保留无关内容 |
+| `value` | 宿主编译器依据冻结当前消息、选中 span、replacement 与固定 attribution 派生；模型不再提交 | native_message 再验证完整目标值，保留选中 span 外的原文 |
 | `verification_tasks/execution_order` | 已有宿主验证能力 + 模型动作引用 | 输出模板改为真实数组结构，与 compile() 的数组/顺序要求一致；不把逗号字符串转换成数组 |
 
 ## 本次消除的断点
@@ -25,6 +25,7 @@
 3. read_version 返回 source_version，证据结果及后续进度通过原始来源定位保持这一连接。未知/非文件来源显示 null，并保留原始 source_locator；不为它推测文件版本。
 4. 当前消息的完整证据片段要求原来主要存在于编译器，现由 pending_message_sources 明确呈现，并在请求中说明。生成证据仍须显式调用，错误 FINAL 仍立即结束。
 5. execution_order 和 verification_tasks 的输出模板由文字描述改为数组示例，与实际消费者一致。
+6. 单次 field-link 试验 `37300920836` 已正确使用合法 witness 并区分 TASK_START 与 parent，但最终同时提交 replacement 与完整 value，触发 `UNRELATED_MESSAGE_TEXT_DRIFT`。活动接口现只接受局部 replacement；完整 value 由宿主派生，不增加新字段或兼容层。每个 diagnosis 的 source/destination witness 要求也直接暴露给模型。
 
 ## 验证及限制
 
@@ -35,9 +36,9 @@
 - 当前完整导航 JSON 为 108265 字节（ensure_ascii=False、sort_keys=True 默认 JSON 分隔符）。显式关联时间增加了元数据体积；不宣称节省 token。预算和模型参数不变。
 - 当前/历史的字段关联已明确，不等于语义判定必然正确。TASK_START 不能单独证明当前不存在某功能；当前功能存在也不能证明历史从未修改。不得以字段一致性认证修复有效。
 
-本次到此收口：静态检索、直接链接、冻结回放。不增加注册层，也不自动登记新试验。
+本次到此收口：静态检索、直接链接、冻结回放，以及活动生产端/消费端的单一字段职责。不增加注册层，也不自动登记新试验。
 
-## 检索计数
+## e55d5c3 检索计数（整理基线）
 
 范围：活动规划链路及其直接调用的 8 个模块。下表按 AST 中完全匹配字段名的字符串常量计数，包含读写、校验和说明，不代表独立字段定义数量；历史证据不参与计数。
 

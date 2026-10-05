@@ -30,8 +30,10 @@ actual-source witnesses, separates modify/preserve/verify roles, records unknown
 relations and submits a complete proposal. Source-query replay rejects inserted
 or fabricated witnesses. A description or graph connection cannot widen writes.
 
-The exact current message version, replacement span and final value are then
-bound by the host. Text outside the selected clause stays byte-identical, apart
+The exact current message version and replacement span are bound by the host.
+The planner supplies only the replacement for that selected span; it does not
+supply the complete message value. The host derives the final value from the
+frozen current message plus the fixed attribution header. Text outside the selected clause stays byte-identical, apart
 from a visible repair-attribution header. The native `from` field is retained;
 the header explicitly states that the revised text is a branch repair annotation
 and is not a new statement from the original sender. The original message remains
@@ -290,3 +292,23 @@ it has not yet run in this local checkout.
 ## 2026-10-05 活动字段连接整理
 
 现行导航使用 v3 自包含版本记录，替代 v2 平行数组；工具参数校验直接引用既有工具说明。读取和证据进度显式链接来源版本。字段生产/消费对照、检索计数及验证限制见 [StageII_Field_Link_Audit.md](StageII_Field_Link_Audit.md)。本次不增加注册表或付费实验；历史记录保持原状。
+
+## Field-link trial closure
+
+Run `37300920836` used the field-linked interface and, unlike the earlier
+failures, selected a legal `witness:1`, read exact host-issued parent and
+TASK_START versions, and correctly distinguished current functionality from
+historical process accounting. It then failed closed at
+`UNRELATED_MESSAGE_TEXT_DRIFT` because the actor supplied both a replacement
+that already contained the repair attribution and a separately composed full
+message `value`.
+
+The active interface now removes that duplicate producer responsibility.
+A pending-message proposal supplies `start`, `end`, `before_span_hash` and
+the local `replacement`; the host derives the complete attributed value from
+the frozen current message. Actor-supplied full values are rejected rather than
+silently normalized. The diagnosis contract also states the already enforced
+rule that each diagnosis must cite selected `witness:*` IDs covering both
+source and destination endpoints. Raw `read:*` IDs remain non-citations.
+This is an interface-link correction only: no registry, compatibility layer,
+natural rerun or new paid trial is introduced.

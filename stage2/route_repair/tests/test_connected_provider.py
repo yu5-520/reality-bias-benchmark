@@ -261,6 +261,10 @@ class ConnectedProviderTests(unittest.TestCase):
             self.assertIn('"kind":"TOOL"', host_request['instructions'])
             self.assertEqual(host_request['response_contract']['oneOf'][0]['required'], ['kind', 'name', 'arguments'])
             self.assertFalse(host_request['response_contract']['oneOf'][0]['additionalProperties'])
+            message_contract = host_request['output_schema']['repair']['proposal']['host_message']
+            self.assertNotIn('value', message_contract)
+            self.assertIn('Do not return a full message value', host_request['instructions'])
+            self.assertIn('covering both source_ref and destination_ref', host_request['instructions'])
             self.assertEqual(result['state'], 'COMPLETED')
             self.assertEqual(result['tool_queries'], 1)
             self.assertEqual(result['actor_calls'], 2)

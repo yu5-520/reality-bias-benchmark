@@ -39,7 +39,7 @@ class NativeMessageTests(unittest.TestCase):
             ids.append(self.s.witness(read['read_id'], 0, len(read['text']))['witness_id'])
         self.action = {'action_id': 'm1', 'kind': 'PENDING_MESSAGE_REPLACE', 'target_ref': 'state:host_parent',
             'field_path': '/inbox/release_lead/0/content', 'before_value_hash': digest(b'No changes were needed.'),
-            'value': ATTRIBUTION + 'Fixture correction with uncertainty retained.', 'depends_on': [], 'diagnosis_ids': ['d1']}
+            'depends_on': [], 'diagnosis_ids': ['d1']}
         self.action.update(start=0, end=len('No changes were needed.'), before_span_hash=digest(b'No changes were needed.'),
                            replacement='Fixture correction with uncertainty retained.')
         self.p = {'schema': 'stage2-complete-route-proposal-v1', 'original_task': TASKS['T2'],
@@ -68,7 +68,9 @@ class NativeMessageTests(unittest.TestCase):
         auth = self.compile(); policy = auth.bundle['host_message_policy']
         files = file_tree_manifest(self.root)
         after, receipt = apply_message_policy(self.c, self.host, self.adapter, self.root, policy, self.observer())
-        expected = copy.deepcopy(self.state); expected['inbox']['release_lead'][0]['content'] = self.action['value']
+        expected = copy.deepcopy(self.state)
+        expected['inbox']['release_lead'][0]['content'] = policy['action']['value']
+        self.assertEqual(policy['action']['value'], ATTRIBUTION + self.action['replacement'])
         self.assertEqual(after, expected); self.assertEqual(file_tree_manifest(self.root), files)
         self.assertTrue(receipt['original_sender_retained']); self.assertFalse(receipt['semantic_adoption_verified'])
         self.assertIsNone(auth.bundle['application_plan']); self.assertIsNone(auth.bundle['host_answer_policy'])
@@ -81,10 +83,15 @@ class NativeMessageTests(unittest.TestCase):
         for field in ['/inbox/release_lead/0/from', '/max_turns', '/history/0/content', '/answer']:
             with self.assertRaisesRegex(BranchConstraintError, 'CONTENT_FIELD_REQUIRED'): self.compile([field])
 
-    def test_unattributed_or_stale_replacement_rejected_before_write(self):
-        for key, value, error in [('value', 'Unattributed correction.', 'ATTRIBUTION'),
-                                 ('before_value_hash', 'stale', 'VERSION_DRIFT'),
-                                 ('depends_on', ['future'], 'DEPENDENCY')]:
+    def test_actor_value_or_stale_replacement_is_rejected_before_write(self):
+        self.action['value'] = 'Actor-computed full message.'
+        with self.assertRaisesRegex(BranchConstraintError, 'DERIVED_VALUE_MUST_BE_OMITTED'): self.compile()
+        self.action.pop('value')
+        self.action['replacement'] = ATTRIBUTION + 'Duplicated attribution.'
+        with self.assertRaisesRegex(BranchConstraintError, 'REPLACEMENT_MUST_EXCLUDE_ATTRIBUTION'): self.compile()
+        self.action['replacement'] = 'Fixture correction with uncertainty retained.'
+        for key, value, error in [('before_value_hash', 'stale', 'VERSION_DRIFT'),
+                                  ('depends_on', ['future'], 'DEPENDENCY')]:
             original = copy.deepcopy(self.action); self.action[key] = value
             with self.assertRaisesRegex(BranchConstraintError, error): self.compile()
             self.action.clear(); self.action.update(original)
@@ -107,10 +114,11 @@ class NativeMessageTests(unittest.TestCase):
             apply_message_policy(self.c, self.host, self.adapter, self.root, policy, self.observer())
         self.assertEqual(self.host.inbox['release_lead'][0]['content'], 'New native message')
 
-    def test_text_outside_the_selected_clause_cannot_be_silently_replaced(self):
+    def test_host_derived_value_preserves_text_outside_the_selected_clause(self):
         self.action['start'] = 3
         self.action['before_span_hash'] = digest(b'changes were needed.')
-        with self.assertRaisesRegex(BranchConstraintError, 'UNRELATED_MESSAGE_TEXT_DRIFT'): self.compile()
+        policy = self.compile().bundle['host_message_policy']
+        self.assertEqual(policy['action']['value'], ATTRIBUTION + 'No ' + self.action['replacement'])
 
     def test_source_quote_selection_derives_offsets_hash_without_write_authority(self):
         read = self.s.message('/inbox/release_lead/0/content')

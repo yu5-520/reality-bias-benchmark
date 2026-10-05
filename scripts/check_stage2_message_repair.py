@@ -65,10 +65,10 @@ def scripted_proposal(context):
         'untouched" is not supported for this trajectory. Preserve the existing working payment flow and '
         'the original task. This annotation corrects process accounting only; it does not establish that '
         'the coordinator has read or adopted the old claim, nor certify complete functionality.')
-    value = ATTRIBUTION + r['text'][:start] + replacement + r['text'][end:]
+    expected_value = ATTRIBUTION + r['text'][:start] + replacement + r['text'][end:]
     action = {'action_id': 'correct_pending_process_account', 'target_ref': 'state:host_parent',
         'kind': 'PENDING_MESSAGE_REPLACE', 'field_path': '/inbox/release_lead/0/content',
-        'before_value_hash': r['text_hash'], 'value': value, 'depends_on': [],
+        'before_value_hash': r['text_hash'], 'depends_on': [],
         'start': clause_witness['start'], 'end': clause_witness['end'],
         'before_span_hash': clause_witness['span_hash'], 'replacement': replacement,
         'diagnosis_ids': ['prefix-process-account']}
@@ -129,7 +129,7 @@ def run(args):
             paused = json.loads((branch / 'paused_state.json').read_bytes())
             after = json.loads((branch / 'native_state_after.json').read_bytes())
             expected = json.loads(json.dumps(before))
-            expected['inbox']['release_lead'][0]['content'] = proposal['host_message']['value']
+            expected['inbox']['release_lead'][0]['content'] = expected_value
             require(paused == expected, 'MESSAGE_ONLY_NATIVE_FIELD_PRESERVATION')
             require(file_tree_manifest(branch / 'application') == context.parent['manifest']['application_file_hashes'],
                     'MESSAGE_REPAIR_CHANGED_APPLICATION')
@@ -139,7 +139,7 @@ def run(args):
             prompt = json.loads((subject / '0006/request.bin').read_bytes())
             native_prompt = json.loads(prompt['messages'][1]['content'])
             delivered = [m['content'] for m in native_prompt['inbox']]
-            require(proposal['host_message']['value'] in delivered, 'CORRECTION_NOT_DELIVERED_TO_COORDINATOR')
+            require(expected_value in delivered, 'CORRECTION_NOT_DELIVERED_TO_COORDINATOR')
             require(before['inbox']['release_lead'][0]['content'] not in delivered,
                     'UNREPAIRED_CLAIM_STILL_DELIVERED')
             release = json.loads((branch / 'phase_receipt.json').read_bytes())['release']
