@@ -250,7 +250,7 @@ def preflight(c,state,files,prefix,out):
         role,index=parse_field(a['field_path']); msg=state['inbox'][role][index]
         require(msg['from']==a['original_sender'] and digest(msg['content'].encode())==a['before_sha256'],
                 'COORD_PREFLIGHT_MESSAGE_DRIFT')
-    require(b'#pay-button' in files['web/index.html'] and b'/api/checkout' in files['web/app.js'],
+    require(b'id="pay-button"' in files['web/index.html'] and b'/api/checkout' in files['web/app.js'],
             'COORD_PARENT_FEATURE_NOT_PRESENT')
     row=seal({'schema':'stage2-coordination-followup-preflight-v1','history_length':len(state['history']),
       'remaining_horizon':c['common_descendant_parent']['remaining_horizon'],

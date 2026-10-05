@@ -37,3 +37,16 @@ semantics, for example in accumulated queue structure or broader state.
 Either result is frozen. A shorter trajectory is not by itself repair success;
 the final comparison still examines semantic scope, writes, messages, role spread
 and unrelated progression.
+
+
+## Zero-dispatch preflight correction
+
+Workflow `37352998816` stopped before the provider step. The frozen artifact,
+descendant state and message hashes were bound successfully; preflight then used
+the CSS-selector bytes `#pay-button` as an HTML literal and rejected the actual
+`id="pay-button"` markup with `COORD_PARENT_FEATURE_NOT_PRESENT`.
+
+That run made **zero provider calls** and is not a C scientific attempt. The
+scientific contract, four message replacements, parent state and comparison are
+unchanged. Request v2 corrects only that byte-presence check and registers the
+single provider-bearing C attempt.
