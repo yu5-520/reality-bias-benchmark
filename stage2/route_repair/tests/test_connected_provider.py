@@ -300,6 +300,11 @@ class ConnectedProviderTests(unittest.TestCase):
         self.assertEqual(actual['text_hash'], digest(text.encode()))
         self.assertEqual(actual['text_length'], len(text))
         witness = requests[2]['source_read_state']['selected_witnesses'][0]
+        self.assertEqual(witness['source_version'], actual['source_version'])
+        self.assertTrue(actual['source_version']['is_parent'])
+        self.assertEqual(actual['source_version']['checkpoint_hash'], self.c.parent_checkpoint_hash)
+        self.assertEqual(requests[1]['messages'][-1]['result']['source_version'], actual['source_version'])
+        self.assertEqual(requests[2]['messages'][-1]['result']['source_version'], witness['source_version'])
         self.assertEqual(witness['span_hash'], actual['text_hash'])
         self.assertEqual((witness['start'], witness['end']), (0, len(text)))
         self.assertEqual([r['remaining_responses_including_this'] for r in requests], [16, 15, 14])
@@ -326,8 +331,9 @@ class ConnectedProviderTests(unittest.TestCase):
         self.assertEqual(index['all_node_refs'], original['all_node_refs'])
         for ref, rows in original['all_file_versions'].items():
             expected = sorted((r['checkpoint_hash'], r['content_sha256']) for r in rows)
-            recovered = sorted((index['checkpoints'][i]['checkpoint_hash'], group['content_sha256'])
-                for group in index['file_versions'][ref] for i in group['checkpoint_indices'])
+            recovered = sorted((row['checkpoint_hash'], row['content_sha256'])
+                for row in index['file_versions'][ref])
+            self.assertEqual(index['file_versions'][ref], SourceNavigation(self.c).versions(ref)['versions'])
             self.assertEqual(recovered, expected)
         self.assertFalse(index['metadata_is_source_read'])
         self.assertFalse(index['source_limits']['future_suffix_visible'])
@@ -349,7 +355,12 @@ class ConnectedProviderTests(unittest.TestCase):
         other = SourceNavigation(changed)
         self.assertFalse(set(nav._versions) & set(other._versions))
         session = __import__('stage2.route_repair.planning_session', fromlist=['RoutePlanningSession']).RoutePlanningSession(self.c, self.fixture.host.task)
-        self.assertEqual(nav.read(session, rows[0]['version_handle'])['text'], 'x=1\n')
+        reads = [nav.read(session, row['version_handle']) for row in rows]
+        self.assertEqual(reads[0]['text'], 'x=1\n')
+        self.assertEqual(reads[0]['text_hash'], reads[1]['text_hash'])
+        self.assertNotEqual(reads[0]['source_version']['is_parent'], reads[1]['source_version']['is_parent'])
+        for read in reads:
+            self.assertEqual(nav.read_version_metadata(session.reads[read['read_id']]), read['source_version'])
         with self.assertRaisesRegex(BranchConstraintError, 'OUTSIDE_VERIFIED_PREFIX'):
             other.read(session, rows[0]['version_handle'])
 

@@ -28,6 +28,19 @@ class SourceNavigation:
                 require(handle not in self._versions, 'DUPLICATE_VERSION_HANDLE')
                 self._versions[handle] = value
 
+    def describe(self, row):
+        return {**{k: copy.deepcopy(row[k]) for k in
+            ['ref', 'version_handle', 'checkpoint_hash', 'content_sha256', 'native_sequence', 'boundary']},
+            'is_parent': row['checkpoint_hash'] == self.context.parent_checkpoint_hash}
+
+    def read_version_metadata(self, read):
+        # Link an admitted read to its exact original locator, never by content
+        # hash alone: identical bytes can occur at different checkpoints.
+        matches = [row for row in self._versions.values()
+            if row['ref'] == read['ref'] and row['content_source'] == read['source_locator']]
+        require(len(matches) <= 1, 'AMBIGUOUS_READ_VERSION_LOCATOR')
+        return self.describe(matches[0]) if matches else None
+
     def versions(self, ref, at='ALL'):
         require(isinstance(ref, str) and ref in self.context.file_versions,
                 'NODE_OUTSIDE_VERIFIED_PREFIX')
@@ -39,8 +52,7 @@ class SourceNavigation:
             rows = [row for row in rows if row['checkpoint_hash'] == self.context.parent_checkpoint_hash]
         # Never substitute the earliest available file for an absent initial file.
         return {'status': 'AVAILABLE' if rows else 'VERSION_ABSENT', 'ref': ref, 'at': at,
-                'versions': [{k: row[k] for k in ['version_handle', 'checkpoint_hash',
-                    'content_sha256', 'native_sequence', 'boundary']} for row in rows],
+                'versions': [self.describe(row) for row in rows],
                 'source_content_read': False, 'write_authority_granted': False}
 
     def read(self, session, handle):
@@ -52,8 +64,9 @@ class SourceNavigation:
         require(row['checkpoint_hash'] == bound['checkpoint_hash']
                 and digest(row['content'].encode()) == bound['content_sha256'],
                 'VERSION_CONTENT_HASH_MISMATCH')
-        return session._read('read_file', {'ref': bound['ref'], 'checkpoint_hash': bound['checkpoint_hash']},
+        result = session._read('read_file', {'ref': bound['ref'], 'checkpoint_hash': bound['checkpoint_hash']},
                              bound['ref'], row['content'], row['source_locator'])
+        return {**result, 'source_version': self.describe(bound)}
 
 
 # Only errors that expose no new source or authority may remain in this session.

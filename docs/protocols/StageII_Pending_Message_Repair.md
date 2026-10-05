@@ -285,3 +285,8 @@ unrelated fields/files and the natural archive. It used the pinned official SDK
 and protocol with Python 3.12 locally. No live-model efficacy was measured.
 The fourth trial ZIP inspection is prepared for the read-only Actions workflow;
 it has not yet run in this local checkout.
+
+
+## 2026-10-05 活动字段连接整理
+
+现行导航使用 v3 自包含版本记录，替代 v2 平行数组；工具参数校验直接引用既有工具说明。读取和证据进度显式链接来源版本。字段生产/消费对照、检索计数及验证限制见 [StageII_Field_Link_Audit.md](StageII_Field_Link_Audit.md)。本次不增加注册表或付费实验；历史记录保持原状。
