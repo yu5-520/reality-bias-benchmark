@@ -30,6 +30,8 @@ on:
       - 'stage2/replication_v2/message_corrected_contract_followup_v1/**'
       - 'scripts/validate_stage2_message_source_read_trial.py'
       - 'stage2/replication_v2/message_source_read_contract_trial_v1/**'
+      - 'scripts/validate_stage2_field_link_frozen_failure.py'
+      - 'stage2/replication_v2/message_field_link_trial_v1/**'
       - 'scripts/review_stage2_connected_repair.py'
       - 'stage2/replication_v2/pending_message_repair_v1/**'
       - 'stage2/replication_v2/connected_http_mcp_preflight_v1/**'
@@ -168,7 +170,7 @@ jobs:
       - name: Verify corrected paper reference partitions and native prefix readiness
         run: |
           python scripts/validate_stage2_chronology_semantic_review.py
-          python scripts/validate_stage2_field_link_frozen_failure.py
+          python "$GITHUB_WORKSPACE/scripts/validate_stage2_field_link_frozen_failure.py"
           python scripts/prepare_stage2_paper_alignment.py --source-root "$RUNNER_TEMP/sources" --out "$RUNNER_TEMP/paper-alignment" --compare-frozen
       - name: Verify active exact message repair through native closure
         working-directory: .
