@@ -69,3 +69,13 @@
 | `value` | 15 | 4 |
 | `verification_tasks` | 7 | 3 |
 | `execution_order` | 4 | 3 |
+
+## 冻结 field-link 失败回归
+
+真实试验 `37300920836`（head `d28816be`，artifact `11342057023`）的最终模型响应、query log、witness ledger 与 outcome 已压缩保留到 `stage2/replication_v2/message_field_link_trial_v1/`。离线校验不新增 provider 调用，并固定三层结论：
+
+1. 原输出仍包含 actor 提交的完整 `value`，当前接口明确以 `MESSAGE_DERIVED_VALUE_MUST_BE_OMITTED` 拒绝，不把历史失败自动转换成成功。
+2. 仅移除旧 `value` 后，旧 `replacement` 仍重复携带固定 attribution，当前接口以 `MESSAGE_REPLACEMENT_MUST_EXCLUDE_ATTRIBUTION` 拒绝；宿主在移除这项重复生产责任后可派生与原意图相同的完整值。
+3. 即使只做上述接口职责投影，原 `claim-2` 与 `claim-3` 仍没有任何 `witness:*`。这是冻结输出中的模型证据选择缺口，不再归因于字段身份、版本时间或消息值拼装。
+
+该回归已接入现有 Node-route 离线工作流；不新增注册层、兼容层、自然重跑或付费评价。

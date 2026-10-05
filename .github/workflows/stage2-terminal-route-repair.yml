@@ -168,6 +168,7 @@ jobs:
       - name: Verify corrected paper reference partitions and native prefix readiness
         run: |
           python scripts/validate_stage2_chronology_semantic_review.py
+          python scripts/validate_stage2_field_link_frozen_failure.py
           python scripts/prepare_stage2_paper_alignment.py --source-root "$RUNNER_TEMP/sources" --out "$RUNNER_TEMP/paper-alignment" --compare-frozen
       - name: Verify active exact message repair through native closure
         working-directory: .
