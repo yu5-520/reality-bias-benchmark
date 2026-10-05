@@ -1,0 +1,65 @@
+{
+  "schema": "stage2-message-version-handle-trial-request-v1",
+  "trial_id": "G3-X4-T2-message-version-handle-trial-v1",
+  "execute_single_trial": true,
+  "authorization": {
+    "instruction": "\u6267\u884c",
+    "scope": "One real version-handle trial after successful integration; retain every outcome without resampling; source-bound semantic review only for actual native continuation."
+  },
+  "verified_implementation": {
+    "remote_commit": "15b479752fc33ad8d5a2b1b46eebb224f91d1932",
+    "tree": "76a852f07149d7b4e663714758188903032ae539",
+    "successful_ci_run": 37295030262
+  },
+  "prior_attempts": [
+    {
+      "run_id": 37205090807,
+      "head_sha": "96acfc60970109591f08213fd26a3ca2cc0ff23f",
+      "artifact_id": 11304078695,
+      "artifact_zip_sha256": "21ae77d77e7279f17082f26098d589021ab22bc3279deda81d39135388c4e4d3",
+      "failure": "EXACT_READ_ONLY_TOOL_MESSAGE_REQUIRED",
+      "provider_calls": 1
+    },
+    {
+      "run_id": 37210176711,
+      "head_sha": "77a98a567870391c8689c83882a16c8de8f6e0dd",
+      "artifact_id": 11305979052,
+      "artifact_zip_sha256": "86d1d4b47feecadeb5ccbd53befef21fb67b107c67bb6943ebf0af4f3a24eb00",
+      "failure": "NO_ACTION_SOURCE_NOT_INSPECTED",
+      "provider_calls": 2
+    },
+    {
+      "run_id": 37214544344,
+      "head_sha": "15d0d75acd69162458a6d80159508e884e27df36",
+      "artifact_id": 11307124579,
+      "artifact_zip_sha256": "2191cbc2774dc8e4c9d93582ad5e89f495b291a158caed0ad1356dc35c28d6a8",
+      "failure": "NO_ACTION_SOURCE_NOT_INSPECTED",
+      "provider_calls": 7
+    },
+    {
+      "run_id": 37231964981,
+      "head_sha": "c1b9b80a31c10e661cafb6bb1ba99b2f47eead24",
+      "artifact_id": 11314621407,
+      "artifact_zip_sha256": "d28b12bbbe3b8b56580cf78766674529f50bf47d5449333ee7148c6c6b600292",
+      "failure": "FILE_VERSION_OUTSIDE_VERIFIED_PREFIX",
+      "provider_calls": 2
+    }
+  ],
+  "change_under_test": "Host-issued exact version handles, quote-backed spans and bounded query rejection receipts; same frozen prefix, model and intervention boundaries.",
+  "frozen_files": {
+    "configs/stage2_connected_mechanism_v1.json": "413c1198fb83a134c6f65ac952a50ecedf4d278c481ebaaca96e78d2e631018d",
+    "stage2/route_repair/connected_planning.py": "43ceebbf33ceb6fc65046adb9daf7c7ec12258ce36a8df267222599a5475080f",
+    "stage2/route_repair/planning_session.py": "a32808eb0d460031567bff98751360071a7633cc0cb465210816d12f5d8d1192",
+    "scripts/run_stage2_connected_repair.py": "f94e964c64eb735ae8a5de4dda6a2aa28c0d837d5fe0827109bfb537eeb33d85",
+    "stage2/route_repair/source_navigation.py": "39fae9f0fd10c6834f4efebc0848cb386ff7a7b66553cbaf4cc341ded6b123b8",
+    "configs/stage2_monitor_repair_active.json": "97ec73ac8b19a17df76c7e4a46c7a661db802ca37b1866282df68f6b3b470c4a"
+  },
+  "planning_max_calls": 16,
+  "subject_trial_max_calls": 49,
+  "native_ceiling": 64,
+  "automatic_replay": false,
+  "natural_reruns": false,
+  "automatic_paid_reviewer": false,
+  "application_writes_allowed": false,
+  "analysis_scope": "Non-blind retrospectively selected process-account case; full response bytes and failures retained; efficacy requires observed post-exit paths."
+}
