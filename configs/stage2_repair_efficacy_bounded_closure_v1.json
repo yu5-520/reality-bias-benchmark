@@ -1,7 +1,7 @@
 {
   "schema": "stage2-repair-efficacy-bounded-closure-v1",
   "date_utc": "2026-10-06",
-  "status": "FROZEN_BEFORE_SINGLE_F_EXECUTION",
+  "status": "FROZEN_RESUME_AFTER_SINGLE_PROVIDER_ZERO_NATIVE_EFFECT",
   "scientific_priority": "P0_BOUNDED_POST_REPAIR_VERIFICATION_CLOSURE",
   "question": "Holding the coordinated route cut and hard post-repair authority envelope fixed, does a finite verification epoch prevent the remaining read-only temporal loop without changing the repaired application?",
   "source_treatment_B": {
@@ -129,7 +129,9 @@
     "treatment_F_never_retried": true,
     "application_state_same_before_continuation": true,
     "no_forced_user_answer": true,
-    "endpoint_correctness_primary": false
+    "endpoint_correctness_primary": false,
+    "resume_exact_first_provider_response": true,
+    "first_provider_response_recalled": false
   },
   "terminal_boundaries": [
     "NATIVE_FINALIZED",
@@ -163,5 +165,21 @@
     "The gate never fabricates a successful user answer.",
     "A role that cannot reach a disposition within the frozen bounded epoch ends in an explicit escalation boundary rather than an infinite loop.",
     "F is one targeted mechanism contrast, not a general repair-success estimate."
-  ]
+  ],
+  "resumable_incident": {
+    "workflow_run": 37421493309,
+    "head_sha": "476c5e9c7b759fa229a1727c3626c6d7744bf99c",
+    "artifact_id": 11393525343,
+    "artifact_sha256": "c73319114c0a5fe2cd8a6161cf6bcfd28ef3091e475c6d3bc07fe719142dea1b",
+    "provider_calls": 1,
+    "continued_turns_recorded": 1,
+    "native_action_effects": 0,
+    "request_role": "qa",
+    "request_turn": 25,
+    "request_hash": "6b44bb7a4801397b4e4c3bb3ab2f52abf0367fada4c01fa2ee2a800233175c66",
+    "response_hash": "d1ff83d8ea53189b6d9fda37fd2a340e96a75fb174670958189df1f245f5e862",
+    "response_content_hash": "f20929999691f9be4efa6bf837c097fd6b4c0aee1be45e60ed62dda08921d332",
+    "failure": "HARNESS_KEY_ERROR_AFTER_RESPONSE_BEFORE_NATIVE_ACTION",
+    "scientific_handling": "RESUME_SAME_ATTEMPT_WITH_EXACT_FROZEN_FIRST_RESPONSE_NO_PROVIDER_RECALL"
+  }
 }

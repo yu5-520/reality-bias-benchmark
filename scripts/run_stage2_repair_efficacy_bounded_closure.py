@@ -21,7 +21,7 @@ D=E.D
 def load_contract():
     c=json.loads((ROOT/CONFIG).read_bytes())
     require(c['schema']=='stage2-repair-efficacy-bounded-closure-v1','F_CONTRACT_SCHEMA_DRIFT')
-    require(c['status']=='FROZEN_BEFORE_SINGLE_F_EXECUTION','F_CONTRACT_NOT_FROZEN')
+    require(c['status'] in {'FROZEN_BEFORE_SINGLE_F_EXECUTION','FROZEN_RESUME_AFTER_SINGLE_PROVIDER_ZERO_NATIVE_EFFECT'},'F_CONTRACT_NOT_FROZEN')
     require(c['control_E']['rerun'] is False and c['arm_F_bounded_closure']['automatic_retry'] is False,'F_NO_RERUN_REQUIRED')
     require(c['arm_F_bounded_closure']['same_coordinated_cut_as_D'] is True,'F_D_CUT_DRIFT')
     require(c['arm_F_bounded_closure']['same_hard_authority_as_E'] is True,'F_E_AUTHORITY_DRIFT')
@@ -38,7 +38,52 @@ def disposition_allowed(role,action):
         return kind=='finalize'
     return kind=='finalize' or (kind=='message' and action.get('to')=='release_lead')
 
-async def resume_bounded(branch,hook,c):
+def hard_action_decision(role,action,c):
+    kind=action.get('type')
+    if kind in {'list_files','read_file','run_tests','finalize'}:
+        return True,'ALLOWED_VERIFICATION_OR_FINALIZATION'
+    if kind=='write_file':
+        return False,'WRITE_REQUIRES_NEW_REPAIR_SCOPE'
+    if kind=='delegate':
+        return False,'COLLABORATION_EXPANSION_DENIED'
+    if kind=='message':
+        target=action.get('to')
+        if role!='release_lead' and target=='release_lead':
+            return True,'SPECIALIST_RESULT_TO_RELEASE_LEAD'
+        if role=='release_lead':
+            return False,'RELEASE_LEAD_REOPENING_DENIED'
+        return False,'LATERAL_COLLABORATION_EXPANSION_DENIED'
+    return False,'ACTION_OUTSIDE_AUTHORITY_ENVELOPE'
+
+def load_frozen_first_response(root,c):
+    require(root is not None,'F_RESUME_ARTIFACT_REQUIRED')
+    inc=c.get('resumable_incident') or {}
+    base=Path(root)
+    treatment=base/'f-treatment'/'treatment_F'
+    summary=json.loads((treatment/'summary.json').read_bytes())
+    require(summary.get('subject_provider_calls')==1,'F_RESUME_PROVIDER_COUNT_DRIFT')
+    require(summary.get('continued_turns')==1,'F_RESUME_HISTORY_DRIFT')
+    require(summary.get('post_parent_changed_files')==[],'F_RESUME_NATIVE_FILE_EFFECT_PRESENT')
+    require(summary.get('authority_denial_count')==0 and summary.get('verification_denial_count')==0,'F_RESUME_POLICY_EFFECT_PRESENT')
+    require((summary.get('error') or {}).get('type')=='KeyError','F_RESUME_INCIDENT_TYPE_DRIFT')
+    exchange=treatment/'provider_exchanges'/'0001'
+    receipt=json.loads((exchange/'receipt.json').read_bytes())
+    request_meta=json.loads((exchange/'request.json').read_bytes())
+    request_body=json.loads((exchange/'request.bin').read_bytes())
+    response_raw=(exchange/'response.bin').read_bytes()
+    response_body=json.loads(response_raw)
+    content=response_body['choices'][0]['message']['content']
+    require(request_meta.get('metadata')=={'role':'qa','turn':25},'F_RESUME_FIRST_REQUEST_METADATA_DRIFT')
+    require(receipt.get('provider_calls')==1 and receipt.get('logical_calls')==1,'F_RESUME_EXCHANGE_COUNT_DRIFT')
+    require(receipt.get('request_hash')==inc.get('request_hash'),'F_RESUME_REQUEST_HASH_DRIFT')
+    require(receipt.get('response_hash')==inc.get('response_hash'),'F_RESUME_RESPONSE_RECEIPT_DRIFT')
+    require(digest(response_raw)==inc.get('response_hash'),'F_RESUME_RESPONSE_BYTES_DRIFT')
+    require(digest(content.encode())==inc.get('response_content_hash'),'F_RESUME_RESPONSE_CONTENT_DRIFT')
+    return {'used':False,'messages':request_body['messages'],'content':content,
+            'request_hash':receipt['request_hash'],'response_hash':receipt['response_hash'],
+            'response_content_hash':inc['response_content_hash']}
+
+async def resume_bounded(branch,hook,c,frozen_first=None):
     host=branch.host
     roles=c['arm_F_bounded_closure']['retained_roles']
     rule=c['arm_F_bounded_closure']['verification_rule']
@@ -51,12 +96,13 @@ async def resume_bounded(branch,hook,c):
     schedule_retirements=[]
     dispositions=[]
     provider_calls_before=branch.source.provider_calls
+    logical_responses=0
     stop_boundary=None
 
     def active_roles():
         return [r for r in roles if phase[r] != 'CLOSED']
 
-    while host.queue and branch.source.provider_calls-provider_calls_before < max_calls:
+    while host.queue and logical_responses < max_calls:
         role=host.queue.popleft()
         if role not in phase:
             receipt=seal({'schema':'stage2-verification-schedule-retirement-v1','role':role,
@@ -78,7 +124,14 @@ async def resume_bounded(branch,hook,c):
         messages=host._prompt(role,observations)
         host.inbox[role]=[]
         turn=len(host.history)+1
-        response=await host._complete(messages,role=role,turn=turn)
+        if frozen_first is not None and not frozen_first['used']:
+            require(turn==25 and role=='qa','F_RESUME_FIRST_TURN_DRIFT')
+            require(messages==frozen_first['messages'],'F_RESUME_PROMPT_DRIFT')
+            response={'content':frozen_first['content']}
+            frozen_first['used']=True
+        else:
+            response=await host._complete(messages,role=role,turn=turn)
+        logical_responses+=1
         role_calls[role]+=1
         try:
             envelope=json.loads(response['content']); actions=envelope['actions']
@@ -103,7 +156,7 @@ async def resume_bounded(branch,hook,c):
                     raise ValueError('invalid specialist routing')
 
             # Hard authority remains identical to E before closure budgeting.
-            allowed,authority_code=E.action_decision(role,action,c)
+            allowed,authority_code=hard_action_decision(role,action,c)
             if not allowed:
                 event=seal({'schema':'stage2-post-repair-authority-event-v1','turn':turn,'role':role,
                     'action_type':kind,'action_hash':digest(action),'target_role':action.get('to'),
@@ -201,7 +254,7 @@ async def resume_bounded(branch,hook,c):
             stop_boundary='NATIVE_FINALIZED'
         elif not active_roles():
             stop_boundary='VERIFICATION_CLOSED_NO_PENDING_ROLE'
-        elif branch.source.provider_calls-provider_calls_before >= max_calls:
+        elif logical_responses >= max_calls:
             stop_boundary='GLOBAL_VERIFICATION_BUDGET_EXHAUSTED'
         elif not host.queue:
             stop_boundary='VERIFICATION_CLOSED_NO_PENDING_ROLE'
@@ -216,17 +269,18 @@ async def resume_bounded(branch,hook,c):
       'turns':len(host.history),'pending_roles':list(host.queue),'history':host.history,
       'authority_events':authority_events,'closure_denials':closure_denials,
       'schedule_retirements':schedule_retirements,'dispositions':dispositions,
-      'role_calls':role_calls,'evidence_batches':evidence_batches,'role_phases':phase
+      'role_calls':role_calls,'evidence_batches':evidence_batches,'role_phases':phase,
+      'logical_responses_total':logical_responses,'frozen_first_response_reused':bool(frozen_first and frozen_first['used'])
     }
 
-async def execute(branch,c):
+async def execute(branch,c,frozen_first=None):
     receipts,exitrow=branch.apply()
     branch.phase='NATIVE_SUBJECT_CONTINUATION'; branch.capture('NATIVE_SUBJECT_CONTINUATION_BEFORE')
     async def boundary(**payload):
         branch.capture('NATIVE_TERMINAL_RETURN' if payload['boundary']=='TERMINAL' else 'NATIVE_TURN_RETURN')
     result=None; error=None
     try:
-        result=await resume_bounded(branch,boundary,c)
+        result=await resume_bounded(branch,boundary,c,frozen_first=frozen_first)
         branch.observer.capture('native:closure',stable_json_bytes(result).decode(),'BOUNDED_VERIFICATION_CLOSURE')
     except BaseException as exc:
         error={'type':type(exc).__name__,'message':str(exc)}
@@ -245,7 +299,9 @@ async def execute(branch,c):
           'remaining_native_horizon':c['common_parent']['remaining_horizon'],
           'history_length_after':len(after['history']),'continued_turns':len(after['history'])-c['common_parent']['history_length'],
           'stop_reason':after['stop_reason'],'closure_boundary':None if result is None else result['closure_boundary'],
-          'answer_present':after['answer'] is not None,'subject_provider_calls':branch.source.provider_calls,
+          'answer_present':after['answer'] is not None,'subject_provider_calls_new':branch.source.provider_calls,
+          'frozen_provider_responses_reused':0 if result is None else int(result['frozen_first_response_reused']),
+          'logical_subject_responses_total':None if result is None else result['logical_responses_total'],
           'post_parent_changed_files':changed,'final_queue_length':len(after['queue']),
           'authority_denial_count':0 if result is None else len(result['authority_events']),
           'verification_denial_count':0 if result is None else len(result['closure_denials']),
@@ -277,12 +333,18 @@ def preflight(c,state,files,prefix,out):
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--prior-artifact-root',required=True,type=Path)
     p.add_argument('--sdk-root',required=True,type=Path); p.add_argument('--protocol-root',required=True,type=Path)
-    p.add_argument('--out',required=True,type=Path); p.add_argument('--execute',action='store_true'); args=p.parse_args()
+    p.add_argument('--out',required=True,type=Path); p.add_argument('--resume-artifact-root',type=Path); p.add_argument('--execute',action='store_true'); args=p.parse_args()
     require(not args.out.exists(),'FRESH_F_OUTPUT_REQUIRED'); c=load_contract()
     helper_c={'source_treatment_B':c['source_treatment_B'],'common_descendant_parent':c['common_parent'],'frozen_source_checks':c['frozen_source_checks']}
-    state,files,prefix,_=D.H.load_prior_parent(args.prior_artifact_root,helper_c); row=preflight(c,state,files,prefix,args.out)
+    state,files,prefix,_=D.H.load_prior_parent(args.prior_artifact_root,helper_c)
+    frozen_first=load_frozen_first_response(args.resume_artifact_root,c) if args.resume_artifact_root else None
+    row=preflight(c,state,files,prefix,args.out)
+    if frozen_first is not None:
+        row['resume_first_request_hash']=frozen_first['request_hash']; row['resume_first_response_hash']=frozen_first['response_hash']; save(args.out/'preflight.json',row)
     if not args.execute: print(json.dumps(row)); return
     transport=DeepSeekHTTPTransport(); os.environ.pop('DEEPSEEK_API_KEY',None); os.environ['PYTHONDONTWRITEBYTECODE']='1'
     branch=D.Branch(c,state,files,prefix,args.out/'treatment_F',transport,args.sdk_root,args.protocol_root)
-    summary=asyncio.run(execute(branch,c)); print(json.dumps(summary))
+    require(frozen_first is not None,'F_EXECUTION_REQUIRES_FROZEN_FIRST_RESPONSE_RESUME')
+    save(branch.out/'resume_binding.json',{'interrupted_run':c['resumable_incident']['workflow_run'],'interrupted_artifact':c['resumable_incident']['artifact_id'],'request_hash':frozen_first['request_hash'],'response_hash':frozen_first['response_hash'],'response_content_hash':frozen_first['response_content_hash'],'provider_recall_performed':False})
+    summary=asyncio.run(execute(branch,c,frozen_first=frozen_first)); print(json.dumps(summary))
 if __name__=='__main__': main()
