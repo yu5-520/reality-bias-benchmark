@@ -1,0 +1,85 @@
+name: Single coordinated complete-route repair D
+on:
+  push:
+    branches: [fix/p2-native-evidence-replay]
+    paths: ['configs/stage2_repair_efficacy_complete_route_request_v1.json']
+permissions: {contents: read, actions: read}
+concurrency:
+  group: stage2-complete-route-repair-D-v1
+  cancel-in-progress: false
+jobs:
+  complete-route-D:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Enforce one D treatment
+        env: {GH_TOKEN: ${{ github.token }}}
+        run: |
+          python - <<'PY'
+          import json,os,subprocess
+          req=json.load(open('configs/stage2_repair_efficacy_complete_route_request_v1.json'))
+          c=json.load(open(req['contract']))
+          assert req['execute_single_D'] is True and req['automatic_replay'] is False
+          assert c['status']=='FROZEN_BEFORE_SINGLE_D_EXECUTION'
+          assert c['arm_C_control']['rerun'] is False and c['arm_D_complete_route_repair']['automatic_retry'] is False
+          repo=os.environ['GITHUB_REPOSITORY']
+          run=json.loads(subprocess.check_output(['gh','api',f"repos/{repo}/actions/runs/{os.environ['GITHUB_RUN_ID']}"]))
+          pages=subprocess.check_output(['gh','api','--paginate','--slurp',f"repos/{repo}/actions/workflows/{run['workflow_id']}/runs?per_page=100"])
+          earlier=[r for page in json.loads(pages) for r in page['workflow_runs'] if r['id']<run['id']]
+          assert not earlier,'COMPLETE_ROUTE_D_ALREADY_REGISTERED_NO_REPLAY'
+          PY
+      - name: Bind exact frozen B artifact
+        env: {GH_TOKEN: ${{ github.token }}}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json,os,subprocess
+          c=json.load(open('configs/stage2_repair_efficacy_complete_route_v1.json'))
+          meta=json.loads(subprocess.check_output(['gh','api',f"repos/{os.environ['GITHUB_REPOSITORY']}/actions/artifacts/{c['source_treatment_B']['artifact_id']}"]))
+          assert meta['workflow_run']['id']==c['source_treatment_B']['workflow_run']
+          assert meta['workflow_run']['head_sha']==c['source_treatment_B']['head_sha']
+          assert meta['digest']=='sha256:'+c['source_treatment_B']['artifact_sha256']
+          PY
+          mkdir -p "$RUNNER_TEMP/prior"
+          gh run download 37349337495 --repo "$GITHUB_REPOSITORY" --name repair-efficacy-first-contrast-408258db42df4a016276ea9f5ecebb8c49e584d9 --dir "$RUNNER_TEMP/prior"
+      - name: Bind unchanged official MCP runtime
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/modelcontextprotocol/python-sdk "$RUNNER_TEMP/mcp-sdk"
+          git -C "$RUNNER_TEMP/mcp-sdk" checkout -q f1b6589088534632fef92238ee9750951e3c0185
+          git clone -q https://github.com/modelcontextprotocol/modelcontextprotocol "$RUNNER_TEMP/mcp-protocol"
+          git -C "$RUNNER_TEMP/mcp-protocol" checkout -q 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          python -m pip install -q uv
+          cd "$RUNNER_TEMP/mcp-sdk" && uv sync --frozen --no-default-groups --python "$(command -v python)"
+      - name: Preflight coordinated cut without provider calls
+        run: |
+          "$RUNNER_TEMP/mcp-sdk/.venv/bin/python" scripts/run_stage2_repair_efficacy_complete_route.py --prior-artifact-root "$RUNNER_TEMP/prior" --sdk-root "$RUNNER_TEMP/mcp-sdk" --protocol-root "$RUNNER_TEMP/mcp-protocol" --out "$RUNNER_TEMP/d-preflight"
+      - name: Execute the single D treatment
+        env: {DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}}
+        run: |
+          "$RUNNER_TEMP/mcp-sdk/.venv/bin/python" scripts/run_stage2_repair_efficacy_complete_route.py --prior-artifact-root "$RUNNER_TEMP/prior" --sdk-root "$RUNNER_TEMP/mcp-sdk" --protocol-root "$RUNNER_TEMP/mcp-protocol" --out "$RUNNER_TEMP/d-treatment" --execute
+      - name: Print retained result
+        if: always()
+        run: |
+          python - <<'PY'
+          import json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'d-treatment'
+          for rel in ['preflight.json','treatment_D/summary.json','treatment_D/coordinated_repair_receipts.json','treatment_D/repair_executor_exit.json']:
+              p=root/rel
+              if p.exists(): print(json.dumps({'source':rel,'value':json.loads(p.read_bytes())},ensure_ascii=False))
+          PY
+      - name: Retain full D evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repair-efficacy-complete-route-D-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/d-preflight
+            ${{ runner.temp }}/d-treatment
+          retention-days: 90
+          if-no-files-found: warn
