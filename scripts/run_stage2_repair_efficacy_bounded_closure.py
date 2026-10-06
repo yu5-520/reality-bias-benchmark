@@ -21,7 +21,7 @@ D=E.D
 def load_contract():
     c=json.loads((ROOT/CONFIG).read_bytes())
     require(c['schema']=='stage2-repair-efficacy-bounded-closure-v1','F_CONTRACT_SCHEMA_DRIFT')
-    require(c['status'] in {'FROZEN_BEFORE_SINGLE_F_EXECUTION','FROZEN_RESUME_AFTER_SINGLE_PROVIDER_ZERO_NATIVE_EFFECT'},'F_CONTRACT_NOT_FROZEN')
+    require(c['status'] in {'FROZEN_BEFORE_SINGLE_F_EXECUTION','FROZEN_RESUME_AFTER_SINGLE_PROVIDER_ZERO_NATIVE_EFFECT','FROZEN_RESUME2_AFTER_ZERO_NEW_PROVIDER_TURN_COUNTER_INCIDENT'},'F_CONTRACT_NOT_FROZEN')
     require(c['control_E']['rerun'] is False and c['arm_F_bounded_closure']['automatic_retry'] is False,'F_NO_RERUN_REQUIRED')
     require(c['arm_F_bounded_closure']['same_coordinated_cut_as_D'] is True,'F_D_CUT_DRIFT')
     require(c['arm_F_bounded_closure']['same_hard_authority_as_E'] is True,'F_E_AUTHORITY_DRIFT')

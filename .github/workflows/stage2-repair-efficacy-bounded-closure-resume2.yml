@@ -46,7 +46,9 @@ jobs:
           pages=json.loads(subprocess.check_output(['gh','api','--paginate','--slurp',
               f"repos/{repo}/actions/workflows/{run['workflow_id']}/runs?per_page=100"]))
           earlier=[r for page in pages for r in page['workflow_runs'] if r['id']<run['id']]
-          assert not earlier,'F_RESUME2_ALREADY_REGISTERED_NO_SECOND_TURN26_CONTINUATION'
+          allowed_preflight_only=set(req.get('allowed_preflight_only_prior_runs') or [])
+          unexpected=[r['id'] for r in earlier if r['id'] not in allowed_preflight_only]
+          assert not unexpected,f'F_RESUME2_UNEXPECTED_PRIOR_RUNS:{unexpected}'
           PY
 
       - name: Download frozen parent and original interrupted F evidence
