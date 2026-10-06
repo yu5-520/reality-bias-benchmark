@@ -1,7 +1,7 @@
 {
   "schema": "stage2-repair-efficacy-bounded-closure-v1",
   "date_utc": "2026-10-06",
-  "status": "FROZEN_RESUME2_AFTER_ZERO_NEW_PROVIDER_TURN_COUNTER_INCIDENT",
+  "status": "F_SEALED_BOUNDED_VERIFICATION_ESCALATION",
   "scientific_priority": "P0_BOUNDED_POST_REPAIR_VERIFICATION_CLOSURE",
   "question": "Holding the coordinated route cut and hard post-repair authority envelope fixed, does a finite verification epoch prevent the remaining read-only temporal loop without changing the repaired application?",
   "source_treatment_B": {
@@ -210,5 +210,35 @@
       "failure": "BOUND_PROVIDER_NATIVE_TURN_DRIFT_BEFORE_TURN26_DISPATCH",
       "scientific_handling": "RECONSTRUCT_FROM_FROZEN_PARENT_AND_EXACT_TURN25_RESPONSE_THEN_CONTINUE_TURN26_WITH_LOGICAL_COUNTER_ADVANCED"
     }
-  ]
+  ],
+  "execution": {
+    "canonical_completion_workflow_run": 37422418453,
+    "canonical_completion_head_sha": "61b2c0169e8b3e175b7942c99dd9da572e6844c1",
+    "canonical_completion_artifact_id": 11393378077,
+    "canonical_completion_artifact_sha256": "ec0ced42bfd593bc94d3b4dc751ff18e12dfdfda867a3c6d58d36e1500e70a7a",
+    "original_turn25_workflow_run": 37421493309,
+    "original_turn25_provider_calls": 1,
+    "first_resume_workflow_run": 37421933976,
+    "first_resume_new_provider_calls": 0,
+    "resume2_preflight_only_run": 37422296557,
+    "resume2_preflight_only_provider_calls": 0,
+    "completion_new_provider_calls": 10,
+    "frozen_provider_responses_reused": 1,
+    "logical_subject_responses_total": 11,
+    "automatic_retry": false,
+    "control_E_reruns": 0
+  },
+  "result": {
+    "machine_summary": "stage2/replication_v2/repair_efficacy_bounded_closure_F_v1/summary.json",
+    "report": "docs/reports/2026-10-06_Repair_Efficacy_Bounded_Closure_F.md",
+    "overall_process_effect": "BOUNDED_VERIFICATION_ESCALATION",
+    "closure_boundary": "ESCALATION_REQUIRED",
+    "continued_turns": 11,
+    "final_queue_length": 0,
+    "dispositions": 4,
+    "verification_denials": 3,
+    "authority_denials": 1,
+    "application_writes": 0,
+    "final_scientific_gate": "REPAIR_EFFICACY_MECHANISM_CHAIN_COMPLETE_FOR_PAPER"
+  }
 }
