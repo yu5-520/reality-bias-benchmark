@@ -103,3 +103,22 @@ def render_route_text(route_map: Mapping[str, Any]) -> str:
             f"{edge['source_ref']} -[{edge['relation_type']}|{edge['status']}]-> {edge['destination_ref']}"
         )
     return "\n".join(lines) + "\n"
+
+
+def export_observation_map(graph):
+    """Complete retrospective observation graph; never a repair authorization."""
+    payload = {
+        "schema": "RB-STAGE2-COMPLETE-OBSERVATION-MAP-v2",
+        "graph_hash": graph["graph_hash"],
+        "nodes": [{**n, "route_capability": "OBSERVE_ONLY"} for n in graph["nodes"]],
+        "edges": copy.deepcopy(graph["edges"]),
+        "observations": copy.deepcopy(graph["observations"]),
+        "visible_refs": sorted(n["ref"] for n in graph["nodes"]),
+        "authorized_write_refs": [], "supported_reachable_refs": [],
+        "preserve_refs": [], "unknown_refs": [],
+        "scope": "COMPLETE_FROZEN_TRAJECTORY_RETROSPECTIVE_ONLY",
+        "eligible_as_repair_input": False,
+        "semantic_dependencies_adjudicated": False, "global_clock_available": False,
+    }
+    payload["route_map_hash"] = digest(payload)
+    return payload

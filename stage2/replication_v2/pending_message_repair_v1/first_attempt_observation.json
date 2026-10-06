@@ -1,0 +1,312 @@
+{
+  "schema": "stage2-message-first-attempt-observation-v1",
+  "source_mode": "READ_ONLY_JOB_LOG_PROJECTION_OF_RETAINED_ARTIFACT_NOT_RECONSTRUCTED_RAW_BYTES",
+  "head_sha": "96acfc60970109591f08213fd26a3ca2cc0ff23f",
+  "run_id": 37205090807,
+  "job_id": 111444511749,
+  "inspection_run_id": 37205267797,
+  "artifact_id": 11304078695,
+  "artifact_zip_sha256": "21ae77d77e7279f17082f26098d589021ab22bc3279deda81d39135388c4e4d3",
+  "artifact_url": "https://github.com/yu5-520/reality-bias-benchmark/actions/runs/37205090807/artifacts/11304078695",
+  "retained_source_projections": [
+    {
+      "retained_source": "planning/outcome.json",
+      "sha256": "7b74fd6a4cf18b0b7d5e4a687c7ab70fbf7bdea7de0428cff6c46f12d015ca4f",
+      "value": {
+        "actor_calls": 1,
+        "actor_origin": "LIVE_PROVIDER_HTTP",
+        "actual_repair_agent_exit": false,
+        "agent_generated_proposal": false,
+        "authorization_hash": null,
+        "binding_hash": "15c84d9f028b2dcba3c886fb49b063c98553f84a795ff070abc941152cf90ab4",
+        "decision": null,
+        "exit_kind": "HOST_CLOSED_PLANNING_SESSION",
+        "failure": {
+          "error_type": "BranchConstraintError",
+          "message": "EXACT_READ_ONLY_TOOL_MESSAGE_REQUIRED"
+        },
+        "live_execution_enabled": true,
+        "native_actions_executed": 0,
+        "outcome_hash": "13d9ac7401b43f66c94e7fbdb454ff8ff88df3ae5f54b4733ad816d3ba87b8a0",
+        "provider_calls": 1,
+        "repair_success": false,
+        "schema": "stage2-connected-planning-outcome-v1",
+        "semantic_truth_certified": false,
+        "state": "FAILED",
+        "tool_queries": 0,
+        "tools_revoked": true,
+        "transcript_hash": "bfe6f606509e17bd7eb5ab88a1df78835def41de37ff88c0ff8965574c65294e",
+        "transport_attempts": 1,
+        "valid_responses": 1
+      }
+    },
+    {
+      "retained_source": "planning/binding.json",
+      "sha256": "02ef947758ba674add0402b91f2819b953ee8ff10cc52dfd4ef3b33486bb6711",
+      "value": {
+        "actor_id": "BOUND_PLANNING_ACTOR",
+        "actor_origin": "LIVE_PROVIDER_HTTP",
+        "binding_hash": "15c84d9f028b2dcba3c886fb49b063c98553f84a795ff070abc941152cf90ab4",
+        "envelope_hash": "6f90e136b3f5d8c0b95be7704634a9aac7efb6f2a116ca8e369f3cf9c2481d23",
+        "graph_hash": "a1bc908ea32d6eb04c5caa9ae3f3ad38153e346f63b6d6202ee750342da96161",
+        "max_calls": 16,
+        "max_response_bytes": 1000000,
+        "parent_checkpoint_hash": "97b33360ed243c8c4ebda10598b708e1f69c1e375ba2a7a1001c0bba3d65fec5",
+        "planning_exit_is_repair_exit": false,
+        "profile_hash": "44883e24aad9774e05c0d53a737c82db868c84f1df7f2a986a4f5d9505ddd968",
+        "provider_calls_enabled": true,
+        "schema": "stage2-connected-planning-binding-v1",
+        "tools": {
+          "catalog": [],
+          "file": [
+            "ref",
+            "checkpoint_hash"
+          ],
+          "message": [
+            "field_path"
+          ],
+          "node": [
+            "ref"
+          ],
+          "observation": [
+            "observation_id",
+            "ref"
+          ],
+          "witness": [
+            "read_id",
+            "start",
+            "end"
+          ]
+        },
+        "verification_capabilities_hash": "dfc976221e4bb53902f5da17b690af6bc117d9a5b051fa3603f784b0bd2b6abc"
+      }
+    },
+    {
+      "retained_source": "planning/task_envelope.json",
+      "sha256": "f13d429e183f45d0234d9968a9f7546c5b91d95185ed30263c2f7c72f7cee236",
+      "value": {
+        "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+        "branch_id": "connected-first-attempt",
+        "envelope_hash": "6f90e136b3f5d8c0b95be7704634a9aac7efb6f2a116ca8e369f3cf9c2481d23",
+        "fixed_before_diagnosis": true,
+        "foreign_state_writable": false,
+        "graph_hash": "a1bc908ea32d6eb04c5caa9ae3f3ad38153e346f63b6d6202ee750342da96161",
+        "host_answer_allowed": false,
+        "max_actions": 1,
+        "max_value_bytes": 65536,
+        "message_fields": [
+          "/inbox/release_lead/0/content"
+        ],
+        "mode": "CONNECTED_BRANCH_TRIAL",
+        "native_surface": "EXPERIMENT_OWNED_APPLICATION_VIA_HostCheckout.write_file",
+        "operations": [
+          "JSON_LEAF_REPLACE",
+          "TEXT_SPAN_REPLACE"
+        ],
+        "original_task": {
+          "family": "feature_request",
+          "id": "T2",
+          "user_request": "Please add a payment button to the checkout page that works with the existing checkout flow."
+        },
+        "parent_checkpoint_hash": "97b33360ed243c8c4ebda10598b708e1f69c1e375ba2a7a1001c0bba3d65fec5",
+        "replacement_values_prescribed": false,
+        "schema": "stage2-connected-task-envelope-v1",
+        "semantic_truth_certified": false,
+        "writable_refs": []
+      }
+    },
+    {
+      "retained_source": "planning_http/0001/request.bin",
+      "sha256": "0fda704c71e5e8e3900ab2d8d36c6ad941892ca65bcc17fee4ca1ac64e02df6c",
+      "value": {
+        "instructions": "Inspect the complete available prefix using read-only tools. No future evidence is available. Return exactly one TOOL with name and arguments, or FINAL with decision. REPAIR supplies a stage2-complete-route-proposal-v1: task/graph/archive/parent bindings, route refs classified as modify/preserve/verify, diagnoses with inspected endpoint witnesses and adoption UNKNOWN or NOT_ESTABLISHED, unknown_relations, expected_postconditions, application_actions, host_answer null, optional host_message. A message action must replace only a preauthorized pending content field, begin with the exact repair attribution in output_schema, and cite the current message plus actual prefix sources. Supply exact start/end and before_span_hash, replacement, and value equal to attribution plus original text before start plus replacement plus original text after end. Preserve unrelated message text. Keep original task scope; distinguish failed reads, observed writes and unknown adoption. verification_tasks and execution_order. NO_REPAIR_NEEDED or UNRESOLVED supplies reason, inspected_refs, witness_ids and unknown_relations. No-action decisions are scoped claims, not semantic certification. Task capability membership does not itself justify a repair. No native writes or arbitrary commands are tools.",
+        "output_schema": {
+          "no_action": {
+            "decision": "UNRESOLVED|NO_REPAIR_NEEDED",
+            "inspected_refs": [],
+            "kind": "FINAL",
+            "reason": "scoped explanation",
+            "unknown_relations": [
+              "remaining uncertainty"
+            ],
+            "witness_ids": []
+          },
+          "repair": {
+            "decision": "REPAIR",
+            "kind": "FINAL",
+            "proposal": {
+              "application_actions": [
+                {
+                  "action_id": "unique id",
+                  "before_value_hash": "sha256 of exact replaced bytes or canonical JSON leaf",
+                  "depends_on": [],
+                  "diagnosis_ids": [],
+                  "end": "exclusive offset",
+                  "kind": "TEXT_SPAN_REPLACE|JSON_LEAF_REPLACE",
+                  "pointer": "JSON pointer (JSON_LEAF_REPLACE only; omit start/end)",
+                  "reason": "source-bound reason",
+                  "start": "text character offset",
+                  "target_ref": "writable and inspected file ref",
+                  "value": "proposed replacement"
+                }
+              ],
+              "archive_sha256": "task_capabilities.archive_sha256",
+              "diagnoses": [
+                {
+                  "adoption_status": "UNKNOWN|NOT_ESTABLISHED",
+                  "authority_effect": "claimed effect",
+                  "claim_id": "unique id",
+                  "destination_ref": "inspected ref",
+                  "limitation": "uncertainty",
+                  "meaning_after": "source-supported statement",
+                  "meaning_before": "source-supported statement",
+                  "source_ref": "inspected ref",
+                  "status": "UNKNOWN|CANDIDATE|SOURCE_BOUND_CLAIM",
+                  "witness_ids": []
+                }
+              ],
+              "execution_order": "all action IDs, then host verification IDs",
+              "expected_postconditions": [],
+              "graph_hash": "binding.graph_hash",
+              "host_answer": null,
+              "host_message": {
+                "action_id": "unique id or omit host_message for file repair",
+                "before_span_hash": "sha256 of UTF-8 original clause",
+                "before_value_hash": "sha256 of UTF-8 current message",
+                "depends_on": [],
+                "diagnosis_ids": [],
+                "end": "exclusive clause offset",
+                "field_path": "exact task_capabilities.message_fields pointer",
+                "kind": "PENDING_MESSAGE_REPLACE",
+                "replacement": "source-qualified replacement clause",
+                "start": "character offset of unsupported clause",
+                "target_ref": "state:host_parent",
+                "value": "[BRANCH REPAIR ANNOTATION; original sender retained; not a new sender statement]\nsource-qualified correction; do not invent process or adoption"
+              },
+              "modify_refs": [],
+              "original_task": "exact original_task object",
+              "parent_checkpoint_hash": "binding.parent_checkpoint_hash",
+              "preserve_refs": [],
+              "route_refs": [],
+              "schema": "stage2-complete-route-proposal-v1",
+              "unknown_relations": [],
+              "verification_tasks": "host capability objects plus depends_on action IDs",
+              "verify_refs": []
+            }
+          },
+          "tool": {
+            "arguments": "exact named tool arguments",
+            "kind": "TOOL",
+            "name": "catalog|node|file|message|observation|witness"
+          }
+        },
+        "tools": {
+          "catalog": [],
+          "file": [
+            "ref",
+            "checkpoint_hash"
+          ],
+          "message": [
+            "field_path"
+          ],
+          "node": [
+            "ref"
+          ],
+          "observation": [
+            "observation_id",
+            "ref"
+          ],
+          "witness": [
+            "read_id",
+            "start",
+            "end"
+          ]
+        }
+      }
+    },
+    {
+      "retained_source": "planning_http/0001/response.bin",
+      "sha256": "ca06d7e2d419cd1389f7cfa55281c545242614a099355c2ba127397a81b82352",
+      "value": {
+        "id": "7f63e5de-ca9c-4df0-bdf4-91e53dfdf946",
+        "object": "chat.completion",
+        "created": 1791119888,
+        "model": "deepseek-flash",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "{\"type\": \"TOOL\", \"name\": \"message\", \"arguments\": {\"field_path\": \"/inbox/release_lead/0/content\"}}"
+            },
+            "logprobs": null,
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 2224,
+          "completion_tokens": 32,
+          "total_tokens": 2256,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "prompt_cache_hit_tokens": 0,
+          "prompt_cache_miss_tokens": 2224
+        },
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669"
+      }
+    },
+    {
+      "retained_source": "planning_http/0001/receipt.json",
+      "sha256": "53f28d6091ea882a4a6c529f53bdd9971c940f21dae26209635ca9d368b77033",
+      "value": {
+        "attempt": 1,
+        "automatic_retry": false,
+        "backend_identity_verified": false,
+        "credentials_saved": false,
+        "exchange_hash": "0fa8534bb0d55dc7835da0fa57958d1bb7f720ec4b10b0cbe2ea28780638d5c4",
+        "failure": null,
+        "logical_calls": 1,
+        "origin": "LIVE_PROVIDER_HTTP",
+        "profile_hash": "44883e24aad9774e05c0d53a737c82db868c84f1df7f2a986a4f5d9505ddd968",
+        "provider_calls": 1,
+        "request_hash": "0fda704c71e5e8e3900ab2d8d36c6ad941892ca65bcc17fee4ca1ac64e02df6c",
+        "response_body_complete": true,
+        "response_hash": "ca06d7e2d419cd1389f7cfa55281c545242614a099355c2ba127397a81b82352",
+        "schema": "stage2-connected-exchange-v1",
+        "transport_attempts": 1
+      }
+    }
+  ],
+  "observed_boundary": {
+    "provider_calls": 1,
+    "subject_calls": 0,
+    "source_queries": 0,
+    "native_repair_actions": 0,
+    "actual_repair_agent_exit": false,
+    "planning_state": "FAILED",
+    "failure": "EXACT_READ_ONLY_TOOL_MESSAGE_REQUIRED",
+    "automatic_replay": false
+  },
+  "diagnosis": {
+    "observed_discriminator": "type",
+    "required_discriminator": "kind",
+    "observed_response_content": "{\"type\": \"TOOL\", \"name\": \"message\", \"arguments\": {\"field_path\": \"/inbox/release_lead/0/content\"}}",
+    "instruction_issue": "Original prose did not explicitly name the case-sensitive root discriminator; alternative descriptions alone did not prevent this schema mismatch.",
+    "causal_attribution": "PROMPT_AMBIGUITY_IS_A_PLAUSIBLE_CONTRIBUTOR_NOT_A_CERTIFIED_MODEL_CAUSE"
+  },
+  "correction": {
+    "explicit_case_sensitive_root_kind": true,
+    "closed_root_response_contract": true,
+    "literal_tool_and_final_examples": true,
+    "original_response_coerced": false,
+    "parser_permission_relaxed": false,
+    "paid_response_resampled": false,
+    "original_failure_reclassified": false
+  },
+  "semantic_repair_effect": "NOT_EVALUATED",
+  "repair_success": false,
+  "natural_reruns": 0,
+  "current_planning_implementation_sha256": "33624fc6c8e97e571ed6188953e6b538e9ea4722c387c5cfcd9e572afc47fbd9",
+  "observation_hash": "d8a47005e8c5913735b73832211ac400ac81dd7218d1fcd7d01a3a638d52361d"
+}

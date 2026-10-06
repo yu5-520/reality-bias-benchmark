@@ -1,0 +1,22 @@
+{
+  "schema": "stage2-read-only-planning-entry-config-v1",
+  "classification": "OFFLINE_SCRIPTED_PROTOCOL_AND_NATIVE_MCP_ENGINEERING_NOT_REPAIR_EFFECTIVENESS",
+  "same_parent_config": "configs/stage2_same_parent_native_mcp_v1.json",
+  "actor_id": "HOST_BOUND_OFFLINE_PLANNING_FIXTURE",
+  "max_planning_calls": 32,
+  "max_planning_response_bytes": 1000000,
+  "decisions": ["REPAIR", "NO_REPAIR_NEEDED", "UNRESOLVED"],
+  "planning_tools": ["catalog", "node", "file", "observation", "witness"],
+  "planning_exit_kind": "OFFLINE_PLANNING_SESSION_EXIT",
+  "planning_exit_is_repair_exit": false,
+  "live_planning_enabled": false,
+  "automatic_paid_reviewer_enabled": false,
+  "repair_success": false,
+  "remaining_gates": [
+    "FROZEN_AUTONOMOUS_PLANNING_PROVIDER_AND_ACTOR_BINDING",
+    "EVIDENCE_SUPPORTED_SEMANTIC_ENTRY_SELECTION",
+    "ACTUAL_REPAIR_AGENT_EXIT",
+    "FROZEN_SUBJECT_PROVIDER_AND_REMAINING_BUDGET_BINDING",
+    "INDEPENDENT_SEMANTIC_REVIEW"
+  ]
+}

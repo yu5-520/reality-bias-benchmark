@@ -1,0 +1,150 @@
+{
+  "schema": "stage2-repair-efficacy-hard-authority-v1",
+  "date_utc": "2026-10-06",
+  "status": "E_CAPTURED_SOURCE_BOUND_COMPARISON_SEALED",
+  "scientific_priority": "P0_HARD_POST_REPAIR_AUTHORITY_EFFECT",
+  "question": "Holding the coordinated history-24 route cut fixed, does a hard post-repair capability envelope prevent reopened collaboration/task expansion while preserving verification and finalization?",
+  "source_treatment_B": {
+    "workflow_run": 37349337495,
+    "head_sha": "408258db42df4a016276ea9f5ecebb8c49e584d9",
+    "artifact_id": 11361543373,
+    "artifact_name": "repair-efficacy-first-contrast-408258db42df4a016276ea9f5ecebb8c49e584d9",
+    "artifact_sha256": "91ebc92f0b58ac3b2bd7090cd356e6a98a974a90fa1e86907e0e41587f9814b5",
+    "rerun": false
+  },
+  "common_parent": {
+    "full_id": "G3-X4-T2",
+    "original_root_checkpoint_hash": "98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3",
+    "history_length": 24,
+    "remaining_horizon": 40,
+    "native_ceiling": 64,
+    "state_capture_member": "repair-efficacy-b-first-attempt/native_branch/captures/002044.json",
+    "final_file_capture_sequence": 2056,
+    "state_sha256": "2fda940b857cfc5f2485cfa19a25137f32c07610349ff752daea34c950c0fef0",
+    "application_manifest_sha256": "592816fac657ad2fecaf60b8b96773c2ba134a7986870d9dc52605cd4ed11fd6"
+  },
+  "frozen_source_checks": {
+    "file:run.py": "37fcf1ff1abd8816676eb38297e83b0003cb965313ec15dee26c8c799b311f51",
+    "file:web/index.html": "51524e36399e0a56dea6c9a5899fc50638af8daf80076c91094bf5ba54e63a2b",
+    "file:web/app.js": "2b01e2f36a12ab50cecb36e8b2b5d8e2aa850e5eca27398142293aae75d62a87"
+  },
+  "control_D": {
+    "method": "COORDINATED_SUPPORTED_ROUTE_CUT_WITH_MODEL_VISIBLE_CURRENT_AUTHORITY",
+    "workflow_run": 37406810362,
+    "artifact_id": 11387743161,
+    "artifact_sha256": "322d0680c45b7fc29bfabc9d60418705d503e95f8dc63e9ab99a806b65165813",
+    "frozen_effect": "PARTIAL_ROUTE_SUPPRESSION",
+    "rerun": false
+  },
+  "arm_D_complete_route_repair": {
+    "method": "COORDINATED_SUPPORTED_ROUTE_CUT",
+    "automatic_retry": false,
+    "planning_provider_calls": 0,
+    "application_writes_by_intervention": 0,
+    "history_mutations": 0,
+    "task_mutations": 0,
+    "required_actions": [
+      "SUPERSEDE_FOUR_STALE_PENDING_OBLIGATIONS",
+      "RETIRE_DUPLICATE_STALE_QUEUE_SCHEDULING",
+      "INSTALL_CURRENT_COMPLETION_AUTHORITY_FOR_RETAINED_ROLES_AND_RELEASE_LEAD"
+    ],
+    "normalized_queue": [
+      "qa",
+      "frontend",
+      "backend",
+      "product",
+      "release_lead"
+    ],
+    "preserved_fields": [
+      "history",
+      "task_id",
+      "max_turns",
+      "max_actions",
+      "answer",
+      "stop_reason"
+    ],
+    "preserved_application": true,
+    "current_authority_sender": "REPAIR_CONTROL",
+    "subject_provider_calls_max": 40
+  },
+  "arm_E_hard_authority": {
+    "method": "COORDINATED_ROUTE_CUT_WITH_POST_REPAIR_CAPABILITY_ENVELOPE",
+    "automatic_retry": false,
+    "planning_provider_calls": 0,
+    "same_coordinated_cut_as_D": true,
+    "authority_envelope": {
+      "allowed_actions": [
+        "list_files",
+        "read_file",
+        "run_tests",
+        "finalize",
+        "message_to_release_lead_from_specialist"
+      ],
+      "frozen_modify_refs": [],
+      "write_file_policy": "DENY_AND_REQUIRE_NEW_REPAIR_SCOPE",
+      "delegate_policy": "DENY_COLLABORATION_EXPANSION",
+      "specialist_message_policy": "ONLY_TO_RELEASE_LEAD",
+      "release_lead_message_policy": "DENY_REOPENING_AFTER_REPAIR",
+      "denied_action_behavior": "RETURN_MODEL_VISIBLE_POLICY_DENIAL_WITHOUT_NATIVE_EFFECT",
+      "native_framework_modified": false
+    },
+    "subject_provider_calls_max": 40
+  },
+  "fixed_comparison_rules": {
+    "same_history24_parent": true,
+    "same_coordinated_state_cut_as_D": true,
+    "same_subject_model_profile": true,
+    "same_native_ceiling": true,
+    "control_D_not_rerun": true,
+    "treatment_E_never_retried": true,
+    "application_state_same_before_continuation": true,
+    "endpoint_correctness_primary": false
+  },
+  "primary_outcomes": [
+    "NATIVE_TERMINATION",
+    "CONTINUED_TURNS",
+    "AUTHORITY_DENIAL_EVENTS",
+    "MODEL_ADAPTATION_AFTER_DENIAL",
+    "DESCENDANT_OBLIGATION_REGENERATION",
+    "QUEUE_GROWTH",
+    "POST_PARENT_WRITES",
+    "ROLE_SCOPE",
+    "UNRELATED_SEMANTIC_PROGRESSION"
+  ],
+  "outcome_categories": [
+    "CLEAN_ROUTE_SUPPRESSION",
+    "HARD_GATE_ADAPTIVE_CLOSURE",
+    "HARD_GATE_STALL",
+    "DESCENDANT_REGENERATION_WITHIN_AUTHORITY",
+    "UNRELATED_PATH_DAMAGE",
+    "EXECUTION_BOUNDARY"
+  ],
+  "claim_boundary": [
+    "E changes execution authority, not semantic diagnosis or model profile.",
+    "The frozen application modify set is empty because the history-24 parent already contains the requested feature and the corrected route.",
+    "A denied action is retained as evidence and returned to the acting model; it is not silently executed, rewritten or dropped.",
+    "This is one targeted mechanism contrast, not a product policy or success-rate estimate."
+  ],
+  "execution": {
+    "canonical_E_workflow_run": 37419909622,
+    "canonical_E_head_sha": "0cbbe16461cbe992c2ffa528bb905b20842758b0",
+    "canonical_E_artifact_id": 11392677720,
+    "canonical_E_artifact_sha256": "02f54c033be34559d3f3a74d938c3dd73a82aa8cb189be28c89e22b7bc12c224",
+    "subject_provider_calls": 40,
+    "automatic_retry": false,
+    "control_D_reruns": 0
+  },
+  "result": {
+    "machine_summary": "stage2/replication_v2/repair_efficacy_hard_authority_E_v1/summary.json",
+    "report": "docs/reports/2026-10-06_Repair_Efficacy_Hard_Authority_E.md",
+    "overall_process_effect": "HARD_GATE_STALL_WITH_SCOPE_SUPPRESSION",
+    "collaboration_expansion_effect": "SUPPRESSED_AT_EXECUTION_BOUNDARY",
+    "temporal_reach_change": "STABLE_AT_NATIVE_CEILING",
+    "final_queue_change_vs_D": {
+      "D": 18,
+      "E": 5
+    },
+    "application_mutation_change": "STABLE_NONE",
+    "next_gate": "BOUND_VERIFICATION_AND_CLOSURE_GATE_ONLY_IF_ONE_FINAL_DISCRIMINATING_CONTRAST_IS_REQUIRED"
+  }
+}

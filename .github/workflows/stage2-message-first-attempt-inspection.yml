@@ -1,0 +1,29 @@
+name: Read retained message first-attempt evidence
+
+on:
+  push:
+    branches: [fix/p2-native-evidence-replay]
+    paths: ['scripts/inspect_stage2_message_first_attempt.py']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: message-mechanism-first-attempt-96acfc60970109591f08213fd26a3ca2cc0ff23f
+          run-id: 37205090807
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/retained-first-attempt
+      - name: Inspect original response without provider dispatch
+        run: python scripts/inspect_stage2_message_first_attempt.py --artifact-root "$RUNNER_TEMP/retained-first-attempt"

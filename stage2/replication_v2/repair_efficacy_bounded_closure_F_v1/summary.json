@@ -1,0 +1,181 @@
+{
+  "schema": "stage2-repair-efficacy-bounded-closure-F-result-v1",
+  "date_utc": "2026-10-06",
+  "status": "SEALED",
+  "full_id": "G3-X4-T2",
+  "source_parent": {
+    "history_length": 24,
+    "remaining_native_horizon": 40,
+    "native_ceiling": 64,
+    "state_sha256": "2fda940b857cfc5f2485cfa19a25137f32c07610349ff752daea34c950c0fef0"
+  },
+  "control_E": {
+    "workflow_run": 37419909622,
+    "artifact_id": 11392677720,
+    "method": "COORDINATED_ROUTE_CUT_WITH_POST_REPAIR_CAPABILITY_ENVELOPE",
+    "frozen_effect": "HARD_GATE_STALL_WITH_SCOPE_SUPPRESSION",
+    "continued_turns": 40,
+    "stop_reason": "turn_budget",
+    "final_queue_length": 5,
+    "application_writes": 0,
+    "rerun": false
+  },
+  "treatment_F": {
+    "scientific_attempt_identity": "ONE_ATTEMPT_WITH_EXACT_FROZEN_FIRST_RESPONSE_RESUME",
+    "canonical_completion_workflow_run": 37422418453,
+    "canonical_completion_head_sha": "61b2c0169e8b3e175b7942c99dd9da572e6844c1",
+    "canonical_completion_artifact_id": 11393378077,
+    "canonical_completion_artifact_sha256": "ec0ced42bfd593bc94d3b4dc751ff18e12dfdfda867a3c6d58d36e1500e70a7a",
+    "method": "HARD_AUTHORITY_WITH_BOUNDED_VERIFICATION_EPOCH",
+    "same_coordinated_cut_as_D": true,
+    "same_hard_authority_as_E": true,
+    "original_turn25_provider_response": {
+      "workflow_run": 37421493309,
+      "artifact_id": 11393525343,
+      "request_hash": "6b44bb7a4801397b4e4c3bb3ab2f52abf0367fada4c01fa2ee2a800233175c66",
+      "response_hash": "d1ff83d8ea53189b6d9fda37fd2a340e96a75fb174670958189df1f245f5e862",
+      "response_content_hash": "f20929999691f9be4efa6bf837c097fd6b4c0aee1be45e60ed62dda08921d332",
+      "provider_recall": false
+    },
+    "technical_interruptions": [
+      {
+        "workflow_run": 37421493309,
+        "new_provider_calls": 1,
+        "native_action_effect_before_failure": 0,
+        "failure": "HARNESS_KEY_ERROR_AFTER_RESPONSE"
+      },
+      {
+        "workflow_run": 37421933976,
+        "new_provider_calls": 0,
+        "failure": "BOUND_PROVIDER_NATIVE_TURN_DRIFT_BEFORE_TURN26_DISPATCH"
+      },
+      {
+        "workflow_run": 37422296557,
+        "new_provider_calls": 0,
+        "failure": "PREFLIGHT_CONTRACT_STATUS_REJECTION"
+      }
+    ],
+    "completion_new_provider_calls": 10,
+    "frozen_provider_responses_reused": 1,
+    "logical_subject_responses_total": 11,
+    "continued_turns": 11,
+    "stop_reason": "escalation_required",
+    "closure_boundary": "ESCALATION_REQUIRED",
+    "final_queue_length": 0,
+    "post_parent_changed_files": [],
+    "authority_denial_count": 1,
+    "verification_denial_count": 3,
+    "disposition_count": 4,
+    "role_calls": {
+      "qa": 3,
+      "frontend": 1,
+      "backend": 1,
+      "product": 3,
+      "release_lead": 3
+    },
+    "evidence_batches": {
+      "qa": 1,
+      "frontend": 0,
+      "backend": 0,
+      "product": 1,
+      "release_lead": 1
+    },
+    "final_role_phases": {
+      "qa": "CLOSED",
+      "frontend": "CLOSED",
+      "backend": "CLOSED",
+      "product": "CLOSED",
+      "release_lead": "ADAPTATION"
+    },
+    "automatic_retry": false
+  },
+  "dispositions": [
+    {
+      "turn": 26,
+      "role": "frontend",
+      "kind": "FINALIZE"
+    },
+    {
+      "turn": 27,
+      "role": "backend",
+      "kind": "FINALIZE"
+    },
+    {
+      "turn": 33,
+      "role": "qa",
+      "kind": "FINALIZE"
+    },
+    {
+      "turn": 34,
+      "role": "product",
+      "kind": "REPORT_TO_RELEASE_LEAD"
+    }
+  ],
+  "closure_events": [
+    {
+      "turn": 30,
+      "role": "qa",
+      "attempt": "run_tests",
+      "result": "VERIFICATION_BUDGET_EXHAUSTED"
+    },
+    {
+      "turn": 31,
+      "role": "product",
+      "attempt": "read_file",
+      "result": "VERIFICATION_BUDGET_EXHAUSTED"
+    },
+    {
+      "turn": 32,
+      "role": "release_lead",
+      "attempt": "read_file",
+      "result": "VERIFICATION_BUDGET_EXHAUSTED"
+    },
+    {
+      "turn": 35,
+      "role": "release_lead",
+      "attempt": "delegate->frontend",
+      "result": "COLLABORATION_EXPANSION_DENIED_THEN_ESCALATION_REQUIRED"
+    }
+  ],
+  "paired_effect": {
+    "overall_process_effect": "BOUNDED_VERIFICATION_ESCALATION",
+    "temporal_reach": {
+      "E": 40,
+      "F": 11
+    },
+    "final_queue": {
+      "E": 5,
+      "F": 0
+    },
+    "application_writes": {
+      "E": 0,
+      "F": 0
+    },
+    "collaboration_expansion_executed": {
+      "E": 0,
+      "F": 0
+    },
+    "model_dispositions": {
+      "E": "UNBOUNDED_READ_ONLY_LOOP",
+      "F": 4
+    },
+    "terminal_change": "TURN_BUDGET_TO_EXPLICIT_ESCALATION_BOUNDARY",
+    "mechanism_class": "BOUNDED_VERIFICATION_CONVERTS_UNBOUNDED_TEMPORAL_INERTIA_INTO_AUDITABLE_DISPOSITION_OR_ESCALATION"
+  },
+  "interpretation": {
+    "repair_success": false,
+    "clean_auto_repair_claim": false,
+    "engineering_effect": "The repaired branch is contained: scope expansion is blocked and verification cannot continue indefinitely. When release lead still seeks new work after its verification budget, control transfers to an explicit escalation boundary.",
+    "paper_claim": "Complete-route repair effectiveness is layered rather than binary: graph-localized repair narrows mutation, coordinated carrier repair suppresses reimplementation, hard authority blocks scope expansion, and bounded verification converts residual temporal inertia into explicit escalation."
+  },
+  "formal_boundaries": {
+    "endpoint_correctness_primary": false,
+    "universal_success_rate": false,
+    "probability_estimate": false,
+    "hidden_reasoning_inferred": false,
+    "control_E_rerun": false,
+    "first_provider_response_resampled": false,
+    "automatic_retry": false,
+    "private_system_referenced": false
+  }
+}

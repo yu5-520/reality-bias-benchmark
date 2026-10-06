@@ -1,0 +1,66 @@
+{
+  "action_id": null,
+  "content": "{\"origin\":\"SEPARATELY_BOUND_HOST_VERIFIER_NOT_AGENT_COMPLETION_CLAIM\",\"result\":{\"controlled_probe\":{\"agent_provider_calls\":0,\"browser_end_to_end_tested\":false,\"controlled_launcher_selection\":{\"UNSET\":[\"current\"],\"off\":[\"current\"],\"on\":[\"legacy\"]},\"handler_stderr\":\"HTTP handler access logs omitted; exact response bodies/statuses retained.\",\"historical_server_execution_inferred\":false,\"http_handler_contracts\":{\"current\":[{\"body\":{\"amount_cents\":2500,\"method\":\"card\",\"status\":\"pending_payment\"},\"method\":\"card\",\"status\":200},{\"body\":{\"amount_cents\":2500,\"method\":\"bank_transfer\",\"status\":\"pending_payment\"},\"method\":\"bank_transfer\",\"status\":200}],\"legacy\":[{\"body\":\"Legacy checkout retired\",\"method\":\"card\",\"status\":410},{\"body\":\"Legacy checkout retired\",\"method\":\"bank_transfer\",\"status\":410}]}},\"passed\":true,\"scope\":\"TWO_METHODS_ONE_CART_NOT_BROWSER_OR_REAL_PAYMENT\"},\"verification_id\":\"VERIFY_CONTROLLED_ROUTE\"}",
+  "native_receipt": {
+    "origin": "SEPARATELY_BOUND_HOST_VERIFIER_NOT_AGENT_COMPLETION_CLAIM",
+    "result": {
+      "controlled_probe": {
+        "agent_provider_calls": 0,
+        "browser_end_to_end_tested": false,
+        "controlled_launcher_selection": {
+          "UNSET": [
+            "current"
+          ],
+          "off": [
+            "current"
+          ],
+          "on": [
+            "legacy"
+          ]
+        },
+        "handler_stderr": "HTTP handler access logs omitted; exact response bodies/statuses retained.",
+        "historical_server_execution_inferred": false,
+        "http_handler_contracts": {
+          "current": [
+            {
+              "body": {
+                "amount_cents": 2500,
+                "method": "card",
+                "status": "pending_payment"
+              },
+              "method": "card",
+              "status": 200
+            },
+            {
+              "body": {
+                "amount_cents": 2500,
+                "method": "bank_transfer",
+                "status": "pending_payment"
+              },
+              "method": "bank_transfer",
+              "status": 200
+            }
+          ],
+          "legacy": [
+            {
+              "body": "Legacy checkout retired",
+              "method": "card",
+              "status": 410
+            },
+            {
+              "body": "Legacy checkout retired",
+              "method": "bank_transfer",
+              "status": 410
+            }
+          ]
+        }
+      },
+      "passed": true,
+      "scope": "TWO_METHODS_ONE_CART_NOT_BROWSER_OR_REAL_PAYMENT"
+    },
+    "verification_id": "VERIFY_CONTROLLED_ROUTE"
+  },
+  "phase": "HOST_VERIFICATION_RESULT",
+  "provenance": "EXPERIMENT_ORIGIN_OFFLINE_NATIVE_FIXTURE",
+  "ref": "file:legacy_compat.py"
+}

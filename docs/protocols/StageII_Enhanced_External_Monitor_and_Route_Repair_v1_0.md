@@ -1,3 +1,9 @@
+> Current replay correction: use [P2 native evidence replay v2](StageII_P2_Replay_Correction_v2.md). The v1 graph promotion and localization comparison are withdrawn; prior frozen files remain historical evidence.
+
+> Current repair design: [Complete node-route repair](StageII_Complete_Node_Route_Repair_Design.md). The terminal harness below is historical and its live entrypoint is disabled; it did not implement the intended route-level method.
+
+> Historical, disabled terminal harness: [Terminal node-graph repair v1](StageII_Terminal_Node_Graph_Repair_v1.md). Its two-case, four-arm terminal-phase specification was a diagnostic harness and does not define the current route-repair method. Full observation indexing remains separate from authority; historical R7 midrun interventions are unchanged.
+
 # Stage-II Enhanced External Evidence-Graph Monitor and Route-Repair Protocol v1.0
 
 Status: implementation baseline. This protocol adds a public research prototype only. It does not change frozen natural trajectories, historical R7 outputs, studied framework protocols, or existing evidence.
@@ -61,3 +67,7 @@ Route repair: stage2/route_repair/plan.py and runner.py.
 Frozen machine-readable boundary: configs/stage2_enhanced_external_monitor_contract_v1.json.
 
 The implementation is additive. Existing Stage-I and Stage-II monitor, lineage, checkpoint and repair code remains the historical/reproduction baseline.
+
+## 9. Monitoring stages and current audit comparison
+
+Runtime observation and terminal frozen verification form complementary stages of the monitoring design. Candidate objects feed the observation graph; route-map-assisted repair is not one repair per candidate. Complete available observation maps support diagnosis without conferring write authority or proving all semantic edges. The [dual-audit comparison](../reports/2026-10-03_Enhanced_Monitor_Dual_Audit_Comparison.md) records the tested retrospective gains, including the A2A application case, and separates these from unmeasured live performance and future route-repair outcomes.

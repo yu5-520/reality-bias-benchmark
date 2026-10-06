@@ -1,0 +1,23 @@
+name: Sealed first repair-efficacy contrast
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sealed-record:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify sealed canonical result without provider calls
+        run: |
+          python - <<'PY'
+          import json
+          c=json.load(open('configs/stage2_repair_efficacy_first_contrast_v1.json'))
+          assert c['status']=='B_CAPTURED_SOURCE_BOUND_COMPARISON_SEALED'
+          assert c['execution']['actual_B_workflow_run']==37349337495
+          print(json.dumps({'sealed':True,'canonical_run':37349337495,
+                            'result':c['result']['overall_process_effect']}))
+          PY

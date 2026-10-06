@@ -1,54 +1,55 @@
-name: Stage-II P2 Evidence Graph Replay
+name: Stage-II P2 Corrected Native Evidence Replay
 
 on:
   push:
     paths:
-      - "scripts/run_stage2_p2_evidence_graph_replay_v1.py"
-      - "configs/stage2_p2_evidence_graph_replay_v1.json"
-      - "stage2/monitor_enhancement/evidence_graph.py"
-      - "stage2/monitor_enhancement/inspection.py"
-      - "stage2/monitor_enhancement/route_export.py"
-      - ".github/workflows/stage2-p2-evidence-graph-replay.yml"
+      - 'scripts/*stage2*p2*v2.py'
+      - 'scripts/inspect_stage2_evidence_graph.py'
+      - 'configs/stage2_p2_evidence_graph_replay_v2.json'
+      - 'stage2/monitor_enhancement/**'
+      - '.github/workflows/stage2-p2-evidence-graph-replay.yml'
+  workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: stage2-p2-evidence-graph-replay
+  group: stage2-p2-native-replay-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   replay:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - name: Validate enhanced monitor primitives
+          python-version: '3.11'
+      - name: Validate monitor and repair authority boundaries
         run: |
-          python -m unittest stage2.monitor_enhancement.tests.test_evidence_graph stage2.route_repair.tests.test_route_repair
-      - name: Materialize frozen Natural A evidence commits
+          python -m unittest discover -s stage2/monitor_enhancement/tests -v
+          python -m unittest discover -s stage2/route_repair/tests -v
+      - name: Read frozen public Natural A archives
+        shell: bash
         run: |
+          set -euo pipefail
           for g in 2 3 4 5; do
             commit=$(python -c "import json; print(json.load(open('configs/stage2_g${g}_ab_paired_semantic_audit_v1.json'))['source']['natural_A_evidence_commit'])")
             git archive "$commit" "stage2/replication_v2/G${g}/natural_A" | tar -x
           done
-      - name: Run P2 offline replay
-        run: |
-          rm -rf stage2/replication_v2/enhanced_monitor_p2_v1
-          python scripts/run_stage2_p2_evidence_graph_replay_v1.py --out stage2/replication_v2/enhanced_monitor_p2_v1
-      - name: Freeze P2 results in repository
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add stage2/replication_v2/enhanced_monitor_p2_v1
-          if git diff --cached --quiet; then
-            echo "No P2 result changes to commit."
-            exit 0
-          fi
-          git commit -m "Freeze P2 offline Evidence Graph replay results"
-          git pull --rebase origin main
-          git push origin HEAD:main
+      - name: Replay without any subject or provider execution
+        run: python scripts/run_stage2_p2_evidence_graph_replay_v2.py --out "$RUNNER_TEMP/p2-replay"
+      - name: Validate persisted graph and field bindings
+        run: python scripts/validate_stage2_p2_replay_v2.py --root "$RUNNER_TEMP/p2-replay" --receipt "$RUNNER_TEMP/p2-validation.json"
+      - name: Retain complete generated graphs and maps
+        uses: actions/upload-artifact@v4
+        with:
+          name: p2-native-evidence-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/p2-replay
+            ${{ runner.temp }}/p2-validation.json
+          retention-days: 90
+          if-no-files-found: error

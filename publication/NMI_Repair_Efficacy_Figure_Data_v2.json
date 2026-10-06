@@ -1,0 +1,67 @@
+{
+  "schema": "nmi-repair-efficacy-figure-data-v2",
+  "date_utc": "2026-10-06",
+  "status": "SEALED_PUBLICATION_PROJECTION",
+  "scope": "G3-X4-T2 targeted mechanism series; not a repair-success denominator",
+  "stages": [
+    {
+      "id": "A",
+      "label": "Local repair",
+      "remaining_failure": "BROAD_REGENERATION",
+      "terminal": "TURN_64"
+    },
+    {
+      "id": "B",
+      "label": "Graph-informed single-carrier repair",
+      "remaining_failure": "TEMPORAL_AND_COORDINATION_INERTIA",
+      "terminal": "TURN_64"
+    },
+    {
+      "id": "C",
+      "label": "Pending-obligation carrier-class repair",
+      "remaining_failure": "DESCENDANT_OBLIGATION_REGENERATION",
+      "terminal": "TURN_64",
+      "final_queue": 23
+    },
+    {
+      "id": "D",
+      "label": "Coordinated complete-route repair",
+      "remaining_failure": "REVIEW_VERIFICATION_REGENERATION",
+      "terminal": "TURN_64",
+      "final_queue": 18,
+      "post_parent_writes": 0
+    },
+    {
+      "id": "E",
+      "label": "Hard post-repair authority",
+      "remaining_failure": "READ_ONLY_VERIFICATION_LOOP",
+      "terminal": "TURN_64",
+      "final_queue": 5,
+      "authority_denials": 5,
+      "executed_messages": 0,
+      "executed_delegates": 0,
+      "post_parent_writes": 0
+    },
+    {
+      "id": "F",
+      "label": "Bounded verification / closure",
+      "remaining_failure": "EXPLICIT_ESCALATION",
+      "terminal": "ESCALATION_REQUIRED",
+      "logical_subject_responses": 11,
+      "new_provider_calls_after_frozen_first": 10,
+      "frozen_first_responses_reused": 1,
+      "final_queue": 0,
+      "dispositions": 4,
+      "verification_denials": 3,
+      "authority_denials": 1,
+      "post_parent_writes": 0
+    }
+  ],
+  "primary_claim": "Repair efficacy is layered: route reconstruction, coordinated carrier repair, execution authority and closure policy remove different regeneration channels.",
+  "exclusions": [
+    "Do not interpret stages as independent randomized arms.",
+    "Do not convert this series into a repair success rate.",
+    "Do not combine with the historical 45-pair denominator.",
+    "Do not describe F escalation as automatic repair success."
+  ]
+}

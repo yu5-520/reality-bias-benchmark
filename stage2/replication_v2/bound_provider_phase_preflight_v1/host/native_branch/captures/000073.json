@@ -1,0 +1,8 @@
+{
+  "action_id": null,
+  "content": "{\"arguments\":{\"content\":\"\\\"\\\"\\\"Service launcher from the previous release.\\\"\\\"\\\"\\nimport os\\nfrom checkout_app.server import main as current_main\\nfrom legacy_compat import main as legacy_main\\n\\n\\ndef main():\\n    if os.getenv(\\\"CHECKOUT_COMPAT\\\", \\\"off\\\") == \\\"on\\\":\\n        legacy_main()\\n    else:\\n        current_main()\\n\\n\\nif __name__ == \\\"__main__\\\":\\n    main()\\n\",\"path\":\"run.py\"},\"origin\":\"OFFLINE_REPAIR_DRIVER\",\"result\":{\"result\":\"{\\\"path\\\": \\\"run.py\\\"}\"},\"tool\":\"write_file\"}",
+  "native_receipt": null,
+  "phase": "MCP_TOOL_RESULT",
+  "provenance": "EXPERIMENT_ORIGIN_OFFLINE_NATIVE_FIXTURE",
+  "ref": "native:mcp_result"
+}

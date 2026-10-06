@@ -1,3 +1,7 @@
+> P2 replay correction: the v1 graph promotion and localization comparison are withdrawn. See [native evidence replay correction](docs/protocols/StageII_P2_Replay_Correction_v2.md). Frozen v1 files remain historical evidence.
+
+> Current monitoring/repair engineering: [frozen provider profiles and explicit native phases](docs/protocols/StageII_Bound_Provider_and_Native_Phases.md). The active entry is `configs/stage2_monitor_repair_active.json`: read-only planning, exact native repair, a checked pause, host release and native continuation. Prior one-call entries are retained for frozen reproduction without current fallback. Request/response byte capture and no-action/failure paths are verified with offline fixtures. Autonomous planning, actual repair-agent exit, live subject continuation and independent semantic effectiveness remain pending.
+
 # reality-bias-benchmark
 
 Open research repository for the **Reality Bias** programme and the first-paper **Process Reality** mechanism study in multi-agent AI systems.

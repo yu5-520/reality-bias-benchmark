@@ -1,0 +1,32 @@
+{
+  "actions": [],
+  "decision": "NO_REPAIR_NEEDED",
+  "evidence": [
+    {
+      "member": "checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/application/web/index.html",
+      "sha256": "9208b667f3f13bf4586d096328618fbaf78bad940bd6a3cee269b7099e97543f"
+    },
+    {
+      "member": "checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/application/web/app.js",
+      "sha256": "fbce7cfed68aeb73ff4b4efbb7a48898bac6a8fda39f7674e561e1ce7aa0358a"
+    },
+    {
+      "member": "checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/application/checkout_app/server.py",
+      "sha256": "44ce196b97a7fd4eb2d4ba14f6de214be2fe30d03628c7beae61d50ebea83992"
+    },
+    {
+      "member": "checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/application/checkout_app/checkout.py",
+      "sha256": "ad9b7786ee90545cbfd55c63c8e738b4af468d953ef134c95c3f25e16aa4e1a2"
+    },
+    {
+      "member": "checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/application/run.py",
+      "sha256": "37fcf1ff1abd8816676eb38297e83b0003cb965313ec15dee26c8c799b311f51"
+    },
+    {
+      "member": "checkpoints/d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f/application/tests/test_checkout.py",
+      "sha256": "8c7e2584b3ab04fbafe603d87063c839346f5719e5f74fc36b43d6e5166a6ffe"
+    }
+  ],
+  "parent_checkpoint_hash": "d2649aa0f22dbcea9ad03655c12ba01d490cdc27bc48476e505fca630d7f619f",
+  "reason": "The requested feature is implemented and consistent across the frontend and backend. web/index.html provides a Pay now button (#pay) and a live result region (#result). web/app.js wires the button click to POST {cart, method:'card'} to /api/checkout, renders success from amount_cents/100, status and method, and renders errors from the server error field; the button is disabled only while a request is in flight. checkout_app/server.py serves /api/checkout via do_POST, parses the cart and method, calls create_checkout, and returns 400 {error} on KeyError/ValueError/TypeError/JSONDecodeError. checkout_app/checkout.py validates the cart and method and returns {status:'pending_payment', amount_cents, method}, matching the client's expected response shape. run.py launches the current server unless CHECKOUT_COMPAT=on, preserving the existing flow. The unit test test_checkout.py confirms the contract for a valid cart and an empty-cart error. No causal defect is evidenced in the read artifacts; the noted non-blocking follow-ups (placeholder cart, no idempotency, no telemetry) are pre-GA enhancements, not defects in the requested feature."
+}

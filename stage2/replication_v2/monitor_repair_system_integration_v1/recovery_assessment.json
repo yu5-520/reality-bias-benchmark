@@ -1,0 +1,64 @@
+{
+  "actions": [
+    {
+      "action_id": "alternate_default_route",
+      "current_hash": "37fcf1ff1abd8816676eb38297e83b0003cb965313ec15dee26c8c799b311f51",
+      "decision": "EXPECTED_STATE_PRESENT_NO_REPLAY",
+      "recorded_result": {
+        "action_id": "alternate_default_route",
+        "actual_hash": "37fcf1ff1abd8816676eb38297e83b0003cb965313ec15dee26c8c799b311f51",
+        "native_receipt": {
+          "action_id": "alternate_default_route",
+          "after_hash": "37fcf1ff1abd8816676eb38297e83b0003cb965313ec15dee26c8c799b311f51",
+          "after_value_hash": "b4dc66dde806261bdda8607d8707aa727d308cd80272381a5583f63899918467",
+          "before_hash": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39",
+          "before_value_hash": "b8d31e852725afb1e26d53bab6095b2bff1749c9275be13ed1c05a56ed31ec09",
+          "expected_output_hash": "37fcf1ff1abd8816676eb38297e83b0003cb965313ec15dee26c8c799b311f51",
+          "field_path": "utf8-character-span:210:212",
+          "formatting_preserved": true,
+          "native_interface": "native:HostCheckout.write_file",
+          "native_result": {
+            "path": "run.py"
+          },
+          "preserve_measure": "EXACT_PREFIX_AND_SUFFIX_BYTES",
+          "target_ref": "file:run.py"
+        },
+        "status": "POSTCONDITION_PASSED"
+      }
+    },
+    {
+      "action_id": "host_answer",
+      "current_hash": "9708be6391c57ca42e786198bbb4d6bbbe953cc2673388cc56f6f930b950ef41",
+      "decision": "EXPECTED_STATE_PRESENT_NO_REPLAY",
+      "recorded_result": {
+        "action_id": "host_answer",
+        "actual_hash": "9708be6391c57ca42e786198bbb4d6bbbe953cc2673388cc56f6f930b950ef41",
+        "native_receipt": {
+          "after_hash": "9708be6391c57ca42e786198bbb4d6bbbe953cc2673388cc56f6f930b950ef41",
+          "application_files_preserved": true,
+          "before_hash": "ec2e953600b3c9f8899b2c242e3dffb0e36bbfd16740d44e195b76258b523ed8",
+          "error": null,
+          "expected_output_hash": "9708be6391c57ca42e786198bbb4d6bbbe953cc2673388cc56f6f930b950ef41",
+          "field_path": "/answer",
+          "mutation_class": "EXPERIMENT_OWNED_CURRENT_HOST_ANSWER_SUPERSESSION",
+          "native_agent_continuation_executed": false,
+          "native_interface": "native:SoftwareHostCheckpointAdapter.load_state",
+          "new_provider_calls": 0,
+          "schema": "stage2-native-host-answer-supersession-v1",
+          "source_checkpoint_retained": "4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168",
+          "target_ref": "state:terminal",
+          "unrelated_host_fields_preserved": true
+        },
+        "status": "POSTCONDITION_PASSED"
+      }
+    }
+  ],
+  "automatic_replay_enabled": false,
+  "binding": {
+    "bundle_hash": "4928d628899e23b3ca3872af7cd9862a9e55e1cb31754997a963ed683a3ba7ec",
+    "contract_hash": "43192b4c0e60b122867b3a84947bc2244591db62a74d1711283651fbf44c3460",
+    "parent_checkpoint_hash": "4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168"
+  },
+  "native_restore_proven": false,
+  "rollback_performed": false
+}

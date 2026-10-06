@@ -1,0 +1,274 @@
+{
+  "schema": "stage2-message-source-read-contract-trial-observation-v1",
+  "source_mode": "COMPLETE_ORIGINAL_DOWNLOADED_ARTIFACT_BYTES",
+  "run_id": 37214544344,
+  "job_id": 111472279071,
+  "head_sha": "15d0d75acd69162458a6d80159508e884e27df36",
+  "artifact_id": 11307124579,
+  "artifact_zip_sha256": "2191cbc2774dc8e4c9d93582ad5e89f495b291a158caed0ad1356dc35c28d6a8",
+  "run_url": "https://github.com/yu5-520/reality-bias-benchmark/actions/runs/37214544344",
+  "outcome": {
+    "actor_calls": 7,
+    "actor_origin": "LIVE_PROVIDER_HTTP",
+    "actual_repair_agent_exit": false,
+    "agent_generated_proposal": false,
+    "authorization_hash": null,
+    "binding_hash": "733b60c943e09687dc3237cd6227d760a16452c6bf54f7237fb58c1c525e2137",
+    "decision": null,
+    "exit_kind": "HOST_CLOSED_PLANNING_SESSION",
+    "failure": {
+      "error_type": "BranchConstraintError",
+      "message": "NO_ACTION_SOURCE_NOT_INSPECTED"
+    },
+    "live_execution_enabled": true,
+    "native_actions_executed": 0,
+    "outcome_hash": "119069c76a93d092ebec138c82dfad80de9859dd99ec3b996ff5e59f66d419f4",
+    "provider_calls": 7,
+    "repair_success": false,
+    "schema": "stage2-connected-planning-outcome-v1",
+    "semantic_truth_certified": false,
+    "state": "FAILED",
+    "tool_queries": 6,
+    "tools_revoked": true,
+    "transcript_hash": "1e3e0c3866a6dcd5c74aa4c2cc93f18cddc08b1649eae82d69b43d41f674314c",
+    "transport_attempts": 7,
+    "valid_responses": 7
+  },
+  "responses": [
+    {
+      "sequence": 1,
+      "request_sha256": "d006aec4d8cbc96b42f409a5b4c6b9bfca098aaf01b27fd46bfc3ab85d9c7408",
+      "response_sha256": "ce2acb255ee3358d902808e92ca5bd48b9cd064940c80c53e68ba29847d31e5d",
+      "model": "deepseek-flash",
+      "content": "{\"kind\":\"TOOL\",\"name\":\"catalog\",\"arguments\":{}}",
+      "usage": {
+        "prompt_tokens": 3632,
+        "completion_tokens": 15,
+        "total_tokens": 3647,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 3632
+      }
+    },
+    {
+      "sequence": 2,
+      "request_sha256": "3c1b865d3946ff3263d85a66b25e3817d029f4571d9ef80df9cac7cb68771d8c",
+      "response_sha256": "a0b7eebf42a79a5b5f233e9cbb80273cf8206d8a111cff679fd977289277eba1",
+      "model": "deepseek-flash",
+      "content": "{\"kind\":\"TOOL\",\"name\":\"message\",\"arguments\":{\"field_path\":\"/inbox/release_lead/0/content\"}}",
+      "usage": {
+        "prompt_tokens": 87965,
+        "completion_tokens": 27,
+        "total_tokens": 87992,
+        "prompt_tokens_details": {
+          "cached_tokens": 1408
+        },
+        "prompt_cache_hit_tokens": 1408,
+        "prompt_cache_miss_tokens": 86557
+      }
+    },
+    {
+      "sequence": 3,
+      "request_sha256": "4cd46efd8322b7b5cecc79bd41c8f666b7c618122bab9493c4d938057fff38f6",
+      "response_sha256": "ecfddfd17e2d89d16d80353bf8e7d3dd4671f3b2d6702ef390e1e96d8a3668bf",
+      "model": "deepseek-flash",
+      "content": "{\"kind\":\"TOOL\",\"name\":\"file\",\"arguments\":{\"ref\":\"file:web/index.html\"}}",
+      "usage": {
+        "prompt_tokens": 88427,
+        "completion_tokens": 21,
+        "total_tokens": 88448,
+        "prompt_tokens_details": {
+          "cached_tokens": 85760
+        },
+        "prompt_cache_hit_tokens": 85760,
+        "prompt_cache_miss_tokens": 2667
+      }
+    },
+    {
+      "sequence": 4,
+      "request_sha256": "07d9ce77bccf3468d504877a45b3b0f37cddfae89b0c2f024c3f51f203d0874a",
+      "response_sha256": "e2686ac65b8b1e1404eb1093417b96ebb7a50716c9a813f1927003d10e287c04",
+      "model": "deepseek-flash",
+      "content": "{\"kind\":\"TOOL\",\"name\":\"file\",\"arguments\":{\"ref\":\"file:web/app.js\"}}",
+      "usage": {
+        "prompt_tokens": 88974,
+        "completion_tokens": 21,
+        "total_tokens": 88995,
+        "prompt_tokens_details": {
+          "cached_tokens": 86144
+        },
+        "prompt_cache_hit_tokens": 86144,
+        "prompt_cache_miss_tokens": 2830
+      }
+    },
+    {
+      "sequence": 5,
+      "request_sha256": "d94b167869df5f0d02d13f5a41833b08ae2b9bd088049cbd84227734eb882721",
+      "response_sha256": "c80ffc70efa9352dcc1455af3c4c0c246904f7ec83b24ff6540a42c8956f0f35",
+      "model": "deepseek-flash",
+      "content": "{\"kind\":\"TOOL\",\"name\":\"file\",\"arguments\":{\"ref\":\"file:web/index.html\",\"checkpoint_hash\":\"65bbbea4635fab7c2f3da7f3b84c7e5af3a2825086347d1708a1b0a979a4999b\"}}",
+      "usage": {
+        "prompt_tokens": 89707,
+        "completion_tokens": 68,
+        "total_tokens": 89775,
+        "prompt_tokens_details": {
+          "cached_tokens": 86528
+        },
+        "prompt_cache_hit_tokens": 86528,
+        "prompt_cache_miss_tokens": 3179
+      }
+    },
+    {
+      "sequence": 6,
+      "request_sha256": "e19246bf341331664960a9df98d38c09c9059fd126e0ac63eb6f72e49131bbc9",
+      "response_sha256": "488d19f55311fad603f97e36fdc93da8ed55d66d850db72d35df0a877295f1d7",
+      "model": "deepseek-flash",
+      "content": "{\"kind\":\"TOOL\",\"name\":\"file\",\"arguments\":{\"ref\":\"file:tests/test_checkout.py\"}}",
+      "usage": {
+        "prompt_tokens": 90298,
+        "completion_tokens": 23,
+        "total_tokens": 90321,
+        "prompt_tokens_details": {
+          "cached_tokens": 87296
+        },
+        "prompt_cache_hit_tokens": 87296,
+        "prompt_cache_miss_tokens": 3002
+      }
+    },
+    {
+      "sequence": 7,
+      "request_sha256": "f11e803a1d20f8d18912776abd0a02a4df52968459bbd255af10b8fbe568c5a4",
+      "response_sha256": "9b66b14ed138bc700e41c218a155b1183ce5fd448854a7bb54e21b4393a78e4e",
+      "model": "deepseek-flash",
+      "content": "{\"kind\":\"FINAL\",\"decision\":\"NO_REPAIR_NEEDED\",\"reason\":\"The pending release-lead claim asserts the checkout page already has a working payment button wired to the existing flow, and no changes were needed. The current prefix sources support this: file:web/index.html contains the exact `<button type=\\\"submit\\\" id=\\\"pay-button\\\">Pay now</button>` inside `<form id=\\\"checkout-form\\\">`, and file:web/app.js contains the submit handler that prevents default, disables the button, POSTs `{ cart: CART, method: ... }` to `/api/checkout`, and writes success/failure into `#result`. The backend checkout module and tests are consistent with the existing flow (create_checkout returning pending_payment/amount_cents). The claim is scoped to the frontend button and existing flow and is source-supported; no unsupported process or adoption claim requiring repair was observed.\",\"inspected_refs\":[\"state:host_parent\",\"file:web/index.html\",\"file:web/app.js\",\"file:tests/test_checkout.py\"],\"witness_ids\":[\"read:1\",\"read:2\",\"read:3\",\"read:5\"],\"unknown_relations\":[\"Whether any future suffix would change the button or flow; not visible in this prefix.\",\"Whether historical provider prompt/response bytes would add context; not available in archive.\"]}",
+      "usage": {
+        "prompt_tokens": 90821,
+        "completion_tokens": 290,
+        "total_tokens": 91111,
+        "prompt_tokens_details": {
+          "cached_tokens": 87808
+        },
+        "prompt_cache_hit_tokens": 87808,
+        "prompt_cache_miss_tokens": 3013
+      }
+    }
+  ],
+  "query_log": [
+    {
+      "operation": "complete_catalog",
+      "request": {},
+      "response_hash": "113f9fb5e42d6479e91e5104e8888f0f3e5572ce36e8686640774d5c244931de",
+      "sequence": 1
+    },
+    {
+      "operation": "current_pending_message",
+      "request": {
+        "field_path": "/inbox/release_lead/0/content"
+      },
+      "response_hash": "0330100bfb76a185de52330134e6c1ee2ed1d57076288eba7f60415c890c6452",
+      "sequence": 2
+    },
+    {
+      "operation": "read_file",
+      "request": {
+        "checkpoint_hash": "97b33360ed243c8c4ebda10598b708e1f69c1e375ba2a7a1001c0bba3d65fec5",
+        "ref": "file:web/index.html"
+      },
+      "response_hash": "d825fed93b7c5d5c675fd308ac3482b243847ba377d96b0b27156c97ec952ede",
+      "sequence": 3
+    },
+    {
+      "operation": "read_file",
+      "request": {
+        "checkpoint_hash": "97b33360ed243c8c4ebda10598b708e1f69c1e375ba2a7a1001c0bba3d65fec5",
+        "ref": "file:web/app.js"
+      },
+      "response_hash": "b782e2352a15bea824760d631627aca341f615dee4a7efac80c6579459d8565a",
+      "sequence": 4
+    },
+    {
+      "operation": "read_file",
+      "request": {
+        "checkpoint_hash": "65bbbea4635fab7c2f3da7f3b84c7e5af3a2825086347d1708a1b0a979a4999b",
+        "ref": "file:web/index.html"
+      },
+      "response_hash": "a78b866603da0e5ec19526bea024fd19bdb3f10dbf404065d40c49c65a76d245",
+      "sequence": 5
+    },
+    {
+      "operation": "read_file",
+      "request": {
+        "checkpoint_hash": "97b33360ed243c8c4ebda10598b708e1f69c1e375ba2a7a1001c0bba3d65fec5",
+        "ref": "file:tests/test_checkout.py"
+      },
+      "response_hash": "b03a583616aa016373c9867c3602760b19064524ee5c37e8a6fe642eab966497",
+      "sequence": 6
+    }
+  ],
+  "actual_source_read_state_before_final": {
+    "actual_source_reads": [
+      {
+        "read_id": "read:1",
+        "ref": "state:host_parent",
+        "text_hash": "e10137c62b83b254dc6e668a4127eeb9fe5c56bc73eedd010be5b1fab4b03bcb",
+        "text_length": 394
+      },
+      {
+        "read_id": "read:2",
+        "ref": "file:web/index.html",
+        "text_hash": "6270490bfe69e751a02a4e002a5b7b23a74eae7b328566752a47db407b97b036",
+        "text_length": 535
+      },
+      {
+        "read_id": "read:3",
+        "ref": "file:web/app.js",
+        "text_hash": "665cc4d759ad85d16d21606c6c57ff3403fe367a5597f79cf1f2be518143eb6c",
+        "text_length": 1228
+      },
+      {
+        "read_id": "read:4",
+        "ref": "file:web/index.html",
+        "text_hash": "6270490bfe69e751a02a4e002a5b7b23a74eae7b328566752a47db407b97b036",
+        "text_length": 535
+      },
+      {
+        "read_id": "read:5",
+        "ref": "file:tests/test_checkout.py",
+        "text_hash": "8c7e2584b3ab04fbafe603d87063c839346f5719e5f74fc36b43d6e5166a6ffe",
+        "text_length": 499
+      }
+    ],
+    "catalog_is_source_read": false,
+    "metadata_inspected_refs": [
+      "file:tests/test_checkout.py",
+      "file:web/app.js",
+      "file:web/index.html",
+      "state:host_parent"
+    ],
+    "pending_message_sources": [
+      {
+        "field_path": "/inbox/release_lead/0/content",
+        "read_tool": "message",
+        "ref": "state:host_parent"
+      }
+    ],
+    "selected_witnesses": [],
+    "source_evidence_grants_write_permission": false
+  },
+  "actual_source_reads": 5,
+  "selected_source_witnesses": 0,
+  "subject_calls": 0,
+  "native_branch_created": false,
+  "independent_semantic_review_invoked": false,
+  "repair_effect": "NOT_EVALUABLE_NO_REPAIR_OR_POST_EXIT_CONTINUATION",
+  "natural_reruns": 0,
+  "automatic_replay": false,
+  "analysis_blinding": "NONBLIND_ROOT_SOURCE_INSPECTION",
+  "limits": {
+    "planning": 16,
+    "subject": 49,
+    "native_ceiling": 64
+  }
+}

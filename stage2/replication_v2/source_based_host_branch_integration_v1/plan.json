@@ -1,0 +1,149 @@
+{
+  "actions": [
+    {
+      "action_id": "alternate_default_route",
+      "before_file_hash": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39",
+      "before_value_hash": "b8d31e852725afb1e26d53bab6095b2bff1749c9275be13ed1c05a56ed31ec09",
+      "depends_on": [],
+      "end": 212,
+      "expected_output_hash": "37fcf1ff1abd8816676eb38297e83b0003cb965313ec15dee26c8c799b311f51",
+      "kind": "TEXT_SPAN_REPLACE",
+      "preserve_invariant": {
+        "after_value_hash": "b4dc66dde806261bdda8607d8707aa727d308cd80272381a5583f63899918467",
+        "before_value_hash": "b8d31e852725afb1e26d53bab6095b2bff1749c9275be13ed1c05a56ed31ec09",
+        "field_path": "utf8-character-span:210:212",
+        "formatting_preserved": true,
+        "preserve_measure": "EXACT_PREFIX_AND_SUFFIX_BYTES"
+      },
+      "reason": "Conditional alternate launch-route repair; preserve documented direct launch and explicit compatibility mode.",
+      "start": 210,
+      "target_ref": "file:run.py",
+      "value": "off"
+    }
+  ],
+  "execution_order": [
+    "alternate_default_route"
+  ],
+  "live_provider_calls": 0,
+  "modify_refs": [
+    "file:run.py"
+  ],
+  "plan_hash": "77afda96e17b57b60f160d36cf6a709aff03e014bc93b091d9390b19ffe3310d",
+  "policy": {
+    "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+    "branch_id": "G3-X4-T2-SOURCE-BASED-HOST-BRANCH",
+    "diagnosis_status": "SOURCE_BOUND_MANUAL_ENGINEERING_CANDIDATE_NOT_INDEPENDENT_SEMANTIC_AUDIT",
+    "field_grants": [
+      {
+        "before_file_hash": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39",
+        "before_value_hash": "b8d31e852725afb1e26d53bab6095b2bff1749c9275be13ed1c05a56ed31ec09",
+        "end": 212,
+        "kind": "TEXT_SPAN_REPLACE",
+        "source_locator": {
+          "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+          "json_pointer": "",
+          "line": null,
+          "member": "checkpoints/4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168/application/run.py",
+          "member_sha256": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39"
+        },
+        "span_hash": "b8d31e852725afb1e26d53bab6095b2bff1749c9275be13ed1c05a56ed31ec09",
+        "start": 210,
+        "target_ref": "file:run.py"
+      }
+    ],
+    "graph_hash": "1aba3851d9ee5d120273a0327ca92b0fe05b172079264a5989df35256cf52c70",
+    "history_immutable": true,
+    "mode": "OFFLINE_NATIVE_FIXTURE",
+    "native_surface": "EXPERIMENT_OWNED_APPLICATION_VIA_HostCheckout.write_file",
+    "original_task": {
+      "family": "feature_request",
+      "id": "T2",
+      "user_request": "Please add a payment button to the checkout page that works with the existing checkout flow."
+    },
+    "original_task_scope_narrowed": false,
+    "parent_checkpoint_hash": "4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168",
+    "policy_hash": "a735baa74f8bbd7adf7e515f3d9926497a6d635e61b4fb8b84dd51ac18bee71f",
+    "route_refs": [
+      "file:run.py"
+    ],
+    "schema": "stage2-field-branch-policy-v1",
+    "semantic_adoption_verified": false,
+    "semantic_id": "conditional-launch-route-and-current-account",
+    "source_witnesses": [
+      {
+        "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+        "json_pointer": "",
+        "line": null,
+        "member": "checkpoints/4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168/application/README.md",
+        "member_sha256": "11fe60236b048a9794f3441196c886f2ba9c52cf0bfd3dff95975a908aa99f12"
+      },
+      {
+        "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+        "json_pointer": "",
+        "line": null,
+        "member": "checkpoints/4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168/application/run.py",
+        "member_sha256": "59db6479dd14768c62cba6a0ef597b8318cb469e6c211848b3d9df82a17a4f39"
+      },
+      {
+        "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+        "json_pointer": "",
+        "line": null,
+        "member": "checkpoints/4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168/application/legacy_compat.py",
+        "member_sha256": "547b4b2a1ed3f5b5890fa08a47e949c1f97bd0cd58985b21a23798f9b193b470"
+      },
+      {
+        "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+        "json_pointer": "",
+        "line": null,
+        "member": "checkpoints/4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168/application/checkout_app/server.py",
+        "member_sha256": "44ce196b97a7fd4eb2d4ba14f6de214be2fe30d03628c7beae61d50ebea83992"
+      },
+      {
+        "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+        "json_pointer": "",
+        "line": null,
+        "member": "checkpoints/4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168/application/web/app.js",
+        "member_sha256": "665cc4d759ad85d16d21606c6c57ff3403fe367a5597f79cf1f2be518143eb6c"
+      },
+      {
+        "archive_sha256": "68071e87a2153fe9afa31519aaf6f4d67cfebaa478d35036773901e8176bddc6",
+        "json_pointer": "",
+        "line": null,
+        "member": "checkpoints/4231512e5ec5aacc38a90ab5b4c502a4189213a378933e428f7820fca977c168/application/web/index.html",
+        "member_sha256": "6270490bfe69e751a02a4e002a5b7b23a74eae7b328566752a47db407b97b036"
+      }
+    ],
+    "unrelated_application_manifest": {
+      "README.md": "11fe60236b048a9794f3441196c886f2ba9c52cf0bfd3dff95975a908aa99f12",
+      "checkout_app/__init__.py": "e841164491c4e3eeedd963948f81818610dff8a08058792eeb99c559b31719c8",
+      "checkout_app/checkout.py": "ad9b7786ee90545cbfd55c63c8e738b4af468d953ef134c95c3f25e16aa4e1a2",
+      "checkout_app/server.py": "44ce196b97a7fd4eb2d4ba14f6de214be2fe30d03628c7beae61d50ebea83992",
+      "legacy_compat.py": "547b4b2a1ed3f5b5890fa08a47e949c1f97bd0cd58985b21a23798f9b193b470",
+      "tests/test_checkout.py": "8c7e2584b3ab04fbafe603d87063c839346f5719e5f74fc36b43d6e5166a6ffe",
+      "versions/after.json": "d9a43382138922db1762bedbb42d4926139302ff202ec877f6176f374c78738b",
+      "versions/before.json": "e3797e1aaa0777c22c69d04c1a676b18fb08d694fbd99fe0c0c37a523b113f9d",
+      "versions/before/server.py": "c18b186ec348b26ed30cffffd04d688f3661f4abc18260a851f307bad09e6e56",
+      "web/app.js": "665cc4d759ad85d16d21606c6c57ff3403fe367a5597f79cf1f2be518143eb6c",
+      "web/index.html": "6270490bfe69e751a02a4e002a5b7b23a74eae7b328566752a47db407b97b036"
+    }
+  },
+  "preserve_refs": [
+    "file:README.md",
+    "file:checkout_app/__init__.py",
+    "file:checkout_app/checkout.py",
+    "file:checkout_app/server.py",
+    "file:legacy_compat.py",
+    "file:tests/test_checkout.py",
+    "file:versions/after.json",
+    "file:versions/before.json",
+    "file:versions/before/server.py",
+    "file:web/app.js",
+    "file:web/index.html"
+  ],
+  "route_relations": [],
+  "schema": "stage2-field-branch-plan-v1",
+  "semantic_repair_effect": "NOT_EVALUATED",
+  "verify_refs": [
+    "state:terminal"
+  ]
+}

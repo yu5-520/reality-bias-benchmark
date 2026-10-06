@@ -1,0 +1,77 @@
+{
+  "schema": "stage2-message-field-link-trial-request-v2",
+  "trial_id": "G3-X4-T2-message-field-link-trial-v2",
+  "execute_single_trial": true,
+  "authorization": {
+    "instruction": "继续推进",
+    "scope": "One real trial after offline closure of host-derived message value and explicit diagnosis witness requirements; preserve all prior failures, no resampling or paid reviewer."
+  },
+  "verified_implementation": {
+    "remote_commit": "588b03e0183601cc7cc98adc84f05211222ffeee",
+    "tree": "afc840146984c242f0af1f0457960b5461c1a357",
+    "successful_ci_run": 37313676051
+  },
+  "prior_attempts": [
+    {
+      "run_id": 37205090807,
+      "head_sha": "96acfc60970109591f08213fd26a3ca2cc0ff23f",
+      "artifact_id": 11304078695,
+      "artifact_zip_sha256": "21ae77d77e7279f17082f26098d589021ab22bc3279deda81d39135388c4e4d3",
+      "failure": "EXACT_READ_ONLY_TOOL_MESSAGE_REQUIRED",
+      "provider_calls": 1
+    },
+    {
+      "run_id": 37210176711,
+      "head_sha": "77a98a567870391c8689c83882a16c8de8f6e0dd",
+      "artifact_id": 11305979052,
+      "artifact_zip_sha256": "86d1d4b47feecadeb5ccbd53befef21fb67b107c67bb6943ebf0af4f3a24eb00",
+      "failure": "NO_ACTION_SOURCE_NOT_INSPECTED",
+      "provider_calls": 2
+    },
+    {
+      "run_id": 37214544344,
+      "head_sha": "15d0d75acd69162458a6d80159508e884e27df36",
+      "artifact_id": 11307124579,
+      "artifact_zip_sha256": "2191cbc2774dc8e4c9d93582ad5e89f495b291a158caed0ad1356dc35c28d6a8",
+      "failure": "NO_ACTION_SOURCE_NOT_INSPECTED",
+      "provider_calls": 7
+    },
+    {
+      "run_id": 37231964981,
+      "head_sha": "c1b9b80a31c10e661cafb6bb1ba99b2f47eead24",
+      "artifact_id": 11314621407,
+      "artifact_zip_sha256": "d28b12bbbe3b8b56580cf78766674529f50bf47d5449333ee7148c6c6b600292",
+      "failure": "FILE_VERSION_OUTSIDE_VERIFIED_PREFIX",
+      "provider_calls": 2
+    },
+    {
+      "run_id": 37295828097,
+      "head_sha": "9a2d082119963dcdfba8ca4a3795d1dc28646857",
+      "artifact_id": 11338367847,
+      "artifact_zip_sha256": "5cc06d2db20850c03e2b3b03e761b0b22a981b19d2338d6760f36c605f6f8eb1",
+      "failure": "CURRENT_MESSAGE_WITNESS_REQUIRED",
+      "provider_calls": 5
+    },
+    {
+      "run_id": 37300920836,
+      "head_sha": "d28816be757fbb835e6f55a12d22465a79b2df06",
+      "artifact_id": 11342057023,
+      "artifact_zip_sha256": "e4890edc6e4af5b7c5cd7fc7ad02316722c167a1a458e259592f4e51507380d5",
+      "failure": "UNRELATED_MESSAGE_TEXT_DRIFT",
+      "provider_calls": 7
+    }
+  ],
+  "change_under_test": "Host owns full pending-message value composition from frozen current message + selected span + actor replacement; actor replacement excludes attribution; diagnosis contract explicitly requires selected witness IDs for both endpoints. Existing source-version/read/witness identity links remain unchanged.",
+  "frozen_files": {
+    "configs/stage2_connected_mechanism_v1.json": "413c1198fb83a134c6f65ac952a50ecedf4d278c481ebaaca96e78d2e631018d",
+    "configs/stage2_monitor_repair_active.json": "97ec73ac8b19a17df76c7e4a46c7a661db802ca37b1866282df68f6b3b470c4a"
+  },
+  "planning_max_calls": 16,
+  "subject_trial_max_calls": 49,
+  "native_ceiling": 64,
+  "automatic_replay": false,
+  "natural_reruns": false,
+  "automatic_paid_reviewer": false,
+  "application_writes_allowed": false,
+  "analysis_scope": "Same frozen non-blind retrospectively selected G3-X4-T2 process-account case. One first attempt only; full provider bytes and partial failures retained. Success requires host-valid planning output before any native branch action."
+}

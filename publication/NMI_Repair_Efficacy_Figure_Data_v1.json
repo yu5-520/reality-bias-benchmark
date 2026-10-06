@@ -1,0 +1,68 @@
+{
+  "schema": "nmi-repair-efficacy-figure-data-v1",
+  "date_utc": "2026-10-06",
+  "status": "SEALED_PUBLICATION_PROJECTION",
+  "scope": "G3-X4-T2 targeted mechanism contrasts; not a repair success-rate denominator",
+  "common_parent": {
+    "local_and_route_checkpoint": "98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3",
+    "local_and_route_native_sequence": 4,
+    "native_ceiling": 64
+  },
+  "panels": [
+    {
+      "id": "A_LOCAL",
+      "label": "Local process revision",
+      "overall_process_effect": "REGENERATION",
+      "terminal_turn": 64,
+      "subject_writes": 5,
+      "distinct_written_refs": 3,
+      "backend_turns": 13,
+      "security_turns": 3,
+      "delegation_actions": 4,
+      "key_extra_path": "checkout_app/api.py",
+      "visual_note": "broad downstream implementation regeneration"
+    },
+    {
+      "id": "B_ROUTE",
+      "label": "Source-bound route repair",
+      "overall_process_effect": "MIXED_EFFECT",
+      "terminal_turn": 64,
+      "subject_writes": 2,
+      "distinct_written_refs": 2,
+      "backend_turns": 5,
+      "security_turns": 0,
+      "delegation_actions": 0,
+      "route_correction_persisted": true,
+      "key_extra_path": null,
+      "visual_note": "locality improved; verification/review inertia persisted"
+    },
+    {
+      "id": "C_OBLIGATION",
+      "label": "Pending-obligation supersession",
+      "parent_history": 24,
+      "remaining_turns": 40,
+      "direct_obligation_effect": "LOCAL_SUPPRESSION_OR_REDIRECTION",
+      "downstream_effect": "REGENERATION",
+      "overall_process_effect": "REGENERATION_AFTER_LOCAL_SUPPRESSION",
+      "terminal_turn": 64,
+      "intervention_message_replacements": 4,
+      "intervention_application_writes": 0,
+      "control_suffix_messages": 10,
+      "treatment_suffix_messages": 13,
+      "control_final_queue_length": 20,
+      "treatment_final_queue_length": 23,
+      "visual_note": "targeted message authority changed immediately; equivalent obligation regenerated through descendants"
+    }
+  ],
+  "figure_claim": "Repair locality and direct authority change can improve without reducing temporal reach; equivalent task pressure can regenerate through descendant carriers.",
+  "exclusions": [
+    "Do not graph A/B/C as a success-rate population.",
+    "Do not combine with the historical 45-pair denominator.",
+    "Do not imply that endpoint correctness is the primary outcome."
+  ],
+  "sources": [
+    "stage2/replication_v2/repair_efficacy_first_contrast_v1/summary.json",
+    "stage2/replication_v2/repair_efficacy_coordination_followup_v1/summary.json",
+    "stage2/replication_v2/repair_efficacy_synthesis_v1/summary.json"
+  ]
+}

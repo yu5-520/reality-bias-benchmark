@@ -1,0 +1,127 @@
+name: Single field-link v3 message trial
+
+on:
+  push:
+    branches: [fix/p2-native-evidence-replay]
+    paths: ['configs/stage2_message_field_link_trial_v3.json']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: stage2-message-field-link-trial-v3
+  cancel-in-progress: false
+
+jobs:
+  field-link-trial:
+    if: github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify prior failure, exact successful implementation and one new trial
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,subprocess
+          request=json.load(open('configs/stage2_message_field_link_trial_v3.json'))
+          assert request['execute_single_trial'] is True
+          for flag in ['automatic_replay','natural_reruns','automatic_paid_reviewer','application_writes_allowed']:
+              assert request[flag] is False
+          for path,digest in request['frozen_files'].items():
+              assert hashlib.sha256(open(path,'rb').read()).hexdigest()==digest, path
+          config=json.load(open('configs/stage2_connected_mechanism_v1.json'))
+          assert request['native_ceiling']==64
+          assert config['planning_max_calls']==request['planning_max_calls']==16
+          assert config['subject_trial_max_calls']==request['subject_trial_max_calls']==49
+          repo=os.environ['GITHUB_REPOSITORY']
+          def api(path): return json.loads(subprocess.check_output(['gh','api',f'repos/{repo}/{path}']))
+          implementation=request['verified_implementation']
+          ci=api(f"actions/runs/{implementation['successful_ci_run']}")
+          assert ci['conclusion']=='success' and ci['head_sha']==implementation['remote_commit']
+          assert subprocess.check_output(['git','rev-parse',implementation['remote_commit']+'^{tree}']).decode().strip()==implementation['tree']
+          subprocess.check_call(['git','merge-base','--is-ancestor',implementation['remote_commit'],'HEAD'])
+          allowed=['configs/stage2_message_field_link_trial_v3.json','.github/workflows/stage2-message-field-link-trial-v3.yml']
+          changes=subprocess.check_output(['git','diff','--name-only',implementation['remote_commit'],'HEAD']).decode().splitlines()
+          assert set(changes)<=set(allowed), 'VERIFIED_IMPLEMENTATION_CHANGED'
+          for item in request['prior_attempts']:
+              prior=api(f"actions/runs/{item['run_id']}")
+              assert prior['conclusion']=='failure' and prior['head_sha']==item['head_sha'] and prior['run_attempt']==1
+          run=api(f"actions/runs/{os.environ['GITHUB_RUN_ID']}")
+          assert run['run_attempt']==1
+          pages=subprocess.check_output(['gh','api','--paginate','--slurp',f"repos/{repo}/actions/workflows/{run['workflow_id']}/runs?per_page=100"])
+          earlier=[r for p in json.loads(pages) for r in p['workflow_runs'] if r['id']<run['id']]
+          allowed_zero={x['run_id']:x for x in request.get('zero_dispatch_workflow_failures',[])}
+          assert {r['id'] for r in earlier}==set(allowed_zero), 'UNREGISTERED_V3_WORKFLOW_ATTEMPT'
+          for prior in earlier:
+              jobs=api(f"actions/runs/{prior['id']}/jobs")['jobs']
+              execute=[s for j in jobs for s in j.get('steps',[]) if s['name']=='Execute one field-link-v3 branch trial with retained provider bytes']
+              assert len(execute)==1 and execute[0]['conclusion']=='skipped', 'V3_PROVIDER_DISPATCH_ALREADY_STARTED_NO_REPLAY'
+              assert prior['head_sha']==allowed_zero[prior['id']]['head_sha']
+          print(json.dumps({'trial_id':request['trial_id'],'implementation_ci':'PASS','prior_failure_retained':True,'zero_dispatch_failures_retained':sorted(allowed_zero),'single_provider_trial_registered':True}))
+          PY
+      - name: Materialize immutable natural prefix archive
+        run: |
+          set -euo pipefail
+          commit=$(python -c "import json; print(json.load(open('configs/stage2_g3_ab_paired_semantic_audit_v1.json'))['source']['natural_A_evidence_commit'])")
+          mkdir -p "$RUNNER_TEMP/sources/G3A"
+          git cat-file -e "$commit^{commit}" || git fetch origin "$commit"
+          git archive "$commit" stage2/replication_v2/G3/natural_A | tar -x -C "$RUNNER_TEMP/sources/G3A"
+      - name: Bind unchanged official MCP sources and runtime
+        run: |
+          set -euo pipefail
+          git clone -q https://github.com/modelcontextprotocol/python-sdk "$RUNNER_TEMP/mcp-sdk"
+          git -C "$RUNNER_TEMP/mcp-sdk" checkout -q f1b6589088534632fef92238ee9750951e3c0185
+          git clone -q https://github.com/modelcontextprotocol/modelcontextprotocol "$RUNNER_TEMP/mcp-protocol"
+          git -C "$RUNNER_TEMP/mcp-protocol" checkout -q 5f5440bb26a62e2cf3440b92da5a667efa03b267
+          python -m pip install -q uv
+          cd "$RUNNER_TEMP/mcp-sdk"
+          uv sync --frozen --no-default-groups --python "$(command -v python)"
+      - name: Verify immutable mechanism entry without additional model calls
+        run: |
+          "$RUNNER_TEMP/mcp-sdk/.venv/bin/python" scripts/run_stage2_connected_repair.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/mcp-sdk" --protocol-root "$RUNNER_TEMP/mcp-protocol" --out "$RUNNER_TEMP/mechanism-preflight"
+      - name: Execute one field-link-v3 branch trial with retained provider bytes
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          "$RUNNER_TEMP/mcp-sdk/.venv/bin/python" scripts/run_stage2_connected_repair.py --source-root "$RUNNER_TEMP/sources" --sdk-root "$RUNNER_TEMP/mcp-sdk" --protocol-root "$RUNNER_TEMP/mcp-protocol" --out "$RUNNER_TEMP/mechanism-field-link-trial-v3" --execute --purpose mechanism
+      - name: Inspect retained field-link-v3 outcome
+        if: always()
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'mechanism-field-link-trial-v3'
+          for name in ['result.json','planning/outcome.json','planning/decision.json','planning/query_log.json','planning/witnesses.json','host/native_branch/phase_receipt.json','host/native_branch/continuation_assessment.json']:
+              path=root/name
+              if path.exists():
+                  raw=path.read_bytes()
+                  print(json.dumps({'retained_source':name,'sha256':hashlib.sha256(raw).hexdigest(),'value':json.loads(raw)},ensure_ascii=False))
+          for path in sorted(root.rglob('planning_http/**/response.bin')):
+              raw=path.read_bytes()
+              print(json.dumps({'retained_source':str(path.relative_to(root)),'sha256':hashlib.sha256(raw).hexdigest(),'raw_utf8':raw.decode()},ensure_ascii=False))
+          exchanges=root/'host/native_branch/provider_exchanges'
+          for directory in sorted(exchanges.glob('[0-9][0-9][0-9][0-9]')):
+              for name in ['request.bin','response.bin','receipt.json']:
+                  path=directory/name
+                  if path.exists():
+                      raw=path.read_bytes()
+                      print(json.dumps({'retained_source':str(path.relative_to(root)),'sha256':hashlib.sha256(raw).hexdigest(),'raw_utf8':raw.decode()},ensure_ascii=False))
+          PY
+      - name: Retain all source-read trial evidence including partial failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: message-mechanism-field-link-trial-v3-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/mechanism-preflight
+            ${{ runner.temp }}/mechanism-field-link-trial-v3
+          retention-days: 90
+          if-no-files-found: warn

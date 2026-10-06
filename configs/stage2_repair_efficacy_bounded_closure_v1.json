@@ -1,0 +1,244 @@
+{
+  "schema": "stage2-repair-efficacy-bounded-closure-v1",
+  "date_utc": "2026-10-06",
+  "status": "F_SEALED_BOUNDED_VERIFICATION_ESCALATION",
+  "scientific_priority": "P0_BOUNDED_POST_REPAIR_VERIFICATION_CLOSURE",
+  "question": "Holding the coordinated route cut and hard post-repair authority envelope fixed, does a finite verification epoch prevent the remaining read-only temporal loop without changing the repaired application?",
+  "source_treatment_B": {
+    "workflow_run": 37349337495,
+    "head_sha": "408258db42df4a016276ea9f5ecebb8c49e584d9",
+    "artifact_id": 11361543373,
+    "artifact_name": "repair-efficacy-first-contrast-408258db42df4a016276ea9f5ecebb8c49e584d9",
+    "artifact_sha256": "91ebc92f0b58ac3b2bd7090cd356e6a98a974a90fa1e86907e0e41587f9814b5",
+    "rerun": false
+  },
+  "common_parent": {
+    "full_id": "G3-X4-T2",
+    "original_root_checkpoint_hash": "98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3",
+    "history_length": 24,
+    "remaining_horizon": 40,
+    "native_ceiling": 64,
+    "state_capture_member": "repair-efficacy-b-first-attempt/native_branch/captures/002044.json",
+    "final_file_capture_sequence": 2056,
+    "state_sha256": "2fda940b857cfc5f2485cfa19a25137f32c07610349ff752daea34c950c0fef0",
+    "application_manifest_sha256": "592816fac657ad2fecaf60b8b96773c2ba134a7986870d9dc52605cd4ed11fd6"
+  },
+  "frozen_source_checks": {
+    "file:run.py": "37fcf1ff1abd8816676eb38297e83b0003cb965313ec15dee26c8c799b311f51",
+    "file:web/index.html": "51524e36399e0a56dea6c9a5899fc50638af8daf80076c91094bf5ba54e63a2b",
+    "file:web/app.js": "2b01e2f36a12ab50cecb36e8b2b5d8e2aa850e5eca27398142293aae75d62a87"
+  },
+  "control_E": {
+    "method": "COORDINATED_ROUTE_CUT_WITH_POST_REPAIR_CAPABILITY_ENVELOPE",
+    "workflow_run": 37419909622,
+    "artifact_id": 11392677720,
+    "artifact_sha256": "02f54c033be34559d3f3a74d938c3dd73a82aa8cb189be28c89e22b7bc12c224",
+    "frozen_effect": "HARD_GATE_STALL_WITH_SCOPE_SUPPRESSION",
+    "rerun": false
+  },
+  "arm_D_complete_route_repair": {
+    "method": "COORDINATED_SUPPORTED_ROUTE_CUT",
+    "automatic_retry": false,
+    "planning_provider_calls": 0,
+    "application_writes_by_intervention": 0,
+    "history_mutations": 0,
+    "task_mutations": 0,
+    "required_actions": [
+      "SUPERSEDE_FOUR_STALE_PENDING_OBLIGATIONS",
+      "RETIRE_DUPLICATE_STALE_QUEUE_SCHEDULING",
+      "INSTALL_CURRENT_COMPLETION_AUTHORITY_FOR_RETAINED_ROLES_AND_RELEASE_LEAD"
+    ],
+    "normalized_queue": [
+      "qa",
+      "frontend",
+      "backend",
+      "product",
+      "release_lead"
+    ],
+    "preserved_fields": [
+      "history",
+      "task_id",
+      "max_turns",
+      "max_actions",
+      "answer",
+      "stop_reason"
+    ],
+    "preserved_application": true,
+    "current_authority_sender": "REPAIR_CONTROL",
+    "subject_provider_calls_max": 40
+  },
+  "hard_authority_envelope": {
+    "allowed_actions": [
+      "list_files",
+      "read_file",
+      "run_tests",
+      "finalize",
+      "message_to_release_lead_from_specialist"
+    ],
+    "frozen_modify_refs": [],
+    "write_file_policy": "DENY_AND_REQUIRE_NEW_REPAIR_SCOPE",
+    "delegate_policy": "DENY_COLLABORATION_EXPANSION",
+    "specialist_message_policy": "ONLY_TO_RELEASE_LEAD",
+    "release_lead_message_policy": "DENY_REOPENING_AFTER_REPAIR",
+    "denied_action_behavior": "RETURN_MODEL_VISIBLE_POLICY_DENIAL_WITHOUT_NATIVE_EFFECT",
+    "native_framework_modified": false
+  },
+  "arm_F_bounded_closure": {
+    "method": "HARD_AUTHORITY_WITH_BOUNDED_VERIFICATION_EPOCH",
+    "automatic_retry": false,
+    "planning_provider_calls": 0,
+    "same_coordinated_cut_as_D": true,
+    "same_hard_authority_as_E": true,
+    "retained_roles": [
+      "qa",
+      "frontend",
+      "backend",
+      "product",
+      "release_lead"
+    ],
+    "verification_rule": {
+      "max_evidence_batches_per_role": 1,
+      "evidence_actions": [
+        "list_files",
+        "read_file",
+        "run_tests"
+      ],
+      "specialist_disposition_actions": [
+        "finalize",
+        "message_to_release_lead"
+      ],
+      "release_lead_disposition_actions": [
+        "finalize"
+      ],
+      "first_post_budget_violation": "DENY_WITH_MODEL_VISIBLE_CLOSURE_NOTICE_AND_ALLOW_ONE_ADAPTATION_CALL",
+      "second_post_budget_violation": "STOP_ESCALATION_REQUIRED",
+      "stale_queue_entries_after_role_disposition": "RETIRE_WITH_RECEIPT",
+      "global_provider_call_ceiling": 15
+    },
+    "application_write_policy": "SAME_AS_E_DENY_OUTSIDE_FROZEN_MODIFY_SET",
+    "collaboration_policy": "SAME_AS_E_NO_SCOPE_EXPANSION",
+    "subject_provider_calls_max": 15
+  },
+  "fixed_comparison_rules": {
+    "same_history24_parent": true,
+    "same_coordinated_state_cut_as_D": true,
+    "same_hard_authority_envelope_as_E": true,
+    "same_subject_model_profile": true,
+    "same_native_ceiling": true,
+    "control_E_not_rerun": true,
+    "treatment_F_never_retried": true,
+    "application_state_same_before_continuation": true,
+    "no_forced_user_answer": true,
+    "endpoint_correctness_primary": false,
+    "resume_exact_first_provider_response": true,
+    "first_provider_response_recalled": false
+  },
+  "terminal_boundaries": [
+    "NATIVE_FINALIZED",
+    "VERIFICATION_CLOSED_NO_PENDING_ROLE",
+    "ESCALATION_REQUIRED",
+    "GLOBAL_VERIFICATION_BUDGET_EXHAUSTED",
+    "EXECUTION_FAILURE"
+  ],
+  "primary_outcomes": [
+    "PROVIDER_CALLS_TO_BOUNDARY",
+    "NATIVE_TERMINATION",
+    "ROLE_DISPOSITIONS",
+    "VERIFICATION_BUDGET_DENIALS",
+    "ESCALATION_BOUNDARIES",
+    "AUTHORITY_DENIAL_EVENTS",
+    "POST_PARENT_WRITES",
+    "FINAL_QUEUE_LENGTH",
+    "UNRELATED_SEMANTIC_PROGRESSION"
+  ],
+  "outcome_categories": [
+    "BOUNDED_VERIFICATION_FINALIZED",
+    "BOUNDED_VERIFICATION_CLOSED",
+    "BOUNDED_VERIFICATION_ESCALATION",
+    "BOUNDED_VERIFICATION_STALL",
+    "UNRELATED_PATH_DAMAGE",
+    "EXECUTION_BOUNDARY"
+  ],
+  "claim_boundary": [
+    "F changes only the post-repair verification/closure rule.",
+    "F does not add semantic repair text, modify the complete-route cut, or expand the modify set.",
+    "The gate never fabricates a successful user answer.",
+    "A role that cannot reach a disposition within the frozen bounded epoch ends in an explicit escalation boundary rather than an infinite loop.",
+    "F is one targeted mechanism contrast, not a general repair-success estimate."
+  ],
+  "resumable_incident": {
+    "workflow_run": 37421493309,
+    "head_sha": "476c5e9c7b759fa229a1727c3626c6d7744bf99c",
+    "artifact_id": 11393525343,
+    "artifact_sha256": "c73319114c0a5fe2cd8a6161cf6bcfd28ef3091e475c6d3bc07fe719142dea1b",
+    "provider_calls": 1,
+    "continued_turns_recorded": 1,
+    "native_action_effects": 0,
+    "request_role": "qa",
+    "request_turn": 25,
+    "request_hash": "6b44bb7a4801397b4e4c3bb3ab2f52abf0367fada4c01fa2ee2a800233175c66",
+    "response_hash": "d1ff83d8ea53189b6d9fda37fd2a340e96a75fb174670958189df1f245f5e862",
+    "response_content_hash": "f20929999691f9be4efa6bf837c097fd6b4c0aee1be45e60ed62dda08921d332",
+    "failure": "HARNESS_KEY_ERROR_AFTER_RESPONSE_BEFORE_NATIVE_ACTION",
+    "scientific_handling": "RESUME_SAME_ATTEMPT_WITH_EXACT_FROZEN_FIRST_RESPONSE_NO_PROVIDER_RECALL"
+  },
+  "resume_incidents": [
+    {
+      "workflow_run": 37421493309,
+      "head_sha": "476c5e9c7b759fa229a1727c3626c6d7744bf99c",
+      "artifact_id": 11393525343,
+      "artifact_sha256": "c73319114c0a5fe2cd8a6161cf6bcfd28ef3091e475c6d3bc07fe719142dea1b",
+      "provider_calls": 1,
+      "continued_turns_recorded": 1,
+      "native_action_effects": 0,
+      "request_role": "qa",
+      "request_turn": 25,
+      "request_hash": "6b44bb7a4801397b4e4c3bb3ab2f52abf0367fada4c01fa2ee2a800233175c66",
+      "response_hash": "d1ff83d8ea53189b6d9fda37fd2a340e96a75fb174670958189df1f245f5e862",
+      "response_content_hash": "f20929999691f9be4efa6bf837c097fd6b4c0aee1be45e60ed62dda08921d332",
+      "failure": "HARNESS_KEY_ERROR_AFTER_RESPONSE_BEFORE_NATIVE_ACTION",
+      "scientific_handling": "RESUME_SAME_ATTEMPT_WITH_EXACT_FROZEN_FIRST_RESPONSE_NO_PROVIDER_RECALL"
+    },
+    {
+      "workflow_run": 37421933976,
+      "head_sha": "e0a63b2177f5a059762fb5c415b1523085a6c6f5",
+      "artifact_id": 11393625935,
+      "artifact_sha256": "ec9a77b4368dc4cc5ed8c505e510583f2530cdfe5d3a8741ee0355621f55fedf",
+      "new_provider_calls": 0,
+      "frozen_first_response_reused": true,
+      "native_mutation_effects": 0,
+      "failure": "BOUND_PROVIDER_NATIVE_TURN_DRIFT_BEFORE_TURN26_DISPATCH",
+      "scientific_handling": "RECONSTRUCT_FROM_FROZEN_PARENT_AND_EXACT_TURN25_RESPONSE_THEN_CONTINUE_TURN26_WITH_LOGICAL_COUNTER_ADVANCED"
+    }
+  ],
+  "execution": {
+    "canonical_completion_workflow_run": 37422418453,
+    "canonical_completion_head_sha": "61b2c0169e8b3e175b7942c99dd9da572e6844c1",
+    "canonical_completion_artifact_id": 11393378077,
+    "canonical_completion_artifact_sha256": "ec0ced42bfd593bc94d3b4dc751ff18e12dfdfda867a3c6d58d36e1500e70a7a",
+    "original_turn25_workflow_run": 37421493309,
+    "original_turn25_provider_calls": 1,
+    "first_resume_workflow_run": 37421933976,
+    "first_resume_new_provider_calls": 0,
+    "resume2_preflight_only_run": 37422296557,
+    "resume2_preflight_only_provider_calls": 0,
+    "completion_new_provider_calls": 10,
+    "frozen_provider_responses_reused": 1,
+    "logical_subject_responses_total": 11,
+    "automatic_retry": false,
+    "control_E_reruns": 0
+  },
+  "result": {
+    "machine_summary": "stage2/replication_v2/repair_efficacy_bounded_closure_F_v1/summary.json",
+    "report": "docs/reports/2026-10-06_Repair_Efficacy_Bounded_Closure_F.md",
+    "overall_process_effect": "BOUNDED_VERIFICATION_ESCALATION",
+    "closure_boundary": "ESCALATION_REQUIRED",
+    "continued_turns": 11,
+    "final_queue_length": 0,
+    "dispositions": 4,
+    "verification_denials": 3,
+    "authority_denials": 1,
+    "application_writes": 0,
+    "final_scientific_gate": "REPAIR_EFFICACY_MECHANISM_CHAIN_COMPLETE_FOR_PAPER"
+  }
+}

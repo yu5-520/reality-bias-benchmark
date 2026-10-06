@@ -1,0 +1,147 @@
+{
+  "schema": "stage2-repair-efficacy-first-contrast-result-v1",
+  "date_utc": "2026-10-06",
+  "status": "SEALED",
+  "full_id": "G3-X4-T2",
+  "common_parent": {
+    "checkpoint_hash": "98a72990529ea23b994511beb7bdf19ac5f3aa29c5e06a748711c3362455a2f3",
+    "native_sequence": 4,
+    "remaining_horizon": 60,
+    "native_ceiling": 64,
+    "task_id": "T2"
+  },
+  "control_local_repair": {
+    "workflow_run": 36309205795,
+    "artifact_id": 10927609662,
+    "artifact_sha256": "5e8076b9d939adf1671dd892d683d4bd12eee1bedf15228d409191509f8037ac",
+    "selected_package_id": "g1pkg:0f95ddfd0d1341eb815d5a83",
+    "method": "R7_LOCAL_PROCESS_REVISION",
+    "frozen_overall_process_effect": "REGENERATION",
+    "termination": "turn_budget",
+    "history_length_after": 64,
+    "full_role_counts": {
+      "frontend": 25,
+      "qa": 15,
+      "backend": 13,
+      "release_lead": 5,
+      "reviewer": 3,
+      "security": 3
+    },
+    "suffix_action_counts": {
+      "read_file": 140,
+      "list_files": 19,
+      "message": 19,
+      "delegate": 4,
+      "write_file": 5,
+      "run_tests": 3,
+      "finalize": 3
+    },
+    "subject_written_refs": [
+      "file:web/index.html",
+      "file:web/app.js",
+      "file:checkout_app/api.py"
+    ],
+    "rerun": false
+  },
+  "enhanced_route_repair": {
+    "workflow_run": 37349337495,
+    "head_sha": "408258db42df4a016276ea9f5ecebb8c49e584d9",
+    "artifact_id": 11361543373,
+    "artifact_sha256": "91ebc92f0b58ac3b2bd7090cd356e6a98a974a90fa1e86907e0e41587f9814b5",
+    "method": "PREFIX_ONLY_SOURCE_BOUND_ROUTE_REPAIR",
+    "enhanced_plan_hash": "5ca73f0716a780d0dd8c7000057a7a4abaf3fa5f55f9ea52382a92a5bcebfe4d",
+    "frozen_plan_exit_hash": "114a64c61a2db2ca09b62625d7be71768408a90a57c7283ceb01bce55c0ea44d",
+    "receipt_hash": "7cb99dadcc2471cbd60b9f71746bf2ff02b529cd59e14690f630bbfb25d82d1d",
+    "repair_target": "file:run.py",
+    "repair_semantics": "Unset CHECKOUT_COMPAT selects the documented current service; explicit legacy mode remains available.",
+    "native_repair_actions": 1,
+    "verification_checks": 1,
+    "planning_provider_calls": 0,
+    "subject_provider_calls": 60,
+    "termination": "turn_budget",
+    "history_length_after": 64,
+    "remaining_after": 0,
+    "enhanced_monitor_new_observations": 6293,
+    "full_role_counts": {
+      "frontend": 22,
+      "qa": 21,
+      "release_lead": 9,
+      "reviewer": 5,
+      "backend": 5,
+      "product": 2
+    },
+    "suffix_action_counts": {
+      "read_file": 137,
+      "list_files": 25,
+      "message": 19,
+      "delegate": 0,
+      "write_file": 2,
+      "run_tests": 6,
+      "finalize": 4
+    },
+    "subject_written_refs": [
+      "file:web/index.html",
+      "file:web/app.js"
+    ],
+    "repair_target_persisted": true,
+    "automatic_retry": false,
+    "rerun": false
+  },
+  "paired_effect": {
+    "overall_process_effect": "MIXED_EFFECT",
+    "mechanism_class": "LOCALITY_IMPROVED_TEMPORAL_AND_COORDINATION_INERTIA_PERSIST",
+    "repair_target_effect": "PRESERVED_INTENDED_ROUTE_CORRECTION",
+    "target_task_work_after_repair": "REGENERATED_ONCE",
+    "mutation_breadth_vs_local": "REDUCED",
+    "subject_write_count_change": {
+      "local": 5,
+      "enhanced": 2
+    },
+    "distinct_subject_written_ref_count_change": {
+      "local": 3,
+      "enhanced": 2
+    },
+    "backend_role_turns_change": {
+      "local": 13,
+      "enhanced": 5
+    },
+    "security_role_turns_change": {
+      "local": 3,
+      "enhanced": 0
+    },
+    "delegate_action_change": {
+      "local": 4,
+      "enhanced": 0
+    },
+    "qa_role_turns_change": {
+      "local": 15,
+      "enhanced": 21
+    },
+    "run_tests_change": {
+      "local": 3,
+      "enhanced": 6
+    },
+    "temporal_reach_change": "STABLE_AT_NATIVE_CEILING",
+    "route_relation": "DIVERGED",
+    "collaboration_scope_change": "MIXED_REDIRECTED",
+    "unrelated_structure_preservation": "PRESERVED_WITHIN_OBSERVED_NATIVE_BOUNDARY"
+  },
+  "source_bound_mechanism_observations": [
+    "Immediately after the route repair, the restored parent still contained pre-existing QA, reviewer and frontend obligations; the application repair did not erase or rewrite those host collaboration states.",
+    "The enhanced arm later wrote only web/index.html and web/app.js; it did not create the local arm's additional checkout_app/api.py path and did not enter the local arm's security/delegation expansion.",
+    "After the payment button was present, multiple frontend/backend responses stated that the feature already existed or required no further change, but release_lead continued to reopen review/testing work and the trajectory still reached turn 64.",
+    "The first contrast therefore separates improved intervention locality from process closure: narrower mutation and role expansion did not remove inherited temporal/collaboration inertia."
+  ],
+  "formal_boundaries": {
+    "endpoint_correctness_primary": false,
+    "autonomous_planner_evaluated": false,
+    "evidence_selection_gate_evaluated": false,
+    "cpr_dimensions_independently_relabelled": false,
+    "natural_A_rerun": false,
+    "local_control_rerun": false,
+    "enhanced_treatment_retry": false,
+    "repeat_run_probability_claim": false,
+    "universal_repair_success_claim": false
+  },
+  "next_gate": "FREEZE_FIRST_RESULT_THEN_SELECT_AT_MOST_ONE_MINIMAL_DISCRIMINATING_FOLLOWUP_TARGETING_LIVE_COORDINATION_OBLIGATIONS"
+}

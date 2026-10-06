@@ -109,8 +109,15 @@ def validate_agent_route_choice(
     visible = set(plan.get("visible_refs") or [])
     frozen_preserve = set(plan.get("preserve_refs") or [])
 
-    if not modify:
+    decision = agent_choice.get("decision", "REPAIR")
+    if decision not in {"REPAIR", "NO_REPAIR_NEEDED", "UNRESOLVED"}:
+        raise ValueError("invalid agent decision")
+    if decision == "REPAIR" and not modify:
         raise ValueError("agent route choice requires modify_refs")
+    if decision != "REPAIR" and modify:
+        raise ValueError("non-repair decision cannot modify refs")
+    if decision != "REPAIR" and not str(agent_choice.get("reason") or "").strip():
+        raise ValueError("non-repair decision requires reason")
     if not modify <= repairable:
         raise ValueError("agent attempted modification outside repairable route")
     if preserve != frozen_preserve:
@@ -123,6 +130,8 @@ def validate_agent_route_choice(
     row = {
         "schema": "RB-STAGE2-AGENT-ROUTE-CHOICE-v1",
         "plan_hash": plan["plan_hash"],
+        "decision": decision,
+        "reason": agent_choice.get("reason"),
         "modify_refs": sorted(modify),
         "preserve_refs": sorted(preserve),
         "verify_refs": sorted(verify),

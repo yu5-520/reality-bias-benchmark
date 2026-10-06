@@ -301,6 +301,7 @@ def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
 
 
 def main() -> None:
+    raise RuntimeError("P2 v1 replay withdrawn: incompatible native archive ingestion. Use run_stage2_p2_evidence_graph_replay_v2.py; historical reproduction requires commit 237cfa2516c57f8be3a78365e0089e8967e79830.")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()

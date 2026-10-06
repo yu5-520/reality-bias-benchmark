@@ -108,7 +108,7 @@ def adapt_relation_evidence(record: Mapping[str, Any]) -> dict[str, Any]:
     if semantic_use in {"ADOPTED_AS_PREMISE", "REJECTED_OR_ABANDONED"}:
         status = "SUPPORTED" if semantic_use == "ADOPTED_AS_PREMISE" else "REJECTED"
         basis = "SEMANTIC_REVIEW"
-    elif row.get("evidence_level") == "UNRESOLVED":
+    elif row.get("evidence_level", "UNRESOLVED") == "UNRESOLVED":
         status = "UNKNOWN"
         basis = "UNRESOLVED_RELATION_EVIDENCE"
     else:

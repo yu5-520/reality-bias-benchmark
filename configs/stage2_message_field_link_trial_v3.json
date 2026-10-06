@@ -1,0 +1,94 @@
+{
+  "schema": "stage2-message-field-link-trial-request-v3",
+  "trial_id": "G3-X4-T2-message-field-link-trial-v3",
+  "execute_single_trial": true,
+  "authorization": {
+    "instruction": "继续推进",
+    "scope": "One provider-bearing trial only. Preserve the prior v3 workflow preflight failure because its execute step was skipped and provider calls were zero; same frozen G3-X4-T2 prefix, no resampling, no paid reviewer."
+  },
+  "verified_implementation": {
+    "remote_commit": "3396ed97bffd705cd7635548328561c903a2513c",
+    "tree": "ab1e33601f17463856e1fae441b30d95afeaeb67",
+    "successful_ci_run": 37323090846
+  },
+  "prior_attempts": [
+    {
+      "run_id": 37205090807,
+      "head_sha": "96acfc60970109591f08213fd26a3ca2cc0ff23f",
+      "artifact_id": 11304078695,
+      "artifact_zip_sha256": "21ae77d77e7279f17082f26098d589021ab22bc3279deda81d39135388c4e4d3",
+      "failure": "EXACT_READ_ONLY_TOOL_MESSAGE_REQUIRED",
+      "provider_calls": 1
+    },
+    {
+      "run_id": 37210176711,
+      "head_sha": "77a98a567870391c8689c83882a16c8de8f6e0dd",
+      "artifact_id": 11305979052,
+      "artifact_zip_sha256": "86d1d4b47feecadeb5ccbd53befef21fb67b107c67bb6943ebf0af4f3a24eb00",
+      "failure": "NO_ACTION_SOURCE_NOT_INSPECTED",
+      "provider_calls": 2
+    },
+    {
+      "run_id": 37214544344,
+      "head_sha": "15d0d75acd69162458a6d80159508e884e27df36",
+      "artifact_id": 11307124579,
+      "artifact_zip_sha256": "2191cbc2774dc8e4c9d93582ad5e89f495b291a158caed0ad1356dc35c28d6a8",
+      "failure": "NO_ACTION_SOURCE_NOT_INSPECTED",
+      "provider_calls": 7
+    },
+    {
+      "run_id": 37231964981,
+      "head_sha": "c1b9b80a31c10e661cafb6bb1ba99b2f47eead24",
+      "artifact_id": 11314621407,
+      "artifact_zip_sha256": "d28b12bbbe3b8b56580cf78766674529f50bf47d5449333ee7148c6c6b600292",
+      "failure": "FILE_VERSION_OUTSIDE_VERIFIED_PREFIX",
+      "provider_calls": 2
+    },
+    {
+      "run_id": 37295828097,
+      "head_sha": "9a2d082119963dcdfba8ca4a3795d1dc28646857",
+      "artifact_id": 11338367847,
+      "artifact_zip_sha256": "5cc06d2db20850c03e2b3b03e761b0b22a981b19d2338d6760f36c605f6f8eb1",
+      "failure": "CURRENT_MESSAGE_WITNESS_REQUIRED",
+      "provider_calls": 5
+    },
+    {
+      "run_id": 37300920836,
+      "head_sha": "d28816be757fbb835e6f55a12d22465a79b2df06",
+      "artifact_id": 11342057023,
+      "artifact_zip_sha256": "e4890edc6e4af5b7c5cd7fc7ad02316722c167a1a458e259592f4e51507380d5",
+      "failure": "UNRELATED_MESSAGE_TEXT_DRIFT",
+      "provider_calls": 7
+    },
+    {
+      "run_id": 37314310759,
+      "head_sha": "f684bd034806648489a955c0b48a3ae2eb5c09bb",
+      "artifact_id": 11347431060,
+      "artifact_zip_sha256": "0dc0570338693b50a2e832bde4632c41aba4d91774e9e26825dcc721ab30357f",
+      "failure": "PROPOSAL_ACTION_BUDGET",
+      "provider_calls": 8
+    }
+  ],
+  "change_under_test": "Expose existing connected capability boundaries directly: application_actions may only target task_capabilities.writable_refs and must be [] when writable_refs is empty; with max_actions=1 pending-message repair uses host_message as the sole write action and verification depends on host_message.action_id. Diagnosis endpoint reads still require explicit selected witness IDs; no read-to-witness conversion.",
+  "frozen_files": {
+    "configs/stage2_connected_mechanism_v1.json": "413c1198fb83a134c6f65ac952a50ecedf4d278c481ebaaca96e78d2e631018d",
+    "configs/stage2_monitor_repair_active.json": "97ec73ac8b19a17df76c7e4a46c7a661db802ca37b1866282df68f6b3b470c4a"
+  },
+  "planning_max_calls": 16,
+  "subject_trial_max_calls": 49,
+  "native_ceiling": 64,
+  "automatic_replay": false,
+  "natural_reruns": false,
+  "automatic_paid_reviewer": false,
+  "application_writes_allowed": false,
+  "analysis_scope": "Same frozen non-blind retrospectively selected G3-X4-T2 process-account case. One first attempt only; full provider bytes and partial failures retained. Primary acceptance: no duplicate message application action; any SOURCE_BOUND_CLAIM must carry selected witnesses for both endpoint refs before host compilation.",
+  "zero_dispatch_workflow_failures": [
+    {
+      "run_id": 37323705618,
+      "head_sha": "1d5ce3bea8350c36f6f4d722958a44731f8af0e0",
+      "failure": "workflow typo: git archive requested stage2/replication_v3/G3/natural_A; provider execute step skipped",
+      "provider_calls": 0,
+      "execute_step": "skipped"
+    }
+  ]
+}
