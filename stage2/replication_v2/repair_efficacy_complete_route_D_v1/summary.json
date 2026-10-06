@@ -1,0 +1,112 @@
+{
+  "schema": "stage2-repair-efficacy-complete-route-D-result-v1",
+  "date_utc": "2026-10-06",
+  "status": "SEALED",
+  "full_id": "G3-X4-T2",
+  "source_parent": {
+    "history_length": 24,
+    "remaining_horizon": 40,
+    "native_ceiling": 64,
+    "state_sha256": "2fda940b857cfc5f2485cfa19a25137f32c07610349ff752daea34c950c0fef0"
+  },
+  "control_C": {
+    "workflow_run": 37353325159,
+    "artifact_id": 11363043669,
+    "method": "SOURCE_BOUND_PENDING_OBLIGATION_SUPERSESSION",
+    "overall_process_effect": "REGENERATION_AFTER_LOCAL_SUPPRESSION",
+    "continued_turns": 40,
+    "stop_reason": "turn_budget",
+    "post_parent_writes": 0,
+    "messages": 13,
+    "tests": 6,
+    "final_queue_length": 23,
+    "role_counts": {
+      "qa": 14,
+      "frontend": 12,
+      "backend": 5,
+      "release_lead": 4,
+      "product": 3,
+      "reviewer": 2
+    },
+    "rerun": false
+  },
+  "treatment_D": {
+    "workflow_run": 37406810362,
+    "head_sha": "cecea7a2fe49b4d1a9b03da3d213309b9fea2a8f",
+    "artifact_id": 11387743161,
+    "artifact_sha256": "322d0680c45b7fc29bfabc9d60418705d503e95f8dc63e9ab99a806b65165813",
+    "method": "COORDINATED_SUPPORTED_ROUTE_CUT",
+    "repair_exit_hash": "17c1cdb4253568bec4d7d6ac06dc13f7dd2a85a88d27f128ccf99c742290b4c4",
+    "result_summary_hash": "542610e728dd1853d818542f6e046d8f783a51219a4ca776566ea23b0fe48b85",
+    "required_actions_complete": true,
+    "message_supersessions": 4,
+    "initial_queue_before": 11,
+    "initial_queue_after": 5,
+    "current_completion_authority_roles": 5,
+    "planning_provider_calls": 0,
+    "subject_provider_calls": 40,
+    "continued_turns": 40,
+    "stop_reason": "turn_budget",
+    "post_parent_changed_files": [],
+    "final_queue_length": 18,
+    "graph_new_observations": 3885,
+    "role_counts": {
+      "qa": 9,
+      "frontend": 9,
+      "backend": 9,
+      "product": 4,
+      "release_lead": 7,
+      "reviewer": 2
+    },
+    "action_counts": {
+      "read_file": 86,
+      "list_files": 14,
+      "message": 17,
+      "run_tests": 5,
+      "finalize": 2,
+      "write_file": 0,
+      "delegate": 0
+    },
+    "automatic_retry": false
+  },
+  "paired_effect": {
+    "overall_process_effect": "PARTIAL_ROUTE_SUPPRESSION",
+    "route_relation": "DIVERGED",
+    "direct_implementation_obligation": "SUPPRESSED_OR_REDIRECTED",
+    "application_mutation": "NONE_IN_BOTH_C_AND_D_SUFFIXES",
+    "descendant_regeneration": "VERIFICATION_AND_REVIEW_OBLIGATIONS_REGENERATED",
+    "temporal_reach_change": "STABLE_AT_NATIVE_CEILING",
+    "queue_pressure_change": {
+      "C_final": 23,
+      "D_final": 18
+    },
+    "message_pressure_change": {
+      "C": 13,
+      "D": 17
+    },
+    "role_scope_change": "SIX_ROLES_RETAINED_WITH_REDISTRIBUTION",
+    "mechanism_class": "COORDINATED_CARRIER_CUT_SUPPRESSES_REIMPLEMENTATION_BUT_SOFT_CURRENT_AUTHORITY_DOES_NOT_PREVENT_REOPENED_REVIEW"
+  },
+  "source_bound_observations": [
+    "At D turn 26, frontend finalized that the current checkout page already satisfied the request and made no changes.",
+    "At D turn 31, release_lead nevertheless reopened four verification/review branches despite the current completion-authority notice, asking frontend, backend, QA and reviewer to re-check the already-present feature.",
+    "No subject write_file or delegate action occurred in the D suffix; the payment-button implementation obligation did not return as a new application mutation.",
+    "Later messages repeatedly asked whether anything was missing and expanded review/test questions; QA recommended additional coverage and the run still exhausted all 40 remaining calls.",
+    "Compared with C, D ended with a smaller pending queue (18 versus 23) but more messages (17 versus 13), showing redirection of pressure rather than whole-process closure."
+  ],
+  "interpretation": {
+    "complete_route_cut_effect": "The coordinated current-state cut changed the form of regeneration and suppressed reimplementation pressure, but it did not eliminate process inertia.",
+    "remaining_variable": "The current completion authority was model-visible text and initial state supersession, not a persistent execution-authority gate over future message/delegate/write actions.",
+    "next_scientific_question": "Does binding the same repaired route to a frozen post-repair capability envelope prevent unauthorized reopening while preserving read/test/finalize and unrelated progress?"
+  },
+  "formal_boundaries": {
+    "endpoint_correctness_primary": false,
+    "universal_success_rate": false,
+    "probability_estimate": false,
+    "hidden_reasoning_inferred": false,
+    "control_rerun": false,
+    "treatment_retry": false,
+    "application_files_mutated_by_intervention": false,
+    "private_system_referenced": false
+  }
+}

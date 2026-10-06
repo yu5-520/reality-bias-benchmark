@@ -1,7 +1,7 @@
 {
   "schema": "stage2-repair-efficacy-complete-route-v1",
   "date_utc": "2026-10-06",
-  "status": "FROZEN_BEFORE_SINGLE_D_EXECUTION",
+  "status": "D_CAPTURED_SOURCE_BOUND_COMPARISON_SEALED",
   "scientific_priority": "P0_TRUE_COORDINATED_COMPLETE_ROUTE_REPAIR",
   "question": "From the same G3-X4-T2 history-24 parent used by the carrier-class repair, does one coordinated repair over the supported regeneration route suppress descendant task-pressure regeneration while preserving healthy application state?",
   "source_treatment_B": {
@@ -113,5 +113,35 @@
       "scientific_attempt": false,
       "reason": "WORKFLOW_REGISTRATION_FAILED_BEFORE_ANY_JOB"
     }
-  ]
+  ],
+  "execution": {
+    "canonical_D_workflow_run": 37406810362,
+    "canonical_D_head_sha": "cecea7a2fe49b4d1a9b03da3d213309b9fea2a8f",
+    "canonical_D_artifact_id": 11387743161,
+    "canonical_D_artifact_sha256": "322d0680c45b7fc29bfabc9d60418705d503e95f8dc63e9ab99a806b65165813",
+    "provider_calls": 40,
+    "automatic_retry": false,
+    "control_reruns": 0,
+    "pre_execution_zero_job_run": 37406709650,
+    "pre_execution_zero_job_scientific_attempt": false
+  },
+  "result": {
+    "machine_summary": "stage2/replication_v2/repair_efficacy_complete_route_D_v1/summary.json",
+    "report": "docs/reports/2026-10-06_Repair_Efficacy_Complete_Route_D.md",
+    "overall_process_effect": "PARTIAL_ROUTE_SUPPRESSION",
+    "route_relation": "DIVERGED",
+    "direct_target_effect": "REIMPLEMENTATION_PRESSURE_SUPPRESSED_TO_VERIFICATION_REVIEW",
+    "descendant_effect": "VERIFICATION_REVIEW_REGENERATION",
+    "temporal_reach_change": "STABLE_AT_NATIVE_CEILING",
+    "application_mutation_change": "STABLE_NONE_AFTER_HISTORY_24",
+    "final_queue_change_vs_C": {
+      "C": 23,
+      "D": 18
+    },
+    "message_count_change_vs_C": {
+      "C": 13,
+      "D": 17
+    },
+    "next_gate": "HARD_POST_REPAIR_AUTHORITY_GATE_CONTRAST_ONLY_IF_EXECUTION_AUTHORITY_IS_THE_REMAINING_VARIABLE"
+  }
 }
