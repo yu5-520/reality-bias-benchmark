@@ -129,6 +129,11 @@ async def resume_bounded(branch,hook,c,frozen_first=None):
             require(messages==frozen_first['messages'],'F_RESUME_PROMPT_DRIFT')
             response={'content':frozen_first['content']}
             frozen_first['used']=True
+            # The frozen turn-25 response is part of this same logical provider sequence.
+            # Advance logical counters without a transport dispatch so the next live call is native turn 26.
+            require(branch.source.calls==0 and branch.source.provider_calls==0,'F_RESUME_PROVIDER_COUNTER_NOT_FRESH')
+            branch.source.calls=1
+            branch.source.valid_responses=1
         else:
             response=await host._complete(messages,role=role,turn=turn)
         logical_responses+=1
